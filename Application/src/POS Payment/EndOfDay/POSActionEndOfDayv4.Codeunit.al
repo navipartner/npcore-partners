@@ -16,15 +16,12 @@ codeunit 6014600 "NPR POS Action: EndOfDay V4" implements "NPR IPOS Workflow"
         OpenCashDrawerDescription: Label 'Auto-Open Payment Bin No. when counting starts.';
         PaymentBinCaption: Label 'Payment Bin No.';
         PaymentBinDescription: Label 'The bin to open before the counting starts.';
-        PopupOptionCaption: Label 'Suppress Parked Sales Dialog';
-        PopupOptionDescription: Label 'Specifies whether to suppress parked sales dialog';
     begin
         Workflow.AddJavascript(GetActionScript());
         Workflow.AddActionDescription(ActionDescription);
         Workflow.AddOptionParameter('Type', TypeOptions, TypeDefaultOption, TypeCaption, TypeOptionDescription, TypeOptionCaptions);
         Workflow.AddBooleanParameter('Auto-Open Cash Drawer', false, OpenCashDrawerCaption, OpenCashDrawerDescription);
         Workflow.AddTextParameter('Cash Drawer No.', '', PaymentBinCaption, PaymentBinDescription);
-        Workflow.AddBooleanParameter('SuppressParkedSalesDialog', false, PopupOptionCaption, PopupOptionDescription);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup")
@@ -35,19 +32,16 @@ codeunit 6014600 "NPR POS Action: EndOfDay V4" implements "NPR IPOS Workflow"
         SalePOS: Record "NPR POS Sale";
         CashDrawerNo: Code[10];
         EntryNo: Integer;
-        HidePopup: Boolean;
     begin
 
         EndOfDayType := Context.GetIntegerParameter('Type');
         CashDrawerNo := CopyStr(Context.GetStringParameter('Cash Drawer No.'), 1, MaxStrLen(CashDrawerNo));
-        if not Context.GetBooleanParameter('SuppressParkedSalesDialog', HidePopup) then
-            HidePopup := false;
 
         Sale.GetCurrentSale(SalePOS);
 
         case Step of
             'ValidateRequirements':
-                EndOfDayWorker.ValidateRequirements(Setup.GetPOSUnitNo(), SalePOS."Sales Ticket No.", HidePopup);
+                EndOfDayWorker.ValidateRequirements(Setup.GetPOSUnitNo(), SalePOS."Sales Ticket No.");
             'DiscoverEftIntegrationsForEndOfDay':
                 FrontEnd.WorkflowResponse(EndOfDayWorker.DiscoverEftIntegrationsForEndOfDay(EndOfDayType));
             'OpenCashDrawer':
