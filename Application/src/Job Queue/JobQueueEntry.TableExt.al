@@ -19,5 +19,10 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
             DataClassification = CustomerContent;
             MinValue = 0;
         }
+        field(6014403; "NPR Manually Set On Hold"; Boolean)
+        {
+            Caption = 'Manually Set On Hold';
+            DataClassification = CustomerContent;
+        }
     }
 }

@@ -103,6 +103,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold')) then begin
+            SetManuallySetOnHold();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -412,6 +417,14 @@
                     JobQueueEntry.Modify();
                 end;
             until JobQueueEntry.Next() = 0;
+    end;
+
+    local procedure SetManuallySetOnHold()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"On Hold");
+        JobQueueEntry.ModifyAll("NPR Manually Set On Hold", true);
     end;
 
     local procedure AssignJoqCategoryToTMRetentionJQ()
