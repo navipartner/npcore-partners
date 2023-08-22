@@ -39,6 +39,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Item Group"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Magento Passwords"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
@@ -220,6 +221,8 @@
                 case UpgradeStep of
                     '':
                         exit('NPR-RetenPolTables-20221020');
+                    'POSPostingLog':
+                        exit('NPR-RetenPolTables-POSPostingLog-20230822');
                     'POSLayoutArchive':
                         exit('NPR-RetenPolTables-POSLayoutArchive-20221207');
                     'POSSavedSales':
