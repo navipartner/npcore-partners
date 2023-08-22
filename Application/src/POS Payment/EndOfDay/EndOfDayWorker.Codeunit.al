@@ -5,7 +5,7 @@ codeunit 6059860 "NPR End Of Day Worker"
     var
         EndOfDayOptions: Option "X-Report","Z-Report",CloseWorkShift;
 
-    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]; HidePopup: Boolean): Boolean
+    procedure ValidateRequirements(POSUnitCode: Code[10]; SalesTicketNo: Code[20]): Boolean
     var
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
@@ -21,7 +21,7 @@ codeunit 6059860 "NPR End Of Day Worker"
         if (LineExists(SalePOS)) then
             Error(SaleMustBeEmpty);
 
-        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS, HidePopup) then
+        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');
 
         exit(true);
