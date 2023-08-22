@@ -15,8 +15,6 @@ let main = async ({ workflow, runtime, context }) => {
         return ({ "success": synchronousSuccess, "tryEndSale": request.tryEndSale })
     }
 
-    runtime.suspendTimeout(); //Avoid self-service timeout
-
     // invoke the specific workflow that handles the integration
     debugger;
     const { success, tryEndSale } = await workflow.run(workflowName, { context: { request: integrationRequest } });
