@@ -55,6 +55,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetAutoRescedulePOSPostGL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
@@ -258,6 +259,8 @@
                         exit('SetAutoRescedulePOSPostGL-20230131');
                     'SetEndingTimeForPOSPostGLJQ':
                         exit('SetEndingTimeForPOSPostGLJQ-20230809');
+                    'SetManuallySetOnHold':
+                        exit('SetManuallySetOnHold-20230818')
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
