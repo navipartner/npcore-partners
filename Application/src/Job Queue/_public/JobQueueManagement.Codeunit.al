@@ -355,7 +355,7 @@
         if not TaskScheduler.CanCreateTask() then
             exit;
 
-        if JobQueueEntry.Status = JobQueueEntry.Status::"In Process" then
+        if (JobQueueEntry.Status = JobQueueEntry.Status::"In Process") or JobQueueEntry."NPR Manually Set On Hold" then
             exit;
 
         HasStartDT := (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and (JobQueueEntry."Earliest Start Date/Time" <= NotBeforeDateTime);
@@ -732,6 +732,34 @@
             JobQueueRefreshSetup.Init();
             JobQueueRefreshSetup.Insert();
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Job Queue Entries", 'OnAfterActionEvent', 'Suspend', false, false)]
+    local procedure HandleOnAfterSuspendOnJobQueueEntries(var Rec: Record "Job Queue Entry")
+    begin
+        SetManuallySetOnHold(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Job Queue Entry Card", 'OnAfterActionEvent', 'Set On Hold', false, false)]
+    local procedure HandleOnAfterSetOnHoldOnJobQueueEntryCard(var Rec: Record "Job Queue Entry")
+    begin
+        SetManuallySetOnHold(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeSetStatusValue', '', false, false)]
+#if not (BC17 or BC18 or BC19 or BC20)
+    local procedure HandleOnBeforeSetStatusValue(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var NewStatus: Option; var IsHandled: Boolean)
+#else
+    local procedure HandleOnBeforeSetStatusValue(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var NewStatus: Option)
+#endif
+    begin
+        JobQueueEntry."NPR Manually Set On Hold" := false;
+    end;
+
+    local procedure SetManuallySetOnHold(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        JobQueueEntry."NPR Manually Set On Hold" := true;
+        JobQueueEntry.Modify();
     end;
 
     [IntegrationEvent(false, false)]
