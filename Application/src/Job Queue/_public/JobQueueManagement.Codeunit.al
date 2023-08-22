@@ -558,12 +558,22 @@
     var
         ActiveSession: Record "Active Session";
         ErrorMessage: Record "Error Message";
+        NprEnvironment: Record "NPR Environment Information";
+        EnvTypeOrdinalValue, EnvTypeIndex : Integer;
+        EnvTypeName: Text;
         TypeHelper: Codeunit "Type Helper";
         CustomDimensions: Dictionary of [Text, Text];
         ErrorMessageText: Text;
     begin
         if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
             Clear(ActiveSession);
+
+        if (not (NprEnvironment.Get())) then
+            NprEnvironment.Init();
+
+        EnvTypeOrdinalValue := NprEnvironment."Environment Type".AsInteger();
+        EnvTypeIndex := NprEnvironment."Environment Type".Ordinals.IndexOf(EnvTypeOrdinalValue);
+        EnvTypeName := NprEnvironment."Environment Type".Names.Get(EnvTypeIndex);
 
         JobQueueLogEntry.CalcFields("Object Caption to Run");
         ErrorMessage.SetRange("Register ID", JobQueueLogEntry."Error Message Register Id");
@@ -584,6 +594,7 @@
         CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
         CustomDimensions.Add('NPR_TenantId', Database.TenantId());
         CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_EnvironmentType', EnvTypeName);
         CustomDimensions.Add('NPR_UserID', UserId);
         CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
 
