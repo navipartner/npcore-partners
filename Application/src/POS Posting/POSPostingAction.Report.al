@@ -22,7 +22,7 @@ report 6014438 "NPR POS Posting Action"
                     }
                     field("Finance Posting"; FinancePosting)
                     {
-                        Caption = 'Finance Post';
+                        Caption = 'General Ledger Post';
                         ToolTip = 'If checked system will try to post entries in G/L Entry, etc...';
                         ApplicationArea = NPRRetail;
                     }
