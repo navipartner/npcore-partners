@@ -72,16 +72,8 @@ codeunit 6184474 "NPR POS Action: EFT Trx" implements "NPR POS IPaymentWFHandler
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTTrx.js###
-'let main=async({workflow:s,runtime:t,context:n})=>{const e=await s.respond("PrepareEftRequest",{context:{suggestedAmount:n.suggestedAmount}}),{workflowName:u,integrationRequest:r,legacy:c,synchronousRequest:a,synchronousSuccess:o}=e;debugger;if(c)return{success:!0,legacy:!0};if(a)return{success:o,tryEndSale:e.tryEndSale};t.suspendTimeout();debugger;const{success:d,tryEndSale:g}=await s.run(u,{context:{request:r}});return{success:d,tryEndSale:e.tryEndSale&&g}};'
+'let main=async({workflow:t,runtime:d,context:s})=>{const e=await t.respond("PrepareEftRequest",{context:{suggestedAmount:s.suggestedAmount}}),{workflowName:n,integrationRequest:r,legacy:u,synchronousRequest:c,synchronousSuccess:a}=e;debugger;if(u)return{success:!0,legacy:!0};if(c)return{success:a,tryEndSale:e.tryEndSale};debugger;const{success:o,tryEndSale:g}=await t.run(n,{context:{request:r}});return{success:o,tryEndSale:e.tryEndSale&&g}};'
         );
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR SS Action: Payment", 'OnGetPaymentHandler', '', false, false)]
-    local procedure OnGetPaymentHandlerSelfService(POSPaymentMethod: Record "NPR POS Payment Method"; var PaymentHandler: Text; var ForceAmount: Decimal)
-    begin
-        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
-            exit;
-        PaymentHandler := GetPaymentHandler();
     end;
 
     #region POS data driver extension

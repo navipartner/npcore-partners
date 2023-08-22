@@ -36,11 +36,34 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 #if not CLOUD
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
+    var
+        EFTSetup: Record "NPR EFT Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+        IsUnattended: Boolean;
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Adyen Cloud Integ.";
+
+        // TODO: remove below hack once adyen full POS is also in v3, instead of just selfservice
+        POSSession.GetSetup(POSSetup);
+        EFTSetup.SetRange("EFT Integration Type", IntegrationType());
+        EFTSetup.SetRange("POS Unit No.", POSSetup.GetPOSUnitNo());
+        if EFTSetup.FindFirst() then begin
+            IsUnattended := GetUnattended(EFTSetup);
+        end else begin
+            EFTSetup.SetRange("POS Unit No.", '');
+            if EFTSetup.FindFirst() then begin
+                IsUnattended := GetUnattended(EFTSetup);
+            end
+        end;
+
+        if IsUnattended then begin
+            tmpEFTIntegrationType."Version 2" := true;
+        end;
+
         tmpEFTIntegrationType.Insert();
     end;
 
