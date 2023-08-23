@@ -25,11 +25,11 @@
         Text107: Label 'Item No. should be specified in the worksheet line.';
         Text108: Label 'No. Series should be set up when creating items.';
         Text111: Label 'Please specify the Vendor No. for the purchase price registration on line %1.';
-        Text118: Label 'The Purchase Price Currency Code does not match the Local Currency on line %1. Please set up purchase prices on Item+Variant level on the Item Worksheet Template.';
+        Text118: Label 'The Purchase Price Currency Code does not match the Local Currency on line %1. Please set up purchase prices on Price List level on the Item Worksheet Template.';
         Text116: Label 'There are multiple Variety lines in the worksheet line with Internal Barcode %1.';
         Text114: Label 'There are multiple Variety lines in the worksheet line with the combination of Varieties: %1: %2, %3: %4, %5: %6, %7: %8.';
         Text115: Label 'There are multiple Variety lines in the worksheet line with Vendors Barcode %1.';
-        Text110: Label 'The Sales Price Currency Code does not match the Local Currency on line %1. Please set up sales prices on Item+Variant level on the Item Worksheet Template.';
+        Text110: Label 'The Sales Price Currency Code does not match the Local Currency on line %1. Please set up sales prices on Price List level on the Item Worksheet Template.';
         Text121: Label 'Variety %1: %2 not specified.';
         Text124: Label 'Variety %1 does not match setup on item %1. Variety cannot be updated from the worksheet.';
         Text122: Label 'Variety %2 specifed but not defined in Variety %1. ';
@@ -336,7 +336,7 @@
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        if ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::Item then begin
+        if ItemWorksheetTemplate."Sales Price Handl." = ItemWorksheetTemplate."Sales Price Handl."::Item then begin
             if ItemWkshtLine."Sales Price Currency Code" <> '' then begin
                 GLSetup.Get();
                 if GLSetup."LCY Code" <> ItemWkshtLine."Currency Code" then begin
@@ -350,7 +350,7 @@
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::Item then begin
+        if ItemWorksheetTemplate."Purchase Price Handl." = ItemWorksheetTemplate."Purchase Price Handl."::Item then begin
             if (ItemWkshtLine."Purchase Price Currency Code" <> '') and (ItemWkshtLine."Direct Unit Cost" <> 0) then begin
                 GLSetup.Get();
                 if GLSetup."LCY Code" <> ItemWkshtLine."Purchase Price Currency Code" then begin
@@ -358,7 +358,7 @@
                 end;
             end;
         end;
-        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant" then begin
+        if ItemWorksheetTemplate."Purchase Price Handl." = ItemWorksheetTemplate."Purchase Price Handl."::PriceList then begin
             if ItemWkshtLine."Vendor No." = '' then begin
                 if ItemWkshtLine."Direct Unit Cost" <> 0 then begin
                     ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);

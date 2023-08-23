@@ -2704,24 +2704,28 @@
         ItemWorksheetVar.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVar.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVar.SetRange("Worksheet Line No.", "Line No.");
-        ItemWorksheetVar.DeleteAll();
+        if not ItemWorksheetVar.IsEmpty() then
+            ItemWorksheetVar.DeleteAll();
 
         ItemWorksheetVrtValue.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetVrtValue.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetVrtValue.SetRange("Worksheet Line No.", "Line No.");
-        ItemWorksheetVrtValue.DeleteAll();
+        if not ItemWorksheetVrtValue.IsEmpty() then
+            ItemWorksheetVrtValue.DeleteAll();
 
         NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK", "MDR Line PK", "MDR Option PK");
         NPRAttributeKey.SetRange("Table ID", Database::"NPR Item Worksheet Line");
         NPRAttributeKey.SetRange("MDR Code PK", "Worksheet Template Name");
         NPRAttributeKey.SetRange("MDR Code 2 PK", "Worksheet Name");
         NPRAttributeKey.SetRange("MDR Line PK", "Line No.");
-        NPRAttributeKey.DeleteAll();
+        if not NPRAttributeKey.IsEmpty() then
+            NPRAttributeKey.DeleteAll();
 
         ItemWorksheetFieldChange.SetRange("Worksheet Template Name", "Worksheet Template Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Name", "Worksheet Name");
         ItemWorksheetFieldChange.SetRange("Worksheet Line No.", "Line No.");
-        ItemWorksheetFieldChange.DeleteAll();
+        if not ItemWorksheetFieldChange.IsEmpty() then
+            ItemWorksheetFieldChange.DeleteAll();
     end;
 
     local procedure SetUseVariant()
