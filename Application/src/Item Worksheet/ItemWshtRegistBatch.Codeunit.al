@@ -87,6 +87,7 @@
 
     local procedure RegisterLines()
     var
+        ItemWorksheetLine: Record "NPR Item Worksheet Line";
         LineCount: Integer;
     begin
         LineCount := 0;
@@ -95,7 +96,8 @@
             LineCount := LineCount + 1;
             Window.Update(3, LineCount);
             Window.Update(4, Round(LineCount / NoOfRecords * 10000, 1));
-            CODEUNIT.Run(CODEUNIT::"NPR Item Wsht.Register Line", ItemWkshLine);
+            ItemWorksheetLine := ItemWkshLine;
+            Codeunit.Run(Codeunit::"NPR Item Wsht.Register Line", ItemWorksheetLine);
         until ItemWkshLine.Next() = 0;
     end;
 
