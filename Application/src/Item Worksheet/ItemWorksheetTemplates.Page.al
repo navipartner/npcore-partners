@@ -67,12 +67,12 @@
                     ToolTip = 'Specifies if vendor barcodes should be created or not. If yes, the manner in which they are created also needs to be specified.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Sales Price Handling"; Rec."Sales Price Handling")
+                field("Sales Price Handling"; Rec."Sales Price Handl.")
                 {
                     ToolTip = 'Specifies how the sales prices are going to be handled';
                     ApplicationArea = NPRRetail;
                 }
-                field("Purchase Price Handling"; Rec."Purchase Price Handling")
+                field("Purchase Price Handling"; Rec."Purchase Price Handl.")
                 {
                     ToolTip = 'Specifies how the purchase prices are going to be handled';
                     ApplicationArea = NPRRetail;

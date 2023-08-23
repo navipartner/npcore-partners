@@ -85,14 +85,6 @@
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-    end;
-
     trigger OnInsert()
     begin
         AssignSortOrder();
