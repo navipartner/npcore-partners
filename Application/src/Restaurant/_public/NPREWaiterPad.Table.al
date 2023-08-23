@@ -258,4 +258,20 @@
             exit;
         WaiterPadManagement.TryCloseWaiterPad(Rec, true, "NPR NPRE W/Pad Closing Reason"::"Manually Closed");
     end;
+
+    internal procedure RGBColorCodeHex(IncludeHashMark: Boolean): Text
+    var
+        ColorTable: Record "NPR NPRE Color Table";
+        FlowStatus: Record "NPR NPRE Flow Status";
+        CurrentColorPriority: Integer;
+        HasBeenAssigned: Boolean;
+    begin
+        HasBeenAssigned := false;
+        if FlowStatus.get("Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow) then
+            FlowStatus.GetColorTable(CurrentColorPriority, HasBeenAssigned, ColorTable);
+        if FlowStatus.get(Status, FlowStatus."Status Object"::WaiterPad) then
+            FlowStatus.GetColorTable(CurrentColorPriority, HasBeenAssigned, ColorTable);
+
+        exit(ColorTable.RGBHexCode(IncludeHashMark));
+    end;
 }
