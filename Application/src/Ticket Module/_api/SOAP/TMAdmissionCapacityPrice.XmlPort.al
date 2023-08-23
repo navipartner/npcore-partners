@@ -128,6 +128,7 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                     {
                         XmlName = 'admission_schedule_entry';
                         UseTemporary = true;
+                        MinOccurs = Zero;
 
                         fieldattribute(external_entry_no; TmpAdmScheduleEntryResponse."External Schedule Entry No.")
                         {
