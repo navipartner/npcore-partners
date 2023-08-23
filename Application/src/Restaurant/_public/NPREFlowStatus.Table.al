@@ -170,4 +170,16 @@
         if FlowStatus2.Find() then
             Error(SameAlreadyExistsTxt, FlowStatus2."Status Object", FlowStatus."Status Object");
     end;
+
+    internal procedure GetColorTable(var CurrentColorPriority: Integer; var HasBeenAssigned: Boolean; var ColorTable: Record "NPR NPRE Color Table")
+    begin
+        if not "Available in Front-End" then
+            exit;
+        if (CurrentColorPriority >= "Status Color Priority") and HasBeenAssigned then
+            exit;
+        CurrentColorPriority := "Status Color Priority";
+        HasBeenAssigned := true;
+        if not ColorTable.Get(Color) then
+            Clear(ColorTable);
+    end;
 }

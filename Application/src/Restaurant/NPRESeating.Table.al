@@ -262,7 +262,7 @@
     begin
         HasBeenAssigned := false;
         if FlowStatus.get(Status, FlowStatus."Status Object"::Seating) then
-            GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
+            FlowStatus.GetColorTable(CurrentColorPriority, HasBeenAssigned, ColorTable);
 
         SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange("Seating Code", Code);
@@ -271,25 +271,13 @@
             repeat
                 if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then begin
                     if FlowStatus.Get(WaiterPad."Serving Step Code", FlowStatus."Status Object"::WaiterPadLineMealFlow) then
-                        GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
+                        FlowStatus.GetColorTable(CurrentColorPriority, HasBeenAssigned, ColorTable);
                     if FlowStatus.Get(WaiterPad.Status, FlowStatus."Status Object"::WaiterPad) then
-                        GetGolorTable(FlowStatus, CurrentColorPriority, HasBeenAssigned, ColorTable);
+                        FlowStatus.GetColorTable(CurrentColorPriority, HasBeenAssigned, ColorTable);
                 end;
             until SeatingWaiterPadLink.Next() = 0;
 
         exit(ColorTable.RGBHexCode(IncludeHashMark));
-    end;
-
-    local procedure GetGolorTable(FlowStatus: Record "NPR NPRE Flow Status"; var CurrentColorPriority: Integer; var HasBeenAssigned: Boolean; var ColorTable: Record "NPR NPRE Color Table")
-    begin
-        if not FlowStatus."Available in Front-End" then
-            exit;
-        if (CurrentColorPriority >= FlowStatus."Status Color Priority") and HasBeenAssigned then
-            exit;
-        CurrentColorPriority := FlowStatus."Status Color Priority";
-        HasBeenAssigned := true;
-        if not ColorTable.Get(FlowStatus.Color) then
-            Clear(ColorTable);
     end;
 
     local procedure UpdateSeatingNo()

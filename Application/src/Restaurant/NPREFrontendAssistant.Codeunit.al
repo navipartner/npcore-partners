@@ -220,7 +220,7 @@
                                     WaiterPadContent.Add('caption', WaiterPad."No.");
                                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                                WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
+                                WaiterPadContent.Add('servingStepColor', WaiterPad.RGBColorCodeHex(false));
                                 WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
                                 WaiterPadList.Add(WaiterPadContent);
                             until SeatingWaiterPadLink.Next() = 0;
@@ -417,7 +417,7 @@
                     WaiterPadContent.Add('caption', WaiterPad."No.");
                 WaiterPadContent.Add('statusId', WaiterPad.Status);
                 WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                WaiterPadContent.Add('servingStepColor', GetFlowStatusRgbColorHex(WaiterPad."Serving Step Code", 2));
+                WaiterPadContent.Add('servingStepColor', WaiterPad.RGBColorCodeHex(false));
                 WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
 
                 // links to tables
@@ -494,7 +494,7 @@
                 if Seating.FindSet() then
                     repeat
                         if not SeatingStatus.Contains(Seating.Code) then
-                            SeatingStatus.Add(Seating.Code, Seating.Status);
+                            SeatingStatus.Add(Seating.Code, StatusAndColor(Seating.Status, Seating.RGBColorCodeHex(false)));
 
                         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
                         SeatingWaiterPadLink.SetRange(Closed, false);
@@ -502,7 +502,7 @@
                             repeat
                                 if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") and not WaiterPad.Closed then
                                     if not WaiterPadStatus.Contains(WaiterPad."No.") then
-                                        WaiterPadStatus.Add(WaiterPad."No.", WaiterPad.Status);
+                                        WaiterPadStatus.Add(WaiterPad."No.", StatusAndColor(WaiterPad.Status, WaiterPad.RGBColorCodeHex(false)));
                             until SeatingWaiterPadLink.Next() = 0;
                     until Seating.Next() = 0;
             until SeatingLocation.Next() = 0;
@@ -511,6 +511,15 @@
         Request.GetContent().Add('waiterPad', WaiterPadStatus);
 
         FrontEnd.InvokeFrontEndMethod2(Request);
+    end;
+
+    local procedure StatusAndColor(StatusCode: Code[10]; RGBColorCodeHex: Text): JsonObject
+    var
+        SeatingProperties: JsonObject;
+    begin
+        SeatingProperties.Add('status', StatusCode);
+        SeatingProperties.Add('color', RGBColorCodeHex);
+        exit(SeatingProperties);
     end;
 
     internal procedure SetRestaurant(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
@@ -551,18 +560,6 @@
                 StatusObjectContent.Add('icon', NPREFlowStatus."Icon Class");
                 StatusObjectList.Add(StatusObjectContent);
             until NPREFlowStatus.Next() = 0;
-    end;
-
-    local procedure GetFlowStatusRgbColorHex(StatusCode: Code[10]; StatusObject: Integer): Text
-    var
-        ColorTable: Record "NPR NPRE Color Table";
-        FlowStatus: Record "NPR NPRE Flow Status";
-    begin
-        if not FlowStatus.get(StatusCode, StatusObject) then
-            exit('');
-        if not ColorTable.get(FlowStatus.Color) then
-            ColorTable.Init();
-        exit(ColorTable.RGBHexCode(false));
     end;
 
     local procedure RefreshKitchenOrders(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
