@@ -117,6 +117,7 @@
     var
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "NPR POS UI Management";
+        UsesLegacyPOSMenus: Boolean;
     begin
         // This method is intended to be called only from the POS page during the initialization stage of the page.
         // Do not call this method from elsewhere!
@@ -127,13 +128,15 @@
         _Setup.GetSalespersonRecord(Salesperson);
         DebugWithTimestamp('GetPOSUnit');
         _Setup.GetPOSUnit(_POSUnit);
+        UsesLegacyPOSMenus := not _Setup.UsesNewPOSFrontEnd();
+        EmitPOSLayoutUsageTelemetry(_POSUnit, UsesLegacyPOSMenus);
         DebugWithTimestamp('UI.Initialize');
         UI.Initialize(_FrontEnd);
         DebugWithTimestamp('UI.SetOptions');
         UI.SetOptions(_Setup);
         DebugWithTimestamp('UI.InitializeCaptions');
         UI.InitializeCaptions();
-        if not _Setup.UsesNewPOSFrontEnd() then begin
+        if UsesLegacyPOSMenus then begin
             DebugWithTimestamp('UI.InitializeLogo');
             UI.InitializeLogo(_POSUnit);
             DebugWithTimestamp('UI.InitializeNumberAndDateFormat');
@@ -163,6 +166,7 @@
         Salesperson: Record "Salesperson/Purchaser";
         UI: Codeunit "NPR POS UI Management";
         PreviousRegisterNo: Code[10];
+        UsesLegacyPOSMenus: Boolean;
     begin
         PreviousRegisterNo := _POSUnit."No.";
         _Setup.GetPOSUnit(_POSUnit);
@@ -171,7 +175,12 @@
             _Setup.GetSalespersonRecord(Salesperson);
 
             UI.Initialize(_FrontEnd);
-            if not _Setup.UsesNewPOSFrontEnd() then begin
+
+            UsesLegacyPOSMenus := not _Setup.UsesNewPOSFrontEnd();
+            if (PreviousRegisterNo <> _POSUnit."No.") then
+                EmitPOSLayoutUsageTelemetry(_POSUnit, UsesLegacyPOSMenus);
+
+            if UsesLegacyPOSMenus then begin
                 UI.InitializeMenus(_POSUnit, Salesperson);
 
                 if (PreviousRegisterNo <> _POSUnit."No.") then
@@ -211,6 +220,37 @@
         _Sale.InitializeAtLogin(_POSUnit, _Setup);
     end;
 
+    local procedure EmitPOSLayoutUsageTelemetry(POSUnit: Record "NPR POS Unit"; UsesLegacyPOSMenus: Boolean)
+    var
+        ActiveSession: Record "Active Session";
+        LogDict: Dictionary of [Text, Text];
+        EventId: Text;
+        EventMsg: Text;
+        POSMenuEventIdTok: Label 'NPR_POSMenus', Locked = true;
+        POSMenuTok: Label 'POS Unit: using legacy menus. Company: %1, Tenant: %2, Instance: %3, Server: %4, POS Unit No.: %5';
+        POSLayoutEventIdTok: Label 'NPR_POSLayout', Locked = true;
+        POSLayoutTok: Label 'POS Unit: using POS layouts: Company: %1, Tenant: %2, Instance: %3, Server: %4, POS Unit No.: %5, POS Layout Code: %6';
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+        LogDict.Add('NPR_Server', ActiveSession."Server Computer Name");
+        LogDict.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        LogDict.Add('NPR_TenantId', Database.TenantId());
+        LogDict.Add('NPR_CompanyName', CompanyName());
+        LogDict.Add('NPR_UserID', ActiveSession."User ID");
+        LogDict.Add('NPR_POSUnitNo', POSUnit."No.");
+        if UsesLegacyPOSMenus then begin
+            EventId := POSMenuEventIdTok;
+            EventMsg := StrSubstNo(POSMenuTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", POSUnit."No.");
+        end else begin
+            LogDict.Add('NPR_POSLayoutCode', POSUnit."POS Layout Code");
+            EventId := POSLayoutEventIdTok;
+            EventMsg := StrSubstNo(POSLayoutTok, CompanyName(), Database.TenantId(), ActiveSession."Server Instance Name", ActiveSession."Server Computer Name", POSUnit."No.", POSUnit."POS Layout Code");
+        end;
+
+        Session.LogMessage(EventId, EventMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, LogDict);
+    end;
     //#endregion
 
     //#region  Workflows Session Storage
