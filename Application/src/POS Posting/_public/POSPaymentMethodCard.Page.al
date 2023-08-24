@@ -4,6 +4,10 @@
     UsageCategory = None;
     Caption = 'POS Payment Method Card';
     SourceTable = "NPR POS Payment Method";
+#IF NOT BC17
+    AboutTitle = 'POS Payment Method';
+    AboutText = 'The Point of Sale Payment Method Card allows you to configure and manage payment methods utilized within your POS system, facilitating seamless transactions and customer interactions.';
+#ENDIF
 
     layout
     {
@@ -12,6 +16,10 @@
             group(General)
             {
                 Caption = 'General';
+#IF NOT BC17
+                AboutTitle = 'General Information';
+                AboutText = 'This section is used to provide essential information about the payment method, including its name, description, and any relevant details that distinguish it from other payment methods.';
+#ENDIF
                 field("Code"; Rec.Code)
                 {
 
@@ -53,7 +61,10 @@
             group(Other)
             {
                 Caption = 'Other';
-
+#IF NOT BC17
+                AboutTitle = 'Other Section';
+                AboutText = 'Within the "Other" section, you can establish specific attributes for the payment method, such as whether counting is involved, the currency code associated with the method a fixed exchange rate if required, and the option to automatically conclude a sale after payment.';
+#ENDIF
                 field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
 
@@ -139,6 +150,10 @@
             group(Rounding)
             {
                 Caption = 'Rounding';
+#IF NOT BC17
+                AboutTitle = 'Rounding';
+                AboutText = 'In the "Rounding" section, you can define rules for rounding transaction amounts. This includes determining how amounts are rounded based on specified criteria, such as rounding to the nearest denomination or rounding up/down.';
+#ENDIF
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
 
@@ -169,6 +184,10 @@
             group(Options)
             {
                 Caption = 'Option';
+#IF NOT BC17
+                AboutTitle = 'Options';
+                AboutText = 'The "Option" section allows you to further customize the payment method''s behavior. You can set a minimum transaction amount, specify a maximum transaction limit, and indicate whether refunds are permitted using this payment method.';
+#ENDIF
                 field("Minimum Amount"; Rec."Minimum Amount")
                 {
 
