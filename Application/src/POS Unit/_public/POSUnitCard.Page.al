@@ -5,6 +5,10 @@
     ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_pos_unit/';
     RefreshOnActivate = true;
     SourceTable = "NPR POS Unit";
+#IF NOT BC17
+    AboutTitle = 'POS Unit';
+    AboutText = 'The Point of Sale Unit (POS Unit) is an essential component within the store. And a place where retail transaction is done in the store. A POS unit can be a physical Cash Register, or other devices such as Tablet or even a mobile phone where NPR has a lighter App. (Mpos) that can be installed on the latter. In the Card Page, all devices used for doing transactions will be defined as a POS Unit. ';
+#ENDIF
 
     layout
     {
@@ -13,6 +17,10 @@
             group(General)
             {
                 Caption = 'General';
+#IF NOT BC17
+                AboutTitle = 'General Information';
+                AboutText = 'Provide fundamental details about the Point of Sale Unit in this section. Include the unit''s name, identifier, location within the store, and any other pertinent information that distinguishes it from other units.';
+#ENDIF
                 field("No."; Rec."No.")
                 {
                     ToolTip = 'Specifies the number of the POS unit.';
@@ -59,6 +67,10 @@
             group(Profiles)
             {
                 Caption = 'Profiles';
+#IF NOT BC17
+                AboutTitle = 'Profiles';
+                AboutText = 'If the Point of Sale Unit is associated with distinct operational profiles, specify them here. For instance, if this unit serves as a dedicated counter for takeaway orders, link the appropriate Takeaway Profile. Additionally, select the specific Posting Profile to be used for transactions conducted through this unit. Each profile is dedicated to setting up different aspects of POS units.';
+#ENDIF
                 field("POS Audit Profile"; Rec."POS Audit Profile")
                 {
                     ShowMandatory = true;
