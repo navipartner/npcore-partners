@@ -450,14 +450,6 @@ page 6151245 "NPR Retail Setup RC"
             group(Miscellaneous)
             {
                 Caption = 'Miscellaneous';
-                action("Retail Cross References")
-                {
-                    Caption = 'POS Cross References';
-                    RunObject = Page "NPR POS Cross References";
-
-                    ToolTip = 'View or edit the POS Cross References';
-                    ApplicationArea = NPRRetail;
-                }
                 action("POS Info List")
                 {
                     Caption = 'POS Info List';
@@ -613,30 +605,12 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Period Discounts List';
                     ApplicationArea = NPRRetail;
                 }
-
-                action("Retail Campaigns")
-                {
-                    Caption = 'Retail Campaigns List';
-                    RunObject = page "NPR Retail Campaigns";
-
-                    ToolTip = 'View or edit the Retail Campaigns List';
-                    ApplicationArea = NPRRetail;
-                }
-
                 action("Discount Priority List")
                 {
                     Caption = 'Discount Priority List';
                     RunObject = page "NPR Discount Priority List";
 
                     ToolTip = 'View or edit the Discount Priority List';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Retail Replenisment Setup")
-                {
-                    Caption = 'Retail Replenisment Setup';
-                    RunObject = page "NPR Retail Replenish. SKU List";
-
-                    ToolTip = 'View or edit the Retail Replenisment Setup';
                     ApplicationArea = NPRRetail;
                 }
                 action("Item AddOns")
@@ -647,7 +621,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Item AddOns';
                     ApplicationArea = NPRRetail;
                 }
-
             }
 
 
