@@ -506,6 +506,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'Open the Global POS Sales Setups page';
                     ApplicationArea = NPRRetail;
                 }
+                action("NPR Environment Information")
+                {
+                    Caption = 'Environment Information';
+                    RunObject = page "NPR Environment Information";
+
+                    ToolTip = 'Open the Environment Information page';
+                    ApplicationArea = NPRRetail;
+                }
 
             }
 
