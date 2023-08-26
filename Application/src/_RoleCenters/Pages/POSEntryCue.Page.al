@@ -155,43 +155,6 @@
                     end;
                 }
             }
-            cuegroup("Active Discounts, Coupons & Vouchers")
-            {
-                Caption = 'Active Discounts, Coupons & Vouchers';
-                ShowCaption = true;
-
-                field(CampaignDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Campaign Discount List"))))
-                {
-                    ApplicationArea = NPRRetail;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
-                    AutoFormatType = 11;
-                    Caption = 'Campaign Discounts';
-                    ToolTip = 'Specifies the number of the Campaign Discounts. By clicking, you can drill down to the list of the Campaign Discounts.';
-
-                    trigger OnDrillDown()
-                    begin
-                        Page.RunModal(Page::"NPR Campaign Discount List");
-                        CurrPage.Update(false);
-                    end;
-                }
-                field(MixDiscounts; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Mix Discount List"))))
-                {
-                    ApplicationArea = NPRRetail;
-                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
-                    AutoFormatType = 11;
-                    Caption = 'Mix Discounts';
-                    ToolTip = 'Specifies the number of the Mix Discounts. By clicking, you can drill down to the list of the Mix Discounts.';
-
-                    trigger OnDrillDown()
-                    var
-                        MixedDiscount: Record "NPR Mixed Discount";
-                    begin
-                        MixedDiscount.SetRange("Mix Type", MixedDiscount."Mix Type"::Standard, MixedDiscount."Mix Type"::Combination);
-                        Page.RunModal(Page::"NPR Mixed Discount List", MixedDiscount);
-                        CurrPage.Update(false);
-                    end;
-                }
-            }
         }
     }
 
