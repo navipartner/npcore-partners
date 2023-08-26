@@ -890,12 +890,12 @@
             }
             group("Discount, Coupons & Vouchers")
             {
-                Action("Campaign Discount List")
+                Action("Period Discount List")
                 {
-                    Caption = 'Campaign Discount List';
+                    Caption = 'Period Discount List';
                     RunObject = Page "NPR Campaign Discount List";
 
-                    ToolTip = 'Displays the campaign discount list.';
+                    ToolTip = 'Displays the period discount list.';
                     ApplicationArea = NPRRetail;
                 }
 
