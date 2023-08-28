@@ -190,7 +190,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
     begin
         if Rec.IsTemporary then
             exit;
-        if (not (Rec."Line Type" in [Rec."Line Type"::"POS Payment", Rec."Line Type"::"GL Payment"])) then
+        if (not (Rec."Line Type" = Rec."Line Type"::"POS Payment")) then
             exit;
 
         Insert(Rec);
@@ -201,7 +201,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
     begin
         if Rec.IsTemporary then
             exit;
-        if (not (Rec."Line Type" in [Rec."Line Type"::"POS Payment", Rec."Line Type"::"GL Payment"])) then
+        if (not (Rec."Line Type" = Rec."Line Type"::"POS Payment")) then
             exit;
 
         Delete(Rec);
@@ -212,7 +212,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
     begin
         if Rec.IsTemporary then
             exit;
-        if (not (Rec."Line Type" in [Rec."Line Type"::"POS Payment", Rec."Line Type"::"GL Payment"])) then
+        if (not (Rec."Line Type" = Rec."Line Type"::"POS Payment")) then
             exit;
 
         Modify(Rec);
@@ -223,7 +223,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
     begin
         if Rec.IsTemporary then
             exit;
-        if (not (Rec."Line Type" in [Rec."Line Type"::"POS Payment", Rec."Line Type"::"GL Payment"])) then
+        if (not (Rec."Line Type" = Rec."Line Type"::"POS Payment")) then
             exit;
 
         Rename(Rec, xRec);
