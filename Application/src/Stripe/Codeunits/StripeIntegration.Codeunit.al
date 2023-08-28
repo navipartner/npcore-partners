@@ -55,6 +55,7 @@ codeunit 6059807 "NPR Stripe Integration"
     internal procedure ShouldStripeBeUsed(): Boolean
     var
         Company: Record Company;
+        NPREnvironmentInformation: Record "NPR Environment Information";
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         // Following line makes sure that Stripe is used only for app installed in production SaaS environment for companies which are not Cronus or evaluation. 
@@ -72,6 +73,10 @@ codeunit 6059807 "NPR Stripe Integration"
 
         if Company.Get(CompanyName()) then
             if Company."Evaluation Company" then
+                exit(false);
+
+        if NPREnvironmentInformation.Get() then
+            if (NPREnvironmentInformation."Environment Type" <> NPREnvironmentInformation."Environment Type"::PROD) or not NPREnvironmentInformation."Environment Verified" then
                 exit(false);
 
         exit(true);
