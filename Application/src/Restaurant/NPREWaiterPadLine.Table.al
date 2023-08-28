@@ -125,7 +125,6 @@
             IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
             IF ("Line Type" = CONST(Item)) Item."No.";
-            ValidateTableRelation = false;
         }
         field(52; Description; Text[100])
         {

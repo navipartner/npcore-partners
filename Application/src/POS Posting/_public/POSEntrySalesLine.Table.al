@@ -66,7 +66,6 @@
             IF (Type = CONST(Item)) Item
             ELSE
             IF (Type = CONST(Rounding)) "G/L Account";
-            ValidateTableRelation = false;
         }
         field(12; "Location Code"; Code[10])
         {

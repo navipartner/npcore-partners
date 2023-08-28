@@ -66,7 +66,6 @@
             IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
             IF ("Line Type" = CONST(Item)) Item."No.";
-            ValidateTableRelation = false;
 
             trigger OnValidate()
             begin

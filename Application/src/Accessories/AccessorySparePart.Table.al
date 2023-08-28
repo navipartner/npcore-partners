@@ -20,7 +20,6 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             TableRelation = Item;
-            ValidateTableRelation = false;
 
             trigger OnValidate()
             begin

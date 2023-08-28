@@ -68,7 +68,6 @@ table 6014694 "NPR POS Entry Sale & Payment"
             IF (Type = CONST(Item)) Item
             ELSE
             IF (Type = CONST(Rounding)) "G/L Account";
-            ValidateTableRelation = false;
         }
         field(14; Description; Text[100])
         {

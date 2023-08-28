@@ -33,7 +33,6 @@
             Caption = 'Item No.';
             DataClassification = CustomerContent;
             TableRelation = Item;
-            ValidateTableRelation = false;
         }
         field(7; "Vendor Item No."; Text[20])
         {
