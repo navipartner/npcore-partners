@@ -503,6 +503,7 @@
                 InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
             until (SaleLinePOS.Next() = 0);
 
+        Sale.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
         POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Sale);
 
         POSSale.RefreshCurrent();
