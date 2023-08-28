@@ -81,7 +81,6 @@
             Caption = 'Customer No.';
             DataClassification = CustomerContent;
             TableRelation = Customer."No.";
-            ValidateTableRelation = false;
 
             trigger OnValidate()
             var

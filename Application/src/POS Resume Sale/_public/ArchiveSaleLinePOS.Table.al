@@ -62,7 +62,6 @@
             IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
             IF ("Line Type" = CONST(Item)) Item."No.";
-            ValidateTableRelation = false;
         }
         field(7; "Location Code"; Code[10])
         {
@@ -257,6 +256,9 @@
             Editable = false;
             TableRelation = Customer;
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR25.0';
+            ObsoleteReason = 'Not used';
         }
         field(47; "Invoice Discount Amount"; Decimal)
         {

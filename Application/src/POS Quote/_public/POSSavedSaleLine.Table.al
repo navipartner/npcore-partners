@@ -48,7 +48,6 @@
             IF ("Line Type" = CONST("Customer Deposit")) Customer."No."
             ELSE
             IF ("Line Type" = CONST(Item)) Item."No.";
-            ValidateTableRelation = false;
         }
         field(20; "Variant Code"; Code[10])
         {
