@@ -1,27 +1,23 @@
-﻿codeunit 6150705 "NPR POS Sale"
+codeunit 6150705 "NPR POS Sale"
 {
     var
-        LastSalePOSEntry: Record "NPR POS Entry";
-        Rec: Record "NPR POS Sale";
-        POSUnit: Record "NPR POS Unit";
-        This: Codeunit "NPR POS Sale";
-        Setup: Codeunit "NPR POS Setup";
+        _LastSalePOSEntry: Record "NPR POS Entry";
+        _Rec: Record "NPR POS Sale";
+        _POSUnit: Record "NPR POS Unit";
+        _This: Codeunit "NPR POS Sale";
+        _Setup: Codeunit "NPR POS Setup";
         _FrontEnd: Codeunit "NPR POS Front End Management";
-        SaleLine: Codeunit "NPR POS Sale Line";
-        PaymentLine: Codeunit "NPR POS Payment Line";
-        OnRunType: Enum "NPR POS Sale OnRunType";
-        IsModified: Boolean;
-        Initialized: Boolean;
-        Ended: Boolean;
-        LastSaleRetrieved: Boolean;
-        SkipItemAvailabilityCheck: Boolean;
-        SetDimension01: Label 'Dimension %1 does not exist';
-        EndedSalesAmount: Decimal;
-        EndedPaidAmount: Decimal;
-        EndedChangeAmount: Decimal;
-        EndedRoundingAmount: Decimal;
-        Text000: Label 'During End Sale';
-        ERROR_AFTER_END_SALE: Label 'An error occurred after the sale ended: %1';
+        _SaleLine: Codeunit "NPR POS Sale Line";
+        _PaymentLine: Codeunit "NPR POS Payment Line";
+        _IsModified: Boolean;
+        _Initialized: Boolean;
+        _Ended: Boolean;
+        _LastSaleRetrieved: Boolean;
+        _SkipItemAvailabilityCheck: Boolean;
+        _EndedSalesAmount: Decimal;
+        _EndedPaidAmount: Decimal;
+        _EndedChangeAmount: Decimal;
+        _EndedRoundingAmount: Decimal;
         _LastSaleTotal: Decimal;
         _LastSalePayment: Decimal;
         _LastSaleDateText: Text;
@@ -30,64 +26,80 @@
 
     internal procedure InitializeAtLogin(POSUnitIn: Record "NPR POS Unit"; SetupIn: Codeunit "NPR POS Setup")
     begin
-        POSUnit := POSUnitIn;
-        Setup := SetupIn;
+        _POSUnit := POSUnitIn;
+        _Setup := SetupIn;
 
-        OnAfterInitializeAtLogin(POSUnit);
+        OnAfterInitializeAtLogin(_POSUnit);
     end;
 
     internal procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     begin
-        Initialized := true;
+        _Initialized := true;
 
         _FrontEnd := FrontEndIn;
-        POSUnit := POSUnitIn;
-        Setup := SetupIn;
-        This := ThisIn;
+        _POSUnit := POSUnitIn;
+        _Setup := SetupIn;
+        _This := ThisIn;
 
-        Clear(Rec);
-        Clear(LastSaleRetrieved);
+        Clear(_Rec);
+        Clear(_LastSaleRetrieved);
 
-        OnBeforeInitSale(Rec, _FrontEnd);
-        InitSale();
-        OnAfterInitSale(Rec, _FrontEnd);
+        OnBeforeInitSale(_Rec, _FrontEnd);
+        InsertSale();
+        InitGlobalState();
+        OnAfterInitSale(_Rec, _FrontEnd);
 
-        _FrontEnd.StartTransaction(Rec);
+        _FrontEnd.StartTransaction(_Rec);
     end;
 
-    local procedure InitSale()
+    internal procedure InitializeFromWebserviceSession(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale"; SalesTicketNo: Text)
+    begin
+        _Initialized := true;
+
+        _FrontEnd := FrontEndIn;
+        _POSUnit := POSUnitIn;
+        _Setup := SetupIn;
+        _This := ThisIn;
+
+        _Rec.Get(POSUnitIn."No.", SalesTicketNo);
+        InitGlobalState();
+    end;
+
+    local procedure InsertSale()
     var
     begin
-        Rec."Salesperson Code" := Setup.Salesperson();
-        Rec."Register No." := POSUnit."No.";
-        Rec."Sales Ticket No." := GetNextReceiptNo(Rec."Register No.");
-        Rec.Date := Today();
-        Rec."Start Time" := Time;
+        _Rec."Salesperson Code" := _Setup.Salesperson();
+        _Rec."Register No." := _POSUnit."No.";
+        _Rec."Sales Ticket No." := GetNextReceiptNo(_Rec."Register No.");
+        _Rec.Date := Today();
+        _Rec."Start Time" := Time;
 
         if WorkDate() <> Today() then begin
             WorkDate := Today();
         end;
 
-        Rec.Insert(true);
+        _Rec.Insert(true);
+        _Rec.Validate("Customer No.", '');
+        _Rec.Modify(true);
 
-        Rec.Validate("Customer No.", '');
-        Rec.Modify(true);
+        _IsModified := true;
+        _Ended := false;
+    end;
 
-        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
-        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
+    local procedure InitGlobalState()
+    begin
+        _SaleLine.Init(_Rec."Register No.", _Rec."Sales Ticket No.", _This, _Setup, _FrontEnd);
+        _PaymentLine.Init(_Rec."Register No.", _Rec."Sales Ticket No.", _This, _Setup, _FrontEnd);
 
-        Rec.FilterGroup := 2;
-        Rec.SetRange("Register No.", Rec."Register No.");
-        Rec.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-        Rec.FilterGroup := 0;
-
-        IsModified := true;
-        Ended := false;
+        _Rec.FilterGroup := 2;
+        _Rec.SetRange("Register No.", _Rec."Register No.");
+        _Rec.SetRange("Sales Ticket No.", _Rec."Sales Ticket No.");
+        _Rec.FilterGroup := 0;
     end;
 
     procedure IsInitialized(): Boolean
     begin
-        exit(Initialized);
+        exit(_Initialized);
     end;
 
     internal procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
@@ -112,8 +124,8 @@
 
     internal procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
-        SaleLineOut := SaleLine;
-        PaymentLineOut := PaymentLine;
+        SaleLineOut := _SaleLine;
+        PaymentLineOut := _PaymentLine;
     end;
 
     internal procedure ToDataset(var CurrDataSet: Codeunit "NPR Data Set"; DataSource: Codeunit "NPR Data Source"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -121,40 +133,40 @@
         TempRec: Record "NPR POS Sale" temporary;
         DataMgt: Codeunit "NPR POS Data Mgmt. Internal";
     begin
-        if not Initialized then begin
-            TempRec."Register No." := POSUnit."No.";
+        if not _Initialized then begin
+            TempRec."Register No." := _POSUnit."No.";
             TempRec.Insert();
             DataMgt.RecordToDataSet(TempRec, CurrDataSet, DataSource, POSSession, FrontEnd);
             exit;
         end;
 
-        DataMgt.RecordToDataSet(Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
+        DataMgt.RecordToDataSet(_Rec, CurrDataSet, DataSource, POSSession, FrontEnd);
     end;
 
     internal procedure SetPosition(Position: Text): Boolean
     begin
-        Rec.SetPosition(Position);
-        exit(Rec.Find());
+        _Rec.SetPosition(Position);
+        exit(_Rec.Find());
     end;
 
     internal procedure GetPosition(UseNames: Boolean): Text
     begin
-        exit(Rec.GetPosition(UseNames));
+        exit(_Rec.GetPosition(UseNames));
     end;
 
     procedure GetCurrentSale(var SalePOS: Record "NPR POS Sale")
     begin
-        SalePOS.Copy(Rec);
+        SalePOS.Copy(_Rec);
     end;
 
     internal procedure SetLastSalePOSEntry(POSEntryIn: Record "NPR POS Entry")
     begin
-        LastSalePOSEntry := POSEntryIn;
+        _LastSalePOSEntry := POSEntryIn;
     end;
 
     internal procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
     begin
-        POSEntryOut := LastSalePOSEntry;
+        POSEntryOut := _LastSalePOSEntry;
     end;
 
     internal procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
@@ -164,30 +176,30 @@
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         LastSaleDateLbl: Label '%1 | %2', Locked = true;
     begin
-        if not LastSaleRetrieved then begin
-            POSEntry := LastSalePOSEntry;
-            LastSaleRetrieved :=
+        if not _LastSaleRetrieved then begin
+            POSEntry := _LastSalePOSEntry;
+            _LastSaleRetrieved :=
                 (POSEntry."Entry No." <> 0) and POSEntry.IsSaleTransaction() and
-                ((Rec."Register No." = POSEntry."POS Unit No.") or ((Rec."Register No." = '') and (POSUnit."No." = POSEntry."POS Unit No.")));
-            if not LastSaleRetrieved and ((Rec."Register No." <> '') or (POSUnit."No." <> '')) then begin
+                ((_Rec."Register No." = POSEntry."POS Unit No.") or ((_Rec."Register No." = '') and (_POSUnit."No." = POSEntry."POS Unit No.")));
+            if not _LastSaleRetrieved and ((_Rec."Register No." <> '') or (_POSUnit."No." <> '')) then begin
                 POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
-                if Rec."Register No." <> '' then begin
-                    POSEntry.SetRange("POS Store Code", Rec."POS Store Code");
-                    POSEntry.SetRange("POS Unit No.", Rec."Register No.");
+                if _Rec."Register No." <> '' then begin
+                    POSEntry.SetRange("POS Store Code", _Rec."POS Store Code");
+                    POSEntry.SetRange("POS Unit No.", _Rec."Register No.");
                 end else begin
-                    POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
-                    POSEntry.SetRange("POS Unit No.", POSUnit."No.");
+                    POSEntry.SetRange("POS Store Code", _POSUnit."POS Store Code");
+                    POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
                 end;
                 POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-                LastSaleRetrieved := POSEntry.FindLast();
-                if LastSaleRetrieved then
+                _LastSaleRetrieved := POSEntry.FindLast();
+                if _LastSaleRetrieved then
                     SetLastSalePOSEntry(POSEntry);
             end;
 
             LastSaleTotalOut := 0;
             LastSalePaymentOut := 0;
             LastSaleReturnAmountOut := 0;
-            if LastSaleRetrieved then begin
+            if _LastSaleRetrieved then begin
                 LastReceiptNoOut := POSEntry."Fiscal No.";
                 LastSaleDateTextOut := StrSubstNo(LastSaleDateLbl, POSEntry."Entry Date", POSEntry."Ending Time");
 
@@ -228,24 +240,24 @@
     [Obsolete('Automatic in workflow v3', 'NPR23.0')]
     internal procedure GetModified() Result: Boolean
     begin
-        Result := IsModified or (not Initialized);
-        IsModified := false;
+        Result := _IsModified or (not _Initialized);
+        _IsModified := false;
     end;
 
     [Obsolete('Automatic in workflow v3', 'NPR23.0')]
     procedure SetModified()
     begin
-        IsModified := true;
+        _IsModified := true;
     end;
 
     internal procedure SetEnded(NewEnded: Boolean)
     begin
-        Ended := NewEnded;
+        _Ended := NewEnded;
     end;
 
     internal procedure PosSaleRecMustExit(): Boolean
     begin
-        exit((Rec."Sales Ticket No." <> '') and not Ended);
+        exit((_Rec."Sales Ticket No." <> '') and not _Ended);
     end;
 
     internal procedure GetTotals(var SalesAmountOut: Decimal; var PaidAmountOut: Decimal; var ChangeAmountOut: Decimal; var RoundingAmountOut: Decimal)
@@ -253,39 +265,39 @@
         ReturnAmount: Decimal;
         SubTotal: Decimal;
     begin
-        if Ended then begin
-            SalesAmountOut := EndedSalesAmount;
-            PaidAmountOut := EndedPaidAmount;
-            ChangeAmountOut := EndedChangeAmount;
-            RoundingAmountOut := EndedRoundingAmount;
+        if _Ended then begin
+            SalesAmountOut := _EndedSalesAmount;
+            PaidAmountOut := _EndedPaidAmount;
+            ChangeAmountOut := _EndedChangeAmount;
+            RoundingAmountOut := _EndedRoundingAmount;
         end else
-            PaymentLine.CalculateBalance(SalesAmountOut, PaidAmountOut, ReturnAmount, SubTotal); //ReturnAmount & SubTotal are legacy. Cannot calculate true return without knowing payment type that ended sale.
+            _PaymentLine.CalculateBalance(SalesAmountOut, PaidAmountOut, ReturnAmount, SubTotal); //ReturnAmount & SubTotal are legacy. Cannot calculate true return without knowing payment type that ended sale.
     end;
 
     procedure Modify(RunTriggers: Boolean; ReturnValue: Boolean) Result: Boolean
     begin
 
         if ReturnValue then begin
-            Result := Rec.Modify(RunTriggers);
+            Result := _Rec.Modify(RunTriggers);
             if Result then
-                IsModified := true;
+                _IsModified := true;
         end else begin
-            Rec.Modify(RunTriggers);
-            IsModified := true;
+            _Rec.Modify(RunTriggers);
+            _IsModified := true;
         end;
     end;
 
     procedure Refresh(var SalePOS: Record "NPR POS Sale")
     begin
-        Rec.Copy(SalePOS);
-        OnRefresh(Rec);
+        _Rec.Copy(SalePOS);
+        OnRefresh(_Rec);
     end;
 
     procedure RefreshCurrent()
     begin
-        if not Rec.Get(Rec."Register No.", Rec."Sales Ticket No.") then
-            ThrowNonExistentSaleErr(Rec);
-        OnRefresh(Rec);
+        if not _Rec.Get(_Rec."Register No.", _Rec."Sales Ticket No.") then
+            ThrowNonExistentSaleErr(_Rec);
+        OnRefresh(_Rec);
     end;
 
     local procedure ThrowNonExistentSaleErr(SalePOS: Record "NPR POS Sale")
@@ -302,13 +314,14 @@
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
         OldDimSetID: Integer;
+        SetDimension01: Label 'Dimension %1 does not exist';
     begin
         if DimCode = '' then
             exit;
         if (not Dim.Get(DimCode)) then
             Error(SetDimension01, DimCode);
 
-        DimMgt.GetDimensionSet(TempDimSetEntry, Rec."Dimension Set ID");
+        DimMgt.GetDimensionSet(TempDimSetEntry, _Rec."Dimension Set ID");
         if TempDimSetEntry.Get(TempDimSetEntry."Dimension Set ID", Dim.Code) then
             TempDimSetEntry.Delete();
         if DimValueCode <> '' then begin
@@ -317,25 +330,25 @@
             if TempDimSetEntry.Insert() then;
         end;
 
-        OldDimSetID := Rec."Dimension Set ID";
-        Rec."Dimension Set ID" := TempDimSetEntry.GetDimensionSetID(TempDimSetEntry);
-        DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
-        Rec.Modify();
+        OldDimSetID := _Rec."Dimension Set ID";
+        _Rec."Dimension Set ID" := TempDimSetEntry.GetDimensionSetID(TempDimSetEntry);
+        DimMgt.UpdateGlobalDimFromDimSetID(_Rec."Dimension Set ID", _Rec."Shortcut Dimension 1 Code", _Rec."Shortcut Dimension 2 Code");
+        _Rec.Modify();
 
-        if (OldDimSetID <> Rec."Dimension Set ID") and Rec.SalesLinesExist() then
-            Rec.UpdateAllLineDim(Rec."Dimension Set ID", OldDimSetID);
+        if (OldDimSetID <> _Rec."Dimension Set ID") and _Rec.SalesLinesExist() then
+            _Rec.UpdateAllLineDim(_Rec."Dimension Set ID", OldDimSetID);
 
         RefreshCurrent();
     end;
 
     internal procedure SetShortcutDimCode1(DimensionValue: Code[20])
     begin
-        Rec.Validate(Rec."Shortcut Dimension 1 Code", DimensionValue);
+        _Rec.Validate(_Rec."Shortcut Dimension 1 Code", DimensionValue);
     end;
 
     internal procedure SetShortcutDimCode2(DimensionValue: Code[20])
     begin
-        Rec.Validate(Rec."Shortcut Dimension 2 Code", DimensionValue);
+        _Rec.Validate(_Rec."Shortcut Dimension 2 Code", DimensionValue);
     end;
 
     internal procedure TryEndSale(POSSession: Codeunit "NPR POS Session"): Boolean
@@ -350,20 +363,20 @@
         ReturnAmount: Decimal;
         SubTotal: Decimal;
     begin
-        if not Initialized then
+        if not _Initialized then
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
-        OnAttemptEndSale(Rec);
+        OnAttemptEndSale(_Rec);
 
-        PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if SubTotal <> 0 then
             exit(false);
 
         EndSale(POSSession, StartNew);
-        EndedSalesAmount := SalesAmount;
-        EndedPaidAmount := PaidAmount;
+        _EndedSalesAmount := SalesAmount;
+        _EndedPaidAmount := PaidAmount;
         exit(true);
     end;
 
@@ -391,25 +404,25 @@
         ChangeAmount: Decimal;
         RoundAmount: Decimal;
     begin
-        if not Initialized then
+        if not _Initialized then
             Error('POS Sale codeunit not initialized. This is a programming bug, not a user error');
         RefreshCurrent();
 
-        OnAttemptEndSale(Rec);
+        OnAttemptEndSale(_Rec);
 
-        PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if not IsPaymentValidForEndingSale(POSPaymentMethod, ReturnPOSPaymentMethod, SalesAmount, PaidAmount) then
             exit(false);
 
-        ChangeAmount := POSGiveChange.InsertChange(Rec, ReturnPOSPaymentMethod, PaidAmount - SalesAmount);
-        RoundAmount := POSRounding.InsertRounding(Rec, PaidAmount - SalesAmount - ChangeAmount);
+        ChangeAmount := POSGiveChange.InsertChange(_Rec, ReturnPOSPaymentMethod, PaidAmount - SalesAmount);
+        RoundAmount := POSRounding.InsertRounding(_Rec, PaidAmount - SalesAmount - ChangeAmount);
 
         EndSale(POSSession, true);
-        EndedSalesAmount := SalesAmount;
-        EndedPaidAmount := PaidAmount;
-        EndedChangeAmount := ChangeAmount;
-        EndedRoundingAmount := RoundAmount;
+        _EndedSalesAmount := SalesAmount;
+        _EndedPaidAmount := PaidAmount;
+        _EndedChangeAmount := ChangeAmount;
+        _EndedRoundingAmount := RoundAmount;
 
         exit(true);
     end;
@@ -432,18 +445,22 @@
         SentryActiveSpan.StartChildSpan('bc.end_sale.pre_processing', 'bc.end_sale.pre_processing', SentryPreEndSaleSpan);
 
         CheckItemAvailability();
-        PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
-        OnBeforeEndSale(Rec);
-        SalePOS := Rec;
+
+        OnBeforeEndSale(_Rec);
+
+        SalePOS := _Rec;
 
         SentryPreEndSaleSpan.Finish();
         SentryActiveSpan.StartChildSpan('bc.end_sale.pos_entry_write', 'bc.end_sale.pos_entry_write', SentryEndSaleSpan);
 
-        ValidateSaleBeforeEnd(Rec);
+        ValidateSaleBeforeEnd(_Rec);
+
         EndSaleTransaction(SalePOS);
         Commit(); // Sale is now committed to POS entry
-        Ended := true;
+
+        _Ended := true;
 
         SentryEndSaleSpan.Finish();
         SentryActiveSpan.StartChildSpan('bc.end_sale.post_processing', 'bc.end_sale.post_processing', SentryPostEndSaleSpan);
@@ -464,14 +481,14 @@
         POSEntry: Record "NPR POS Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
-        POSCreateEntry.Run(Rec);
+        POSCreateEntry.Run(_Rec);
         POSCreateEntry.GetCreatedPOSEntry(POSEntry);
         SetLastSalePOSEntry(POSEntry);
 
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.DeleteAll();
-        Rec.Delete();
+        _Rec.Delete();
     end;
 
     local procedure IsPaymentValidForEndingSale(POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
@@ -490,7 +507,7 @@
         POSViewProfile: Record "NPR POS View Profile";
     begin
         POSViewProfile.Init();
-        Setup.GetPOSViewProfile(POSViewProfile);
+        _Setup.GetPOSViewProfile(POSViewProfile);
 
         if (POSViewProfile."After End-of-Sale View" = POSViewProfile."After End-of-Sale View"::INITIAL_SALE_VIEW) then begin
             POSSession.StartTransaction();
@@ -660,21 +677,21 @@
 
     internal procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
     begin
-        Initialized := true;
+        _Initialized := true;
 
         _FrontEnd := FrontEndIn;
-        POSUnit := POSUnitIn;
-        Setup := SetupIn;
-        This := ThisIn;
+        _POSUnit := POSUnitIn;
+        _Setup := SetupIn;
+        _This := ThisIn;
 
-        Clear(Rec);
-        Clear(LastSaleRetrieved);
+        Clear(_Rec);
+        Clear(_LastSaleRetrieved);
 
-        OnBeforeResumeSale(Rec, _FrontEnd);
+        OnBeforeResumeSale(_Rec, _FrontEnd);
         ResumeSale(SalePOS_ToResume);
-        OnAfterResumeSale(Rec, _FrontEnd);
+        OnAfterResumeSale(_Rec, _FrontEnd);
 
-        _FrontEnd.StartTransaction(Rec);
+        _FrontEnd.StartTransaction(_Rec);
     end;
 
     local procedure ResumeSale(SalePOS_ToResume: Record "NPR POS Sale")
@@ -683,37 +700,37 @@
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         POSSession: Codeunit "NPR POS Session";
     begin
-        Rec := SalePOS_ToResume;
-        Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
-        Rec."Server Instance ID" := Database.ServiceInstanceId();
-        Rec."User Session ID" := Database.SessionId();
+        _Rec := SalePOS_ToResume;
+        _Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(_Rec."User ID"));
+        _Rec."Server Instance ID" := Database.ServiceInstanceId();
+        _Rec."User Session ID" := Database.SessionId();
 
-        Rec."Salesperson Code" := Setup.Salesperson();
-        if Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
-            Rec.CreateDimFromDefaultDim(Rec.FieldNo("Salesperson Code"));
+        _Rec."Salesperson Code" := _Setup.Salesperson();
+        if _Rec."Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
+            _Rec.CreateDimFromDefaultDim(_Rec.FieldNo("Salesperson Code"));
 
-        Rec.Modify(true);
+        _Rec.Modify(true);
 
-        SaleLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
-        SaleLinePOS.SetRange("Register No.", Rec."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+        _SaleLine.Init(_Rec."Register No.", _Rec."Sales Ticket No.", _This, _Setup, _FrontEnd);
+        SaleLinePOS.SetRange("Register No.", _Rec."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", _Rec."Sales Ticket No.");
         SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
         if not SaleLinePOS.IsEmpty then
-            SaleLine.SetLast();
+            _SaleLine.SetLast();
 
-        PaymentLine.Init(Rec."Register No.", Rec."Sales Ticket No.", This, Setup, _FrontEnd);
+        _PaymentLine.Init(_Rec."Register No.", _Rec."Sales Ticket No.", _This, _Setup, _FrontEnd);
 
-        Rec.FilterGroup := 2;
-        Rec.SetRange("Register No.", Rec."Register No.");
-        Rec.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
-        Rec.FilterGroup := 0;
+        _Rec.FilterGroup := 2;
+        _Rec.SetRange("Register No.", _Rec."Register No.");
+        _Rec.SetRange("Sales Ticket No.", _Rec."Sales Ticket No.");
+        _Rec.FilterGroup := 0;
 
-        IsModified := true;
+        _IsModified := true;
 
         //Because the lines are not modified no table subscribers are hit, so auto refresh doesn't work.
         POSSession.RequestFullRefresh();
 
-        POSResumeSale.LogSaleResume(Rec, SalePOS_ToResume."Sales Ticket No.");
+        POSResumeSale.LogSaleResume(_Rec, SalePOS_ToResume."Sales Ticket No.");
     end;
 
     internal procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
@@ -722,15 +739,15 @@
         POSResumeSale: Codeunit "NPR POS Resume Sale Mgt.";
         Ok: Boolean;
     begin
-        Ok := POSResumeSale.LoadFromPOSQuote(Rec, POSQuoteNo);
+        Ok := POSResumeSale.LoadFromPOSQuote(_Rec, POSQuoteNo);
         if Ok then begin
-            SaleLinePOS.SetRange("Register No.", Rec."Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+            SaleLinePOS.SetRange("Register No.", _Rec."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", _Rec."Sales Ticket No.");
             SaleLinePOS.SetFilter("Line Type", '<>%1', SaleLinePOS."Line Type"::"POS Payment");
             if not SaleLinePOS.IsEmpty then
-                SaleLine.SetLast();
+                _SaleLine.SetLast();
 
-            IsModified := true;
+            _IsModified := true;
         end;
 
         exit(Ok);
@@ -740,19 +757,20 @@
     var
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
     begin
-        POSAfterSaleExecution.OnRunTypeSet(OnRunType::RunAfterEndSale);
-        POSAfterSaleExecution.RecSet(Rec);
-        POSAfterSaleExecution.PosSaleCodeunitSet(This);
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::RunAfterEndSale);
+        POSAfterSaleExecution.RecSet(_Rec);
+        POSAfterSaleExecution.PosSaleCodeunitSet(_This);
         POSAfterSaleExecution.OnRunXRecSet(xRec);
         Commit();
         Success := POSAfterSaleExecution.Run();
-        POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::Undefined);
     end;
 
     local procedure RunAfterEndSale(xRec: Record "NPR POS Sale")
     var
         CreateDeFiskalyonSale: Codeunit "NPR Create De Fiskaly on Sale";
         Success: Boolean;
+        AfterEndSaleErr: Label 'An error occurred after the sale ended: %1';
         FiskalyError: Label 'The error occurred during the fiskaly process: %1';
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
@@ -762,17 +780,15 @@
         ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
-            Message(ERROR_AFTER_END_SALE, GetLastErrorText);
+            Message(AfterEndSaleErr, GetLastErrorText);
     end;
 
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)
     var
         POSSession: Codeunit "NPR POS Session";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        if not POSSession.IsActiveSession(POSFrontEnd) then
+        if not POSSession.IsInitialized() then
             exit;
-        POSFrontEnd.GetSession(POSSession);
         POSSession.AddServerStopwatch(Keyword, Duration);
         LogFinishTelem(Duration);
     end;
@@ -807,14 +823,14 @@
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         Success: Boolean;
     begin
-        if SkipItemAvailabilityCheck then
+        if _SkipItemAvailabilityCheck then
             exit;
-        if POSCreateEntry.IsCancelledSale(Rec) then
+        if POSCreateEntry.IsCancelledSale(_Rec) then
             exit;
 
         Clear(PosItemCheckAvail);
         if BindSubscription(PosItemCheckAvail) then;
-        Success := PosItemCheckAvail.CheckAvailability_PosSale(Rec, true);
+        Success := PosItemCheckAvail.CheckAvailability_PosSale(_Rec, true);
         UnbindSubscription(PosItemCheckAvail);
         if not Success then
             ItemCheckAvail.RaiseUpdateInterruptedError();
@@ -822,7 +838,7 @@
 
     internal procedure SetSkipItemAvailabilityCheck(Set: Boolean)
     begin
-        SkipItemAvailabilityCheck := Set;
+        _SkipItemAvailabilityCheck := Set;
     end;
 
     #region Events
@@ -883,8 +899,10 @@
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
+    var
+        DuringEndSaleLbl: Label 'During End Sale';
     begin
-        Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), Text000, CurrCodeunitId(), 'OnFinishSale');
+        Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), DuringEndSaleLbl, CurrCodeunitId(), 'OnFinishSale');
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -897,14 +915,14 @@
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
         FinishSaleWorkflowErr: Label 'Sale successfully completed, but an error in the post processing occurred:\\%1\\%2';
     begin
-        POSAfterSaleExecution.OnRunTypeSet(OnRunType::OnFinishSale);
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::OnFinishSale);
         POSAfterSaleExecution.OnRunPOSSalesWorkflowStepSet(POSSalesWorkflowStep);
-        POSAfterSaleExecution.RecSet(Rec);
-        POSAfterSaleExecution.PosSaleCodeunitSet(This);
+        POSAfterSaleExecution.RecSet(_Rec);
+        POSAfterSaleExecution.PosSaleCodeunitSet(_This);
         ClearLastError();
         if not POSAfterSaleExecution.Run() then
             Message(FinishSaleWorkflowErr, POSSalesWorkflowStep.Description, GetLastErrorText());
-        POSAfterSaleExecution.OnRunTypeSet(OnRunType::Undefined);
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::Undefined);
     end;
 
     internal procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")

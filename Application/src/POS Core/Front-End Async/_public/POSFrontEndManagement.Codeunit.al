@@ -2,7 +2,6 @@
 {
     var
         _POSSession: Codeunit "NPR POS Session";
-        _Framework: Interface "NPR Framework Interface";
         _RegisteredWorkflows: List of [Text];//TODO: Delete when workflow v1/v2 are gone
 
         _WorkflowStack: Codeunit "NPR Stack of [Integer]";//TODO: Delete when workflow v1/v2 are gone
@@ -21,10 +20,8 @@
         _DragonglassResponseContextLbl: Label '_dragonglassResponseContext', Locked = true;
         _DragonglassInvocationRespondedLbl: Label '_dragonglassResponseContext', Locked = true;
 
-    internal procedure Initialize(FrameworkIn: Interface "NPR Framework Interface")
+    internal procedure Initialize()
     begin
-        _Framework := FrameworkIn;
-
         Clear(_RegisteredWorkflows);
         Clear(_WorkflowStack);
         Clear(_ActionStack);
@@ -36,12 +33,10 @@
 
     local procedure IsActiveSession(): Boolean
     var
-        Framework: Interface "NPR Framework Interface";
         POSSession: Codeunit "NPR POS Session";
     begin
         if POSSession.IsInitialized() then begin
-            POSSession.GetFramework(Framework);
-            Initialize(Framework);
+            Initialize();
             exit(true);
         end else
             exit(false);
@@ -143,7 +138,7 @@
     [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
-        FrontEndIn.Initialize(_Framework);
+        FrontEndIn.Initialize();
         FrontEndIn.SetWorkflowID(WorkflowIDIn);
     end;
 
@@ -387,6 +382,8 @@
     var
         DebugTrace: Text;
         ServerStopwatch: Text;
+        POSSession: Codeunit "NPR POS Session";
+        DragonglassResponseQueue: Codeunit "NPR Dragonglass Response Queue";
     begin
         DebugTrace := _POSSession.DebugFlush();
         if DebugTrace <> '' then
@@ -396,7 +393,8 @@
         if ServerStopwatch <> '' then
             Trace(Request, 'server_stopwatch', ServerStopwatch);
 
-        _Framework.InvokeFrontEndAsync(Request.GetJson());
+        POSSession.GetResponseQueue(DragonglassResponseQueue);
+        DragonglassResponseQueue.QueueInvokeFrontendRequest(Request.GetJson());
     end;
 
     internal procedure InvokeFrontEndMethod2(Request: Interface "NPR Front-End Async Request")
