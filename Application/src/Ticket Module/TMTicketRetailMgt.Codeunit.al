@@ -282,5 +282,67 @@
 
         exit(true);
     end;
+
+    procedure CreatePOSLinesForReservationRequest(TicketToken: Text; POSSale: Record "NPR POS Sale")
+    var
+        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleLineRec: Record "NPR POS Sale Line";
+        LineNo: Integer;
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+
+        TMTicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TMTicketReservationReq.SetRange("Session Token ID", TicketToken);
+        TMTicketReservationReq.FindSet(true);
+
+        POSSaleLine.SetUsePresetLineNo(true);
+
+        repeat
+            POSSaleLine.GetNewSaleLine(POSSaleLineRec);
+            LineNo += 10000;
+
+            POSSaleLineRec."Line Type" := POSSaleLineRec."Line Type"::Item;
+            POSSaleLineRec."No." := TMTicketReservationReq."Item No.";
+            POSSaleLineRec."Variant Code" := TMTicketReservationReq."Variant Code";
+            POSSaleLineRec.Quantity := TMTicketReservationReq.Quantity;
+            POSSaleLineRec."Line No." := LineNo;
+
+            TMTicketReservationReq."Line No." := LineNo;
+            TMTicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
+            TMTicketReservationReq.Modify();
+            POSSaleLine.InsertLine(POSSaleLineRec);
+        until TMTicketReservationReq.Next() = 0;
+    end;
+
+    procedure IsFullyLinkedToTicket(TicketToken: Text; POSSale: Record "NPR POS Sale"): Boolean
+    var
+        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+
+        TMTicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TMTicketReservationReq.SetRange("Session Token ID", TicketToken);
+        TMTicketReservationReq.FindSet();
+
+        repeat
+            if not POSSaleLine.Get(POSSale."Register No.", POSSale."Sales Ticket No.", POSSale.Date, POSSaleLine."Sale Type", TMTicketReservationReq."Line No.") then
+                exit(false);
+            if POSSaleLine."Sales Ticket No." <> TMTicketReservationReq."Receipt No." then
+                exit(false);
+            if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Item then
+                exit(false);
+            if POSSaleLine."No." <> TMTicketReservationReq."Item No." then
+                exit(false);
+            if POSSaleLine.Quantity <> TMTicketReservationReq.Quantity then
+                exit(false);
+        until TMTicketReservationReq.Next() = 0;
+
+        exit(true);
+    end;
 }
 

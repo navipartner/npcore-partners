@@ -123,7 +123,6 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
     local procedure SaveSale2Pad(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
         BusinessLogic: Codeunit "NPR NPRE POSAction: Save2WP-B";
-        POSSession: Codeunit "NPR POS Session";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterPadNo: Code[20];
         OpenWaiterPad: Boolean;
@@ -139,7 +138,7 @@ codeunit 6150666 "NPR NPRE POSAction: Save2Wa." implements "NPR IPOS Workflow"
         BusinessLogic.SaveSale2WPad(Sale, WaiterPadNo, OpenWaiterPad, SaleCleanupSuccessful);
 
         if ReturnToDefaultView and SaleCleanupSuccessful then
-            Sale.SelectViewForEndOfSale(POSSession);
+            Sale.SelectViewForEndOfSale();
         if not SaleCleanupSuccessful then begin
             Context.SetContext('ShowResultMessage', true);
             Context.SetContext('ResultMessageText', WaiterPadPOSMgt.UnableToCleanupSaleMsgText(false));

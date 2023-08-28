@@ -5,7 +5,7 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
     var
         AltSaleCancelDescription: Text;
 
-    procedure CancelSale(POSSession: Codeunit "NPR POS Session"): Boolean
+    procedure CancelSale(): Boolean
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -14,6 +14,7 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         CANCEL_SALELbl: Label 'Sale was canceled %1';
+        POSSession: Codeunit "NPR POS Session";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);

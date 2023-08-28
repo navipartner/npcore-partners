@@ -138,7 +138,7 @@ codeunit 85050 "NPR TM Performance Test"
         if (WithStatistics) then
             TicketStats.BuildCompressedStatistics(Today, false);
 
-        ActionCancelSale.CancelSale(_POSSession);
+        ActionCancelSale.CancelSale();
 
         CountAfter := Ticket.Count();
         Assert.AreEqual(0, CountAfter - CountBefore, StrSubstNo('Number of tickets after cancel sale must be %1.', 0));
@@ -252,7 +252,7 @@ codeunit 85050 "NPR TM Performance Test"
         if (WithStatistics) then
             TicketStats.BuildCompressedStatistics(Today, false);
 
-        ActionCancelSale.CancelSale(_POSSession);
+        ActionCancelSale.CancelSale();
 
         CountAfter := Ticket.Count();
         Assert.AreEqual(0, CountAfter - CountBefore, StrSubstNo('Number of tickets after cancel sale must be %1.', 0));

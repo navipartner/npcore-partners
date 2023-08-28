@@ -1,4 +1,4 @@
-﻿codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
+codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -37,11 +37,11 @@
         POSSession: Codeunit "NPR POS Session";
         POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
     begin
-        if not POSActionCancelSaleB.CancelSale(POSSession) then
+        if not POSActionCancelSaleB.CancelSale() then
             exit(false);
 
         POSSession.GetSale(POSSale);
-        POSSale.SelectViewForEndOfSale(POSSession);
+        POSSale.SelectViewForEndOfSale();
         exit(true);
     end;
 
@@ -49,7 +49,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionCancelSale.js###
-'let main=async({workflow:e,captions:a,popup:t})=>{debugger;if(await t.confirm({title:a.title,caption:a.prompt}))await e.respond("CheckSaleBeforeCancel"),await e.respond("CancelSale");else return" "};'
+'let main=async({workflow:e,captions:a,popup:t})=>{if(await t.confirm({title:a.title,caption:a.prompt}))await e.respond("CheckSaleBeforeCancel"),await e.respond("CancelSale");else return" "};'
         );
     end;
 }

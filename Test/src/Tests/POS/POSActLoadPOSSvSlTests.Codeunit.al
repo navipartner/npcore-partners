@@ -29,7 +29,7 @@ codeunit 85086 "NPR POS ActLoadPOSSvSl Tests"
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         NPRLibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
 
-        POSActSaveSale.CreatePOSQuoteAndStartNewSale(POSSession, POSQuoteEntry);
+        POSActSaveSale.SaveSaleAndStartNewSale(POSQuoteEntry);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
