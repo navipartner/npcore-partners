@@ -24,6 +24,11 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
                 ToolTip = 'Specifies how many seconds to wait before re-running this job queue entry, in cases when you want the job to be automatically rescheduled after status "Error"';
                 ApplicationArea = NPRRetail;
             }
+            field("NPR Manually Set On Hold"; Rec."NPR Manually Set On Hold")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies whether the job queue entry was manually set on hold.';
+            }
         }
     }
 
