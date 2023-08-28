@@ -28,7 +28,6 @@
         _DebugTrace: Text;
         _ServerStopwatch: Text;
         _POSPageId: Guid;
-        _Framework: Interface "NPR Framework Interface";
         _ACTION_STATE_ERROR: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
 #if not CLOUD
         _Stargate: Codeunit "NPR POS Stargate Management";
@@ -37,33 +36,57 @@
         _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
         _POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         TempSessionActions: Record "NPR POS Action" temporary;
+        _DragonglassResponseQueue: Codeunit "NPR Dragonglass Response Queue";
         _POSRefreshData: Codeunit "NPR POS Refresh Data";
 
 
     //#region Initialization
 
-    internal procedure Constructor(FrameworkIn: Interface "NPR Framework Interface"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; PageId: Guid; POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API")
+    internal procedure Constructor(POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API")
     var
         JavaScriptInterface: Codeunit "NPR POS JavaScript Interface";
+        PageId: Guid;
     begin
+        PageId := _POSPageId;
         ClearAll();
-
         _POSPageId := PageId;
-        FrontEndIn.Initialize(FrameworkIn);
-        _FrontEnd := FrontEndIn;
-        _Framework := FrameworkIn;
-        _Setup := SetupIn;
+
+        _FrontEnd.Initialize();
 #if not CLOUD
         Clear(_Stargate);
 #endif
         _Setup.Initialize();
         _Setup.GetPOSUnit(_POSUnit);
 
-        JavaScriptInterface.Initialize(FrontEndIn);
+        JavaScriptInterface.Initialize(_FrontEnd);
         _POSBackgroundTaskAPI := POSBackgroundTaskAPI;
 
         _Initialized := true;
         OnInitialize(_FrontEnd);
+    end;
+
+    internal procedure ConstructFromWebserviceSession(Initial: Boolean; POSUnitNo: Text; SalesTicketNo: Text)
+    begin
+        _FrontEnd.Initialize();
+        _Setup.Initialize();
+
+        //Reconstruct global wrapper codeunits
+        if POSUnitNo <> '' then begin
+            _POSUnit.Get(POSUnitNo);
+            _Setup.SetPOSUnit(_POSUnit);
+        end else begin
+            _Setup.GetPOSUnit(_POSUnit);
+        end;
+
+        if SalesTicketNo <> '' then begin
+            _Sale.InitializeFromWebserviceSession(_POSUnit, _FrontEnd, _Setup, _Sale, SalesTicketNo);
+        end;
+
+        _Initialized := true;
+
+        if Initial then begin
+            OnInitialize(_FrontEnd);
+        end;
     end;
 
     internal procedure ClearAll()
@@ -92,9 +115,9 @@
         Clear(_DebugTrace);
         Clear(_ServerStopwatch);
         Clear(_POSPageId);
-        Clear(_Framework);
         Clear(TempSessionActions);
         Clear(_POSBackgroundTaskAPI);
+        Clear(_DragonglassResponseQueue);
         Clear(_POSRefreshData);
     end;
 
@@ -106,11 +129,6 @@
     internal procedure SetPageId(PageId: Guid)
     begin
         _POSPageId := PageId;
-    end;
-
-    internal procedure GetFramework(var FrameworkOut: Interface "NPR Framework Interface")
-    begin
-        FrameworkOut := _Framework;
     end;
 
     internal procedure InitializeUI()
@@ -524,11 +542,10 @@
         if ActionCode = '' then
             exit(false);
         if not TempSessionActions.Get(ActionCode) then begin
+            POSAction.SetAutoCalcFields(Workflow, "Custom JavaScript Logic");
             if (not POSAction.Get(ActionCode)) then
                 exit(false);
-            // During named workflow discovery, v3 workflows are not included in action discovery. 
-            POSAction.CalcFields(Workflow);
-            POSAction.CalcFields("Custom JavaScript Logic");
+            // During named workflow discovery, v3 workflows are not included in action discovery.             
             TempSessionActions.TransferFields(POSAction);
             TempSessionActions.Insert();
         end;
@@ -592,6 +609,17 @@
         ErrorIfNotInitialized();
         DataStoreOut := _DataStore;
     end;
+
+    internal procedure GetResponseQueue(var DragonglassResponseQueue: Codeunit "NPR Dragonglass Response Queue")
+    begin
+        DragonglassResponseQueue := _DragonglassResponseQueue;
+    end;
+
+    internal procedure PopResponseQueue() ResponseArray: JsonArray
+    begin
+        exit(_DragonglassResponseQueue.PopQueuedRequests());
+    end;
+
 
 #if not CLOUD
     [Obsolete('Remove when stargate is gone', 'NPR23.0')]

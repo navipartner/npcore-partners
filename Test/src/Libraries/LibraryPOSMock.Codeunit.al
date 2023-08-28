@@ -6,9 +6,6 @@ codeunit 85003 "NPR Library - POS Mock"
 
     procedure InitializePOSSession(POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit")
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
         POSAction: Record "NPR POS Action" temporary;
@@ -20,9 +17,8 @@ codeunit 85003 "NPR Library - POS Mock"
         if not UserSetup.Insert() then
             UserSetup.Modify();
 
-        POSMockFramework.Constructor();
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
+        POSSession.Constructor(POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
 
         POSAction.DiscoverActions();
@@ -58,9 +54,6 @@ codeunit 85003 "NPR Library - POS Mock"
     procedure InitializePOSSessionAndStartSaleWithoutActions(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
     var
         UserSetup: record "User Setup";
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
     begin
@@ -70,9 +63,8 @@ codeunit 85003 "NPR Library - POS Mock"
         if not UserSetup.Insert() then
             UserSetup.Modify();
 
-        POSMockFramework.Constructor();
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
+        POSSession.Constructor(POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
         POSSession.StartTransaction();
         POSSession.GetSale(POSSale);
