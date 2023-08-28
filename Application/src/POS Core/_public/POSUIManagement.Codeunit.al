@@ -16,6 +16,7 @@
         CaptionMgt: Codeunit "NPR POS Caption Management";
         Captions: JsonObject;
         WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
+        DiscoverAllWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
         Language.Get(GlobalLanguage);
         ConfigureCaptions(Captions);
@@ -32,6 +33,16 @@
 
         CaptionMgt.Initialize(FrontEnd);
         OnInitializeCaptions(CaptionMgt);
+
+        if not GuiAllowed then begin
+            // Hack:
+            // We need to refresh v3 for HTTP POS here to have the caption buffer populated.
+            // It's not pretty but the only right fix is when we later refactor retrieval of all workflows+metadata
+            // to be GET requests made explicitly by frontend instead of injecting things at various timings from backend.
+            DiscoverAllWorkflows.RefreshAll(); //v3
+        end;
+
+
         WorkflowCaptionBuffer.GetAllParameterCaptionsOnPOSSessionInit(CaptionMgt);
         CaptionMgt.Finalize(Captions);
 

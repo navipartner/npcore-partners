@@ -2,10 +2,6 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
 {
     procedure InitializePOSSession(POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit")
     var
-        // TempPOSAction: Record "NPR POS Action" temporary;
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSMockFramework: Codeunit "NPR BCPT POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
         BCPTPOSSetupEventSubs: Codeunit "NPR BCPT POS Setup Event Subs";
@@ -13,12 +9,10 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
         BindSubscription(BCPTPOSSetupEventSubs);
         BCPTPOSSetupEventSubs.SetPOSUnit(POSUnit);
 
-        POSMockFramework.Constructor();
         POSBackgroundTaskAPI.Initialize(POSBackgroundTaskManager);
-        POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
+        POSSession.Constructor(POSBackgroundTaskAPI);
         POSSession.StartPOSSession();
 
-        // TempPOSAction.DiscoverActions();
         UnbindSubscription(BCPTPOSSetupEventSubs);
     end;
 

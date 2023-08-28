@@ -1,4 +1,4 @@
-﻿codeunit 6150701 "NPR POS JavaScript Interface"
+codeunit 6150701 "NPR POS JavaScript Interface"
 {
     var
         _Stopwatch: Codeunit "NPR Stopwatch";
@@ -25,7 +25,7 @@
     end;
 
     [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone', 'NPR23.0')]
-    internal procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    internal procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSAction: Record "NPR POS Action";
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
@@ -78,14 +78,19 @@
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    internal procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Self: Codeunit "NPR POS JavaScript Interface")
+    internal procedure InvokeMethod(Method: Text; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
+    var
+        POSSession: Codeunit "NPR POS Session";
+        FrontEnd: Codeunit "NPR POS Front End Management";
     begin
-        OnBeforeInvokeMethod(Method, Context, POSSession, FrontEnd);
+        POSSession.GetFrontEnd(FrontEnd, false);
 
         case Method of
             'OnAction20':
-                if not Method_RunAction30(Context, FrontEnd) then //Action30 is using the same event as Action20 in frontend. We fall back to old 2.0 backend implementation if not detected as enum impl.
+                if not Method_RunActionV3(Context, FrontEnd) then //Action30 is using the same event as Action20 in frontend. We fall back to old 2.0 backend implementation if not detected as enum impl.
                     InvokeCustomMethod(Method, Context, FrontEnd);
+            'OnAction':
+                Method_RunActionV1(Context, FrontEnd);
             'AbortWorkflow':
                 Method_AbortWorkflow(FrontEnd, Context);
             'AbortAllWorkflows':
@@ -93,9 +98,9 @@
             'BeforeWorkflow':
                 Method_BeforeWorkflow(POSSession, FrontEnd, Context, Self);
             'Login':
-                Method_Login(POSSession, FrontEnd, Context, Self);
+                Method_Login(POSSession, FrontEnd, Context);
             'TextEnter':
-                Method_TextEnter(POSSession, FrontEnd, Context, Self);
+                Method_TextEnter(POSSession, FrontEnd, Context);
 #if not CLOUD
             'InvokeDeviceResponse':
                 Method_InvokeDeviceResponse(POSSession, FrontEnd, Context);
@@ -105,7 +110,7 @@
             'FrontEndId':
                 FrontEnd.HardwareInitializationComplete();
             'Unlock':
-                Method_Unlock(POSSession, FrontEnd, Context, Self);
+                Method_Unlock(POSSession, FrontEnd, Context);
             'ProtocolUIResponse':
                 Method_ProtocolUIResponse(POSSession, FrontEnd, Context);
             'InitializationComplete':
@@ -113,8 +118,6 @@
             else
                 InvokeCustomMethod(Method, Context, FrontEnd);
         end;
-
-        OnAfterInvokeMethod(Method, Context, POSSession, FrontEnd);
     end;
 
     local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -243,7 +246,31 @@
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text004, 'OnSetPosition', DataSet.DataSource()));
     end;
 
-    local procedure Method_RunAction30(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
+    local procedure Method_RunActionV1(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        JToken: JsonToken;
+        ActionCode: Text;
+        WorkflowStep: Text;
+        WorkflowID: Integer;
+        ActionID: Integer;
+        ActionContext: JsonObject;
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        Context.SelectToken('action', JToken);
+        ActionCode := JToken.AsValue().AsText();
+        Context.SelectToken('workflowStep', JToken);
+        WorkflowStep := JToken.AsValue().AsText();
+        Context.SelectToken('workflowId', JToken);
+        WorkflowID := JToken.AsValue().AsInteger();
+        Context.SelectToken('actionId', JToken);
+        ActionID := JToken.AsValue().AsInteger();
+        Context.SelectToken('context', JToken);
+        ActionContext := JToken.AsObject();
+
+        InvokeAction(CopyStr(ActionCode, 1, 20), WorkflowStep, WorkflowId, actionId, ActionContext, POSSession, FrontEnd);
+    end;
+
+    local procedure Method_RunActionV3(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         Workflow30: Codeunit "NPR POS Workflow 3.0";
     begin
@@ -324,22 +351,22 @@
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    local procedure Method_Login(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
+    local procedure Method_Login(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
     begin
         Setup.Action_Login(Action, POSSession);
-        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
+        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd);
     end;
 
-    local procedure Method_TextEnter(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
+    local procedure Method_TextEnter(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
     begin
         Setup.Action_TextEnter(Action, POSSession);
-        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self);
+        InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd);
     end;
 #if not CLOUD
 
@@ -400,13 +427,13 @@
         Stargate.AppGatewayProtocol(ActionName, Step, EventName, SerializedArguments, Callback, FrontEnd);
     end;
 #endif
-    local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
+    local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         "Action": Record "NPR POS Action";
         Setup: Codeunit "NPR POS Setup";
     begin
         if (Setup.Action_UnlockPOS(Action, POSSession)) then
-            InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd, Self)
+            InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd)
         else
             POSSession.ChangeViewSale();
     end;
@@ -469,11 +496,13 @@
     begin
     end;
 
+    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', 'NPR24.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
+    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', 'NPR24.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin

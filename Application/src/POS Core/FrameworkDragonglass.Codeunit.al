@@ -18,6 +18,6 @@
         if not initialized then
             Error(ErrorNotInitialized);
 
-        Framework.InvokeFrontEndAsync(Request);
+        Framework.ControlAddinResponse(Request);
     end;
 }

@@ -127,15 +127,11 @@ codeunit 85146 "NPR EODLoadTestWS"
 
     local procedure InitializeSale(var POSSale: Codeunit "NPR POS Sale")
     var
-        POSFrontEnd: Codeunit "NPR POS Front End Management";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSMockFramework: Codeunit "NPR POS Framework: Mock";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
     begin
-        POSMockFramework.Constructor();
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
-        _POSSession.Constructor(POSMockFramework, POSFrontEnd, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
+        _POSSession.Constructor(POSBackgroundTaskAPI);
         _POSSession.StartTransaction();
         _POSSession.GetSale(POSSale);
 

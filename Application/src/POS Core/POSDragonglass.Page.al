@@ -1,4 +1,4 @@
-﻿page 6150750 "NPR POS (Dragonglass)"
+page 6150750 "NPR POS (Dragonglass)"
 {
     Extensible = False;
     Caption = 'POS';
@@ -14,49 +14,59 @@
             {
                 ApplicationArea = NPRRetail;
 
-                trigger OnFrameworkReady()
+                trigger InvokeMethod(requestId: Integer; method: Text; parameters: JsonObject)
                 var
-                    FrameworkDragonGlass: Codeunit "NPR Framework: Dragonglass";
+                    POSPageStackCheck: Codeunit "NPR POS Page Stack Check";
+                    Response: JsonObject;
+                    Success: Boolean;
                     POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
+                    POSSession: Codeunit "NPR POS Session"; //Single instance
+                    POSDragonglassRunMethod: Codeunit "NPR POS Dragonglass Run Method";
                 begin
-                    FrameworkDragonGlass.Constructor(CurrPage.Framework);
-                    POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
-                    _POSSession.Constructor(FrameworkDragonGlass, _FrontEnd, _Setup, _PageId, POSBackgroundTaskAPI);
-                    CheckUserLocked();
-                    CheckUserExpired();
-                    if _POSSession.GetErrorOnInitialize() then begin
-                        CurrPage.Close();
+                    if method = 'KeepAlive' then begin //every couple of minutes to prevent NST from shutting down idle POS sessions
+                        Response.Add('RequestID', requestId);
+                        Response.Add('Success', true);
+                        CurrPage.Framework.ControlAddinResponse(Response);
+                        exit;
+                    end;
+                    if method = 'FrameworkReady' then begin //once when POS frontend has loaded
+                        POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
+                        POSSession.Constructor(POSBackgroundTaskAPI);
+                        CheckUserLocked();
+                        CheckUserExpired();
+                        if POSSession.GetErrorOnInitialize() then begin
+                            CurrPage.Close();
+                            Error(GetLastErrorText());
+                        end;
+
+                        Response.Add('RequestID', requestId);
+                        Response.Add('Success', true);
+                        CurrPage.Framework.ControlAddinResponse(Response);
+                        exit;
+                    end;
+
+                    POSSession.ErrorIfPageIdMismatch(_PageId);
+                    POSSession.DebugWithTimestamp('Method:' + method);
+                    _POSBackgroundTaskManager.ClearQueues();
+                    BindSubscription(POSPageStackCheck);
+
+                    ClearLastError();
+                    POSDragonglassRunMethod.SetMethodParameters(method, parameters);
+                    Success := POSDragonglassRunMethod.Run(); //Implicit commit
+
+                    Response.Add('RequestID', requestId);
+                    Response.Add('Success', Success);
+                    if Success then begin
+                        Response.Add('Responses', POSSession.PopResponseQueue());
+                    end else begin
+                        Response.Add('ErrorMessage', GetLastErrorText());
+                    end;
+
+                    CurrPage.Framework.ControlAddinResponse(Response);
+
+                    if not Success then begin
                         Error(GetLastErrorText());
                     end;
-                end;
-
-                trigger OnInvokeMethod(method: Text; eventContext: JsonObject)
-                var
-                    POSPageStackCheck: Codeunit "NPR POS Page Stack Check";
-                begin
-                    if method = 'KeepAlive' then
-                        exit; //exit asap to minimize overhead of idle sessions       
-                    _POSSession.ErrorIfPageIdMismatch(_PageId);
-
-                    BindSubscription(POSPageStackCheck);
-                    _POSBackgroundTaskManager.ClearQueues();
-
-                    _JavaScript.InvokeMethod(method, eventContext, _POSSession, _FrontEnd, _JavaScript);
-
-                    ProcessBackgroundTaskQueues();
-                end;
-
-                trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: JsonObject)
-                var
-                    POSPageStackCheck: Codeunit "NPR POS Page Stack Check";
-                begin
-                    _POSSession.ErrorIfNotInitialized();
-                    _POSSession.ErrorIfPageIdMismatch(_PageId);
-
-                    BindSubscription(POSPageStackCheck);
-                    _POSBackgroundTaskManager.ClearQueues();
-
-                    _JavaScript.InvokeAction(CopyStr(action, 1, 20), workflowStep, workflowId, actionId, context, _POSSession, _FrontEnd, _JavaScript);
 
                     ProcessBackgroundTaskQueues();
                 end;
@@ -67,14 +77,15 @@
     trigger OnOpenPage()
     var
         TempAction: Record "NPR POS Action" temporary;
+        POSSession: Codeunit "NPR POS Session";
         ClientDiagnostic: Record "NPR Client Diagnostic v2";
         UserLoginType: Enum "NPR User Login Type";
     begin
         _PageId := CreateGuid();
-        _POSSession.SetPageId(_PageId);
-        _POSSession.DebugWithTimestamp('Action discovery starts');
+        POSSession.SetPageId(_PageId);
+        POSSession.DebugWithTimestamp('Action discovery starts');
         TempAction.DiscoverActions();
-        _POSSession.DebugWithTimestamp('Action discovery ends');
+        POSSession.DebugWithTimestamp('Action discovery ends');
 
         if ClientDiagnostic.Get(UserSecurityId(), UserLoginType::POS) then
             TempClientDiagnostic := ClientDiagnostic;
@@ -92,8 +103,6 @@
         //Process enqueue tasks
         _POSBackgroundTaskManager.GetQueue(QueuedTasks);
         if QueuedTasks.Count() <> 0 then begin
-            Commit(); // in case EnqueueBackgroundTask throws error we don't want to rollback anything that happened in the page trigger
-
             foreach WrapperTaskId in QueuedTasks do begin
                 Clear(PBTTaskId);
                 _POSBackgroundTaskManager.GetQueuedTask(WrapperTaskId, Parameters, Timeout);
@@ -156,10 +165,6 @@
 
     var
         TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
-        _Setup: Codeunit "NPR POS Setup";
-        _POSSession: Codeunit "NPR POS Session";
-        _JavaScript: Codeunit "NPR POS JavaScript Interface";
-        _FrontEnd: Codeunit "NPR POS Front End Management";
         _PageId: Guid;
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
 }

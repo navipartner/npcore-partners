@@ -253,19 +253,14 @@
         POSSession: Codeunit "NPR POS Session";
         POSSetup: Codeunit "NPR POS Setup";
         POSFrontEndMgt: Codeunit "NPR POS Front End Management";
-        FrameworkDragonGlass: Codeunit "NPR Framework: Dragonglass";
-        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
-        POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
-        NPRDragonglass: ControlAddIn "NPR Dragonglass";
     begin
-        POSSetup.Initialize();
-        FrameworkDragonGlass.Constructor(NPRDragonglass);
-        POSBackgroundTaskAPI.Initialize(POSBackgroundTaskManager);
-        POSSession.Constructor(FrameworkDragonGlass, POSFrontEndMgt, POSSetup, CreateGuid(), POSBackgroundTaskAPI);
+        POSSession.ConstructFromWebserviceSession(false, SalePOS."Register No.", SalePOS."Sales Ticket No.");
 
         POSSession.GetSale(POSSale);
         POSSale.SetPosition(SalePOS.GetPosition(false));
         POSSession.GetSaleLine(POSSaleLine);
+        POSSession.GetSetup(POSSetup);
+        POSSession.GetFrontEnd(POSFrontEndMgt);
         POSSaleLine.Init(SalePOS."Register No.", SalePOS."Sales Ticket No.", POSSale, POSSetup, POSFrontEndMgt);
         TempNpDcExtCouponBuffer.FindSet();
         repeat
