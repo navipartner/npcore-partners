@@ -36,11 +36,12 @@ codeunit 6059860 "NPR End Of Day Worker"
         FrontEnd: Codeunit "NPR POS Front End Management";
         CheckpointEntryNo: Integer;
         POSUnitIn: Record "NPR POS Unit";
+        NullGuid: Guid;
     begin
         POSSession.GetFrontEnd(FrontEnd);
         if not Sale.IsInitialized() then begin
             if POSUnitIn.Get(POSUnitNo) then
-                Sale.InitializeNewSale(POSUnitIn, FrontEnd, Setup, Sale);
+                Sale.InitializeNewSale(POSUnitIn, FrontEnd, Setup, Sale, NullGuid);
         end;
         Sale.GetCurrentSale(SalePOS);
 

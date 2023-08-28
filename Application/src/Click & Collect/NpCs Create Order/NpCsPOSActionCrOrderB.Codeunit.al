@@ -173,7 +173,7 @@ codeunit 6059948 "NPR NpCs POSAction Cr. Order B"
             NpCsDocument.Modify();
         end else
             //End sale
-            POSSale.SelectViewForEndOfSale(POSSession);
+            POSSale.SelectViewForEndOfSale();
         NpCsPOSActionEvents.OnCreateCollectOrderBeforeScheduleRunWorkflow(NpCsDocument);
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;

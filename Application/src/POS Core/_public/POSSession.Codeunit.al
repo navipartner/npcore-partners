@@ -274,9 +274,16 @@
     //#region  Workflows Session Storage
 
     procedure StartTransaction()
+    var
+        NullGuid: Guid;
+    begin
+        StartTransaction(NullGuid);
+    end;
+
+    procedure StartTransaction(SystemId: Guid)
     begin
         ClearSale();
-        _Sale.InitializeNewSale(_POSUnit, _FrontEnd, _Setup, _Sale);
+        _Sale.InitializeNewSale(_POSUnit, _FrontEnd, _Setup, _Sale, SystemId);
     end;
 
     internal procedure ResumeTransaction(SalePOS: Record "NPR POS Sale")

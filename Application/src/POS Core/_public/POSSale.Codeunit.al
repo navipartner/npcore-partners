@@ -32,7 +32,7 @@ codeunit 6150705 "NPR POS Sale"
         OnAfterInitializeAtLogin(_POSUnit);
     end;
 
-    internal procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
+    internal procedure InitializeNewSale(POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale"; SystemId: Guid)
     begin
         _Initialized := true;
 
@@ -45,7 +45,7 @@ codeunit 6150705 "NPR POS Sale"
         Clear(_LastSaleRetrieved);
 
         OnBeforeInitSale(_Rec, _FrontEnd);
-        InsertSale();
+        InsertSale(SystemId);
         InitGlobalState();
         OnAfterInitSale(_Rec, _FrontEnd);
 
@@ -65,7 +65,7 @@ codeunit 6150705 "NPR POS Sale"
         InitGlobalState();
     end;
 
-    local procedure InsertSale()
+    local procedure InsertSale(SystemId: Guid)
     var
     begin
         _Rec."Salesperson Code" := _Setup.Salesperson();
@@ -78,7 +78,13 @@ codeunit 6150705 "NPR POS Sale"
             WorkDate := Today();
         end;
 
-        _Rec.Insert(true);
+        if not IsNullGuid(SystemId) then begin
+            _Rec.SystemId := SystemId;
+            _Rec.Insert(true, true);
+        end else begin
+            _Rec.Insert(true);
+        end;
+
         _Rec.Validate("Customer No.", '');
         _Rec.Modify(true);
 
@@ -468,7 +474,7 @@ codeunit 6150705 "NPR POS Sale"
         RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
 
         if StartNew then begin
-            SelectViewForEndOfSale(POSSession);
+            SelectViewForEndOfSale();
         end;
 
         SentryPostEndSaleSpan.Finish();
@@ -502,8 +508,9 @@ codeunit 6150705 "NPR POS Sale"
         exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) = 0);
     end;
 
-    internal procedure SelectViewForEndOfSale(POSSession: Codeunit "NPR POS Session")
+    internal procedure SelectViewForEndOfSale()
     var
+        POSSession: Codeunit "NPR POS Session";
         POSViewProfile: Record "NPR POS View Profile";
     begin
         POSViewProfile.Init();

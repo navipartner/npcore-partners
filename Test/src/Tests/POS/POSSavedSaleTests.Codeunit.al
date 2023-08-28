@@ -68,7 +68,7 @@ codeunit 85007 "NPR POS Saved Sale Tests"
         PreviousSaleSystemId := SalePOS.SystemId;
 
         // [When] Saving to POS quote
-        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
+        POSActionSavePOSQuote.SaveSaleAndStartNewSale(POSQuoteEntry);
 
         // [Then] Correct data is saved
         POSQuoteEntry.TestField(SystemId, SalePOS.SystemId);

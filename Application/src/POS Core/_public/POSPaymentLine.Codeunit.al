@@ -81,6 +81,13 @@
         Rec.FindLast();
     end;
 
+    procedure IsEmpty(): Boolean
+    begin
+        if not Initialized then
+            exit(true);
+        exit(Rec.IsEmpty());
+    end;
+
     procedure GetCurrentPaymentLine(var PaymentLinePOS: Record "NPR POS Sale Line")
     begin
         RefreshCurrent();

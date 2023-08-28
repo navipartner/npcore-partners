@@ -11,7 +11,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
         Request: JsonObject;
     begin
-        if not GuiAllowed then
+        if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
 
         if POSSession.IsInitialized() then begin
@@ -39,7 +39,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         Request: JsonObject;
         Base64Convert: Codeunit "Base64 Convert";
     begin
-        if not GuiAllowed then
+        if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
         if StrLen(FileExtension) = 0 then
             exit;
