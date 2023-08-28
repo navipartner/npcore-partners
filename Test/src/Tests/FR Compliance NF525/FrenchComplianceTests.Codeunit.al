@@ -476,7 +476,7 @@ codeunit 85039 "NPR French Compliance Tests"
         POSSaleWrapper.GetCurrentSale(POSSaleRecord);
 
         // [When] Cancelling sale
-        ActionCancelSale.CancelSale(_POSSession);
+        ActionCancelSale.CancelSale();
 
         // [Then] Cancellation is signed;        
         POSAuditLog.SetRange("Active POS Sale SystemId", POSSaleRecord.SystemId);

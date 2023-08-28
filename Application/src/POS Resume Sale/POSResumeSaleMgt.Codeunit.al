@@ -128,14 +128,14 @@
     procedure DoSaveAsPOSQuote(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; SkipDialog: Boolean): Integer
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSActionSavePOSQuote: Codeunit "NPR POS Action: SavePOSSvSl B";
+        SavePOSSale: Codeunit "NPR POS Action: SavePOSSvSl B";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
     begin
         //Do not save as POS Saved Sales unfinished sales with no lines
         if not SalePOS.SalesLinesExist() then
             SkipDialog := true
         else begin
-            POSActionSavePOSQuote.CreatePOSQuote(SalePOS, POSQuoteEntry);
+            SavePOSSale.CreateSavedSaleEntry(SalePOS, POSQuoteEntry);
             POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
         end;
 

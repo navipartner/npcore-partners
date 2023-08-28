@@ -52,7 +52,7 @@
 
         POSActionCancelSale.CheckSaleBeforeCancel(POSSale);
         POSActionCancelSale.SetAlternativeDescription(AltSaleCancelDescription);
-        if not POSActionCancelSale.CancelSale(_POSSession) then
+        if not POSActionCancelSale.CancelSale() then
             Error('');
     end;
 

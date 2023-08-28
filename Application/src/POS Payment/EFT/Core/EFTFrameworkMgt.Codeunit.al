@@ -335,6 +335,7 @@
     local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20])
     var
         SalePOS: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
     begin
         EFTSetup.TestField("EFT Integration Type");
         EFTSetup.TestField("Payment Type POS");
@@ -346,6 +347,10 @@
         EFTTransactionRequest."User ID" := CopyStr(UserId, 1, MaxStrLen(EFTTransactionRequest."User ID"));
         EFTTransactionRequest.Started := CurrentDateTime;
         EFTTransactionRequest.Token := CreateGuid();
+        if POSUnitNo <> '' then begin
+            POSUnit.Get(POSUnitNo);
+            EFTTransactionRequest."Self Service" := POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED;
+        end;
 
         if (POSUnitNo <> '') and (SalesReceiptNo <> '') then begin
             SalePOS.Get(POSUnitNo, SalesReceiptNo);

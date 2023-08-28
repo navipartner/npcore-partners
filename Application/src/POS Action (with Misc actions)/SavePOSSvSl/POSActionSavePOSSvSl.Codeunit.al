@@ -59,12 +59,11 @@ codeunit 6151004 "NPR POS Action: SavePOSSvSl" implements "NPR IPOS Workflow"
     local procedure SaveAsQuote(Context: Codeunit "NPR POS JSON Helper")
     var
         POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSSession: Codeunit "NPR POS Session";
         PrintAfterSave: Boolean;
         PrintTemplateCode: Code[20];
         POSActSavePOSSvSlB: Codeunit "NPR POS Action: SavePOSSvSl B";
     begin
-        POSActSavePOSSvSlB.CreatePOSQuoteAndStartNewSale(POSSession, POSQuoteEntry);
+        POSActSavePOSSvSlB.SaveSaleAndStartNewSale(POSQuoteEntry);
 
         PrintAfterSave := Context.GetBooleanParameter('PrintAfterSave');
 

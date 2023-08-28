@@ -305,7 +305,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                 POSActionDocExportB.HandlePayAndPost(POSSession, SalesHeader, PayAndPostPrint, PayAndPostPdf2Nav, PayAndPostSend, FullPosting, POSSalesDocumentPost);
             end else begin
                 //End sale
-                Sale.SelectViewForEndOfSale(POSSession);
+                Sale.SelectViewForEndOfSale();
             end;
     end;
 

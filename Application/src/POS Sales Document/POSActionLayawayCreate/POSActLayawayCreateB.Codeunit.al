@@ -127,7 +127,7 @@ codeunit 6060012 "NPR POS Act.: Layaway Create-B"
             HandleDownpayment(POSSession, DownpaymentInvoiceNo);
         end else
             //End sale
-            POSSale.SelectViewForEndOfSale(POSSession)
+            POSSale.SelectViewForEndOfSale()
     end;
 
     local procedure HandleDownpayment(var POSSession: Codeunit "NPR POS Session"; DownpaymentInvoiceNo: Text)

@@ -176,7 +176,7 @@ codeunit 6150670 "NPR NPRE POS Action: SplitBill" implements "NPR IPOS Workflow"
         if InSale then
             BusinessLogic.UpdateSaleAfterSplit(Sale, WaiterPadNo, ReturnToDefaultView, CleanupMessageText);
         if ReturnToDefaultView then
-            Sale.SelectViewForEndOfSale(POSSession)
+            Sale.SelectViewForEndOfSale()
         else
             if CleanupMessageText <> '' then
                 Context.SetContext('CleanupMessageText', CleanupMessageText);

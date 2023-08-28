@@ -481,6 +481,7 @@
         VoidRequest: JsonObject;
         VoidMechanism: Enum "NPR EFT Request Mechanism";
         VoidWorkflow: Text;
+        Rejected: Boolean;
     begin
         ClearLastError();
 
@@ -497,7 +498,11 @@
         ResponseObject.Add('BCSuccess', EFTTransactionRequest.Successful);
 
         if (EFTTransactionRequest.Successful) and (EFTTransactionRequest."Signature Type" <> EFTTransactionRequest."Signature Type"::" ") then begin
-            if not Confirm(SignatureApprovalLbl, false) then begin
+            Rejected := EFTTransactionRequest."Self Service";
+            if not Rejected then
+                Rejected := not Confirm(SignatureApprovalLbl, false);
+
+            if Rejected then begin
                 ResponseObject.Add('voidTransaction', true);
                 //prepare void workflow, json so the payment can be voided right away
                 EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");

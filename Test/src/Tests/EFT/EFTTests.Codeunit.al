@@ -1236,7 +1236,8 @@ codeunit 85004 "NPR EFT Tests"
         OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
+        POSActionSavePOSQuote.SaveSaleAndStartNewSale(POSQuoteEntry);
+
 
         // [Given] New sale is started
         _POSSession.GetSale(POSSale);
@@ -1934,7 +1935,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         OriginalEFTTransactionRequest.Get(_LastTrxEntryNo);
-        POSActionSavePOSQuote.CreatePOSQuoteAndStartNewSale(_POSSession, POSQuoteEntry);
+        POSActionSavePOSQuote.SaveSaleAndStartNewSale(POSQuoteEntry);
 
         // [Given] Fresh sale
         _POSSession.GetSale(POSSale);
@@ -1984,7 +1985,7 @@ codeunit 85004 "NPR EFT Tests"
         _POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
-        POSActionCancelSale.CancelSale(_POSSession);
+        POSActionCancelSale.CancelSale();
 
         // [Given] Fresh sale
         _POSSession.StartTransaction();

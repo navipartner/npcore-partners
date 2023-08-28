@@ -47,7 +47,6 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogic: Codeunit "NPR NPRE POSAction: Run WAct-B";
-        POSSession: Codeunit "NPR POS Session";
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
         WPadLinesToSend: Option "New/Updated",All;
         ServingStepToRequest: Code[10];
@@ -93,7 +92,7 @@ codeunit 6150676 "NPR NPRE POSAction: Run Wa.Act" implements "NPR IPOS Workflow"
                         NewWaiterPadNo := CopyStr(Context.GetString('NewWaiterPadNo'), 1, MaxStrLen(NewWaiterPadNo));
                     BusinessLogic.CleanupSale(WPadAction, NewWaiterPadNo, ClearSaleOnFinish, Sale, SaleLine);
                     if ReturnToDefaultView then
-                        Sale.SelectViewForEndOfSale(POSSession);
+                        Sale.SelectViewForEndOfSale();
                 end;
         end;
     end;

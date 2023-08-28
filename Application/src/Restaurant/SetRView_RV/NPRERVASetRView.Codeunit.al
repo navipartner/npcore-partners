@@ -41,7 +41,7 @@ codeunit 6150681 "NPR NPRE RVA: Set R-View" implements "NPR IPOS Workflow"
         ReturnToDefaultEndOfSaleView: Boolean;
     begin
         if Context.GetBooleanParameter('ReturnToDefaultEndOfSaleView', ReturnToDefaultEndOfSaleView) and ReturnToDefaultEndOfSaleView then
-            POSSale.SelectViewForEndOfSale(POSSession)
+            POSSale.SelectViewForEndOfSale()
         else
             POSSession.ChangeViewRestaurant();
     end;

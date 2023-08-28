@@ -1,28 +1,40 @@
 codeunit 6059851 "NPR POS Action: SavePOSSvSl B"
 {
     Access = Internal;
-    procedure CreatePOSQuoteAndStartNewSale(POSSession: Codeunit "NPR POS Session"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
+    procedure SaveSaleAndStartNewSale(var POSSavedSaleEntry: Record "NPR POS Saved Sale Entry")
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        POSSession.GetSale(POSSale);
+
+        SaveSale(POSSavedSaleEntry);
+
+        POSSale.SelectViewForEndOfSale();
+    end;
+
+    procedure SaveSale(var POSSavedSaleEntry: Record "NPR POS Saved Sale Entry")
     var
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
+        POSSession: Codeunit "NPR POS Session";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        CreatePOSQuote(SalePOS, POSQuoteEntry);
+        CreateSavedSaleEntry(SalePOS, POSSavedSaleEntry);
         POSCreateEntry.InsertParkSaleEntry(SalePOS."Register No.", SalePOS."Salesperson Code");
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.DeleteAll();
         SalePOS.Delete();
         Commit();
-
-        POSSale.SelectViewForEndOfSale(POSSession);
     end;
 
-    procedure CreatePOSQuote(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
+
+    procedure CreateSavedSaleEntry(SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;

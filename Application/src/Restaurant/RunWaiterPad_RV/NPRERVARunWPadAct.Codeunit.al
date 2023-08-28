@@ -47,7 +47,6 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act." implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogic: Codeunit "NPR NPRE RVA: Run W/Pad.Act.-B";
-        POSSession: Codeunit "NPR POS Session";
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad";
         WPadLinesToSend: Option "New/Updated",All;
         ServingStepToRequest: Code[10];
@@ -73,7 +72,7 @@ codeunit 6150677 "NPR NPRE RVA: Run WPad Act." implements "NPR IPOS Workflow"
         Context.SetContext('ResultMessageText', ResultMessageText);
 
         if ReturnToDefaultView then
-            Sale.SelectViewForEndOfSale(POSSession);
+            Sale.SelectViewForEndOfSale();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
