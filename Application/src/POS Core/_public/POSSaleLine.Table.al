@@ -2538,12 +2538,12 @@
         GLAccount.Get("No.");
         GLAccount.CheckGLAcc();
         Description := GLAccount.Name;
-        "Gen. Posting Type" := GLAccount."Gen. Posting Type";
-        "Gen. Bus. Posting Group" := GLAccount."Gen. Bus. Posting Group";
-        "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
-        "VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
-        "VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
-        "Tax Group Code" := GLAccount."Tax Group Code";
+        Validate("Gen. Posting Type", GLAccount."Gen. Posting Type");
+        Validate("Gen. Bus. Posting Group", GLAccount."Gen. Bus. Posting Group");
+        Validate("Gen. Prod. Posting Group", GLAccount."Gen. Prod. Posting Group");
+        Validate("VAT Bus. Posting Group", GLAccount."VAT Bus. Posting Group");
+        Validate("VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
+        Validate("Tax Group Code", GLAccount."Tax Group Code");
     end;
 
     local procedure InitFromItem()
