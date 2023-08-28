@@ -5,6 +5,7 @@ codeunit 6151396 "NPR Sentry Helper"
     internal procedure ShouldUseSentryCron(): Boolean
     var
         Company: Record Company;
+        NPREnvironmentInformation: Record "NPR Environment Information";
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         // for now Sentry Cron should be used only for production SaaS environments for companies which are not Cronus or evaluation and the their last G/L Entry has been modified in the last 30 days
@@ -19,6 +20,10 @@ codeunit 6151396 "NPR Sentry Helper"
 
         if Company.Get(CompanyName()) then
             if Company."Evaluation Company" then
+                exit(false);
+
+        if NPREnvironmentInformation.Get() then
+            if (NPREnvironmentInformation."Environment Type" <> NPREnvironmentInformation."Environment Type"::PROD) or not NPREnvironmentInformation."Environment Verified" then
                 exit(false);
 
         if not IsThereRecentGLEntry(CreateDateTime(CalcDate('<-30D>', Today()), Time())) then
