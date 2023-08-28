@@ -49,6 +49,7 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         GLAccount: Record "G/L Account";
         POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         AccountNo: Code[20];
+        PayOption: Integer;
     begin
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
@@ -62,6 +63,16 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         else
             if (Page.RunModal(PAGE::"NPR TouchScreen: G/L Accounts", GLAccount) <> ACTION::LookupOK) then
                 Error('');
+
+        PayOption := Context.GetIntegerParameter('PayOption');
+
+        if PayOption = 0 then begin
+            GLAccount.TestField("Gen. Bus. Posting Group");
+            GLAccount.TestField("Gen. Prod. Posting Group");
+            GLAccount.TestField("VAT Bus. Posting Group");
+            GLAccount.TestField("VAT Prod. Posting Group");
+            GLAccount.TestField("Gen. Posting Type");
+        end;
 
         Response.Add('accountNumber', GLAccount."No.");
         Response.Add('description', GLAccount.Name);
