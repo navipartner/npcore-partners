@@ -51,7 +51,7 @@ codeunit 6150996 "NPR MPOS Action ScanFind Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:MPOSActionScanFindItem.js###
-'let main=async({})=>{debugger;var e=await workflow.respond("GetScanditRequest"),a=navigator.userAgent||navigator.vendor||window.opera;/android/i.test(a)&&window.top.mpos.handleBackendMessage(e),/iPad|iPhone|iPod|Macintosh/.test(a)&&!window.MSStream&&window.webkit.messageHandlers.invokeAction.postMessage(e)};'
+'let main=async({})=>{debugger;var e=await workflow.respond("GetScanditRequest"),i=navigator.userAgent||navigator.vendor||window.opera;/android/i.test(i)&&(window.top.mpos?window.top.mpos.handleBackendMessage(e):window.top.jsBridge.invokeAction(JSON.stringify(e))),/iPad|iPhone|iPod|Macintosh/.test(i)&&!window.MSStream&&window.webkit.messageHandlers.invokeAction.postMessage(e)};'
         )
     end;
 }

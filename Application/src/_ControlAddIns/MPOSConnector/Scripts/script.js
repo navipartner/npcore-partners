@@ -2,7 +2,10 @@ function CallNativeFunction(jsonobject) {
   try {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera;
     if (/android/i.test(userAgent)) {
-      window.top.mpos.handleBackendMessage(jsonobject);
+      if (window.top.mpos)
+        window.top.mpos.handleBackendMessage(jsonobject);
+      else
+        window.top.jsBridge.invokeAction(JSON.stringify(jsonobject));
       Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("RequestSendSuccessfully");
       return;
     }

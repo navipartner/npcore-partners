@@ -5,7 +5,10 @@ let main = async ({}) => {
     var userAgent = navigator.userAgent || navigator.vendor || window.opera; 
     
     if (/android/i.test(userAgent)) {
-        window.top.mpos.handleBackendMessage(jsonObject); 
+        if (window.top.mpos)
+            window.top.mpos.handleBackendMessage(jsonObject);
+        else
+            window.top.jsBridge.invokeAction(JSON.stringify(jsonObject));
     }
 
     if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { 
