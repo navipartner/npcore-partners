@@ -627,6 +627,20 @@
         end;
     end;
 
+    procedure DeletePOSInfoTransaction(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesLineNo: Integer; POSInfoCode: Code[20]; POSInfo: Text[250])
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.SetRange("Register No.", RegisterNo);
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSInfoTransaction.SetRange("Sales Line No.", SalesLineNo);
+        POSInfoTransaction.SetRange("POS Info Code", POSInfoCode);
+        if POSInfo <> '' then
+            POSInfoTransaction.SetRange("POS Info", POSInfo);
+        if POSInfoTransaction.FindFirst() then
+            POSInfoTransaction.Delete(true);
+    end;
+
     procedure FindPOSInfoTransaction(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesLineNo: Integer; POSInfoCode: Code[20]; POSInfo: Text[250]): Boolean
     var
         POSInfoTransaction: Record "NPR POS Info Transaction";
@@ -639,6 +653,7 @@
             POSInfoTransaction.SetRange("POS Info", POSInfo);
         exit(not POSInfoTransaction.IsEmpty);
     end;
+
 
     #region DataSource Extension
     local procedure ThisExtension(): Text

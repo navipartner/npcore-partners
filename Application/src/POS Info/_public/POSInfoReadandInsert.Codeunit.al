@@ -40,4 +40,10 @@ codeunit 6059835 "NPR POS Info Read and Insert"
         exit(POSInfoMgmt.FindPOSInfoTransaction(RegisterNo, SalesTicketNo, SalesLineNo, POSInfoCode, POSInfo));
     end;
 
+    procedure DeletePOSInfoTransaction(RegisterNo: Code[10]; SalesTicketNo: Code[20]; SalesLineNo: Integer; POSInfoCode: Code[20]; POSInfo: Text[250])
+
+    begin
+        POSInfoMgmt.DeletePOSInfoTransaction(RegisterNo, SalesTicketNo, SalesLineNo, POSInfoCode, POSInfo);
+    end;
+
 }
