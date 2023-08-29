@@ -5,7 +5,10 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     var
         _FRCertificationSetup: Record "NPR FR Audit Setup";
-#if not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804) 
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21) 
+        _SignatureKey: Codeunit "Signature Key";
+#elif not (BC17 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804) 
         _SignatureKey: Record "Signature Key";
 #else
         _X509Certificate2: DotNet NPRNetX509Certificate2;
