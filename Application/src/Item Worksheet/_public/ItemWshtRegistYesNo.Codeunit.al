@@ -1,6 +1,5 @@
 ﻿codeunit 6060043 "NPR Item Wsht.-Regist.(Yes/No)"
 {
-    Access = Internal;
     TableNo = "NPR Item Worksheet Line";
 
     trigger OnRun()
