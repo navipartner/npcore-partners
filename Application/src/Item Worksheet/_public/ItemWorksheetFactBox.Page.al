@@ -1,6 +1,5 @@
 ﻿page 6060051 "NPR Item Worksheet FactBox"
 {
-    Extensible = False;
     Caption = 'Item Worksheet FactBox';
     PageType = CardPart;
     RefreshOnActivate = true;
