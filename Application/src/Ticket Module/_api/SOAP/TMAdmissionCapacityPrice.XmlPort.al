@@ -498,14 +498,15 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
         TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
         TempSaleLinePOS."Allow Line Discount" := true;
         TempSaleLinePOS.Insert();
-
+        WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
         if (M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS)) then begin
             AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
             AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
             AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
             AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
             AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
-        end
+        end;
+        WorkDate(Today());
     end;
 }
 
