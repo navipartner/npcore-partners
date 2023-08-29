@@ -168,7 +168,7 @@ codeunit 6150969 "NPR M2 MSI Integration Mgt."
                 NcTask."Table No." := Database::"NPR M2 MSI Request";
                 NcTask."Log Date" := CurrentDateTime();
 #pragma warning disable AA0139
-                NcTask."Record Position" := TempMSIRequest.GetPosition();
+                NcTask."Record Position" := TempMSIRequest.GetPosition(false);
 #pragma warning restore AA00139
                 NcTask."Record ID" := TempMSIRequest.RecordId;
                 NcTask."Record Value" := CopyStr(StrSubstNo('%1,%2,%3', TempMSIRequest."Item No.", TempMSIRequest."Variant Code", TempMSIRequest."Magento Source"), 1, MaxStrLen(NcTask."Record Value"));
