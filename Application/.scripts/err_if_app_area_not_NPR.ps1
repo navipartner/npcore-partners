@@ -14,8 +14,8 @@ function IsApplicationAreaAllowed {
         {
             #ignore comments
         }
-        elseif ($line.ToLower() -match 'page 6151231 "npr app. area setup"') {
-            #ignore main application area setup. Main setup is build with app area All 
+        elseif ($line.ToLower() -match 'page 6151094 "npr feature management"') {
+            #ignore feature management page. feature management is build with app area All 
             return $true
         }
         elseif ($line.ToLower().replace(' ', '') -match 'applicationarea=') 

@@ -1775,6 +1775,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
     procedure CalcTaxAmountDebitSaleForTaxUnliablePosted()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSViewProfile: Record "NPR POS View Profile";
         Customer: Record Customer;
         VATPostingSetup: Record "VAT Posting Setup";
         Item: array[2] of Record Item;
@@ -1819,6 +1820,10 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] POS View Profile
+        CreatePOSViewProfile(POSViewProfile, false);
+        AssignPOSViewProfileToPOSUnit(POSViewProfile.Code);
 
         // [GIVEN] Update rounding amount account
         UpdatePOSSalesRoundingAcc();
@@ -1896,6 +1901,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         VerifySalesforGLEntry(POSEntry, Item, Customer."Gen. Bus. Posting Group");
 
         //Revert
+        AssignPOSViewProfileToPOSUnit('');
         AssignVATBusPostGroupToPOSPostingProfile('');
     end;
 

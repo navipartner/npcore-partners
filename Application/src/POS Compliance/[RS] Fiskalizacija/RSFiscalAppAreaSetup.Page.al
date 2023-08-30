@@ -1,11 +1,13 @@
 page 6059911 "NPR RS Fiscal App. Area Setup"
 {
-    ApplicationArea = NPRRetail;
     Caption = 'RS Fiscal Application Area Setup';
     Extensible = false;
     PageType = List;
     SourceTable = "Application Area Setup";
-    UsageCategory = Administration;
+    UsageCategory = None;
+    ObsoleteReason = 'Not used anymore.';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
 
     layout
     {
