@@ -256,20 +256,6 @@
 
     actions
     {
-        area(navigation)
-        {
-            action(ApplicationArea)
-            {
-                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
-                Caption = 'Ticket Application Area';
-                ToolTip = 'Executes the Ticket Application Area action';
-                Image = SetupList;
-                Ellipsis = true;
-                RunObject = Page "NPR Ticket App. Area Setup";
-            }
-
-        }
-
         area(Processing)
         {
             action(TicketWizard)

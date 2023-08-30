@@ -63,7 +63,7 @@ stages:
                                 "NPRRSRLocal",
                                 "NPRRSLocal",
                                 "NPRRSFiscal")
-      exceptions: (@{Type = "Page"; Id = 6151231; Name = "NPR App. Area Setup" })
+      exceptions: (@{Type = "Page"; Id = 6151094; Name = "NPR Feature Management" })
     generatePermissions:
       enabled: true
       alObjectsFolder: $(Build.Repository.LocalPath)/Application/src/

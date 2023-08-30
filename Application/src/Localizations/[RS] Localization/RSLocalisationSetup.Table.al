@@ -17,10 +17,6 @@ table 6060009 "NPR RS Localisation Setup"
         {
             Caption = 'Enable RS Localisation';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            begin
-                SetApplicationAreaForNPRRSLocal(Rec."Enable RS Local");
-            end;
         }
     }
 
@@ -31,14 +27,4 @@ table 6060009 "NPR RS Localisation Setup"
             Clustered = true;
         }
     }
-
-    internal procedure SetApplicationAreaForNPRRSLocal(EnableAppArea: Boolean)
-    var
-        ApplicationAreaSetup: Record "Application Area Setup";
-    begin
-        ApplicationAreaSetup.SetRange("Company Name", CompanyName());
-        if ApplicationAreaSetup.IsEmpty() then
-            exit;
-        ApplicationAreaSetup.ModifyAll("NPR RS Local", EnableAppArea);
-    end;
 }

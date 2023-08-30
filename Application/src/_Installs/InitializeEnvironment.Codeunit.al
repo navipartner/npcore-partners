@@ -6,7 +6,6 @@
     trigger OnInstallAppPerDatabase()
     begin
         AllowHttpRequestForSandboxEnvironment();
-        EnableNPRRetailInApplicationAreaSetup();
     end;
 
     local procedure AllowHttpRequestForSandboxEnvironment()
@@ -14,12 +13,5 @@
         EnvironmentHandler: Codeunit "NPR Environment Handler";
     begin
         EnvironmentHandler.EnableAllowHttpInSandbox();
-    end;
-
-    local procedure EnableNPRRetailInApplicationAreaSetup()
-    var
-        ApplicationAreaSetup: Record "Application Area Setup";
-    begin
-        ApplicationAreaSetup.ModifyAll("NPR Retail", true);
     end;
 }

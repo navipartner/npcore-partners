@@ -4,10 +4,11 @@
     Caption = 'Ticket Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";
-    UsageCategory = Administration;
+    UsageCategory = None;
     AdditionalSearchTerms = 'Ticket Setup';
-    ApplicationArea = NPRRetail;
-
+    ObsoleteReason = 'Replaced by page 6151094 "NPR Feature Management"';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
 
     layout
     {

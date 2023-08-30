@@ -58,7 +58,6 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG App. Area User Exp."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Customer Templates"));
@@ -134,6 +133,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -278,8 +278,6 @@
                 end;
             Codeunit::"NPR Event Report Layout Upg.":
                 exit('NPREventReportLayoutUpg-20210803');
-            Codeunit::"NPR UPG App. Area User Exp.":
-                exit('NPR-482497-AppAreaForUserExperience-20210825');
             Codeunit::"NPR UPG Sales Pr. Maint. Setup":
                 exit('NPRSalesPriceMaintSetupUpgrade-20210901');
             Codeunit::"NPR UPG Cust. Config. Temp.":
@@ -487,6 +485,11 @@
                         exit('NPRE_KitchReqSeatWaiter_20230704');
                     'RefreshKitchenOrderStatus':
                         exit('NPRE_RefreshKitchenOrderStatus_20230704');
+                end;
+            Codeunit::"NPR Feature Management Install":
+                case UpgradeStep of
+                    'AddFeatures':
+                        exit('FeaturesInstall-20230818');
                 end;
         end;
     end;
