@@ -1,8 +1,8 @@
-page 6059926 "NPR APIV1 PBIItem"
+page 6151166 "NPR APIV2 PBIItem"
 {
     APIGroup = 'powerBI';
     APIPublisher = 'navipartner';
-    APIVersion = 'v1.0';
+    APIVersion = 'v2.0';
     PageType = API;
     EntityName = 'item';
     EntitySetName = 'items';
@@ -13,9 +13,6 @@ page 6059926 "NPR APIV1 PBIItem"
     SourceTable = "Item";
     Extensible = false;
     Editable = false;
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR26.0';
-    ObsoleteReason = 'version v2.0 created';
 
     layout
     {
@@ -50,10 +47,6 @@ page 6059926 "NPR APIV1 PBIItem"
                 field(itemCategoryCode; Rec."Item Category Code")
                 {
                     Caption = 'Item Category Code', Locked = true;
-                }
-                field(salesQty; Rec."Sales (Qty.)")
-                {
-                    Caption = 'Sales (Qty.)', Locked = true;
                 }
                 field(type; Rec."Type")
                 {
