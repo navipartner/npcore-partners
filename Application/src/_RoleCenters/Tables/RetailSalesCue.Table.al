@@ -163,6 +163,9 @@
             CalcFormula = Count("Incoming Document" WHERE(Processed = CONST(false)));
             Caption = 'My Incoming Documents';
             FieldClass = FlowField;
+            ObsoleteReason = 'Moved to table 6151247 "NPR POS Entry Cue."';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR23.0';
         }
         field(109; "Sales Credit Memos"; Integer)
         {
