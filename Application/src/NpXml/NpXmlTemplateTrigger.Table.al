@@ -115,7 +115,7 @@
                 EventSubscription: Record "Event Subscription";
             begin
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
+                EventSubscription.SetFilter("Publisher Object ID", '%1|%2', Codeunit::"NPR NpXml Trigger Mgt.", Codeunit::"NPR NpXml Templ. Trigger Event");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
                 if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
                     exit;
@@ -134,7 +134,7 @@
                 end;
 
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
+                EventSubscription.SetFilter("Publisher Object ID", '%1|%2', Codeunit::"NPR NpXml Trigger Mgt.", Codeunit::"NPR NpXml Templ. Trigger Event");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Parent Codeunit ID");
                 if "Generic Parent Function" <> '' then
@@ -162,7 +162,7 @@
                 EventSubscription: Record "Event Subscription";
             begin
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
+                EventSubscription.SetFilter("Publisher Object ID", '%1|%2', Codeunit::"NPR NpXml Trigger Mgt.", Codeunit::"NPR NpXml Templ. Trigger Event");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
                 if PAGE.RunModal(PAGE::"Event Subscriptions", EventSubscription) <> ACTION::LookupOK then
                     exit;
@@ -181,7 +181,7 @@
                 end;
 
                 EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
-                EventSubscription.SetRange("Publisher Object ID", CODEUNIT::"NPR NpXml Trigger Mgt.");
+                EventSubscription.SetFilter("Publisher Object ID", '%1|%2', Codeunit::"NPR NpXml Trigger Mgt.", Codeunit::"NPR NpXml Templ. Trigger Event");
                 EventSubscription.SetRange("Published Function", 'OnSetupGenericParentTable');
                 EventSubscription.SetRange("Subscriber Codeunit ID", "Generic Parent Codeunit ID");
                 if "Generic Parent Function" <> '' then

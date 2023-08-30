@@ -193,6 +193,7 @@
     procedure SetParentFilter(NpXmlTemplateTrigger: Record "NPR NpXml Template Trigger"; PrevRecRef: RecordRef; RecRef: RecordRef; var RecRef2: RecordRef)
     var
         NpXmlTemplateTriggerLink: Record "NPR NpXml Templ.Trigger Link";
+        NpXmlTemplTriggerEvent: Codeunit "NPR NpXml Templ. Trigger Event";
         FieldRef: FieldRef;
         FieldRef2: FieldRef;
         BufferDecimal: Decimal;
@@ -200,8 +201,10 @@
         Handled: Boolean;
     begin
         Clear(RecRef2);
-        if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> 0 then
+        if NpXmlTemplateTrigger."Generic Parent Codeunit ID" <> 0 then begin
             OnSetupGenericParentTable(NpXmlTemplateTrigger, RecRef, RecRef2, Handled);
+            NpXmlTemplTriggerEvent.OnSetupGenericParentTable(NpXmlTemplateTrigger."Generic Parent Codeunit ID", NpXmlTemplateTrigger."Generic Parent Function", RecRef, RecRef2, Handled);
+        end;
         if (not Handled) or (NpXmlTemplateTrigger."Generic Parent Codeunit ID" = 0) then begin
             RecRef2.Open(NpXmlTemplateTrigger."Parent Table No.");
             if RecRef.Number = NpXmlTemplateTrigger."Parent Table No." then
