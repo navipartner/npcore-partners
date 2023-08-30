@@ -4,62 +4,62 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
     {
         field(6060100; "NPR Ticket Essential"; Boolean)
         {
-            Caption = 'NPR Ticket Essential';
+            Caption = 'NaviPartner Ticket Essential';
             DataClassification = CustomerContent;
         }
         field(6060101; "NPR Ticket Advanced"; Boolean)
         {
-            Caption = 'NPR Ticket Advanced';
+            Caption = 'NaviPartner Ticket Advanced';
             DataClassification = CustomerContent;
         }
         field(6060102; "NPR Ticket Wallet"; Boolean)
         {
-            Caption = 'NPR Ticket Wallet';
+            Caption = 'NaviPartner Ticket Wallet';
             DataClassification = CustomerContent;
         }
         field(6060103; "NPR Ticket Dynamic Price"; Boolean)
         {
-            Caption = 'NPR Ticket Dynamic Price';
+            Caption = 'NaviPartner Ticket Dynamic Price';
             DataClassification = CustomerContent;
         }
         field(6060104; "NPR Retail"; Boolean)
         {
-            Caption = 'NPR Retail';
+            Caption = 'NaviPartner Retail';
             DataClassification = CustomerContent;
         }
         field(6060105; "NPR NaviConnect"; Boolean)
         {
-            Caption = 'NPR NaviConnect';
+            Caption = 'NaviPartner NaviConnect';
             DataClassification = CustomerContent;
         }
         field(6060106; "NPR Membership Essential"; Boolean)
         {
-            Caption = 'NPR Membership Essential';
+            Caption = 'NaviPartner Membership Essential';
             DataClassification = CustomerContent;
         }
         field(6060107; "NPR Membership Advanced"; Boolean)
         {
-            Caption = 'NPR Membership Advanced';
+            Caption = 'NaviPartner Membership Advanced';
             DataClassification = CustomerContent;
         }
         field(6060108; "NPR HeyLoyalty"; Boolean)
         {
-            Caption = 'NPR HeyLoyalty Integration';
+            Caption = 'NaviPartner HeyLoyalty Integration';
             DataClassification = CustomerContent;
         }
         field(6060109; "NPR RS Local"; Boolean)
         {
-            Caption = 'NPR RS Localization';
+            Caption = 'NaviPartner RS Localization';
             DataClassification = CustomerContent;
         }
         field(6060110; "NPR RS R Local"; Boolean)
         {
-            Caption = 'NPR RS Retail Localization';
+            Caption = 'NaviPartner RS Retail Localization';
             DataClassification = CustomerContent;
         }
         field(6060111; "NPR RS Fiscal"; Boolean)
         {
-            Caption = 'NPR RS Fiscalisation';
+            Caption = 'NaviPartner RS Fiscalisation';
             DataClassification = CustomerContent;
         }
     }

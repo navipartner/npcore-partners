@@ -20,6 +20,12 @@ page 6151108 "NPR RS Localisation Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Enable RS Localisation field.';
+
+                    trigger OnValidate()
+                    begin
+                        if xRec."Enable RS Local" <> Rec."Enable RS Local" then
+                            EnabledValueChanged := true;
+                    end;
                 }
             }
         }
@@ -32,4 +38,15 @@ page 6151108 "NPR RS Localisation Setup"
             Rec.Insert();
         end;
     end;
+
+    trigger OnClosePage()
+    var
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+    begin
+        if EnabledValueChanged then
+            ApplicationAreaMgmtFacade.RefreshExperienceTierCurrentCompany(); // refresh of experience tier has to be done in order to trigger OnGetEssentialExperienceAppAreas publisher
+    end;
+
+    var
+        EnabledValueChanged: Boolean;
 }

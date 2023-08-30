@@ -519,34 +519,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
         exit(RSFiscalisationSetup."Enable RS Fiscal");
     end;
 
-    internal procedure EnableApplicationAreaForNPRRSFiscal(EnableAppArea: Boolean)
-    var
-        ApplicationAreaSetup: Record "Application Area Setup";
-    begin
-        case EnableAppArea of
-            true:
-                begin
-                    ApplicationAreaSetup.SetRange("Company Name", CompanyName());
-                    ApplicationAreaSetup.SetRange("NPR RS Fiscal", false);
-                    if ApplicationAreaSetup.IsEmpty() then
-                        ApplicationAreaSetup.ModifyAll("NPR RS Fiscal", true)
-                    else begin
-                        ApplicationAreaSetup.Init();
-                        ApplicationAreaSetup."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(ApplicationAreaSetup."Company Name"));
-                        ApplicationAreaSetup."NPR RS Fiscal" := true;
-                        ApplicationAreaSetup.Insert();
-                    end;
-                end;
-            false:
-                begin
-                    ApplicationAreaSetup.SetRange("Company Name", CompanyName());
-                    ApplicationAreaSetup.SetRange("NPR RS Fiscal", true);
-                    if not ApplicationAreaSetup.IsEmpty() then
-                        ApplicationAreaSetup.ModifyAll("NPR RS Fiscal", false);
-                end;
-        end;
-    end;
-
     internal procedure CheckIfVATPostingSetupHasEntries(VATPostingSetup: Record "VAT Posting Setup"): Boolean
     var
         VATEntry: Record "VAT Entry";

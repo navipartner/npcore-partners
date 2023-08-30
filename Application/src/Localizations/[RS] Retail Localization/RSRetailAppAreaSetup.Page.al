@@ -4,8 +4,10 @@ page 6150836 "NPR RS Retail App. Area Setup"
     Caption = 'RS Retail Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
+    ObsoleteReason = 'Not used anymore.';
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR24.0';
 
     layout
     {

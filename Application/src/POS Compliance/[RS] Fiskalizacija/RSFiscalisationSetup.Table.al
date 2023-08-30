@@ -17,12 +17,6 @@ table 6059861 "NPR RS Fiscalisation Setup"
         {
             Caption = 'Enable RS Fiscalisation';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            var
-                RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
-            begin
-                RSAuditMgt.EnableApplicationAreaForNPRRSFiscal(Rec."Enable RS Fiscal");
-            end;
         }
         field(10; "Sandbox URL"; Text[100])
         {
