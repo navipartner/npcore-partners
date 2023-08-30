@@ -164,11 +164,15 @@
             cuegroup("Incoming Documents")
             {
                 Caption = 'Incoming Documents';
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR23.0';
+                ObsoleteReason = 'Moved to page 6151260 "NPR POS Entry Cue"';
+
                 field("My Incoming Documents"; Rec."My Incoming Documents")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the number of the incoming documents that are assigned to the current user.';
-
                 }
             }
         }

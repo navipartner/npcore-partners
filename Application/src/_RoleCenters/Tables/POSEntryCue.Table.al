@@ -1,8 +1,9 @@
 ﻿table 6151247 "NPR POS Entry Cue."
 {
     Access = Internal;
-    DataClassification = CustomerContent;
     Caption = 'POS Entry Cue.';
+    DataClassification = CustomerContent;
+    
     fields
     {
         field(1; "Primary Key"; Code[10])
@@ -81,7 +82,12 @@
         {
             FieldClass = FlowFilter;
         }
-
+        field(20; "My Incoming Documents"; Integer)
+        {
+            CalcFormula = count("Incoming Document" where(Processed = const(false)));
+            Caption = 'My Incoming Documents';
+            FieldClass = FlowField;
+        }
     }
     keys
     {

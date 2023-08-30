@@ -155,6 +155,15 @@
                     end;
                 }
             }
+            cuegroup("Incoming Documents")
+            {
+                Caption = 'Incoming Documents';
+                field("My Incoming Documents"; Rec."My Incoming Documents")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the number of the incoming documents that are assigned to the current user.';
+                }
+            }
         }
     }
 
