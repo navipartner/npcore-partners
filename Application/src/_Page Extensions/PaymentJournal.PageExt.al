@@ -2,7 +2,7 @@ pageextension 6014503 "NPR Payment Journal" extends "Payment Journal"
 {
     layout
     {
-        addafter(Correction)
+        addlast(Control1)
         {
             field("NPR Prepayment"; Rec.Prepayment)
             {
