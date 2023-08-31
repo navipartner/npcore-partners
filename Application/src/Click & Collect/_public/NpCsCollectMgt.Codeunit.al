@@ -211,6 +211,7 @@
     begin
         UpdateDeliveryStatus(NpCsDocument, NpCsDocument."Delivery Status"::Expired, 0, '');
         NpCsWorkflowMgt.SendNotificationToStore(NpCsDocument);
+        NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit();
 
         if not SkipWorkflow then
