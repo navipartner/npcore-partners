@@ -11,6 +11,7 @@
     SourceTableTemporary = true;
     UsageCategory = None;
     ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
+
     layout
     {
         area(content)
@@ -134,7 +135,7 @@
                         if (Rec.Quantity < 1) then
                             Error(QTY_MUST_BE_GT_ZERO);
 
-                        if CustomizableTicket() then
+                        if (not AllowCustomizableTicketQtyChange()) then
                             Error(OptionalErr);
 
                         if (xRec.Quantity <> Rec.Quantity) then begin
@@ -169,6 +170,7 @@
                             if (Rec.FindFirst()) then
                                 CommonQty := Rec.Quantity;
                             Rec.Reset();
+                            Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
                             Rec.Get(CurrentEntryNo);
                             Rec.Quantity := CommonQty;
                             Rec."Admission Inclusion" := Rec."Admission Inclusion"::SELECTED;
@@ -185,7 +187,7 @@
                             gReservationEdited := true;
 
                         gReservationEdited := true;
-
+                        gVisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
                     end;
                 }
                 field("Customer No."; Rec."Customer No.")
@@ -427,6 +429,7 @@
         gTicketRequestEntryNo: Integer;
         gTourTicket: Boolean;
         gTourTicketPaymentOptions: Option UNPAID,POSTPAID;
+        _AllowCustomizableTicketQtyChange: Boolean;
         NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
         DIFFERENT_DATES_WARNING: Label 'Please note that the selected time schedules have different dates.';
@@ -546,6 +549,9 @@
     begin
 
         gConfirmStatusText := '';
+
+        if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
+            exit(false);
 
         if (TicketReservationRequest."External Adm. Sch. Entry No." <= 0) then
             exit(true);
@@ -706,6 +712,8 @@
             ResponseMessage := 'If this message is shown, waiting list return code 11 is not handled properly.';
             exit(11);
         end;
+
+        Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
         Rec.Reset();
 
         if (gReservationEdited) then begin
@@ -713,6 +721,7 @@
             TicketRequestManager.DeleteReservationRequest(Rec."Session Token ID", false);
 
             Rec.Reset();
+            Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
             if (Rec.FindFirst()) then;
             repeat
 
@@ -820,6 +829,9 @@
         if (gAllowQuantityChange and gQuantityChanged) then
             ChangeTourTicketQuantity(Rec);
 
+        Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
+        Rec.FindSet();
+
         exit(0);
     end;
 
@@ -893,6 +905,9 @@
             TicketRequestManager.ConfirmChangeRequestDynamicTicket(Rec."Session Token ID");
         end;
 
+        Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
+        Rec.FindSet();
+
         exit(0);
     end;
 
@@ -948,6 +963,8 @@
 
         until ((Rec.Next() = 0) or TimeOverlapIssue);
 
+        Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
+        Rec.FindSet();
         Rec.Get(SelectedRequestEntryNo);
 
         if (TimeOverlapIssue) then
@@ -960,10 +977,14 @@
 
     internal procedure SetIgnoreScheduleSelectionFilter(IgnoreFilter: Boolean): Boolean
     begin
-
         gIgnoreScheduleFilter := IgnoreFilter;
         exit(gIgnoreScheduleFilter);
+    end;
 
+    internal procedure SetAllowCustomizableTicketQtyChange(AllowChange: Boolean)
+    var
+    begin
+        _AllowCustomizableTicketQtyChange := AllowChange;
     end;
 
     local procedure IsRescheduleAllowed(ExtAdmSchEntryNo: Integer) RescheduleAllowed: Boolean;
@@ -971,7 +992,6 @@
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-
         RescheduleAllowed := true;
 
         if (gChangeRequestMode) then begin
@@ -981,7 +1001,6 @@
         end;
 
         exit(RescheduleAllowed);
-
     end;
 
     local procedure GetDataCaptionExpr(): Text
@@ -991,13 +1010,17 @@
         exit(StrSubstNo(DateTimeLbl, Today(), Time()));
     end;
 
-    local procedure CustomizableTicket(): Boolean
+    local procedure AllowCustomizableTicketQtyChange(): Boolean
     var
         TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
     begin
+        if (_AllowCustomizableTicketQtyChange) then
+            exit(true);
+
+        TMTicketReservationReq.SetCurrentKey("Session Token ID");
         TMTicketReservationReq.SetRange("Session Token ID", Rec."Session Token ID");
         TMTicketReservationReq.SetFilter("Admission Inclusion", '%1|%2', TMTicketReservationReq."Admission Inclusion"::NOT_SELECTED, TMTicketReservationReq."Admission Inclusion"::SELECTED);
-        exit(not TMTicketReservationReq.IsEmpty());
+        exit(TMTicketReservationReq.IsEmpty());
     end;
 
     local procedure ChangeTourTicketQuantity(Request: Record "NPR TM Ticket Reservation Req.")

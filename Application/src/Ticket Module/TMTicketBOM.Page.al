@@ -513,7 +513,9 @@
             TicketReservationRequest."Entry No." := 0;
             TicketReservationRequest."Session Token ID" := Token;
 
-            TicketReservationRequest.Quantity := GetDefaultQuantity(PaymentType);
+            TicketReservationRequest.Quantity := 0;
+            if (TicketAdmissionBOM."Admission Inclusion" in [TicketAdmissionBOM."Admission Inclusion"::REQUIRED, TicketAdmissionBOM."Admission Inclusion"::SELECTED]) then
+                TicketReservationRequest.Quantity := GetDefaultQuantity(PaymentType);
 
             TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo(ItemNo, VariantCode);
             TicketReservationRequest."Item No." := ItemNo;
@@ -522,6 +524,7 @@
             TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
             if (TicketReservationRequest."Admission Description" = '') then
                 TicketReservationRequest."Admission Description" := Admission.Description;
+            TicketReservationRequest."Admission Inclusion" := TicketAdmissionBOM."Admission Inclusion";
             TicketReservationRequest."Payment Option" := PaymentType;
             TicketReservationRequest."Created Date Time" := CurrentDateTime;
             TicketReservationRequest.Insert();
@@ -543,6 +546,7 @@
             DisplayTicketReservationRequest.LoadTicketRequest(Token);
             DisplayTicketReservationRequest.SetTicketItem(ItemNo, VariantCode);
             DisplayTicketReservationRequest.SetIgnoreScheduleSelectionFilter(true);
+            DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
 
             DisplayTicketReservationRequest.AllowQuantityChange(true);
             DisplayTicketReservationRequest.LookupMode(true);
