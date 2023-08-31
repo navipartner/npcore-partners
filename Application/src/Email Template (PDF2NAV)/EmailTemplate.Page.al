@@ -293,7 +293,7 @@
             action(SendTestEmail)
             {
                 Caption = 'Send E-mail';
-                Image = Delete;
+                Image = SendMail;
                 Visible = true;
                 ToolTip = 'Send Test E-mail';
                 ApplicationArea = NPRRetail;
