@@ -349,38 +349,44 @@
         LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer E-mail", NpCsDocument."Processing Status");
         NpCsDocument.TestField("Customer E-mail");
 
-        case NpCsDocument."Processing Status" of
-            NpCsDocument."Processing Status"::Pending:
-                begin
-                    if NpCsDocument."E-mail Template (Pending)" = '' then
-                        exit(false);
-
-                    EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Pending)");
-                end;
-            NpCsDocument."Processing Status"::Confirmed:
-                begin
-                    if NpCsDocument."E-mail Template (Confirmed)" = '' then
-                        exit(false);
-
-                    EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Confirmed)");
-                end;
-            NpCsDocument."Processing Status"::Rejected:
-                begin
-                    if NpCsDocument."E-mail Template (Rejected)" = '' then
-                        exit(false);
-
-                    EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Rejected)");
-                end;
-            NpCsDocument."Processing Status"::Expired:
-                begin
-                    if NpCsDocument."E-mail Template (Expired)" = '' then
-                        exit(false);
-
-                    EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Expired)");
-                end;
-            else
+        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Expired then begin
+            if NpCsDocument."E-mail Template (Expired)" = '' then
                 exit(false);
-        end;
+            EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Expired)");
+            LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer E-mail", NpCsDocument."Delivery Status");
+        end else
+            case NpCsDocument."Processing Status" of
+                NpCsDocument."Processing Status"::Pending:
+                    begin
+                        if NpCsDocument."E-mail Template (Pending)" = '' then
+                            exit(false);
+
+                        EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Pending)");
+                    end;
+                NpCsDocument."Processing Status"::Confirmed:
+                    begin
+                        if NpCsDocument."E-mail Template (Confirmed)" = '' then
+                            exit(false);
+
+                        EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Confirmed)");
+                    end;
+                NpCsDocument."Processing Status"::Rejected:
+                    begin
+                        if NpCsDocument."E-mail Template (Rejected)" = '' then
+                            exit(false);
+
+                        EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Rejected)");
+                    end;
+                NpCsDocument."Processing Status"::Expired:
+                    begin
+                        if NpCsDocument."E-mail Template (Expired)" = '' then
+                            exit(false);
+
+                        EmailTemplateHeader.Get(NpCsDocument."E-mail Template (Expired)");
+                    end;
+                else
+                    exit(false);
+            end;
         EmailTemplateHeader.TestField("Table No.", DATABASE::"NPR NpCs Document");
         EmailTemplateHeader.SetRecFilter();
 
@@ -412,38 +418,44 @@
         LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer Phone No.", NpCsDocument."Processing Status");
         NpCsDocument.TestField("Customer Phone No.");
 
-        case NpCsDocument."Processing Status" of
-            NpCsDocument."Processing Status"::Pending:
-                begin
-                    if NpCsDocument."Sms Template (Pending)" = '' then
-                        exit(false);
-
-                    SmsTemplateHeader.Get(NpCsDocument."Sms Template (Pending)");
-                end;
-            NpCsDocument."Processing Status"::Confirmed:
-                begin
-                    if NpCsDocument."Sms Template (Confirmed)" = '' then
-                        exit(false);
-
-                    SmsTemplateHeader.Get(NpCsDocument."Sms Template (Confirmed)");
-                end;
-            NpCsDocument."Processing Status"::Rejected:
-                begin
-                    if NpCsDocument."Sms Template (Rejected)" = '' then
-                        exit(false);
-
-                    SmsTemplateHeader.Get(NpCsDocument."Sms Template (Rejected)");
-                end;
-            NpCsDocument."Processing Status"::Expired:
-                begin
-                    if NpCsDocument."Sms Template (Expired)" = '' then
-                        exit(false);
-
-                    SmsTemplateHeader.Get(NpCsDocument."Sms Template (Expired)");
-                end;
-            else
+        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Expired then begin
+            if NpCsDocument."Sms Template (Expired)" = '' then
                 exit(false);
-        end;
+            SmsTemplateHeader.Get(NpCsDocument."Sms Template (Expired)");
+            LogMessage := StrSubstNo(NotifSentLbl, NpCsDocument."Sell-to Customer Name", NpCsDocument."Customer Phone No.", NpCsDocument."Delivery Status");
+        end else
+            case NpCsDocument."Processing Status" of
+                NpCsDocument."Processing Status"::Pending:
+                    begin
+                        if NpCsDocument."Sms Template (Pending)" = '' then
+                            exit(false);
+
+                        SmsTemplateHeader.Get(NpCsDocument."Sms Template (Pending)");
+                    end;
+                NpCsDocument."Processing Status"::Confirmed:
+                    begin
+                        if NpCsDocument."Sms Template (Confirmed)" = '' then
+                            exit(false);
+
+                        SmsTemplateHeader.Get(NpCsDocument."Sms Template (Confirmed)");
+                    end;
+                NpCsDocument."Processing Status"::Rejected:
+                    begin
+                        if NpCsDocument."Sms Template (Rejected)" = '' then
+                            exit(false);
+
+                        SmsTemplateHeader.Get(NpCsDocument."Sms Template (Rejected)");
+                    end;
+                NpCsDocument."Processing Status"::Expired:
+                    begin
+                        if NpCsDocument."Sms Template (Expired)" = '' then
+                            exit(false);
+
+                        SmsTemplateHeader.Get(NpCsDocument."Sms Template (Expired)");
+                    end;
+                else
+                    exit(false);
+            end;
         SmsTemplateHeader.TestField("Table No.", DATABASE::"NPR NpCs Document");
         SmsContent := SmsMgt.MakeMessage(SmsTemplateHeader, NpCsDocument);
 
