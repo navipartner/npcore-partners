@@ -66,12 +66,15 @@ page 6151245 "NPR Retail Setup RC"
                 Image = Reconcile;
                 action("POS Menus")
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS Menus';
                     Image = PaymentJournal;
+                    ObsoleteReason = 'It will not be used anymore.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR26.0';
                     RunObject = Page "NPR POS Menus";
-
                     ToolTip = 'View or edit the the POS Menus';
-                    ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 action("POS Actions")
                 {
@@ -84,21 +87,27 @@ page 6151245 "NPR Retail Setup RC"
                 }
                 action("POS View List")
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS View List';
                     Image = ViewDocumentLine;
+                    ObsoleteReason = 'It will not be used anymore.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR26.0';
                     RunObject = Page "NPR POS View List";
-
                     ToolTip = 'View or edit the POS View List';
-                    ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
                 action("POS Default View")
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS Default View';
                     Image = View;
+                    ObsoleteReason = 'It will not be used anymore.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR26.0';
                     RunObject = Page "NPR POS Default Views";
-
                     ToolTip = 'View or edit the POS Default View';
-                    ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
 
                 action("POS Scenarios")
