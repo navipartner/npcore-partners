@@ -23,14 +23,17 @@
                 }
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
-
                     ToolTip = 'Specifies a code to identify the POS Payment Method';
                     ApplicationArea = NPRRetail;
                 }
                 field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
-
                     ToolTip = 'Specifies a code to identify the POS Payment Bin';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Close to POS Bin No."; Rec."Close to POS Bin No.")
+                {
+                    ToolTip = 'Specifies the bin number used to close the POS';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
@@ -46,11 +49,6 @@
                 field("Difference Account Type"; Rec."Difference Account Type")
                 {
                     ToolTip = 'Specifies the account type used to track differences';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Close to POS Bin No."; Rec."Close to POS Bin No.")
-                {
-                    ToolTip = 'Specifies the bin number used to close the POS';
                     ApplicationArea = NPRRetail;
                 }
                 field("Difference Acc. No."; Rec."Difference Acc. No.")
