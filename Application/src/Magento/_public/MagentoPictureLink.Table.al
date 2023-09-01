@@ -25,6 +25,9 @@
         {
             Caption = 'Variant Value Code';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR26.0';
+            ObsoleteReason = 'We are going to use field 60 "Variety Value" from this table.';
         }
         field(15; "Line No."; Integer)
         {
@@ -45,7 +48,6 @@
             var
                 MagPicture: Record "NPR Magento Picture Link";
             begin
-                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 MagPicture.SetRange("Variety Type", "Variety Type");
                 MagPicture.SetRange("Variety Table", "Variety Table");
                 MagPicture.SetRange("Variety Value", "Variety Value");
@@ -64,7 +66,6 @@
             var
                 MagPicture: Record "NPR Magento Picture Link";
             begin
-                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 MagPicture.SetRange("Variety Type", "Variety Type");
                 MagPicture.SetRange("Variety Table", "Variety Table");
                 MagPicture.SetRange("Variety Value", "Variety Value");
@@ -83,7 +84,6 @@
             var
                 MagPicture: Record "NPR Magento Picture Link";
             begin
-                MagPicture.SetRange("Variant Value Code", "Variant Value Code");
                 MagPicture.SetRange("Variety Type", "Variety Type");
                 MagPicture.SetRange("Variety Table", "Variety Table");
                 MagPicture.SetRange("Variety Value", "Variety Value");
@@ -153,6 +153,9 @@
         }
         key(Key2; "Variant Value Code")
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR26.0';
+            ObsoleteReason = 'We are going to use field 60 "Variety Value" from this table.';
         }
         key(Key3; "Replication Counter")
         {
@@ -172,7 +175,6 @@
         MagPicture: Record "NPR Magento Picture Link";
     begin
         TestField("Picture Name");
-        MagPicture.SetRange("Variant Value Code", "Variant Value Code");
         MagPicture.SetRange("Variety Type", "Variety Type");
         MagPicture.SetRange("Variety Table", "Variety Table");
         MagPicture.SetRange("Variety Value", "Variety Value");

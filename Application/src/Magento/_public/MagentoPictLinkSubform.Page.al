@@ -64,15 +64,12 @@
     begin
         if ItemNo <> '' then
             Rec."Item No." := ItemNo;
-        if VariantValueCode <> '' then
-            Rec."Variant Value Code" := VariantValueCode;
         Rec."Variety Type" := VarietyTypeCode;
         Rec."Variety Table" := VarietyTableCode;
         Rec."Variety Value" := VarietyValueCode;
     end;
 
     var
-        VariantValueCode: Code[20];
         ItemNo: Code[20];
         VarietyTypeCode: Code[10];
         VarietyTableCode: Code[40];
@@ -89,18 +86,11 @@
         Rec.FilterGroup(2);
         if ItemNo <> '' then
             Rec.SetRange("Item No.", ItemNo);
-        Rec.SetRange("Variant Value Code", VariantValueCode);
         Rec.SetRange("Variety Type", VarietyTypeCode);
         Rec.SetRange("Variety Table", VarietyTableCode);
         Rec.SetRange("Variety Value", VarietyValueCode);
         Rec.FilterGroup(0);
         CurrPage.Update(false);
-    end;
-
-    internal procedure SetVariantValueCode(NewVariantValueCode: Code[20])
-    begin
-        VariantValueCode := NewVariantValueCode;
-        SetVariantFilters();
     end;
 
     internal procedure SetVarietyFilters(NewVarietyTypeCode: Code[10]; NewVarietyTableCode: Code[40]; NewVarietyValueCode: Code[50])
