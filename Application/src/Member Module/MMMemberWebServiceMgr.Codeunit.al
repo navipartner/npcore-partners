@@ -292,6 +292,7 @@
         ResponseMessage: Text;
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
+        MembershipEntry: Record "NPR MM Membership Entry";
     begin
 
         MemberInfoCapture.Init();
@@ -307,6 +308,16 @@
         if (MembershipEntryNo = 0) then
             Error(INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
 
+        Membership.Get(MembershipEntryNo);
+
+        // There should probably be date constraints here to figure out exactly which item controls the age constrains. 
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipEntry.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.SetFilter(Context, '%1|%2|%3|%4|%5', MembershipEntry.Context::NEW, MembershipEntry.Context::RENEW, MembershipEntry.Context::UPGRADE, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
+        if (MembershipEntry.FindLast()) then
+            MemberInfoCapture."Item No." := MembershipEntry."Item No.";
+
         TransferAttributes(Request, MemberInfoCapture);
 
         if (not (MembershipManagement.AddMemberAndCard(MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
@@ -318,7 +329,6 @@
         Member."Document ID" := DocumentID;
         Member.Modify();
 
-        Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         MemberCard.Get(MemberInfoCapture."Card Entry No.");
         MemberCard.SetRecFilter();
