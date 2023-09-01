@@ -449,7 +449,12 @@
                         exit('NPR-PopupDimension-20230531');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
-                exit('NPR_Upgrade_Variety_Setup_20230314');
+                case UpgradeStep of
+                    '':
+                        exit('NPR_Upgrade_Variety_Setup_20230314');
+                    'MoveVariantValueCode':
+                        exit('NPR_Move_VariantValueCode_20230711');
+                end;
             Codeunit::"NPR UPG Retail Logo":
                 exit('NPR_retail_logo_UPG_2023-04-03');
             Codeunit::"NPR UPG BalanceV4":

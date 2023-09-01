@@ -39,6 +39,9 @@ page 6060014 "NPR APIV1 - MagentoPictureLink"
                 field(variantValueCode; Rec."Variant Value Code")
                 {
                     Caption = 'Variant Value Code', Locked = true;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteReason = 'We are going to use field 60 "Variety Value" from the same table.';
                 }
                 field(lineNo; Rec."Line No.")
                 {
