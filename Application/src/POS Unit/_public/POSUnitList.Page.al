@@ -160,16 +160,20 @@
                 }
                 action("MPOS QR Code")
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'MPOS QR Code';
                     Ellipsis = true;
                     Image = Sales;
+                    ObsoleteReason = 'It will not be used anymore.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR26.0';
                     Promoted = true;
-                    PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
+                    PromotedOnly = true;
                     RunObject = Page "NPR MPOS QR Code List";
                     ToolTip = 'Displays a page showing list of related MPOS QR Code setups';
-                    ApplicationArea = NPRRetail;
+                    Visible = false;
                 }
             }
         }
