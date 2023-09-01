@@ -252,7 +252,9 @@
         OnBeforeLoadMonTables(TempDataLogSetup, TempDataLogSubscriber, Handled);
         If Handled then
             exit;
-
+        if not DataLogSetup.ReadPermission() then
+            exit;
+            
         TempDataLogSetup.DeleteAll();
         if DataLogSetup.FindSet() then
             repeat
