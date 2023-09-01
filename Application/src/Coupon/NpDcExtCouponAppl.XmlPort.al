@@ -86,6 +86,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                         var
                             Item: Record Item;
                             ItemVariant: Record "Item Variant";
+                            IsHandled: Boolean;
                         begin
                             if TempSaleLinePOSReq.Description = '' then begin
                                 Item.Get(TempSaleLinePOSReq."No.");
@@ -96,7 +97,9 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                                 TempSaleLinePOSReq."Magento Brand" := Item."NPR Magento Brand";
                             end;
                             if (TempSaleLinePOSReq."Description 2" = '') and (TempSaleLinePOSReq."Variant Code" <> '') then begin
-                                ItemVariant.Get(TempSaleLinePOSReq."No.", TempSaleLinePOSReq."Variant Code");
+                                OnBeforeGetItemVariant(ItemVariant, TempSaleLinePOSReq, IsHandled);
+                                if not IsHandled then
+                                    ItemVariant.Get(TempSaleLinePOSReq."No.", TempSaleLinePOSReq."Variant Code");
                                 TempSaleLinePOSReq."Description 2" := CopyStr(ItemVariant.Description, 1, MaxStrLen(TempSaleLinePOSReq."Description 2"));
                             end;
                         end;
@@ -225,6 +228,11 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
     begin
         TempSalePOSRes.Copy(TempSalePOSRes2, true);
         TempSaleLinePOSRes.Copy(TempSaleLinePOSRes2, true);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetItemVariant(var ItemVariant: Record "Item Variant"; var SaleLinePOS: Record "NPR POS Sale Line"; var IsHandled: Boolean)
+    begin
     end;
 }
 
