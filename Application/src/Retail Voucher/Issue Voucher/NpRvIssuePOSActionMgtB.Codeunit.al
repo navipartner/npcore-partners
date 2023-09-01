@@ -118,6 +118,18 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         SaleLinePOS."Unit Price" := VoucherType."Voucher Amount";
     end;
 
+    local procedure UpdateSaleLinePOS(NewReferenceNo: Text[50]; NpRvSalesLine: Record "NPR NpRv Sales Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if NewReferenceNo = NpRvSalesLine."Reference No." then
+            exit;
+
+        VoucherType.Get(NpRvSalesLine."Voucher Type");
+        SaleLinePOS.Description := CopyStr(NewReferenceNo + ' ' + VoucherType.Description, 1, MaxStrLen(SaleLinePOS.Description));
+        SaleLinePOS.Modify();
+    end;
+
     procedure ContactInfo(SaleLinePOS: Record "NPR POS Sale Line")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
@@ -139,6 +151,7 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvSalesLineReferences: Page "NPR NpRv Sales Line Ref.";
+        NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
     begin
         if not GuiAllowed then
             exit;
@@ -150,6 +163,10 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
 
         NpRvSalesLineReferences.SetNpRvSalesLine(NpRvSalesLine, Quantity);
         NpRvSalesLineReferences.RunModal();
+
+        NpRvSalesLineRef.SetRange("Sales Line Id", NpRvSalesLine.Id);
+        if NpRvSalesLineRef.FindFirst() then
+            UpdateSaleLinePOS(NpRvSalesLineRef."Reference No.", NpRvSalesLine, SaleLinePOS);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
