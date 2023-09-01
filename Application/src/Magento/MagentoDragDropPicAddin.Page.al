@@ -86,7 +86,9 @@
         PicturesAlreadyExistLbl: Label '%1 pictures already exist:', Comment = '%1 = number of pictures';
         _PictureName: Text;
         PictureLinkNo: Code[20];
+#pragma warning disable AA0206
         PictureLinkVariantValueCode: Code[20];
+#pragma warning enable AA0206
         _PictureType: Integer;
         Text00101: Label '\  - %1';
         ConfirmOverwriteLbl: Label '\\Overwrite?';
@@ -224,7 +226,6 @@
 
         Clear(MagentoPictureLink);
         MagentoPictureLink.SetRange("Item No.", PictureLinkNo);
-        MagentoPictureLink.SetRange("Variant Value Code", PictureLinkVariantValueCode);
         MagentoPictureLink.SetRange("Variety Type", VarietyTypeCode);
         MagentoPictureLink.SetRange("Variety Table", VarietyTableCode);
         MagentoPictureLink.SetRange("Variety Value", VarietyValueCode);
@@ -235,7 +236,6 @@
         LineNo += 10000;
         MagentoPictureLink.Init();
         MagentoPictureLink."Item No." := PictureLinkNo;
-        MagentoPictureLink."Variant Value Code" := PictureLinkVariantValueCode;
         MagentoPictureLink."Variety Type" := VarietyTypeCode;
         MagentoPictureLink."Variety Table" := VarietyTableCode;
         MagentoPictureLink."Variety Value" := VarietyValueCode;
@@ -306,6 +306,7 @@
         if Rec.Get(PictureType, PictureName) then;
     end;
 
+    [Obsolete('We are going to use field 60 "Variety Value" from the same table.', 'NPR24.0')]
     procedure SetVariantValueCode(NewVariantValueCode: Code[20])
     begin
         PictureLinkVariantValueCode := NewVariantValueCode;
