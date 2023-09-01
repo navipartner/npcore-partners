@@ -3236,7 +3236,7 @@
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
 
         if (MembershipRole.IsEmpty()) then
-            exit(false);
+            exit(true); // this membership does not have members that are subject to age control. 
 
         if (AppliesTo in [MembershipSalesSetup."Age Constraint Applies To"::OLDEST, MembershipSalesSetup."Age Constraint Applies To"::YOUNGEST]) then begin
             MembershipRole.FindSet();
