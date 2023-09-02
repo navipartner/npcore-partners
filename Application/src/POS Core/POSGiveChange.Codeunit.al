@@ -51,7 +51,6 @@
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := SalePOS.Date;
         SaleLinePOS."Line No." := GetLastLineNo(SalePOS) + 10000;
-        SaleLinePOS.Insert(true);
         SaleLinePOS."Location Code" := SalePOS."Location Code";
         SaleLinePOS."Responsibility Center" := SalePOS."Responsibility Center";
         SaleLinePOS.Reference := SalePOS.Reference;
@@ -62,7 +61,7 @@
         SaleLinePOS."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         SaleLinePOS."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
         SaleLinePOS."Dimension Set ID" := SalePOS."Dimension Set ID";
-        SaleLinePOS.Modify(true);
+        SaleLinePOS.Insert(true);
     end;
 
     local procedure GetReturnPaymentType(): Code[10]
