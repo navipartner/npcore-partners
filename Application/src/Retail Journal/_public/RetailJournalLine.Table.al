@@ -51,7 +51,7 @@
                 "Quantity to Print" := 1;
                 FindItemSalesPrice();
                 Validate("Quantity for Discount Calc", 1);
-                calcProfit();
+                CalcProfit();
             end;
         }
         field(3; "Quantity to Print"; Decimal)
@@ -117,7 +117,7 @@
                     Currency."Amount Rounding Precision");
 
                 CalcDiscountPrice(FieldNo("Discount Price Incl. Vat"));
-                calcProfit();
+                CalcProfit();
             end;
         }
         field(8; "Last Direct Cost"; Decimal)
@@ -127,7 +127,7 @@
 
             trigger OnValidate()
             begin
-                calcProfit();
+                CalcProfit();
             end;
         }
         field(9; "Line No."; Integer)
@@ -365,12 +365,11 @@
             trigger OnValidate()
             var
                 Item: Record Item;
-                PriceListLineUOMMgt: Codeunit "NPR Price List Line UOM";
             begin
                 Item.Get(Rec."Item No.");
-                Rec."Last Direct Cost" := Item."Last Direct Cost" * PriceListLineUOMMgt.GetQtyPerUOMFromUOM(Rec."Item No.", Rec."Unit of Measure");
+                Rec."Last Direct Cost" := Item."Last Direct Cost" * UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Rec."Unit of Measure");
                 FindItemSalesPrice();
-                calcProfit();
+                CalcProfit();
             end;
         }
         field(50; "Location Filter"; Code[10])
@@ -583,6 +582,7 @@
 
     var
         RetailJournalHeader: Record "NPR Retail Journal Header";
+        UnitofMeasureManagement: Codeunit "Unit of Measure Management";
         LineNo: Integer;
         ShowDialog: Boolean;
         TotalRecNo: Integer;
@@ -602,7 +602,6 @@
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
-        PriceListLineUOMMgt: Codeunit "NPR Price List Line UOM";
     begin
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
         TempSaleLinePOS."No." := "Item No.";
@@ -641,7 +640,7 @@
         TempSaleLinePOS."Register No." := "Register No.";
 #pragma warning restore
         TempSaleLinePOS."Unit of Measure Code" := "Unit of Measure";
-        TempSaleLinePOS."Qty. per Unit of Measure" := PriceListLineUOMMgt.GetQtyPerUOMFromUOM("Item No.", "Unit of Measure");
+        TempSaleLinePOS."Qty. per Unit of Measure" := UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Rec."Unit of Measure");
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
         TempSaleLinePOS2 := TempSaleLinePOS;
@@ -662,7 +661,7 @@
         "Discount Pct." := TempSaleLinePOS2."Discount %";
     end;
 
-    internal procedure calcProfit()
+    internal procedure CalcProfit()
     var
         TempItem: Record Item temporary;
         Item1: Record Item;
