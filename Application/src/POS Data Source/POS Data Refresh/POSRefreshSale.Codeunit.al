@@ -194,7 +194,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
 
             SalespersonPurchaser.SetLoadFields(Name);
             if not SalespersonPurchaser.Get(SalePOS."Salesperson Code") then
-                SalespersonPurchaser.Name := 'Unknown';
+                Clear(SalespersonPurchaser);
 
             POSUnit.SetLoadFields(Name);
             if not POSUnit.Get(SalePOS."Register No.") then
@@ -219,7 +219,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
             end;
 
             FieldsObject.Add('SalespersonName', SalespersonPurchaser.Name);
-            FieldsObject.Add('RegisterName', SalespersonPurchaser.Name);
+            FieldsObject.Add('RegisterName', POSUnit.Name);
             FieldsObject.Add('CustomerName', Customer.Name);
             FieldsObject.Add('CustomerPostingGroup', Customer."Customer Posting Group");
             FieldsObject.Add('ContactName', Contact.Name);

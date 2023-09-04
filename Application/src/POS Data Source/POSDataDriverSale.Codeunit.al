@@ -114,7 +114,7 @@
 
         SalespersonPurchaser.SetLoadFields(Name);
         if not SalespersonPurchaser.Get(SalePOS."Salesperson Code") then
-            SalespersonPurchaser.Name := 'Unknown';
+            Clear(SalespersonPurchaser);
 
         POSUnit.SetLoadFields(Name);
         if not POSUnit.Get(SalePOS."Register No.") then
