@@ -721,7 +721,7 @@
 
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::RETAILJOURNAL, RecRef);
-    
+
                 end;
             }
         }
@@ -758,7 +758,7 @@
             RetailJournalLine.FindSet();
             repeat
                 RetailJournalLine.FindItemSalesPrice();
-                RetailJournalLine.calcProfit();
+                RetailJournalLine.CalcProfit();
                 RetailJournalLine.Modify();
             until RetailJournalLine.Next() = 0;
         end;
