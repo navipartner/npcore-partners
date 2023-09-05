@@ -67,3 +67,16 @@
          If you want, you can check the restore status by accessing the agenda via **Open Azure Restore Management** button.
 
          ![image.png](../.attachments/image-e9b74e1e-ff14-4c2b-84da-46783bf9e0de.png)
+
+---
+
+- Windows (**Defender**) reporting problems with **chisel.exe** when extracting C/SIDE client folder.
+
+  - Solution:
+    - Add the following two rules via PowerShell (run PowerShell as Admin on your machine):
+      ```PowerShell
+      Add-MpPreference -ThreatIDDefaultAction_Ids 2147855167 -ThreatIDDefaultAction_Actions Allow
+      Set-MpPreference -ThreatIDDefaultAction_Ids 2147778169 -ThreatIDDefaultAction_Actions Allow
+      ```
+    - After that, copy **chisel.exe** once more from the ZIP folder (this isn't always required, but it's recommended to do so in case it's been removed by the **Defender**).
+
