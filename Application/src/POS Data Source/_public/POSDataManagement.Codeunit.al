@@ -10,7 +10,7 @@
 
     procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean; Editable: Boolean)
     begin
-        _POSDataMgmtInternal.AddFieldToDataSource(DataSource, Record, FieldNo, Visible);
+        _POSDataMgmtInternal.AddFieldToDataSource(DataSource, Record, FieldNo, Visible, Editable);
     end;
 
     [IntegrationEvent(false, false)]
