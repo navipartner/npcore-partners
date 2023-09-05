@@ -57,6 +57,8 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         GetHeyLoyaltyTaskProcessorCode();  //Make sure HeyLoyality task processor is created
         if HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR HL HeyLoyalty Member");
+        if HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Heybooking) then
+            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR TM Ticket Notif. Entry");
     end;
 
     local procedure CreateTaskSetupEntry(TaskProcessorCode: Code[20]; TableId: Integer)
@@ -75,9 +77,12 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         NcTaskSetup."Task Processor Code" := TaskProcessorCode;
         NcTaskSetup."Table No." := TableId;
         case true of
-            HLIntegrationMgt.IsIntegratedTable("NPR HL Integration Area"::Members, TableId),
+            HLIntegrationMgt.IsIntegratedTable(Enum::"NPR HL Integration Area"::Members, TableId),
             TableId = Database::"NPR HL HeyLoyalty Member":
                 NcTaskSetup."Codeunit ID" := Codeunit::"NPR HL Send Members";
+
+            HLIntegrationMgt.IsIntegratedTable(Enum::"NPR HL Integration Area"::Heybooking, TableId):
+                NcTaskSetup."Codeunit ID" := Codeunit::"NPR HL Heybooking Send Ticket";
         end;
         NcTaskSetup.Insert();
     end;

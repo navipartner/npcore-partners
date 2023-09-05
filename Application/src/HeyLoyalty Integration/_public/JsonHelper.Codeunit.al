@@ -1,6 +1,6 @@
 codeunit 6059994 "NPR Json Helper"
 {
-    Access = Internal;
+    Access = Public;
 
     procedure GetJText(Token: JsonToken; Path: Text; Required: Boolean): Text
     begin
@@ -228,5 +228,187 @@ codeunit 6059994 "NPR Json Helper"
             AbsolutePath += '/';
         AbsolutePath += Path;
         exit(AbsolutePath);
+    end;
+
+    procedure RecordToJson(TableNo: Integer; RecordPosition: Text): JsonObject
+    var
+        RecRef: RecordRef;
+    begin
+        RecRef.Open(TableNo);
+        RecRef.SetPosition(RecordPosition);
+        RecRef.Find();
+        exit(RecordToJson(RecRef));
+    end;
+
+    procedure RecordToJson(RecRelatedVariant: Variant): JsonObject
+    var
+        DataTypeManagement: Codeunit "Data Type Management";
+        FldRef: FieldRef;
+        RecRef: RecordRef;
+        JField: JsonObject;
+        JRecord: JsonObject;
+        i: Integer;
+        RecNotFoundErr: Label 'Database record could not be found for %1.', Comment = '%1 - record identifier';
+    begin
+        if not DataTypeManagement.GetRecordRef(RecRelatedVariant, RecRef) then
+            Error(RecNotFoundErr, RecRelatedVariant);
+
+        JRecord.Add('id', RecRef.Number());
+        JRecord.Add('name', DelChr(RecRef.Name(), '=', ' /.-*+'));
+        JRecord.Add('company', RecRef.CurrentCompany());
+        JRecord.Add('position', RecRef.GetPosition(false));
+        JRecord.Add('recordId', Format(RecRef.RecordId()));
+
+        for i := 1 to RecRef.FieldCount do begin
+            FldRef := RecRef.FieldIndex(i);
+            JField.Add(Format(FldRef.Number(), 0, 9), FieldToJsonValue(FldRef));
+        end;
+        JRecord.Add('fields', JField);
+        exit(JRecord);
+    end;
+
+    local procedure FieldToJsonValue(FldRef: FieldRef): JsonValue
+    var
+        FieldValue: JsonValue;
+        IntValue: Integer;
+        BigIntegerValue: BigInteger;
+        DecimalValue: Decimal;
+        DateTimeValue: DateTime;
+        DateValue: Date;
+        TimeValue: Time;
+        DurationValue: Duration;
+        GuidValue: Guid;
+        BoolValue: Boolean;
+    begin
+        if (FldRef.Class() = FieldClass::FlowField) then
+            FldRef.CalcField();
+
+        if (FldRef.Type() <> FieldType::Boolean) and (not HasValue(FldRef)) then begin
+            FieldValue.SetValueToNull();
+            exit(FieldValue);
+        end;
+
+        case FldRef.Type() of
+            FieldType::Boolean:
+                begin
+                    BoolValue := FldRef.Value();
+                    FieldValue.SetValue(BoolValue);
+                end;
+            FieldType::Integer:
+                begin
+                    IntValue := FldRef.Value();
+                    FieldValue.SetValue(IntValue);
+                end;
+            FieldType::Decimal:
+                begin
+                    DecimalValue := FldRef.Value();
+                    FieldValue.SetValue(DecimalValue);
+                end;
+            FieldType::Date:
+                begin
+                    DateValue := FldRef.Value();
+                    FieldValue.SetValue(DateValue);
+                end;
+            FieldType::Time:
+                begin
+                    TimeValue := FldRef.Value();
+                    FieldValue.SetValue(TimeValue);
+                end;
+            FieldType::DateTime:
+                begin
+                    DateTimeValue := FldRef.Value();
+                    FieldValue.SetValue(DateTimeValue);
+                end;
+            FieldType::Duration:
+                begin
+                    DurationValue := FldRef.Value();
+                    FieldValue.SetValue(DurationValue);
+                end;
+            FieldType::BigInteger:
+                begin
+                    BigIntegerValue := FldRef.Value();
+                    FieldValue.SetValue(BigIntegerValue);
+                end;
+            FieldType::Guid:
+                begin
+                    GuidValue := FldRef.Value();
+                    FieldValue.SetValue(GuidValue);
+                end;
+            FieldType::Media,
+            FieldType::MediaSet:
+                begin
+                    FieldValue.SetValue(GetBase64(FldRef));
+                end;
+            else
+                FieldValue.SetValue(Format(FldRef.Value()));
+        end;
+
+        exit(FieldValue);
+    end;
+
+    local procedure HasValue(FldRef: FieldRef): Boolean
+    var
+        Int: Integer;
+        Dec: Decimal;
+        D: Date;
+        T: Time;
+    begin
+        case FldRef.Type() of
+            FieldType::Boolean:
+                exit(FldRef.Value());
+            FieldType::Option:
+                exit(true);
+            FieldType::Integer:
+                begin
+                    Int := FldRef.Value();
+                    exit(Int <> 0);
+                end;
+            FieldType::Decimal:
+                begin
+                    Dec := FldRef.Value();
+                    exit(Dec <> 0);
+                end;
+            FieldType::Date:
+                begin
+                    D := FldRef.Value();
+                    exit(D <> 0D);
+                end;
+            FieldType::Time:
+                begin
+                    T := FldRef.Value();
+                    exit(T <> 0T);
+                end;
+            FieldType::Blob:
+                exit(false);
+            else
+                exit(Format(FldRef.Value()) <> '');
+        end;
+    end;
+
+    local procedure GetBase64(FldRef: FieldRef): Text
+    var
+        Item: Record Item;
+        TenantMedia: Record "Tenant Media";
+        Base64: Codeunit "Base64 Convert";
+        RecRef: RecordRef;
+        InStream: InStream;
+    begin
+        RecRef := FldRef.Record();
+        case true of
+            (RecRef.Number() = Database::Item) and (FldRef.Number() = Item.FieldNo(Picture)):
+                begin
+                    Item.Get(RecRef.RecordId());
+                    if (Item.Picture.Count() > 0) then
+                        if TenantMedia.Get(Item.Picture.Item(1)) then begin
+                            TenantMedia.CalcFields(Content);
+                            if TenantMedia.Content.HasValue() then begin
+                                TenantMedia.Content.CreateInStream(InStream, TextEncoding::Windows);
+                                exit(Base64.ToBase64(InStream));
+                            end;
+                        end;
+                    exit('<NOIMAGE>');
+                end;
+        end;
+        exit('<Not Handled>');
     end;
 }

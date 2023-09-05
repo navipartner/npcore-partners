@@ -940,6 +940,7 @@
         end;
 
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
+        NotificationEntry."Notification Engine" := TicketNotProfileLine."Notification Engine";
         if (TicketNotProfileLine."Notification Engine" = TicketNotProfileLine."Notification Engine"::NPR_EXTERNAL) then
             NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::EXTERNAL;
 
@@ -1050,6 +1051,7 @@
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketNotificationEntry2: Record "NPR TM Ticket Notif. Entry";
+        HLHeybookingSendTicket: Codeunit "NPR HL Heybooking Send Ticket";
         Window: Dialog;
         ResponseMessage: Text;
         MaxCount: Integer;
@@ -1083,39 +1085,46 @@
                     SetNotificationDetention(TicketNotificationEntry2, ResponseMessage);
 
                 if (TicketNotificationEntry2."Notification Send Status" <> TicketNotificationEntry2."Notification Send Status"::DETAINED) then begin
-                    case TicketNotificationEntry2."Notification Method" of
-                        TicketNotificationEntry2."Notification Method"::NA:
-                            begin
-                                TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::NOT_SENT;
-                                ResponseMessage := StrSubstNo(INVALID, TicketNotificationEntry2.FieldCaption("Notification Method"));
-                            end;
+                    if TicketNotificationEntry2."Notification Engine" = TicketNotificationEntry2."Notification Engine"::NPR_HEYLOYALTY then
+                        HLHeybookingSendTicket.Touch(TicketNotificationEntry2)
+                    else
+                        case TicketNotificationEntry2."Notification Method" of
+                            TicketNotificationEntry2."Notification Method"::NA:
+                                begin
+                                    TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::NOT_SENT;
+                                    ResponseMessage := StrSubstNo(INVALID, TicketNotificationEntry2.FieldCaption("Notification Method"));
+                                end;
 
-                        TicketNotificationEntry2."Notification Method"::EMAIL:
-                            begin
-                                if (SendMailNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
-                                    TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
-                            end;
+                            TicketNotificationEntry2."Notification Method"::EMAIL:
+                                begin
+                                    if (SendMailNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
+                                        TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
+                                end;
 
-                        TicketNotificationEntry2."Notification Method"::SMS:
-                            begin
-                                if (SendSmsNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
-                                    TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
-                            end;
+                            TicketNotificationEntry2."Notification Method"::SMS:
+                                begin
+                                    if (SendSmsNotificationEntry(TicketNotificationEntry2, ResponseMessage)) then
+                                        TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry2."Notification Send Status"::SENT;
+                                end;
 
-                        else
-                            Error(NOT_IMPLEMENTED, TicketNotificationEntry2.FieldCaption("Notification Method"), TicketNotificationEntry2."Notification Method");
-                    end;
+                            else
+                                Error(NOT_IMPLEMENTED, TicketNotificationEntry2.FieldCaption("Notification Method"), TicketNotificationEntry2."Notification Method");
+                        end;
                 end;
 
-                TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));
-                TicketNotificationEntry2.Modify();
-                Commit();
+                if TicketNotificationEntry2."Notification Engine" <> TicketNotificationEntry2."Notification Engine"::NPR_HEYLOYALTY then begin
+                    TicketNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry2."Failed With Message"));
+                    TicketNotificationEntry2.Modify();
+                    Commit();
+                end;
 
                 if (GuiAllowed()) then
                     Window.Update(1, Round(Current / MaxCount * 10000, 1));
                 Current += 1;
 
             until (TicketNotificationEntry.Next() = 0);
+
+            HLHeybookingSendTicket.SendTouched();  //Has a commit
 
             if (GuiAllowed()) then
                 Window.Close();

@@ -91,4 +91,9 @@ codeunit 6059992 "NPR HL Integration Events"
     internal procedure OnAfterManuallyModifyAssignedHLMCFOptionValues(AppliesToRecID: RecordID; MultiChoiceFieldCode: Code[20])
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddFieldsToHeybookingDBPayload(TicketNotifEntry: Record "NPR TM Ticket Notif. Entry"; var FieldNameValueList: Dictionary of [Text, Text])
+    begin
+    end;
 }
