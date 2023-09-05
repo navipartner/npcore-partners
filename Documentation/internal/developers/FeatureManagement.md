@@ -2,9 +2,9 @@
 
 ## Table of Contents
 
-1. [Purpose of NaviPartner Feature Management]()
-2. [NaviPartner Feature Management Page]()
-3. [Module Specific Table for Application Area]()
+1. [Purpose of NaviPartner Feature Management](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/FeatureManagement.md&_a=preview&anchor=purpose-of-navipartner-feature-management)
+2. [NaviPartner Feature Management Page](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/FeatureManagement.md&_a=preview&anchor=navipartner-feature-management-page)
+3. [Module Specific Table for Application Area](https://navipartner.visualstudio.com/NpCore/_git/NpCore?path=/Documentation/internal/developers/FeatureManagement.md&_a=preview&anchor=module-specific-table-for-application-area)
 
 ## Purpose of NaviPartner Feature Management
 
