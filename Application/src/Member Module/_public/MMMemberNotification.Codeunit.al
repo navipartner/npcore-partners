@@ -624,6 +624,7 @@
         MembershipNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
 
         AzureMemberRegistration := false;
+
         if (AzureMemberRegSetupCode <> '') then
             if (AzureRegistrationSetup.Get(AzureMemberRegSetupCode)) then
                 AzureMemberRegistration := AzureRegistrationSetup.Enabled;
@@ -640,10 +641,14 @@
                 MembershipNotification."Entry No." := 0;
                 MembershipNotification."Include NP Pass" := true;
                 MembershipNotification.AzureRegistrationSetupCode := '';
+                MembershipNotification.Insert();
                 NotificationEntryNoList.Add(MembershipNotification."Entry No.");
             end;
         end else begin
             MembershipNotification."Entry No." := 0;
+            if (AzureMemberRegistration) then
+                MembershipNotification.AzureRegistrationSetupCode := AzureMemberRegSetupCode;
+            MembershipNotification.Insert();
             NotificationEntryNoList.Add(MembershipNotification."Entry No.");
         end;
 
