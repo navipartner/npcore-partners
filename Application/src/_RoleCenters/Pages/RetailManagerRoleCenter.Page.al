@@ -25,11 +25,17 @@
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
+                ObsoleteReason = 'Replaced with page "NPR Chart Wrapper".';
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR26.0';
                 Visible = false;
             }
             part(RetailSalesByShopChart; "NPR Retail Sales Chart by Shop")
             {
                 ApplicationArea = NPRRetail;
+                ObsoleteReason = 'Replaced with page "NPR Chart Wrapper".';
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR26.0';
                 Visible = false;
             }
             //NOTE: If this part is to be deleted from RoleCenter, Logo will be deleted as well

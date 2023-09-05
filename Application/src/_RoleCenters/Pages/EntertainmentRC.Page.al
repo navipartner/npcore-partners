@@ -42,6 +42,9 @@
             part(RetailSalesChart; "NPR Retail Sales Chart")
             {
                 ApplicationArea = NPRRetail;
+                ObsoleteReason = 'Replaced with page "NPR Chart Wrapper".';
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR26.0';
                 Visible = false;
             }
             part(RetailPerformance; "NPR Chart Wrapper")
