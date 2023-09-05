@@ -1834,7 +1834,7 @@
 
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
-        NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(AttributeNumber, 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
+        NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
     end;
 
     procedure SetPOSUnit(PosUnitNoIn: Code[10])
