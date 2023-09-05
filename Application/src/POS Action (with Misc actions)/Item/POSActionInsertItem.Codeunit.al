@@ -240,6 +240,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 CheckAvailability(PosInventoryProfile,
                                   PosItemCheckAvail);
 
+        Response.Add('postAddWorkflows', AddPostWorkflowsToRun(Context, SaleLinePOS));
+
         LogFinishTelem();
     end;
 
@@ -403,6 +405,14 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
     end;
     #endregion AssignSerialNo
+
+    local procedure AddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; SaleLinePOS: Record "NPR POS Sale Line") PostWorkflows: JsonObject
+    var
+        ItemProcessingEvents: Codeunit "NPR POS Act. Insert Item Event";
+    begin
+        ItemProcessingEvents.OnAddPostWorkflowsToRun(Context, SaleLinePOS, PostWorkflows);
+    end;
+
     procedure ActionCode(): Text
     begin
         exit(Format(enum::"NPR POS Workflow"::ITEM));
@@ -585,7 +595,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:t,context:n,scope:s,popup:i,parameters:a,captions:e})=>{debugger;if(t.context.GetPrompt=!1,a.EditDescription&&(t.context.Desc1=await i.input({title:e.editDesc_title,caption:e.editDesc_lead,value:n.defaultDescription}),t.context.Desc1===null)||a.EditDescription2&&(t.context.Desc2=await i.input({title:e.editDesc2_title,caption:e.editDesc2_lead,value:n.defaultDescription}),t.context.Desc2===null))return" ";const{childBOMLinesWithoutSerialNo:d,ItemGroupSale:u,useSpecTracking:S,GetPromptSerial:g,Success:N,AddItemAddOn:x,BaseLineNo:h}=await t.respond("addSalesLine");if(N)for(var c=0;c<d.length;c++)for(var l=!0,r;l;)l=!1,c!="remove"&&c!="add"&&c!="addRange"&&c!="aggregate"&&(t.context.SerialNo="",t.context.childBOMLineWithoutSerialNo=d[c],a.SelectSerialNo&&t.context.childBOMLineWithoutSerialNo.useSpecTracking?(r=await t.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await i.confirm({title:e.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(l=!0)):(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:format(e.bomItemTracking_Lead,t.context.childBOMLineWithoutSerialNo.description,t.context.childBOMLineWithoutSerialNo.parentBOMDescription)}),t.context.SerialNo&&(r=await t.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await i.confirm({title:e.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(l=!0))));else{if(t.context.GetPrompt=!0,u&&!a.usePreSetUnitPrice&&(t.context.UnitPrice=await i.numpad({title:e.UnitpriceTitle,caption:e.UnitPriceCaption}),t.context.UnitPrice===null)||S&&!a.SelectSerialNo&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null)||!S&&g&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null))return" ";t.context.useSpecTracking=S,await t.respond("addSalesLine")}x&&(await t.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:h},parameters:{SkipItemAvailabilityCheck:!0}}),await t.respond("checkAvailability"))};function format(t,...n){if(!t.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return t.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(s,i,a)=>{if(i)return i.replace(/(?:{{)|(?:}})/g,e=>e[0]);if(a>=n.length)throw new Error("argument index is out of range in format");return n[a]})}'
+'let main=async({workflow:t,context:n,scope:g,popup:i,parameters:a,captions:e})=>{debugger;if(t.context.GetPrompt=!1,a.EditDescription&&(t.context.Desc1=await i.input({title:e.editDesc_title,caption:e.editDesc_lead,value:n.defaultDescription}),t.context.Desc1===null)||a.EditDescription2&&(t.context.Desc2=await i.input({title:e.editDesc2_title,caption:e.editDesc2_lead,value:n.defaultDescription}),t.context.Desc2===null))return" ";const{childBOMLinesWithoutSerialNo:d,ItemGroupSale:N,useSpecTracking:s,GetPromptSerial:o,Success:x,AddItemAddOn:h,BaseLineNo:m,postAddWorkflows:S}=await t.respond("addSalesLine");if(x)for(var c=0;c<d.length;c++)for(var l=!0,r;l;)l=!1,c!="remove"&&c!="add"&&c!="addRange"&&c!="aggregate"&&(t.context.SerialNo="",t.context.childBOMLineWithoutSerialNo=d[c],a.SelectSerialNo&&t.context.childBOMLineWithoutSerialNo.useSpecTracking?(r=await t.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await i.confirm({title:e.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(l=!0)):(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:format(e.bomItemTracking_Lead,t.context.childBOMLineWithoutSerialNo.description,t.context.childBOMLineWithoutSerialNo.parentBOMDescription)}),t.context.SerialNo&&(r=await t.respond("assignSerialNo"),!r.AssignSerialNoSuccess&&r.AssignSerialNoSuccessErrorText&&await i.confirm({title:e.serialNoError_title,caption:r.AssignSerialNoSuccessErrorText})&&(l=!0))));else{if(t.context.GetPrompt=!0,N&&!a.usePreSetUnitPrice&&(t.context.UnitPrice=await i.numpad({title:e.UnitpriceTitle,caption:e.UnitPriceCaption}),t.context.UnitPrice===null)||s&&!a.SelectSerialNo&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null)||!s&&o&&(t.context.SerialNo=await i.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),t.context.SerialNo===null))return" ";t.context.useSpecTracking=s,await t.respond("addSalesLine")}if(h&&(await t.run("RUN_ITEM_ADDONS",{context:{BaseLineNo:m},parameters:{SkipItemAvailabilityCheck:!0}}),await t.respond("checkAvailability")),S)for(const f of Object.entries(S)){let[u,D]=f;u&&await t.run(u,{parameters:D})}};function format(t,...n){if(!t.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return t.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(g,i,a)=>{if(i)return i.replace(/(?:{{)|(?:}})/g,e=>e[0]);if(a>=n.length)throw new Error("argument index is out of range in format");return n[a]})}'
         );
     end;
 
