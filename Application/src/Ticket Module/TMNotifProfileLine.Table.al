@@ -63,8 +63,8 @@
         {
             Caption = 'Notification Engine';
             DataClassification = CustomerContent;
-            OptionMembers = NPR_INTERNAL,NPR_EXTERNAL;
-            OptionCaption = 'Internal,External';
+            OptionMembers = NPR_INTERNAL,NPR_EXTERNAL,NPR_HEYLOYALTY;
+            OptionCaption = 'Internal,External,HeyLoyalty';
         }
         field(45; "Template Code"; Code[10])
         {

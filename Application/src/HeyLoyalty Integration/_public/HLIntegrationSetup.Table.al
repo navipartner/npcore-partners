@@ -92,6 +92,44 @@ table 6059800 "NPR HL Integration Setup"
             DataClassification = CustomerContent;
             InitValue = true;
         }
+        field(100; "Heybooking Integration Enabled"; Boolean)
+        {
+            Caption = 'Heybooking Integration Enabled';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                Modify();
+                if "Heybooking Integration Enabled" then
+                    HLIntegrationMgt.SetupHeybookingTicketNotifProfile();
+            end;
+        }
+        field(110; "Heycommerce/Booking DB Api Url"; Text[250])
+        {
+            Caption = 'Heycommerce/Booking DB Api Url';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = URL;
+            InitValue = 'https://tracking.heycommerce.dk/api';
+        }
+        field(120; "Heybooking Integration Id"; Code[20])
+        {
+            Caption = 'Heybooking Integration Id';
+            DataClassification = CustomerContent;
+        }
+        field(130; "Send Heybooking Err. to E-Mail"; Text[80])
+        {
+            Caption = 'Send Heybooking Err. to E-Mail';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            var
+                MailManagement: Codeunit "Mail Management";
+            begin
+                if "Send Heybooking Err. to E-Mail" <> '' then
+                    MailManagement.CheckValidEmailAddresses("Send Heybooking Err. to E-Mail");
+            end;
+        }
     }
 
     keys

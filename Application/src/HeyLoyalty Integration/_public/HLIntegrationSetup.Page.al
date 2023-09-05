@@ -73,6 +73,34 @@ page 6150720 "NPR HL Integration Setup"
                         ToolTip = 'Specifies whether member data is going to be read from received HeyLoyalty webhook payload. If disabled, for each incoming webhook request system will issue an additional GET call to HeyLoyalty server in order to retrieve the most recent member data available at HeyLoyalty.';
                     }
                 }
+                group(HeybookingIntegrationArea)
+                {
+                    Caption = 'Heybooking Integration Area';
+                    field("Heybooking Integration Enabled"; Rec."Heybooking Integration Enabled")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = IntegrationIsEnabled;
+                        Caption = 'Enabled';
+                        ToolTip = 'Specifies whether the Heybooking Integration area is enabled. This will enable booking and transaction information be sent to HeyLoyalty.';
+
+                        trigger OnValidate()
+                        begin
+                            UpdateControlVisibility();
+                        end;
+                    }
+                    field("Heybooking Integration Id"; Rec."Heybooking Integration Id")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = HeybookingIntegrationIsEnabled;
+                        ToolTip = 'Specifies the Heybooking Integration Id.';
+                    }
+                    field("Send Heybooking Err. to E-Mail"; Rec."Send Heybooking Err. to E-Mail")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = HeybookingIntegrationIsEnabled;
+                        ToolTip = 'Specifies the email address notifications are sent to in case of errors while importing data to HeyLoyalty Heycommerce/Booking database.';
+                    }
+                }
             }
             group(Connection)
             {
@@ -81,6 +109,11 @@ page 6150720 "NPR HL Integration Setup"
                 {
                     ApplicationArea = NPRHeyLoyalty;
                     ToolTip = 'Specifies the URL for HeyLoyalty Api, for example: https://api.heyloyalty.com/loyalty/v1';
+                }
+                field("Heycommerce/Booking DB Api Url"; Rec."Heycommerce/Booking DB Api Url")
+                {
+                    ApplicationArea = NPRHeyLoyalty;
+                    ToolTip = 'Specifies the URL for HeyLoyalty Heycommerce/Booking database Api, for example: https://tracking.heycommerce.dk/api or http://tracking.heyloyalty.com/api';
                 }
                 field("HeyLoyalty Api Key"; Rec."HeyLoyalty Api Key")
                 {
@@ -240,12 +273,14 @@ page 6150720 "NPR HL Integration Setup"
     begin
         IntegrationIsEnabled := Rec."Enable Integration";
         MemberListIntegrationIsEnabled := Rec."Enable Integration" and Rec."Member Integration";
+        HeybookingIntegrationIsEnabled := Rec."Enable Integration" and Rec."Heybooking Integration Enabled";
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
     end;
 
     var
         xSetup: Record "NPR HL Integration Setup";
         HasAzureADConnection: Boolean;
+        HeybookingIntegrationIsEnabled: Boolean;
         IntegrationIsEnabled: Boolean;
         MemberListIntegrationIsEnabled: Boolean;
 }

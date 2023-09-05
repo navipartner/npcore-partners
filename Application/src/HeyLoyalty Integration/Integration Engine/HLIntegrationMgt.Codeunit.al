@@ -69,6 +69,15 @@ codeunit 6059993 "NPR HL Integration Mgt."
         HeyLoyaltyResponse.ReadFrom(ResponseText);
     end;
 
+    procedure InvokeHeybookingDBUpdateRequest(var NcTask: Record "NPR Nc Task")
+    var
+        IntegrationID: Code[20];
+        Url: Text;
+    begin
+        Url := GetHeybookingUrl(IntegrationID) + StrSubstNo('/import/%1', IntegrationID);
+        SendHeyLoyaltyRequest(NcTask, 'POST', Url);
+    end;
+
     [TryFunction]
     procedure InvokeMemberDeleteRequest(var NcTask: Record "NPR Nc Task"; HeyLoyaltyMemberID: Text[50])
     var
@@ -97,13 +106,29 @@ codeunit 6059993 "NPR HL Integration Mgt."
     local procedure TrySendHeyLoyaltyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var ResponseText: Text)
     var
         Client: HttpClient;
+        Content: HttpContent;
         Headers: HttpHeaders;
         RequestMsg: HttpRequestMessage;
         ResponseMsg: HttpResponseMessage;
+        InStr: InStream;
         DateString: Text;
         EmptyResponseTxt: Label '{}', Locked = true;
     begin
         ClearLastError();
+
+        //Only heybooking requests will have request content payload
+        if NcTask."Table No." = Database::"NPR TM Ticket Notif. Entry" then
+            if NcTask."Data Output".HasValue then begin
+                NcTask."Data Output".CreateInStream(InStr);
+                Content.WriteFrom(InStr);
+
+                Content.GetHeaders(Headers);
+                if Headers.Contains('Content-Type') then
+                    Headers.Remove('Content-Type');
+                Headers.Add('Content-Type', StrSubstNo('multipart/form-data; boundary="%1"', NcTask."Record Value"));
+
+                RequestMsg.Content := Content;
+            end;
 
         RequestMsg.SetRequestUri(Url);
         RequestMsg.Method(RestMethod);
@@ -170,6 +195,15 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(HLSetup."HeyLoyalty Api Url" + '/lists/' + HLSetup."HeyLoyalty Member List Id");
     end;
 
+    local procedure GetHeybookingUrl(var IntegrationID: Code[20]): Text
+    begin
+        HLSetup.GetRecordOnce(false);
+        HLSetup.TestField("Heycommerce/Booking DB Api Url");
+        HLSetup.TestField("Heybooking Integration Id");
+        IntegrationID := HLSetup."Heybooking Integration Id";
+        exit(HLSetup."Heycommerce/Booking DB Api Url" + '/booking');
+    end;
+
     local procedure GetHLMembersUrl(): Text
     begin
         exit(GetHLMemberListUrl() + '/members');
@@ -228,6 +262,65 @@ codeunit 6059993 "NPR HL Integration Mgt."
         end;
     end;
 
+    procedure SetupHeybookingTicketNotifProfile()
+    var
+        TicketNotifPrifile: Record "NPR TM Notification Profile";
+        TicketNotifPrifileLine: Record "NPR TM Notif. Profile Line";
+        CreateNotProfileQst: Label 'HeyLoyalty booking database integration requires a ticket notification profile, which is going to be used to send data from BC to HeyLoyalty.\Do you want the system to setup the profile for you now?';
+    begin
+        TicketNotifPrifileLine.SetRange("Notification Engine", TicketNotifPrifileLine."Notification Engine"::NPR_HEYLOYALTY);
+        TicketNotifPrifileLine.SetRange(Blocked, false);
+        if TicketNotifPrifileLine.IsEmpty() then
+            if not Confirm(CreateNotProfileQst, true) then
+                exit;
+        CreateDefaultHeybookingTicketNotifProfile(TicketNotifPrifile);
+        Commit();
+        Page.Run(Page::"NPR TM Notif. Profile Card", TicketNotifPrifile);
+    end;
+
+    local procedure CreateDefaultHeybookingTicketNotifProfile(var TicketNotifPrifile: Record "NPR TM Notification Profile")
+    var
+        TicketNotifPrifileLine: Record "NPR TM Notif. Profile Line";
+        ProfileDescrTxt: Label 'Send data to HeyLoyalty', MaxLength = 80;
+        TicketAdmisDescrTxt: Label 'Each ticket admission (scan)', MaxLength = 80;
+        WelcomeNotifDescrTxt: Label 'New tickets', MaxLength = 80;
+    begin
+        if not TicketNotifPrifile.Get(HeyLoyaltyCode()) then begin
+            TicketNotifPrifile.Init();
+            TicketNotifPrifile."Profile Code" := HeyLoyaltyCode();
+            TicketNotifPrifile.Description := ProfileDescrTxt;
+            TicketNotifPrifile.Insert();
+        end else
+            if TicketNotifPrifile.Blocked then begin
+                TicketNotifPrifile.Blocked := false;
+                TicketNotifPrifile.Insert();
+            end;
+        CreateHeybookingTicketNotifProfileLine(TicketNotifPrifile, TicketNotifPrifileLine."Notification Trigger"::WELCOME, WelcomeNotifDescrTxt);
+        CreateHeybookingTicketNotifProfileLine(TicketNotifPrifile, TicketNotifPrifileLine."Notification Trigger"::ON_EACH_ADMISSION, TicketAdmisDescrTxt);
+    end;
+
+    local procedure CreateHeybookingTicketNotifProfileLine(TicketNotifPrifile: Record "NPR TM Notification Profile"; NotifTrigger: Integer; Description: Text[80])
+    var
+        TicketNotifPrifileLine: Record "NPR TM Notif. Profile Line";
+    begin
+        TicketNotifPrifileLine.SetRange("Profile Code", TicketNotifPrifile."Profile Code");
+        TicketNotifPrifileLine.SetRange("Notification Engine", TicketNotifPrifileLine."Notification Engine"::NPR_HEYLOYALTY);
+        TicketNotifPrifileLine.SetRange("Notification Trigger", NotifTrigger);
+        if not TicketNotifPrifileLine.FindFirst() then begin
+            TicketNotifPrifileLine.Init();
+            TicketNotifPrifileLine."Profile Code" := TicketNotifPrifile."Profile Code";
+            TicketNotifPrifileLine."Notification Engine" := TicketNotifPrifileLine."Notification Engine"::NPR_HEYLOYALTY;
+            TicketNotifPrifileLine."Notification Trigger" := NotifTrigger;
+            TicketNotifPrifileLine.Description := Description;
+            TicketNotifPrifileLine."Line No." := 0;
+            TicketNotifPrifileLine.Insert(true);
+        end;
+        TicketNotifPrifileLine.Blocked := false;
+        TicketNotifPrifileLine.Units := 0;
+        TicketNotifPrifileLine."Detention Time Seconds" := 0;
+        TicketNotifPrifileLine.Modify();
+    end;
+
     procedure IsEnabled(IntegrationArea: Enum "NPR HL Integration Area"): Boolean
     var
         AreaIsEnabled: Boolean;
@@ -245,6 +338,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
                 exit(HLSetup."Enable Integration");
             IntegrationArea::Members:
                 exit(HLSetup."Member Integration");
+            IntegrationArea::Heybooking:
+                exit(HLSetup."Heybooking Integration Enabled");
         end;
     end;
 
@@ -266,6 +361,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
                          Database::"NPR MM Membership Role",
                          Database::"NPR GDPR Consent Log",
                          Database::"NPR HL Selected MCF Option"];
+            IntegrationArea::Heybooking:
+                TableIsIntegrated := TableId = Database::"NPR TM Ticket Notif. Entry";
             else
                 TableIsIntegrated := false;
         end;
@@ -340,6 +437,12 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Unsubscribe if Blocked");
+    end;
+
+    procedure SendHeybookingErrToEmail(): Text
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Send Heybooking Err. to E-Mail");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
