@@ -17,7 +17,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         }
     }
 
-    const {childBOMLinesWithoutSerialNo, ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo } = await workflow.respond("addSalesLine");
+    const {childBOMLinesWithoutSerialNo, ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo, postAddWorkflows} = await workflow.respond("addSalesLine");
 
     if (!Success) {
         workflow.context.GetPrompt = true;
@@ -99,6 +99,15 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         await workflow.run('RUN_ITEM_ADDONS', { context: { BaseLineNo: BaseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
         await workflow.respond("checkAvailability");
     }
+
+    if (postAddWorkflows) {
+        for (const postWorkflow of Object.entries(postAddWorkflows)) {
+            let [postWorkflowName, postWorkflowParameters] = postWorkflow;
+            if (postWorkflowName) {
+                await workflow.run(postWorkflowName, { parameters: postWorkflowParameters });
+            };
+        };
+    };
 
 }
 
