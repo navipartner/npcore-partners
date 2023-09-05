@@ -146,7 +146,7 @@ codeunit 6150790 "NPR POS Data Mgmt. Internal"
         end;
     end;
 
-    internal procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean)
+    internal procedure AddFieldToDataSource(DataSource: Codeunit "NPR Data Source"; "Record": Variant; FieldNo: Integer; Visible: Boolean; Editable: Boolean)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -198,7 +198,7 @@ codeunit 6150790 "NPR POS Data Mgmt. Internal"
                 exit;
         end;
 
-        DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible, DataColumn, Visible);
+        DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible, DataColumn, Editable);
         DataColumn.SetWidth(Width);
     end;
 }
