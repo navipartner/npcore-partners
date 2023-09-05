@@ -1,6 +1,6 @@
 ﻿table 6060110 "NPR TM Ticket Notif. Entry"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Ticket Notification Entry';
     DataClassification = CustomerContent;
     fields
@@ -112,6 +112,13 @@
         {
             Caption = 'Notification Profile Code';
             DataClassification = CustomerContent;
+        }
+        field(78; "Notification Engine"; Option)
+        {
+            Caption = 'Notification Engine';
+            DataClassification = CustomerContent;
+            OptionMembers = NPR_INTERNAL,NPR_EXTERNAL,NPR_HEYLOYALTY;
+            OptionCaption = 'Internal,External,HeyLoyalty';
         }
         field(80; "Notification Method"; Enum "NPR TM Not. Method")
         {
@@ -318,9 +325,5 @@
         key(Key5; SystemModifiedAt)
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 }
