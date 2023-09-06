@@ -226,6 +226,7 @@
         Mechanism: Enum "NPR EFT Request Mechanism";
         Workflow: Text;
         Context: JsonObject;
+        EFTNETSBAXIPaymSetup: Record "NPR EFT NETS BAXI Paym. Setup";
     begin
         if not (EndOfDayType = 1) then
             exit;
@@ -241,6 +242,10 @@
             if (not EFTSetup.FindFirst()) then
                 exit;
         end;
+
+        GetPaymentTypeParameters(EFTsetup, EFTNETSBAXIPaymSetup);
+        if EFTNETSBAXIPaymSetup."Skip auto close on EOD" then
+            exit;
 
         EftTransactionMgt.PrepareEndWorkshift(EFTSetup, POSSetup.GetPOSUnitNo(), PosSale."Sales Ticket No.", Request, Mechanism, Workflow);
         Context.Add('request', Request);

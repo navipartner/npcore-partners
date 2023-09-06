@@ -41,6 +41,7 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
         Response: JsonObject;
         TrxErrorLbl: Label '%1 %2 failed\%3\%4';
         EFTNETSCloudIntegrat: Codeunit "NPR EFT NETSCloud Integrat.";
+        POSSession: Codeunit "NPR POS Session";
     begin
         EntryNo := Context.GetInteger('EntryNo');
         TrxStatus := Enum::"NPR EFT NETSCloud Trx Status".FromInteger(_trxStatus.Get(EntryNo));
@@ -53,6 +54,11 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
             TrxStatus::ResponseReceived:
                 begin
                     EFTTransactionRequest.Get(EntryNo);
+
+                    POSSession.RequestFullRefresh();
+                    // Needed because payment line was inserted in the background task continuation
+                    // so the delta calculation on user session does not work as it happened outside the action.
+
 
                     if (not EftTransactionRequest.Successful) then
                         Message(TrxErrorLbl, EftTransactionRequest."Integration Type", Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");

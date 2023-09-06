@@ -141,6 +141,11 @@
             DataClassification = CustomerContent;
             InitValue = 20;
         }
+        field(350; "Skip auto close on EOD"; Boolean)
+        {
+            Caption = 'Skip auto close on EOD';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
