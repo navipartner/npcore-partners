@@ -1,6 +1,6 @@
-table 6060020 "NPR RS Vendor Posting Group"
+table 6060022 "NPR RS Customer Posting Group"
 {
-    Caption = 'RS Vendor Posting Group';
+    Caption = 'RS Customer Posting Group';
     Access = Internal;
     DataClassification = CustomerContent;
 
@@ -22,7 +22,7 @@ table 6060020 "NPR RS Vendor Posting Group"
                 GLAccountCategory: Record "G/L Account Category";
                 GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
             begin
-                GLAccountCategoryMgt.CheckGLAccount("Prepayment Account", false, false, GLAccountCategory."Account Category"::Liabilities, GLAccountCategoryMgt.GetCurrentLiabilities());
+                GLAccountCategoryMgt.CheckGLAccount("Prepayment Account", false, false, GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetAR());
             end;
         }
     }
