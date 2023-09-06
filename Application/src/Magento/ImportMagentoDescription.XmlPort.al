@@ -6,7 +6,7 @@ xmlport 6014404 "NPR ImportMagentoDescription"
     UseRequestPage = false;
     TableSeparator = '<NewLine>';
     Caption = 'ImportItemDescription';
-    FieldSeparator = ',';
+    FieldSeparator = '|';
     FieldDelimiter = '"';
 
     schema
