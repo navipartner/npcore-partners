@@ -132,6 +132,11 @@
                     ToolTip = 'Specifies the value of the Close Timeout Seconds field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Skip auto close on EOD"; Rec."Skip auto close on EOD")
+                {
+                    ToolTip = 'If enabled, NPRetail will not try to close the connection to terminal when balancing the POS';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
