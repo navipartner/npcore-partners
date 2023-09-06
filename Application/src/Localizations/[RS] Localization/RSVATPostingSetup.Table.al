@@ -1,6 +1,6 @@
-table 6060020 "NPR RS Vendor Posting Group"
+table 6060024 "NPR RS VAT Posting Setup"
 {
-    Caption = 'RS Vendor Posting Group';
+    Caption = 'RS VAT Posting Setup';
     Access = Internal;
     DataClassification = CustomerContent;
 
@@ -11,19 +11,11 @@ table 6060020 "NPR RS Vendor Posting Group"
             Caption = 'Table SystemId';
             DataClassification = CustomerContent;
         }
-        field(6014400; "Prepayment Account"; Code[20])
+        field(6014413; "Sales Prep. VAT Account"; Code[20])
         {
-            Caption = 'Prepayment Account';
+            Caption = 'Sales Prepayment VAT Account';
             TableRelation = "G/L Account";
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                GLAccountCategory: Record "G/L Account Category";
-                GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
-            begin
-                GLAccountCategoryMgt.CheckGLAccount("Prepayment Account", false, false, GLAccountCategory."Account Category"::Liabilities, GLAccountCategoryMgt.GetCurrentLiabilities());
-            end;
         }
     }
 

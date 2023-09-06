@@ -187,6 +187,55 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Sales Order';
             }
         }
+        addafter("Prepayment %")
+        {
+            field("NPR Prepayment Amount"; RSSalesHeader."Prepmt. Amount Incl. VAT")
+            {
+                ApplicationArea = NPRRSLocal;
+                BlankZero = true;
+                Caption = 'Prepayment Amount Incl. VAT';
+                ToolTip = 'Specifies the value of the Prepayment Amount field.';
+                trigger OnValidate()
+                begin
+                    RSSalesHeader.Validate("Prepmt. Amount Incl. VAT");
+                    RSSalesHeader.Save();
+                    CurrPage.Update();
+                end;
+            }
+            field("NPR Applies-to Bank Entry"; RSSalesHeader."Applies-to Bank Entry")
+            {
+                ApplicationArea = NPRRSLocal;
+                BlankZero = true;
+                ToolTip = 'Specifies the value of the Applies-to Bank Entry field.';
+                Caption = 'Applies-to Bank Entry';
+                trigger OnDrillDown()
+                var
+                    EntryNo: Integer;
+                begin
+                    EntryNo := RSSalesHeader.DrillDownAppliesToBankEntry(Rec);
+                    if EntryNo = 0 then
+                        exit;
+                    RSSalesHeader.Validate("Applies-to Bank Entry", EntryNo);
+                    RSSalesHeader.Save();
+                end;
+
+                trigger OnValidate()
+                begin
+                    RSSalesHeader.CheckValidatedBankEntry(Rec);
+                    RSSalesHeader.Validate("Applies-to Bank Entry");
+                    RSSalesHeader.Save();
+                    CurrPage.Update();
+                end;
+            }
+            field("NPR Bank Prepayment Amount"; RSSalesHeader."Bank Prepayment Amount")
+            {
+                ApplicationArea = NPRRSLocal;
+                BlankZero = true;
+                Editable = false;
+                Caption = 'Bank Prepayment Amount';
+                ToolTip = 'Specifies the value of the Bank Prepayment Amount field.';
+            }
+        }
 
         modify(Control1900316107)
         {
@@ -488,12 +537,14 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSSalesHeader: Record "NPR RS Sales Header";
         AsyncEnabled: Boolean;
 
     trigger OnAfterGetCurrRecord()
 
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+        RSSalesHeader.Read(Rec.SystemId);
     end;
 
     trigger OnOpenPage()

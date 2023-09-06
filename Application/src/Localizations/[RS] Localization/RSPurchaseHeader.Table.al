@@ -33,7 +33,11 @@ table 6060021 "NPR RS Purchase Header"
     end;
 
     internal procedure Read(IncSystemId: Guid)
+    var
+        RSLocalisationMgt: Codeunit "NPR RS Localisation Mgt.";
     begin
+        if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
+            exit;
         if not Rec.Get(IncSystemId) then begin
             Rec.Init();
             Rec."Table SystemId" := IncSystemId;
