@@ -277,17 +277,11 @@
     /// <param name="Item">Item to be modified</param>
     internal procedure UpdateItemSeoLink(var Item: Record Item)
     var
-        PrevRec: Text;
         SeoLinkText: Text;
     begin
-        PrevRec := Format(Item);
-
         SeoLinkText := Item."NPR Seo Link";
         OnBeforeItemSeoLinkFormat(Item, SeoLinkText);
         Item."NPR Seo Link" := CopyStr(MagentoFunctions.SeoFormat(SeoLinkText), 1, MaxStrLen(Item."NPR Seo Link"));
-
-        if PrevRec <> Format(Item) then
-            Item.Modify(false);
     end;
 
     procedure GetStockQty(ItemNo: Code[20]; VariantFilter: Text) StockQty: Decimal
