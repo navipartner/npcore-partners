@@ -1149,7 +1149,7 @@
                 PromotedCategory = Process;
                 Image = Import;
                 ApplicationArea = NPRRetail;
-                ToolTip = 'Executes the Update Magento Description action.';
+                ToolTip = 'Executes the Update Magento Description action. You will be asked for .CSV file from which data will be imported. File should have 3 columns/fields sorted as: Item No, Magento Description, Magento Short Description. Field separator is pipe (|) while field Delimiter, or somewhere called qualificator is quotation marks symbol ("). For example: "1000"|"Magento Description"|"Magento Short Description"';
 
                 trigger OnAction()
                 begin
