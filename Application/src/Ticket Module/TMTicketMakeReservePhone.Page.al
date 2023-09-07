@@ -1,11 +1,11 @@
-﻿page 6060113 "NPR TM Ticket Make Reserv."
+page 6151184 "NPR TM TicketMakeReservePhone"
 {
     Extensible = False;
     Caption = 'Make your reservation';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = Worksheet;
+    PageType = List;
     SourceTable = "NPR TM Ticket Reservation Req.";
     SourceTableView = sorting("Session Token ID", "Admission Inclusion");
     SourceTableTemporary = true;
@@ -18,20 +18,6 @@
         {
             repeater(Group)
             {
-                field("External Item Code"; Rec."External Item Code")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Item No.';
-                    Editable = false;
-                    Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
-                    ToolTip = 'Specifies the value of the Item No. field';
-
-                    trigger OnValidate()
-                    begin
-                        gReservationEdited := true;
-                    end;
-                }
                 field("Admission Code"; Rec."Admission Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -39,6 +25,20 @@
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
                     ToolTip = 'Specifies the value of the Admission Code field';
+
+                    trigger OnDrillDown()
+                    begin
+                        SelectSchedule();
+                        CurrPage.Update(false);
+                    end;
+                }
+                field("Admission Description"; Rec."Admission Description")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Editable = false;
+                    Style = Unfavorable;
+                    StyleExpr = gVisualQueueUnfavorable;
+                    ToolTip = 'Specifies the value of the Admission Description field';
 
                     trigger OnDrillDown()
                     begin
@@ -67,42 +67,22 @@
                         CurrPage.Update(false);
                     end;
                 }
-                field(ScheduledTimeDescription_ChangeRequest; Rec."Scheduled Time Description")
+
+                field("External Item Code"; Rec."External Item Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Editable = false;
-                    Style = Subordinate;
-                    StyleExpr = gDisallowReschedule;
-                    Visible = gChangeRequestMode;
-                    ToolTip = 'Specifies the value of the Scheduled Time Description field';
-
-                    trigger OnDrillDown()
-                    begin
-                        SelectSchedule();
-                        CurrPage.Update(false);
-                    end;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        SelectSchedule();
-                        CurrPage.Update(false);
-                    end;
-                }
-
-                field("Admission Description"; Rec."Admission Description")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Item No.';
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
-                    ToolTip = 'Specifies the value of the Admission Description field';
+                    ToolTip = 'Specifies the value of the Item No. field';
 
-                    trigger OnDrillDown()
+                    trigger OnValidate()
                     begin
-                        SelectSchedule();
-                        CurrPage.Update(false);
+                        gReservationEdited := true;
                     end;
                 }
+
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -175,157 +155,12 @@
                         gVisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
                     end;
                 }
-                field("Customer No."; Rec."Customer No.")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = gBatchTicketCreateMode;
-                    ToolTip = 'Specifies the value of the Customer No. field';
-
-                    trigger OnValidate()
-                    begin
-                        Rec.ModifyAll("Customer No.", Rec."Customer No.");
-                        CurrPage.Update(false);
-                        gReservationEdited := true;
-                    end;
-                }
-                field("External Order No."; Rec."External Order No.")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = gBatchTicketCreateMode;
-                    ToolTip = 'Specifies the value of the External Order No. field';
-
-                    trigger OnValidate()
-                    begin
-                        Rec.ModifyAll("External Order No.", Rec."External Order No.");
-                        CurrPage.Update(false);
-                        gReservationEdited := true;
-                    end;
-                }
-                field("Payment Option"; Rec."Payment Option")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Payment Option field';
-
-                    trigger OnValidate()
-                    begin
-                        Rec.ModifyAll("Payment Option", Rec."Payment Option");
-                        CurrPage.Update(false);
-                        gReservationEdited := true;
-                    end;
-                }
-                field("Waiting List Reference Code"; Rec."Waiting List Reference Code")
-                {
-                    ApplicationArea = NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Waiting List Reference Code field';
-
-                    trigger OnValidate()
-                    var
-                        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-                        Admission: Record "NPR TM Admission";
-                        TicketWaitingList: Record "NPR TM Ticket Wait. List";
-                        WaitingListSetup: Record "NPR TM Waiting List Setup";
-                        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
-                        DateTimeLbl: Label '%1  - %2', Locked = true;
-                        ResponseMessage: Text;
-                    begin
-
-                        if (Rec."Waiting List Reference Code" <> '') then
-                            if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(Rec."Waiting List Reference Code", CreateDateTime(Today, Time), false, AdmissionScheduleEntry, TicketWaitingList, ResponseMessage)) then
-                                Error(ResponseMessage);
-
-                        if (Rec."Waiting List Reference Code" = '') then begin
-                            Rec."External Adm. Sch. Entry No." := -1;
-                            Rec."Scheduled Time Description" := '';
-
-                        end else begin
-                            Admission.Get(Rec."Admission Code");
-                            WaitingListSetup.Get(Admission."Waiting List Setup Code");
-
-                            if (WaitingListSetup."Enforce Same Item") then begin
-                                Rec.TestField("Item No.", TicketWaitingList."Item No.");
-                                Rec.TestField("Variant Code", TicketWaitingList."Variant Code");
-                            end;
-
-                            Rec.Validate(Quantity, TicketWaitingList.Quantity);
-                            Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
-                            Rec."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
-                            if (gDeliverTicketTo = '') then
-                                gDeliverTicketTo := TicketWaitingList."Notification Address";
-
-                        end;
-
-                        Rec.Modify();
-                        gReservationEdited := true;
-                        CurrPage.Update(false);
-
-                        CalcVisualQueueUnfavorable(Rec);
-                    end;
-                }
                 field(UnitPrice; _UnitPrice)
                 {
                     ApplicationArea = NPRTicketAdvanced, NPRTicketDynamicPrice;
                     ToolTip = 'Specifies the value for the Unit Price field.';
                     Caption = 'Unit Price';
                     Editable = false;
-                }
-                field("Admission Created"; Rec."Admission Created")
-                {
-                    ToolTip = 'Specifies the value of the Admission Created field';
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-                field("Admission Inclusion Status"; Rec."Admission Inclusion Status")
-                {
-                    ToolTip = 'Specifies the value of the Admission Inclusion Status field.';
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-                field("Authorization Code"; Rec."Authorization Code")
-                {
-                    ToolTip = 'Specifies the value of the Authorization Code field';
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-
-            }
-            group(PaymentOptions)
-            {
-                ShowCaption = true;
-                Visible = gTourTicket;
-                field(gTourTicketPaymentOptions; gTourTicketPaymentOptions)
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Payment Options';
-                    ToolTip = 'Specifies the Payment Option for Ticket Request.';
-                    OptionCaption = 'Unpaid,Post Paid';
-                    trigger OnValidate()
-                    begin
-                        Rec.ModifyAll("Payment Option", Rec."Payment Option");
-                        CurrPage.Update(false);
-                        gReservationEdited := true;
-                    end;
-                }
-            }
-            group(Control6014406)
-            {
-                ShowCaption = false;
-                Visible = gShowDeliverTo;
-                field(gDeliverTicketTo; gDeliverTicketTo)
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Deliver eTicket To';
-                    ToolTip = 'Specifies the value of the Deliver eTicket To field';
-                }
-            }
-            group(Control6014400)
-            {
-                ShowCaption = false;
-                field(gConfirmStatusText; gConfirmStatusText)
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Reservation Confirm Status';
-                    Enabled = false;
-                    Style = Favorable;
-                    StyleExpr = gConfirmStatusStyleFavorable;
-                    ToolTip = 'Specifies the value of the Reservation Confirm Status field';
                 }
             }
         }
@@ -381,8 +216,6 @@
             else
                 gConfirmStatusText := STATUS_CONFIRMED;
 
-        gDisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
-
         TicketPrice.CalculateScheduleEntryPrice(Rec."Item No.", Rec."Variant Code", Rec."Admission Code", Rec."External Adm. Sch. Entry No.", Today, Time, BasePrice, AddonPrice);
         _UnitPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
         if (BasePrice <> 0) or (AddonPrice <> 0) then
@@ -400,7 +233,7 @@
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
 
-        if (CloseAction = Action::LookupOK) then begin
+        if (CloseAction = Action::OK) then begin
 
             if (gBatchTicketCreateMode) then
                 if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) and (Rec."Entry Type" <> Rec."Entry Type"::CHANGE) then begin
@@ -417,7 +250,6 @@
         gBatchTicketCreateMode: Boolean;
         gChangeRequestMode: Boolean;
         gConfirmStatusStyleFavorable: Boolean;
-        gDisallowReschedule: Boolean;
         gIgnoreScheduleFilter: Boolean;
         gPrimaryRequestMode: Boolean;
         gQuantityChanged: Boolean;
@@ -428,8 +260,6 @@
         gTicketItemNo: Code[20];
         gLimitToDateSelected: Date;
         gTicketRequestEntryNo: Integer;
-        gTourTicket: Boolean;
-        gTourTicketPaymentOptions: Option UNPAID,POSTPAID;
         _AllowCustomizableTicketQtyChange: Boolean;
         NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
@@ -469,7 +299,7 @@
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TMAdmission: Record "NPR TM Admission";
-        PageScheduleEntry: Page "NPR TM Ticket Select Schedule";
+        PageScheduleEntryPhone: Page "NPR TM SelectSchedulePhone";
         "0DF": DateFormula;
         PageAction: Action;
         ToDate: Date;
@@ -496,14 +326,14 @@
             end;
         end;
 
-        Clear(PageScheduleEntry);
-        PageScheduleEntry.FillPage(AdmissionScheduleEntry, Rec.Quantity, gTicketItemNo, gTicketVariantCode);
-        PageScheduleEntry.LookupMode(true);
-        PageAction := PageScheduleEntry.RunModal();
+        Clear(PageScheduleEntryPhone);
+        PageScheduleEntryPhone.FillPage(AdmissionScheduleEntry, Rec.Quantity, gTicketItemNo, gTicketVariantCode);
+        PageScheduleEntryPhone.LookupMode(true);
+        PageAction := PageScheduleEntryPhone.RunModal();
 
-        if ((PageAction = Action::Yes) or (PageAction = Action::LookupOK)) then begin
+        if ((PageAction = Action::Yes) or (PageAction = Action::LookupOK) or (PageAction = Action::OK)) then begin
             OldEntryNo := Rec."External Adm. Sch. Entry No.";
-            PageScheduleEntry.GetRecord(AdmissionScheduleEntry);
+            PageScheduleEntryPhone.GetRecord(AdmissionScheduleEntry);
 
             Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
             Rec."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
