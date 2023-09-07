@@ -62,7 +62,8 @@ stages:
                                 "NPRHeyLoyalty",
                                 "NPRRSRLocal",
                                 "NPRRSLocal",
-                                "NPRRSFiscal")
+                                "NPRRSFiscal",
+                                "NPRCROFiscal")
       exceptions: (@{Type = "Page"; Id = 6151094; Name = "NPR Feature Management" })
     generatePermissions:
       enabled: true
