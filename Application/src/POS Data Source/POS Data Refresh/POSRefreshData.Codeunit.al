@@ -41,13 +41,15 @@ codeunit 6150791 "NPR POS Refresh Data"
         DataSets: JsonObject;
         POSDataManagement: Codeunit "NPR POS Data Management";
     begin
+        // For backwards compatibility we need to always refresh the sale header record, as the POS Sale data drivers depend on a refresh to ship
+        // their values to frontend, even when the POS Sale record has not been modified.
+        DataSets.Add(POSDataManagement.POSDataSource_BuiltInSale(), _POSRefreshSale.GetFullDataInCurrentSale());
+
         if (_RefreshAll) then begin
             //Only set on action error, view switch and by rare actions like resume sale which re-uses old POS lines without modifying/inserting them.
-            DataSets.Add(POSDataManagement.POSDataSource_BuiltInSale(), _POSRefreshSale.GetFullDataInCurrentSale());
             DataSets.Add(POSDataManagement.POSDataSource_BuiltInSaleLine(), _POSRefreshSaleLine.GetFullDataInCurrentSale());
             DataSets.Add(POSDataManagement.POSDataSource_BuiltInPaymentLine(), _POSRefreshPaymentLine.GetFullDataInCurrentSale());
         end else begin
-            DataSets.Add(POSDataManagement.POSDataSource_BuiltInSale(), _POSRefreshSale.GetDeltaData());
             DataSets.Add(POSDataManagement.POSDataSource_BuiltInSaleLine(), _POSRefreshSaleLine.GetDeltaData());
             DataSets.Add(POSDataManagement.POSDataSource_BuiltInPaymentLine(), _POSRefreshPaymentLine.GetDeltaData());
         end;
