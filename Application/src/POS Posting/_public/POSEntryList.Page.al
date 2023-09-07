@@ -60,7 +60,6 @@
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
-                    Visible = not _IsSimpleView;
                     ToolTip = 'Specifies POS Store from which the POS entry has been created.';
                     ApplicationArea = NPRRetail;
                 }
