@@ -77,7 +77,7 @@
                 field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
 
-                    Visible = true;
+                    Visible = false;
                     ToolTip = 'Specifies the Posting Description for condensed POS payment lines. %1 = POS Unit Code, %2 = POS Store Code, %3 = Posting Date, %4 = POS Period Register No, %5 = POS Payment Date."';
                     ApplicationArea = NPRRetail;
                 }
