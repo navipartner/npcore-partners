@@ -57,6 +57,7 @@
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
+        DisplayTicketReservationRequestPhone: Page "NPR TM TicketMakeReservePhone";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         AdmissionScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         NewQuantity: Integer;
@@ -85,31 +86,62 @@
         end;
 
         ResultCode := 0;
-        repeat
-            Clear(DisplayTicketReservationRequest);
-            DisplayTicketReservationRequest.LoadTicketRequest(Token);
-            DisplayTicketReservationRequest.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
-            DisplayTicketReservationRequest.AllowQuantityChange(HaveSalesLine);
-            DisplayTicketReservationRequest.LookupMode(true);
-            DisplayTicketReservationRequest.Editable(true);
 
-            if (ResultCode <> 0) then
-                if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
+
+        if (Session.CurrentClientType = Session.CurrentClientType::Phone) then begin
+            repeat
+                Clear(DisplayTicketReservationRequestPhone);
+                DisplayTicketReservationRequestPhone.LoadTicketRequest(Token);
+                DisplayTicketReservationRequestPhone.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
+                DisplayTicketReservationRequestPhone.AllowQuantityChange(HaveSalesLine);
+                DisplayTicketReservationRequestPhone.LookupMode(false);
+                DisplayTicketReservationRequestPhone.Editable(true);
+
+                if (ResultCode <> 0) then
+                    if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
+                        exit(false);
+
+                PageAction := DisplayTicketReservationRequestPhone.RunModal();
+                if (PageAction <> Action::OK) then begin
+                    ResponseMessage := ABORTED;
                     exit(false);
+                end;
 
-            PageAction := DisplayTicketReservationRequest.RunModal();
-            if (PageAction <> Action::LookupOK) then begin
-                ResponseMessage := ABORTED;
-                exit(false);
-            end;
+                ResultCode := DisplayTicketReservationRequestPhone.FinalizeReservationRequest(false, ResponseMessage);
+                if (ResultCode = 11) then begin
+                    ResponseMessage := ''; // Silent error downstream
+                    exit(false);
+                end;
 
-            ResultCode := DisplayTicketReservationRequest.FinalizeReservationRequest(false, ResponseMessage);
-            if (ResultCode = 11) then begin
-                ResponseMessage := ''; // Silent error downstream
-                exit(false);
-            end;
+            until (ResultCode = 0);
 
-        until (ResultCode = 0);
+        end else begin
+            repeat
+                Clear(DisplayTicketReservationRequest);
+                DisplayTicketReservationRequest.LoadTicketRequest(Token);
+                DisplayTicketReservationRequest.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
+                DisplayTicketReservationRequest.AllowQuantityChange(HaveSalesLine);
+                DisplayTicketReservationRequest.LookupMode(true);
+                DisplayTicketReservationRequest.Editable(true);
+
+                if (ResultCode <> 0) then
+                    if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
+                        exit(false);
+
+                PageAction := DisplayTicketReservationRequest.RunModal();
+                if (PageAction <> Action::LookupOK) then begin
+                    ResponseMessage := ABORTED;
+                    exit(false);
+                end;
+
+                ResultCode := DisplayTicketReservationRequest.FinalizeReservationRequest(false, ResponseMessage);
+                if (ResultCode = 11) then begin
+                    ResponseMessage := ''; // Silent error downstream
+                    exit(false);
+                end;
+
+            until (ResultCode = 0);
+        end;
 
         if (HaveSalesLine) then begin
             DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQuantity);
