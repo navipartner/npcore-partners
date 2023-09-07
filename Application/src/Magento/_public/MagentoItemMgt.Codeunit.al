@@ -237,12 +237,19 @@
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterInsertEvent', '', true, true)]
     local procedure ItemOnInsert(var Rec: Record Item; RunTrigger: Boolean)
+    var
+        PrevRec: Text;
     begin
         if not RunTrigger then
             exit;
         if Rec.IsTemporary then
             exit;
+
+        PrevRec := Format(Rec);
         SetupMagentoData(Rec);
+        if PrevRec <> Format(Rec) then
+            Rec.Modify(false);
+
         ReplicateSpecialPrice2SalesPrice(Rec, false);
     end;
 
