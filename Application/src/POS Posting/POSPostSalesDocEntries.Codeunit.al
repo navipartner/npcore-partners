@@ -26,20 +26,22 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
         POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::Unposted, POSEntrySalesDocLink."Post Sales Document Status"::"Error while Posting");
         if POSEntrySalesDocLink.FindSet() then
             repeat
-                POSEntrySalesDocLink."Post Sales Document Status" := POSEntrySalesDocLink."Post Sales Document Status"::"Error while Posting";
-                POSEntrySalesDocLink.Modify();
-                Commit();
+                if SalesDocumentExist(POSEntrySalesDocLink) then begin
+                    POSEntrySalesDocLink."Post Sales Document Status" := POSEntrySalesDocLink."Post Sales Document Status"::"Error while Posting";
+                    POSEntrySalesDocLink.Modify();
+                    Commit();
 
-                CheckIfPreviousTransactionsWerePosted(POSEntrySalesDocLink);
-                case POSEntrySalesDocLink."Post Sales Invoice Type" of
-                    POSEntrySalesDocLink."Post Sales Invoice Type"::Prepayment:
-                        PostPrepayment(POSEntrySalesDocLink);
-                    POSEntrySalesDocLink."Post Sales Invoice Type"::"Prepayment Refund":
-                        PostPrepaymentRefund(POSEntrySalesDocLink);
-                    POSEntrySalesDocLink."Post Sales Invoice Type"::Order:
-                        PostDocument(POSEntrySalesDocLink, POSEntry);
+                    CheckIfPreviousTransactionsWerePosted(POSEntrySalesDocLink);
+                    case POSEntrySalesDocLink."Post Sales Invoice Type" of
+                        POSEntrySalesDocLink."Post Sales Invoice Type"::Prepayment:
+                            PostPrepayment(POSEntrySalesDocLink);
+                        POSEntrySalesDocLink."Post Sales Invoice Type"::"Prepayment Refund":
+                            PostPrepaymentRefund(POSEntrySalesDocLink);
+                        POSEntrySalesDocLink."Post Sales Invoice Type"::Order:
+                            PostDocument(POSEntrySalesDocLink, POSEntry);
+                    end;
                 end;
-
+                //either manually posted or deleted status should be changed to be filter out
                 POSEntrySalesDocLink."Post Sales Document Status" := POSEntrySalesDocLink."Post Sales Document Status"::Posted;
                 POSEntrySalesDocLink.Modify();
                 Commit();
@@ -86,6 +88,7 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
         if POSEntrySalesLine.FindFirst() then begin
             POSEntrySalesLine."Applies-to Doc. Type" := POSEntrySalesLine."Applies-to Doc. Type"::Invoice;
             POSEntrySalesLine."Applies-to Doc. No." := SalesHeader."Last Prepayment No.";
+            POSEntrySalesLine.Modify();
             POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSEntrySalesDocLinkIn."Sales Document Type"::POSTED_INVOICE, POSEntrySalesLine."Applies-to Doc. No.", InvoiceType::" ");
         end;
 
@@ -189,17 +192,12 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
                 begin
                     //multiple prepayments can be made on one order.
                     //Using pos entry sale line to validate individual prepayments
-                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntrySalesDocLinkIn."POS Entry No.");
-                    POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Customer);
-                    POSEntrySalesLine.FindFirst();
+                    POSEntrySalesLine.Get(POSEntrySalesDocLinkIn."POS Entry No.", POSEntrySalesDocLinkIn."POS Entry Reference Line No.");
                     ValidatePrepayment(SalesHeader, POSEntrySalesLine);
                 end;
             InvoiceType::"Prepayment Refund":
                 begin
                     //multiple prepayments can be made on one order.
-                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntrySalesDocLinkIn."POS Entry No.");
-                    POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Customer);
-                    POSEntrySalesLine.FindFirst();
                     ValidatePrepaymentRefund(SalesHeader);
                 end;
             InvoiceType::Order:
@@ -395,6 +393,12 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
         end;
     end;
 
+    local procedure SalesDocumentExist(POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link"): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        exit(SalesHeader.Get(POSEntrySalesDocLink."Sales Document Type", POSEntrySalesDocLink."Sales Document No"));
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostPOSEntry(var POSEntry: Record "NPR POS Entry")
