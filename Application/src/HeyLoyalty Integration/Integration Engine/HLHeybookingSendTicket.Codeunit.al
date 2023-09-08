@@ -115,7 +115,6 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
     [TryFunction]
     local procedure GenerateTicketNotifEntryCSVPayload(TicketNotifEntry: Record "NPR TM Ticket Notif. Entry"; LineNo: Integer; var CSVBuffer: Record "CSV Buffer"; var CSVFieldList: List of [Text])
     var
-        AdmisScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Item: Record Item;
         Ticket: Record "NPR TM Ticket";
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
@@ -123,7 +122,6 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         HLIntegrationEvents: Codeunit "NPR HL Integration Events";
         FieldNameValueList: Dictionary of [Text, Text];
         FieldName: Text;
-        ScheduledAdmissionDateTime: Text;
         INVALID: Label 'Invalid %1';
         NOT_IMPLEMENTED: Label 'Case %1 %2 is not implemented.';
     begin
@@ -137,20 +135,14 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         if not TicketType.Get(TempTouchedTicketNotifEntry."Ticket Type Code") then
             Clear(TicketType);
 
-        Clear(AdmisScheduleEntry);
-        FindTicketRequests(Ticket."Ticket Reservation Entry No.", TempTicketReservationRequest);
-        TempTicketReservationRequest.SetRange("Admission Code", TicketNotifEntry."Admission Code");
-        if TempTicketReservationRequest.IsEmpty() then
-            TempTicketReservationRequest.SetRange("Admission Code");
-        TempTicketReservationRequest.FindFirst();
-        if TempTicketReservationRequest."External Adm. Sch. Entry No." <> 0 then begin
-            AdmisScheduleEntry.SetRange("External Schedule Entry No.", TempTicketReservationRequest."External Adm. Sch. Entry No.");
-            if AdmisScheduleEntry.FindFirst() then
-                if AdmisScheduleEntry."Admission Start Date" <> 0D then
-                    ScheduledAdmissionDateTime := StrSubstNo('%1 %2', Format(AdmisScheduleEntry."Admission Start Date", 0, 9), CopyStr(Format(AdmisScheduleEntry."Admission Start Time", 0, 9), 1, 5))
+        if TempTouchedTicketNotifEntry."Ticket Item No." = '' then begin
+            FindTicketRequests(Ticket."Ticket Reservation Entry No.", TempTicketReservationRequest);
+            TempTicketReservationRequest.SetRange("Admission Code", TicketNotifEntry."Admission Code");
+            if TempTicketReservationRequest.IsEmpty() then
+                TempTicketReservationRequest.SetRange("Admission Code");
+            if TempTicketReservationRequest.FindFirst() then
+                TempTouchedTicketNotifEntry."Ticket Item No." := TempTicketReservationRequest."Item No.";
         end;
-        if TempTouchedTicketNotifEntry."Ticket Item No." = '' then
-            TempTouchedTicketNotifEntry."Ticket Item No." := TempTicketReservationRequest."Item No.";
         if not Item.Get(TempTouchedTicketNotifEntry."Ticket Item No.") then
             Clear(Item);
 
@@ -162,7 +154,6 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         FieldNameValueList.Add('category_name', TicketType.Description);
         FieldNameValueList.Add('booking_date', Format(Ticket."Document Date", 0, 9));
         FieldNameValueList.Add('price', Format(Item."Unit Price", 0, 9));
-        FieldNameValueList.Add('scheduled_admission', ScheduledAdmissionDateTime);
         HLIntegrationEvents.OnAddFieldsToHeybookingDBPayload(TempTouchedTicketNotifEntry, FieldNameValueList);
 
         foreach FieldName in FieldNameValueList.Keys() do
@@ -223,7 +214,8 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
 
         //file
         ContentString.AppendLine('--' + NcTask."Record Value");
-        ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'file') + StrSubstNo(FileNameLbl, Format(CurrentDateTime, 0, '<Year4><Month,2><Day,2><Hours24,2><Minutes,2><Seconds,2>')) + '; Content-Type: text/csv');
+        ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'file') + StrSubstNo(FileNameLbl, Format(CurrentDateTime, 0, '<Year4><Month,2><Day,2><Hours24,2><Minutes,2><Seconds,2>')));
+        ContentString.AppendLine('Content-Type: text/csv');
         ContentString.AppendLine();
         TempBlob.CreateInStream(CSVFileStream);
         while not CSVFileStream.EOS() do begin
@@ -235,37 +227,44 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         //delimiter
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'delimiter'));
+        ContentString.AppendLine();
         ContentString.AppendLine(CSVFieldSeparator);
 
         //skip_header_line
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'skip_header_line'));
+        ContentString.AppendLine();
         ContentString.AppendLine('false');
 
         //date_format
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'date_format'));
+        ContentString.AppendLine();
         ContentString.AppendLine('iso8601');
 
         //sendErrorsTo
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'sendErrorsTo'));
+        ContentString.AppendLine();
         ContentString.AppendLine(HLIntegrationMgt.SendHeybookingErrToEmail());
 
         //duplicate_field
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'duplicate_field'));
-        ContentString.AppendLine('bookingid');
+        ContentString.AppendLine();
+        ContentString.AppendLine('booking_id');
 
         //handle_existing
         ContentString.AppendLine('--' + NcTask."Record Value");
         ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'handle_existing'));
+        ContentString.AppendLine();
         ContentString.AppendLine('update');
 
         //fields
         foreach FieldName in CSVFieldList do begin
             ContentString.AppendLine('--' + NcTask."Record Value");
             ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'fields_selected[]'));
+            ContentString.AppendLine();
             ContentString.AppendLine(FieldName);
         end;
         ContentString.AppendLine('--' + NcTask."Record Value" + '--');
