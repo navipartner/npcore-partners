@@ -142,41 +142,49 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         POSSale.GetCurrentSale(SalePOS);
 
         if SalePOS."Customer No." <> '' then begin
-            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
             SalePOS.TestField("Customer No.", SalesHeader."Bill-to Customer No.");
         end else begin
-            SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
             SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();
         end;
 
         POSSession.GetSaleLine(POSSaleLine);
+        if (NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS) then
+            if not DocumentCanBeImportedOnPOS(NpCsDocument, SalesHeader) then begin
+                NpCsDocument."Bill via" := NpCsDocument."Bill via"::"Sales Document";
+                NpCsDocument.Modify();
+            end;
+        if (NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS) then begin
+            InsertDeliveryCommentLine(DeliverText, NpCsDocument, POSSaleLine);
+            POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+            SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
+            SaleLinePOS.SetRecFilter();
+            SalesDocImpMgt.SalesDocumentToPOSCustom(POSSession, SalesHeader, false, false);
+            SaleLinePOS.SetFilter("Line No.", '>%1', SaleLinePOS."Line No.");
+            if SaleLinePOS.FindSet() then
+                repeat
+                    InsertPOSReference(NpCsDocument, SaleLinePOS);
+                until SaleLinePOS.Next() = 0;
+        end else begin
 
-        InsertDeliveryCommentLine(DeliverText, NpCsDocument, POSSaleLine);
+            InsertDeliveryCommentLine(DeliverText, NpCsDocument, POSSaleLine);
 
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
-        if RemainingAmount > 0 then begin
-            SalesHeader.CalcFields("NPR Magento Payment Amount");
-            RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
-            if RemainingAmount < 0 then
-                RemainingAmount := 0;
-        end;
-        SalesHeader.Invoice := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
-        SalesHeader.Ship := NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS;
-        SalesHeader.Receive := false;
-        SalesHeader."Print Posted Documents" := false;
-
-        IF NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS then
-            POSSalesDocumentPost := POSSalesDocumentPost::Synchronous
-        else
+            POSSaleLine.GetNewSaleLine(SaleLinePOS);
+            RemainingAmount := SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
+            if RemainingAmount > 0 then begin
+                SalesHeader.CalcFields("NPR Magento Payment Amount");
+                RemainingAmount -= SalesHeader."NPR Magento Payment Amount";
+                if RemainingAmount < 0 then
+                    RemainingAmount := 0;
+            end;
             POSSalesDocumentPost := POSSalesDocumentPost::No;
 
-        SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, POSSalesDocumentPost);
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        InsertPOSReference(NpCsDocument, SaleLinePOS);
+            SalesDocImpMgt.SalesDocumentPaymentAmountToPOSSaleLine(RemainingAmount, SaleLinePOS, SalesHeader, false, false, POSSalesDocumentPost);
+            SaleLinePOS.UpdateAmounts(SaleLinePOS);
+            POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+            InsertPOSReference(NpCsDocument, SaleLinePOS);
+        end;
     end;
 
     procedure DeliverPostedInvoice(ConfirmInvDiscAmt: Boolean; DeliverText: Text; POSSession: Codeunit "NPR POS Session"; NpCsDocument: Record "NPR NpCs Document")
@@ -260,6 +268,21 @@ codeunit 6060069 "NPR NpCs POSAct. Deliv.Order-B"
         NpCsSaleLinePOSReference."Document No." := NpCsDocument."Document No.";
         NpCsSaleLinePOSReference."Document Type" := NpCsDocument."Document Type";
         NpCsSaleLinePOSReference.Insert();
+    end;
+
+    local procedure DocumentCanBeImportedOnPOS(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+    begin
+        if NpCsDocument."Prepaid Amount" <> 0 then
+            exit(false);
+        if SalesDocImpMgt.DocumentIsPartiallyPosted(SalesHeader) then
+            exit(false);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter("Prepmt Amt to Deduct", '<>0');
+        exit(SalesLine.IsEmpty);
     end;
 
     procedure DeliverDocument(EntryNo: Integer; DeliverText: Text; ConfirmInvDiscAmt: Boolean)
