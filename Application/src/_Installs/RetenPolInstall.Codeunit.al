@@ -148,8 +148,9 @@
     local procedure CreateRetentionPolicySetup(TableId: Integer; RetentionPeriodCode: Code[20]; EnablePolicy: Boolean; ApplyToAllRecords: Boolean)
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
+        JobQueueUserHandler: Codeunit "NPR Job Queue User Handler";
     begin
-        if not RetentionPolicySetup.WritePermission() then begin
+        if not (RetentionPolicySetup.WritePermission() and JobQueueUserHandler.CanUserRefreshJobQueueEntries()) then begin
             AddRetentionPolicySetupToBuffer(TableId, RetentionPeriodCode, EnablePolicy, ApplyToAllRecords);
             exit;
         end;
@@ -182,11 +183,8 @@
     local procedure EnableRetentionPolicySetup(TableId: Integer)
     var
         RetentionPolicySetup: Record "Retention Policy Setup";
-        JobQueueUserHandler: Codeunit "NPR Job Queue User Handler";
     begin
         if not RetentionPolicySetup.Get(TableId) then
-            exit;
-        if not JobQueueUserHandler.CanUserRefreshJobQueueEntries() then
             exit;
 
         RetentionPolicySetup.Validate(Enabled, true);
@@ -197,9 +195,6 @@
     var
         RetenPolicySetupBuffer: Record "NPR Reten. Policy Setup Buffer";
     begin
-        if not (RetenPolicySetupBuffer.WritePermission() and RetenPolicySetupBuffer.ReadPermission()) then
-            exit;
-
         if RetenPolicySetupBuffer.Get(TableId) then // this to cover the case if there were multiple tries to do the install/upgrade, but data from the buffer hasn't been processed in the meantime
             RetenPolicySetupBuffer.Delete();
 

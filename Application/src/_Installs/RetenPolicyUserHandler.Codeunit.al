@@ -54,7 +54,7 @@ codeunit 6151317 "NPR Reten. Policy User Handler"
     var
         RetenPolicySetupBuffer: Record "NPR Reten. Policy Setup Buffer";
         RetentionPolicySetup: Record "Retention Policy Setup";
-        User: Record User;
+        JobQueueUserHandler: Codeunit "NPR Job Queue User Handler";
     begin
         if not GuiAllowed then
             exit(false);
@@ -65,16 +65,7 @@ codeunit 6151317 "NPR Reten. Policy User Handler"
         if not RetentionPolicySetup.WritePermission() then
             exit(false);
 
-        if not TaskScheduler.CanCreateTask() then
-            exit(false);
-
-        if not User.Get(UserSecurityId()) then
-            exit(false);
-
-        if User."License Type" = User."License Type"::"Limited User" then
-            exit(false);
-
-        exit(true);
+        exit(JobQueueUserHandler.CanUserRefreshJobQueueEntries());
     end;
 
     local procedure IsTaskAlreadyScheduled(): Boolean
