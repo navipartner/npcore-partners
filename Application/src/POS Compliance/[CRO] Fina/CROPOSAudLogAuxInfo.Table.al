@@ -1,4 +1,4 @@
-table 6060031 "NPR CRO POS Aud. Log Aux. Info"
+table 6060059 "NPR CRO POS Aud. Log Aux. Info"
 {
     Access = Internal;
     Caption = 'CRO POS Audit Log Aux. Info';

@@ -1,4 +1,4 @@
-page 6151147 "NPR CRO POS Aud. Log Aux. Info"
+page 6151213 "NPR CRO POS Aud. Log Aux. Info"
 {
     ApplicationArea = NPRCROFiscal;
     Caption = 'CRO POS Audit Log Aux. Info';
