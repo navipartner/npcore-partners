@@ -540,6 +540,14 @@
             FieldClass = FlowField;
             CalcFormula = exist("NPR RS POS Audit Log Aux. Info" where("Audit Entry Type" = const("POS Entry"), "POS Entry No." = field("Entry No.")));
         }
+        field(840; "Total Item Sales (LCY)"; Decimal)
+        {
+            CalcFormula = Sum("NPR POS Entry Sales Line"."Amount Incl. VAT" WHERE("POS Entry No." = FIELD("Entry No."),
+                                                                         Type = FILTER("Item")));
+            Caption = 'Total Item Sales (LCY)';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(5052; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';

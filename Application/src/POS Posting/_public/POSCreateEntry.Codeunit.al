@@ -566,14 +566,14 @@
                 BufferPOSEntrySalesLine."Serial No." := TempItemLedgEntry."Serial No.";
 
                 BufferPOSEntrySalesLine."Return Reason Code" := SalesInvoiceLine."Return Reason Code";
-                BufferPOSEntrySalesLine.Quantity := -SalesInvoiceLine.Quantity;
+                BufferPOSEntrySalesLine.Quantity := SalesInvoiceLine.Quantity;
                 BufferPOSEntrySalesLine."Line Discount %" := SalesInvoiceLine."Line Discount %";
                 BufferPOSEntrySalesLine."Dimension Set ID" := SalesInvoiceLine."Dimension Set ID";
-                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesInvoiceLine.Amount;
-                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesInvoiceLine."Amount Including VAT";
-                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesInvoiceLine."VAT Base Amount";
-                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesInvoiceLine."Quantity (Base)";
-                BufferPOSEntrySalesLine."VAT Difference" := -SalesInvoiceLine."VAT Difference";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := SalesInvoiceLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := SalesInvoiceLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := SalesInvoiceLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := SalesInvoiceLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := SalesInvoiceLine."VAT Difference";
                 BufferPOSEntrySalesLine.Modify();
 
             until SalesInvoiceLine.Next() = 0;
@@ -640,14 +640,14 @@
                 ItemTrackingDocManagement.RetrieveEntriesFromPostedInvoice(TempItemLedgEntry, SalesCrMemoLine.RowID1());
                 BufferPOSEntrySalesLine."Serial No." := TempItemLedgEntry."Serial No.";
                 BufferPOSEntrySalesLine."Return Reason Code" := SalesCrMemoLine."Return Reason Code";
-                BufferPOSEntrySalesLine.Quantity := -SalesCrMemoLine.Quantity;
+                BufferPOSEntrySalesLine.Quantity := SalesCrMemoLine.Quantity;
                 BufferPOSEntrySalesLine."Line Discount %" := SalesCrMemoLine."Line Discount %";
                 BufferPOSEntrySalesLine."Dimension Set ID" := SalesCrMemoLine."Dimension Set ID";
-                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesCrMemoLine.Amount;
-                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesCrMemoLine."Amount Including VAT";
-                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesCrMemoLine."VAT Base Amount";
-                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesCrMemoLine."Quantity (Base)";
-                BufferPOSEntrySalesLine."VAT Difference" := -SalesCrMemoLine."VAT Difference";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := SalesCrMemoLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := SalesCrMemoLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := SalesCrMemoLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := SalesCrMemoLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := SalesCrMemoLine."VAT Difference";
                 BufferPOSEntrySalesLine.Modify();
 
             until SalesCrMemoLine.Next() = 0;
@@ -721,15 +721,15 @@
                     BufferPOSEntrySalesLine."Serial No." := ReservationEntry."Serial No.";
 
                 BufferPOSEntrySalesLine."Return Reason Code" := SalesLine."Return Reason Code";
-                BufferPOSEntrySalesLine.Quantity := -SalesLine.Quantity;
+                BufferPOSEntrySalesLine.Quantity := SalesLine.Quantity;
                 BufferPOSEntrySalesLine."Line Discount %" := SalesLine."Line Discount %";
-                BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := -SalesLine."Line Discount Amount";
-                BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := -SalesLine."Line Discount Amount";
-                BufferPOSEntrySalesLine."Amount Excl. VAT" := -SalesLine.Amount;
-                BufferPOSEntrySalesLine."Amount Incl. VAT" := -SalesLine."Amount Including VAT";
-                BufferPOSEntrySalesLine."VAT Base Amount" := -SalesLine."VAT Base Amount";
-                BufferPOSEntrySalesLine."Quantity (Base)" := -SalesLine."Quantity (Base)";
-                BufferPOSEntrySalesLine."VAT Difference" := -SalesLine."VAT Difference";
+                BufferPOSEntrySalesLine."Line Discount Amount Excl. VAT" := SalesLine."Line Discount Amount";
+                BufferPOSEntrySalesLine."Line Discount Amount Incl. VAT" := SalesLine."Line Discount Amount";
+                BufferPOSEntrySalesLine."Amount Excl. VAT" := SalesLine.Amount;
+                BufferPOSEntrySalesLine."Amount Incl. VAT" := SalesLine."Amount Including VAT";
+                BufferPOSEntrySalesLine."VAT Base Amount" := SalesLine."VAT Base Amount";
+                BufferPOSEntrySalesLine."Quantity (Base)" := SalesLine."Quantity (Base)";
+                BufferPOSEntrySalesLine."VAT Difference" := SalesLine."VAT Difference";
                 BufferPOSEntrySalesLine.Modify();
             until SalesLine.Next() = 0;
     end;
