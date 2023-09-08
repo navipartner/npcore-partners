@@ -1,4 +1,4 @@
-codeunit 6151547 "NPR CRO Audit Mgt."
+codeunit 6151548 "NPR NO Audit Mgt."
 {
     Access = Internal;
 
@@ -6,12 +6,12 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Enabled: Boolean;
         Initialized: Boolean;
 
-    #region CRO Fiscal - POS Handling Subscribers
+    #region NO Fiscal - POS Handling Subscribers
 
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
     local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
     begin
-        if not IsCROAuditEnabled(POSAuditProfile.Code) then
+        if not IsNOAuditEnabled(POSAuditProfile.Code) then
             exit;
         OnActionShowSetup();
     end;
@@ -19,7 +19,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
     local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
-        AddCROAuditHandler(tmpRetailList);
+        AddNOAuditHandler(tmpRetailList);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
@@ -42,8 +42,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     #endregion
 
-    #region CRO Fiscal - Audit Profile Mgt
-    local procedure AddCROAuditHandler(var tmpRetailList: Record "NPR Retail List")
+    #region NO Fiscal - Audit Profile Mgt
+    local procedure AddNOAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
         tmpRetailList.Choice := CopyStr(HandlerCode(), 1, MaxStrLen(tmpRetailList.Choice));
@@ -52,7 +52,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     local procedure HandleOnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var
-        CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
+        NOPOSAuditLogAuxInfo: Record "NPR NO POS Audit Log Aux. Info";
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
@@ -62,12 +62,12 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
             exit;
-        if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
+        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
         if not POSStore.Get(POSUnit."POS Store Code") then
             exit;
 
-        if not CROPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
+        if not NOPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
             exit;
 
         if not (POSAuditLog."Action Type" in [POSAuditLog."Action Type"::DIRECT_SALE_END, POSAuditLog."Action Type"::CREDIT_SALE_END]) then
@@ -75,35 +75,35 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         POSEntry.Get(POSAuditLog."Record ID");
         if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
-            InsertCROPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
+            InsertNOPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
     end;
 
-    local procedure InsertCROPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    local procedure InsertNOPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
     var
-        CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
+        NOPOSAuditLogAuxInfo: Record "NPR NO POS Audit Log Aux. Info";
     begin
-        CROPOSAuditLogAuxInfo.Init();
-        CROPOSAuditLogAuxInfo."Audit Entry Type" := CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
-        CROPOSAuditLogAuxInfo."POS Entry No." := POSEntry."Entry No.";
-        CROPOSAuditLogAuxInfo."Entry Date" := POSEntry."Entry Date";
-        CROPOSAuditLogAuxInfo."POS Store Code" := POSStore.Code;
-        CROPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
-        CROPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
-        CROPOSAuditLogAuxInfo.Insert();
+        NOPOSAuditLogAuxInfo.Init();
+        NOPOSAuditLogAuxInfo."Audit Entry Type" := NOPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
+        NOPOSAuditLogAuxInfo."POS Entry No." := POSEntry."Entry No.";
+        NOPOSAuditLogAuxInfo."Entry Date" := POSEntry."Entry Date";
+        NOPOSAuditLogAuxInfo."POS Store Code" := POSStore.Code;
+        NOPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
+        NOPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
+        NOPOSAuditLogAuxInfo.Insert();
     end;
 
     #endregion
 
-    #region CRO Fiscal - Procedures/Helper Functions
-    internal procedure IsCROFiscalActive(): Boolean
+    #region NO Fiscal - Procedures/Helper Functions
+    internal procedure IsNOFiscalActive(): Boolean
     var
-        CROFiscalSetup: Record "NPR CRO Fiscalization Setup";
+        NOFiscalSetup: Record "NPR NO Fiscalization Setup";
     begin
-        if CROFiscalSetup.Get() then
-            exit(CROFiscalSetup."Enable CRO Fiscal");
+        if NOFiscalSetup.Get() then
+            exit(NOFiscalSetup."Enable NO Fiscal");
     end;
 
-    local procedure IsCROAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
+    local procedure IsNOAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
@@ -120,39 +120,39 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     local procedure HandlerCode(): Text
     var
-        HandlerCodeTxt: Label 'CRO_FINA', Locked = true, MaxLength = 20;
+        HandlerCodeTxt: Label 'NO_LOVDATA', Locked = true, MaxLength = 20;
     begin
         exit(HandlerCodeTxt);
     end;
 
     local procedure OnActionShowSetup()
     var
-        CROFiscalisationSetup: Page "NPR CRO Fiscalization Setup";
+        NOFiscalisationSetup: Page "NPR NO Fiscalization Setup";
     begin
-        CROFiscalisationSetup.RunModal();
+        NOFiscalisationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")
     var
-        CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
-        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for digital signature.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - CRO POS Audit Log Aux. Info table caption';
+        NOPOSAuditLogAuxInfo: Record "NPR NO POS Audit Log Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for digital signature.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - NO POS Audit Log Aux. Info table caption';
     begin
-        CROPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
-        if not CROPOSAuditLogAuxInfo.IsEmpty() then
-            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, CROPOSAuditLogAuxInfo.TableCaption());
+        NOPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
+        if not NOPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, NOPOSAuditLogAuxInfo.TableCaption());
     end;
 
     local procedure ErrorOnRenameOfPOSUnitIfAlreadyUsed(OldPOSUnit: Record "NPR POS Unit")
     var
-        CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
-        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for digital signature.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - CRO POS Audit Log Aux. Info table caption';
+        NOPOSAuditLogAuxInfo: Record "NPR NO POS Audit Log Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for digital signature.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - NO POS Audit Log Aux. Info table caption';
     begin
-        if not IsCROAuditEnabled(OldPOSUnit."POS Audit Profile") then
+        if not IsNOAuditEnabled(OldPOSUnit."POS Audit Profile") then
             exit;
 
-        CROPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
-        if not CROPOSAuditLogAuxInfo.IsEmpty() then
-            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", CROPOSAuditLogAuxInfo.TableCaption());
+        NOPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
+        if not NOPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", NOPOSAuditLogAuxInfo.TableCaption());
     end;
 
     #endregion

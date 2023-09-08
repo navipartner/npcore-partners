@@ -1,10 +1,10 @@
-table 6060058 "NPR CRO Fiscalization Setup"
+table 6060060 "NPR NO Fiscalization Setup"
 {
     Access = Internal;
-    Caption = 'CRO Fiscalization Setup';
+    Caption = 'NO Fiscalization Setup';
     DataClassification = CustomerContent;
-    DrillDownPageId = "NPR CRO Fiscalization Setup";
-    LookupPageId = "NPR CRO Fiscalization Setup";
+    DrillDownPageId = "NPR NO Fiscalization Setup";
+    LookupPageId = "NPR NO Fiscalization Setup";
 
     fields
     {
@@ -13,9 +13,9 @@ table 6060058 "NPR CRO Fiscalization Setup"
             Caption = 'Primary Key';
             DataClassification = CustomerContent;
         }
-        field(2; "Enable CRO Fiscal"; Boolean)
+        field(2; "Enable NO Fiscal"; Boolean)
         {
-            Caption = 'Enable CRO Fiscalisation';
+            Caption = 'Enable NO Fiscalisation';
             DataClassification = CustomerContent;
         }
     }

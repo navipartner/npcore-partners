@@ -67,5 +67,15 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner CRO Fiscalization';
             DataClassification = CustomerContent;
         }
+        field(6060113; "NPR NO Fiscal"; Boolean)
+        {
+            Caption = 'NaviPartner NO Fiscalisation';
+            DataClassification = CustomerContent;
+        }
+        field(6060114; "NPR SI Fiscal"; Boolean)
+        {
+            Caption = 'NaviPartner SI Fiscalisation';
+            DataClassification = CustomerContent;
+        }
     }
 }

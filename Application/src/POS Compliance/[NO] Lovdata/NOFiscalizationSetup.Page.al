@@ -1,12 +1,12 @@
-page 6151214 "NPR CRO Fiscalization Setup"
+page 6151224 "NPR NO Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'CRO Tax Fiscalisation Setup';
+    Caption = 'NO Tax Fiscalisation Setup';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;
     PageType = Card;
-    SourceTable = "NPR CRO Fiscalization Setup";
+    SourceTable = "NPR NO Fiscalization Setup";
     UsageCategory = Administration;
 
     layout
@@ -17,13 +17,13 @@ page 6151214 "NPR CRO Fiscalization Setup"
             {
                 Caption = 'General Settings';
 
-                field("Enable CRO Fiscal"; Rec."Enable CRO Fiscal")
+                field("Enable NO Fiscal"; Rec."Enable NO Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable CRO Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable NO Fiscalisation field.';
                     trigger OnValidate()
                     begin
-                        if xRec."Enable CRO Fiscal" <> Rec."Enable CRO Fiscal" then
+                        if xRec."Enable NO Fiscal" <> Rec."Enable NO Fiscal" then
                             EnabledValueChanged := true;
                     end;
                 }
