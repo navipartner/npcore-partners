@@ -27,6 +27,7 @@
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
         Item: Record Item;
+        SalesLineTypeNotSupportedErr: Label 'Sales Document contains line with unsupported type. Supported types are %1, %2 and %3.', Comment = '%1=SalesLine.Type::"";%2=SalesLine.Type::Item;%3=SalesLine.Type::"G/L Account"';
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -42,7 +43,10 @@
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetFilter(Type, '%1|%2', SalesLine.Type::Item, SalesLine.Type::" ");
+        SalesLine.SetFilter(Type, '<>%1&<>%2&<>%3', SalesLine.Type::" ", SalesLine.Type::"G/L Account", SalesLine.Type::Item);
+        if not SalesLine.IsEmpty() then
+            Error(SalesLineTypeNotSupportedErr, SalesLine.Type::" ", SalesLine.Type::"G/L Account", SalesLine.Type::Item);
+        SalesLine.SetRange(Type);
         if not SalesLine.FindSet() then
             exit;
 
@@ -56,10 +60,8 @@
                         else
                             InsertLine(SalesLine, POSSaleLine, SalesHeader);
                     end;
-                SalesLine.Type::" ":
-                    begin
-                        InsertLine(SalesLine, POSSaleLine, SalesHeader);
-                    end;
+                else
+                    InsertLine(SalesLine, POSSaleLine, SalesHeader);
             end;
         until SalesLine.Next() = 0;
 
@@ -166,6 +168,11 @@
                 end;
             SalesLine.Type::" ":
                 SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
+            SalesLine.Type::"G/L Account":
+                begin
+                    SaleLinePOS."Line Type" := "NPR POS Sale Line Type"::"GL Payment";
+                    SaleLinePOS.Validate("No.", SalesLine."No.");
+                end;
         end;
 
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
