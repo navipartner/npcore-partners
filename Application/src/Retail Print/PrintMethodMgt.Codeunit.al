@@ -10,11 +10,12 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
         Request: JsonObject;
+        Stack: Codeunit "NPR POS Page Stack Check";
     begin
         if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
 
-        if POSSession.IsInitialized() then begin
+        if POSSession.IsInitialized() and Stack.CurrentStackWasStartedByPOSTrigger() then begin
             //print to hardware connector via POS page
             Request.Add('PrinterName', PrinterName);
             Request.Add('PrintJob', PrintJobBase64);
