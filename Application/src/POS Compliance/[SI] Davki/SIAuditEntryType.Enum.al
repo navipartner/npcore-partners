@@ -1,4 +1,4 @@
-enum 6014586 "NPR CRO Audit Entry Type"
+enum 6014533 "NPR SI Audit Entry Type"
 {
 #IF NOT BC17
     Access = Internal;
