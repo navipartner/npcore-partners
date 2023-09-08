@@ -257,9 +257,8 @@
         if TrySelectToken(JObject, 'AID', JToken, false) then begin
             EFTTransactionRequest."Card Application ID" := JToken.AsValue().AsText();
         end;
-
         if TrySelectToken(JObject, 'OptionalData', JToken, false) then begin
-            ParseOptionalData(EFTTransactionRequest, JToken.AsValue().AsText());
+            ParseOptionalData(EFTTransactionRequest, JValTextOrDefault(JToken.AsValue(), ''));
         end;
 
         if TrySelectToken(JObject, 'ResponseCode', JToken, false) then begin
@@ -442,6 +441,22 @@
         //TODO:
         //Undocumented by NETS where balance & expiry date is located in json respose.
         //Test gift card is currently expired so cannot be check myself at this time.
+    end;
+
+    local procedure JValTextOrDefault(JVal: JsonValue; Default: Text): Text
+    var
+        Txt: Text;
+    begin
+        if (JVal.IsNull() or JVal.IsUndefined() or not TryJValText(JVal, Txt)) then
+            exit(Default)
+        else
+            exit(Txt);
+    end;
+
+    [TryFunction]
+    local procedure TryJValText(JVal: JsonValue; var Txt: Text)
+    begin
+        Txt := JVal.AsText();
     end;
 
     local procedure TrySelectToken(JObject: JsonObject; Path: Text; var JToken: JsonToken; WithError: Boolean): Boolean
