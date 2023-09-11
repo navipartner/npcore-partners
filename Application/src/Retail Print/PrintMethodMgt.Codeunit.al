@@ -9,8 +9,8 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
-        Request: JsonObject;
         Stack: Codeunit "NPR POS Page Stack Check";
+        Request: JsonObject;
     begin
         if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
@@ -37,8 +37,9 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
-        Request: JsonObject;
         Base64Convert: Codeunit "Base64 Convert";
+        Stack: Codeunit "NPR POS Page Stack Check";
+        Request: JsonObject;
     begin
         if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
@@ -47,7 +48,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         if Stream.EOS() then
             exit;
 
-        if POSSession.IsInitialized() then begin
+        if POSSession.IsInitialized() and Stack.CurrentStackWasStartedByPOSTrigger() then begin
             //print to hardware connector via POS page
             Request.Add('PrinterName', PrinterName);
             Request.Add('FileData', Base64Convert.ToBase64(Stream));
