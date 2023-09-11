@@ -39,6 +39,7 @@ query 6014427 "NPR VAT EV Entries"
             filter(Type; Type) { }
             filter(Document_Type; "Document Type") { }
             filter(VAT_Report_Mapping; "VAT Report Mapping") { }
+            filter(Prepayment; "Prepayment") { }
             filter(VAT_Calculation_Type; "VAT Calculation Type") { }
         }
     }

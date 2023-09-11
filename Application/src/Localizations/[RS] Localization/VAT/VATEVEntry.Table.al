@@ -1070,8 +1070,10 @@ table 6060018 "NPR VAT EV Entry"
         NewValue: Decimal;
     begin
         recRef.GetTable(Rec);
-        //Sales
+        VATEVEntries.SetRange(Prepayment, false);
         VATEVEntries.SetFilter(VAT_Calculation_Type, '<>%1', Enum::"Tax Calculation Type"::"Full VAT");
+
+        #region Sales
         VATEVEntries.SetRange(type, "General Posting Type"::Sale);
         VATEVEntries.SetRange(Document_Type, "Gen. Journal Document Type"::Payment);
         VATEVEntries.Open();
@@ -1095,6 +1097,18 @@ table 6060018 "NPR VAT EV Entry"
             fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
         end;
 
+        VATEVEntries.SetRange(Prepayment, true);
+        VATEVEntries.Open();
+        while VATEVEntries.Read() do begin
+            fldRef := recRef.field(VATReportMapping."Prep. Sales Invoice Base");
+            NewValue := fldRef.Value;
+            fldRef.Value(NewValue + Abs(VATEVEntries.Base));
+            fldRef := recRef.field(VATReportMapping."Prep. Sales Invoice Amount");
+            NewValue := fldRef.Value;
+            fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
+        end;
+        VATEVEntries.SetRange(Prepayment, false);
+
         VATEVEntries.SetRange(Document_Type, "Gen. Journal Document Type"::"Credit Memo");
         VATEVEntries.Open();
         while VATEVEntries.Read() do begin
@@ -1105,8 +1119,9 @@ table 6060018 "NPR VAT EV Entry"
             NewValue := fldRef.Value;
             fldRef.Value(NewValue - Abs(VATEVEntries.Amount));
         end;
+        #endregion
 
-        //Purchase
+        #region Purchase
         VATEVEntries.SetRange(type, "General Posting Type"::Purchase);
         VATEVEntries.SetRange(Document_Type, "Gen. Journal Document Type"::Payment);
         VATEVEntries.Open();
@@ -1133,15 +1148,15 @@ table 6060018 "NPR VAT EV Entry"
                     fldRef.Value(NewValue + Abs(VATEVEntries.Non_Deductible_VAT_Amount));
                 end else begin
 #ENDIF
-                    fldRef := recRef.field(VATReportMapping."Purchase Invoice Base");
-                    NewValue := fldRef.Value;
-                    fldRef.Value(NewValue + Abs(VATEVEntries.Base));
-                    fldRef := recRef.field(VATReportMapping."Purchase Invoice Amount");
-                    NewValue := fldRef.Value;
-                    fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
-                    fldRef := recRef.field(VATReportMapping."Deductable Amount");
-                    NewValue := fldRef.Value;
-                    fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
+                fldRef := recRef.field(VATReportMapping."Purchase Invoice Base");
+                NewValue := fldRef.Value;
+                fldRef.Value(NewValue + Abs(VATEVEntries.Base));
+                fldRef := recRef.field(VATReportMapping."Purchase Invoice Amount");
+                NewValue := fldRef.Value;
+                fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
+                fldRef := recRef.field(VATReportMapping."Deductable Amount");
+                NewValue := fldRef.Value;
+                fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
                 end;
 #ENDIF
@@ -1157,8 +1172,9 @@ table 6060018 "NPR VAT EV Entry"
             NewValue := fldRef.Value;
             fldRef.Value(NewValue - Abs(VATEVEntries.Amount));
         end;
+        #endregion
 
-        //Full VAT 
+        #region Full-VAT
         VATEVEntries.SetRange(VAT_Calculation_Type, Enum::"Tax Calculation Type"::"Full VAT");
         //Purchase
         VATEVEntries.SetRange(type, "General Posting Type"::Purchase);
@@ -1182,6 +1198,18 @@ table 6060018 "NPR VAT EV Entry"
             fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
         end;
 
+        VATEVEntries.SetRange(Prepayment, true);
+        VATEVEntries.Open();
+        while VATEVEntries.Read() do begin
+            fldRef := recRef.field(VATReportMapping."Prep. Purchase Invoice Base");
+            NewValue := fldRef.Value;
+            fldRef.Value(NewValue + Abs(VATEVEntries.VAT_Base_Full_VAT));
+            fldRef := recRef.field(VATReportMapping."Prep. Purchase Invoice Amount");
+            NewValue := fldRef.Value;
+            fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
+        end;
+        VATEVEntries.SetRange(Prepayment, false);
+
         //Sales
         VATEVEntries.SetRange(type, "General Posting Type"::Sale);
         VATEVEntries.SetRange(Document_Type, "Gen. Journal Document Type"::Payment);
@@ -1199,6 +1227,7 @@ table 6060018 "NPR VAT EV Entry"
             NewValue := fldRef.Value;
             fldRef.Value(NewValue + Abs(VATEVEntries.Amount));
         end;
+        #endregion
 
         recRef.SetTable(Rec);
     end;
@@ -1207,7 +1236,8 @@ table 6060018 "NPR VAT EV Entry"
     var
         VATReportMapping: Record "NPR VAT Report Mapping";
     begin
-        //Sales
+        RSVATEntry.SetRange(Prepayment, false);
+        #region Sales
         RSVATEntry.SetRange(Type, "General Posting Type"::Sale);
 
         RSVATEntry.SetRange("Document Type", "Gen. Journal Document Type"::Payment);
@@ -1247,6 +1277,22 @@ table 6060018 "NPR VAT EV Entry"
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Sales Invoice Amount");
 
+        RSVATEntry.SetRange(Prepayment, true);
+        VATReportMapping.SetRange("Prep. Sales Invoice Base", FieldNo);
+        if VATReportMapping.FindSet() then
+            repeat
+                FillTempEntry(VATReportMapping, RSVATEntry);
+            until VATReportMapping.Next() = 0;
+        VATReportMapping.SetRange("Prep. Sales Invoice Base");
+
+        VATReportMapping.SetRange("Prep. Sales Invoice Amount", FieldNo);
+        if VATReportMapping.FindSet() then
+            repeat
+                FillTempEntry(VATReportMapping, RSVATEntry);
+            until VATReportMapping.Next() = 0;
+        VATReportMapping.SetRange("Prep. Sales Invoice Amount");
+        RSVATEntry.SetRange(Prepayment, false);
+
         RSVATEntry.SetRange("Document Type", "Gen. Journal Document Type"::"Credit Memo");
         VATReportMapping.SetRange("Sales Cr. Memo Base", FieldNo);
         if VATReportMapping.FindSet() then
@@ -1261,8 +1307,9 @@ table 6060018 "NPR VAT EV Entry"
                 FillTempEntry(VATReportMapping, RSVATEntry);
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Sales Cr. Memo Amount");
+        #endregion
 
-        //Purchase
+        #region Purchase
         RSVATEntry.SetRange(Type, "General Posting Type"::Purchase);
 
         RSVATEntry.SetRange("Document Type", "Gen. Journal Document Type"::Payment);
@@ -1295,6 +1342,22 @@ table 6060018 "NPR VAT EV Entry"
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Purchase Invoice Amount");
 
+        RSVATEntry.SetRange(Prepayment, true);
+        VATReportMapping.SetRange("Prep. Purchase Invoice Base", FieldNo);
+        if VATReportMapping.FindSet() then
+            repeat
+                FillTempEntry(VATReportMapping, RSVATEntry);
+            until VATReportMapping.Next() = 0;
+        VATReportMapping.SetRange("Prep. Purchase Invoice Base");
+
+        VATReportMapping.SetRange("Prep. Purchase Invoice Amount", FieldNo);
+        if VATReportMapping.FindSet() then
+            repeat
+                FillTempEntry(VATReportMapping, RSVATEntry);
+            until VATReportMapping.Next() = 0;
+        VATReportMapping.SetRange("Prep. Purchase Invoice Amount");
+        RSVATEntry.SetRange(Prepayment, false);
+
         RSVATEntry.SetRange("Document Type", "Gen. Journal Document Type"::"Credit Memo");
         VATReportMapping.SetRange("Purchase Cr. Memo Base", FieldNo);
         if VATReportMapping.FindSet() then
@@ -1309,8 +1372,9 @@ table 6060018 "NPR VAT EV Entry"
                 FillTempEntry(VATReportMapping, RSVATEntry);
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Purchase Cr. Memo Amount");
+        #endregion
 
-        //Deductable
+        #region Deductable
         RSVATEntry.SetRange("Document Type", "Gen. Journal Document Type"::Invoice);
         VATReportMapping.SetRange("Deductable Amount", FieldNo);
         if VATReportMapping.FindSet() then
@@ -1318,8 +1382,9 @@ table 6060018 "NPR VAT EV Entry"
                 FillTempEntry(VATReportMapping, RSVATEntry);
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Deductable Amount");
+        #endregion
 
-        //Non-Deductable
+        #region Non-Deductable
         VATReportMapping.SetRange("Non-Deductable Base", FieldNo);
         if VATReportMapping.FindSet() then
             repeat
@@ -1333,6 +1398,7 @@ table 6060018 "NPR VAT EV Entry"
                 FillTempEntry(VATReportMapping, RSVATEntry);
             until VATReportMapping.Next() = 0;
         VATReportMapping.SetRange("Non-Deductable Amount");
+        #endregion
     end;
 
     var
