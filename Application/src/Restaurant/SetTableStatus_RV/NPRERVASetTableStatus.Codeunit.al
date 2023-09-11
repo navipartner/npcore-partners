@@ -35,8 +35,7 @@ codeunit 6150685 "NPR NPRE RVA: Set Table Status" implements "NPR IPOS Workflow"
         Seating.Find();
         BusinessLogic.SetSeatingStatus(Seating.Code, NewStatusCode);
 
-        if Seating."Seating Location" <> '' then
-            FrontendAssistant.RefreshStatus(FrontEnd, Seating.GetSeatingRestaurant(), Seating."Seating Location", Seating.Code);
+        FrontendAssistant.RefreshStatus(FrontEnd, Seating.GetSeatingRestaurant(), Seating."Seating Location", Seating.Code);
     end;
 
     local procedure GetActionScript(): Text
