@@ -6,6 +6,10 @@
     ContextSensitiveHelpPage = 'docs/retail/vouchers/explanation/voucher_types/';
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpRv Voucher Type";
+#if NOT BC17
+    AboutTitle = 'Voucher Type';
+    AboutText = 'This page is used to configure and manage NpRv Voucher Types. Voucher types enable you to create, send, set up, and validate vouchers for various purposes. Personalize voucher types to suit your business requirements and efficiently distribute value to recipients';
+#endif
 
     layout
     {
@@ -14,6 +18,10 @@
             group(General)
             {
                 Caption = 'General';
+#if NOT BC17
+                AboutTitle = 'General Information';
+                AboutText = 'This section is used to access general information about the NPR NpRv Voucher Type. Here, you can find details such as the voucher type''s name, description, and any relevant information that distinguishes it from other voucher types.';
+#endif
                 group(Control6014420)
                 {
                     ShowCaption = false;
@@ -57,6 +65,10 @@
             group("Send Voucher")
             {
                 Caption = 'Send Voucher';
+#if NOT BC17
+                AboutTitle = 'Send Voucher';
+                AboutText = 'This section is used to initiate the process of sending vouchers to recipients. You can specify the recipients, voucher details, and distribution method to ensure vouchers are delivered accurately to intended recipients.';
+#endif
                 group(Control6014425)
                 {
                     ShowCaption = false;
@@ -205,6 +217,10 @@
             group("Setup Voucher")
             {
                 Caption = 'Setup Voucher';
+#if NOT BC17
+                AboutTitle = 'Setup Voucher';
+                AboutText = 'This section is used to configure the settings and parameters of the voucher type. You can define rules, expiration dates, and any restrictions associated with the vouchers, ensuring they align with your business''s needs and promotions.';
+#endif
 
                 field("Voucher Amount"; Rec."Voucher Amount")
                 {
@@ -230,6 +246,10 @@
             group("Validate Voucher")
             {
                 Caption = 'Validate Voucher';
+#if NOT BC17
+                AboutTitle = 'Validate Voucher';
+                AboutText = 'Use this section to validate vouchers presented by customers or recipients. Verify that the voucher conditions are met and that it is still valid for use. Ensure seamless redemption experience for customers by confirming voucher eligibility.';
+#endif
                 group(Control6014427)
                 {
                     ShowCaption = false;
@@ -260,6 +280,10 @@
             group("Apply Payment")
             {
                 Caption = 'Apply Payment';
+#if NOT BC17
+                AboutTitle = 'Apply Payment';
+                AboutText = 'Navigate to this section to confirm payments made using vouchers. Ensure that payments are valid and in compliance with voucher terms and conditions. Verify that the voucher''s value has been correctly applied to the transaction, providing a seamless and accurate payment experience for customers.';
+#endif
                 field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
                     ToolTip = 'Specifies the value of the Apply Payment Module field';

@@ -8,7 +8,10 @@
 
     PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
     SourceTable = "NPR NpDc Coupon Type";
-
+#if NOT BC17
+    AboutTitle = 'Coupon Type';
+    AboutText = 'This card is used to access and manage NpDc Coupon Types. These coupon types are used to create, issue, validate, and apply discounts to transactions. Customize coupon types based on your promotional needs to enhance customer experience and boost sales.';
+#endif
 
     layout
     {
@@ -16,6 +19,10 @@
         {
             group(General)
             {
+#if NOT BC17
+                AboutTitle = 'General Information';
+                AboutText = 'This section is used to view general information about the NPR NpDc Coupon Type. This includes details such as its name, description, and any relevant information that sets it apart from other coupon types.';
+#endif
                 group(Control6014442)
                 {
                     ShowCaption = false;
@@ -97,6 +104,10 @@
             group("Issue Coupon")
             {
                 Caption = 'Issue Coupon';
+#if NOT BC17
+                AboutTitle = 'Issue Coupon';
+                AboutText = 'This section is used to create and issue new coupons. You can generate and distribute coupons to customers based on specific criteria or promotions. Ensure your coupons are set up correctly to apply discounts accurately.';
+#endif
                 group(Control6014426)
                 {
                     ShowCaption = false;
@@ -167,6 +178,10 @@
             group("Validate Coupon")
             {
                 Caption = 'Validate Coupon';
+#if NOT BC17
+                AboutTitle = 'Validate Coupon';
+                AboutText = 'This section allows you to validate coupons presented by customers during transactions. Verify that the coupon''s conditions are met and that it is still valid for use. Ensure smooth customer experience by confirming coupon eligibility.';
+#endif
                 group(Control6014430)
                 {
                     ShowCaption = false;
@@ -213,6 +228,10 @@
             group("Apply Discount")
             {
                 Caption = 'Apply Discount';
+#if NOT BC17
+                AboutTitle = 'Apply Discount';
+                AboutText = 'Use this section to apply discounts to transactions using validated coupons. Configure the system to automatically calculate and subtract discounts, providing customers with cost savings as intended.';
+#endif
                 group(Control6014432)
                 {
                     ShowCaption = false;
