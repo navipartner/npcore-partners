@@ -59,9 +59,6 @@
     local procedure ImportTicketReservations(Document: XmlDocument; DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
-        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Reservation: XmlElement;
         Node: XmlNode;
         TicketAdmissionNodeList: XmlNodeList;
@@ -69,9 +66,7 @@
         NTicketAdmission: Integer;
         NReservation: Integer;
         Token: Text[100];
-        TicketCreated: Boolean;
         Lines: List of [Integer];
-        Line: Integer;
     begin
 
         TicketRequestManager.ExpireReservationRequests();
@@ -99,6 +94,19 @@
                 ImportTicketReservation(Node.AsXmlElement(), Token, Lines);
             end;
         end;
+
+        FinalizeTicketReservation(Token, Lines);
+    end;
+
+    internal procedure FinalizeTicketReservation(Token: Text[100]; Lines: List of [Integer])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketCreated: Boolean;
+        Line: Integer;
+    begin
 
         //Import remaining BOM lines per line no
         foreach Line in Lines do begin
@@ -172,7 +180,7 @@
         end;
     end;
 
-    local procedure PreConfirmReservationRequest(Token: Text[100])
+    internal procedure PreConfirmReservationRequest(Token: Text[100])
     var
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -184,7 +192,7 @@
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
 
         if (TicketReservationRequest.FindSet(true)) then begin
-            TicketReservationRequest.ModifyAll("Expires Date Time", CurrentDateTime() + 1500 * 1000);
+            TicketReservationRequest.ModifyAll("Expires Date Time", TicketRequestManager.CalculateNewExpireTime());
             exit;
         end;
 
