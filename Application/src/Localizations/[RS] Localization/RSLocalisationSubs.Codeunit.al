@@ -8,6 +8,23 @@ codeunit 6151390 "NPR RS Localisation Subs."
 
     #region SyncRSVATEntryWithVATEntry
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Line", 'OnAfterInsertVATEntry', '', false, false)]
+    local procedure GenJnlPostLine_OnAfterInsertVATEntry(GenJnlLine: Record "Gen. Journal Line"; VATEntry: Record "VAT Entry");
+    var
+        RSVATEntry: Record "NPR RS VAT Entry";
+    begin
+        if VATEntry.IsTemporary() then
+            exit;
+        if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
+            exit;
+        if not GenJnlLine.Prepayment then
+            exit;
+        if not RSVATEntry.Get(VATEntry."Entry No.") then
+            exit;
+        RSVATEntry.Prepayment := GenJnlLine.Prepayment;
+        RSVATEntry.Modify();
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"VAT Entry", 'OnAfterInsertEvent', '', false, false)]
     local procedure OnAfterInsertVATEntry(var Rec: Record "VAT Entry")
     var
