@@ -35,8 +35,19 @@ codeunit 6151434 "NPR Feature Management Install"
 
     local procedure InitFeatures()
     var
+        ExistingFeature: Record "NPR Feature";
+        TempExistingFeature: Record "NPR Feature" temporary;
+        FeatureManagement: Interface "NPR Feature Management";
         Feature: Enum "NPR Feature";
     begin
+        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::HeyLoyalty);
+        if ExistingFeature.FindSet() then
+            repeat
+                TempExistingFeature := ExistingFeature;
+                TempExistingFeature.Insert();
+            until ExistingFeature.Next() = 0;
+        ExistingFeature.DeleteAll();
+
         AddFeature(Feature::Retail);
         AddFeature(Feature::"Ticket Essential");
         AddFeature(Feature::"Ticket Advanced");
@@ -46,6 +57,16 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Membership Essential");
         AddFeature(Feature::"Membership Advanced");
         AddFeature(Feature::HeyLoyalty);
+
+        if ExistingFeature.FindSet() then
+            repeat
+                TempExistingFeature.SetRange(Feature, ExistingFeature.Feature);
+                if TempExistingFeature.FindFirst() and TempExistingFeature.Enabled then begin
+                    FeatureManagement := ExistingFeature.Feature;
+                    if not FeatureManagement.IsFeatureEnabled() then
+                        FeatureManagement.SetFeatureEnabled(true);
+                end;
+            until ExistingFeature.Next() = 0;
     end;
 
     local procedure AddFeature(FeatureToAdd: Enum "NPR Feature")
