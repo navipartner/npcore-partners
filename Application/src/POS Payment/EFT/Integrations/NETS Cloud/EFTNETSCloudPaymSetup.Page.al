@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'EFT NETS Cloud Payment Setup';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/nets_baxi/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR EFT NETS Cloud Paym. Setup";
