@@ -108,7 +108,6 @@
         {
             Caption = 'Number of Guests';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53';
         }
         field(41; "Billed Number of Guests"; Integer)
         {

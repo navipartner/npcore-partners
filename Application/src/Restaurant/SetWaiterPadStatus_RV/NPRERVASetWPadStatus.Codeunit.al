@@ -28,19 +28,27 @@ codeunit 6150684 "NPR NPRE RVA: Set WPad Status" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogic: Codeunit "NPR NPRE RVA: Set WP Status-B";
+        FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
         NewStatusParamValue: Text;
         ResultMessageText: Text;
+        SeatingFilter: Text;
+        SeatingLocationFilter: Text;
         WaiterPadNoParamValue: Text;
+        WaiterPadNo: Code[20];
     begin
         if not Context.GetStringParameter(_ParamStatusCodeLbl, NewStatusParamValue) or (NewStatusParamValue = '') then
             exit;
         if not Context.GetStringParameter(_ParamWaiterPadCodeLbl, WaiterPadNoParamValue) then
             WaiterPadNoParamValue := '';
+        WaiterPadNo := CopyStr(WaiterPadNoParamValue, 1, 20);
 
-        BusinessLogic.SetWaiterPadStatus(Sale, CopyStr(WaiterPadNoParamValue, 1, 20), CopyStr(NewStatusParamValue, 1, 10), ResultMessageText);
-
+        BusinessLogic.SetWaiterPadStatus(Sale, WaiterPadNo, CopyStr(NewStatusParamValue, 1, 10), ResultMessageText);
         Context.SetContext('ShowResultMessage', ResultMessageText <> '');
         Context.SetContext('ResultMessageText', ResultMessageText);
+
+        BusinessLogic.GetWaiterPadSeatingAndLocationFilters(WaiterPadNo, SeatingFilter, SeatingLocationFilter);
+        if SeatingFilter <> '' then
+            FrontendAssistant.RefreshStatus(FrontEnd, '', SeatingLocationFilter, SeatingFilter);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

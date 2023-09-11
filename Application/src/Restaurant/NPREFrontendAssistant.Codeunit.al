@@ -469,7 +469,7 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
     end;
 
-    procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20]; SeatingCode: Code[20])
+    procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantFilter: Text; SeatingLocationFilter: Text; SeatingFilter: Text)
     var
         Seating: Record "NPR NPRE Seating";
         SeatingLocation: Record "NPR NPRE Seating Location";
@@ -481,12 +481,12 @@
     begin
         Request.SetMethod('UpdateRestaurantStatuses');
 
-        if RestaurantCode <> '' then
-            SeatingLocation.SetRange("Restaurant Code", RestaurantCode);
-        if LocationCode <> '' then
-            SeatingLocation.SetRange(Code, LocationCode);
-        if SeatingCode <> '' then
-            Seating.SetRange(Code, SeatingCode);
+        if RestaurantFilter <> '' then
+            SeatingLocation.SetFilter("Restaurant Code", RestaurantFilter);
+        if SeatingLocationFilter <> '' then
+            SeatingLocation.SetFilter(Code, SeatingLocationFilter);
+        if SeatingFilter <> '' then
+            Seating.SetFilter(Code, SeatingFilter);
 
         if SeatingLocation.FindSet() then
             repeat

@@ -290,8 +290,8 @@
     var
         SeatingLocation: Record "NPR NPRE Seating Location";
     begin
-        TestField("Seating Location");
-        SeatingLocation.Get("Seating Location");
+        if not SeatingLocation.Get("Seating Location") then
+            exit('');
         exit(SeatingLocation."Restaurant Code");
     end;
 }
