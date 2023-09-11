@@ -38,7 +38,7 @@ codeunit 6151479 "NPR Move Entries"
             Error(UsedInTransErr, Item."No.", ItemWorksheetLine.TableCaption());
 
         WaiterPadswithLines.SetRange(Closed, false);
-        WaiterPadswithLines.SetRange(Type, WaiterPadswithLines.Type::Item);
+        WaiterPadswithLines.SetRange(Type, Enum::"NPR POS Sale Line Type"::Item);
         WaiterPadswithLines.SetRange(No, Item."No.");
         WaiterPadswithLines.Open();
         if WaiterPadswithLines.Read() then
