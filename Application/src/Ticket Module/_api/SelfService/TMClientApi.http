@@ -1,0 +1,84 @@
+#
+#    {{hostname}}, {{username}}, {{password}} defined in settings.json
+#
+
+###
+@baseUrl = https://{{hostname}}/BC/ODataV4
+@serviceName = REST
+@functionName = InvokeMethod
+
+# @name companies
+GET {{baseUrl}}/Company
+Authorization: Basic {{username}} {{password}}
+
+###
+@companyId = {{companies.response.body.$.value[0].Id}}
+
+@ticketToken = 3A3800F28C884BF795895C80BE7EB025
+@itemNumber = 31100
+@referenceDate = 2023-09-07
+@quantity = 1
+@admissionCode = CASTLE
+###
+
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.GetTicketReservation",
+    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetTicketReservation\"}, \"NPRetail.TM.GetTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "lastServerId": ""
+}
+
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.PreConfirmTicketReservation",
+    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.PreConfirmTicketReservation\"}, \"NPRetail.TM.PreConfirmTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "lastServerId": ""
+}
+
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.CancelTicketReservation",
+    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.CancelTicketReservation\"}, \"NPRetail.TM.CancelTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "lastServerId": ""
+}
+
+
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.GetAdmissionCapacity",
+    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetAdmissionCapacity\"}, \"NPRetail.TM.GetAdmissionCapacity\": [{\"requestId\":\"\",\"itemReference\":\"{{itemNumber}}\",\"admissionCode\":\"\",\"referenceDate\":\"{{referenceDate}}\",\"customerNumber\":\"\",\"quantity\":{{quantity}}}]}",
+    "lastServerId": ""
+}
+
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.MakeTicketReservation",
+    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.MakeTicketReservation\"}, \"NPRetail.TM.MakeTicketReservation\": [{\"token\": \"\", \"lines\": [{\"itemReference\":\"{{itemNumber}}\",\"admissionCode\":\"{{admissionCode}}\",\"quantity\":1,\"scheduleId\":-1,\"memberNumber\":\"\",\"notificationAddress\":\"\"}]}  ]}",
+    "lastServerId": ""
+}
+
+ 

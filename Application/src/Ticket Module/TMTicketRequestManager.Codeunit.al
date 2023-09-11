@@ -583,6 +583,7 @@
         until (TicketReservationRequest.Next() = 0);
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     procedure ConfirmReservationRequest(Token: Text[100]; var ResponseMessage: Text) ReservationConfirmed: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1943,7 +1944,7 @@
           ToFile);
     end;
 
-    local procedure CalculateNewExpireTime(): DateTime;
+    procedure CalculateNewExpireTime(): DateTime;
     begin
         exit(CurrentDateTime() + 1500 * 1000);
     end;
