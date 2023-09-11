@@ -2,6 +2,9 @@ codeunit 6151373 "NPR Prepayment Mgt."
 {
     Access = Internal;
 #if not (BC17 or BC18 or BC19)
+    var
+        AppliesToID: Label 'PREV', Locked = true;
+
     #region Purchase Prepayment
     internal procedure SetPayablesAccount(GenJournalLine: Record "Gen. Journal Line"; VendorPostingGroup: Record "Vendor Posting Group"; var PayablesAccount: Code[20])
     var
@@ -97,14 +100,14 @@ codeunit 6151373 "NPR Prepayment Mgt."
                         if not ApplyCustLedgerEntry.IsEmpty() then begin
                             CustLedgerEntry."Applying Entry" := true;
                             if CustLedgerEntry."Applies-to ID" = '' then
-                                CustLedgerEntry."Applies-to ID" := 'PREV';
+                                CustLedgerEntry."Applies-to ID" := AppliesToID;
                             CustLedgerEntry.CalcFields("Remaining Amount");
                             if CustLedgerEntry."Remaining Amount" = 0 then
                                 exit;
                             CustLedgerEntry."Amount to Apply" := CustLedgerEntry."Remaining Amount";
                             CustLedgerEntry.Modify();
 
-                            CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, 'PREV');
+                            CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, AppliesToID);
                             GLSetup.Get();
                             if GLSetup."Journal Templ. Name Mandatory" then begin
                                 GLSetup.TestField("Apply Jnl. Template Name");
@@ -486,7 +489,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
-        CustLedgerEntry.SetRange("Applies-to ID", 'PREV');
+        CustLedgerEntry.SetRange("Applies-to ID", AppliesToID);
         if CustLedgerEntry.IsEmpty() then
             exit;
         CustLedgerEntry.ModifyAll("Applies-to ID", '');
@@ -521,7 +524,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
 
         CustLedgerEntry."Applying Entry" := true;
         if CustLedgerEntry."Applies-to ID" = '' then
-            CustLedgerEntry."Applies-to ID" := 'PREV';
+            CustLedgerEntry."Applies-to ID" := AppliesToID;
         CustLedgerEntry.CalcFields("Remaining Amount");
         if CustLedgerEntry."Remaining Amount" = 0 then
             exit;
@@ -536,7 +539,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
         if ApplyCustLedgerEntry.IsEmpty() then
             exit;
 
-        CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, 'PREV');
+        CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, AppliesToID);
         GLSetup.Get();
         if GLSetup."Journal Templ. Name Mandatory" then begin
             GLSetup.TestField("Apply Jnl. Template Name");
@@ -568,7 +571,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
 
         CustLedgerEntry."Applying Entry" := true;
         if CustLedgerEntry."Applies-to ID" = '' then
-            CustLedgerEntry."Applies-to ID" := 'PREV';
+            CustLedgerEntry."Applies-to ID" := AppliesToID;
         CustLedgerEntry.CalcFields("Remaining Amount");
         if CustLedgerEntry."Remaining Amount" = 0 then
             exit;
@@ -585,7 +588,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
         if ApplyCustLedgerEntry.IsEmpty() then
             exit;
 
-        CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, 'PREV');
+        CustEntrySetApplID.SetApplId(ApplyCustLedgerEntry, CustLedgerEntry, AppliesToID);
         GLSetup.Get();
         if GLSetup."Journal Templ. Name Mandatory" then begin
             GLSetup.TestField("Apply Jnl. Template Name");

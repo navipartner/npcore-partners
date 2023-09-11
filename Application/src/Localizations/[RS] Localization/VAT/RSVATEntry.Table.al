@@ -234,6 +234,12 @@ table 6060014 "NPR RS VAT Entry"
             Caption = 'VAT Base Full VAT';
             Editable = false;
         }
+        field(6014402; "Prepayment"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Prepayment';
+            Editable = false;
+        }
     }
 
     keys

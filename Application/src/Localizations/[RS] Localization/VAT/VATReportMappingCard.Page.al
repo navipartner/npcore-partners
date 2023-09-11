@@ -69,7 +69,15 @@ page 6151117 "NPR VAT Report Mapping Card"
                     Editable = false;
                     ApplicationArea = NPRRSLocal;
                 }
-
+                field("Prep. Purchase Invoice Base"; Rec."Prep. Purchase Invoice Base")
+                {
+                    ToolTip = 'Specifies the value of the Prepayment Purchase Invoice Base field.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        LookupField(Rec."Prep. Purchase Invoice Base");
+                    end;
+                }
                 field("Purchase Payment Amount"; Rec."Purchase Payment Amount")
                 {
                     ToolTip = 'Specifies the value of the Purchase Payment Amount field.';
@@ -115,6 +123,15 @@ page 6151117 "NPR VAT Report Mapping Card"
                         LookupField(Rec."Deductable Amount");
                     end;
                 }
+                field("Prep. Purchase Invoice Amount"; Rec."Prep. Purchase Invoice Amount")
+                {
+                    ToolTip = 'Specifies the value of the Prepayment Purchase Invoice Amount field.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        LookupField(Rec."Prep. Purchase Invoice Amount");
+                    end;
+                }
             }
             group(Sales)
             {
@@ -156,6 +173,15 @@ page 6151117 "NPR VAT Report Mapping Card"
                         LookupField(Rec."VAT Base Full VAT");
                     end;
                 }
+                field("Prep. Sales Invoice Base"; Rec."Prep. Sales Invoice Base")
+                {
+                    ToolTip = 'Specifies the value of the Prepayment Sales Invoice Base field.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        LookupField(Rec."Prep. Sales Invoice Base");
+                    end;
+                }
                 field("Sales Payment Amount"; Rec."Sales Payment Amount")
                 {
                     ToolTip = 'Specifies the value of the Sales Payment Amount field.';
@@ -188,6 +214,15 @@ page 6151117 "NPR VAT Report Mapping Card"
                     ShowCaption = false;
                     Editable = false;
                     ApplicationArea = NPRRSLocal;
+                }
+                field("Prep. Sales Invoice Amount"; Rec."Prep. Sales Invoice Amount")
+                {
+                    ToolTip = 'Specifies the value of the Prepayment Sales Invoice Amount field.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        LookupField(Rec."Prep. Sales Invoice Amount");
+                    end;
                 }
             }
             group("Book of Incoming Invoices")

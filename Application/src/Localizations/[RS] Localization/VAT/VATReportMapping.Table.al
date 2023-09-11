@@ -189,6 +189,46 @@ table 6060017 "NPR VAT Report Mapping"
             TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
+        field(43; "Prep. Purchase Invoice Base"; Integer)
+        {
+            Caption = 'Prepayment Purchase Invoice Base';
+            DataClassification = CustomerContent;
+#if BC17 or BC18 or BC19 or BC20 or BC21
+            TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
+#else
+            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+#endif
+        }
+        field(44; "Prep. Purchase Invoice Amount"; Integer)
+        {
+            Caption = 'Prepayment Purchase Invoice Amount';
+            DataClassification = CustomerContent;
+#if BC17 or BC18 or BC19 or BC20 or BC21
+            TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
+#else
+            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+#endif
+        }
+        field(45; "Prep. Sales Invoice Base"; Integer)
+        {
+            Caption = 'Prepayment Sales Invoice Base';
+            DataClassification = CustomerContent;
+#if BC17 or BC18 or BC19 or BC20 or BC21
+            TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
+#else
+            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+#endif
+        }
+        field(46; "Prep. Sales Invoice Amount"; Integer)
+        {
+            Caption = 'Prepayment Sales Invoice Amount';
+            DataClassification = CustomerContent;
+#if BC17 or BC18 or BC19 or BC20 or BC21
+            TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
+#else
+            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+#endif
+        }
         field(6014401; "VAT Base Full VAT"; Integer)
         {
             Caption = 'VAT Base Full VAT';

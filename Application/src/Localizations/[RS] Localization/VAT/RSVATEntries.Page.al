@@ -153,6 +153,11 @@ page 6151115 "NPR RS VAT Entries"
                     ToolTip = 'Specifies the country/region of the address.';
                     ApplicationArea = NPRRSLocal;
                 }
+                field(Prepayment; Rec.Prepayment)
+                {
+                    ToolTip = 'Specifies the value of the Prepayment field.';
+                    ApplicationArea = NPRRSLocal;
+                }
                 field(Closed; Rec.Closed)
                 {
                     ToolTip = 'Specifies whether the VAT entry has been closed by the Calc. and Post VAT Settlement batch job.';
