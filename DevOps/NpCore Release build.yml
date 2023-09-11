@@ -16,7 +16,7 @@ stages:
         # Now only 2019 is available but in the future it will be every newer version.
         # Then we will probably remove this requirement as it will alwyas TRUE.
         - Agent.OS -equals Windows_NT
-        - Agent.OSVersion -equals 10.0.17763
+        #- Agent.OSVersion -equals 10.0.17763
       containerDefinitions:
         - name: Auto
 
@@ -47,6 +47,8 @@ stages:
         azureKeyVaultCertName: BusinessCentralKeyVaultReader
         azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
         azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
+      objectVisibilityCheck: true
+      obsoleteTagsCheck: true
       translations:
         translationsRepoUrl: https://gitlab.com/navipartner1/npcore/npcore-translations.git
         translationRepoUser: AzureDevOpsCI
@@ -62,10 +64,10 @@ stages:
         objectName: 'NPR NP RETAIL'
         objectCaption: 'NP Retail'
         xmlRoleId: 'NP RETAIL'
-        xmlRoleName: 'NP Retail'           
-      obsoleteTagsCheck: true
+        xmlRoleName: 'NP Retail'
+      runTests: true
       testApps:
-      - 'Performance Toolkit'
+      #- 'Performance Toolkit'
       - 'Test'
       outputLogExcludeFilters:
       - (?=^[\w\W]*(AL0432):[\w\W]*)(?!^[\w\W]*AL0432:[\w\W]*(Tag:[\w\W]*))
