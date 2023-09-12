@@ -1,6 +1,7 @@
 ﻿page 6151102 "NPR NpRi Reimbursements"
 {
     Caption = 'Reimbursements';
+    ContextSensitiveHelpPage = 'docs/retail/reimbursement/intro/';
     DelayedInsert = true;
     PageType = List;
     RefreshOnActivate = true;
