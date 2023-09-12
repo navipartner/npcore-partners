@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Actions';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/reference/pos_actions_ref/';
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
