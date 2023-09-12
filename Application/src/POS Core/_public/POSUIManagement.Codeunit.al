@@ -580,6 +580,23 @@
         GlobalSettingsEditVariablesLbl: Label 'Edit Variables';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsAddNewLbl: Label 'Add New';
+        DialogItemSelectionQuantityOutOfLbl: Label 'Quantity:';
+        DialogItemSelectionOutOfLbl: Label 'out of';
+        DialogItemSelectionEnterTheNumberLbl: Label 'Enter the number';
+        DialogItemSelectionRemoveLbl: Label 'Remove';
+        DialogItemSelectionQuantityFallsShortLbl: Label 'Quantity falls short of the minimum required amount of';
+        DialogItemSelectionInLbl: Label 'in';
+        DialogItemSelectionQuantityExceedsMaximumLbl: Label 'Quantity exceeds maximum allowed amount of';
+        DialogItemSelectionItemSelectionErrorLbl: Label 'Item selection error...';
+        DialogItemSelectionDescriptionLbl: Label 'Description';
+        DialogItemSelectionItemNoLbl: Label 'Item No';
+        DialogItemSelectionUnitPriceLbl: Label 'Unit Price';
+        DialogItemSelectionVariantCodeLbl: Label 'Variant Code';
+        DialogItemSelectionMinQuantityLbl: Label 'Min Quantity';
+        DialogItemSelectionMaxQuantityLbl: Label 'Max Quantity';
+        DialogItemSelectionInvalidConfigurationLbl: Label '(INVALID CONFIGURATION)';
+        NumberOfGuestsForWaiterPadLbl: Label 'Number of guests for waiter pad:';
+        NumberOfGuestsAtActiveTableLbl: Label 'Number of guests at table:';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -891,6 +908,23 @@
         Captions.Add('Global_Settings_EditVariables', GlobalSettingsEditVariablesLbl);
         Captions.Add('Global_Settings_PleaseEnterNameForThisAction', GlobalSettingsPleaseEnterNameForThisActionLbl);
         Captions.Add('Global_Settings_AddNew', GlobalSettingsAddNewLbl);
+        Captions.Add('Dialog_ItemSelection_QuantityOutOf',DialogItemSelectionQuantityOutOfLbl);
+        Captions.Add('Dialog_ItemSelection_OutOf',DialogItemSelectionOutOfLbl);
+        Captions.Add('Dialog_ItemSelection_EnterTheNumber',DialogItemSelectionEnterTheNumberLbl);
+        Captions.Add('Dialog_ItemSelection_Remove',DialogItemSelectionRemoveLbl);
+        Captions.Add('Dialog_ItemSelection_QuantityFallsShort',DialogItemSelectionQuantityFallsShortLbl);
+        Captions.Add('Dialog_ItemSelection_In',DialogItemSelectionInLbl);
+        Captions.Add('Dialog_ItemSelection_QuantityExceedsMaximum',DialogItemSelectionQuantityExceedsMaximumLbl);
+        Captions.Add('Dialog_ItemSelection_ItemSelectionError',DialogItemSelectionItemSelectionErrorLbl);
+        Captions.Add('Dialog_ItemSelection_Description',DialogItemSelectionDescriptionLbl);
+        Captions.Add('Dialog_ItemSelection_ItemNo',DialogItemSelectionItemNoLbl);
+        Captions.Add('Dialog_ItemSelection_UnitPrice',DialogItemSelectionUnitPriceLbl);
+        Captions.Add('Dialog_ItemSelection_VariantCode',DialogItemSelectionVariantCodeLbl);
+        Captions.Add('Dialog_ItemSelection_MinQuantity',DialogItemSelectionMinQuantityLbl);
+        Captions.Add('Dialog_ItemSelection_MaxQuantity',DialogItemSelectionMaxQuantityLbl);
+        Captions.Add('Dialog_ItemSelection_InvalidConfiguration',DialogItemSelectionInvalidConfigurationLbl);
+        Captions.Add('Number_Of_Guests_ForWaiterPad',NumberOfGuestsForWaiterPadLbl);
+        Captions.Add('Number_Of_Guests_At_Active_Table_ForTable',NumberOfGuestsAtActiveTableLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
