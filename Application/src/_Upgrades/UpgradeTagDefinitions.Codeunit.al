@@ -492,6 +492,16 @@
                     'RefreshKitchenOrderStatus':
                         exit('NPRE_RefreshKitchenOrderStatus_20230704');
                 end;
+            Codeunit::"NPR Feature Flags Install":
+                case UpgradeStep of
+                    'PrepareFeatureFlags':
+                        exit('Install_PrepareFeatureFlags-20230830');
+                end;
+            Codeunit::"NPR Feature Flags Upgrade":
+                case UpgradeStep of
+                    'PrepareFeatureFlags':
+                        exit('Upgrade_PrepareFeatureFlags-20230830');
+                end;
             Codeunit::"NPR Feature Management Install":
                 case UpgradeStep of
                     'AddFeatures':
