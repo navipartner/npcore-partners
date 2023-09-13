@@ -159,10 +159,14 @@
 
         RecordRef.GetTable(TicketNotificationEntry);
         EMailMgt.AttemptSendEmail(RecordRef, TicketNotificationEntry."Notification Address", ResponseMessage);
+
+        if (ResponseMessage <> '') then
+            EmitTicketNotificationTelemetry(TicketNotificationEntry, ResponseMessage);
+
         exit(ResponseMessage = '');
     end;
 
-    local procedure SendSmsNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
+    internal procedure SendSmsNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
     var
         SMSManagement: Codeunit "NPR SMS Management";
         SMSTemplateHeader: Record "NPR SMS Template Header";
@@ -181,6 +185,9 @@
             SMSManagement.SendSMS(TicketNotificationEntry."Notification Address", SMSTemplateHeader.Description, SMSMessage);
         end else
             ResponseMessage := StrSubstNo(NO_SMS_TEMPLATE, TicketNotificationEntry.TableCaption());
+
+        if (ResponseMessage <> '') then
+            EmitTicketNotificationTelemetry(TicketNotificationEntry, ResponseMessage);
 
         exit(ResponseMessage = '');
 
@@ -1132,6 +1139,24 @@
         end;
     end;
 
+    internal procedure EmitTicketNotificationTelemetry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; FailReason: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+
+        CustomDimensions.Add('NPR_EntryNumber', Format(TicketNotificationEntry."Entry No.", 0, 9));
+        CustomDimensions.Add('NPR_WalletPassId', TicketNotificationEntry."eTicket Pass Id");
+        CustomDimensions.Add('NPR_Method', Format(TicketNotificationEntry."Notification Method", 0, 9));
+
+        CustomDimensions.Add('NPR_Token', TicketNotificationEntry."Ticket Token");
+
+        Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
 
     internal procedure ExportNotifications(var Notification: Record "NPR TM Ticket Notif. Entry")
     var
