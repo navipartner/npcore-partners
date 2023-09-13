@@ -31,13 +31,14 @@
 
     procedure BinTransfer(UsePosEntry: Boolean; WithPosting: Boolean; POSStoreCode: Code[10]; UnitNo: Code[10])
     var
+        POSUnit: Record "NPR POS Unit";
         CheckPointEntryNo: Integer;
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
-
-        CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode, UnitNo);
+        if POSUnit.Get(UnitNo) then;
+        CheckPointEntryNo := POSCheckpointMgr.CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode, UnitNo, POSUnit.Status);
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
         Commit();
 
@@ -107,7 +108,7 @@
         PosEntryNo := 0;
         POSUnit.Get(UnitNo);
 
-        CheckpointEntryNo := CreateCheckpointWorker(Mode, UnitNo);
+        CheckpointEntryNo := CreateCheckpointWorker(Mode, UnitNo, POSUnit.Status);
         if (not POSWorkshiftCheckpoint.Get(CheckpointEntryNo)) then
             exit(0);
 
@@ -251,7 +252,7 @@
         exit(ConfirmEoD);
     end;
 
-    internal procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[10]) CheckPointEntryNo: Integer
+    internal procedure CreateCheckpointWorker(Mode: Option; UnitNo: Code[10]; xPOSUnitStatus: Option) CheckPointEntryNo: Integer
     var
         POSUnit: Record "NPR POS Unit";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
@@ -263,7 +264,7 @@
 
         //Create checkpoints for managed POS Units
         IsManager := CreateCheckpointForManagedPosUnits(UnitNo, Mode);
-        CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
+        CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.", xPOSUnitStatus);
 
 
         POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
@@ -348,7 +349,7 @@
             POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::XREPORT);
             POSWorkshiftCheckpoint.SetFilter(Open, '=%1', true);
             if (not POSWorkshiftCheckpoint.FindLast()) then begin
-                CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
+                CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.", POSUnit.Status);
                 POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
                 POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::XREPORT;
                 POSWorkshiftCheckpoint.Modify();
@@ -361,7 +362,7 @@
             PaymentBinCheckpoint.TransferToPaymentBin(POSWorkshiftCheckpoint."Entry No.", POSUnit."No.", MasterPosUnit."No.");
 
             // Create a new check point now with zero in the bins
-            CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
+            CheckPointEntryNo := CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.", POSUnit.Status);
             POSWorkshiftCheckpoint.Get(CheckPointEntryNo);
             POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::WORKSHIFT_CLOSE;
             POSWorkshiftCheckpoint.Open := true;
@@ -554,7 +555,7 @@
 
     end;
 
-    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode: Code[10]; POSUnitNo: Code[10]) CheckpointEntryNo: Integer
+    procedure CreateEndWorkshiftCheckpoint_POSEntry(POSStoreCode: Code[10]; POSUnitNo: Code[10]; xPOSUnitStatus: Option) CheckpointEntryNo: Integer
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
     begin
@@ -562,6 +563,7 @@
         POSWorkshiftCheckpoint.Init();
         POSWorkshiftCheckpoint."Entry No." := 0;
         POSWorkshiftCheckpoint."POS Unit No." := POSUnitNo;
+        POSWorkshiftCheckpoint."POS Unit Status Before Checkp." := xPOSUnitStatus;
         POSWorkshiftCheckpoint."Created At" := CurrentDateTime();
         POSWorkshiftCheckpoint.Open := true;
         POSWorkshiftCheckpoint.Insert();

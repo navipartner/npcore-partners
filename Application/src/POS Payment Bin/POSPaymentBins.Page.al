@@ -187,7 +187,7 @@
         CheckpointEntryNo: Integer;
         PageAction: Action;
     begin
-        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry('', '');
+        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry('', '', 0);
         PaymentBinCheckpoint.CreatePosEntryBinCheckpoint('', Rec."No.", CheckpointEntryNo, POSPaymentBinCheckpoint.type::TRANSFER);
         Commit();
 
