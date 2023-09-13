@@ -34,7 +34,7 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
 
         FromBinNo := POSActionBinTransferB.GetDefaultUnitBin(POSSession);
         POSActionBinTransferB.GetPosUnitFromBin(FromBinNo, PosUnit);
-        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.");
+        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.", POSUnit.Status);
 
         POSActionBinTransferB.TransferContentsToBin(POSSession, FromBinNo, CheckpointEntryNo);
 
