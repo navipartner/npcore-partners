@@ -278,6 +278,12 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             if (TmpAdmScheduleEntryResponse."Admission Is" = TmpAdmScheduleEntryResponse."Admission Is"::CLOSED) then
                                 _CapacityStatusCode := -5;
 
+                            if (TmpAdmScheduleEntryResponse."Admission End Date" < Today()) then
+                                _CapacityStatusCode := -5;
+
+                            if ((TmpAdmScheduleEntryResponse."Admission End Date" = Today()) and (TmpAdmScheduleEntryResponse."Admission End Time" < Time())) then
+                                _CapacityStatusCode := -5;
+
                             if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse,
                                         xAdmCapacityPriceBufferResponse.ItemNumber,
                                         xAdmCapacityPriceBufferResponse.VariantCode,
@@ -295,17 +301,7 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                                 NonWorking,
                                 _CalendarExceptionText);
 
-                            if (NonWorking) then
-                                _CapacityStatusCode := -6;
-
-                            if (_CapacityStatusCode <> 1) then
-                                exit;
-
-                            SetCapacityStatusCode();
-
-                            if ((_CalendarExceptionText <> '') and (_CapacityStatusCode > 0)) then
-                                _CapacityStatusCode := 6;
-
+                            // Dynamic Price Calculations
                             xDynPriceOptionOut := '';
                             xDynAmountOut := '';
                             xDynPercentageOut := '';
@@ -340,6 +336,18 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
 
                             if (_DynamicCustomerPrice < 0) then
                                 _DynamicCustomerPrice := 0;
+
+                            if (NonWorking) then
+                                _CapacityStatusCode := -6;
+
+                            if (_CapacityStatusCode <> 1) then
+                                exit;
+
+                            SetCapacityStatusCode();
+
+                            if ((_CalendarExceptionText <> '') and (_CapacityStatusCode > 0)) then
+                                _CapacityStatusCode := 6;
+
                         end;
 
                     }
@@ -473,6 +481,7 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                 xResponseMessageOut := 'The admission schedule indicated that admission is closed.';
             -6:
                 xResponseMessageOut := _CalendarExceptionText;
+
             else
                 xResponseMessageOut := StrSubstNo(_ResponseLbl, _CapacityStatusCode);
         end;
