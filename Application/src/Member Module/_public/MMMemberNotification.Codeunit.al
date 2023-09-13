@@ -526,6 +526,9 @@
             end;
         end;
 
+        if (ResponseMessage <> '') then
+            EmitMemberNotificationTelemetry(MemberNotificationEntry, ResponseMessage);
+
         exit(ResponseMessage = '');
     end;
 
@@ -556,6 +559,9 @@
                 ResponseMessage := '';
             end;
         end;
+
+        if (ResponseMessage <> '') then
+            EmitMemberNotificationTelemetry(MemberNotificationEntry, ResponseMessage);
 
         exit(ResponseMessage = '');
     end;
@@ -893,7 +899,11 @@
 
         MemberNotificationEntry."Wallet Pass Id" := MembershipRole."Wallet Pass Id";
 
-        exit(NPPassServerInvokeApi('PUT', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, PassData, JSONResult));
+        if (NPPassServerInvokeApi('PUT', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, PassData, JSONResult)) then
+            exit(true);
+
+        EmitMemberWalletTelemetry('PUT', MemberNotificationSetup, MemberNotificationEntry, FailReason);
+        exit(false);
     end;
 
     local procedure SetPassUrl(var MemberNotificationEntry: Record "NPR MM Member Notific. Entry"): Boolean
@@ -907,11 +917,15 @@
         if (not MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code")) then
             exit(false);
 
-        if (not (NPPassServerInvokeApi('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult))) then
+        if (not (NPPassServerInvokeApi('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult))) then begin
+            EmitMemberWalletTelemetry('GET', MemberNotificationSetup, MemberNotificationEntry, FailReason);
             exit(false);
+        end;
 
-        if (JSONResult = '') then
+        if (JSONResult = '') then begin
+            EmitMemberWalletTelemetry('GET', MemberNotificationSetup, MemberNotificationEntry, 'Empty result set from pass-server.');
             exit(false);
+        end;
 
         JObject.ReadFrom(JSONResult);
         MemberNotificationEntry."Wallet Pass Default URL" := CopyStr(GetStringValue(JObject, 'public_url.default'), 1, MaxStrLen(MemberNotificationEntry."Wallet Pass Default URL"));
@@ -1335,6 +1349,58 @@
     begin
 
         exit(CODEUNIT::"NPR MM Member Notification");
+    end;
+
+    local procedure EmitMemberWalletTelemetry(HttpVerb: Text; MemberNotificationSetup: Record "NPR MM Member Notific. Setup"; MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; FailReason: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        Url: Text;
+        UrlLbl: Label '%1%2?sync=%3', Locked = true;
+    begin
+        Url := StrSubstNo(UrlLbl, MemberNotificationSetup."NP Pass Server Base URL",
+                    StrSubstNo(MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", MemberNotificationEntry."Wallet Pass Id"),
+                    Format(MemberNotificationSetup."Pass Notification Method", 0, 9));
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+
+        CustomDimensions.Add('NPR_EntryNumber', Format(MemberNotificationEntry."Notification Entry No.", 0, 9));
+        CustomDimensions.Add('NPR_WalletPassId', MemberNotificationEntry."Wallet Pass Id");
+        CustomDimensions.Add('NPR_Membership', MemberNotificationEntry."External Membership No.");
+        CustomDimensions.Add('NPR_Member', MemberNotificationEntry."External Member No.");
+        CustomDimensions.Add('NPR_MemberCard', MemberNotificationEntry."External Member Card No.");
+        CustomDimensions.Add('NPR_Method', Format(MemberNotificationEntry."Notification Method", 0, 9));
+        CustomDimensions.Add('NPR_NotificationCode', MemberNotificationEntry."Notification Code");
+
+        CustomDimensions.Add('NPR_Wallet', 'true');
+        CustomDimensions.Add('NPR_HttpVerb', HttpVerb);
+        CustomDimensions.Add('NPR_Endpoint', Url);
+
+        Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
+    local procedure EmitMemberNotificationTelemetry(MemberNotificationEntry: Record "NPR MM Member Notific. Entry"; FailReason: Text)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+
+        CustomDimensions.Add('NPR_EntryNumber', Format(MemberNotificationEntry."Notification Entry No.", 0, 9));
+        CustomDimensions.Add('NPR_WalletPassId', MemberNotificationEntry."Wallet Pass Id");
+        CustomDimensions.Add('NPR_Membership', MemberNotificationEntry."External Membership No.");
+        CustomDimensions.Add('NPR_Member', MemberNotificationEntry."External Member No.");
+        CustomDimensions.Add('NPR_MemberCard', MemberNotificationEntry."External Member Card No.");
+        CustomDimensions.Add('NPR_Method', Format(MemberNotificationEntry."Notification Method", 0, 9));
+        CustomDimensions.Add('NPR_NotificationCode', MemberNotificationEntry."Notification Code");
+
+        Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
