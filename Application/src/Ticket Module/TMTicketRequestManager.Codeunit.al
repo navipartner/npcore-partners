@@ -2350,6 +2350,7 @@
     procedure SendETicketNotification(NotificationEntryNo: Integer; NotifyWithExternalModule: Boolean; var ResponseMessage: Text): Boolean
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
     begin
         TicketNotificationEntry.Get(NotificationEntryNo);
 
@@ -2380,7 +2381,8 @@
 
         if (not NotifyWithExternalModule) then begin
             if (TicketNotificationEntry."Notification Trigger" = TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE) then begin
-                if (not SendSMS(TicketNotificationEntry, ResponseMessage)) then begin
+                Commit();
+                if (not TicketNotifyParticipant.SendSmsNotificationEntry(TicketNotificationEntry, ResponseMessage)) then begin
                     TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
                     TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
                     TicketNotificationEntry.Modify();
@@ -2588,32 +2590,6 @@
         exit(template);
     end;
 
-    local procedure SendSMS(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
-    var
-        RecordRef: RecordRef;
-        SMSManagement: Codeunit "NPR SMS Management";
-        SMSTemplateHeader: Record "NPR SMS Template Header";
-        SmsBody: Text;
-    begin
-
-        RecordRef.GetTable(TicketNotificationEntry);
-
-        if (TicketNotificationEntry."Notification Address" = '') then
-            ResponseMessage := 'Phone number is missing.';
-
-        if (TicketNotificationEntry."Notification Address" <> '') then begin
-            Commit();
-            ResponseMessage := 'Template not found.';
-            if (SMSManagement.FindTemplate(RecordRef, SMSTemplateHeader)) then begin
-                SmsBody := SMSManagement.MakeMessage(SMSTemplateHeader, TicketNotificationEntry);
-                SMSManagement.SendSMS(TicketNotificationEntry."Notification Address", SMSTemplateHeader."Alt. Sender", SmsBody);
-                ResponseMessage := '';
-            end;
-        end;
-
-        exit(ResponseMessage = '');
-    end;
-
     local procedure FindTicketByToken(var Ticket: Record "NPR TM Ticket"; SessionTokenID: Text[100]; AdmissionCode: Code[20]; Current: Boolean; ExtLineReferenceNo: Integer): Boolean
 
     var
@@ -2750,9 +2726,44 @@
         end;
     end;
 
+    procedure NPPassServerInvokeApi(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text): Boolean
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        Url: Text;
+        UrlLbl: Label '%1%2?sync=%3', Locked = true;
+    begin
+        if (NPPassServerInvokeApiWorker(RequestMethod, TicketNotificationEntry, ReasonText, JSONIn, JSONOut)) then
+            exit(true);
+
+        TicketSetup.Get();
+        Url := StrSubstNo(UrlLbl, TicketSetup."NP-Pass Server Base URL",
+                                           StrSubstNo(TicketSetup."NP-Pass API", TicketNotificationEntry."eTicket Type Code", TicketNotificationEntry."eTicket Pass Id"),
+                                           Format(TicketSetup."NP-Pass Notification Method", 0, 9));
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+
+        CustomDimensions.Add('NPR_EntryNumber', Format(TicketNotificationEntry."Entry No.", 0, 9));
+        CustomDimensions.Add('NPR_WalletPassId', TicketNotificationEntry."eTicket Pass Id");
+        CustomDimensions.Add('NPR_Method', Format(TicketNotificationEntry."Notification Method", 0, 9));
+
+        CustomDimensions.Add('NPR_Token', TicketNotificationEntry."Ticket Token");
+
+        CustomDimensions.Add('NPR_Wallet', 'true');
+        CustomDimensions.Add('NPR_HttpVerb', RequestMethod);
+        CustomDimensions.Add('NPR_Endpoint', Url);
+
+        Session.LogMessage('NPR_TicketWalletNotification', ReasonText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+
+        exit(false);
+    end;
 
     [TryFunction]
-    procedure NPPassServerInvokeApi(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
+    local procedure NPPassServerInvokeApiWorker(RequestMethod: Code[10]; TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ReasonText: Text; JSONIn: Text; var JSONOut: Text)
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         Client: HttpClient;
