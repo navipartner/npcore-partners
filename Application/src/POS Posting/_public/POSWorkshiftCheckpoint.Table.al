@@ -56,6 +56,13 @@
             Caption = 'Period Type';
             DataClassification = CustomerContent;
         }
+        field(15; "POS Unit Status Before Checkp."; Option)
+        {
+            Caption = 'POS Unit Status Before Checkp.';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Open,Closed,End of Day,Inactive';
+            OptionMembers = OPEN,CLOSED,EOD,INACTIVE;
+        }
         field(20; "GL Payment (LCY)"; Decimal)
         {
             Caption = 'GL Payment (LCY)';

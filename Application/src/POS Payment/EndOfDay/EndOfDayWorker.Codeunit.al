@@ -29,6 +29,7 @@ codeunit 6059860 "NPR End Of Day Worker"
 
     procedure CalculateEndOfDay(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; Setup: codeunit "NPR POS Setup"; Sale: codeunit "NPR POS Sale"; POSUnitNo: Code[10]): Integer
     var
+        xPOSUnit: Record "NPR POS Unit";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         SalePOS: Record "NPR POS Sale";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -48,17 +49,18 @@ codeunit 6059860 "NPR End Of Day Worker"
         Setup.GetSalespersonRecord(SalespersonPurchaser);
         CheckpointEntryNo := 0;
 
+        xPOSUnit.Get(POSUnitNo);
         POSManagePOSUnit.SetEndOfDayPOSUnitNo(POSUnitNo);
         case (EndOfDayType) of
             EndOfDayType::"Z-Report":
-                CheckpointEntryNo := CreateReport(EndOfDayType, POSUnitNo, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                CheckpointEntryNo := CreateReport(EndOfDayType, POSUnitNo, xPOSUnit.Status, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
 
             EndOfDayType::CloseWorkShift:
                 CheckpointEntryNo := CloseWorkshift(POSUnitNo, SalespersonPurchaser.Code, SalePOS."Dimension Set ID");
 
             EndOfDayType::"X-Report":
                 begin
-                    CheckpointEntryNo := CreateReport(EndOfDayType, POSUnitNo, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                    CheckpointEntryNo := CreateReport(EndOfDayType, POSUnitNo, xPOSUnit.Status, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
                     POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnitNo);
                 end;
         end;
@@ -96,12 +98,12 @@ codeunit 6059860 "NPR End Of Day Worker"
         Exit(Result);
     end;
 
-    procedure CreateReport(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; POSUnitNo: Code[10]; SalesPersonCode: Code[20]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") EntryNo: Integer;
+    procedure CreateReport(EndOfDayType: Option "X-Report","Z-Report",CloseWorkShift; POSUnitNo: Code[10]; xPOSUnitStatus: Option; SalesPersonCode: Code[20]; SaleDimSetID: Integer; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") EntryNo: Integer;
     var
         POSCheckpointMgr: Codeunit "NPR POS Workshift Checkpoint";
     begin
         CloseSlaveUnits(POSUnitNo, SaleDimSetID);
-        EntryNo := POSCheckpointMgr.CreateCheckpointWorker(EndOfDayType, POSUnitNo);
+        EntryNo := POSCheckpointMgr.CreateCheckpointWorker(EndOfDayType, POSUnitNo, xPOSUnitStatus);
     end;
 
     procedure CloseSlaveUnits(UnitNo: Code[10]; DimensionSetId: Integer)

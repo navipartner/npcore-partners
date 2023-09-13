@@ -130,7 +130,7 @@
                             begin
                                 if (UseBusinessCentralUI(POSUnit."No.")) then CreateZReport(POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession);
                                 if (not UseBusinessCentralUI(POSUnit."No.")) then begin
-                                    EntryNo := POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                                    EntryNo := POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", POSUnit.Status, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
                                     if (POSWorkShiftCheckpoint.Get(EntryNo)) then
                                         POSEndOfDay.SwitchView(FrontEnd, EndOfDayType, POSWorkShiftCheckpoint);
                                 end;
@@ -144,7 +144,7 @@
                                 PreliminaryEndOfDay(POSUnit."No.", SalePOS."Dimension Set ID");
                                 POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
                             end;
-                            if (not UseBusinessCentralUI(POSUnit."No.")) then POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
+                            if (not UseBusinessCentralUI(POSUnit."No.")) then POSEndOfDay.CreateReport(EndOfDayType, POSUnit."No.", POSUnit.Status, SalespersonPurchaser.Code, SalePOS."Dimension Set ID", POSSession, FrontEnd);
                         end;
                     end;
                 end;

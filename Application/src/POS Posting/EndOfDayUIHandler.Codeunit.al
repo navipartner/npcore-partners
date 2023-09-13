@@ -332,7 +332,6 @@
 
     local procedure BalancingSetState(Context: JsonObject; var Handled: Boolean);
     var
-        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSSession: Codeunit "NPR POS Session";
         JsonText: Text;
         CheckpointEntryNo: Integer;
@@ -347,7 +346,7 @@
 
         if (not GetValueAsBoolean(Context, 'confirmed')) then begin
             // User clicked cancel, balancing will be aborted. Return to invoking workflow
-            POSManagePOSUnit.ReOpenLastPeriodRegister(_POSUnit."No.");
+            RestorePOSUnitStatus(_POSWorkShiftCheckpoint);
             Commit();
             POSSession.ChangeViewLogin();
             exit;
@@ -603,6 +602,16 @@
 
         POSSession.ChangeViewLogin();
         EndOfDayWorker.PrintEndOfDayReport(_POSWorkShiftCheckpoint."POS Unit No.", BalanceEntryToPrint);
+    end;
+
+    local procedure RestorePOSUnitStatus(POSWorkShiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    var
+        POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
+    begin
+        if POSWorkShiftCheckpoint."POS Unit Status Before Checkp." = POSWorkShiftCheckpoint."POS Unit Status Before Checkp."::CLOSED then
+            POSManagePOSUnit.ClosePOSUnitNo(POSWorkShiftCheckpoint."POS Unit No.", 0)
+        else
+            POSManagePOSUnit.ReOpenLastPeriodRegister(POSWorkShiftCheckpoint."POS Unit No.");
     end;
 
     [IntegrationEvent(false, false)]
