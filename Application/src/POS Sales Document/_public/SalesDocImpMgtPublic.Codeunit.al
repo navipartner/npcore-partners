@@ -17,4 +17,9 @@ codeunit 6059986 "NPR Sales Doc. Imp. Mgt Public"
     begin
         _SalesDocImpMgt.GetTotalAmountToBeInvoiced(SalesHeader);
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterTransferFromSaleLineToSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line"; SalesLine: Record "Sales Line")
+    begin
+    end;
 }

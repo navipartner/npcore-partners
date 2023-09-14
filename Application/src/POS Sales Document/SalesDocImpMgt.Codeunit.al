@@ -103,6 +103,8 @@
     end;
 
     local procedure FromSaleLineToSaleLinePOS(SalesLine: Record "Sales Line"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SalesDocImptMgtPublic: Codeunit "NPR Sales Doc. Imp. Mgt Public";
     begin
         SaleLinePOS.SetSkipUpdateDependantQuantity(false);
         SaleLinePOS.Description := SalesLine.Description;
@@ -123,6 +125,7 @@
         SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
         SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
         SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
+        SalesDocImptMgtPublic.OnAfterTransferFromSaleLineToSaleLinePOS(SaleLinePOS, SalesLine);
     end;
 
     local procedure InsertItemWithTrackingLine(SalesLine: Record "Sales Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
