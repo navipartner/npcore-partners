@@ -166,8 +166,10 @@
 
         if AsyncPosting then begin
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntry, SalesHeader."Document Type", SalesHeader."No.", ReadyToBePosted(SalesHeader), Print, Send, Pdf2Nav);
-            if POSAsyncPosting.ReadyToBePosted(SalesHeader) then
+            if POSAsyncPosting.ReadyToBePosted(SalesHeader) then begin
                 POSEntry."Post Sales Document Status" := POSEntry."Post Sales Document Status"::Unposted;
+                POSAsyncPosting.InsertPOSEntrySalesLineHeaderRelation(POSEntry, SalesHeader);
+            end;
         end else
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, SalesHeader."Document Type", SalesHeader."No.");
 
@@ -470,12 +472,12 @@
             POSSaleLine."Sales Document Prepay. Refund" then
                 if POSEntrySalesDocLink."Sales Document Type" = POSEntrySalesDocLink."Sales Document Type"::ORDER then
                     if SalesHeader.Get(SalesHeader."Document Type"::Order, POSSaleLine."Sales Document No.") then
-                        InsertItemLines(POSEntry, SalesHeader);
+                        InsertItemLines(POSSaleLine, POSEntry, SalesHeader);
 
         end else begin
             if POSSaleLine."Sales Document No." <> '' then
                 if SalesHeader.Get(POSSaleLine."Sales Document Type", POSSaleLine."Sales Document No.") then
-                    InsertItemLines(POSEntry, SalesHeader);
+                    InsertItemLines(POSSaleLine, POSEntry, SalesHeader);
         end;
     end;
 
@@ -653,12 +655,13 @@
             until SalesCrMemoLine.Next() = 0;
     end;
 
-    local procedure InsertItemLines(POSEntry: Record "NPR POS Entry"; SalesHeader: Record "Sales Header")
+    local procedure InsertItemLines(POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
         PricesIncludeTax: Boolean;
         ReservationEntry: Record "Reservation Entry";
         BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
     begin
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetFilter(Type, '=%1', SalesLine.Type::Item);
@@ -731,6 +734,8 @@
                 BufferPOSEntrySalesLine."Quantity (Base)" := SalesLine."Quantity (Base)";
                 BufferPOSEntrySalesLine."VAT Difference" := SalesLine."VAT Difference";
                 BufferPOSEntrySalesLine.Modify();
+
+                POSAsyncPostingMgt.InsertPOSEntrySalesLineRelation(POSSaleLine, POSEntry, SalesLine, BufferPOSEntrySalesLine);
             until SalesLine.Next() = 0;
     end;
 
