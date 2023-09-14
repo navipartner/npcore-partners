@@ -218,6 +218,23 @@
                 LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
         end;
 
+        if POSEntry."Post Sales Document Status" = POSEntry."Post Sales Document Status"::"Error while Posting" then begin
+            POSPostingLog.SetRange("Posting Per", POSPostingLog."Posting Per"::"POS Entry");
+            POSPostingLog.SetRange("Posting Per Entry No.", POSEntry."Entry No.");
+            POSPostingLog.SetRange("Posting Type", POSPostingLog."Posting Type"::Finance);
+            POSPostingLog.SetRange("With Error", true);
+            if AllLogEntries then begin
+                if POSPostingLog.FindSet() then
+                    repeat
+                        LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+                    until POSPostingLog.Next() = 0;
+            end
+            else begin
+                if POSPostingLog.FindLast() then
+                    LogEntryNoFilter += '|' + format(POSPostingLog."Entry No.");
+            end;
+        end;
+
         LogEntryNoFilter := DelChr(LogEntryNoFilter, '<', '|');
         POSPostingLog.Reset();
         POSPostingLog.SetFilter("Entry No.", LogEntryNoFilter);
