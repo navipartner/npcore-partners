@@ -70,6 +70,20 @@
 
     actions
     {
+        area(navigation)
+        {
+            action("Related Sale Document Lines")
+            {
+                Caption = 'Related Sale Document Lines';
+                Image = ViewDocumentLine;
+                ToolTip = 'Related Sale Document Lines';
+                ApplicationArea = NPRRetail;
+                RunObject = page "NPR POS Entry S.Lines Relation";
+                RunPageLink = "POS Entry No." = field("POS Entry No."),
+                            "POS Entry Reference Line No." = field("POS Entry Reference Line No."),
+                            "Sale Document No." = field("Sales Document No");
+            }
+        }
     }
 
     var
