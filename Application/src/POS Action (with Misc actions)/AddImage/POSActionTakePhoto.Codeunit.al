@@ -35,14 +35,29 @@ codeunit 6059840 "NPR POS Action Take Photo" implements "NPR IPOS Workflow"
         BusinessLogic: Codeunit "NPR POS Action Take Photo B";
         AddPhotoTo: Integer;
         DocumentNo: Text;
+        ErrorLbl: Label 'No Document number was specified.';
     begin
         Context.GetIntegerParameter('AddPhotoToSelection', AddPhotoTo);
-        DocumentNo := Context.GetString('PosEntry_DocumentNo');
 
-        if AddPhotoTo = 0 then
-            BusinessLogic.TakePhoto(Sale) //Current POS Sale
-        else
-            BusinessLogic.AddImageOnPosEntry(DocumentNo, Setup, AddPhotoTo);
+        case AddPhotoTo of
+            0: //Current POS Sale';
+                begin
+                    BusinessLogic.TakePhoto(Sale) //Current POS Sale
+                end;
+            1, //Last POS Entry
+            2: //Select POS Entry
+                begin
+                    BusinessLogic.AddImageOnPosEntry('', Setup, AddPhotoTo);
+                end;
+            3: //POS Entry By DocumentNo
+                begin
+                    if (Context.HasProperty('PosEntry_DocumentNo')) then
+                        DocumentNo := Context.GetString('PosEntry_DocumentNo')
+                    else
+                        Error(ErrorLbl);
+                    BusinessLogic.AddImageOnPosEntry(DocumentNo, Setup, AddPhotoTo);
+                end;
+        end;
     end;
 
 
