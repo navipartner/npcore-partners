@@ -9,14 +9,15 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSSession: Codeunit "NPR POS Session";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
-        Stack: Codeunit "NPR POS Page Stack Check";
+        PageStack: Codeunit "NPR POS Page Stack Check";
+        APIStack: Codeunit "NPR POS API Stack Check";
         Request: JsonObject;
     begin
         if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
             exit;
 
-        if POSSession.IsInitialized() and Stack.CurrentStackWasStartedByPOSTrigger() then begin
-            //print to hardware connector via POS page
+        if POSSession.IsInitialized() and (PageStack.CurrentStackWasStartedByPOSTrigger() or APIStack.CurrentStackWasStartedByPOSAPI()) then begin
+            //print to hardware connector via POS
             Request.Add('PrinterName', PrinterName);
             Request.Add('PrintJob', PrintJobBase64);
 
@@ -38,7 +39,8 @@ codeunit 6014582 "NPR Print Method Mgt."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         HWCPOSRequest: Codeunit "NPR Front-End: HWC";
         Base64Convert: Codeunit "Base64 Convert";
-        Stack: Codeunit "NPR POS Page Stack Check";
+        PageStack: Codeunit "NPR POS Page Stack Check";
+        APIStack: Codeunit "NPR POS API Stack Check";
         Request: JsonObject;
     begin
         if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
@@ -48,8 +50,8 @@ codeunit 6014582 "NPR Print Method Mgt."
         if Stream.EOS() then
             exit;
 
-        if POSSession.IsInitialized() and Stack.CurrentStackWasStartedByPOSTrigger() then begin
-            //print to hardware connector via POS page
+        if POSSession.IsInitialized() and (PageStack.CurrentStackWasStartedByPOSTrigger() or APIStack.CurrentStackWasStartedByPOSAPI()) then begin
+            //print to hardware connector via POS
             Request.Add('PrinterName', PrinterName);
             Request.Add('FileData', Base64Convert.ToBase64(Stream));
             Request.Add('FileExtension', FileExtension);

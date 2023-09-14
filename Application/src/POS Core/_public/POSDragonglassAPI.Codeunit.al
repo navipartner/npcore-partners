@@ -23,6 +23,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
         POSUnitNo: Text;
         SalesTicketNo: Text;
         Response: JsonObject;
+        POSAPIStackCheck: Codeunit "NPR POS API Stack Check";
     begin
         if ((lastServerId = '') or (lastServerId <> Format(ServiceInstanceId()))) then begin
             SelectLatestVersion(); //Unlike control addin requests, inbound webservice requests can be load balanced across multiple NSTs meaning the cache sync delay can lead to invisible records.
@@ -43,6 +44,8 @@ codeunit 6060078 "NPR POS Dragonglass API"
             Response.WriteTo(JsonResponse);
             exit;
         end;
+
+        BindSubscription(POSAPIStackCheck);
 
         ContextJsonObject.ReadFrom(parameters);
         GetSaleKey(ContextJsonObject, POSUnitNo, SalesTicketNo);
