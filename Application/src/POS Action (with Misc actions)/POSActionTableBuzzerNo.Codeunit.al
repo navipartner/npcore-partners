@@ -32,7 +32,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTableBuzzerNo.js###
-'let main=async({workflow:t,captions:p,parameters:i,context:a})=>{i.DialogType==i.DialogType.TextField?a.input=await popup.input({caption:p.prompt}):a.input=await popup.numpad({caption:p.prompt}),await t.respond()};'
+'let main=async({workflow:n,captions:i,parameters:a,context:p})=>{a.DialogType==a.DialogType.TextField?p.input=await popup.input({caption:i.prompt}):p.input=await popup.numpad({caption:i.prompt}),p.input!==null&&await n.respond()};'
         );
     end;
 

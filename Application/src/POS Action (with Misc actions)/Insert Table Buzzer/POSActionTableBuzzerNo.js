@@ -5,5 +5,9 @@ let main = async ({ workflow, captions, parameters, context }) => {
     else {
         context.input = await popup.numpad({ caption: captions.prompt });
     }
+    //blank input ok, cancel is not
+    if (context.input === null) {
+        return;
+    }
     await workflow.respond();
 };
