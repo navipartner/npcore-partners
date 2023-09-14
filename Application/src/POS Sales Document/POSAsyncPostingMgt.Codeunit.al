@@ -165,14 +165,23 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
         exit(not POSPostingProfile.IsEmpty());
     end;
 
-    internal procedure IsPostingScheduledFromPOS(SalesLine: Record "Sales Line"): Boolean
-    var
-        SalesHeader: Record "Sales Header";
+    internal procedure IsPostingScheduledFromPOS(SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"): Boolean
     begin
         If not SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
             exit;
         SalesHeader.CalcFields("NPR POS Trans. Sch. For Post");
         exit(SalesHeader."NPR POS Trans. Sch. For Post");
+    end;
+
+    local procedure CheckIsModificationAllowed(var SalesHeader: Record "Sales Header"): Boolean
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSEntrySalesDocLink.SetCurrentKey("Orig. Sales Document No.", "Orig. Sales Document Type", "Post Sales Invoice Type");
+        POSEntrySalesDocLink.SetRange("Orig. Sales Document No.", SalesHeader."No.");
+        POSEntrySalesDocLink.SetRange("Orig. Sales Document Type", SalesHeader."Document Type");
+        POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::Unposted);
+        exit(POSEntrySalesDocLink.IsEmpty());
     end;
 
     internal procedure CheckMandatoryLineFields(Rec: Record "Sales Line"; xRec: Record "Sales Line")
@@ -192,6 +201,12 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
                 Error(ScheduledErr, Rec.FieldCaption("Line Discount %"));
             Rec."Amount Including VAT" <> xRec."Amount Including VAT":
                 Error(ScheduledErr, Rec.FieldCaption("Amount Including VAT"));
+            Rec."Qty. to Invoice" <> xRec."Qty. to Invoice":
+                Error(ScheduledErr, Rec.FieldCaption("Qty. to Invoice"));
+            Rec."Qty. to Ship" <> xRec."Qty. to Ship":
+                Error(ScheduledErr, Rec.FieldCaption("Qty. to Ship"));
+            Rec."Return Qty. to Receive" <> xRec."Return Qty. to Receive":
+                Error(ScheduledErr, Rec.FieldCaption("Return Qty. to Receive"));
         end;
     end;
 
@@ -261,21 +276,104 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
         else
             exit(Enum::"NPR POS Sales Document Post"::Synchronous);
     end;
+
+    internal procedure InsertPOSEntrySalesLineRelation(POSSaleLine: Record "NPR POS Sale Line"; POSEntry: Record "NPR POS Entry"; SalesLine: Record "Sales Line"; BufferPOSEntrySalesLine: Record "NPR POS Entry Sales Line")
+    var
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
+    begin
+        POSEntrySLineRelation.Init();
+        POSEntrySLineRelation."POS Entry No." := POSEntry."Entry No.";
+        POSEntrySLineRelation."Line No." := GetLastPOSEntrySaleLineRelationLineNo(POSEntry);
+        POSEntrySLineRelation."POS Entry Reference Type" := POSEntrySLineRelation."POS Entry Reference Type"::SALESLINE;
+        POSEntrySLineRelation."POS Entry Reference Line No." := POSSaleLine."Line No.";
+        POSEntrySLineRelation."POS Entry Buff.Sales Line No." := BufferPOSEntrySalesLine."Line No.";
+        InsertPOSEntrySLRelationFromSaleLine(POSEntrySLineRelation, SalesLine);
+        POSEntrySLineRelation.Insert();
+    end;
+
+    internal procedure InsertPOSEntrySalesLineHeaderRelation(POSEntry: Record "NPR POS Entry"; SalesHeader: Record "Sales Header")
+    var
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        SalesLine: Record "Sales Line";
+    begin
+        //relation 1:1
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::HEADER);
+        if not POSEntrySalesDocLink.FindFirst() then
+            exit;
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        if SalesLine.FindSet() then
+            repeat
+                POSEntrySLineRelation.Init();
+                POSEntrySLineRelation."POS Entry No." := POSEntry."Entry No.";
+                POSEntrySLineRelation."Line No." := GetLastPOSEntrySaleLineRelationLineNo(POSEntry);
+                POSEntrySLineRelation."POS Entry Reference Line No." := POSEntrySalesDocLink."POS Entry Reference Line No.";
+                POSEntrySLineRelation."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::HEADER;
+                POSEntrySLineRelation."POS Entry Buff.Sales Line No." := SalesLine."Line No.";
+                InsertPOSEntrySLRelationFromSaleLine(POSEntrySLineRelation, SalesLine);
+                POSEntrySLineRelation.Insert();
+            until SalesLine.Next() = 0;
+    end;
+
+    local procedure InsertPOSEntrySLRelationFromSaleLine(var POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation"; SalesLine: Record "Sales Line")
+    begin
+        POSEntrySLineRelation."Sale Line No." := SalesLine."Line No.";
+        POSEntrySLineRelation."Sale Document No." := SalesLine."Document No.";
+        POSEntrySLineRelation."Sale Document Type" := SalesLine."Document Type";
+        POSEntrySLineRelation.Quantity := SalesLine.Quantity;
+        POSEntrySLineRelation."No." := SalesLine."No.";
+        POSEntrySLineRelation."Qty. to Ship" := SalesLine."Qty. to Ship";
+        POSEntrySLineRelation."Qty. to Invoice" := SalesLine."Qty. to Invoice";
+        POSEntrySLineRelation."Return Qty. to Receive" := SalesLine."Return Qty. to Receive";
+        POSEntrySLineRelation.Description := SalesLine.Description;
+    end;
+
+    local procedure DisableControlAfterModification(SalesLine: Record "Sales Line")
+    var
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
+    begin
+        POSEntrySLineRelation.SetRange("Sale Document No.", SalesLine."Document No.");
+        POSEntrySLineRelation.SetRange("Sale Document Type", SalesLine."Document Type");
+        POSEntrySLineRelation.SetRange("Sale Line No.", SalesLine."Line No.");
+        if POSEntrySLineRelation.FindFirst() then begin
+            POSEntrySLineRelation.Enabled := false;
+            POSEntrySLineRelation.Modify();
+        end;
+    end;
+
+    local procedure GetLastPOSEntrySaleLineRelationLineNo(POSEntry: Record "NPR POS Entry"): Integer
+    var
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
+    begin
+        POSEntrySLineRelation.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSEntrySLineRelation.FindLast() then
+            exit(POSEntrySLineRelation."Line No." + 10000)
+        else
+            exit(10000)
+    end;
     //Subscribers region
     //ORDER
     [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnModifyRecordEvent', '', false, false)]
     local procedure OnModifySalesOrderLine(Rec: Record "Sales Line"; xRec: Record "Sales Line")
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
-            CheckMandatoryLineFields(Rec, xRec);
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
+            if CheckIsModificationAllowed(SalesHeader) then //allow if status is Error
+                DisableControlAfterModification(Rec)
+            else
+                CheckMandatoryLineFields(Rec, xRec)
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteSalesOrderLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. Line can''t be deleted before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
 
@@ -283,8 +381,9 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     local procedure OnInsertSalesOrderLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. New Line can''t be added before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
 
@@ -302,17 +401,23 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnModifyRecordEvent', '', false, false)]
     local procedure OnModifySalesInvoiceLine(Rec: Record "Sales Line"; xRec: Record "Sales Line")
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
-            CheckMandatoryLineFields(Rec, xRec);
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
+            if CheckIsModificationAllowed(SalesHeader) then //allow if status is Error
+                DisableControlAfterModification(Rec)
+            else
+                CheckMandatoryLineFields(Rec, xRec)
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteSalesInvoiceLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. Line can''t be deleted before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
 
@@ -320,8 +425,9 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     local procedure OnInsertSalesCrMemoLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. New Line can''t be added before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
     //CREDIT MEMO
@@ -335,24 +441,31 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     local procedure OnInsertCrMemoLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. New Line can''t be added before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnModifyRecordEvent', '', false, false)]
     local procedure OnModifySalesCrMemoLine(Rec: Record "Sales Line"; xRec: Record "Sales Line")
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
-            CheckMandatoryLineFields(Rec, xRec);
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
+            if CheckIsModificationAllowed(SalesHeader) then //allow if status is Error
+                DisableControlAfterModification(Rec)
+            else
+                CheckMandatoryLineFields(Rec, xRec)
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteSalesCrMemoLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. Line can''t be deleted before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
     //RETURN ORDER
@@ -366,37 +479,57 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     local procedure OnInsertReturnOrderLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. New Line can''t be added before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Return Order Subform", 'OnModifyRecordEvent', '', false, false)]
     local procedure OnModifySalesReturnOrderLine(Rec: Record "Sales Line"; xRec: Record "Sales Line")
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
-            CheckMandatoryLineFields(Rec, xRec);
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
+            if CheckIsModificationAllowed(SalesHeader) then //allow if status is Error
+                DisableControlAfterModification(Rec)
+            else
+                CheckMandatoryLineFields(Rec, xRec)
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Sales Return Order Subform", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteSalesReturnOrderLine(Rec: Record "Sales Line")
     var
         ScheduledErr: Label 'This document is created from POS and it is scheduled for posting. Line can''t be deleted before Posting POS Entry.';
+        SalesHeader: Record "Sales Header";
     begin
-        if IsPostingScheduledFromPOS(Rec) then
+        if IsPostingScheduledFromPOS(Rec, SalesHeader) then
             Error(ScheduledErr);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
+    local procedure OnAfterDeleteAfterPosting(SalesHeader: Record "Sales Header"; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; CommitIsSuppressed: Boolean);
+    var
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
+    begin
+        POSEntrySLineRelation.SetCurrentKey("Sale Document No.", "Sale Document Type");
+        POSEntrySLineRelation.SetRange("Sale Document No.", SalesHeader."No.");
+        POSEntrySLineRelation.SetRange("Sale Document Type", SalesHeader."Document Type");
+        POSEntrySLineRelation.DeleteAll(true);
     end;
 #IF NOT (BC17 or BC18)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post (Yes/No)", 'OnBeforeOnRun', '', false, false)]
     local procedure OnBeforeOnRun(var SalesHeader: Record "Sales Header");
     begin
-        FromPOSRelatedPOSTransExist(SalesHeader);
+        if not CheckIsModificationAllowed(SalesHeader) then//raise message if status is unposted
+            FromPOSRelatedPOSTransExist(SalesHeader);
     end;
 #ELSE
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post (Yes/No)", 'OnBeforeConfirmSalesPost', '', false, false)]
     local procedure OnBeforeConfirmSalesPost(var SalesHeader: Record "Sales Header"; var HideDialog: Boolean; var IsHandled: Boolean; var DefaultOption: Integer; var PostAndSend: Boolean);
     begin
-        FromPOSRelatedPOSTransExist(SalesHeader);
+         if not CheckIsModificationAllowed(SalesHeader) then    //raise message if status is unposted
+            FromPOSRelatedPOSTransExist(SalesHeader);
     end;
 #ENDIF
 }

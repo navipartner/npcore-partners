@@ -201,15 +201,9 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
                     ValidatePrepaymentRefund(SalesHeader);
                 end;
             InvoiceType::Order:
-                //multiple or partial payments can be made on one order.
-                ValidateOrder(SalesHeader, POSEntrySalesLine, POSEntrySalesDocLinkIn)
-
+                ValidateOrder(SalesHeader, POSEntrySalesDocLinkIn);
         end;
     end;
-
-    var
-        TextCustomerBlocked: Label 'Customer is blocked.';
-        TextDateNotAllowed: Label 'is not within your range of allowed posting dates.';
 
     local procedure ValidatePrepayment(var SalesHeaderIn: Record "Sales Header"; var POSEntrySalesLineIn: Record "NPR POS Entry Sales Line")
     var
@@ -228,42 +222,46 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
             Error(NO_PREPAYMENT, SalesHeaderIn."Document Type", SalesHeaderIn."No.");
     end;
 
-    local procedure ValidateOrder(SalesHeaderIn: Record "Sales Header"; var POSEntrySalesLineIn: Record "NPR POS Entry Sales Line"; POSEntrySalesDocLinkIn: Record "NPR POS Entry Sales Doc. Link")
+    local procedure ValidateOrder(SalesHeaderIn: Record "Sales Header"; POSEntrySalesDocLinkIn: Record "NPR POS Entry Sales Doc. Link")
     var
         SalesLine: Record "Sales Line";
-        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntrySLineRelation: Record "NPR POS Entry S.Line Relation";
     begin
-        POSEntrySalesDocLink.SetCurrentKey("Orig. Sales Document No.", "Orig. Sales Document Type");
-        POSEntrySalesDocLink.SetRange("Orig. Sales Document No.", POSEntrySalesDocLinkIn."Orig. Sales Document No.");
-        POSEntrySalesDocLink.SetRange("Orig. Sales Document Type", POSEntrySalesDocLinkIn."Orig. Sales Document Type");
-        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLinkIn."POS Entry Reference Type"::HEADER);
-        if POSEntrySalesDocLink.FindFirst() then begin
-            POSEntrySalesLineIn.SetRange("POS Entry No.", POSEntrySalesDocLink."POS Entry No.");
-            POSEntrySalesLineIn.FindSet();
+        POSEntrySLineRelation.SetCurrentKey("Sale Document No.", "Sale Document Type", "Sale Line No.", "POS Entry Reference Line No.");
+        POSEntrySLineRelation.SetRange("POS Entry No.", POSEntrySalesDocLinkIn."POS Entry No.");
+        POSEntrySLineRelation.SetRange("POS Entry Reference Line No.", POSEntrySalesDocLinkIn."POS Entry Reference Line No.");
+        POSEntrySLineRelation.SetRange("Sale Document No.", SalesHeaderIn."No.");
+        POSEntrySLineRelation.SetRange(Enabled, true);
+        if POSEntrySLineRelation.FindSet() then
             repeat
-                SalesLine.Get(SalesHeaderIn."Document Type", SalesHeaderIn."No.", POSEntrySalesLineIn."Line No.");
-                SalesLine.TestField("No.", POSEntrySalesLineIn."No.");
+                POSEntrySalesLine.Get(POSEntrySLineRelation."POS Entry No.", POSEntrySLineRelation."POS Entry Buff.Sales Line No.");
+                SalesLine.Get(POSEntrySLineRelation."Sale Document Type", POSEntrySLineRelation."Sale Document No.", POSEntrySLineRelation."Sale Line No.");
+
+                SalesLine.TestField("No.", POSEntrySalesLine."No.");
                 case SalesHeaderIn."Document Type" of
                     "Sales Document Type"::Order:
                         begin
-                            SalesLinE.TestField(Quantity, POSEntrySalesLineIn.Quantity);
-                            SalesLine.TestField("Amount Including VAT", POSEntrySalesLineIn."Amount Incl. VAT");
+                            SalesLine.TestField(Quantity, POSEntrySalesLine.Quantity);
+                            SalesLine.TestField("Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT");
                         end;
                     "Sales Document Type"::"Credit Memo",
                     "Sales Document Type"::"Return Order":
                         begin
-                            SalesLine.TestField(Quantity, -POSEntrySalesLineIn.Quantity);
-                            SalesLine.TestField("Amount Including VAT", -POSEntrySalesLineIn."Amount Incl. VAT");
+                            SalesLine.TestField(Quantity, -POSEntrySalesLine.Quantity);
+                            SalesLine.TestField("Amount Including VAT", -POSEntrySalesLine."Amount Incl. VAT");
                         end;
                 end;
-                SalesLine.TestField("Variant Code", POSEntrySalesLineIn."Variant Code");
-                SalesLine.TestField("Line Discount %", POSEntrySalesLineIn."Line Discount %");
-                SalesLine.TestField("Unit Cost", POSEntrySalesLineIn."Unit Cost");
+                SalesLine.TestField("Variant Code", POSEntrySalesLine."Variant Code");
+                SalesLine.TestField("Line Discount %", POSEntrySalesLine."Line Discount %");
+                SalesLine.TestField("Unit Price", POSEntrySalesLine."Unit Price");
 
-            until POSEntrySalesLineIn.Next() = 0;
-
-        end;
+                SalesLine.TestField("Qty. to Invoice", POSEntrySLineRelation."Qty. to Invoice");
+                SalesLine.TestField("Qty. to Ship", POSEntrySLineRelation."Qty. to Ship");
+                SalesLine.TestField("Return Qty. to Receive", POSEntrySLineRelation."Return Qty. to Receive");
+            until POSEntrySLineRelation.Next() = 0;
     end;
+
 
     local procedure SetPostedSalesLineDocInfo(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var SalesHeader: Record "Sales Header")
     var
@@ -415,6 +413,11 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
     local procedure OnAfterPostPOSEntry(var POSEntry: Record "NPR POS Entry")
     begin
     end;
+
+    var
+        TextCustomerBlocked: Label 'Customer is blocked.';
+        TextDateNotAllowed: Label 'is not within your range of allowed posting dates.';
+
 }
 
 

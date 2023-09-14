@@ -351,7 +351,7 @@
                     exit(false);
         end;
         SalesHeader."Print Posted Documents" := false;
-
+        SalesHeader.Modify();
         exit(true);
     end;
 
@@ -359,39 +359,9 @@
     var
         NothingToPostErr: Label 'There is nothing to post.';
     begin
-        SalesHeader.Invoice := CalcInvoice(SalesHeader);
-        SalesHeader.Modify();
         if not (SalesHeader.Ship or SalesHeader.Invoice or SalesHeader.Receive) then
             Error(NothingToPostErr);
     end;
-
-    local procedure CalcInvoice(SalesHeader: Record "Sales Header") NewInvoice: Boolean
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetFilter(Quantity, '<>0');
-        if SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"] then
-            SalesLine.SetFilter("Qty. to Invoice", '<>0');
-        NewInvoice := not SalesLine.IsEmpty;
-        if NewInvoice then
-            case SalesHeader."Document Type" of
-                SalesHeader."Document Type"::Order:
-                    if not SalesHeader.Ship then begin
-                        SalesLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
-                        NewInvoice := not SalesLine.IsEmpty;
-                    end;
-                SalesHeader."Document Type"::"Return Order":
-                    if not SalesHeader.Receive then begin
-                        SalesLine.SetFilter("Return Qty. Rcd. Not Invd.", '<>0');
-                        SalesHeader.Invoice := not SalesLine.IsEmpty;
-                    end;
-            end;
-
-        exit(NewInvoice);
-    end;
-
 
     procedure CreateSalesHeader(var SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var
