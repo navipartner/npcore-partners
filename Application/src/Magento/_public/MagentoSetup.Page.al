@@ -1149,7 +1149,7 @@
                 PromotedCategory = Process;
                 Image = Import;
                 ApplicationArea = NPRRetail;
-                ToolTip = 'Executes the Update Magento Description action. You will be asked for .CSV file from which data will be imported. File should have 3 columns/fields sorted as: Item No, Magento Description, Magento Short Description. Field separator is pipe (|) while field Delimiter, or somewhere called qualificator is quotation marks symbol ("). For example: "1000"|"Magento Description"|"Magento Short Description"';
+                ToolTip = 'Executes the Update Magento Description action. You will be asked for .CSV file from which data will be imported. File should have 3 columns/fields sorted as: Item No, Magento Description, Magento Short Description. Field separator is pipe (|) while field Delimiter, or somewhere called qualificator is quotation marks symbol ("). For example: "1000"|"Magento Description"|"Magento Short Description". Also, if the file contians special characters and you see them like this: Æ,æ,Ø,ø,Å,å,ß you should do replace command because they should be HTML encoded (including ; at the end): Æ is &AElig;  æ is &aelig;  Ø is &Oslash;  ø is &oslash;  Å is &Aring;  å is &aring;  ß is &szlig; ';
 
                 trigger OnAction()
                 begin
