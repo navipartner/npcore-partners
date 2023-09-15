@@ -5,11 +5,10 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
-    UsageCategory = Administration;
+    UsageCategory = None;
 
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
 
     layout
     {
