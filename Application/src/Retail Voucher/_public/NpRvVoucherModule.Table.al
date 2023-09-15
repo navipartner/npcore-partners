@@ -1,6 +1,5 @@
 ﻿table 6151011 "NPR NpRv Voucher Module"
 {
-    Access = Internal;
     Caption = 'Retail Voucher Module';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NpRv Voucher Modules";
