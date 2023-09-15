@@ -1,6 +1,5 @@
 ﻿codeunit 6151011 "NPR NpRv Module Mgt."
 {
-    Access = Internal;
 
     [IntegrationEvent(false, false)]
     internal procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
