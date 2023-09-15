@@ -122,8 +122,9 @@
             if (not AddNamedMember(MembershipEntryNo, MemberInfoCapture, MemberEntryNo, ResponseMessage)) then
                 exit(0);
 
-        if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, ResponseMessage, false)) then
-            exit(0);
+        if (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES) then
+            if (not IssueMemberCardWorker(MembershipEntryNo, MemberEntryNo, MemberInfoCapture, false, CardEntryNo, ResponseMessage, false)) then
+                exit(0);
 
         MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
         MemberInfoCapture."Member Entry No" := MemberEntryNo;
