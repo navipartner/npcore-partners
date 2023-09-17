@@ -151,7 +151,7 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
-        NPNpDCCouponCheck: Codeunit "NPR NP NpDC Coupon Verify B";
+        NPNpDCCouponCheck: Codeunit "NPR POSAction: Coupon Verify B";
     begin
         Initialize();
 
@@ -177,7 +177,7 @@ codeunit 85074 "NPR Coupon Tests"
     var
         CouponTypeCode: Code[20];
         Quantity: Integer;
-        NpDcModuleIssueOnSaleB: Codeunit "NPR NpDc Module Issue: OnSaleB";
+        NpDcModuleIssueOnSaleB: Codeunit "NPR POSAction Issue DC OnSaleB";
         InstantIssue: Boolean;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";

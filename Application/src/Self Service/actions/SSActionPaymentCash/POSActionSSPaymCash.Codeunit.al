@@ -1,4 +1,4 @@
-codeunit 6151334 "NPR POS Action SS Paym. Cash"
+codeunit 6151334 "NPR POS Action SS Paym. CashB"
 {
     Access = Internal;
     procedure EndSale(POSSession: Codeunit "NPR POS Session"; POSPaymentMethod: Record "NPR POS Payment Method"): Boolean

@@ -188,7 +188,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(36; "SS-SALE-SCREEN")
     {
         Caption = 'SS-SALE-SCREEN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Sale Screen";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Sale Screen";
     }
     value(37; LOAD_FROM_POS_QUOTE)
     {
@@ -238,7 +238,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(46; "SS-PAY-SCREEN")
     {
         Caption = 'SS-PAY-SCREEN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Payment Screen";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Paym. Screen";
     }
     value(47; EFT_MOBILEPAY)
     {
@@ -248,7 +248,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(48; "SS-IDLE-TIMEOUT")
     {
         Caption = 'SS-IDLE-TIMEOUT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Idle Timeout";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Idle Timeout";
     }
     value(49; SALES_DOC_EXP)
     {
@@ -258,7 +258,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(50; "SS-QTY+")
     {
         Caption = 'SS-QTY+', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Qty Increase";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Qty Increase";
     }
     value(51; EFT_GIFT_CARD_2)
     {
@@ -288,7 +288,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(56; "SS-QTY-")
     {
         Caption = 'SS-QTY-', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Qty Decrease";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Qty Decrease";
     }
     value(57; EFT_NETS_CLOUD_TRX)
     {
@@ -298,7 +298,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(58; "SS-ITEM")
     {
         Caption = 'SS-ITEM', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Insert Item";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Insert Item";
     }
     value(59; SALES_DOC_PAY_POST)
     {
@@ -308,7 +308,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(60; CHECK_VOUCHER)
     {
         Caption = 'CHECK_VOUCHER', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpRvCheckVoucher";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: CheckVoucher";
     }
     value(61; SALES_DOC_PREPAY)
     {
@@ -328,7 +328,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(64; CREATE_COLLECT_ORD)
     {
         Caption = 'CREATE_COLLECT_ORD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpCs POSAction Cre. Order";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Create CnC Ord.";
     }
     value(65; INSERT_CUSTOMER)
     {
@@ -343,7 +343,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(67; TOPUP_VOUCHER)
     {
         Caption = 'TOPUP_VOUCHER', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpRv POS Action Top-up";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Voucher Top-up";
     }
     value(68; SALES_DOC_PRE_REFUND)
     {
@@ -399,12 +399,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(79; CHECK_COUPON)
     {
         Caption = 'CHECK_COUPON', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NP NpDC Coupon Verify";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Coupon Verify";
     }
     value(80; ISSUE_COUPON)
     {
         Caption = 'ISSUE_COUPON', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpDc Module Issue: OnSale";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction Issue DC OnSale";
     }
     value(81; LAYAWAY_CREATE)
     {
@@ -434,7 +434,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(87; ISSUE_RETURN_VCHR_2)
     {
         Caption = 'ISSUE_RETURN_VCHR_2', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Act.Issue Return Vchr";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Issue Rtrn Vchr";
     }
     value(88; "SS-VOUCHER-APPLY-2")
     {
@@ -444,17 +444,17 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(90; "SS-DELETE-LINE")
     {
         Caption = 'SS-DELETE-LINE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Delete POS Line";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Delete POSLn";
     }
     value(91; "SS-ITEM-ADDON")
     {
         Caption = 'SS-ITEM-ADDON', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action - Item AddOn";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Item AddOn";
     }
     value(93; "SS-LOGIN-SCREEN")
     {
         Caption = 'SS-LOGIN-SCREEN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR SS Action: Login Screen";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: SS Login Screen";
     }
     value(94; RETAIL_INVENTORY)
     {
@@ -504,12 +504,12 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(103; DELIVER_COLLECT_ORD)
     {
         Caption = 'DELIVER_COLLECT_ORD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpCs POSAction Deliv.Order";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Deliv. Cnc Ord.";
     }
     value(104; PROCESS_COLLECT_ORD)
     {
         Caption = 'PROCESS_COLLECT_ORD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NpCs POSAction Proc. Order";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction Proc. CnC Order";
     }
     value(105; "PRINT_ITEM")
     {
@@ -549,7 +549,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(112; "SPLIT_BILL")
     {
         Caption = 'SPLIT_BILL', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POS Action: SplitBill";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Split Bill";
     }
     value(113; "SETVATBPGRP")
     {
@@ -584,7 +584,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(119; TM_TICKETMGMT_3)
     {
         Caption = 'TM_TICKETMGMT_3', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR TM POS Action: Ticket Mgt.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Ticket Mgt.";
     }
     value(120; CHANGE_BIN)
     {
@@ -649,67 +649,67 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(132; CHANGE_RESP_CENTER)
     {
         Caption = 'CHANGE_RESP_CENTER', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAct:Change Resp. Center";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Ch.Resp.Cent.";
     }
     value(133; RV_SELECT_TABLE)
     {
         Caption = 'RV_SELECT_TABLE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Select Table";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Select Table";
     }
     value(134; RV_NEW_WAITER_PAD)
     {
         Caption = 'RV_NEW_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: New WPad";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV New WPad";
     }
     value(135; RV_GET_WAITER_PAD)
     {
         Caption = 'RV_GET_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Get WPad";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Get WPad";
     }
     value(136; MM_MEMBER_ARRIVAL)
     {
         Caption = 'MM_MEMBER_ARRIVAL', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Arr.";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: MM Member Arr.";
     }
     value(137; MM_MEMBER_BACKEND)
     {
         Caption = 'MM_MEMBER_BACKEND', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: BackEnd Fun";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: MM BackEnd Fun";
     }
     value(138; RV_SET_PARTYSIZE)
     {
         Caption = 'RV_SET_PARTYSIZE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set No.of Guests";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Set NoOfGsts";
     }
     value(139; RV_SAVE_LAYOUT)
     {
         Caption = 'RV_SAVE_LAYOUT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Save Layout";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Save Layout";
     }
     value(140; "RV_RUN_W/PAD_ACTION")
     {
         Caption = 'RV_RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Run WPad Act.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Run WPadAct.";
     }
     value(141; "RV_SET_R-VIEW")
     {
         Caption = 'RV_SET_R-VIEW', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set R-View";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Set R-View";
     }
     value(142; RV_SET_TABLE_STATUS)
     {
         Caption = 'RV_SET_TABLE_STATUS', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set Table Status";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Set TableSts";
     }
     value(143; "RV_SET_W/PAD_STATUS")
     {
         Caption = 'RV_SET_W/PAD_STATUS', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Set WPad Status";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Set WPad Sts";
     }
     value(144; SAVE_TO_WAITER_PAD)
     {
         Caption = 'SAVE_TO_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Save2Wa.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Save2Wa.";
     }
     value(145; LOGIN)
     {
@@ -724,17 +724,17 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(147; PRINT_WAITER_PAD)
     {
         Caption = 'PRINT_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Print Wa.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Print Wa. Pad";
     }
     value(148; "RUN_W/PAD_ACTION")
     {
         Caption = 'RUN_W/PAD_ACTION', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Run Wa.Act";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Run Wa. Action";
     }
     value(149; NEW_WAITER_PAD)
     {
         Caption = 'NEW_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: New Wa.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: New Wa. Pad";
     }
     value(150; "RUN_ITEM_ADDONS")
     {
@@ -754,22 +754,22 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(153; RV_SELECT_RESTAURANT)
     {
         Caption = 'RV_SELECT_RESTAURANT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: SelectRestaurant";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Select Rest.";
     }
     value(154; "RV_K/REQUESTS")
     {
         Caption = 'RV_K/REQUESTS', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE RVA: Show K.Requests";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: RV Show K.Rqsts";
     }
     value(155; GET_WAITER_PAD)
     {
         Caption = 'GET_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Get Wa.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Get Wa. Pad";
     }
     value(156; SHOW_WAITER_PAD)
     {
         Caption = 'SHOW_WAITER_PAD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR NPRE POSAction: Show Wa.";
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: Show Wa. Pad";
     }
     value(157; HYPERLINK)
     {
@@ -804,22 +804,22 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(164; MM_MEMBER_LOYALTY)
     {
         Caption = 'MM_MEMBER_LOYALTY', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MM POS Action: Member Loy.";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: MM Member Loy.";
     }
     value(165; M_SCANDITITEMINFO)
     {
         Caption = 'M_SCANDITITEMINFO', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action Scan Item Info";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action MScan Item Info";
     }
     value(166; M_SCANDITFINDITEM)
     {
         Caption = 'M_SCANDITFINDITEM', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action ScanFind Item";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action MScanFind Item";
     }
     value(167; M_SCANDITSCAN)
     {
         Caption = 'M_SCANDITSCAN', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR MPOS Action Scandit Scan";
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action MScandit Scan";
     }
     value(168; ASSIGN_SERIAL_NO)
     {

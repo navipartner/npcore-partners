@@ -39,7 +39,6 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
     begin
-
         ReportId := Context.GetIntegerParameter('ReportId');
         RunRequestPage := Context.GetBooleanParameter('RequestPage');
         RecordSetting := Context.GetIntegerParameter('Record');

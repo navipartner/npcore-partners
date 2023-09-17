@@ -33,7 +33,7 @@ codeunit 6150847 "NPR POS Action: RunPage (Item)" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionItemCard.js###
+//###NPR_INJECT_FROM_FILE:POSActionRunPageItem.js###
 'let main=async({})=>await workflow.respond();'
         )
     end;

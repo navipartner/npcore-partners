@@ -33,7 +33,7 @@
 
     local procedure ApplyVoucher(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
     var
-        SSActionVoucherApplyB: Codeunit "NPR SS Action: Voucher Apply B";
+        SSActionVoucherApplyB: Codeunit "NPR POSAct. SS Voucher Apply B";
         ReferenceNo: Text;
         VoucherType: Text;
         VoucherTypeCode: Code[20];
@@ -85,7 +85,7 @@
 
     local procedure EndSale(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
-        SSActionVoucherApplyB: Codeunit "NPR SS Action: Voucher Apply B";
+        SSActionVoucherApplyB: Codeunit "NPR POSAct. SS Voucher Apply B";
         VoucherType: Text;
         VoucherTypeCode: Code[20];
     begin
@@ -162,7 +162,7 @@
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:SSActionVoucherApply.js###
+//###NPR_INJECT_FROM_FILE:POSActionSSVoucherApply.js###
 'let main=async({workflow:a,popup:n,parameters:i,captions:t})=>{let r=await n.stringpad({title:t.ApplyVoucherCaption,caption:t.EnterRefNoCaption});if(r===null||r==="")return;let e=await a.respond("prepareRequest",{VoucherRefNo:r});if(e.tryEndSale){i.EndSale&&await a.respond("endSale");return}e.workflowVersion==1?await a.respond("doLegacyWorkflow",{workflowName:e.workflowName}):await a.run(e.workflowName,{parameters:e.parameters})};'
         );
     end;

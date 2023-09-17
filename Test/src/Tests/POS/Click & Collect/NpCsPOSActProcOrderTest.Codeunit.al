@@ -19,7 +19,7 @@ codeunit 85108 "NPR NpCs POSAct ProcOrder Test"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibrarySales: Codeunit "Library - Sales";
         POSSale: Codeunit "NPR POS Sale";
-        ProcessOrderB: Codeunit "NPR NpCs POSAction Proc.OrderB";
+        ProcessOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
         SalesHeader: Record "Sales Header";
     begin
         // [Given] POS & Payment setup
