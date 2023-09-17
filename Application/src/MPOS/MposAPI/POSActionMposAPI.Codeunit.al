@@ -38,7 +38,7 @@ codeunit 6060073 "NPR POS Action: Mpos API" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:MposAPI.js### 
+//###NPR_INJECT_FROM_FILE:POSActionMposAPI.js### 
 'let main=async({workflow:n,parameters:e,context:o,popup:l})=>{let s=null,t=o.IsFromWorkflow===!0;var u=navigator.userAgent||navigator.vendor||window.opera;try{if(/android/i.test(u))s="ANDROID";else if(/iPad|iPhone|iPod|Macintosh/i.test(u)&&!window.MSStream)s="IOS";else throw new Error("This action does not work on non-MPOS Devices");let i=["Mock"],r=null,w=t?o.FunctionName:i[Number(e.Functionality)],d=t?o.FunctionParameter:e.Parameters,a={FunctionName:w,FunctionParameter:d};if(a=JSON.stringify(a),r=await SendToApp(s,a),t)return r;n.respond(w,{mposResponse:r})}catch(i){if(t)return{IsSuccessful:!1,ErrorMessage:i.message,Result:null};l.error(i.message,"mPOS Error")}};async function SendToApp(n,e){let o=''<div style="text-align: left;"><p>This device does not support this feature.<br/>Known reasons:<br/>-If you are running iOS version < 14.0.<br/>-The app is not updated.</p></div>'';if(n==="ANDROID"){if(window.top.jsBridge&&window.top.jsBridge.invokeFunction)return JSON.parse(await window.top.jsBridge.invokeFunction(e));throw Error(o)}else if(n==="IOS"){if(window.top.webkit&&window.top.webkit.messageHandlers&&window.top.webkit.messageHandlers.invokeFunction&&window.top.webkit.messageHandlers.invokeFunction.postMessage)return JSON.parse(await window.top.webkit.messageHandlers.invokeFunction.postMessage(e));throw Error(o)}}function Debug(n,e){try{n==="ANDROID"?window.top.jsBridge.debug(e):n==="IOS"&&window.webkit.messageHandlers.debug.postMessage(e)}catch{}}'
         )
     end;

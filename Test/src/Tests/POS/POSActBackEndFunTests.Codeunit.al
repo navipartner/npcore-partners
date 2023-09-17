@@ -15,7 +15,7 @@ codeunit 85135 "NPR POS Act. Backend Fun Tests"
     [HandlerFunctions('PageHandler_MemberInfoCapture,ConfirmYesHandler')]
     procedure BackEndFun()
     var
-        POSActionBackEndFun: Codeunit "NPR MM POS Action: BackEnd B";
+        POSActionBackEndFun: Codeunit "NPR POS Action: MM BackEnd B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentMethod: Record "NPR POS Payment Method";

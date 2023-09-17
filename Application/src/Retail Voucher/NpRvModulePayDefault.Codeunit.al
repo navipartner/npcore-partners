@@ -329,7 +329,7 @@
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         VoucherType2: Record "NPR NpRv Voucher Type";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSActIssueReturnVchr: Codeunit "NPR POS Act.Issue Return Vchr";
+        POSActIssueReturnVchr: Codeunit "NPR POSAction: Issue Rtrn Vchr";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SaleAmount: Decimal;

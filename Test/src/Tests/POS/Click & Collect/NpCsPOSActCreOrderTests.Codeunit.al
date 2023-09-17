@@ -16,7 +16,7 @@ codeunit 85084 "NPR NpCs POSAct CreOrder Tests"
     procedure NpCsCreateOrder()
     var
         NpCsLibrary: Codeunit "NPR Library Click & Collect";
-        NpCsCreateOrderB: Codeunit "NPR NpCs POSAction Cr. Order B";
+        NpCsCreateOrderB: Codeunit "NPR POSAction Create CnC Ord B";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         TempNpCsStore: Record "NPR NpCs Store" temporary;

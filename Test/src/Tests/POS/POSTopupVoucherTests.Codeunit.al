@@ -17,7 +17,7 @@ codeunit 85093 "NPR POS Top-up Voucher Tests"
     var
         Voucher: Record "NPR NpRv Voucher";
         Assert: Codeunit Assert;
-        POSActionTopUpB: Codeunit "NPR NpRv POS Action Top-up-B";
+        POSActionTopUpB: Codeunit "NPR POS Act. Voucher Top-up-B";
         VoucherNo: Code[20];
     begin
         Initialize();
