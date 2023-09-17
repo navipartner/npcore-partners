@@ -86,7 +86,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyIncrease: Codeunit "NPR SS Action - Qty Increase";
+        SSActionQtyIncrease: Codeunit "NPR POSAction: SS Qty Increase";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -124,7 +124,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
+        SSActionQtyDecrease: Codeunit "NPR POSAct. SS Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -163,7 +163,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
+        SSActionQtyDecrease: Codeunit "NPR POSAct. SS Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -201,7 +201,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
+        SSActionQtyDecrease: Codeunit "NPR POSAct. SS Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -239,7 +239,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        SSActionQtyDecrease: Codeunit "NPR SS Action - Qty Decrease B";
+        SSActionQtyDecrease: Codeunit "NPR POSAct. SS Qty Decrease B";
         GivenQuantity: Decimal;
         NewQuantity: Decimal;
     begin
@@ -268,7 +268,7 @@ codeunit 85073 "NPR POS Self Service Tests"
     var
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        ActionLoginScreen: Codeunit "NPR SS Action: Login Screen";
+        ActionLoginScreen: Codeunit "NPR POSAction: SS Login Screen";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         CurrentView: Codeunit "NPR POS View";
@@ -305,7 +305,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActionDeleteLine: Codeunit "NPR SS Action: Delete POSLineB";
+        SSActionDeleteLine: Codeunit "NPR POSAct. SS Delete POSLineB";
     begin
         // [SCENARIO]
         //Delete Line
@@ -369,7 +369,7 @@ codeunit 85073 "NPR POS Self Service Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
-        ItemAddOnBLogic: Codeunit "NPR SS Action - Item AddOn-BL";
+        ItemAddOnBLogic: Codeunit "NPR POSAct. SS Item AddOn-BL";
     begin
         // [SCENARIO]
         // [Given] POS & Payment setup

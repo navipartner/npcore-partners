@@ -24,7 +24,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
+        SSActInsertItem: Codeunit "NPR POSAction: SS Insert ItemB";
         Success: Boolean;
     begin
         //PARAMETERS:
@@ -77,7 +77,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
+        SSActInsertItem: Codeunit "NPR POSAction: SS Insert ItemB";
     begin
         //PARAMETERS:
         //Edit Description = false
@@ -126,7 +126,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSale: Codeunit "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
+        SSActInsertItem: Codeunit "NPR POSAction: SS Insert ItemB";
     begin
         //PARAMETERS:
         //Edit Description = false
@@ -176,7 +176,7 @@ codeunit 85080 "NPR POS SSAct InsertItem Tests"
         POSSale: Codeunit "NPR POS Sale";
         LibraryRandom: Codeunit "Library - Random";
         SaleLinePOS: Record "NPR POS Sale Line";
-        SSActInsertItem: Codeunit "NPR SS Action: Insert Item B.";
+        SSActInsertItem: Codeunit "NPR POSAction: SS Insert ItemB";
     begin
         //PARAMETERS:
         //Edit Description = false

@@ -21,7 +21,7 @@ codeunit 85134 "NPR POS Act. MemberArr Tests"
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
         ShowWelcomeMessage: Boolean;
-        POSActionMemberArrival: Codeunit "NPR MM POS Action: Member ArrB";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";

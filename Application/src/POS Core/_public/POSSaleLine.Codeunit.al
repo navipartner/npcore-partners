@@ -579,10 +579,10 @@
     local procedure InsertLineInternal(var Line: Record "NPR POS Sale Line"; HandleReturnValue: Boolean) ReturnValue: Boolean
     var
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        POSIssueOnSale: Codeunit "NPR NpDc Module Issue: OnSaleB";
+        POSIssueOnSale: Codeunit "NPR POSAction Issue DC OnSaleB";
         HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
         POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
-        POSActTicketMgt: Codeunit "NPR TM POS Action: Ticket Mgt.";
+        POSActTicketMgt: Codeunit "NPR POSAction: Ticket Mgt.";
         POSActMemberMgt: codeunit "NPR POS Action Member Mgt WF3";
     begin
         Rec := Line;
