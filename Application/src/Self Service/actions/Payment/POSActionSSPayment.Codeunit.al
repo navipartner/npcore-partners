@@ -4,6 +4,7 @@ codeunit 6151291 "NPR POS Action: SS Payment" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'Unattended payment';
         PaymentTypeName: Label 'Payment Type';
         PaymentTypeDescription: Label 'POS Payment Method to pay with';
@@ -12,6 +13,7 @@ codeunit 6151291 "NPR POS Action: SS Payment" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.SetWorkflowTypeUnattended();
         WorkflowConfig.AddTextParameter('PaymentType', '', PaymentTypeName, PaymentTypeDescription);
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
