@@ -1,6 +1,7 @@
 ﻿page 6151401 "NPR Magento Setup"
 {
     Caption = 'Magento Setup';
+    ContextSensitiveHelpPage = 'docs/integrations/magento/how-to/azure_directory/';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     RefreshOnActivate = true;
     SourceTable = "NPR Magento Setup";
