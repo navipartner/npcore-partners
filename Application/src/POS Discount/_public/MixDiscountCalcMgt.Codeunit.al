@@ -19,11 +19,15 @@
 
     procedure CalculateMixedDiscountLine(RetailJournalLine: Record "NPR Retail Journal Line"; var POSSaleLineTemp: Record "NPR POS Sale Line" temporary; CalculationDate: Date; FindBestMixedDiscount: Boolean) MixedDiscountExists: Boolean
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
         TempPOSSale: Record "NPR POS Sale" temporary;
         Item: Record Item;
         MixedDiscount: Record "NPR Mixed Discount";
         TempMixedDiscount: Record "NPR Mixed Discount" temporary;
+        TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary;
+        TempImpactedSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        TempDiscountCalcBuffer: Record "NPR Discount Calc. Buffer" temporary;
         MinQty: Decimal;
         LastLineNo: Integer;
     begin
@@ -79,7 +83,11 @@
         POSSaleLineTemp.Insert();
 
         if FindBestMixedDiscount then begin
-            MixedDiscountMgt.FindPotentiallyImpactedMixesAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, true, CalculationDate);
+            if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
+                MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate)
+            else
+                MixedDiscountMgt.FindPotentiallyImpactedMixesAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, true, CalculationDate);
+
             if (TempMixedDiscount.Count = 0) then
                 exit(false);
             TempMixedDiscount.SetRange("Discount Type", TempMixedDiscount."Discount Type"::"Multiple Discount Levels");
@@ -98,7 +106,11 @@
             end;
         end;
 
-        MixedDiscountMgt.ApplyMixDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate);
+        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
+            MixedDiscountMgt.ApplyMixedDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate)
+        else
+            MixedDiscountMgt.ApplyMixDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate);
+
         exit(true);
     end;
 
