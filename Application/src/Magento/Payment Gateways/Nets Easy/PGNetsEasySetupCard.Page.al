@@ -2,6 +2,7 @@ page 6151470 "NPR PG Nets Easy Setup Card"
 {
     Extensible = False;
     Caption = 'Payment Integration Nets Easy Setup Card';
+    ContextSensitiveHelpPage = 'docs/integrations/payment_gateway/how-to/netseasy/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR PG Nets Easy Setup";

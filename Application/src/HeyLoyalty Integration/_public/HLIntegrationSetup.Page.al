@@ -2,6 +2,7 @@ page 6150720 "NPR HL Integration Setup"
 {
     Extensible = true;
     Caption = 'HeyLoyalty Integration Setup';
+    ContextSensitiveHelpPage = 'docs/integrations/heyloyalty/how-to/aad_app/';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
