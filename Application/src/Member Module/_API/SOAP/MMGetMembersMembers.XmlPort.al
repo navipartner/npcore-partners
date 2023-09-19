@@ -119,6 +119,9 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         fieldelement(email; TempMemberInfoResponse."E-Mail Address")
                         {
                         }
+                        fieldelement(storecode; TempMemberInfoResponse."Store Code")
+                        {
+                        }
                         textelement(base64Image)
                         {
                             XmlName = 'base64Image';
