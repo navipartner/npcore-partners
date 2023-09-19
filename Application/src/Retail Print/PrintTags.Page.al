@@ -1,13 +1,9 @@
 ﻿page 6014417 "NPR Print Tags"
 {
-#pragma warning disable AA0139
     Extensible = False;
-    // NPR4.18/MMV/20151229 CASE 225584 Created Page
-
     Caption = 'Print Tags';
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR Print Tags";
     ApplicationArea = NPRRetail;
 
@@ -19,28 +15,22 @@
             {
                 field("Print Tag"; Rec."Print Tag")
                 {
-
-                    ToolTip = 'Specifies the value of the Print Tag field';
+                    ToolTip = 'Specifies a code to identify this print tag.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Pick; Pick)
                 {
-
-                    ShowCaption = false;
-                    ToolTip = 'Specifies the value of the Pick field';
+                    Caption = 'Selected';
+                    ToolTip = 'Specifies if this tag is selected.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
-                        ToggleTag(Rec."Print Tag");
+                        ToggleTag(Rec."Print Tag", false);
                     end;
                 }
             }
         }
-    }
-
-    actions
-    {
     }
 
     trigger OnAfterGetRecord()
@@ -55,68 +45,66 @@
 
     trigger OnOpenPage()
     begin
-        if TagText <> '' then
-            FromText(TagText + ',');
+        if _TagText <> '' then
+            FromText(_TagText);
     end;
 
     var
         TempSelectedPrintTags: Record "NPR Print Tags" temporary;
         Pick: Boolean;
-        TagText: Text[100];
+        _TagText: Text;
 
-    internal procedure ToText(): Text[100]
+    internal procedure ToText(MaxLength: Integer): Text
     var
         TagString: Text;
-        Tagged: Boolean;
+        TooLongErr: Label 'The resulting string of selected pring tags cannot exceed %1 characters.', Comment = '%1 - maximal string length';
     begin
-        if TempSelectedPrintTags.FindSet() then
-            repeat
-                TagString += TempSelectedPrintTags."Print Tag" + ',';
-                Tagged := true;
-            until TempSelectedPrintTags.Next() = 0;
+        if not TempSelectedPrintTags.FindSet() then
+            exit('');
 
-        if Tagged then
-            TagString := DelStr(TagString, StrLen(TagString));
+        repeat
+            if TagString <> '' then
+                TagString += ',';
+            TagString += TempSelectedPrintTags."Print Tag";
+        until TempSelectedPrintTags.Next() = 0;
+
+        if StrLen(TagString) > MaxLength then
+            Error(TooLongErr, MaxLength);
 
         exit(TagString);
     end;
 
     internal procedure FromText(TagString: Text)
     var
-        StringLibrary: Codeunit "NPR String Library";
-        i: Integer;
-        PrevTag: Text;
-        CurrTag: Text;
+        Tag: Text;
+        Tags: List of [Text];
     begin
-        StringLibrary.Construct(TagString);
-
-        repeat
-            i += 1;
-            PrevTag := CurrTag;
-            CurrTag := StringLibrary.SelectStringSep(i, ',');
-            ToggleTag(CurrTag);
-        until PrevTag = CurrTag;
-
+        Tags := TagString.Split(',');
+        foreach Tag in Tags do
+            if StrLen(Tag) <= MaxStrLen(Rec."Print Tag") then
+#pragma warning disable AA0139
+                ToggleTag(Tag, true);
+#pragma warning restore AA0139
         CurrPage.Update(false);
     end;
 
-    internal procedure SetTagText(TagTextIn: Text[100])
+    internal procedure SetTagText(TagTextIn: Text)
     begin
-        TagText := TagTextIn;
+        _TagText := TagTextIn;
     end;
 
-    local procedure ToggleTag(PrintTag: Text)
+    local procedure ToggleTag(PrintTag: Text[100]; AddOnly: Boolean)
     begin
-        if (StrLen(PrintTag) > 100) or (PrintTag = '') then exit;
+        if PrintTag = '' then
+            exit;
 
-        if TempSelectedPrintTags.Get(PrintTag) then
-            TempSelectedPrintTags.Delete()
-        else begin
-            TempSelectedPrintTags.Init();
-            TempSelectedPrintTags."Print Tag" := PrintTag;
-            TempSelectedPrintTags.Insert();
+        if TempSelectedPrintTags.Get(PrintTag) then begin
+            if not AddOnly then
+                TempSelectedPrintTags.Delete();
+            exit;
         end;
+        TempSelectedPrintTags.Init();
+        TempSelectedPrintTags."Print Tag" := PrintTag;
+        TempSelectedPrintTags.Insert();
     end;
-#pragma warning restore AA0139
 }
-

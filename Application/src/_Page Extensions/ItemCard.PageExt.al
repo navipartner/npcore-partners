@@ -331,14 +331,22 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         ToolTip = 'Specifies the item print tags.';
                         ApplicationArea = NPRRetail;
-                        trigger OnValidate()
+                        AssistEdit = true;
+                        Editable = false;
+
+                        trigger OnAssistEdit()
                         var
                             PrintTagsPage: Page "NPR Print Tags";
+                            NotEditableErr: Label 'Please switch to page edit mode first.';
                         begin
+                            if not CurrPage.Editable() then
+                                Error(NotEditableErr);
                             Clear(PrintTagsPage);
                             PrintTagsPage.SetTagText(Rec."NPR Print Tags");
                             if PrintTagsPage.RunModal() = Action::OK then
-                                Rec."NPR Print Tags" := PrintTagsPage.ToText();
+#pragma warning disable AA0139
+                                Rec."NPR Print Tags" := PrintTagsPage.ToText(MaxStrLen(Rec."NPR Print Tags"));
+#pragma warning restore AA0139
                         end;
                     }
                 }
