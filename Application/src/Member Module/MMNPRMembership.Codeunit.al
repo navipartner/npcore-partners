@@ -828,6 +828,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         //      <newsletter>0</newsletter>
         //      <phoneno/>
         //      <email>test0227@test.se</email>
+        //      <storecode/>        
         //      <base64Image>/9j/4AAQSkZJRgABAQEAYAB..</base64Image>
 
         //      <requestfieldupdate>
@@ -879,6 +880,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
         MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'phoneno', MaxStrLen(MemberInfoCapture."Phone No."), false);
         MemberInfoCapture."E-Mail Address" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'email', MaxStrLen(MemberInfoCapture."E-Mail Address"), false);
+        MemberInfoCapture."Store Code" := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'storecode', MaxStrLen(MemberInfoCapture."Store Code"), false);
         Base64Image := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'base64Image', 0, false);
         if Base64Image <> '' then begin
             TempBlob.CreateOutStream(OutStr);
