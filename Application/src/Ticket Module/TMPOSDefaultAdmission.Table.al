@@ -22,8 +22,8 @@
         field(3; "Admission Code"; Code[20])
         {
             DataClassification = CustomerContent;
-            TableRelation = "NPR TM Admission";
             Caption = 'Admission Code';
+            TableRelation = "NPR TM Ticket Admission BOM"."Admission Code" where("Item No." = field("Item No."));
         }
         field(5; "Station Type"; Option)
         {
@@ -36,7 +36,7 @@
         {
             DataClassification = CustomerContent;
             TableRelation = if ("Station Type" = const(POS_UNIT)) "NPR POS Unit";
-            Caption = 'POS Unit No.';
+            Caption = 'Station Identifier';
         }
 
         field(7; "Activation Method"; Option)

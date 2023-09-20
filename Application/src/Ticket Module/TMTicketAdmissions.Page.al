@@ -184,6 +184,16 @@
                 }
             }
         }
+        area(factboxes)
+        {
+            part(AdmissionImage; "NPR TM Admission Media")
+            {
+                Caption = 'Image';
+                SubPageLink = "Admission Code" = FIELD("Admission Code");
+                ApplicationArea = NPRTicketAdvanced;
+            }
+        }
+
     }
 
     actions

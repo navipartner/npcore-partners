@@ -851,7 +851,7 @@
                     TicketReservationRequest2.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
                     TicketReservationRequest2.FindSet();
                     repeat
-                        TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", PosUnitNo, false);
+                        TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", TicketReservationRequest2."Admission Code", TicketReservationRequest2."External Adm. Sch. Entry No.", PosUnitNo, '', false);
                     until (TicketReservationRequest2.Next() = 0);
 
                 until (Ticket.Next() = 0);

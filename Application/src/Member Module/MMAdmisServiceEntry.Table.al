@@ -52,6 +52,11 @@
             Caption = 'Admission Is Valid';
             DataClassification = CustomerContent;
         }
+        field(18; SelectedAdmission; Code[20])
+        {
+            Caption = 'Selected Admission';
+            DataClassification = CustomerContent;
+        }
         field(20; "Card Entry No."; Integer)
         {
             Caption = 'Card Entry No.';

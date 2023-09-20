@@ -10,7 +10,7 @@
                 DoRevalidateRequestForTicketReuse(TempTicketReservationRequest, _ReusedTokenId);
 
             _AttemptFunction::VALIDATE_ARRIVAL:
-                DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo, _PosUnitNo);
+                DoValidateTicketForArrival(_TicketIdentifierType, _TicketIdentifier, _AdmissionCode, _AdmissionScheduleEntryNo, _PosUnitNo, _ScannerStationId);
 
             _AttemptFunction::ISSUE_FROM_TOKEN:
                 DoIssueTicketFromReservationToken(_Token);
@@ -39,6 +39,7 @@
         _NewTicketQuantity: Integer;
         _Token: Text[100];
         _PosUnitNo: Code[10];
+        _ScannerStationId: Code[10];
 
         _AttemptFunction: Option NA,REUSE,VALIDATE_ARRIVAL,ISSUE_FROM_TOKEN,ISSUE_FROM_RESERVATION,CHANGE_RESERVED_QTY;
 
@@ -78,7 +79,7 @@
         exit(Successful);
     end;
 
-    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; var ResponseMessage: Text): Boolean
     begin
 
         _AttemptFunction := _AttemptFunction::VALIDATE_ARRIVAL;
@@ -88,6 +89,7 @@
         _AdmissionCode := AdmissionCode;
         _AdmissionScheduleEntryNo := AdmissionScheduleEntryNo;
         _PosUnitNo := PosUnitNo;
+        _ScannerStationId := ScannerStationId;
 
         exit(InvokeAttemptAction(ResponseMessage));
     end;
@@ -167,7 +169,7 @@
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                     if (Ticket.FindSet()) then begin
                         repeat
-                            TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", '', 0, '', false);
+                            TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", '', 0, '', '', false);
                         until (Ticket.Next() = 0);
                     end;
                 until (TicketReservationRequest.Next() = 0);
@@ -182,11 +184,11 @@
 
     end;
 
-    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10])
+    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10])
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TicketManagement.RegisterArrivalScanTicket(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, false);
+        TicketManagement.RegisterArrivalScanTicket(TicketIdentifierType, TicketIdentifier, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, false);
     end;
 
     local procedure DoIssueTicketFromReservationToken(Token: Text[100])

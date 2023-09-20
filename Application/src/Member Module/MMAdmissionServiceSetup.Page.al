@@ -164,7 +164,18 @@
                     end;
                 }
             }
-
+            Action(NavigateDefaultAdmission)
+            {
+                ToolTip = 'Navigate to Admissions per Scanner Station';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Admissions per Scanner Station';
+                Image = Default;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = Page "NPR TM POS Default Admission";
+                RunPageLink = "Station Type" = const(SCANNER_STATION);
+            }
             action(Entries)
             {
                 Caption = 'Entries';

@@ -50,8 +50,32 @@
                     ToolTip = 'Specifies the value of the Activated field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(IsMultiAdmissionGate; Rec.IsDynamicAdmissionGate)
+                {
+
+                    ToolTip = 'Specifies the value of the Is Multi-Admission Gate field. When true, the scanner station id is used to determine which admission to admit during ticket scan.';
+                    ApplicationArea = NPRTicketAdvanced;
+                }
             }
         }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            Action(NavigateDefaultAdmission)
+            {
+                ToolTip = 'Navigate to Admissions per Scanner Station';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Admissions per Scanner Station';
+                Image = Default;
+                Scope = Repeater;
+                RunObject = Page "NPR TM POS Default Admission";
+                RunPageLink = "Station Type" = const(SCANNER_STATION), "Station Identifier" = field("Scanner Station Id");
+            }
+        }
+
     }
 
 }

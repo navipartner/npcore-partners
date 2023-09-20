@@ -225,6 +225,15 @@ page 6150765 "NPR TM Admission Card"
                 }
             }
         }
+        area(factboxes)
+        {
+            part(AdmissionImage; "NPR TM Admission Media")
+            {
+                Caption = 'Image';
+                SubPageLink = "Admission Code" = FIELD("Admission Code");
+                ApplicationArea = NPRTicketAdvanced;
+            }
+        }
     }
     actions
     {
