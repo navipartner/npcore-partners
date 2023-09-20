@@ -68,6 +68,11 @@
             Caption = 'Turnstile Error Image';
             DataClassification = CustomerContent;
         }
+        field(20; IsDynamicAdmissionGate; Boolean)
+        {
+            Caption = 'Is Dynamic-Admission Gate';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -195,6 +195,12 @@
             Caption = 'Sales Until Time';
             DataClassification = CustomerContent;
         }
+        field(170; AdmissionImage; Media)
+        {
+            Caption = 'Admission Image';
+            DataClassification = CustomerContent;
+        }
+
         field(210; "eTicket Type Code"; Text[30])
         {
             Caption = 'eTicket Type Code';

@@ -980,7 +980,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TicketManagement.RegisterArrivalScanTicket(1, ExternalTicketNumber, AdmissionCode, -1, PosUnitNo, WithPrint);
+        TicketManagement.RegisterArrivalScanTicket(1, ExternalTicketNumber, AdmissionCode, -1, PosUnitNo, '', WithPrint);
     end;
 
     local procedure RegisterDeparture(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20])

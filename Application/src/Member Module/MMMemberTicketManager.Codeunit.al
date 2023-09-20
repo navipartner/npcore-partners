@@ -304,7 +304,7 @@
                             TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
                             TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
                             if (not TicketReservationRequest.IsEmpty()) then // Something is "paid" on this request - admission could be blank and could be determined by pos unit later.
-                                TicketIsReused := AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, ErrorReason); // Reuse existing ticket (if possible)
+                                TicketIsReused := AttemptTicket.AttemptValidateTicketForArrival(0, Ticket."No.", AdmissionCode, -1, PosUnitNo, '', ErrorReason); // Reuse existing ticket (if possible)
                         end;
             until ((Ticket.Next() = 0) or (TicketIsReused));
 
@@ -348,7 +348,7 @@
                 Error(MISSING_CROSSREF);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
-            TicketManagement.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, PosUnitNo, false);
+            TicketManagement.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();
         end;
