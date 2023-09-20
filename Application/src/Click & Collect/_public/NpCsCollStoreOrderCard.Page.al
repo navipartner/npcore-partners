@@ -553,6 +553,8 @@
                         if not Confirm(ConfirmAndPrintQst, true, Rec."Document No.") then
                             exit;
 
+                        Rec.SetRange("Delivery Status");
+
                         NpCsCollectMgt.ConfirmAndPrintOrder(Rec);
                     end;
                 }
