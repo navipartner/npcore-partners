@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Entry Statistics';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_payment_method/';
     Editable = false;
     PageType = Worksheet;
     SourceTable = "NPR POS Entry Statistics";

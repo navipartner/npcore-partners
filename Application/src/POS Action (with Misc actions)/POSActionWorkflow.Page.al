@@ -3,6 +3,7 @@
     Extensible = False;
     AutoSplitKey = true;
     Caption = 'POS Action Workflow';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/reference/pos_actions_ref/';
     PageType = List;
     UsageCategory = Administration;
 

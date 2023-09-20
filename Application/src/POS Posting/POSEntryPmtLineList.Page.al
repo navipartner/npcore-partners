@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Entry Payment Line List';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_payment_method/';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;

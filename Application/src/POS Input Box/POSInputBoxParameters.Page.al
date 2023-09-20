@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'POS Input Box Parameters';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/input_box_profile/input_box_profile/';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Entry Sales Line List';
+    ContextSensitiveHelpPage = 'docs/retail/pos_academy/pos_entry/accounting_entries/';
     Editable = false;
     PageType = List;
     UsageCategory = Administration;

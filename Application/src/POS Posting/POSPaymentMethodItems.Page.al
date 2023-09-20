@@ -2,6 +2,7 @@
 {
     AutoSplitKey = true;
     Caption = 'POS Payment Method Items';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_payment_method/';
     DelayedInsert = true;
     Extensible = false;
     PageType = List;
