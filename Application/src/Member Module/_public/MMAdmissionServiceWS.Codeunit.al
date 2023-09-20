@@ -421,7 +421,7 @@
                         if MMMemberWebService.MemberCardRegisterArrival(MMAdmissionServiceEntry."External Card No.", '', '', MessageText) then begin
                             MMMemberWebService.GetMemberImage(MMAdmissionServiceEntry.Key, PictureBase64, ScannerStationId);
                             if PictureBase64 = '' then
-                                GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id");
+                                GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id", '');
                             MMAdmissionServiceEntry.Message := CopyStr(MessageText, 1, MaxStrLen(MMAdmissionServiceEntry.Message));
                             MMAdmissionServiceEntry.Arrived := true;
                             MMAdmissionServiceEntry."Modify Date" := CurrentDateTime;
@@ -437,7 +437,8 @@
                         if MMAdmissionServiceEntry."External Card No." <> '' then
                             MMMemberWebService.GetMemberImage(MMAdmissionServiceEntry.Key, PictureBase64, ScannerStationId);
                         if PictureBase64 = '' then
-                            GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id");
+                            GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id", MMAdmissionServiceEntry.SelectedAdmission);
+
                         MMAdmissionServiceEntry.Arrived := true;
                         MMAdmissionServiceEntry."Modify Date" := CurrentDateTime;
                         MMAdmissionServiceEntry.Modify(true);
@@ -559,13 +560,27 @@
         end;
     end;
 
-    local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]): Boolean
+    local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "NPR MM Admis. Service Setup"; var Base64StringImage: Text; ScannerStationId: Code[10]; AdmissionCode: Code[20]): Boolean
     var
         TenantMedia: Record "Tenant Media";
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
+        Admission: Record "NPR TM Admission";
         Base64Convert: Codeunit "Base64 Convert";
         InStr: InStream;
     begin
+
+        if (AdmissionCode <> '') then begin
+            if (Admission.Get(AdmissionCode)) then begin
+                if (TenantMedia.Get(Admission.AdmissionImage.MediaId())) then
+                    TenantMedia.CalcFields(Content);
+                if TenantMedia.Content.HasValue() then begin
+                    TenantMedia.Content.CreateInStream(InStr);
+                    Base64StringImage := Base64Convert.ToBase64(InStr);
+                    exit(true);
+                end;
+            end;
+        end;
+
         if MMAdmissionScannerStations.Get(ScannerStationId) then begin
             if MMAdmissionScannerStations.Activated then begin
                 if TenantMedia.Get(MMAdmissionScannerStations."Guest Avatar Image".MediaId()) then
@@ -604,6 +619,9 @@
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
         TMTicketWebService: Codeunit "NPR TM Ticket WebService";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Admission: Record "NPR TM Admission";
         MMAdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
         DataError: Boolean;
         AdmissionIsValid: Boolean;
@@ -715,10 +733,20 @@
 
                     if Item.Get(TMTicket."Item No.") then begin
                         MMAdmissionServiceEntry."Ticket Type Code" := Item."NPR Ticket Type";
-                        if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
-                            MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
-                        else
-                            MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
+                        MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description, 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
+                    end;
+
+                    if (MMAdmissionScannerStations.IsDynamicAdmissionGate) then begin // Selected by the scanner station setup for this item.
+                        DetTicketAccessEntry.SetCurrentKey("Entry No."); // We want the last entry created
+                        DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', TMTicket."No.");
+                        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+                        if (DetTicketAccessEntry.FindLast()) then begin
+                            if (TicketAccessEntry.Get(DetTicketAccessEntry."Ticket Access Entry No.")) then
+                                if (Admission.Get(TicketAccessEntry."Admission Code")) then begin
+                                    MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(StrSubstNo('%1 - %2', Admission."Admission Code", Admission.Description), 1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"));
+                                    MMAdmissionServiceEntry.SelectedAdmission := TicketAccessEntry."Admission Code";
+                                end;
+                        end
                     end;
 
                     MemberCard.SetCurrentKey("External Card No.");
