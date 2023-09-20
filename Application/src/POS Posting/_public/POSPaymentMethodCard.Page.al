@@ -3,6 +3,7 @@
     Extensible = true;
     UsageCategory = None;
     Caption = 'POS Payment Method Card';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/create_payment_method/';
     SourceTable = "NPR POS Payment Method";
 #IF NOT BC17
     AboutTitle = 'POS Payment Method';

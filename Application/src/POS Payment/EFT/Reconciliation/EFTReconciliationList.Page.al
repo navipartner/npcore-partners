@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'EFT Reconciliation List';
+    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/reconciliation/';
     CardPageID = "NPR EFT Reconciliation";
     Editable = false;
     PageType = List;
