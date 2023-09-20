@@ -3,6 +3,7 @@
     Extensible = False;
 
     Caption = 'Loyalty Item Point Setup';
+    ContextSensitiveHelpPage = 'docs/entertainment/loyalty/how-to/setup/';
     PageType = List;
     UsageCategory = None;
 

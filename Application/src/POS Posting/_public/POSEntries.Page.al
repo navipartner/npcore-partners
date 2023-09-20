@@ -1,6 +1,7 @@
 ﻿page 6150650 "NPR POS Entries"
 {
     Caption = 'POS Entries';
+    ContextSensitiveHelpPage = 'docs/retail/pos_academy/pos_entry/accounting_entries/';
     Editable = false;
     PageType = List;
     UsageCategory = None;

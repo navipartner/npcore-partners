@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Reimbursement Modules';
+    ContextSensitiveHelpPage = 'docs/retail/reimbursement/intro/';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NPR NpRi Reimbursement Module";

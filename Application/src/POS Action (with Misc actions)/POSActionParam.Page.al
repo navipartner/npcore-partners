@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'POS Action Parameters';
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/reference/pos';
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;

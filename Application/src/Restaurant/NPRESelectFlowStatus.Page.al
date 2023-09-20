@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Select Flow Status';
+    ContextSensitiveHelpPage = 'docs/entertainment/restaurant/explanation/restaurant_flow/';
     DataCaptionExpression = GetDataCaptionExpr();
     DeleteAllowed = false;
     InsertAllowed = false;

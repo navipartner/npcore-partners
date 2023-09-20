@@ -2,7 +2,7 @@
 {
     Extensible = false;
     Caption = 'Variety Fields Setup';
-    ContextSensitiveHelpPage = 'docs/retail/integrations/explanation/varieties/';
+    ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     PageType = List;
     SourceTable = "NPR Variety Field Setup";
     UsageCategory = Administration;
