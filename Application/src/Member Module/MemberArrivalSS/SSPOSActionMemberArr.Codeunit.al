@@ -1,11 +1,10 @@
-codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
-
+codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'This action handles member arrival functions.';
+        ActionDescription: Label 'This action handles member arrival functions for Self Service.';
         ParamDialogPrompt_CptLbl: Label 'Dialog Prompt';
         ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
         ParamDialogPrompt_OptLbl: Label 'Member Number,Member Card Number,Membership Number,Facial Recognition,No Prompt', Locked = true;
@@ -26,7 +25,6 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
-        // NOTE: Dont forget to update the EAN box parameter setup in OnInitEanBoxParameters()
         ParamDialogPrompt_DefaultValue := CopyStr(SelectStr(2, ParamDialogPrompt_OptLbl), 1, 250);
         WorkflowConfig.AddOptionParameter('DialogPrompt',
                                         ParamDialogPrompt_OptLbl,
@@ -46,6 +44,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
+        WorkflowConfig.SetWorkflowTypeUnattended();
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -65,7 +64,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
         ShowWelcomeMessage: Boolean;
-        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+        POSActionSSMemberArrival: Codeunit "NPR POS Action SS: MemberArr.B";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
     begin
@@ -103,75 +102,13 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
 
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
-        POSActionMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
-    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
-    var
-        MMMemberCard: Record "NPR MM Member Card";
-    begin
-
-        if (not EanBoxEvent.Get(EventCodeExtMemberCardNo())) then begin
-            EanBoxEvent.Init();
-            EanBoxEvent.Code := EventCodeExtMemberCardNo();
-            EanBoxEvent."Module Name" := 'Membership Management';
-            EanBoxEvent.Description := CopyStr(MMMemberCard.FieldCaption("External Card No."), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode();
-            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-            EanBoxEvent.Insert(true);
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
-    begin
-
-        case EanBoxEvent.Code of
-            EventCodeExtMemberCardNo():
-                begin
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'DefaultInputValue', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'DialogPrompt', false, 'No Prompt');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Member Arrival');
-                end;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeMemberCardNo(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
-    var
-        MMMemberCard: Record "NPR MM Member Card";
-    begin
-        if (EanBoxSetupEvent."Event Code" <> EventCodeExtMemberCardNo()) then
-            exit;
-        if (StrLen(EanBoxValue) > MaxStrLen(MMMemberCard."External Card No.")) then
-            exit;
-
-        MMMemberCard.SetRange("External Card No.", UpperCase(EanBoxValue));
-        if not MMMemberCard.IsEmpty() then
-            InScope := true;
-    end;
-
-    local procedure EventCodeExtMemberCardNo(): Code[20]
-    begin
-        exit('MEMBER_ARRIVAL');
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POS Action: MM Member Arr.");
-    end;
-
-    procedure ActionCode(): Code[20]
-    begin
-        exit(Format(Enum::"NPR POS Workflow"::MM_MEMBER_ARRIVAL));
+        POSActionSSMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:POSActionMMMemberArr.js###
+        //###NPR_INJECT_FROM_FILE:POSActionSSMemberArr.js###
 'let main=async({workflow:l,popup:r,captions:t,parameters:e})=>{if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let a=await r.input({caption:t.MemberCardPrompt,title:t.MembershipTitle,value:e.DefaultInputValue});if(a===null)return" ";await l.respond("MemberArrival",{membercard_number:a})}else await l.respond("MemberArrival")};'
         );
     end;
