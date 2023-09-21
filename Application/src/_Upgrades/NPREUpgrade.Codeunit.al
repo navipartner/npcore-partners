@@ -14,6 +14,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         RefreshKitchenOrderStatus();
         UpdatePrimarySeating();
         UpdateKitchenRequestSeatingAndWaiter();
+        UpdateDefaultNumberOfGuests();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -89,6 +90,24 @@ codeunit 6151316 "NPR NPRE Upgrade"
             until WaiterPad.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateDefaultNumberOfGuests()
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests')) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', 'UpdateDefaultNumberOfGuests');
+
+        if RestaurantSetup.Get() then
+            if RestaurantSetup."Default Number of Guests" = RestaurantSetup."Default Number of Guests"::Default then begin
+                RestaurantSetup."Default Number of Guests" := RestaurantSetup."Default Number of Guests"::One;
+                RestaurantSetup.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests'));
         LogMessageStopwatch.LogFinish();
     end;
 }

@@ -83,19 +83,20 @@
             Caption = 'Order Is Ready For Serving';
             DataClassification = CustomerContent;
         }
+        field(90; "Default Number of Guests"; Enum "NPR NPRE Default No. of Guests")
+        {
+            Caption = 'Default Number of Guests';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
-        key(Key1; "Code")
-        {
-        }
+        key(Key1; "Code") { }
     }
     fieldgroups
     {
-        fieldgroup(Brick; Code, Name)
-        {
-        }
+        fieldgroup(Brick; Code, Name) { }
     }
 
     procedure ShowKitchenRequests()

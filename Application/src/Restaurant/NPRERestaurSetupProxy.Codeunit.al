@@ -75,6 +75,11 @@
         if _SeatingLocation."Resend All On New Lines" = _SeatingLocation."Resend All On New Lines"::Default then
             _SeatingLocation."Resend All On New Lines" := _Restaurant."Resend All On New Lines";
 
+        if _Restaurant."Default Number of Guests" = _Restaurant."Default Number of Guests"::Default then
+            _Restaurant."Default Number of Guests" := _NPRESetup."Default Number of Guests";
+        if _SeatingLocation."Default Number of Guests" = _SeatingLocation."Default Number of Guests"::Default then
+            _SeatingLocation."Default Number of Guests" := _Restaurant."Default Number of Guests";
+
         if _Restaurant."Kitchen Printing Active" = _Restaurant."Kitchen Printing Active"::Default then
             if _NPRESetup."Kitchen Printing Active" then
                 _Restaurant."Kitchen Printing Active" := _Restaurant."Kitchen Printing Active"::Yes
@@ -127,6 +132,12 @@
     begin
         MakeSureIsInitialized();
         exit(_SeatingLocation."Resend All On New Lines");
+    end;
+
+    procedure DefaultNumberOfGuests(): Enum "NPR NPRE Default No. of Guests"
+    begin
+        MakeSureIsInitialized();
+        exit(_SeatingLocation."Default Number of Guests");
     end;
 
     procedure KitchenPrintingActivated(): Boolean

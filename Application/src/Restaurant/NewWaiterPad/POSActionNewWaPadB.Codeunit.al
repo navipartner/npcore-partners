@@ -9,7 +9,7 @@ codeunit 6151346 "NPR POSAction New Wa. Pad-B"
         SalePOS: Record "NPR POS Sale";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
-        ActionMsgTxt: Label 'Waiter Pad added for seating %1.';
+        ActionMsgTxt: Label 'Waiter pad %1 has been created for seating %2.', Comment = '%1 - waiter pad number, %2 - seating description';
     begin
         Seating.Get(SeatingCode);
         if NumberOfGuests < 0 then
@@ -32,14 +32,19 @@ codeunit 6151346 "NPR POSAction New Wa. Pad-B"
             exit;
         end;
 
-        ActionMessage := StrSubstNo(ActionMsgTxt, Seating.Description);
+        if Seating.Description = '' then
+            if Seating."Seating No." <> '' then
+                Seating.Description := Seating."Seating No."
+            else
+                Seating.Description := Seating.Code;
+        ActionMessage := StrSubstNo(ActionMsgTxt, WaiterPad."No.", Seating.Description);
     end;
 
     procedure GetSeatingConfirmString(Seating: Record "NPR NPRE Seating") ConfirmString: Text
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         WaiterPad: Record "NPR NPRE Waiter Pad";
-        ConfirmNewQst: Label 'There are the following active waiter pad(s) on seating %1:%2\\Are you sure you want to create a new waiter pad for the seating?';
+        ConfirmNewQst: Label 'There are the following active waiter pad(s) on seating %1:%2<br><br>Are you sure you want to create a new waiter pad for the seating?';
     begin
         SeatingWaiterPadLink.SetCurrentKey(Closed);
         SeatingWaiterPadLink.SetRange(Closed, false);
@@ -51,7 +56,7 @@ codeunit 6151346 "NPR POSAction New Wa. Pad-B"
         SeatingWaiterPadLink.FindSet();
         repeat
             if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") then begin
-                ConfirmString += '\  - ' + WaiterPad."No.";
+                ConfirmString += '<br>  - ' + WaiterPad."No.";
                 ConfirmString += ' ' + Format(WaiterPad.SystemCreatedAt);
                 if WaiterPad.Description <> '' then
                     ConfirmString += ' ' + WaiterPad.Description;

@@ -73,12 +73,14 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     var
         Seating: Record "NPR NPRE Seating";
         BusinessLogic: Codeunit "NPR POSAction New Wa. Pad-B";
+        POSActRVNewWPadB: Codeunit "NPR POSAct. RV New WPad-B";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         ConfirmString: Text;
     begin
         WaiterPadPOSMgt.FindSeating(Context, Seating);
 
         Context.SetContext('seatingCode', Seating.Code);
+        Context.SetContext('defaultNumberOfGuests', POSActRVNewWPadB.GetDefaultNumberOfGuests(Seating.Code));
         ConfirmString := BusinessLogic.GetSeatingConfirmString(Seating);
         if ConfirmString <> '' then
             Context.SetContext('confirmString', ConfirmString);
@@ -113,6 +115,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     var
         SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
+        POSActRVNewWPadB: Codeunit "NPR POSAct. RV New WPad-B";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
     begin
@@ -125,6 +128,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
             Context.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
+            Context.SetContext('defaultNumberOfGuests', POSActRVNewWPadB.GetDefaultNumberOfGuests(SalePOS."NPRE Pre-Set Seating Code"));
         end;
     end;
 
@@ -212,7 +216,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionNewWaPad.js###
-'let main=async({workflow:s,popup:i,parameters:n,context:e,captions:a})=>{if(await s.respond("addPresetValuesToContext"),!e.seatingCode||!n.UseSeatingFromContext)if(e.seatingCode="",n.FixedSeatingCode)e.seatingCode=n.FixedSeatingCode;else switch(n.InputType+""){case"0":e.seatingCode=await i.input({caption:a.InputTypeLabel});break;case"1":e.seatingCode=await i.numpad({caption:a.InputTypeLabel});break;case"2":await s.respond("seatingInput");break}if(!!e.seatingCode&&!(e.confirmString&&(result=await i.confirm({caption:a.ConfirmLabel,label:a.confirmString}),result))&&!(n.AskForNumberOfGuests&&(e.numberOfGuests=await i.numpad({caption:a.NumberOfGuestsLabel}),!e.numberOfGuests))&&(e.seatingCode&&await s.respond("newWaiterPad"),e.actionMessage)){await i.message({caption:a.ActionMessageLabel,label:a.actionMessage});return}};'
+'let main=async({workflow:n,popup:a,parameters:i,context:e,captions:s})=>{if(await n.respond("addPresetValuesToContext"),!e.seatingCode||!i.UseSeatingFromContext)if(e.seatingCode="",i.FixedSeatingCode)e.seatingCode=i.FixedSeatingCode;else switch(i.InputType+""){case"0":e.seatingCode=await a.input({caption:s.InputTypeLabel});break;case"1":e.seatingCode=await a.numpad({caption:s.InputTypeLabel});break;case"2":await n.respond("seatingInput");break}!e.seatingCode||e.confirmString&&(result=await a.confirm({title:s.ConfirmLabel,caption:e.confirmString}),!result)||i.AskForNumberOfGuests&&(e.numberOfGuests=await a.numpad({caption:s.NumberOfGuestsLabel,value:e.defaultNumberOfGuests}),e.numberOfGuests===null)||(e.seatingCode&&await n.respond("newWaiterPad"),e.actionMessage&&a.message({title:s.ActionMessageLabel,caption:e.actionMessage}))};'
         );
     end;
 }

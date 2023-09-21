@@ -133,6 +133,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
     end;
@@ -491,6 +492,8 @@
                         exit('NPRE_KitchReqSeatWaiter_20230704');
                     'RefreshKitchenOrderStatus':
                         exit('NPRE_RefreshKitchenOrderStatus_20230704');
+                    'UpdateDefaultNumberOfGuests':
+                        exit('NPRE_UpdateDefaultNumberOfGuests_20230919');
                 end;
             Codeunit::"NPR Feature Flags Install":
                 case UpgradeStep of
