@@ -361,6 +361,7 @@
         VATLabel = 'VAT Specification';
         PosStoreCodeLabel = 'Store Code';
         UOMLabel = 'UOM';
+        POSUnitLabel = 'POS Unit';
     }
 
     trigger OnPreReport()
