@@ -51,12 +51,12 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'NotifyOnSuccessFalse'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddPosSaleDocumentPostingJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'CustomCUforPostInvtCostToGL'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetAutoRescedulePOSPostGL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
@@ -251,8 +251,6 @@
                         exit('AddPosSaleDocumentPostingJQ-20230802');
                     'CustomCUforPostInvtCostToGL':
                         exit('CustomCUforPostInvtCostToGL-20220530');
-                    'AutoRescheduleRetenPolicy':
-                        exit('AutoRescheduleRetenPolicy-20230509');
                     'TMRetentionJQCategory':
                         exit('TMRetentionJQCategory-20220707');
                     'AutoScheduleMembershipStatistics':
@@ -264,7 +262,9 @@
                     'SetEndingTimeForPOSPostGLJQ':
                         exit('SetEndingTimeForPOSPostGLJQ-20230809');
                     'SetManuallySetOnHold':
-                        exit('SetManuallySetOnHold-20230818')
+                        exit('SetManuallySetOnHold-20230818');
+                    'UpdateRetentionJobQueue':
+                        exit('UpdateRetentionJobQueue-20230919');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
