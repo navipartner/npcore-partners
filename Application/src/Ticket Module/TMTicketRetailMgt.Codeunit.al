@@ -114,6 +114,7 @@
                 end;
 
             until (ResultCode = 0);
+            DisplayTicketReservationRequestPhone.GetChangedTicketQuantity(NewQuantity);
 
         end else begin
             repeat
@@ -141,10 +142,10 @@
                 end;
 
             until (ResultCode = 0);
+            DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQuantity);
         end;
 
         if (HaveSalesLine) then begin
-            DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQuantity);
             SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
             SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS.Modify();
