@@ -6963,6 +6963,15 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>UOMLabel</Prompt>
     </ReportParameter>
+    <ReportParameter Name="POSUnitLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>POSUnitLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>POSUnitLabel</Prompt>
+    </ReportParameter>
     <ReportParameter Name="Picture_CompanyInformationCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -7255,7 +7264,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>45</NumberOfRows>
+      <NumberOfRows>46</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -7325,161 +7334,166 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>Picture_CompanyInformationCaption</ParameterName>
+          <ParameterName>POSUnitLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>Picture_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
+          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
+          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>18</RowIndex>
-          <ParameterName>Document_No_POS_EntryCaption</ParameterName>
+          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>19</RowIndex>
-          <ParameterName>No_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Document_No_POS_EntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>20</RowIndex>
-          <ParameterName>Description_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>No_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>21</RowIndex>
-          <ParameterName>Quantity_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Description_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>22</RowIndex>
-          <ParameterName>UOM_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Quantity_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>23</RowIndex>
-          <ParameterName>Unit_Price_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>UOM_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>24</RowIndex>
-          <ParameterName>Line_Discount_pct_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Unit_Price_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>25</RowIndex>
-          <ParameterName>Amount_Incl_VAT_POS_Entry_Sales_LineCaption</ParameterName>
+          <ParameterName>Line_Discount_pct_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>26</RowIndex>
-          <ParameterName>POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>Amount_Incl_VAT_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>27</RowIndex>
-          <ParameterName>TSSCode_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>POSEntryNo_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>28</RowIndex>
-          <ParameterName>TransactionID_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>TSSCode_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>29</RowIndex>
-          <ParameterName>StartTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>TransactionID_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>30</RowIndex>
-          <ParameterName>FinishTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>StartTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>31</RowIndex>
-          <ParameterName>SignatureCount_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>FinishTime_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>32</RowIndex>
-          <ParameterName>Signature_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>SignatureCount_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>33</RowIndex>
-          <ParameterName>SerialNumber_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
+          <ParameterName>Signature_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>34</RowIndex>
-          <ParameterName>POSPaymentMethodCode_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>SerialNumber_NPRDEPOSAuditLogAuxInfoCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>35</RowIndex>
-          <ParameterName>Description_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>POSPaymentMethodCode_POS_Payment_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>36</RowIndex>
-          <ParameterName>Amount_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>Description_POS_Payment_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>37</RowIndex>
-          <ParameterName>AmountSalesCurrency_POS_Payment_LineCaption</ParameterName>
+          <ParameterName>Amount_POS_Payment_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>38</RowIndex>
-          <ParameterName>VATIdentifier_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>AmountSalesCurrency_POS_Payment_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>39</RowIndex>
-          <ParameterName>TaxCalculationType_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>VATIdentifier_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>40</RowIndex>
-          <ParameterName>Tax_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>TaxCalculationType_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>41</RowIndex>
-          <ParameterName>Quantity_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>Tax_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>42</RowIndex>
-          <ParameterName>LineAmount_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>Quantity_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>43</RowIndex>
-          <ParameterName>TaxBaseAmount_POS_Tax_Amount_LineCaption</ParameterName>
+          <ParameterName>LineAmount_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>44</RowIndex>
+          <ParameterName>TaxBaseAmount_POS_Tax_Amount_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>45</RowIndex>
           <ParameterName>TaxAmount_POS_Tax_Amount_LineCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
