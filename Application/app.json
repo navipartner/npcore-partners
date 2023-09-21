@@ -62,5 +62,5 @@
   "features": [ "TranslationFile", "NoImplicitWith" ],
   "keyVaultUrls": ["https://npcore.vault.azure.net/"],
   "applicationInsightsKey": "c65c1bf1-dc3d-47a1-9789-f4334605dd0c",
-  "preprocessorSymbols": ["BC17","BC1700"]
+  "preprocessorSymbols": ["BC17","BC1700", "DEV_CONTAINER"]
 }
