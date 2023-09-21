@@ -38,7 +38,6 @@
         end;
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1')) then begin
-            UpdateRetenPolicyJobQueueEntry();
             AddTicketDataRetentionJobQueue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         end;
@@ -66,16 +65,11 @@
             UpdateAdjCostJobQueueTimeout();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateAdjCostJobQueueTimeout'));
         end;
+#endif
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue')) then begin
             UpdateRetentionJobQueue();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
-        end;
-#endif
-
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy')) then begin
-            AutoRescheduleRetenPolicyJobQueueEntry();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AutoRescheduleRetenPolicy'));
         end;
 
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory')) then begin
@@ -241,48 +235,6 @@
             until JobQueueEntry.Next() = 0;
     end;
 
-    local procedure UpdateRetenPolicyJobQueueEntry()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        xJobQueueEntry: Record "Job Queue Entry";
-        RecomMaxNoOfAttempts: Integer;
-        RecomRerunDelay: Integer;
-    begin
-        RecomMaxNoOfAttempts := 100;
-        RecomRerunDelay := 60;
-
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", 3997);  //Codeunit::"Retention Policy JQ"
-        if JobQueueEntry.FindSet(true) then
-            repeat
-                xJobQueueEntry := JobQueueEntry;
-                if JobQueueEntry."Maximum No. of Attempts to Run" < RecomMaxNoOfAttempts then
-                    JobQueueEntry."Maximum No. of Attempts to Run" := RecomMaxNoOfAttempts;
-                if JobQueueEntry."Rerun Delay (sec.)" > RecomRerunDelay then
-                    JobQueueEntry."Rerun Delay (sec.)" := RecomRerunDelay;
-                if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
-                    JobQueueEntry.Modify();
-            until JobQueueEntry.Next() = 0;
-    end;
-
-    local procedure AutoRescheduleRetenPolicyJobQueueEntry()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        xJobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", 3997);  //Codeunit::"Retention Policy JQ"
-        if JobQueueEntry.FindSet(true) then
-            repeat
-                xJobQueueEntry := JobQueueEntry;
-                JobQueueMgt.AutoRestartRetentionPolicyJQ(JobQueueEntry);
-                JobQueueMgt.UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
-                if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
-                    JobQueueEntry.Modify();
-            until JobQueueEntry.Next() = 0;
-    end;
-
     local procedure UpgradePOSPostingJobQueues()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -368,27 +320,26 @@
                 end;
             until JobQueueEntry.Next() = 0;
     end;
+#endif
 
     local procedure UpdateRetentionJobQueue()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        JobTimeout: Duration;
+        xJobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
-        JobTimeout := 2 * 60 * 60 * 1000;  //2 hours
-
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", 3997);  //Codeunit::"Retention Policy JQ"
         if JobQueueEntry.FindSet(true) then
             repeat
-                JobQueueEntry."Job Timeout" := JobTimeout;
-                Clear(JobQueueEntry."Next Run Date Formula");
-                JobQueueEntry."No. of Minutes between Runs" := 121;
-                JobQueueEntry."Starting Time" := 020000T;
-                JobQueueEntry."Ending Time" := 060000T;
-                JobQueueEntry.Modify();
+                xJobQueueEntry := JobQueueEntry;
+                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 0;
+                JobQueueMgt.AutoRestartRetentionPolicyJQ(JobQueueEntry);
+                JobQueueMgt.UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
+                if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
+                    JobQueueEntry.Modify();
             until JobQueueEntry.Next() = 0;
     end;
-#endif
 
     local procedure SetAutoRescedulePOSPostGL()
     var
