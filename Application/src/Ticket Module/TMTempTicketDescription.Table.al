@@ -22,7 +22,6 @@ table 6059866 "NPR TM TempTicketDescription"
             Caption = 'Admission Code';
             DataClassification = CustomerContent;
         }
-
         field(10; Title; Text[2048])
         {
             Caption = 'Title';
@@ -89,7 +88,7 @@ table 6059866 "NPR TM TempTicketDescription"
         Variant: Record "Item Variant";
         MagentoStoreItem: Record "NPR Magento Store Item";
         TempBlob: Codeunit "Temp Blob";
-        DescriptionSelector: Option ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+        DescriptionSelector: Option ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -164,7 +163,7 @@ table 6059866 "NPR TM TempTicketDescription"
                         exit(rDescription);
                     end;
                 end else begin
-                    if ((Item."NPR Magento Short Desc.".HasValue()) and (StoreCode = '') and (TicketSetup."Store Code" = '')) then begin
+                    if (Item."NPR Magento Short Desc.".HasValue()) then begin
                         TempBlob.CreateOutStream(OutStr);
                         Item."NPR Magento Short Desc.".ExportStream(OutStr);
                         TempBlob.CreateInStream(InStr);
@@ -181,13 +180,21 @@ table 6059866 "NPR TM TempTicketDescription"
                         exit(rDescription);
                     end;
                 end else begin
-                    if ((Item."NPR Magento Desc.".HasValue()) and (StoreCode = '') and (TicketSetup."Store Code" = '')) then begin
+                    if (Item."NPR Magento Desc.".HasValue()) then begin
                         TempBlob.CreateOutStream(OutStr);
                         Item."NPR Magento Desc.".ExportStream(OutStr);
                         TempBlob.CreateInStream(InStr);
                         InStr.Read(rDescription);
                         exit(rDescription);
                     end;
+                end;
+            DescriptionSelector::WEBSHOP_NAME:
+                begin
+                    if (MagentoStoreItem."Webshop Name Enabled") then
+                        exit(MagentoStoreItem."Webshop Name");
+
+                    if (not MagentoStoreItem."Webshop Name Enabled") then
+                        exit(Item."NPR Magento Name");
                 end;
         end;
 

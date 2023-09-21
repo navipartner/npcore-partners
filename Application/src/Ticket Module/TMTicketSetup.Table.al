@@ -21,36 +21,36 @@
         {
             Caption = 'Ticket Title';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
-            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank,Webshop Name';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         }
         field(76; "Ticket Name"; Option)
         {
             Caption = 'Ticket Name';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
-            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank,Webshop Name';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         }
         field(77; "Ticket Description"; Option)
         {
             Caption = 'Ticket Description';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
-            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank,Webshop Name';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         }
         field(78; "Ticket Full Description"; Option)
         {
             Caption = 'Ticket Full Description';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
-            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank,Webshop Name';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         }
         field(79; "Ticket Sub Title"; Option)
         {
             Caption = 'Ticket Sub Title';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank';
-            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK;
+            OptionCaption = 'Item Description,Admission Description,Ticket Type Description,Ticket BOM Description,Webshop Short Description,Webshop Description,Variant Description,Blank,Webshop Name';
+            OptionMembers = ITEM_DESC,ADM_DESC,TYPE_DESC,BOM_DESC,WEBSHOP_SHORT,WEBSHOP_FULL,VARIANT_DESC,BLANK,WEBSHOP_NAME;
         }
 
         field(80; "Authorization Code Scheme"; Code[20])
