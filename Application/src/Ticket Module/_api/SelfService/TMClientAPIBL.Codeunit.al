@@ -785,6 +785,7 @@ codeunit 6151543 "NPR TM Client API BL"
                             JBuilder.WriteStringProperty('admissionCode', AccessEntry."Admission Code");
                             CastToInteger := AccessEntry.Quantity;
                             JBuilder.WriteRawProperty('quantity', CastToInteger);
+                            JBuilder.WriteStringProperty('name', TicketDescription.Name);
                             JBuilder.WriteStringProperty('description', TicketDescription.Description);
 
                             DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
