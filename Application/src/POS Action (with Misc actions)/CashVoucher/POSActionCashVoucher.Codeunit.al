@@ -177,6 +177,7 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
         InvalidCommisionAmountLbl: Label 'Commision Amount is higher than Voucher Amount.';
         VoucherNotFoundErrorLbl: Label 'Voucher with Reference %1 and Voucher Type %2 is not found.', Comment = '%1 - specifies Reference No., %2 - specifies Voucher Type Code';
     begin
+        NpRvVoucher.SetAutoCalcFields(Amount);
         if not NpRvVoucherMgt.FindVoucher(VoucherType, ReferenceNo, NpRvVoucher) then
             Error(VoucherNotFoundErrorLbl, ReferenceNo, VoucherType);
 
