@@ -21,7 +21,6 @@
         {
             Caption = 'Restaurant Code';
             DataClassification = CustomerContent;
-            Description = 'NPR5.54';
             TableRelation = "NPR NPRE Restaurant";
         }
         field(10; Seatings; Integer)
@@ -56,16 +55,17 @@
         {
             Caption = 'Send by Print Category';
             DataClassification = CustomerContent;
-            Description = 'NPR5.53,NPR5.54';
+        }
+        field(50; "Default Number of Guests"; Enum "NPR NPRE Default No. of Guests")
+        {
+            Caption = 'Default Number of Guests';
+            DataClassification = CustomerContent;
         }
     }
 
     keys
     {
-        key(Key1; "Code")
-        {
-        }
-        key(Key2; "Restaurant Code")
-        { }
+        key(Key1; "Code") { }
+        key(Key2; "Restaurant Code") { }
     }
 }

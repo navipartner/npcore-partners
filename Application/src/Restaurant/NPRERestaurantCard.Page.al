@@ -34,6 +34,11 @@
                     ToolTip = 'Specifies the service flow profile, assigned to the restaurant. Service flow profiles define general restaurant servise flow options, such as at what stage waiter pads should be closed, or when seating should be cleared.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Default Number of Guests"; Rec."Default Number of Guests")
+                {
+                    ToolTip = 'Specifies the default number of guests, when a new waiter pad is created at the restaurant. <Default> means that the value is going to be inherited from restaurant setup. Please note that the value may be overriden for each seating location.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Kitchen Integration")
             {

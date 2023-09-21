@@ -40,6 +40,7 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     begin
         If Step = 'checkSeating' then begin
             BusinessLogic.CheckSeating(SeatingCode(Context));
+            Context.SetContext('defaultNumberOfGuests', BusinessLogic.GetDefaultNumberOfGuests(SeatingCode(Context)));
             Exit;
         end;
 
@@ -93,7 +94,7 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRVNewWPad.js###
-'let main=async({workflow:a,context:t,captions:e})=>{await a.respond("checkSeating");let i={caption:e.Welcome,title:e.NewWaiterpad,settings:[{type:"plusminus",id:"guests",caption:e.NumberOfGuests,minvalue:1,maxvalue:100,value:1},{type:"text",id:"tablename",caption:e.Name}]};t.waiterpadInfo=await popup.configuration(i),t.waiterpadInfo&&await a.respond()};'
+'let main=async({workflow:t,context:a,captions:e})=>{await t.respond("checkSeating");let i={caption:e.Welcome,title:e.NewWaiterpad,settings:[{type:"plusminus",id:"guests",caption:e.NumberOfGuests,minvalue:0,maxvalue:100,value:a.defaultNumberOfGuests},{type:"text",id:"tablename",caption:e.Name}]};a.waiterpadInfo=await popup.configuration(i),a.waiterpadInfo&&await t.respond()};'
         );
     end;
 }

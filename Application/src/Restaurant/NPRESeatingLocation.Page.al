@@ -53,6 +53,11 @@
                     ToolTip = 'Specifies if system should automatically create or update kitchen orders as soon as new products are saved to waiter pads.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Default Number of Guests"; Rec."Default Number of Guests")
+                {
+                    ToolTip = 'Specifies the default number of guests, when a new waiter pad is created for the seating location. <Default> means that the value is going to be inherited from restaurant the seating location belongs to.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
