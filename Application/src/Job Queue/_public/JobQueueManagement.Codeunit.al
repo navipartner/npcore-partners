@@ -621,22 +621,32 @@
            (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
         then begin
             JobQueueEntry."NPR Auto-Resched. after Error" := true;
-            if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 300 then
-                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 300;
+            JobQueueEntry."Maximum No. of Attempts to Run" := 1000;
+            JobQueueEntry."Rerun Delay (sec.)" := 60;
+            if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 60 then
+                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 60;
         end;
     end;
 
     internal procedure UpdateRetentionPolicyJQRecurrence(var JobQueueEntry: Record "Job Queue Entry")
-    var
-        NextRunDateFormula: DateFormula;
     begin
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
            (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
         then begin
-            Evaluate(NextRunDateFormula, '<1D>');
-            if JobQueueEntry."Next Run Date Formula" <> NextRunDateFormula then
-                JobQueueEntry.Validate("Next Run Date Formula", NextRunDateFormula);
+#IF NOT BC17
+            JobQueueEntry."Job Timeout" := 7 * 60 * 60 * 1000;  //7 hours
+#ENDIF
+            Clear(JobQueueEntry."Next Run Date Formula");
+            JobQueueEntry."Run on Mondays" := true;
+            JobQueueEntry."Run on Tuesdays" := true;
+            JobQueueEntry."Run on Wednesdays" := true;
+            JobQueueEntry."Run on Thursdays" := true;
+            JobQueueEntry."Run on Fridays" := true;
+            JobQueueEntry."Run on Saturdays" := true;
+            JobQueueEntry."Run on Sundays" := true;
+            JobQueueEntry.Validate("No. of Minutes between Runs", 2);
             JobQueueEntry.Validate("Starting Time", 233000T);
+            JobQueueEntry."Ending Time" := 060000T;
         end;
     end;
 
@@ -667,11 +677,17 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
     begin
         if JobQueueEntry."Maximum No. of Attempts to Run" = 3 then  //3 - default value in MS standard application
             JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
             JobQueueEntry."Rerun Delay (sec.)" := 180;
+        //Do not rescedule jobs to run after ending time
+        if JobQueueEntry."Recurring Job" and (JobQueueEntry."Ending Time" <> 0T) and (DT2Date(JobQueueEntry."Earliest Start Date/Time") <= Today()) then
+            if JobQueueEntry."Earliest Start Date/Time" > CreateDateTime(Today(), JobQueueEntry."Ending Time") then
+                JobQueueEntry."Earliest Start Date/Time" := JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time");
 
         AutoRestartRetentionPolicyJQ(JobQueueEntry);
         UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
