@@ -41,4 +41,22 @@ codeunit 6151345 "NPR POSAct. RV New WPad-B"
         Seating.Get(SeatingCode);
         Seating.TestField(Blocked, false);
     end;
+
+    procedure GetDefaultNumberOfGuests(SeatingCode: Code[20]): Integer
+    var
+        Seating: Record "NPR NPRE Seating";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+    begin
+        SetupProxy.SetSeating(SeatingCode);
+        case SetupProxy.DefaultNumberOfGuests() of
+            Enum::"NPR NPRE Default No. of Guests"::Zero:
+                exit(0);
+            Enum::"NPR NPRE Default No. of Guests"::"Min Party Size":
+                begin
+                    Seating.Get(SeatingCode);
+                    exit(Seating."Min Party Size");
+                end;
+        end;
+        exit(1);
+    end;
 }

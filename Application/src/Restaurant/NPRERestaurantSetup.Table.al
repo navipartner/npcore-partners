@@ -328,13 +328,18 @@
                     Validate("Go to POS Action");
             end;
         }
+        field(160; "Default Number of Guests"; Enum "NPR NPRE Default No. of Guests")
+        {
+            Caption = 'Default Number of Guests';
+            DataClassification = CustomerContent;
+            InitValue = One;
+            ValuesAllowed = Zero, One, "Min Party Size";
+        }
     }
 
     keys
     {
-        key(Key1; "Code")
-        {
-        }
+        key(Key1; "Code") { }
     }
 
     trigger OnInsert()
