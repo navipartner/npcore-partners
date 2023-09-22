@@ -508,9 +508,9 @@ codeunit 6151077 "NPR Total Discount Management"
                                       TempNPRTotalDiscountBenefit."Step Amount");
     end;
 
-    local procedure CleanUpUnrelevantBenefitItems(SalePOS: Record "NPR POS Sale";
-                                                  TotalDiscountCode: Code[20];
-                                                  TotalDiscountStepAmount: Decimal)
+    internal procedure CleanUpUnrelevantBenefitItems(SalePOS: Record "NPR POS Sale";
+                                                     TotalDiscountCode: Code[20];
+                                                     TotalDiscountStepAmount: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -605,10 +605,7 @@ codeunit 6151077 "NPR Total Discount Management"
                                                                 SaleLinePOS."VAT %",
                                                                 GeneralLedgerSetup."Amount Rounding Precision");
                 end;
-            SaleLinePOS."Total Discount Amount" := 0;
-            SaleLinePOS."Total Discount Code" := '';
-            SaleLinePOS."Total Discount Step" := 0;
-            SaleLinePOS."Disc. Amt. Without Total Disc." := 0;
+            ClearTotalDiscountFromSaleLine(SaleLinePOS);
             SaleLinePOS.Modify()
         until SaleLinePOS.Next() = 0;
 
@@ -1388,6 +1385,83 @@ codeunit 6151077 "NPR Total Discount Management"
             CheckDiscountPriority(Rec);
     end;
 
+    internal procedure ClearTotalDiscountFromSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        SaleLinePOS."Total Discount Amount" := 0;
+        SaleLinePOS."Total Discount Code" := '';
+        SaleLinePOS."Total Discount Step" := 0;
+        SaleLinePOS."Disc. Amt. Without Total Disc." := 0;
+    end;
+
+    internal procedure CleanTotalDiscountFromSale(SalePOS: Record "NPR POS Sale"; CurrSaleLine: Record "NPR POS Sale Line")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LineDiscountAmountWithVAT: Decimal;
+        LineAmountWithVAT: Decimal;
+        LineAmountWithoutDiscountVAT: Decimal;
+        LineDiscountPercent: Decimal;
+    begin
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetFilter("Total Discount Code", '<>%1', '');
+        SaleLinePOS.SetRange("Benefit Item", true);
+        if not SaleLinePOS.IsEmpty then
+            SaleLinePOS.DeleteAll(true);
+
+        SaleLinePOS.SetRange("Benefit Item");
+        if not SaleLinePOS.FindSet(true) then
+            exit;
+
+        repeat
+            if CurrSaleLine.RecordId <> SaleLinePOS.RecordId then begin
+                LineAmountWithoutDiscountVAT := UnitPriceIncludingVAT(SaleLinePOS) * SaleLinePOS.Quantity;
+
+                LineDiscountPercent := 0;
+
+                LineDiscountAmountWithVAT := SaleLinePOS."Disc. Amt. Without Total Disc.";
+                if not SaleLinePOS."Price Includes VAT" then
+                    LineDiscountAmountWithVAT := CalcAmountWithVAT(LineDiscountAmountWithVAT, SaleLinePOS."VAT %", 0);
+
+                if LineAmountWithoutDiscountVAT <> 0 then
+                    LineDiscountPercent := LineDiscountAmountWithVAT / LineAmountWithoutDiscountVAT * 100;
+
+
+                LineAmountWithVAT := LineAmountWithoutDiscountVAT - LineDiscountAmountWithVAT;
+
+                if not SaleLinePOS."Price Includes VAT" then
+                    SaleLinePOS."Discount Amount" := CalcAmountWithoutVAT(LineDiscountAmountWithVAT, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")
+                else
+                    SaleLinePOS."Discount Amount" := LineDiscountAmountWithVAT;
+
+                SaleLinePOS."Discount %" := Round(LineDiscountPercent, GeneralLedgerSetup."Amount Rounding Precision");
+
+                SaleLinePOS."Amount Including VAT" := Round(LineAmountWithVAT, GeneralLedgerSetup."Amount Rounding Precision");
+
+                SaleLinePOS.Amount := CalcAmountWithoutVAT(SaleLinePOS."Amount Including VAT", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+            end;
+
+            ClearTotalDiscountFromSaleLine(SaleLinePOS);
+            SaleLinePOS.Modify()
+        until SaleLinePOS.Next() = 0;
+
+    end;
+
+    internal procedure TestBenefitItem(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        BenefitItemErrorLbl: Label 'You cannot edit a benefit item line.';
+    begin
+        if not SaleLinePOS."Benefit Item" then
+            exit;
+
+        Error(BenefitItemErrorLbl);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority";
                                     SalePOS: Record "NPR POS Sale";
@@ -1423,15 +1497,11 @@ codeunit 6151077 "NPR Total Discount Management"
     local procedure OnAfterValidateQuantity(var Rec: Record "NPR POS Sale Line";
                                             var xRec: Record "NPR POS Sale Line";
                                             RunTrigger: Boolean)
-    var
-        BenefitItemErrorLbl: Label 'You cannot edit a benefit item line.';
     begin
         if not RunTrigger then
             exit;
 
-        if Rec."Benefit Item" then
-            Error(BenefitItemErrorLbl);
-
+        TestBenefitItem(Rec);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnBeforeInsertPOSSalesLine', '', true, true)]
@@ -1489,10 +1559,10 @@ codeunit 6151077 "NPR Total Discount Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
-    local procedure OnFindActiveSaleLineTotalDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary;
-                                                       Rec: Record "NPR POS Sale Line";
-                                                       xRec: Record "NPR POS Sale Line";
-                                                       LineOperation: Option)
+    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary;
+                                                  Rec: Record "NPR POS Sale Line";
+                                                  xRec: Record "NPR POS Sale Line";
+                                                  LineOperation: Option Insert,Modify,Delete,Total)
     var
         DiscountPriority: Record "NPR Discount Priority";
         NPRTotalDiscountHeader: Record "NPR Total Discount Header";
@@ -1504,6 +1574,11 @@ codeunit 6151077 "NPR Total Discount Management"
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
+        if LineOperation = LineOperation::Total then begin
+            tmpDiscountPriority.Reset();
+            if not tmpDiscountPriority.IsEmpty then
+                tmpDiscountPriority.DeleteAll();
+        end;
 
         FilterActiveTotalDiscountHeaders(NPRTotalDiscountHeader,
                                          Today);
