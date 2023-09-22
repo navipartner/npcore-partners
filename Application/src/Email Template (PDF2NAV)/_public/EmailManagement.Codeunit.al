@@ -424,9 +424,12 @@
                 exit('');
             end;
         end else begin
-            if Silent then
-                exit(CopyStr(TempErrorMessage.ToString(), 1, MaxStrLen(ErrorMessage)))
-            else
+            if Silent then begin
+                ErrorMessage := CopyStr(TempErrorMessage.ToString(), 1, MaxStrLen(ErrorMessage));
+                if ErrorMessage <> '' then
+                    exit(ErrorMessage);
+                exit(FindErrors(TempErrorMessage));
+            end else
                 TempErrorMessage.ShowErrors();
         end;
     end;
@@ -868,6 +871,24 @@
     begin
         MailAdrSeparators.Add(';');
         MailAdrSeparators.Add(',');
+    end;
+
+    local procedure FindErrors(var TempErrorMessage: Record "Error Message" temporary): Text[1024]
+    var
+        ErrorString: Text;
+    begin
+        TempErrorMessage.Reset();
+        if TempErrorMessage.FindSet() then
+            repeat
+                if ErrorString <> '' then
+                    ErrorString += '\';
+#if (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+                ErrorString += Format(TempErrorMessage."Message Type") + ': ' + TempErrorMessage."Description";
+#else
+                ErrorString += Format(TempErrorMessage."Message Type") + ': ' + TempErrorMessage."Message";
+#endif
+            until TempErrorMessage.Next() = 0;
+        exit(CopyStr(ErrorString, 1, 1024));
     end;
 
     [IntegrationEvent(false, false)]
