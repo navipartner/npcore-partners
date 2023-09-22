@@ -347,6 +347,7 @@
     internal procedure SetupTempSalesLines(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SetupLinesForTotalDiscount: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
         if not TempSaleLinePOS.IsTemporary() then
             exit;
@@ -370,9 +371,7 @@
                     TempSaleLinePOS."Discount Code" := '';
                     TempSaleLinePOS."Discount %" := 0;
                     TempSaleLinePOS."Discount Amount" := 0;
-                    TempSaleLinePOS."Total Discount Amount" := 0;
-                    TempSaleLinePOS."Total Discount Code" := '';
-                    TempSaleLinePOS."Total Discount Step" := 0;
+                    TotalDiscountManagement.ClearTotalDiscountFromSaleLine(TempSaleLinePOS);
                     TempSaleLinePOS."MR Anvendt antal" := 0;
                     TempSaleLinePOS."Custom Disc Blocked" := false;
                 end;

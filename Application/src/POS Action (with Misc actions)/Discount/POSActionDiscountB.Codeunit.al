@@ -230,8 +230,9 @@
 
     local procedure ApplyDiscountOnLine(var SaleLinePOS: Record "NPR POS Sale Line"; DiscountType: Option DiscountAmt,DiscountPct,LineAmt; InputValue: Decimal; SkipAjmts: Boolean)
     var
+        SalePOS: Record "NPR POS Sale";
         xSaleLine: Record "NPR POS Sale Line";
-        NPRPOSSalesDiscCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
         if SaleLinePOS."Custom Disc Blocked" then
             exit;
@@ -272,9 +273,11 @@
         ApplyAdditionalParams(SaleLinePOS);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if Format(xSaleLine) <> Format(SaleLinePOS) then begin
+            TotalDiscountManagement.TestBenefitItem(SaleLinePOS);
             SaleLinePOS.Modify();
-            NPRPOSSalesDiscCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS,
-                                                            xSaleLine);
+
+            SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+            TotalDiscountManagement.CleanTotalDiscountFromSale(SalePOS, SaleLinePOS);
         end;
     end;
 
