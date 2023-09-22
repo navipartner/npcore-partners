@@ -821,7 +821,7 @@
                 }
                 field(PhoneNo3; Rec."Phone No.")
                 {
-                    ShowMandatory = true;
+                    ShowMandatory = _ShowAzureSection;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
