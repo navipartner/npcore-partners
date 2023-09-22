@@ -315,7 +315,14 @@
         POSUnit: Record "NPR POS Unit";
         AwardPoints: Boolean;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
+        CreatePointEntry: Boolean;
     begin
+
+        CreatePointEntry := true;
+        MembershipEvents.OnBeforeCreatePointEntry(ValueEntry, LoyaltyPostingSource, POSUnitNo, CreatePointEntry);
+        if (not CreatePointEntry) then
+            exit(false);
 
         if (ValueEntry."Item Ledger Entry Type" <> ValueEntry."Item Ledger Entry Type"::Sale) then
             exit(false);
