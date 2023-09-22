@@ -82,4 +82,10 @@
     internal procedure OnAfterBlockMember(MemberEntryNo: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCreatePointEntry(var ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option VALUE_ENTRY,MEMBERSHIP_ENTRY,POS_ENDOFSALE; var POSUnitNo: Code[10]; var CreatePointEntry: Boolean)
+    begin
+    end;
+
 }
