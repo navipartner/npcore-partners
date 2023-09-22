@@ -547,15 +547,17 @@
 
                     trigger OnAction()
                     var
+                        NpCsDocument: Record "NPR NpCs Document";
                         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
                         ConfirmAndPrintQst: Label 'Do you want to confirm and print order %1?', Comment = '%1 = Document no.';
                     begin
                         if not Confirm(ConfirmAndPrintQst, true, Rec."Document No.") then
                             exit;
 
-                        Rec.SetRange("Delivery Status");
+                        if not NpCsDocument.Get(Rec."Entry No.") then
+                            exit;
 
-                        NpCsCollectMgt.ConfirmAndPrintOrder(Rec);
+                        NpCsCollectMgt.ConfirmAndPrintOrder(NpCsDocument);
                     end;
                 }
                 action("Reject Order")
