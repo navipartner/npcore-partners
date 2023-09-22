@@ -19,7 +19,8 @@ codeunit 6151537 "NPR TM Client API"
         JObject: JsonObject;
         RequestArray: JsonArray;
     begin
-        Request.Get(Method, JToken);
+        if (not Request.Get(Method, JToken)) then
+            Error('Request does not contain an object matching the method name: [%1]', Method);
 
         case true of
             JToken.IsObject():

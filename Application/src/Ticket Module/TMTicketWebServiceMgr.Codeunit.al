@@ -830,6 +830,9 @@
         if TMTicketAdmissionBOM."Admission Inclusion" <> TMTicketAdmissionBOM."Admission Inclusion"::REQUIRED then
             TicketReservationRequest."Admission Inclusion" := TicketReservationRequest."Admission Inclusion"::SELECTED;
 
+        if ((TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::SELECTED) and (TicketReservationRequest.Quantity = 0)) then
+            TicketReservationRequest."Admission Inclusion" := TicketReservationRequest."Admission Inclusion"::NOT_SELECTED;
+
         Evaluate(TicketReservationRequest."External Adm. Sch. Entry No.", NpXmlDomMgt.GetXmlAttributeText(Element, 'admission_schedule_entry', false));
 
         TicketReservationRequest."Waiting List Reference Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'waitinglist_reference_code', false), 1, MaxStrLen(TicketReservationRequest."Waiting List Reference Code"));
