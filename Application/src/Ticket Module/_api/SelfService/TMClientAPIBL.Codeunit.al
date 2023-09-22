@@ -473,9 +473,14 @@ codeunit 6151543 "NPR TM Client API BL"
 
             TicketRequest.Default := TicketBOM.Default;
             TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion";
+            if (TicketBOM."Admission Inclusion" <> TicketBOM."Admission Inclusion"::REQUIRED) then
+                TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::SELECTED;
+
+            if ((TicketRequest."Admission Inclusion" = TicketBOM."Admission Inclusion"::SELECTED) and (TicketRequest.Quantity = 0)) then
+                TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::NOT_SELECTED;
+
             TicketRequest."Admission Description" := Admission.Description;
             TicketRequest.Insert();
-
         end;
 
         ExternalId.Add(TicketRequest."Ext. Line Reference No.");

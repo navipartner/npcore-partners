@@ -81,4 +81,15 @@ Company: {{companyId}}
     "lastServerId": ""
 }
 
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.MakeTicketReservation",
+    "parameters": "{\"_dragonglassResponseContext\":{\"invocationId\":\"{{$guid}}\",\"method\":\"NPRetail.TM.MakeTicketReservation\"},\"NPRetail.TM.MakeTicketReservationx\":[{\"token\":\"\",\"lines\":[{\"itemReference\":\"31100\",\"admissionCode\":\"CASTLE\",\"quantity\":1,\"scheduleId\":13427,\"memberNumber\":\"\",\"notificationAddress\":\"\"},{\"itemReference\":\"31100\",\"admissionCode\":\"OPTIONAL2\",\"quantity\":0,\"scheduleId\":32508,\"memberNumber\":\"\",\"notificationAddress\":\"\"}]}]}",
+    "lastServerId": ""
+}
  
