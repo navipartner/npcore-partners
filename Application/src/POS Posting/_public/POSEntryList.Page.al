@@ -67,7 +67,6 @@
                 {
                     ToolTip = 'Specifies POS unit number that has been used for processing this transaction.';
                     ApplicationArea = NPRRetail;
-                    Visible = not _IsSimpleView;
                 }
                 field("POS Period Register No."; Rec."POS Period Register No.")
                 {
