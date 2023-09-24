@@ -161,6 +161,49 @@
     local procedure CreateRecipients(MembershipNotification: Record "NPR MM Membership Notific.")
     var
         MembershipRole: Record "NPR MM Membership Role";
+        HaveNotificationAddress: Boolean;
+        NotificationMethod: Option;
+        NotificationAddress: Text[100];
+        NotificationEngine: Option;
+    begin
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+
+        if (MembershipNotification."Member Entry No." <> 0) then begin
+            MembershipRole.SetFilter("Member Entry No.", '=%1', MembershipNotification."Member Entry No.");
+        end else begin
+            if (MembershipNotification."Target Member Role" <> MembershipNotification."Target Member Role"::ALL_MEMBERS) then
+                MembershipRole.SetFilter("Member Role", '=%1|=%2', MembershipRole."Member Role"::ADMIN, MembershipRole."Member Role"::GUARDIAN);
+        end;
+
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                HaveNotificationAddress := false;
+
+                case (MembershipRole."Member Role") of
+                    MembershipRole."Member Role"::ADMIN:
+                        HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                    MembershipRole."Member Role"::MEMBER:
+                        HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                    MembershipRole."Member Role"::DEPENDENT:
+                        if (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::ALL_MEMBERS) then
+                            HaveNotificationAddress := GetGuardianNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                    MembershipRole."Member Role"::GUARDIAN:
+                        if (MembershipNotification."Target Member Role" in [MembershipNotification."Target Member Role"::ALL_ADMINS, MembershipNotification."Target Member Role"::FIRST_ADMIN]) then
+                            HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                end;
+
+                if (HaveNotificationAddress) then
+                    CreateNotificationEntry(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+
+            until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
+        end;
+    end;
+
+    local procedure CreateNotificationEntry(MembershipNotification: Record "NPR MM Membership Notific."; MembershipEntryNo: Integer; MemberEntryNo: Integer; NotificationMethod: Option; NotificationAddress: Text[100]; NotificationEngine: Option): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
@@ -174,193 +217,211 @@
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
         AzureLog: Record "NPR MM AzureMemberUpdateLog";
         Base64: Codeunit "Base64 Convert";
-        Method: Code[10];
         EMailLbl: Label '%1?email=%2', Locked = true;
         MemberInfoJson: JsonObject;
         MemberInfoText: Text;
     begin
-
         NotificationSetup.Get(MembershipNotification."Notification Code");
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
-        MembershipRole.SetFilter(Blocked, '=%1', false);
-        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+        MembershipRole.Get(MembershipEntryNo, MemberEntryNo);
+        Membership.Get(MembershipRole."Membership Entry No.");
+        Member.Get(MembershipRole."Member Entry No.");
 
-        if (MembershipNotification."Member Entry No." <> 0) then begin
-            MembershipRole.SetFilter("Member Entry No.", '=%1', MembershipNotification."Member Entry No.");
-        end else begin
-            if (MembershipNotification."Target Member Role" <> MembershipNotification."Target Member Role"::ALL_MEMBERS) then
-                MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
+        MembershipRole.CalcFields("Membership Code", "External Membership No.");
+
+        if (Member.Blocked) then
+            exit(false);
+
+        if (MemberNotificationEntry.Get(MembershipNotification."Entry No.", Member."Entry No.")) then begin
+            if ((not MemberNotificationEntry.Blocked) or
+                (not (MemberNotificationEntry."Notification Send Status" = MemberNotificationEntry."Notification Send Status"::SENT))) then
+                MemberNotificationEntry.Delete();
         end;
 
-        if (MembershipRole.FindSet()) then begin
-            repeat
-                MembershipRole.CalcFields("Membership Code", "External Membership No.");
-                Member.Get(MembershipRole."Member Entry No.");
+        MemberNotificationEntry.Init();
+        MemberNotificationEntry.TransferFields(MembershipNotification, true);
 
-                Membership.Get(MembershipRole."Membership Entry No.");
+        MemberNotificationEntry."Auto-Renew" := Membership."Auto-Renew";
+        MemberNotificationEntry."Auto-Renew External Data" := Membership."Auto-Renew External Data";
+        MemberNotificationEntry."Auto-Renew Payment Method Code" := Membership."Auto-Renew Payment Method Code";
+        MemberNotificationEntry."Customer No." := Membership."Customer No.";
 
-                if (not Member.Blocked) then begin
-                    if (MemberNotificationEntry.Get(MembershipNotification."Entry No.", Member."Entry No.")) then begin
-                        if ((not MemberNotificationEntry.Blocked) or
-                            (not (MemberNotificationEntry."Notification Send Status" = MemberNotificationEntry."Notification Send Status"::SENT))) then
-                            MemberNotificationEntry.Delete();
-                    end;
+        MemberNotificationEntry."Member Entry No." := Member."Entry No.";
+        MemberNotificationEntry."External Member No." := Member."External Member No.";
+        MemberNotificationEntry."E-Mail Address" := Member."E-Mail Address";
+        MemberNotificationEntry."First Name" := Member."First Name";
+        MemberNotificationEntry."Middle Name" := Member."Middle Name";
+        MemberNotificationEntry."Last Name" := Member."Last Name";
+        MemberNotificationEntry."Display Name" := Member."Display Name";
+        MemberNotificationEntry.Address := Member.Address;
+        MemberNotificationEntry."Post Code Code" := Member."Post Code Code";
+        MemberNotificationEntry.City := Member.City;
+        MemberNotificationEntry."Country Code" := Member."Country Code";
+        MemberNotificationEntry.Country := Member.Country;
+        MemberNotificationEntry.Birthday := Member.Birthday;
+        MemberNotificationEntry."Phone No." := Member."Phone No.";
 
-                    MemberNotificationEntry.Init();
-                    MemberNotificationEntry.TransferFields(MembershipNotification, true);
+        MemberNotificationEntry."Contact No." := MembershipRole."Contact No.";
+        MemberNotificationEntry."Community Code" := MembershipRole."Community Code";
+        MemberNotificationEntry."Membership Code" := MembershipRole."Membership Code";
+        MemberNotificationEntry."External Membership No." := MembershipRole."External Membership No.";
 
-                    MemberNotificationEntry."Auto-Renew" := Membership."Auto-Renew";
-                    MemberNotificationEntry."Auto-Renew External Data" := Membership."Auto-Renew External Data";
-                    MemberNotificationEntry."Auto-Renew Payment Method Code" := Membership."Auto-Renew Payment Method Code";
-                    MemberNotificationEntry."Customer No." := Membership."Customer No.";
+        if (MemberCommunity.Get(MemberNotificationEntry."Community Code")) then
+            MemberNotificationEntry."Community Description" := MemberCommunity.Description;
 
-                    MemberNotificationEntry."Member Entry No." := Member."Entry No.";
-                    MemberNotificationEntry."External Member No." := Member."External Member No.";
-                    MemberNotificationEntry."E-Mail Address" := Member."E-Mail Address";
-                    MemberNotificationEntry."First Name" := Member."First Name";
-                    MemberNotificationEntry."Middle Name" := Member."Middle Name";
-                    MemberNotificationEntry."Last Name" := Member."Last Name";
-                    MemberNotificationEntry."Display Name" := Member."Display Name";
-                    MemberNotificationEntry.Address := Member.Address;
-                    MemberNotificationEntry."Post Code Code" := Member."Post Code Code";
-                    MemberNotificationEntry.City := Member.City;
-                    MemberNotificationEntry."Country Code" := Member."Country Code";
-                    MemberNotificationEntry.Country := Member.Country;
-                    MemberNotificationEntry.Birthday := Member.Birthday;
-                    MemberNotificationEntry."Phone No." := Member."Phone No.";
+        if (MembershipSetup.Get(MemberNotificationEntry."Membership Code")) then
+            MemberNotificationEntry."Membership Description" := MembershipSetup.Description;
 
-                    MemberNotificationEntry."Contact No." := MembershipRole."Contact No.";
-                    MemberNotificationEntry."Community Code" := MembershipRole."Community Code";
-                    MemberNotificationEntry."Membership Code" := MembershipRole."Membership Code";
-                    MemberNotificationEntry."External Membership No." := MembershipRole."External Membership No.";
+        if (MembershipNotification."Member Card Entry No." = 0) then begin
+            MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
+            MemberCard.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
+            MemberCard.SetFilter(Blocked, '=%1', false);
+        end else begin
+            MemberCard.SetFilter("Entry No.", '=%1', MembershipNotification."Member Card Entry No.");
+        end;
 
-                    if (MemberCommunity.Get(MemberNotificationEntry."Community Code")) then
-                        MemberNotificationEntry."Community Description" := MemberCommunity.Description;
+        if (MemberCard.FindLast()) then begin
+            MemberNotificationEntry."External Member Card No." := MemberCard."External Card No.";
+            MemberNotificationEntry."Pin Code" := MemberCard."Pin Code";
+            MemberNotificationEntry."Card Valid Until" := MemberCard."Valid Until";
+        end;
 
-                    if (MembershipSetup.Get(MemberNotificationEntry."Membership Code")) then
-                        MemberNotificationEntry."Membership Description" := MembershipSetup.Description;
+        MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
+          MemberNotificationEntry."Membership Valid From",
+          MemberNotificationEntry."Membership Valid Until");
 
-                    if (MembershipNotification."Member Card Entry No." = 0) then begin
-                        MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
-                        MemberCard.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
-                        MemberCard.SetFilter(Blocked, '=%1', false);
-                    end else begin
-                        MemberCard.SetFilter("Entry No.", '=%1', MembershipNotification."Member Card Entry No.");
-                    end;
+        MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
+          MemberNotificationEntry."Membership Consecutive From",
+          MemberNotificationEntry."Membership Consecutive Until");
 
-                    if (MemberCard.FindLast()) then begin
-                        MemberNotificationEntry."External Member Card No." := MemberCard."External Card No.";
-                        MemberNotificationEntry."Pin Code" := MemberCard."Pin Code";
-                        MemberNotificationEntry."Card Valid Until" := MemberCard."Valid Until";
-                    end;
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter(Blocked, '=%1', false);
+        MembershipEntry.SetFilter("Valid From Date", '=%1', MemberNotificationEntry."Membership Valid From");
+        MembershipEntry.SetFilter("Valid Until Date", '=%1', MemberNotificationEntry."Membership Valid Until");
+        if (not MembershipEntry.FindLast()) then
+            MembershipEntry.Init();
+        MemberNotificationEntry."Item No." := MembershipEntry."Item No.";
 
-                    MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
-                      MemberNotificationEntry."Membership Valid From",
-                      MemberNotificationEntry."Membership Valid Until");
+        if (MemberNotificationEntry."Card Valid Until" = 0D) then
+            MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
 
-                    MembershipManagement.GetConsecutiveTimeFrame(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
-                      MemberNotificationEntry."Membership Consecutive From",
-                      MemberNotificationEntry."Membership Consecutive Until");
+        // Engine, Method and Address
+        MemberNotificationEntry."Notification Engine" := NotificationEngine;
+        MemberNotificationEntry."Notification Method" := NotificationMethod;
+        MemberNotificationEntry.Address := NotificationAddress;
 
-                    MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
-                    MembershipEntry.SetFilter(Blocked, '=%1', false);
-                    MembershipEntry.SetFilter("Valid From Date", '=%1', MemberNotificationEntry."Membership Valid From");
-                    MembershipEntry.SetFilter("Valid Until Date", '=%1', MemberNotificationEntry."Membership Valid Until");
-                    if (not MembershipEntry.FindLast()) then
-                        MembershipEntry.Init();
-                    MemberNotificationEntry."Item No." := MembershipEntry."Item No.";
+        if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
+            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
 
-                    if (MemberNotificationEntry."Card Valid Until" = 0D) then
-                        MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
+        MemberNotificationEntry."Include NP Pass" := ((MembershipSetup."Enable NP Pass Integration") and (MembershipNotification."Include NP Pass"));
 
-                    case MemberNotificationEntry."Notification Trigger" of
-                        MemberNotificationEntry."Notification Trigger"::WELCOME:
-                            MembershipManagement.GetCommunicationMethod_Welcome(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
-                        MemberNotificationEntry."Notification Trigger"::RENEWAL:
-                            MembershipManagement.GetCommunicationMethod_Renew(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
-                        MemberNotificationEntry."Notification Trigger"::WALLET_CREATE:
-                            MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
-                        MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE:
-                            MembershipManagement.GetCommunicationMethod_MemberCard(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
-                        MemberNotificationEntry."Notification Trigger"::COUPON:
-                            MembershipManagement.GetCommunicationMethod_Coupon(MemberNotificationEntry."Member Entry No.", MemberNotificationEntry."Membership Entry No.", Method, MemberNotificationEntry.Address, MemberNotificationEntry."Notification Engine");
-                    end;
+        MembershipRole."Notification Token" := GenerateNotificationToken();
+        MembershipRole.Modify();
+        MemberNotificationEntry."Notification Token" := MembershipRole."Notification Token";
 
-                    case Method of
-                        'SMS':
-                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-                        'W-SMS':
-                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-                        'EMAIL':
-                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-                        'W-EMAIL':
-                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-                        else
-                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
-                    end;
+        MemberNotificationEntry."Magento Get Password URL" := NotificationSetup."Fallback Magento PW URL";
+        if (Member."E-Mail Address" <> '') then
+            MemberNotificationEntry."Magento Get Password URL" := StrSubstNo(EMailLbl, NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
 
-                    if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
-                        MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
+        if (NotificationSetup."Generate Magento PW URL") then
+            RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
 
-                    MemberNotificationEntry."Include NP Pass" := ((MembershipSetup."Enable NP Pass Integration") and (MembershipNotification."Include NP Pass"));
+        if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::COUPON) then begin
+            if (not Coupon.Get(MembershipNotification."Coupon No.")) then
+                Coupon.Init();
+            MemberNotificationEntry."Coupon Reference No." := Coupon."Reference No.";
+            MemberNotificationEntry."Coupon Description" := Coupon.Description;
+            MemberNotificationEntry."Coupon Discount %" := Coupon."Discount %";
+            MemberNotificationEntry."Coupon Discount Amount" := Coupon."Discount Amount";
+            MemberNotificationEntry."Coupon Discount Type" := Coupon."Discount Type";
+            MemberNotificationEntry."Coupon Ending Date" := Coupon."Ending Date";
+            MemberNotificationEntry."Coupon Starting Date" := Coupon."Starting Date";
+        end;
 
-                    MembershipRole."Notification Token" := GenerateNotificationToken();
-                    MembershipRole.Modify();
-                    MemberNotificationEntry."Notification Token" := MembershipRole."Notification Token";
+        // Azure Member SignUp
+        if (MembershipNotification.AzureRegistrationSetupCode <> '') then begin
+            if (AzureRegistrationSetup.Get(MembershipNotification.AzureRegistrationSetupCode)) then begin
+                MemberNotificationEntry.DataSubjectId := MembershipRole."GDPR Data Subject Id";
+                MemberNotificationEntry.AzureRegistrationSetupCode := MembershipNotification.AzureRegistrationSetupCode;
 
-                    MemberNotificationEntry."Magento Get Password URL" := NotificationSetup."Fallback Magento PW URL";
-                    if (Member."E-Mail Address" <> '') then
-                        MemberNotificationEntry."Magento Get Password URL" := StrSubstNo(EMailLbl, NotificationSetup."Fallback Magento PW URL", Member."E-Mail Address");
+                MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
 
-                    if (NotificationSetup."Generate Magento PW URL") then
-                        RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
+                MemberInfoJson.Add('firstName', Member."First Name");
+                MemberInfoJson.Add('phoneNumber', Member."Phone No.");
+                MemberInfoJson.Add('tos', AzureRegistrationSetup.TermsOfServiceUrl);
+                MemberInfoJson.WriteTo(MemberInfoText);
+                MemberInfoText := Base64.ToBase64(MemberInfoText);
 
-                    if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::COUPON) then begin
-                        if (not Coupon.Get(MembershipNotification."Coupon No.")) then
-                            Coupon.Init();
-                        MemberNotificationEntry."Coupon Reference No." := Coupon."Reference No.";
-                        MemberNotificationEntry."Coupon Description" := Coupon.Description;
-                        MemberNotificationEntry."Coupon Discount %" := Coupon."Discount %";
-                        MemberNotificationEntry."Coupon Discount Amount" := Coupon."Discount Amount";
-                        MemberNotificationEntry."Coupon Discount Type" := Coupon."Discount Type";
-                        MemberNotificationEntry."Coupon Ending Date" := Coupon."Ending Date";
-                        MemberNotificationEntry."Coupon Starting Date" := Coupon."Starting Date";
-                    end;
+                MemberNotificationEntry.ClientSignUpUrl := CopyStr(
+                        StrSubstNo('%1?PartitionKey=%2&RowKey=%3&data=%4',
+                            AzureRegistrationSetup.MemberRegistrationUrl, AzureRegistrationSetup.QueueName,
+                            MembershipRole."GDPR Data Subject Id", MemberInfoText),
+                        1, MaxStrLen(MemberNotificationEntry.ClientSignUpUrl));
+                if (MemberNotificationEntry."Notification Method" = MemberNotificationEntry."Notification Method"::SMS) then
+                    MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.SMSTemplate;
 
-                    // Azure Member SignUp
-                    if (MembershipNotification.AzureRegistrationSetupCode <> '') then begin
-                        if (AzureRegistrationSetup.Get(MembershipNotification.AzureRegistrationSetupCode)) then begin
-                            MemberNotificationEntry.DataSubjectId := MembershipRole."GDPR Data Subject Id";
-                            MemberNotificationEntry.AzureRegistrationSetupCode := MembershipNotification.AzureRegistrationSetupCode;
+                AzureLog.SetupCode := MembershipNotification.AzureRegistrationSetupCode;
+                AzureLog.DataSubjectId := MemberNotificationEntry.DataSubjectId;
+                AzureLog.NotificationAddress := Member."Phone No.";
+                AzureLog.RequestCreated := CurrentDateTime();
+                AzureLog.Insert();
+            end;
+        end;
 
-                            MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.EmailTemplate;
+        if (not MemberNotificationEntry.Insert()) then
+            exit(false);
 
-                            MemberInfoJson.Add('firstName', Member."First Name");
-                            MemberInfoJson.Add('phoneNumber', Member."Phone No.");
-                            MemberInfoJson.Add('tos', AzureRegistrationSetup.TermsOfServiceUrl);
-                            MemberInfoJson.WriteTo(MemberInfoText);
-                            MemberInfoText := Base64.ToBase64(MemberInfoText);
+        exit(true);
+    end;
 
-                            MemberNotificationEntry.ClientSignUpUrl := CopyStr(
-                                    StrSubstNo('%1?PartitionKey=%2&RowKey=%3&data=%4',
-                                        AzureRegistrationSetup.MemberRegistrationUrl, AzureRegistrationSetup.QueueName,
-                                        MembershipRole."GDPR Data Subject Id", MemberInfoText),
-                                    1, MaxStrLen(MemberNotificationEntry.ClientSignUpUrl));
-                            if (MemberNotificationEntry."Notification Method" = MemberNotificationEntry."Notification Method"::SMS) then
-                                MemberNotificationEntry."Template Filter Value" := AzureRegistrationSetup.SMSTemplate;
+    local procedure GetGuardianNotificationAddress(MembershipNotification: Record "NPR MM Membership Notific."; MembershipEntryNo: Integer; var NotificationMethod: Option; var NotificationAddress: Text[100]; var NotificationEngine: Option): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Member: Record "NPR MM Member";
+    begin
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
+        if (not MembershipRole.FindSet()) then
+            exit(false);
 
-                            AzureLog.SetupCode := MembershipNotification.AzureRegistrationSetupCode;
-                            AzureLog.DataSubjectId := MemberNotificationEntry.DataSubjectId;
-                            AzureLog.NotificationAddress := Member."Phone No.";
-                            AzureLog.RequestCreated := CurrentDateTime();
-                            AzureLog.Insert();
-                        end;
-                    end;
+        repeat
+            if (Member.Get(MembershipRole."Member Entry No.")) then
+                if (not Member.Blocked) then
+                    exit(GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine));
+        until (MembershipRole.Next() = 0);
+        exit(false);
+    end;
 
-                    if (MemberNotificationEntry.Insert()) then;
-                end;
-            until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
+    local procedure GetMemberNotificationAddress(MembershipNotification: Record "NPR MM Membership Notific."; MembershipEntryNo: Integer; MemberEntryNo: Integer; var NotificationMethod: Option; var NotificationAddress: Text[100]; var NotificationEngine: Option) FoundAddress: Boolean
+    var
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        Method: Code[10];
+    begin
+        case (MembershipNotification."Notification Trigger") of
+            MembershipNotification."Notification Trigger"::WELCOME:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_Welcome(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::RENEWAL:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_Renew(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::WALLET_CREATE:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_MemberCard(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::WALLET_UPDATE:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_MemberCard(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::COUPON:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_Coupon(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+        end;
+
+        case Method of
+            'SMS':
+                NotificationMethod := MemberNotificationEntry."Notification Method"::SMS;
+            'W-SMS':
+                NotificationMethod := MemberNotificationEntry."Notification Method"::SMS;
+            'EMAIL':
+                NotificationMethod := MemberNotificationEntry."Notification Method"::EMAIL;
+            'W-EMAIL':
+                NotificationMethod := MemberNotificationEntry."Notification Method"::EMAIL;
+            else
+                NotificationMethod := MemberNotificationEntry."Notification Method"::NONE;
         end;
     end;
 
