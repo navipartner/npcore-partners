@@ -13,7 +13,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         APIStack: Codeunit "NPR POS API Stack Check";
         Request: JsonObject;
     begin
-        if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
+        if not (GuiAllowed() or (CurrentClientType in [ClientType::SOAP, ClientType::OData, ClientType::ODataV4, ClientType::Api])) then
             exit;
 
         if POSSession.IsInitialized() and (PageStack.CurrentStackWasStartedByPOSTrigger() or APIStack.CurrentStackWasStartedByPOSAPI()) then begin
@@ -43,7 +43,7 @@ codeunit 6014582 "NPR Print Method Mgt."
         APIStack: Codeunit "NPR POS API Stack Check";
         Request: JsonObject;
     begin
-        if CurrentClientType in [ClientType::Background, ClientType::ChildSession] then
+        if not (GuiAllowed() or (CurrentClientType in [ClientType::SOAP, ClientType::OData, ClientType::ODataV4, ClientType::Api])) then
             exit;
         if StrLen(FileExtension) = 0 then
             exit;
