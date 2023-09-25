@@ -1,4 +1,4 @@
-﻿codeunit 6060109 "NPR TM Offline Ticket Valid."
+﻿codeunit 6060109 "NPR TM OfflineTicketValidBL"
 {
     Access = Internal;
 
@@ -18,7 +18,7 @@
         RESERVATION_DATE: Label 'Reservation date selected.';
         RESERVATION_TIME: Label 'Reservation time selected.';
 
-    procedure ProcessImportBatch(ImportBatchNo: Integer)
+    internal procedure ProcessImportBatch(ImportBatchNo: Integer)
     var
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
     begin
@@ -32,7 +32,7 @@
         end;
     end;
 
-    procedure ProcessEntry(EntryNo: Integer): Boolean
+    internal procedure ProcessEntry(EntryNo: Integer): Boolean
     var
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         Ticket: Record "NPR TM Ticket";
@@ -147,10 +147,10 @@
         exit(true);
     end;
 
-    procedure AddRequestToOfflineValidation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): Integer
+    internal procedure AddRequestToOfflineValidation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): Integer
     var
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
-        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+
         Ticket: Record "NPR TM Ticket";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         ImportBatchNo: Integer;
@@ -166,9 +166,7 @@
         TicketReservationRequest.SetFilter("Entry No.", '=%1', TicketReservationRequest2."Entry No.");
         TicketReservationRequest.FindFirst();
 
-        TicketOfflineValidation.SetCurrentKey("Import Reference No.");
-        if (TicketOfflineValidation.FindLast()) then;
-        ImportBatchNo := TicketOfflineValidation."Import Reference No." + 1;
+        ImportBatchNo := GetNextImportBatchNo();
 
         TicketReservationRequest2.FindSet();
         repeat
@@ -189,28 +187,61 @@
             // The link to ticket is only on the first request
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
-
                 repeat
-                    TicketOfflineValidation.Init();
-                    TicketOfflineValidation."Entry No." := 0;
-
-                    TicketOfflineValidation."Ticket Reference Type" := TicketOfflineValidation."Ticket Reference Type"::EXTERNALTICKETNO;
-                    TicketOfflineValidation."Ticket Reference No." := Ticket."External Ticket No.";
-                    TicketOfflineValidation."Admission Code" := TicketReservationRequest2."Admission Code";
-                    TicketOfflineValidation."Event Type" := TicketOfflineValidation."Event Type"::ADMIT;
-                    TicketOfflineValidation."Event Date" := EventStartDate;
-                    TicketOfflineValidation."Event Time" := EventStartTime;
-                    TicketOfflineValidation."Imported At" := CurrentDateTime;
-                    TicketOfflineValidation."Import Reference Name" := TicketReservationRequest."Session Token ID";
-                    TicketOfflineValidation."Import Reference No." := ImportBatchNo;
-
-                    TicketOfflineValidation.Insert();
+                    CreateAdmitRequest(
+                        Ticket."External Ticket No.",
+                        TicketReservationRequest2."Admission Code",
+                        EventStartDate,
+                        EventStartTime,
+                        TicketReservationRequest2."Session Token ID",
+                        ImportBatchNo);
                 until (Ticket.Next() = 0);
             end;
 
         until (TicketReservationRequest2.Next() = 0);
 
         exit(ImportBatchNo);
+    end;
+
+    internal procedure AdmitTicketWithoutValidation(ExternalTicketNumber: Text[30]; AdmissionCode: Code[20]; ArrivalDate: Date; ArrivalTime: Time) ImportId: Integer
+    begin
+        ImportId := GetNextImportBatchNo();
+
+        if (ArrivalDate = 0D) then
+            ArrivalDate := Today();
+
+        CreateAdmitRequest(ExternalTicketNumber, AdmissionCode, ArrivalDate, ArrivalTime, '', ImportId);
+        ProcessImportBatch(ImportId);
+    end;
+
+    local procedure GetNextImportBatchNo(): Integer
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+    begin
+        TicketOfflineValidation.SetCurrentKey("Import Reference No.");
+        if (not TicketOfflineValidation.FindLast()) then
+            exit(1);
+        exit(TicketOfflineValidation."Import Reference No." + 1);
+    end;
+
+    local procedure CreateAdmitRequest(ExternalTicketNumber: Text[30]; AdmissionCode: Code[20]; ArrivalDate: Date; ArrivalTime: Time; ReferenceName: Text[100]; ReferenceNo: Integer);
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+    begin
+        TicketOfflineValidation.Init();
+        TicketOfflineValidation."Entry No." := 0;
+
+        TicketOfflineValidation."Ticket Reference Type" := TicketOfflineValidation."Ticket Reference Type"::EXTERNALTICKETNO;
+        TicketOfflineValidation."Ticket Reference No." := ExternalTicketNumber;
+        TicketOfflineValidation."Admission Code" := AdmissionCode;
+        TicketOfflineValidation."Event Type" := TicketOfflineValidation."Event Type"::ADMIT;
+        TicketOfflineValidation."Event Date" := ArrivalDate;
+        TicketOfflineValidation."Event Time" := ArrivalTime;
+        TicketOfflineValidation."Imported At" := CurrentDateTime;
+        TicketOfflineValidation."Import Reference Name" := ReferenceName;
+        TicketOfflineValidation."Import Reference No." := ReferenceNo;
+
+        TicketOfflineValidation.Insert();
     end;
 
     local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; pDate: Date; pTime: Time)
@@ -276,16 +307,28 @@
         exit(Closed);
     end;
 
-    procedure GetInternalScheduleEntryNo(AdmissionCode: Code[20]; ArrivalDate: Date; ArrivalTime: Time): Integer
+    internal procedure GetInternalScheduleEntryNo(AdmissionCode: Code[20]; ArrivalDate: Date; ArrivalTime: Time): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
     begin
         AdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ArrivalDate);
         AdmissionScheduleEntry.SetFilter("Admission End Time", '>=%1', ArrivalTime);
 
-        if (AdmissionScheduleEntry.FindFirst()) then;
+        if (not AdmissionScheduleEntry.FindFirst()) then begin
+            AdmissionScheduleEntry.Reset();
+            AdmissionScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
+            AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+            AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+            AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ArrivalDate);
+            if (not AdmissionScheduleEntry.FindLast()) then begin
+                AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', ArrivalDate);
+                if (not AdmissionScheduleEntry.FindFirst()) then
+                    exit(0);
+            end;
+        end;
 
         exit(AdmissionScheduleEntry."Entry No.");
     end;
@@ -386,7 +429,7 @@
 
     internal procedure ImportOfflineValidationFile(ImportId: Integer)
     var
-        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         FileName: Text;
@@ -409,9 +452,26 @@
 
         TempBlob.CreateInStream(JStream);
         JRootObject.ReadFrom(JStream);
-        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::ADMIT, 'Admit', ImportId);
-        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::DEPART, 'Depart', ImportId);
+        CreateAdmitEvents(FileName, JRootObject, ImportId);
+        CreateDepartEvents(FileName, JRootObject, ImportId);
+    end;
 
+    internal procedure CreateAdmitEvents(FileName: Text; JRootObject: JsonObject; var ImportId: Integer)
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+    begin
+        if (ImportId = 0) then
+            ImportId := GetNextImportBatchNo();
+        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::ADMIT, 'Admit', ImportId);
+    end;
+
+    internal procedure CreateDepartEvents(FileName: Text; JRootObject: JsonObject; var ImportId: Integer)
+    var
+        TicketOfflineValidation: Record "NPR TM Offline Ticket Valid.";
+    begin
+        if (ImportId = 0) then
+            ImportId := GetNextImportBatchNo();
+        CreateEvents(FileName, JRootObject, TicketOfflineValidation."Event Type"::DEPART, 'Depart', ImportId);
     end;
 
     local procedure CreateEvents(FileName: Text; JRootObject: JsonObject; EventType: Option; KeyName: Text; ImportId: Integer)

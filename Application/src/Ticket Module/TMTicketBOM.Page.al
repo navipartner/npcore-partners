@@ -434,7 +434,7 @@
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
+        OfflineTicketValidationMgr: Codeunit "NPR TM OfflineTicketValidBL";
         DIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
         Token: Text[100];
         ResponseMessage: Text;

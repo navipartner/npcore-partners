@@ -323,7 +323,7 @@
                         trigger OnAction()
                         var
                             TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-                            OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
+                            OfflineTicketValidationMgr: Codeunit "NPR TM OfflineTicketValidBL";
                             OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
                             ImportReferenceNo: Integer;
                         begin
