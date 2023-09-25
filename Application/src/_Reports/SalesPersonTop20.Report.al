@@ -19,9 +19,7 @@
 
             trigger OnAfterGetRecord()
             begin
-                "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
-                "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
-                "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
+                "Salesperson/Purchaser".NPRGetVESalesCostDiscount(SalesLCY, COGSLCY, DiscountAmount);
                 if OnlySales then
                     if SalesLCY = 0 then
                         CurrReport.Skip();
@@ -184,11 +182,8 @@
                     if TempSalesPerson.Next() = 0 then
                         CurrReport.Break();
 
-                if "Salesperson/Purchaser".Get(TempSalesPerson."Vendor No.") then begin
-                    "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
-                    "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
-                    "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
-                end;
+                if "Salesperson/Purchaser".Get(TempSalesPerson."Vendor No.") then
+                    "Salesperson/Purchaser".NPRGetVESalesCostDiscount(SalesLCY, COGSLCY, DiscountAmount);
 
                 Db := SalesLCY - COGSLCY;
                 J := IncStr(J);

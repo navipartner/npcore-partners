@@ -180,10 +180,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        Rec.NPRGetVESalesLCY(SalesLCY);
-        Rec.NPRGetVESalesQty(SalesQty);
-        Rec.NPRGetVEDiscountAmount(DiscountAmount);
-        Rec.NPRGetVECOGSLCY(COGSLCY);
+        Rec.NPRGetVESalesStats(SalesLCY, COGSLCY, SalesQty, DiscountAmount);
         Rec.NPRGetVEItemGroupSalesLCY(ItemGroupSalesLCY);
     end;
 
