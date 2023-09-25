@@ -62,8 +62,7 @@
 
                 trigger OnAfterGetRecord()
                 begin
-                    NPRGetVESalesLCY(SalesLCY);
-                    NPRGetVESalesQty(SalesQty);
+                    NPRGetVESalesAndQty(SalesLCY, SalesQty);
                     if SalesLCY = 0 then
                         CurrReport.Skip();
 

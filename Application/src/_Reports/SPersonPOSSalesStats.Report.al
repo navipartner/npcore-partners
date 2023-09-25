@@ -56,12 +56,9 @@ report 6014446 "NPR S.Person POS Sales Stats"
                 POSSLDiscAmtType: Query "NPR POS SL Disc. Amt. Type";
                 Index: Integer;
             begin
-                "Salesperson/Purchaser".NPRGetVESalesLCY(SalesLCY);
+                "Salesperson/Purchaser".NPRGetVESalesCostDiscount(SalesLCY, COGSLCY, DiscountAmount);
                 if (SalesLCY = 0) then
                     CurrReport.Skip();
-
-                "Salesperson/Purchaser".NPRGetVEDiscountAmount(DiscountAmount);
-                "Salesperson/Purchaser".NPRGetVECOGSLCY(COGSLCY);
 
                 if "Salesperson/Purchaser".GetFilter("Date Filter") <> '' then begin
                     SalespersonLastYear.Get("Salesperson/Purchaser".Code);
@@ -69,9 +66,7 @@ report 6014446 "NPR S.Person POS Sales Stats"
                     StartDate := CalcDate('<-1Y>', "Salesperson/Purchaser".GetRangeMin("Date Filter"));
                     EndDate := CalcDate('<-1Y>', "Salesperson/Purchaser".GetRangeMax("Date Filter"));
                     SalespersonLastYear.SetRange("Date Filter", StartDate, EndDate);
-                    SalespersonLastYear.NPRGetVESalesLCY(SalesLCYSalesPersonLastYear);
-                    SalespersonLastYear.NPRGetVEDiscountAmount(DiscountAmountSalesPersonLastYear);
-                    SalespersonLastYear.NPRGetVECOGSLCY(COGSLCYSalesPersonLastYear);
+                    SalespersonLastYear.NPRGetVESalesCostDiscount(SalesLCY, COGSLCY, DiscountAmount);
                 end;
 
                 POSSLDiscAmtType.SetFilter(SalespersonCode, "Salesperson/Purchaser".Code);
