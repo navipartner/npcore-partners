@@ -53,7 +53,7 @@ report 6014436 "NPR Update Retention Policy"
         AddAllowedTable(Database::"NPR POS Entry Output Log", RtnPeriodEnum::"3 Months");
         AddAllowedTable(Database::"NPR Nc Import Entry", RtnPeriodEnum::"1 Month");
 
-        AddAllowedTable(Database::"NPR POS Posting Log", RtnPeriodEnum::"6 Months");
+        AddAllowedTable(Database::"NPR POS Posting Log", RtnPeriodEnum::"1 Week");
 
         AddAllowedTable(Database::"NPR POS Saved Sale Entry", RtnPeriodEnum::"3 Months");
         AddAllowedTable(Database::"NPR POS Saved Sale Line", RtnPeriodEnum::"3 Months");
