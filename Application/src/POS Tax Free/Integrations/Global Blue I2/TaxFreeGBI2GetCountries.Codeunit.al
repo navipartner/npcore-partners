@@ -23,7 +23,7 @@
         TaxFreeRequest."Date Start" := Today();
         TaxFreeRequest."Tax Free Profile" := TaxFreeProfile."Tax Free Profile";
 
-        GlobalBlueHandler.InitializeHandler(TaxFreeRequest);
+        GlobalBlueHandler.InitializeHandlerForNAS(TaxFreeRequest);
         GlobalBlueHandler.DownloadCountries(TaxFreeRequest);
     end;
 
@@ -47,13 +47,23 @@
     end;
 
     procedure IsScheduled(): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
     begin
-        //Is task queue configured?
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR TaxFree GBI2 GetCountries");
+        exit(not JobQueueEntry.IsEmpty());
     end;
 
     procedure Schedule(): Boolean
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "Job Queue Management";
     begin
         //Create Task Queue job
+        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
+        JobQueueEntry."Object ID to Run" := Codeunit::"NPR TaxFree GBI2 GetCountries";
+        JobQueueManagement.CreateJobQueueEntry(JobQueueEntry);
     end;
 }
 

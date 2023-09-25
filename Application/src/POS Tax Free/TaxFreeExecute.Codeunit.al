@@ -102,7 +102,7 @@
 
     procedure OnRunSilentSet(Silent: Boolean)
     begin
-        OnRunHandled := Silent
+        OnRunSilent := Silent
     end;
 
     procedure OnRunFunctionSet(OnRunFunctionPar: Enum "NPR Tax Free OnRunFunction")
