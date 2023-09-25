@@ -751,7 +751,7 @@ page 6151245 "NPR Retail Setup RC"
             action(POSDragonglass)
             {
 
-                Caption = 'Open POS';
+                Caption = 'Open POS(Desktop and Mobile)';
                 RunObject = Codeunit "NPR Open POS Page";
                 ToolTip = 'View or edit the Open POS';
                 ApplicationArea = NPRRetail;
