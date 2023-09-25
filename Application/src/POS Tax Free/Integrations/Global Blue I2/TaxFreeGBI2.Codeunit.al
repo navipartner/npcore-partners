@@ -66,6 +66,26 @@
         GlobalBlueServices.FindSet();
     end;
 
+    procedure InitializeHandlerForNAS(TaxFreeRequest: Record "NPR Tax Free Request")
+    var
+        TaxFreeInterface: Codeunit "NPR Tax Free Handler Mgt.";
+    begin
+        //We do not need A POS Unit No. as it is run by NAS
+        GlobalTaxFreeProfile.Get(TaxFreeRequest."Tax Free Profile");
+
+        GlobalBlueParameters.Get(TaxFreeRequest."Tax Free Profile");
+        if (GlobalBlueParameters."Date Last Auto Configured" < Today) then begin
+            TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeProfile, true); //Will silently run desk config & verify that NAS jobs are configured.
+            GlobalBlueParameters.Get(TaxFreeRequest."Tax Free Profile");
+            if GlobalBlueParameters."Date Last Auto Configured" <> Today then
+                Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID Enum");
+        end;
+
+        GlobalBlueServices.SetRange("Tax Free Unit", TaxFreeRequest."Tax Free Profile");
+        GlobalBlueServices.FindSet();
+    end;
+
+
     #region Actions
     local procedure DownloadDeskConfiguration(var TaxFreeRequest: Record "NPR Tax Free Request")
     var
@@ -1681,8 +1701,13 @@
         GetBlockedCountriesJob: Codeunit "NPR TaxFree GBI2 GetBCountries";
         GetIINBlacklistJob: Codeunit "NPR TaxFree GBI2 GetBlockedIIN";
     begin
-        POSUnit.Get(TaxFreeRequest."POS Unit No.");
-        GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        If Silent then begin
+            GlobalTaxFreeProfile.Get(TaxFreeRequest."Tax Free Profile");
+        end else begin
+            POSUnit.Get(TaxFreeRequest."POS Unit No.");
+            GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        end;
+
         GlobalBlueParameters.Get(GlobalTaxFreeProfile."Tax Free Profile");
         DownloadDeskConfiguration(TaxFreeRequest);
 
