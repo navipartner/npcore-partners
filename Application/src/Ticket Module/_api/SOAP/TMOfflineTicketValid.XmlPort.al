@@ -102,7 +102,7 @@
     internal procedure ProcessImportedRecords()
     var
         OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
-        OfflineTicketValidationMgr: Codeunit "NPR TM Offline Ticket Valid.";
+        OfflineTicketValidationMgr: Codeunit "NPR TM OfflineTicketValidBL";
     begin
 
         if (not TmpTicketOfflineValidation.FindSet()) then
