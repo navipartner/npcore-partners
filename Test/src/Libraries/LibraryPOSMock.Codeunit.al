@@ -10,12 +10,15 @@ codeunit 85003 "NPR Library - POS Mock"
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
         POSAction: Record "NPR POS Action" temporary;
         UserSetup: record "User Setup";
+        POSPageStack: Codeunit "NPR POS Page Stack";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
         UserSetup."NPR POS Unit No." := POSUnit."No.";
         if not UserSetup.Insert() then
             UserSetup.Modify();
+
+        POSPageStack.SetIsPOSStack(true);
 
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSBackgroundTaskAPI);
@@ -56,12 +59,15 @@ codeunit 85003 "NPR Library - POS Mock"
         UserSetup: record "User Setup";
         POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
+        POSPageStack: Codeunit "NPR POS Page Stack";
     begin
         if UserSetup.Get(UserId) then;
         UserSetup."User ID" := UserId;
         UserSetup."NPR POS Unit No." := POSUnit."No.";
         if not UserSetup.Insert() then
             UserSetup.Modify();
+
+        POSPageStack.SetIsPOSStack(true);
 
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSBackgroundTaskAPI);
