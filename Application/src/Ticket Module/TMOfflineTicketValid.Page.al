@@ -226,7 +226,7 @@
 
     var
         OfflineTicketValidationRec: Record "NPR TM Offline Ticket Valid.";
-        OfflineTicketValidation: Codeunit "NPR TM Offline Ticket Valid.";
+        OfflineTicketValidation: Codeunit "NPR TM OfflineTicketValidBL";
         APPLY_ON_ALL: Label 'Apply %1 on all unhandled lines (%2) in batch %3?';
 }
 
