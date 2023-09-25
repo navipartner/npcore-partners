@@ -224,7 +224,7 @@
                     '':
                         exit('NPR-RetenPolTables-20221020');
                     'POSPostingLog':
-                        exit('NPR-RetenPolTables-POSPostingLog-20230906');
+                        exit('NPR-RetenPolTables-POSPostingLog-20230922');
                     'POSLayoutArchive':
                         exit('NPR-RetenPolTables-POSLayoutArchive-20221207');
                     'POSSavedSales':
