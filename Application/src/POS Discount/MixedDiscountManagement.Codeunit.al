@@ -1231,7 +1231,7 @@
         SaleLinePOS.Validate(Quantity, Qty);
         SaleLinePOS."Discount Type" := DiscountType;
         SaleLinePOS."Discount Code" := DiscountCode;
-        SaleLinePOS."Discount Amount" := 0;
+        SaleLinePOS.Validate("Discount Amount", 0);
         SaleLinePOS."Custom Disc Blocked" := false;
         SaleLinePOS."Derived from Line" := FromSaleLinePOS.SystemId;
         SaleLinePOS.Modify();
