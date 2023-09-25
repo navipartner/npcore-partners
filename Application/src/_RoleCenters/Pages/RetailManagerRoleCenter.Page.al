@@ -868,6 +868,14 @@
                     ToolTip = 'View POS Saved Sales that have been done.';
                     ApplicationArea = NPRRetail;
                 }
+                 action("NpCs Document List")
+                {
+                    Caption = 'Collect Document List';
+                    Image = RegisteredDocs;
+                    RunObject = Page "NPR NpCs Document List";
+                    ToolTip = 'View Collect Document List.';
+                    ApplicationArea = NPRRetail;
+                }
                 Action("Posted Sales Invoices")
                 {
                     Caption = 'Posted Sales Invoices List';
