@@ -1,6 +1,6 @@
 ﻿table 6060121 "NPR TM Ticket Admission BOM"
 {
-    Access = Internal;
+    Access = Public;
 
     Caption = 'Ticket Admission BOM';
     DataClassification = CustomerContent;
