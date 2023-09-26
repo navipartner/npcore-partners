@@ -16,26 +16,26 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique identifier for this Pepper Version. This code helps distinguish between different versions.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'SSpecifies a user-friendly description or a name for this Pepper Version, making it easier to identify its purpose.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Install Directory"; Rec."Install Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Install Directory field';
+                    ToolTip = 'Specifies the directory in which the Pepper Version is installed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper DLL Version"; Rec."Pepper DLL Version")
                 {
 
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Pepper DLL Version field';
+                    ToolTip = 'Specifies the name or identifier for the XMLport configuration associated with this Pepper Version.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Zip File"; HasZipFile)
@@ -43,7 +43,7 @@
 
                     Caption = 'Zip File';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasZipFile field';
+                    ToolTip = 'Indicates whether a ZIP file is associated with this Pepper Version. This field is non-editable and serves as a flag to show whether a ZIP file is linked.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -55,7 +55,7 @@
                     {
 
                         ShowCaption = false;
-                        ToolTip = 'Specifies the value of the XMLport Configuration field';
+                        ToolTip = 'Specifies the XMLport configuration associated with this Pepper Version. This field controls the XMLport settings used for data exchange.';
                         ApplicationArea = NPRRetail;
 
                         trigger OnValidate()
@@ -67,7 +67,7 @@
                     {
 
                         ShowCaption = false;
-                        ToolTip = 'Specifies the value of the XMLport Configuration Name field';
+                        ToolTip = 'Provides the name or identifier for the XMLport configuration associated with this Pepper Version. This field helps identify the specific XMLport configuration used.';
                         ApplicationArea = NPRRetail;
                     }
                 }

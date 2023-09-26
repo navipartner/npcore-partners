@@ -25,31 +25,31 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique identifier for this Pepper Configuration, that helps distinguish between different configurations.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a user-friendly description or a name for this Pepper Configuration, making it easier to identify its purpose.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Version; Rec.Version)
                 {
 
-                    ToolTip = 'Specifies the value of the Version field';
+                    ToolTip = 'Indicates the version number of this Pepper Configuration, helping track changes and updates.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Recovery Retry Attempts"; Rec."Recovery Retry Attempts")
                 {
 
-                    ToolTip = 'Specifies the value of the Recovery Retry Attempts field';
+                    ToolTip = 'Specifies the number of retry attempts the system should make when attempting to recover from an issue.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Mode; Rec.Mode)
                 {
 
-                    ToolTip = 'Specifies the value of the Mode field';
+                    ToolTip = 'Specifies the current operational mode of the Pepper Configuration, such as "Online" or "Offline.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
@@ -60,7 +60,7 @@
                 field("Header and Footer Handling"; Rec."Header and Footer Handling")
                 {
 
-                    ToolTip = 'Specifies the value of the Header and Footer Handling field';
+                    ToolTip = 'Specifies how this configuration manages header and footer information in documents and receipts.';
                     ApplicationArea = NPRRetail;
                 }
                 field(License; HasLicense)
@@ -68,7 +68,7 @@
 
                     Caption = 'License';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasLicense field';
+                    ToolTip = 'Indicates whether a valid license is associated with this Pepper Configuration.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
@@ -76,49 +76,49 @@
 
                     Caption = 'Additional Parameters';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasAdditionalParameters field';
+                    ToolTip = 'Indicates whether additional configuration parameters are defined for this configuration.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Default POS Timeout (Seconds)"; Rec."Default POS Timeout (Seconds)")
                 {
 
-                    ToolTip = 'Specifies the value of the Default POS Timeout (Seconds) field';
+                    ToolTip = 'Specifies the default time limit (in seconds) for POS operations.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Show Detailed Error Messages"; Rec."Show Detailed Error Messages")
                 {
 
-                    ToolTip = 'Specifies the value of the Show Detailed Error Messages field';
+                    ToolTip = 'Display detailed error messages to aid in troubleshooting.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Offline mode"; Rec."Offline mode")
                 {
 
-                    ToolTip = 'Specifies the value of the Offline mode field';
+                    ToolTip = 'Choose whether the Pepper Configuration is set to operate in an offline mode. This option is useful for remote or disconnected environments.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Min. Length Authorisation No."; Rec."Min. Length Authorisation No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Min. Length Authorisation No. field';
+                    ToolTip = 'Specifies the minimum length required for authorization numbers, enhancing security.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Max. Length Authorisation No."; Rec."Max. Length Authorisation No.")
                 {
 
-                    ToolTip = 'Specifies the value of the Max. Length Authorisation No. field';
+                    ToolTip = 'Specifies the customer or the client associated to this Pepper Configuration.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer ID"; Rec."Customer ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer ID field';
+                    ToolTip = 'Specifies the ID of the license associated with this Pepper Configuration.';
                     ApplicationArea = NPRRetail;
                 }
                 field("License ID"; Rec."License ID")
                 {
 
-                    ToolTip = 'Specifies the value of the License ID field';
+                    ToolTip = 'Specifies the ID of the license associated with this Pepper Configuration.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -127,37 +127,37 @@
                 field("Logging Target"; Rec."Logging Target")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Target field';
+                    ToolTip = 'Specifies the destination where log information is recorded, such as a file or a database.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Logging Level"; Rec."Logging Level")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Level field';
+                    ToolTip = 'Choose how detailed the logged information is.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Logging Max. File Size (MB)"; Rec."Logging Max. File Size (MB)")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Max. File Size (MB) field';
+                    ToolTip = 'Specifies the maximum size (in megabytes) of individual log files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Logging Directory"; Rec."Logging Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Directory field';
+                    ToolTip = 'Specifies the path to the directory in which the log files are stored.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Logging Archive Directory"; Rec."Logging Archive Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Archive Directory field';
+                    ToolTip = 'Specifies the directory in which the archived log files are stored for historical reference.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Logging Archive Max. Age Days"; Rec."Logging Archive Max. Age Days")
                 {
 
-                    ToolTip = 'Specifies the value of the Logging Archive Max. Age Days field';
+                    ToolTip = 'Specifies the maximum number of days the files remain in the log before they are archived or deleted.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -166,13 +166,13 @@
                 field("Card Type File Full Path"; Rec."Card Type File Full Path")
                 {
 
-                    ToolTip = 'Specifies the value of the Card Type File Full Path field';
+                    ToolTip = 'Specifies the full file path to the card type file, including its directory and file name.';
                     ApplicationArea = NPRRetail;
                 }
                 field("License File Full Path"; Rec."License File Full Path")
                 {
 
-                    ToolTip = 'Specifies the value of the License File Full Path field';
+                    ToolTip = 'Specifies the full file path to the license file, providing easy access.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -181,37 +181,37 @@
                 field("Ticket Directory"; Rec."Ticket Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Ticket Directory field';
+                    ToolTip = 'Specifies the location of the directory used for storing ticket-related files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Journal Directory"; Rec."Journal Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Journal Directory field';
+                    ToolTip = 'Specifies the directory for storing journal-related files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Directory"; Rec."Matchbox Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox Directory field';
+                    ToolTip = 'Specifies the path to the directory for Matchbox configuration files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Messages Directory"; Rec."Messages Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Messages Directory field';
+                    ToolTip = 'Specifies the path to the directory used for storing message-related files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Persistance Directory"; Rec."Persistance Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Persistance Directory field';
+                    ToolTip = 'Specifies the path to the directory used for storing persistence-related files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Working Directory"; Rec."Working Directory")
                 {
 
-                    ToolTip = 'Specifies the value of the Working Directory field';
+                    ToolTip = 'Specifies the working directory for this Pepper Configuration, which is the location in which it operates.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -220,43 +220,43 @@
                 field(Open; Rec."Transaction Type Open Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Open Code field';
+                    ToolTip = 'Assign a code used for the open transaction type, used in transaction processing.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Payment; Rec."Transaction Type Payment Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Payment Code field';
+                    ToolTip = 'Assign a code for the payment transaction type, facilitating the payment processing.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Close; Rec."Transaction Type Close Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Close Code field';
+                    ToolTip = 'Assign a code for the close transaction type, used when closing transactions.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Refund; Rec."Transaction Type Refund Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Refund Code field';
+                    ToolTip = 'Assign a code for the refund transaction type, applicable for refunds.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Recover; Rec."Transaction Type Recover Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Recover Code field';
+                    ToolTip = 'Assign a code for the recover transaction type, used during recovery processes.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Auxilary Code"; Rec."Transaction Type Auxilary Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Auxilary Code field';
+                    ToolTip = 'Assign a code for auxiliary transaction types, enhancing the transaction management.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction Type Install Code"; Rec."Transaction Type Install Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Transaction Type Install Code field';
+                    ToolTip = 'Assign a code for the install transaction type, used in the installation processes.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -265,19 +265,19 @@
                 field("End of Day on Close"; Rec."End of Day on Close")
                 {
 
-                    ToolTip = 'Specifies the value of the End of Day on Close field';
+                    ToolTip = 'Choose whether the end-of-day process is triggered automatically when the POS is closed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Unload Library on Close"; Rec."Unload Library on Close")
                 {
 
-                    ToolTip = 'Specifies the value of the Unload Library on Close field';
+                    ToolTip = 'Choose whether the library associated with this configuration is unloaded when the POS is closed.';
                     ApplicationArea = NPRRetail;
                 }
                 field("End of Day Receipt Mandatory"; Rec."End of Day Receipt Mandatory")
                 {
 
-                    ToolTip = 'Specifies the value of the End of Day Receipt Mandatory field';
+                    ToolTip = 'Choose whether it is mandatory to generate an end-of-day receipt when the POS is closed.';
                     ApplicationArea = NPRRetail;
                 }
             }
