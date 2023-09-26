@@ -191,6 +191,9 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 
         Handled := true;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        SalesHeader.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetRange(Status, SalesHeader.Status::Open);
 # pragma warning disable AA0139
