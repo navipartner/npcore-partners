@@ -253,7 +253,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             6:
                 SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '');
             7:
-                POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true);
+                POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true, true, true);
             8:
                 ConvertToMembershipV3(POSSession, FrontEnd, ExternalTicketNumber, AdmissionCode);
             9:
@@ -541,7 +541,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
                 6:
                     SetGroupTicketConfirmedQuantity(JSON, ExternalTicketNumber, '');
                 7:
-                    POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true);
+                    POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true, true, true);
                 8:
                     ConvertToMembership(POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
                 9:
@@ -645,7 +645,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             6:
                 SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '');
             7:
-                POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true);
+                POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReference, true, true, true);
             8:
                 Error('WF20 support for EAN box is not completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
             9:
