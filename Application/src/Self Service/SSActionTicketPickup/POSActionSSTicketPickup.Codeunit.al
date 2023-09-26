@@ -3,7 +3,7 @@ codeunit 6151430 "NPR POSAction SS TicketPickup" implements "NPR IPOS Workflow"
     Access = Internal;
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
-        ActionDescription: Label 'This action allows you to pickup tickets from web orders on a selfservice POS';
+        ActionDescription: Label 'This action allows you to pickup tickets from web orders on a self service POS';
         ScannedValueTitle: Label 'Scanned Ticket Reference';
         ScannedValueDesc: Label 'This should contain the value of the scanned ticket when workflow is run';
     begin
@@ -16,12 +16,14 @@ codeunit 6151430 "NPR POSAction SS TicketPickup" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         POSActionTicketMgtB: Codeunit "NPR POS Action - Ticket Mgt B.";
+        TicketReferenceNumber: Text[30];
     begin
         case Step of
             'printTickets':
-#pragma warning disable AA0139         
-                POSActionTicketMgtB.PickupPreConfirmedTicket(Context.GetStringParameter('scannedValue'), false);
-#pragma warning restore AA0139                
+                begin
+                    TicketReferenceNumber := CopyStr(Context.GetStringParameter('scannedValue'), 1, MaxStrLen(TicketReferenceNumber));
+                    POSActionTicketMgtB.PickupPreConfirmedTicket(TicketReferenceNumber, false, false, false);
+                end;
         end;
     end;
 
