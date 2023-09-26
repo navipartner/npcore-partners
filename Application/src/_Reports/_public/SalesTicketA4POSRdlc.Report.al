@@ -14,32 +14,6 @@
 
     dataset
     {
-        dataitem(CompanyInformation; "Company Information")
-        {
-            column(Picture_CompanyInformation; CompanyInformation.Picture)
-            {
-                IncludeCaption = true;
-            }
-            column(VAT_Registration_No_CompanyInformation; CompanyInformation."VAT Registration No.")
-            {
-                IncludeCaption = true;
-            }
-        }
-        dataitem("POSStoreInfo"; "NPR POS Store")
-        {
-            column(Phone_No_CompanyInformation; POSStoreInfo."Phone No.")
-            {
-                IncludeCaption = true;
-            }
-            column(E_Mail_CompanyInformation; POSStoreInfo."E-Mail")
-            {
-                IncludeCaption = true;
-            }
-            column(Home_Page_CompanyInformation; POSStoreInfo."Home Page")
-            {
-                IncludeCaption = true;
-            }
-        }
         dataitem("NPR POS Entry"; "NPR POS Entry")
         {
             DataItemTableView = SORTING("Entry No.");
@@ -81,6 +55,21 @@
             column(POS_Unit_No_; "POS Unit No.")
             {
             }
+            column(Picture_CompanyInformation; CompanyInformation.Picture)
+            {
+            }
+            column(VAT_Registration_No_CompanyInformation; CompanyInformation."VAT Registration No.")
+            {
+            }
+            column(Phone_No_CompanyInformation; CompanyInformation."Phone No.")
+            {
+            }
+            column(E_Mail_CompanyInformation; CompanyInformation."E-Mail")
+            {
+            }
+            column(Home_Page_CompanyInformation; CompanyInformation."Home Page")
+            {
+            }
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
                 DataItemLink = Code = FIELD("Salesperson Code");
@@ -101,6 +90,10 @@
                     IncludeCaption = true;
                 }
                 column(Description_POS_Entry_Sales_Line; Description)
+                {
+                    IncludeCaption = true;
+                }
+                column(Description_2_POS_Entry_Sales_Line; "Description 2")
                 {
                     IncludeCaption = true;
                 }
@@ -362,14 +355,21 @@
         PosStoreCodeLabel = 'Store Code';
         UOMLabel = 'UOM';
         POSUnitLabel = 'POS Unit';
+        VatRegistrationNoLabel = 'VAT Registration No.';
+        PhoneNoLabel = 'Phone No.';
+        EmailLabel = 'Email';
+        HomePageLabel = 'Home Page';
     }
 
     trigger OnPreReport()
     begin
+        CompanyInformation.Get();
+        CompanyInformation.CalcFields(Picture);
         GeneralLedgerSetup.Get();
     end;
 
     var
+        CompanyInformation: Record "Company Information";
         GeneralLedgerSetup: Record "General Ledger Setup";
         AddrArray: Array[8] of Text[100];
         StoreAddress: Text;

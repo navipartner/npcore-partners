@@ -8,6 +8,7 @@
         <ConnectString />
       </ConnectionProperties>
       <rd:SecurityType>None</rd:SecurityType>
+      <rd:DataSourceID>b80e1ddb-58e1-49d6-acfd-dbe5ba8a7a4f</rd:DataSourceID>
     </DataSource>
   </DataSources>
   <ReportSections>
@@ -5012,7 +5013,6 @@
                                               <PaddingBottom>2pt</PaddingBottom>
                                             </Style>
                                           </Textbox>
-                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
@@ -6299,7 +6299,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!PhoneNo_POS_StoreCaption.Value</Value>
+                      <Value>=Parameters!PhoneNoLabel.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -6334,7 +6334,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!EMail_POS_StoreCaption.Value</Value>
+                      <Value>=Parameters!EmailLabel.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -6369,7 +6369,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!HomePage_POS_StoreCaption.Value</Value>
+                      <Value>=Parameters!HomePageLabel.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -6404,7 +6404,7 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Parameters!VATRegistrationNo_POS_StoreCaption.Value</Value>
+                      <Value>=Parameters!VatRegistrationNoLabel.Value</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
@@ -6972,50 +6972,41 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
       </DefaultValue>
       <Prompt>POSUnitLabel</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Picture_CompanyInformationCaption">
+    <ReportParameter Name="VatRegistrationNoLabel">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>Picture_CompanyInformationCaption</Value>
+          <Value>VatRegistrationNoLabel</Value>
         </Values>
       </DefaultValue>
-      <Prompt>Picture_CompanyInformationCaption</Prompt>
+      <Prompt>VatRegistrationNoLabel</Prompt>
     </ReportParameter>
-    <ReportParameter Name="VAT_Registration_No_CompanyInformationCaption">
+    <ReportParameter Name="PhoneNoLabel">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>VAT_Registration_No_CompanyInformationCaption</Value>
+          <Value>PhoneNoLabel</Value>
         </Values>
       </DefaultValue>
-      <Prompt>VAT_Registration_No_CompanyInformationCaption</Prompt>
+      <Prompt>PhoneNoLabel</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Phone_No_CompanyInformationCaption">
+    <ReportParameter Name="EmailLabel">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>Phone_No_CompanyInformationCaption</Value>
+          <Value>EmailLabel</Value>
         </Values>
       </DefaultValue>
-      <Prompt>Phone_No_CompanyInformationCaption</Prompt>
+      <Prompt>EmailLabel</Prompt>
     </ReportParameter>
-    <ReportParameter Name="E_Mail_CompanyInformationCaption">
+    <ReportParameter Name="HomePageLabel">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>E_Mail_CompanyInformationCaption</Value>
+          <Value>HomePageLabel</Value>
         </Values>
       </DefaultValue>
-      <Prompt>E_Mail_CompanyInformationCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Home_Page_CompanyInformationCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Home_Page_CompanyInformationCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Home_Page_CompanyInformationCaption</Prompt>
+      <Prompt>HomePageLabel</Prompt>
     </ReportParameter>
     <ReportParameter Name="Document_No_POS_EntryCaption">
       <DataType>String</DataType>
@@ -7043,6 +7034,15 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         </Values>
       </DefaultValue>
       <Prompt>Description_POS_Entry_Sales_LineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Description_2_POS_Entry_Sales_LineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Description_2_POS_Entry_Sales_LineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Description_2_POS_Entry_Sales_LineCaption</Prompt>
     </ReportParameter>
     <ReportParameter Name="Quantity_POS_Entry_Sales_LineCaption">
       <DataType>String</DataType>
@@ -7339,42 +7339,42 @@ Cstr(Fields!DocumentNo_POS_Entry.Value), 5)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>Picture_CompanyInformationCaption</ParameterName>
+          <ParameterName>VatRegistrationNoLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>VAT_Registration_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>PhoneNoLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>Phone_No_CompanyInformationCaption</ParameterName>
+          <ParameterName>EmailLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>E_Mail_CompanyInformationCaption</ParameterName>
+          <ParameterName>HomePageLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>18</RowIndex>
-          <ParameterName>Home_Page_CompanyInformationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
           <ParameterName>Document_No_POS_EntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
+          <RowIndex>19</RowIndex>
           <ParameterName>No_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
+          <RowIndex>20</RowIndex>
           <ParameterName>Description_POS_Entry_Sales_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>21</RowIndex>
+          <ParameterName>Description_2_POS_Entry_Sales_LineCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -7612,24 +7612,10 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>2e04e7c2-6a75-462a-86c0-c599714b4f0f</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
-        <Field Name="Picture_CompanyInformation">
-          <DataField>Picture_CompanyInformation</DataField>
-        </Field>
-        <Field Name="VAT_Registration_No_CompanyInformation">
-          <DataField>VAT_Registration_No_CompanyInformation</DataField>
-        </Field>
-        <Field Name="Phone_No_CompanyInformation">
-          <DataField>Phone_No_CompanyInformation</DataField>
-        </Field>
-        <Field Name="E_Mail_CompanyInformation">
-          <DataField>E_Mail_CompanyInformation</DataField>
-        </Field>
-        <Field Name="Home_Page_CompanyInformation">
-          <DataField>Home_Page_CompanyInformation</DataField>
-        </Field>
         <Field Name="Entry_Date_POS_Entry">
           <DataField>Entry_Date_POS_Entry</DataField>
         </Field>
@@ -7678,6 +7664,21 @@ End Function</Code>
         <Field Name="POS_Unit_No_">
           <DataField>POS_Unit_No_</DataField>
         </Field>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="VAT_Registration_No_CompanyInformation">
+          <DataField>VAT_Registration_No_CompanyInformation</DataField>
+        </Field>
+        <Field Name="Phone_No_CompanyInformation">
+          <DataField>Phone_No_CompanyInformation</DataField>
+        </Field>
+        <Field Name="E_Mail_CompanyInformation">
+          <DataField>E_Mail_CompanyInformation</DataField>
+        </Field>
+        <Field Name="Home_Page_CompanyInformation">
+          <DataField>Home_Page_CompanyInformation</DataField>
+        </Field>
         <Field Name="Name_SalespersonPurchaser">
           <DataField>Name_SalespersonPurchaser</DataField>
         </Field>
@@ -7689,6 +7690,9 @@ End Function</Code>
         </Field>
         <Field Name="Description_POS_Entry_Sales_Line">
           <DataField>Description_POS_Entry_Sales_Line</DataField>
+        </Field>
+        <Field Name="Description_2_POS_Entry_Sales_Line">
+          <DataField>Description_2_POS_Entry_Sales_Line</DataField>
         </Field>
         <Field Name="Quantity_POS_Entry_Sales_Line">
           <DataField>Quantity_POS_Entry_Sales_Line</DataField>
