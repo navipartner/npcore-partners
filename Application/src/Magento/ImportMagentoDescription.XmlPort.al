@@ -47,6 +47,7 @@ xmlport 6014404 "NPR ImportMagentoDescription"
                         ModifyItem := true;
                     end;
                     if StrLen(ItemMagentoShortDescription) > 0 then begin
+                        Clear(TempBlob);
                         TempBlob.CreateOutStream(OutStr);
                         OutStr.WriteText(ItemMagentoShortDescription);
                         TempBlob.CreateInStream(InStr);
