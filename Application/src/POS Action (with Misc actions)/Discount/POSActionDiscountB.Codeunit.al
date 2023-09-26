@@ -245,7 +245,7 @@
 
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
         SaleLinePOS."Discount Code" := '';
-        if InputValue <> 0 then
+        if (InputValue <> 0) or (DiscountType = DiscountType::LineAmt) then
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
 
         case DiscountType of
