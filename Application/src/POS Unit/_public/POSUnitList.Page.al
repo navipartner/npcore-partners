@@ -158,6 +158,20 @@
                     ToolTip = 'Opens the Workshifts List';
                     ApplicationArea = NPRRetail;
                 }
+                action(TaxFreeVouchers)
+                {
+                    Caption = 'Tax Free Vouchers';
+                    Ellipsis = true;
+                    Image = Voucher;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "NPR Tax Free Voucher";
+                    RunPageLink = "POS Unit No." = field("No.");
+                    ToolTip = 'Display the list of Tax Free Vouchers for that POS Unit.';
+                    ApplicationArea = NPRRetail;
+                }
                 action("MPOS QR Code")
                 {
                     ApplicationArea = NPRRetail;

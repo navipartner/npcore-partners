@@ -868,7 +868,7 @@
                     ToolTip = 'View POS Saved Sales that have been done.';
                     ApplicationArea = NPRRetail;
                 }
-                 action("NpCs Document List")
+                action("NpCs Document List")
                 {
                     Caption = 'Collect Document List';
                     Image = RegisteredDocs;
@@ -946,6 +946,14 @@
                     RunObject = Page "NPR NpRv Vouchers";
                     ApplicationArea = NPRRetail;
                     ToolTip = 'View or edit the Voucher List';
+                }
+                action("Tax Free Vouchers")
+                {
+                    Caption = 'Tax Free Vouchers List';
+                    Image = Voucher;
+                    RunObject = Page "NPR Tax Free Voucher";
+                    ToolTip = 'View Tax Free Vouchers List';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

@@ -228,6 +228,19 @@
                 ToolTip = 'Set up which screen is used as the second display for that POS Unit.';
                 ApplicationArea = NPRRetail;
             }
+            action("Tax Free Vouchers")
+            {
+                Caption = 'Tax Free Vouchers';
+                Image = Voucher;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPR Tax Free Voucher";
+                RunPageLink = "POS Unit No." = field("No.");
+                ToolTip = 'Display the list of Tax Free Vouchers for that POS Unit.';
+                ApplicationArea = NPRRetail;
+            }
         }
     }
 }
