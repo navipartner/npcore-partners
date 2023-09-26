@@ -137,6 +137,18 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Inventory Posting Group';
                 }
+                field(documentDate; Rec."Document Date")
+                {
+                    Caption = 'Document Date';
+                }
+                field(locationCode; Rec."Location Code")
+                {
+                    Caption = 'Location Code';
+                }
+                field(sourcePostingGroup; Rec."Source Posting Group")
+                {
+                    Caption = 'Source Posting Group';
+                }
             }
         }
     }
