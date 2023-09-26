@@ -17,7 +17,7 @@
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
-                ToolTip = 'Specifies the value of the Receipt1Text field';
+                ToolTip = 'Specifies the first receipt text associated with the EFT transaction request.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
@@ -36,7 +36,7 @@
                 DrillDown = true;
                 Editable = false;
                 ShowCaption = false;
-                ToolTip = 'Specifies the value of the Receipt2Text field';
+                ToolTip = 'Specifies the first receipt text associated with the EFT transaction request.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnDrillDown()
@@ -54,7 +54,7 @@
                 field(Comment; Rec.Comment)
                 {
 
-                    ToolTip = 'Specifies the value of the Comment field';
+                    ToolTip = 'Specifies the first receipt text associated with the EFT transaction request.';
                     ApplicationArea = NPRRetail;
                 }
             }
