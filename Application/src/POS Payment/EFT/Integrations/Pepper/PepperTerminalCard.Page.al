@@ -22,49 +22,49 @@
                 field("Code"; Rec.Code)
                 {
 
-                    ToolTip = 'Specifies the value of the Code field';
+                    ToolTip = 'Specifies the unique identifier for the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
 
-                    ToolTip = 'Specifies the value of the Description field';
+                    ToolTip = 'Specifies a brief description of the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Register No."; Rec."Register No.")
                 {
 
-                    ToolTip = 'Specifies the value of the POS Unit No. field';
+                    ToolTip = 'Specifies the register number associated with the POS unit.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Instance ID"; Rec."Instance ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Instance ID field';
+                    ToolTip = 'Specifies the unique identifier for the terminal instance.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Configuration Code"; Rec."Configuration Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Configuration Code field';
+                    ToolTip = 'Specifies the code for the terminal configuration.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Language; Rec.Language)
                 {
 
-                    ToolTip = 'Specifies the value of the Language field';
+                    ToolTip = 'Specifies the language used for the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pepper Receipt Encoding"; Rec."Pepper Receipt Encoding")
                 {
 
-                    ToolTip = 'Specifies the value of the Pepper Receipt Encoding field';
+                    ToolTip = 'Specifies the encoding format for Pepper receipts.';
                     ApplicationArea = NPRRetail;
                 }
                 field("NAV Receipt Encoding"; Rec."NAV Receipt Encoding")
                 {
 
-                    ToolTip = 'Specifies the value of the NAV Receipt Encoding field';
+                    ToolTip = 'Specifies the encoding format for Business Central receipts.';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
                     ObsoleteTag = 'NPR23.0';
@@ -73,61 +73,61 @@
                 field("Com Port"; Rec."Com Port")
                 {
 
-                    ToolTip = 'Specifies the value of the Com Port field';
+                    ToolTip = 'Specifies the communication port used by the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("IP Address"; Rec."IP Address")
                 {
 
-                    ToolTip = 'Specifies the value of the IP Address field';
+                    ToolTip = 'Specifies the IP address associated with the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Terminal Type Code"; Rec."Terminal Type Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Terminal Type Code field';
+                    ToolTip = 'Specifies the code representing the terminal type.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Receipt Format"; Rec."Receipt Format")
                 {
 
-                    ToolTip = 'Specifies the value of the Receipt Format field';
+                    ToolTip = 'Specifies the format used for receipts.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Fixed Currency Code"; Rec."Fixed Currency Code")
                 {
 
-                    ToolTip = 'Specifies the value of the Fixed Currency Code field';
+                    ToolTip = 'Specifies the currency code for fixed transactions.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Open Automatically"; Rec."Open Automatically")
                 {
 
-                    ToolTip = 'Specifies the value of the Open Automatically field';
+                    ToolTip = ' Indicates whether the terminal opens automatically.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Close Automatically"; Rec."Close Automatically")
                 {
 
-                    ToolTip = 'Specifies the value of the Close Automatically field';
+                    ToolTip = 'Indicates whether the terminal closes automatically.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Cancel at Wrong Signature"; Rec."Cancel at Wrong Signature")
                 {
 
-                    ToolTip = 'Specifies the value of the Cancel at Wrong Signature field';
+                    ToolTip = 'Indicates whether the terminal cancels on a wrong signature.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Customer ID"; Rec."Customer ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Customer ID field';
+                    ToolTip = 'Specifies the unique identifier for the customer.';
                     ApplicationArea = NPRRetail;
                 }
                 field("License ID"; Rec."License ID")
                 {
 
-                    ToolTip = 'Specifies the value of the License ID field';
+                    ToolTip = 'Specifies the unique identifier for the license.';
                     ApplicationArea = NPRRetail;
                 }
                 field(License; HasLicense)
@@ -135,7 +135,7 @@
 
                     Caption = 'License';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasLicense field';
+                    ToolTip = 'Indicates whether the terminal has a license.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Additional Parameters"; HasAdditionalParameters)
@@ -143,7 +143,7 @@
 
                     Caption = 'Additional Parameters';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the HasAdditionalParameters field';
+                    ToolTip = 'Indicates whether the terminal has additional parameters.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -152,31 +152,31 @@
                 field("Matchbox Files"; Rec."Matchbox Files")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox Files field';
+                    ToolTip = 'Specifies information about the Matchbox configuration files.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Company ID"; Rec."Matchbox Company ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox Company ID field';
+                    ToolTip = 'Specifies the unique identifier for the Matchbox company associated with the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Matchbox Shop ID"; Rec."Matchbox Shop ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox Shop ID field';
+                    ToolTip = 'Specifies the unique identifier for the Matchbox shop associated with the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Matchbox POS ID"; Rec."Matchbox POS ID")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox POS ID field';
+                    ToolTip = 'Specifies the unique identifier for the Matchbox POS unit associated with the terminal.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Matchbox File Name"; Rec."Matchbox File Name")
                 {
 
-                    ToolTip = 'Specifies the value of the Matchbox File Name field';
+                    ToolTip = 'Specifies the name of the Matchbox configuration file associated with the terminal.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -185,49 +185,49 @@
                 field("Print File Open"; Rec."Print File Open")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Open field';
+                    ToolTip = 'Specifies the name of the print file for the sign-on ticket. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File Close"; Rec."Print File Close")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Close field';
+                    ToolTip = 'Specifies the name of the print file for the sign-off ticket. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File Transaction"; Rec."Print File Transaction")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Transaction field';
+                    ToolTip = 'Specifies the name of the print file for the transaction ticket (client receipt). In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File CC Transaction"; Rec."Print File CC Transaction")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File CC Transaction field';
+                    ToolTip = 'Specifies the name of the print file for the additional credit card ticket (merchant receipt). In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File Difference"; Rec."Print File Difference")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Difference field';
+                    ToolTip = 'Specifies the name of the print file for the difference ticket. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File End of Day"; Rec."Print File End of Day")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File End of Day field';
+                    ToolTip = 'Specifies the name of the print file for the end-of-day ticket. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File Journal"; Rec."Print File Journal")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Journal field';
+                    ToolTip = 'Specifies the name of the print file for the journal of the EFT terminal. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Print File Initialisation"; Rec."Print File Initialisation")
                 {
 
-                    ToolTip = 'Specifies the value of the Print File Initialisation field';
+                    ToolTip = 'Specifies the name of the print file for the journal of the EFT terminal. In addition, an absolute or relative path preceding the file name can be specified. If the file name extension is “.xml” (not case-sensitive), the file will be created in the XML format.';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -245,7 +245,7 @@
                     Caption = 'License';
                     Image = ImportCodes;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Import a license file.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -259,7 +259,7 @@
                     Caption = 'Additional Parameters';
                     Image = Import;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Import a license file.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -276,7 +276,7 @@
                     Caption = 'License';
                     Image = ElectronicNumber;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Display the license file.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -290,7 +290,7 @@
                     Caption = 'Additional Parameters';
                     Image = ElectronicDoc;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Display the license file.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -306,7 +306,7 @@
                     Caption = 'License';
                     Image = DeleteQtyToHandle;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Delete the license file.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -320,7 +320,7 @@
                     Caption = 'Additional parameters';
                     Image = DeleteXML;
 
-                    ToolTip = 'Executes the Additional parameters action';
+                    ToolTip = 'Delete the additional parameter files.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -337,7 +337,7 @@
                     Caption = 'License';
                     Image = Export;
 
-                    ToolTip = 'Executes the License action';
+                    ToolTip = 'Delete the additional parameter files.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -350,7 +350,7 @@
                     Caption = 'Additional Parameters';
                     Image = TransmitElectronicDoc;
 
-                    ToolTip = 'Executes the Additional Parameters action';
+                    ToolTip = 'Export the additional parameter files.';
                     ApplicationArea = NPRRetail;
 
                     trigger OnAction()
@@ -371,7 +371,7 @@
                 RunPageView = SORTING("Entry No.")
                               ORDER(Ascending);
 
-                ToolTip = 'Executes the Transaction Requests action';
+                ToolTip = 'View the transaction requests associated with the terminal.';
                 ApplicationArea = NPRRetail;
             }
         }
