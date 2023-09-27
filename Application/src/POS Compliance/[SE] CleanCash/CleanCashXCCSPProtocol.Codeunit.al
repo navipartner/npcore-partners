@@ -12,14 +12,13 @@
     // OrgNo = 12345676890
     // PosId = retailint #note: lowercase
 
-
     // This method creates the CleanCash request based on the POS Entry
     procedure StoreReceipt(PosEntry: Record "NPR POS Entry")
     var
-        XccspInterface: Interface "NPR CleanCash XCCSP Interface";
         RequestType: Enum "NPR CleanCash Request Type";
         RequestEntryNo: Integer;
         ResponseEntryNo: Integer;
+        XccspInterface: Interface "NPR CleanCash XCCSP Interface";
     begin
 
         // Negatives and postives need to be on separate transactions
@@ -30,19 +29,18 @@
         XccspInterface := RequestType::RegisterReturnReceipt;
         if (XccspInterface.CreateRequest(PosEntry, RequestType::RegisterReturnReceipt, RequestEntryNo)) then
             HandleRequest(RequestEntryNo, ResponseEntryNo, true);
-
     end;
 
     // This method, products the request XML, sends the request and stores the response XML
     procedure HandleRequest(RequestEntryNo: Integer; ResponseEntryNo: Integer; Verbose: Boolean) Success: Boolean
     var
+        CleanCashSetup: Record "NPR CleanCash Setup";
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         CleanCashResponse: Record "NPR CleanCash Trans. Response";
-        CleanCashSetup: Record "NPR CleanCash Setup";
         MessageHandler: Interface "NPR CleanCash XCCSP Interface";
+        CleanCashMsg: Label '[CleanCash] %1', Locked = true;
         RequestXmlDoc: XmlDocument;
         ResponseXmlDoc: XmlDocument;
-        CleanCashMsg: Label '[CleanCash] %1', Locked = true;
     begin
 
         if (not CleanCashTransaction.Get(RequestEntryNo)) then
@@ -85,7 +83,6 @@
             Message(CleanCashMsg, CleanCashResponse."Fault Description");
 
         exit(true);
-
     end;
 
     // The try function attemps to send the request to clean cash server
@@ -93,44 +90,34 @@
     [TryFunction]
     local procedure TrySendRequest(Url: Text; XmlIn: XmlDocument; var XmlOut: XmlDocument)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Client: HttpClient;
+        Content: HttpContent;
+        Headers: HttpHeaders;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
-        Headers: HttpHeaders;
-        Content: HttpContent;
+        ConnectionErr: Label 'CleanCash server connection error. (reason: %1)';
+        InvalidConnectStringErr: Label 'The URL is expected to contain user and password such as "http://<username>:<password>@online.cleancash.se:8081/xccsp", but url is: %1';
+        InvalidXmlErr: Label 'CleanCash server did not respond with a valid XML document: (response was %1)';
+        RequestMethodTok: Label 'POST', Locked = true;
+        UnexpectedResponseCodeErr: Label 'CleanCash service did not return with a HTTP 200 return code (return code was: %1)';
+        Password: Text;
         RequestText: Text;
         ResponseText: Text;
         Username: Text;
-        Password: Text;
-        JObject: JsonObject;
-
-        RequestMethodTok: Label 'POST', Locked = true;
-        UserAgentTok: Label 'User-Agent', Locked = true;
-        UserAgentTxt: Label 'NP Dynamics Retail / Dynamics 365 Business Central', Locked = true;
-        InvalidConnectStringErr: Label 'The URL is expected to contain user and password such as "http://<username>:<password>@online.cleancash.se:8081/xccsp", but url is: %1';
-        ConnectionErr: Label 'CleanCash server connection error. (reason: %1)';
-        UnexpectedResponseCodeErr: Label 'CleanCash service did not return with a HTTP 200 return code (return code was: %1)';
-        InvalidXmlErr: Label 'CleanCash server did not respond with a valid XML document: (response was %1)';
     begin
         XmlIn.WriteTo(RequestText);
+        Content.WriteFrom(RequestText);
+        Content.GetHeaders(Headers);
 
         if (not ExtractUserNamePasswordFromUrl(Url, Username, Password)) then
             Error(InvalidConnectStringErr, Url);
 
         Request.Method := RequestMethodTok;
-        Request.SetRequestUri('https://navipartner.azure-api.net/npcleancash/CleanCash'); //CleanCash API --> CleanCash Azure Function --> DigestAuth Proxy
-        Request.GetHeaders(Headers);
-        Headers.Add('Ocp-Apim-Subscription-Key', AzureKeyVaultMgt.GetAzureKeyVaultSecret('CleanCashApiKey'));
-        Headers.Add(UserAgentTok, UserAgentTxt);
-
-        JObject.Add('url', Url);
-        JObject.Add('userName', Username);
-        JObject.Add('password', Password);
-        JObject.Add('requestBody', RequestText);
-        JObject.WriteTo(RequestText);
-        Content.WriteFrom(RequestText);
+        Request.SetRequestUri(Url);
         Request.Content(Content);
+        Request.GetHeaders(Headers);
+
+        Headers.Add('Authorization', 'Basic ' + GetBasicAuthInfo(Username, Password));
 
         if (Client.Send(Request, Response)) then begin
 
@@ -138,12 +125,19 @@
                 Response.Content.ReadAs(ResponseText);
                 if (not XmlDocument.ReadFrom(ResponseText, XmlOut)) or (ResponseText.Contains('<type>Fault</type>')) then
                     Error(InvalidXmlErr, ResponseText);
-            end else begin
-                Error(UnexpectedResponseCodeErr, Response.HttpStatusCode)
-            end;
-        end else begin
+            end else
+                Error(UnexpectedResponseCodeErr, Response.HttpStatusCode);
+        end else
             Error(ConnectionErr, GetLastErrorText());
-        end;
+    end;
+
+    [NonDebuggable]
+    local procedure GetBasicAuthInfo(Username: Text; Password: Text): Text
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        SubMsg: Label '%1:%2', Locked = true;
+    begin
+        exit(Base64Convert.ToBase64(StrSubstNo(SubMsg, Username, Password)))
     end;
 
     local procedure ExtractUserNamePasswordFromUrl(var Url: Text; var Username: Text; var Password: Text): Boolean
@@ -174,7 +168,6 @@
 
         exit((StrLen(Url) > 0) and (StrLen(Username) > 0) and (StrLen(Password) > 0));
     end;
-
 
     procedure GetNamespace(): Text
     var
@@ -235,27 +228,25 @@
     // Default or unknown request type implementation (no print)
     procedure AddToPrintBuffer(var LinePrintMgt: Codeunit "NPR RP Line Print Mgt."; var CleanCashTransaction: Record "NPR CleanCash Trans. Request")
     begin
-
     end;
 
     // Get the fault information returned by cleancash server
     procedure SerializeFaultInfo(Element: XmlElement; NamespaceManager: XmlNamespaceManager; var CleanCashResponse: Record "NPR CleanCash Trans. Response")
     var
-        Node: XmlNode;
         EnumAsText: Text;
         DataElement: XmlElement;
+        Node: XmlNode;
     begin
         if (Element.SelectSingleNode('cc:data', NamespaceManager, Node)) then begin
             DataElement := Node.AsXmlElement();
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Code', EnumAsText, MaxStrLen(EnumAsText));
-            evaluate(CleanCashResponse."Fault Code", EnumAsText);
+            Evaluate(CleanCashResponse."Fault Code", EnumAsText);
 #pragma warning disable AA0139
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:ShortMessage', CleanCashResponse."Fault Short Description", MaxStrLen(CleanCashResponse."Fault Short Description"));
             GetElementInnerText(NamespaceManager, DataElement, 'cc:FaultInfo/cc:Message', CleanCashResponse."Fault Description", MaxStrLen(CleanCashResponse."Fault Description"));
 #pragma warning restore
         end;
     end;
-
 
     // Helper function when creating the XML request
     procedure AddElement(Name: Text; Value: Text; XmlNs: Text): XmlElement
@@ -275,7 +266,7 @@
         if (not Element.SelectSingleNode(XPath, NamespaceManager, Node)) then
             exit(false);
 
-        InnerText := copystr(Node.AsXmlElement().InnerText(), 1, MaxLen);
+        InnerText := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxLen);
         exit(true);
     end;
 }
