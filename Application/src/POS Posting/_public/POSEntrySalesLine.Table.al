@@ -499,6 +499,12 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(630; "Voucher Category"; Enum "NPR Voucher Category")
+        {
+            Caption = 'Voucher Category';
+            Editable = false;
+            DataClassification = CustomerContent;
+        }
         field(700; "NPRE Seating Code"; Code[20])
         {
             Caption = 'Seating Code';

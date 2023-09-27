@@ -71,9 +71,10 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         SaleLinePOS.Validate("No.", VoucherType."Account No.");
         SaleLinePOS.Description := VoucherType.Description;
         SaleLinePOS.Quantity := Quantity;
+        SaleLinePOS."Voucher Category" := VoucherType."Voucher Category";
+
         if SaleLinePOS.Quantity < 0 then
             Error(QtyNotPositiveErr);
-
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS."Unit Price" := Amount;

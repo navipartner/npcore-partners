@@ -308,6 +308,12 @@
             DataClassification = CustomerContent;
             TableRelation = "Responsibility Center";
         }
+        field(630; "Voucher Category"; Enum "NPR Voucher Category")
+        {
+            Caption = 'Voucher Category';
+            Editable = false;
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

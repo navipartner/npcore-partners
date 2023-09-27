@@ -286,7 +286,8 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>31.20316cm</Top>
+            <Top>33.65048cm</Top>
+            <Left>0.00599in</Left>
             <Height>1.8cm</Height>
             <Width>19.18752cm</Width>
             <Style>
@@ -547,7 +548,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Fields!POSEntry2_Qty.Value)</Value>
+                                  <Value>=SUM(Fields!POSEntry2_Qty.Value)</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -843,8 +844,8 @@
                 </FilterValues>
               </Filter>
             </Filters>
-            <Top>28.61944cm</Top>
-            <Left>0.01496cm</Left>
+            <Top>31.16201cm</Top>
+            <Left>0.03016cm</Left>
             <Height>2.40733cm</Height>
             <Width>19.17256cm</Width>
             <ZIndex>1</ZIndex>
@@ -1613,8 +1614,8 @@
                 </FilterValues>
               </Filter>
             </Filters>
-            <Top>26.90735cm</Top>
-            <Left>0.06106cm</Left>
+            <Top>29.50324cm</Top>
+            <Left>0.0152cm</Left>
             <Height>1.57409cm</Height>
             <Width>19.17244cm</Width>
             <ZIndex>2</ZIndex>
@@ -1636,7 +1637,7 @@
               </TablixColumns>
               <TablixRows>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -1672,7 +1673,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -1683,9 +1684,9 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!TurnoverLCYlbl_.Value</Value>
+                                  <Value>=Parameters!GrossDirectTurnoverLCYLbl.Value</Value>
                                   <Style>
-                                    <FontSize>8pt</FontSize>
+                                    <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
                                   </Style>
                                 </TextRun>
@@ -1711,9 +1712,9 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!TurnoverLCY_.Value)</Value>
+                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value)+LAST(Fields!DirectReturnSalesLCY_.Value)+LAST(Fields!CreditRealAmtLCY_.Value)+LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
                                   <Style>
-                                    <FontSize>8pt</FontSize>
+                                    <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
                                     <Format>n2</Format>
                                   </Style>
@@ -1736,18 +1737,18 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox14">
+                        <Textbox Name="Textbox31">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DirectTurnoverLCYlbl_.Value</Value>
+                                  <Value>=Parameters!DirectTurnoverLCYlbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1757,12 +1758,11 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox14</rd:DefaultName>
+                          <rd:DefaultName>Textbox31</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
                             </Border>
-                            <PaddingLeft>6pt</PaddingLeft>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -1776,7 +1776,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DirectTurnoverLCY_.Value</Value>
+                                  <Value>=Fields!DirectItemNetSalesLCY.Value+Fields!DirectReturnSalesLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -1801,11 +1801,11 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox135">
+                        <Textbox Name="Textbox26">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1821,7 +1821,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox135</rd:DefaultName>
+                          <rd:DefaultName>Textbox26</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1840,7 +1840,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value)</Value>
+                                  <Value>=Fields!DirectItemNetSalesLCY.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -1864,7 +1864,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -1903,7 +1903,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!DirectReturnSalesLCY_.Value)</Value>
+                                  <Value>=Fields!DirectReturnSalesLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -1927,198 +1927,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox43">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!GLPaymentLCYlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox43</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                            <PaddingLeft>12pt</PaddingLeft>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox17">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=LAST(Fields!GLPaymentLCY_.Value)</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <Format>n2</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox17</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox28">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!DebtorPaymentLCYlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox28</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                            <PaddingLeft>12pt</PaddingLeft>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox27">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=LAST(Fields!DebtorPaymentLCY_.Value)</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <Format>n2</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox27</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23622in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox61">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!DirectNetTurnoverLCYlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox60</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                            <PaddingLeft>6pt</PaddingLeft>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox29">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value)</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Format>n2</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox29</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2151,14 +1960,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox116">
+                        <Textbox Name="SalesCount_3">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!CreditTurnoverLCY_.Value)</Value>
+                                  <Value>=Fields!CreditRealAmtLCY_.Value+Fields!CreditRealReturnAmtLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2171,7 +1980,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox116</rd:DefaultName>
+                          <rd:DefaultName>SalesCount_</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2183,7 +1992,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2222,7 +2031,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!CreditRealAmtLCY_.Value)</Value>
+                                  <Value>=Fields!CreditRealAmtLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2246,7 +2055,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2287,7 +2096,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
+                                  <Value>=Fields!CreditRealReturnAmtLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2311,7 +2120,197 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox127">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!NetTurnoverLCYLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox123</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="SalesCount_4">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!NetDirectTurnover_.Value + Fields!NetCreditTurnover_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>SalesCount_</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox135">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!NetDirectTurnoverLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox135</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>12pt</PaddingLeft>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox69">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!NetDirectTurnover_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox66</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox137">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!NetCreditTurnoverLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox135</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>12pt</PaddingLeft>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox74">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!NetCreditTurnover_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox66</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2322,7 +2321,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!CreditNetTurnOverLCYlbl_.Value</Value>
+                                  <Value>=Parameters!OtherPaymentsLCYLbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2346,14 +2345,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox99">
+                        <Textbox Name="SalesCount_5">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
+                                  <Value>=Fields!GLPaymentLCY_.Value+Fields!DebtorPaymentLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2366,7 +2365,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox99</rd:DefaultName>
+                          <rd:DefaultName>SalesCount_</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2378,82 +2377,18 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox47">
+                        <Textbox Name="Textbox53">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!NetTurnoverLCYlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox47</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox48">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value) + LAST(Fields!DirectReturnSalesLCY_.Value) + LAST(Fields!GLPaymentLCY_.Value) + LAST(Fields!DebtorPaymentLCY_.Value) +LAST(Fields!CreditRealAmtLCY_.Value) +LAST(Fields!CreditRealReturnAmtLCY_.Value)</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Format>n2</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox48</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox30">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
+                                  <Value>=Fields!GLPaymentLCYlbl_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -2462,7 +2397,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox30</rd:DefaultName>
+                          <rd:DefaultName>Textbox43</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2474,7 +2409,105 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox33">
+                        <Textbox Name="Textbox17">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!GLPaymentLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox17</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox57">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!DebtorPaymentLCYlbl_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox28</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>12pt</PaddingLeft>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox27">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!DebtorPaymentLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox27</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox37">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2490,15 +2523,41 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox33</rd:DefaultName>
+                          <rd:DefaultName>Textbox37</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
                             </Border>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
+                            <PaddingLeft>12pt</PaddingLeft>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox45">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox45</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
                           </Style>
                         </Textbox>
                       </CellContents>
@@ -2506,18 +2565,18 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox118">
+                        <Textbox Name="Textbox120">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Discountlbl_.Value</Value>
+                                  <Value>=Parameters!OrderLbl.Value</Value>
                                   <Style>
                                     <FontSize>9pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -2539,7 +2598,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox65">
+                        <Textbox Name="Textbox67">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2570,11 +2629,199 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox143">
+                        <Textbox Name="Textbox144">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!NetCreditUnrealSaleAmtLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox135</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox28">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!CreditUnrealSaleAmtLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox27</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox145">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!NetCreditUnrealSaleReturnAmtLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox135</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox33">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!CreditUnrealReturnAmtLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox27</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox132">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Discountlbl_.Value</Value>
+                                  <Style>
+                                    <FontSize>9pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox117</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <BackgroundColor>LightGrey</BackgroundColor>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox108">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <BackgroundColor>LightGrey</BackgroundColor>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox154">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2632,72 +2879,11 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.23622in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox115">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!CreditUnrealSaleAmtLCYlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox15</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox4">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!CreditUnrealSaleAmtLCY_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox4</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox5">
+                        <Textbox Name="Textbox40">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2713,7 +2899,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox5</rd:DefaultName>
+                          <rd:DefaultName>Textbox40</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2724,7 +2910,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox15">
+                        <Textbox Name="Textbox42">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2742,7 +2928,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox15</rd:DefaultName>
+                          <rd:DefaultName>Textbox42</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2754,7 +2940,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2818,7 +3004,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2856,7 +3042,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!NetTurnoverLCY_.Value)</Value>
+                                  <Value>=Fields!NetDirectTurnover_.Value + Fields!NetCreditTurnover_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2880,7 +3066,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2918,7 +3104,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!itemCostTotal.Value)</Value>
+                                  <Value>=Fields!ItemCostTotal_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -2942,7 +3128,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -2980,7 +3166,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!NetTurnoverLCY_.Value) - LAST(Fields!itemCostTotal.Value)</Value>
+                                  <Value>=Fields!ProfitLcy.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3004,7 +3190,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3042,7 +3228,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(LAST(Fields!itemCostTotal.Value)/LAST(Fields!NetTurnoverLCY_.Value))</Value>
+                                  <Value>=Fields!ProfitPct.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>0.00%</Format>
@@ -3066,68 +3252,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox87">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox87</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox88">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox88</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3191,7 +3316,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3252,7 +3377,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3313,7 +3438,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3374,7 +3499,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3435,69 +3560,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.22055in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox162">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>9pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox162</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox168">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox168</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3561,7 +3624,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3599,7 +3662,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!DirectItemNetSalesLCY.Value)/LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=(Fields!NetDirectTurnover_.Value + Fields!NetCreditTurnover_.Value)/Fields!SalesTicket_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3623,7 +3686,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3661,7 +3724,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!ItemQty.Value)</Value>
+                                  <Value>=Fields!ItemQty_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3685,7 +3748,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3696,7 +3759,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!itemQTYSalesTicket.Value</Value>
+                                  <Value>=Parameters!ItemQTYSalesTicket.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3723,7 +3786,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!ItemQty.Value)/LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=Fields!ItemQty_.Value/Fields!SalesTicket_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -3747,7 +3810,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3785,7 +3848,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!SalesCount_.Value)</Value>
+                                  <Value>=Fields!DirectSalesCount_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3808,7 +3871,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23622in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3846,7 +3909,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!ReturnSalesCount_.Value)</Value>
+                                  <Value>=Fields!DirectSalesReturnCount_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3869,68 +3932,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23622in</Height>
-                  <TablixCells>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox38">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Fields!CashDrawerOpenCountlbl_.Value</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox35</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox45">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=LAST(Fields!CashDraweropnCount_.Value)</Value>
-                                  <Style>
-                                    <FontSize>8pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style>
-                                <TextAlign>Right</TextAlign>
-                              </Style>
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox23</rd:DefaultName>
-                          <Style>
-                            <Border>
-                              <Style>None</Style>
-                            </Border>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                  </TablixCells>
-                </TablixRow>
-                <TablixRow>
-                  <Height>0.23622in</Height>
+                  <Height>0.22407in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -3968,7 +3970,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!CancellesSalesCount_.Value)</Value>
+                                  <Value>=Fields!CancelledSalesCount_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -3991,7 +3993,130 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.23622in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox34">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!DirectTurnoverDirectSalesTicketLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox34</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox178">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!DirectTurnover_.Value / Fields!SumOfDirectSalesTicket_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox177</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.23622in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox14">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox14</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox35">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox35</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -4027,7 +4152,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -4089,7 +4214,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23486in</Height>
+                  <Height>0.1971in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -4127,7 +4252,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!LocalCurrencyLCY.Value)</Value>
+                                  <Value>=Fields!LocalCurrencyLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4151,11 +4276,11 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.03125in</Height>
+                  <Height>0.23622in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox34">
+                        <Textbox Name="Textbox4">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -4169,7 +4294,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox34</rd:DefaultName>
+                          <rd:DefaultName>Textbox4</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -4184,7 +4309,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox40">
+                        <Textbox Name="Textbox5">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -4200,7 +4325,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox40</rd:DefaultName>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -4216,7 +4341,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.22507in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -4252,7 +4377,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.2048in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -4263,7 +4388,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!IssuedVoucherLCYlbl_.Value</Value>
+                                  <Value>=Parameters!IssuedGiftVouchersLCYlbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4290,7 +4415,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!IssuedVouchersLCY.Value)</Value>
+                                  <Value>=Fields!IssuedGiftVoucherLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4314,18 +4439,18 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.23722in</Height>
+                  <Height>0.21942in</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox74">
+                        <Textbox Name="Textbox43">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!RedeemedVoucherLCYlbl_.Value</Value>
+                                  <Value>=Parameters!IssuedCreditVouchersLCYlbl.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                   </Style>
@@ -4334,7 +4459,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox74</rd:DefaultName>
+                          <rd:DefaultName>Textbox43</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -4352,7 +4477,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=LAST(Fields!RedeemedVoucherLCY.Value)</Value>
+                                  <Value>=Fields!IssuedCreditVoucherLCY_.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <Format>n2</Format>
@@ -4375,6 +4500,254 @@
                     </TablixCell>
                   </TablixCells>
                 </TablixRow>
+                <TablixRow>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox30">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!RedeemedGiftVoucherslbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox30</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox15">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!RedeemedGiftVoucherLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.22407in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox38">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!RedeemedCreditVoucherslbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox38</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox29">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!RedeemedCreditVoucherLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.23622in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox55">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!RedeemedVouchersLCYLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox38</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox58">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!RedeemedVoucherLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+                <TablixRow>
+                  <Height>0.23622in</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox47">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Parameters!IssuedVouchersLCYLbl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox38</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox48">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!IssuedVouchersLCY_.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <Format>n2</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox11</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
               </TablixRows>
             </TablixBody>
             <TablixColumnHierarchy>
@@ -4387,21 +4760,6 @@
               <TablixMembers>
                 <TablixMember />
                 <TablixMember />
-                <TablixMember>
-                  <Visibility>
-                    <Hidden>true</Hidden>
-                  </Visibility>
-                </TablixMember>
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember>
-                  <Visibility>
-                    <Hidden>true</Hidden>
-                  </Visibility>
-                </TablixMember>
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
@@ -4409,11 +4767,16 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
-                <TablixMember>
-                  <Visibility>
-                    <Hidden>true</Hidden>
-                  </Visibility>
-                </TablixMember>
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
@@ -4446,11 +4809,14 @@
                     <Hidden>true</Hidden>
                   </Visibility>
                 </TablixMember>
-                <TablixMember>
-                  <Visibility>
-                    <Hidden>true</Hidden>
-                  </Visibility>
-                </TablixMember>
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
+                <TablixMember />
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
@@ -4459,24 +4825,41 @@
                 <TablixMember />
                 <TablixMember>
                   <Visibility>
-                    <Hidden>true</Hidden>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,True,False)</Hidden>
                   </Visibility>
                 </TablixMember>
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
-                <TablixMember />
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,True,False)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,True,False)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,True,False)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,False,True)</Hidden>
+                  </Visibility>
+                </TablixMember>
+                <TablixMember>
+                  <Visibility>
+                    <Hidden>=IIf(Fields!PrintOldVouchers_.Value = True,False,True)</Hidden>
+                  </Visibility>
+                </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
             <KeepTogether>true</KeepTogether>
             <DataSetName>DataSet_Result</DataSetName>
             <Top>0.09405in</Top>
-            <Left>0.00589in</Left>
-            <Height>10.4459in</Height>
+            <Left>0.00594in</Left>
+            <Height>11.47958in</Height>
             <Width>7.54825in</Width>
             <ZIndex>3</ZIndex>
             <Style>
@@ -4486,10 +4869,10 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>33.28752cm</Height>
+        <Height>36.05373cm</Height>
         <Style />
       </Body>
-      <Width>19.24858cm</Width>
+      <Width>19.24492cm</Width>
       <Page>
         <PageHeader>
           <Height>3.05859cm</Height>
@@ -4514,7 +4897,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox18</rd:DefaultName>
               <Top>0.51959in</Top>
-              <Left>0.04608in</Left>
+              <Left>0.04613in</Left>
               <Height>0.20833in</Height>
               <Width>1.60417in</Width>
               <Style>
@@ -4543,7 +4926,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox19</rd:DefaultName>
               <Top>0.85014in</Top>
-              <Left>4.6065in</Left>
+              <Left>4.60655in</Left>
               <Height>0.18055in</Height>
               <Width>2.91667in</Width>
               <ZIndex>1</ZIndex>
@@ -4555,7 +4938,7 @@
             </Textbox>
             <Line Name="Line1">
               <Top>0.7925in</Top>
-              <Left>0.02525in</Left>
+              <Left>0.0253in</Left>
               <Height>0in</Height>
               <Width>7.55144in</Width>
               <ZIndex>2</ZIndex>
@@ -4586,7 +4969,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox20</rd:DefaultName>
               <Top>0.85014in</Top>
-              <Left>1.50095in</Left>
+              <Left>1.501in</Left>
               <Height>0.19792in</Height>
               <Width>1.55965in</Width>
               <ZIndex>3</ZIndex>
@@ -4614,7 +4997,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox20</rd:DefaultName>
               <Top>0.85014in</Top>
-              <Left>0.02404in</Left>
+              <Left>0.02409in</Left>
               <Height>0.19792in</Height>
               <Width>1.44913in</Width>
               <ZIndex>4</ZIndex>
@@ -4626,6 +5009,7 @@
             </Textbox>
             <Line Name="Line2">
               <Top>1.1175in</Top>
+              <Left>0.00005in</Left>
               <Height>0in</Height>
               <Width>7.57228in</Width>
               <ZIndex>5</ZIndex>
@@ -4655,7 +5039,7 @@
                 </Paragraph>
               </Paragraphs>
               <rd:DefaultName>Textbox41</rd:DefaultName>
-              <Left>0.02404in</Left>
+              <Left>0.02409in</Left>
               <Height>0.25in</Height>
               <Width>2.16951in</Width>
               <ZIndex>6</ZIndex>
@@ -4670,7 +5054,7 @@
               <Value>=Convert.ToBase64String(First(Fields!CompInfoPicture_.Value, "DataSet_Result"))</Value>
               <MIMEType>image/bmp</MIMEType>
               <Sizing>FitProportional</Sizing>
-              <Left>16.16968cm</Left>
+              <Left>16.16981cm</Left>
               <Height>52.41048pt</Height>
               <Width>3.06382cm</Width>
               <ZIndex>7</ZIndex>
@@ -4719,15 +5103,6 @@
         </Values>
       </DefaultValue>
       <Prompt>NetTurnoverLCYLbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="ItemCostTotalLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ItemCostTotalLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ItemCostTotalLbl</Prompt>
     </ReportParameter>
     <ReportParameter Name="ProfitLCYLbl">
       <DataType>String</DataType>
@@ -4819,15 +5194,6 @@
       </DefaultValue>
       <Prompt>ItemQTYLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="itemQTYSalesTicket">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>itemQTYSalesTicket</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>itemQTYSalesTicket</Prompt>
-    </ReportParameter>
     <ReportParameter Name="ItemLineslbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -4900,11 +5266,164 @@
       </DefaultValue>
       <Prompt>AmountLbl</Prompt>
     </ReportParameter>
+    <ReportParameter Name="ItemQTYSalesTicket">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ItemQTYSalesTicket</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ItemQTYSalesTicket</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ItemCostTotalLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ItemCostTotalLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ItemCostTotalLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DirectTurnoverLCYlbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DirectTurnoverLCYlbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DirectTurnoverLCYlbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IssuedGiftVouchersLCYlbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IssuedGiftVouchersLCYlbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IssuedGiftVouchersLCYlbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IssuedCreditVouchersLCYlbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IssuedCreditVouchersLCYlbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IssuedCreditVouchersLCYlbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RedeemedGiftVoucherslbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RedeemedGiftVoucherslbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RedeemedGiftVoucherslbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RedeemedCreditVoucherslbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RedeemedCreditVoucherslbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RedeemedCreditVoucherslbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DirectTurnoverDirectSalesTicketLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DirectTurnoverDirectSalesTicketLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DirectTurnoverDirectSalesTicketLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="GrossDirectTurnoverLCYLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>GrossDirectTurnoverLCYLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>GrossDirectTurnoverLCYLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="OrderLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>OrderLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>OrderLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NetCreditUnrealSaleAmtLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NetCreditUnrealSaleAmtLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NetCreditUnrealSaleAmtLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NetCreditUnrealSaleReturnAmtLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NetCreditUnrealSaleReturnAmtLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NetCreditUnrealSaleReturnAmtLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NetDirectTurnoverLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NetDirectTurnoverLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NetDirectTurnoverLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NetCreditTurnoverLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NetCreditTurnoverLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NetCreditTurnoverLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="OtherPaymentsLCYLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>OtherPaymentsLCYLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>OtherPaymentsLCYLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="RedeemedVouchersLCYLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>RedeemedVouchersLCYLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>RedeemedVouchersLCYLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IssuedVouchersLCYLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IssuedVouchersLCYLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IssuedVouchersLCYLbl</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>22</NumberOfRows>
+      <NumberOfRows>37</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -4919,102 +5438,177 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>2</RowIndex>
-          <ParameterName>ItemCostTotalLbl</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
           <ParameterName>ProfitLCYLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>ProfitPCTLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
+          <RowIndex>4</RowIndex>
           <ParameterName>AdjustedCostDetailsLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
+          <RowIndex>5</RowIndex>
           <ParameterName>AdjSalesExclVATLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
+          <RowIndex>6</RowIndex>
           <ParameterName>AdjItemCostTotalLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
+          <RowIndex>7</RowIndex>
           <ParameterName>AdjProfitLCYLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>8</RowIndex>
           <ParameterName>AdjProfitPctLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
+          <RowIndex>9</RowIndex>
           <ParameterName>TurnoverBasketLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
+          <RowIndex>10</RowIndex>
           <ParameterName>TurnoverAvgSalesTicketLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
+          <RowIndex>11</RowIndex>
           <ParameterName>ItemQTYLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
-          <ParameterName>itemQTYSalesTicket</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
+          <RowIndex>12</RowIndex>
           <ParameterName>ItemLineslbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
+          <RowIndex>13</RowIndex>
           <ParameterName>itemLineSalesQtyLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
+          <RowIndex>14</RowIndex>
           <ParameterName>SalesQTYLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>17</RowIndex>
+          <RowIndex>15</RowIndex>
           <ParameterName>SalesAmtLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>18</RowIndex>
+          <RowIndex>16</RowIndex>
           <ParameterName>SalesAvgLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
+          <RowIndex>17</RowIndex>
           <ParameterName>PaymentDetailsLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
+          <RowIndex>18</RowIndex>
           <ParameterName>PaymentMethodLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
+          <RowIndex>19</RowIndex>
           <ParameterName>AmountLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>20</RowIndex>
+          <ParameterName>ItemQTYSalesTicket</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>21</RowIndex>
+          <ParameterName>ItemCostTotalLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>22</RowIndex>
+          <ParameterName>DirectTurnoverLCYlbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>23</RowIndex>
+          <ParameterName>IssuedGiftVouchersLCYlbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>24</RowIndex>
+          <ParameterName>IssuedCreditVouchersLCYlbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>25</RowIndex>
+          <ParameterName>RedeemedGiftVoucherslbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>26</RowIndex>
+          <ParameterName>RedeemedCreditVoucherslbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>27</RowIndex>
+          <ParameterName>DirectTurnoverDirectSalesTicketLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>28</RowIndex>
+          <ParameterName>GrossDirectTurnoverLCYLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>29</RowIndex>
+          <ParameterName>OrderLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>30</RowIndex>
+          <ParameterName>NetCreditUnrealSaleAmtLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>31</RowIndex>
+          <ParameterName>NetCreditUnrealSaleReturnAmtLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>32</RowIndex>
+          <ParameterName>NetDirectTurnoverLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>33</RowIndex>
+          <ParameterName>NetCreditTurnoverLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>34</RowIndex>
+          <ParameterName>OtherPaymentsLCYLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>35</RowIndex>
+          <ParameterName>RedeemedVouchersLCYLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>36</RowIndex>
+          <ParameterName>IssuedVouchersLCYLbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -5139,12 +5733,6 @@ End Function
         <Field Name="CashMovementLCYlbl_">
           <DataField>CashMovementLCYlbl_</DataField>
         </Field>
-        <Field Name="IssuedVoucherLCYlbl_">
-          <DataField>IssuedVoucherLCYlbl_</DataField>
-        </Field>
-        <Field Name="RedeemedVoucherLCYlbl_">
-          <DataField>RedeemedVoucherLCYlbl_</DataField>
-        </Field>
         <Field Name="RedeemedCreditVoucherLClbl_">
           <DataField>RedeemedCreditVoucherLClbl_</DataField>
         </Field>
@@ -5195,9 +5783,6 @@ End Function
         </Field>
         <Field Name="RoundingLCYlbl_">
           <DataField>RoundingLCYlbl_</DataField>
-        </Field>
-        <Field Name="TurnoverLCYlbl_">
-          <DataField>TurnoverLCYlbl_</DataField>
         </Field>
         <Field Name="NetCostLCYlbl_">
           <DataField>NetCostLCYlbl_</DataField>
@@ -5268,17 +5853,11 @@ End Function
         <Field Name="CreditTurnoverLCYlbl_">
           <DataField>CreditTurnoverLCYlbl_</DataField>
         </Field>
-        <Field Name="DirectNetTurnoverLCYlbl_">
-          <DataField>DirectNetTurnoverLCYlbl_</DataField>
-        </Field>
         <Field Name="CreditRealAmtLCYlbl_">
           <DataField>CreditRealAmtLCYlbl_</DataField>
         </Field>
         <Field Name="CreditRealReturnAmtLCYlbl_">
           <DataField>CreditRealReturnAmtLCYlbl_</DataField>
-        </Field>
-        <Field Name="CreditNetTurnOverLCYlbl_">
-          <DataField>CreditNetTurnOverLCYlbl_</DataField>
         </Field>
         <Field Name="CreditUnrealSaleAmtLCYlbl_">
           <DataField>CreditUnrealSaleAmtLCYlbl_</DataField>
@@ -5291,6 +5870,102 @@ End Function
         </Field>
         <Field Name="NetTurnoverLCYlbl_">
           <DataField>NetTurnoverLCYlbl_</DataField>
+        </Field>
+        <Field Name="IssuedGiftVoucherLCY_">
+          <DataField>IssuedGiftVoucherLCY_</DataField>
+        </Field>
+        <Field Name="IssuedGiftVoucherLCY_Format">
+          <DataField>IssuedGiftVoucherLCY_Format</DataField>
+        </Field>
+        <Field Name="IssuedCreditVoucherLCY_">
+          <DataField>IssuedCreditVoucherLCY_</DataField>
+        </Field>
+        <Field Name="IssuedCreditVoucherLCY_Format">
+          <DataField>IssuedCreditVoucherLCY_Format</DataField>
+        </Field>
+        <Field Name="DirectReturnSalesLCY_">
+          <DataField>DirectReturnSalesLCY_</DataField>
+        </Field>
+        <Field Name="DirectReturnSalesLCY_Format">
+          <DataField>DirectReturnSalesLCY_Format</DataField>
+        </Field>
+        <Field Name="NetDirectTurnover_">
+          <DataField>NetDirectTurnover_</DataField>
+        </Field>
+        <Field Name="NetDirectTurnover_Format">
+          <DataField>NetDirectTurnover_Format</DataField>
+        </Field>
+        <Field Name="NetCreditTurnover_">
+          <DataField>NetCreditTurnover_</DataField>
+        </Field>
+        <Field Name="NetCreditTurnover_Format">
+          <DataField>NetCreditTurnover_Format</DataField>
+        </Field>
+        <Field Name="CreditUnrealReturnAmtLCY_">
+          <DataField>CreditUnrealReturnAmtLCY_</DataField>
+        </Field>
+        <Field Name="CreditUnrealReturnAmtLCY_Format">
+          <DataField>CreditUnrealReturnAmtLCY_Format</DataField>
+        </Field>
+        <Field Name="RedeemedCreditVoucherLCY_">
+          <DataField>RedeemedCreditVoucherLCY_</DataField>
+        </Field>
+        <Field Name="RedeemedCreditVoucherLCY_Format">
+          <DataField>RedeemedCreditVoucherLCY_Format</DataField>
+        </Field>
+        <Field Name="RedeemedGiftVoucherLCY_">
+          <DataField>RedeemedGiftVoucherLCY_</DataField>
+        </Field>
+        <Field Name="RedeemedGiftVoucherLCY_Format">
+          <DataField>RedeemedGiftVoucherLCY_Format</DataField>
+        </Field>
+        <Field Name="Turnover_">
+          <DataField>Turnover_</DataField>
+        </Field>
+        <Field Name="Turnover_Format">
+          <DataField>Turnover_Format</DataField>
+        </Field>
+        <Field Name="DirectSalesExcVAT_">
+          <DataField>DirectSalesExcVAT_</DataField>
+        </Field>
+        <Field Name="DirectSalesExcVAT_Format">
+          <DataField>DirectSalesExcVAT_Format</DataField>
+        </Field>
+        <Field Name="CreditSalesExcVAT_">
+          <DataField>CreditSalesExcVAT_</DataField>
+        </Field>
+        <Field Name="CreditSalesExcVAT_Format">
+          <DataField>CreditSalesExcVAT_Format</DataField>
+        </Field>
+        <Field Name="DirectReturnExcVAT_">
+          <DataField>DirectReturnExcVAT_</DataField>
+        </Field>
+        <Field Name="DirectReturnExcVAT_Format">
+          <DataField>DirectReturnExcVAT_Format</DataField>
+        </Field>
+        <Field Name="CreditSalesMemoExcVAT_">
+          <DataField>CreditSalesMemoExcVAT_</DataField>
+        </Field>
+        <Field Name="CreditSalesMemoExcVAT_Format">
+          <DataField>CreditSalesMemoExcVAT_Format</DataField>
+        </Field>
+        <Field Name="SalesTicket_">
+          <DataField>SalesTicket_</DataField>
+        </Field>
+        <Field Name="ItemSoldQty_">
+          <DataField>ItemSoldQty_</DataField>
+        </Field>
+        <Field Name="ItemReturnQty_">
+          <DataField>ItemReturnQty_</DataField>
+        </Field>
+        <Field Name="DirectTurnover_">
+          <DataField>DirectTurnover_</DataField>
+        </Field>
+        <Field Name="DirectTurnover_Format">
+          <DataField>DirectTurnover_Format</DataField>
+        </Field>
+        <Field Name="SumOfDirectSalesTicket_">
+          <DataField>SumOfDirectSalesTicket_</DataField>
         </Field>
         <Field Name="TurnOverLCY">
           <DataField>TurnOverLCY</DataField>
@@ -5307,18 +5982,6 @@ End Function
         <Field Name="NetTurnoverLCY_Format">
           <DataField>NetTurnoverLCY_Format</DataField>
         </Field>
-        <Field Name="DirectReturnSalesLCY_">
-          <DataField>DirectReturnSalesLCY_</DataField>
-        </Field>
-        <Field Name="DirectReturnSalesLCY_Format">
-          <DataField>DirectReturnSalesLCY_Format</DataField>
-        </Field>
-        <Field Name="CreditRealSaleAmtLCY">
-          <DataField>CreditRealSaleAmtLCY</DataField>
-        </Field>
-        <Field Name="CreditRealSaleAmtLCYFormat">
-          <DataField>CreditRealSaleAmtLCYFormat</DataField>
-        </Field>
         <Field Name="DirectItemSalesLineCount">
           <DataField>DirectItemSalesLineCount</DataField>
         </Field>
@@ -5334,8 +5997,8 @@ End Function
         <Field Name="DirectItemReturnsLCYFormat">
           <DataField>DirectItemReturnsLCYFormat</DataField>
         </Field>
-        <Field Name="DirectItemReturnsLineCount">
-          <DataField>DirectItemReturnsLineCount</DataField>
+        <Field Name="DirectItemReturnsLineCount_">
+          <DataField>DirectItemReturnsLineCount_</DataField>
         </Field>
         <Field Name="TotalDiscountLCY_">
           <DataField>TotalDiscountLCY_</DataField>
@@ -5373,11 +6036,11 @@ End Function
         <Field Name="RoundingLCYFormat">
           <DataField>RoundingLCYFormat</DataField>
         </Field>
-        <Field Name="IssuedVouchersLCY">
-          <DataField>IssuedVouchersLCY</DataField>
+        <Field Name="IssuedVouchersLCY_">
+          <DataField>IssuedVouchersLCY_</DataField>
         </Field>
-        <Field Name="IssuedVouchersLCYFormat">
-          <DataField>IssuedVouchersLCYFormat</DataField>
+        <Field Name="IssuedVouchersLCY_Format">
+          <DataField>IssuedVouchersLCY_Format</DataField>
         </Field>
         <Field Name="DirectSalesLCY_">
           <DataField>DirectSalesLCY_</DataField>
@@ -5529,17 +6192,14 @@ End Function
         <Field Name="PrintNetTurnover_">
           <DataField>PrintNetTurnover_</DataField>
         </Field>
-        <Field Name="SalesCount_">
-          <DataField>SalesCount_</DataField>
+        <Field Name="DirectSalesCount_">
+          <DataField>DirectSalesCount_</DataField>
         </Field>
-        <Field Name="SalesCount_Format">
-          <DataField>SalesCount_Format</DataField>
+        <Field Name="CreditSalesCount_">
+          <DataField>CreditSalesCount_</DataField>
         </Field>
-        <Field Name="ReturnSalesCount_">
-          <DataField>ReturnSalesCount_</DataField>
-        </Field>
-        <Field Name="ReturnSalesCount_Format">
-          <DataField>ReturnSalesCount_Format</DataField>
+        <Field Name="DirectSalesReturnCount_">
+          <DataField>DirectSalesReturnCount_</DataField>
         </Field>
         <Field Name="CashDraweropnCount_">
           <DataField>CashDraweropnCount_</DataField>
@@ -5547,17 +6207,11 @@ End Function
         <Field Name="CashDraweropnCount_Format">
           <DataField>CashDraweropnCount_Format</DataField>
         </Field>
-        <Field Name="CancellesSalesCount_">
-          <DataField>CancellesSalesCount_</DataField>
+        <Field Name="ItemCostTotal_">
+          <DataField>ItemCostTotal_</DataField>
         </Field>
-        <Field Name="CancellesSalesCount_Format">
-          <DataField>CancellesSalesCount_Format</DataField>
-        </Field>
-        <Field Name="itemCostTotal">
-          <DataField>itemCostTotal</DataField>
-        </Field>
-        <Field Name="itemCostTotalFormat">
-          <DataField>itemCostTotalFormat</DataField>
+        <Field Name="ItemCostTotal_Format">
+          <DataField>ItemCostTotal_Format</DataField>
         </Field>
         <Field Name="ProfitLcy">
           <DataField>ProfitLcy</DataField>
@@ -5577,11 +6231,8 @@ End Function
         <Field Name="TurnoverAvgSalesTicketFormat">
           <DataField>TurnoverAvgSalesTicketFormat</DataField>
         </Field>
-        <Field Name="ItemQty">
-          <DataField>ItemQty</DataField>
-        </Field>
-        <Field Name="ItemQtyFormat">
-          <DataField>ItemQtyFormat</DataField>
+        <Field Name="ItemQty_">
+          <DataField>ItemQty_</DataField>
         </Field>
         <Field Name="ItemLines">
           <DataField>ItemLines</DataField>
@@ -5622,11 +6273,11 @@ End Function
         <Field Name="EFTLCYFormat">
           <DataField>EFTLCYFormat</DataField>
         </Field>
-        <Field Name="LocalCurrencyLCY">
-          <DataField>LocalCurrencyLCY</DataField>
+        <Field Name="LocalCurrencyLCY_">
+          <DataField>LocalCurrencyLCY_</DataField>
         </Field>
-        <Field Name="LocalCurrencyLCYFormat">
-          <DataField>LocalCurrencyLCYFormat</DataField>
+        <Field Name="LocalCurrencyLCY_Format">
+          <DataField>LocalCurrencyLCY_Format</DataField>
         </Field>
         <Field Name="IssuesVouchersLCy">
           <DataField>IssuesVouchersLCy</DataField>
@@ -5634,23 +6285,17 @@ End Function
         <Field Name="IssuesVouchersLCyFormat">
           <DataField>IssuesVouchersLCyFormat</DataField>
         </Field>
-        <Field Name="RedeemedVoucherLCY">
-          <DataField>RedeemedVoucherLCY</DataField>
+        <Field Name="RedeemedVoucherLCY_">
+          <DataField>RedeemedVoucherLCY_</DataField>
         </Field>
-        <Field Name="RedeemedVoucherLCYFormat">
-          <DataField>RedeemedVoucherLCYFormat</DataField>
+        <Field Name="RedeemedVoucherLCY_Format">
+          <DataField>RedeemedVoucherLCY_Format</DataField>
         </Field>
-        <Field Name="CancellesSalesCount">
-          <DataField>CancellesSalesCount</DataField>
+        <Field Name="CancelledSalesCount_">
+          <DataField>CancelledSalesCount_</DataField>
         </Field>
-        <Field Name="CancellesSalesCountFormat">
-          <DataField>CancellesSalesCountFormat</DataField>
-        </Field>
-        <Field Name="ItemQtySalesTicket_">
-          <DataField>ItemQtySalesTicket_</DataField>
-        </Field>
-        <Field Name="ItemQtySalesTicket_Format">
-          <DataField>ItemQtySalesTicket_Format</DataField>
+        <Field Name="PrintOldVouchers_">
+          <DataField>PrintOldVouchers_</DataField>
         </Field>
         <Field Name="POSEntry2_SalesPersonCode">
           <DataField>POSEntry2_SalesPersonCode</DataField>
@@ -5666,9 +6311,6 @@ End Function
         </Field>
         <Field Name="Name_SalesPerson">
           <DataField>Name_SalesPerson</DataField>
-        </Field>
-        <Field Name="i_">
-          <DataField>i_</DataField>
         </Field>
         <Field Name="TaxAreaCode_">
           <DataField>TaxAreaCode_</DataField>

@@ -301,6 +301,7 @@
                 POSEntrySalesLine.Type := POSEntrySalesLine.Type::Comment;
         end;
         POSEntrySalesLine."Exclude from Posting" := ExcludeFromPosting(POSSaleLine);
+        POSEntrySalesLine."Voucher Category" := POSSaleLine."Voucher Category";
         POSEntrySalesLine."No." := POSSaleLine."No.";
         POSEntrySalesLine."Variant Code" := POSSaleLine."Variant Code";
         POSEntrySalesLine."Location Code" := POSSaleLine."Location Code";
@@ -767,6 +768,7 @@
         POSEntryPaymentLine."POS Payment Method Code" := POSSaleLine."No.";
 #pragma warning restore
 
+        POSEntryPaymentLine."Voucher Category" := POSSaleLine."Voucher Category";
         POSEntryPaymentLine."POS Payment Bin Code" := SelectUnitBin(POSEntryPaymentLine."POS Unit No.");
 
         POSEntryPaymentLine.Description := POSSaleLine.Description;

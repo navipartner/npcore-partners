@@ -179,6 +179,11 @@
             Caption = 'Validate Customer No.';
             DataClassification = CustomerContent;
         }
+        field(630; "Voucher Category"; Enum "NPR Voucher Category")
+        {
+            Caption = 'Voucher Category';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Voucher Qty. (Open)"; Integer)
         {
             CalcFormula = Count("NPR NpRv Voucher" WHERE("Voucher Type" = FIELD(Code),
