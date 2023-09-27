@@ -1229,6 +1229,7 @@
         ValidateVoucher(TempNpRvVoucherBuffer);
 
         POSLine."No." := VoucherType."Payment Type";
+        POSLine."Voucher Category" := VoucherType."Voucher Category";
         POSLine."Register No." := SalePOS."Register No.";
         POSLine.Description := TempNpRvVoucherBuffer.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
@@ -1263,6 +1264,7 @@
         TempNpRvVoucherBuffer."No." := Voucher."No.";
         TempNpRvVoucherBuffer.Amount := AmountToCapture;
         POSLine."No." := VoucherType."Payment Type";
+        POSLine."Voucher Category" := VoucherType."Voucher Category";
         POSLine."Register No." := SalePOS."Register No.";
         POSLine.Description := Voucher.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
@@ -1441,6 +1443,7 @@
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         SaleLinePOS.Validate("No.", VoucherType."Payment Type");
+        SaleLinePOS."Voucher Category" := VoucherType."Voucher Category";
         SaleLinePOS.Description := VoucherType.Description;
         SaleLinePOS.Quantity := 0;
         SaleLinePOS."Unit Price" := 0;
@@ -1573,6 +1576,7 @@
         ValidateVoucher(TempNpRvVoucherBuffer);
 
         POSLine."No." := VoucherType."Payment Type";
+        POSLine."Voucher Category" := VoucherType."Voucher Category";
         POSLine."Register No." := SalePOS."Register No.";
         POSLine.Description := TempNpRvVoucherBuffer.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
@@ -1707,6 +1711,7 @@
         NpRvModuleMgt.OnPreApplyPaymentV3(TempNpRvVoucherBuffer, SalePOS, VoucherType, VoucherNumber, SuggestedAmount);
 
         POSLine."No." := VoucherType."Payment Type";
+        POSLine."Voucher Category" := VoucherType."Voucher Category";
         POSLine."Register No." := SalePOS."Register No.";
         POSLine.Description := TempNpRvVoucherBuffer.Description;
         POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";

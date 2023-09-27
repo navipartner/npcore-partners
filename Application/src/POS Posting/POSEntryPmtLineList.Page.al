@@ -113,6 +113,11 @@
                     ToolTip = 'Specifies the value of the Line No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Voucher Category"; Rec."Voucher Category")
+                {
+                    ToolTip = 'Specifies the category of the retail voucher redeemed on this payment line. Voucher categories are used for reporting purposes.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

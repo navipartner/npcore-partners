@@ -94,12 +94,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
             column(CashMovementLCYlbl_; CashMovementLCYlbl_)
             {
             }
-            column(IssuedVoucherLCYlbl_; IssuedVoucherLCYlbl_)
-            {
-            }
-            column(RedeemedVoucherLCYlbl_; RedeemedVoucherLCYlbl_)
-            {
-            }
             column(RedeemedCreditVoucherLClbl_; RedeemedCreditVoucherLClbl_)
             {
             }
@@ -140,7 +134,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
             {
             }
             column(ForeignCurrencyLCYlbl_; ForeignCurrencyLCYlbl_)
-
             {
             }
             column(GLPaymentLCYlbl_; GLPaymentLCYlbl_)
@@ -150,9 +143,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
             {
             }
             column(RoundingLCYlbl_; RoundingLCYlbl_)
-            {
-            }
-            column(TurnoverLCYlbl_; TurnoverLCYlbl_)
             {
             }
             column(NetCostLCYlbl_; NetCostLCYlbl_)
@@ -221,16 +211,10 @@ report 6014462 "NPR Sales Statistics A4 POS"
             column(CreditTurnoverLCYlbl_; CreditTurnoverLCYlbl_)
             {
             }
-            column(DirectNetTurnoverLCYlbl_; DirectNetTurnoverLCYlbl_)
-            {
-            }
             column(CreditRealAmtLCYlbl_; CreditRealAmtLCYlbl_)
             {
             }
             column(CreditRealReturnAmtLCYlbl_; CreditRealReturnAmtLCYlbl_)
-            {
-            }
-            column(CreditNetTurnOverLCYlbl_; CreditNetTurnOverLCYlbl_)
             {
             }
             column(CreditUnrealSaleAmtLCYlbl_; CreditUnrealSaleAmtLCYlbl_)
@@ -243,6 +227,60 @@ report 6014462 "NPR Sales Statistics A4 POS"
             {
             }
             column(NetTurnoverLCYlbl_; NetTurnoverLCYlbl_)
+            {
+            }
+            column(IssuedGiftVoucherLCY_; IssuedGiftVoucherLCY)
+            {
+            }
+            column(IssuedCreditVoucherLCY_; IssuedCreditVoucherLCY)
+            {
+            }
+            column(DirectReturnSalesLCY_; DirectReturnSalesLCY)
+            {
+            }
+            column(NetDirectTurnover_; NetDirectTurnover)
+            {
+            }
+            column(NetCreditTurnover_; NetCreditTurnover)
+            {
+            }
+            column(CreditUnrealReturnAmtLCY_; CreditUnrealReturnAmtLCY)
+            {
+            }
+            column(RedeemedCreditVoucherLCY_; RedeemedCreditVoucherLCY)
+            {
+            }
+            column(RedeemedGiftVoucherLCY_; RedeemedGiftVoucherLCY)
+            {
+            }
+            column(Turnover_; Turnover)
+            {
+            }
+            column(DirectSalesExcVAT_; DirectSalesExcVAT)
+            {
+            }
+            column(CreditSalesExcVAT_; CreditSalesExcVAT)
+            {
+            }
+            column(DirectReturnExcVAT_; DirectReturnExcVAT)
+            {
+            }
+            column(CreditSalesMemoExcVAT_; CreditSalesMemoExcVAT)
+            {
+            }
+            column(SalesTicket_; SalesTicket)
+            {
+            }
+            column(ItemSoldQty_; ItemSoldQty)
+            {
+            }
+            column(ItemReturnQty_; ItemReturnQty)
+            {
+            }
+            column(DirectTurnover_; DirectTurnover)
+            {
+            }
+            column(SumOfDirectSalesTicket_; SumOfDirectSalesTicket)
             {
             }
             dataitem("POS Sales Line"; "NPR POS Entry Sales Line")
@@ -259,12 +297,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(NetTurnoverLCY_; NetTurnoverLCY)
                 {
                 }
-                column(DirectReturnSalesLCY_; DirectReturnSalesLCY)
-                {
-                }
-                column(CreditRealSaleAmtLCY; CreditRealSaleAmtLCY)
-                {
-                }
                 column(DirectItemSalesLineCount; DirectItemSalesLineCount)
                 {
                 }
@@ -274,7 +306,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(DirectItemReturnsLCY; DirectItemReturnsLCY)
                 {
                 }
-                column(DirectItemReturnsLineCount; DirectItemReturnsLineCount)
+                column(DirectItemReturnsLineCount_; DirectItemReturnsLineCount)
                 {
                 }
                 column(TotalDiscountLCY_; TotalDiscountLCY)
@@ -295,7 +327,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(RoundingLCY; RoundingLCY)
                 {
                 }
-                column(IssuedVouchersLCY; IssuedVouchersLCY)
+                column(IssuedVouchersLCY_; IssuedVouchersLCY)
                 {
                 }
                 column(DirectSalesLCY_; DirectSalesLCY)
@@ -409,19 +441,19 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(PrintNetTurnover_; PrintNetTurnover)
                 {
                 }
-                column(SalesCount_; SalesCount_)
+                column(DirectSalesCount_; DirectSalesCount)
                 {
                 }
-                column(ReturnSalesCount_; ReturnSalesCount_)
+                column(CreditSalesCount_; CreditSalesCount)
+                {
+                }
+                column(DirectSalesReturnCount_; DirectSalesReturnCount)
                 {
                 }
                 column(CashDraweropnCount_; CashDraweropnCount_)
                 {
                 }
-                column(CancellesSalesCount_; CancellesSalesCount_)
-                {
-                }
-                column(itemCostTotal; itemCostTotal)
+                column(ItemCostTotal_; ItemCostTotal)
                 {
                 }
                 column(ProfitLcy; ProfitLcy)
@@ -433,7 +465,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(TurnoverAvgSalesTicket; TurnoverAvgSalesTicket)
                 {
                 }
-                column(ItemQty; ItemQty)
+                column(ItemQty_; ItemQty)
                 {
                 }
                 column(ItemLines; ItemLines)
@@ -457,37 +489,34 @@ report 6014462 "NPR Sales Statistics A4 POS"
                 column(EFTLCY; EFTLCY)
                 {
                 }
-                column(LocalCurrencyLCY; LocalCurrencyLCY)
+                column(LocalCurrencyLCY_; LocalCurrencyLCY)
                 {
                 }
                 column(IssuesVouchersLCy; IssuesVouchersLCy)
                 {
                 }
-                column(RedeemedVoucherLCY; RedeemedVoucherLCY)
+                column(RedeemedVoucherLCY_; RedeemedVoucherLCY)
                 {
                 }
-                column(CancellesSalesCount; CancellesSalesCount_)
+                column(CancelledSalesCount_; CancelledSalesCount)
                 {
                 }
-                column(ItemQtySalesTicket_; ItemQtySalesTicket)
+                column(PrintOldVouchers_; PrintOldVouchers)
                 {
                 }
-                dataitem(posentry2; "NPR POS Entry")
+                dataitem(POSEntry2; "NPR POS Entry")
                 {
                     DataItemTableView = sorting("Entry No.");
-                    column(POSEntry2_SalesPersonCode; posentry2."Salesperson Code")
+                    column(POSEntry2_SalesPersonCode; POSEntry2."Salesperson Code")
                     {
                     }
-                    column(POSEntry2_Qty; posentry2."No. of Sales Lines")
+                    column(POSEntry2_Qty; SalesPersonSalesCount)
                     {
                     }
-                    column(POSEntry2_AmtInclTax; posentry2."Amount Incl. Tax")
+                    column(POSEntry2_AmtInclTax; POSEntry2."Amount Excl. Tax")
                     {
                     }
                     column(Name_SalesPerson; Salesperson.Name)
-                    {
-                    }
-                    column(i_; I)
                     {
                     }
                     dataitem("POS Tax Amount Line"; "NPR POS Entry Tax Line")
@@ -562,37 +591,32 @@ report 6014462 "NPR Sales Statistics A4 POS"
                         column(POSEntryNo_POSPaymentLine; "POS Payment Line"."POS Entry No.")
                         {
                         }
-                        column(PosPaymentmethodcode_POSPaymentLine; "POS Payment Line"."POS Payment Method Code")
+                        column(PosPaymentmethodcode_POSPaymentLine; "POS Payment Method Code")
                         {
                         }
-                        column(AmountLCY_POSPaymentLine; "POS Payment Line"."Amount (LCY)")
+                        column(AmountLCY_POSPaymentLine; Amount)
                         {
                         }
                     }
 
                     trigger OnAfterGetRecord()
                     begin
-
-                        if Salesperson.Get(posentry2."Salesperson Code") then;
-                        I := 1;
+                        Salesperson.Get(POSEntry2."Salesperson Code");
+                        SalesPersonSalesCount := POSSalesLineValue."Quantity";
                     end;
 
                     trigger OnPreDataItem()
                     begin
-                        posentry2.SetRange("Entry Date", "POS Entry"."Entry Date");
-                        posentry2.SetRange("System Entry", false);
-                        posentry2.SetFilter("Entry Type", '%1|%2|%3|%4|%5',
-                        posentry2."Entry Type"::"Credit Sale",
-                        posentry2."Entry Type"::"Direct Sale",
-                        posentry2."Entry Type"::Balancing,
-                        posentry2."Entry Type"::Other,
-                        posentry2."Entry Type"::Comment);
+                        POSEntry2.SetRange("Entry Date", "POS Entry"."Entry Date");
+                        POSEntry2.SetRange("System Entry", false);
+                        POSEntry2.SetFilter("Entry Type", '%1|%2|%3|%4|%5',
+                        POSEntry2."Entry Type"::"Credit Sale",
+                        POSEntry2."Entry Type"::"Direct Sale",
+                        POSEntry2."Entry Type"::Balancing,
+                        POSEntry2."Entry Type"::Other,
+                        POSEntry2."Entry Type"::Comment);
                     end;
                 }
-
-                trigger OnPreDataItem()
-                begin
-                end;
             }
 
             trigger OnAfterGetRecord()
@@ -613,7 +637,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
 
                                 if POSPaymentLine.FindSet() then
                                     repeat
-                                        EFTLCY += POSPaymentLine."Amount (LCY)";
+                                        EFTLCY += POSPaymentLine.Amount;
                                     until POSPaymentLine.Next() = 0;
                             until POSPaymentMethod.Next() = 0;
 
@@ -627,30 +651,24 @@ report 6014462 "NPR Sales Statistics A4 POS"
 
                                 if POSPaymentLine.FindSet() then
                                     repeat
-                                        LocalCurrencyLCY += POSPaymentLine."Amount (LCY)";
+                                        LocalCurrencyLCY += POSPaymentLine.Amount;
                                     until POSPaymentLine.Next() = 0;
                             until POSPaymentMethod.Next() = 0;
 
-                        TurnoverLCY += POSEntryValue."Amount Incl. Tax";
-                        NetTurnoverLCY += POSEntryValue."Amount Excl. Tax";
-                        if POSEntryValue."Return Sales Quantity" < 0 then
-                            ReturnSalesCount_ += 1;
-
                         if POSEntryValue."Entry Type" = POSEntryValue."Entry Type"::"Direct Sale" then begin
-                            SalesCount_ += 1;
                             POSSalesLineValue.Reset();
                             POSSalesLineValue.SetRange("POS Entry No.", POSEntryValue."Entry No.");
+                            if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Quote then
+                                if (POSEntryValue."Sales Quantity" <> 0) or (POSEntryValue."Return Sales Quantity" <> 0) then
+                                    SumOfDirectSalesTicket += 1;
                             if POSSalesLineValue.FindSet() then
                                 repeat
-                                    TotalDiscountLCY += POSSalesLineValue."Line Dsc. Amt. Incl. VAT (LCY)";
-                                    itemCostTotal += POSSalesLineValue."Unit Cost (LCY)";
-
-                                    if POSSalesLineValue.Type = POSSalesLineValue.Type::Item then
-                                        if POSSalesLineValue.Quantity > 0 then begin
-                                            DirectItemNetSalesLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
-                                            ItemQty += POSSalesLineValue.Quantity;
-                                        end else
-                                            DirectReturnSalesLCY += (POSSalesLineValue."Amount Incl. VAT (LCY)");
+                                    TotalDiscountLCY += POSSalesLineValue."Line Dsc. Amt. Excl. VAT (LCY)";
+                                    if POSSalesLineValue.Quantity > 0 then begin
+                                        ItemSoldQty += 1;
+                                    end else begin
+                                        ItemReturnQty += 1;
+                                    end;
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::"G/L Account" then
                                         GLPaymentLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Customer then
@@ -661,24 +679,22 @@ report 6014462 "NPR Sales Statistics A4 POS"
                                         RoundingLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
 
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Voucher then
-                                        IssuedVouchersLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                        AssignVoucherValuesForSalesLine(POSSalesLineValue);
 
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Item then begin
-                                        POSPaymentMethod.Reset();
-                                        POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
-                                        if POSPaymentMethod.FindSet() then
-                                            repeat
-                                                POSPaymentLine.Reset();
-                                                POSPaymentLine.SetRange("POS Entry No.", POSSalesLineValue."POS Entry No.");
-                                                POSPaymentLine.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
-                                                if POSPaymentLine.FindSet() then
-                                                    repeat
-                                                        if POSPaymentLine."Amount (LCY)" < 0 then
-                                                            IssuedVouchersLCY += POSPaymentLine."Amount (LCY)"
-                                                        else
-                                                            RedeemedVoucherLCY += POSPaymentLine."Amount (LCY)";
-                                                    until POSPaymentLine.Next() = 0;
-                                            until POSPaymentMethod.Next() = 0;
+                                        ItemCost := POSSalesLineValue."Unit Cost (LCY)" * POSSalesLineValue.Quantity;
+                                        ItemCostTotal += ItemCost;
+                                        if POSSalesLineValue.Quantity > 0 then begin
+                                            DirectSalesCount += 1;
+                                            DirectSalesExcVAT += POSSalesLineValue."Amount Excl. VAT";
+                                            DirectItemNetSalesLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                        end else begin
+                                            DirectSalesReturnCount += 1;
+                                            DirectReturnSalesLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                            DirectReturnExcVAT += POSSalesLineValue."Amount Excl. VAT";
+                                        end;
+                                        if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Quote then
+                                            NetDirectTurnover += POSSalesLineValue."Amount Excl. VAT (LCY)";
                                     end;
                                 until POSSalesLineValue.Next() = 0;
                         end;
@@ -686,16 +702,11 @@ report 6014462 "NPR Sales Statistics A4 POS"
                         if POSEntryValue."Entry Type" = POSEntryValue."Entry Type"::"Credit Sale" then begin
                             POSSalesLineValue.Reset();
                             POSSalesLineValue.SetRange("POS Entry No.", POSEntryValue."Entry No.");
+                            if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Invoice then
+                                CreditSalesCount += 1;
                             if POSSalesLineValue.FindSet() then
                                 repeat
-
-                                    itemCostTotal += POSSalesLineValue."Unit Cost (LCY)";
-                                    TotalDiscountLCY += POSSalesLineValue."Line Dsc. Amt. Incl. VAT (LCY)";
-                                    CreditTurnoverLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
-                                    if POSSalesLineValue."Amount Incl. VAT (LCY)" > 0 then
-                                        CreditRealSaleAmtLCY += POSSalesLineValue."Amount Incl. VAT (LCY)"
-                                    else
-                                        CreditRealReturnAmtLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                    TotalDiscountLCY += POSSalesLineValue."Line Dsc. Amt. Excl. VAT (LCY)";
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::"G/L Account" then
                                         GLPaymentLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Customer then
@@ -706,37 +717,52 @@ report 6014462 "NPR Sales Statistics A4 POS"
                                         RoundingLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
 
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Voucher then
-                                        IssuedVouchersLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                        AssignVoucherValuesForSalesLine(POSSalesLineValue);
 
+                                    if POSSalesLineValue.Quantity > 0 then
+                                        ItemSoldQty += 1
+                                    else
+                                        ItemReturnQty += 1;
                                     if POSSalesLineValue.Type = POSSalesLineValue.Type::Item then begin
-                                        POSPaymentMethod.Reset();
-                                        POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
-                                        if POSPaymentMethod.FindSet() then
-                                            repeat
-                                                POSPaymentLine.Reset();
-                                                POSPaymentLine.SetRange("POS Entry No.", POSSalesLineValue."POS Entry No.");
-                                                POSPaymentLine.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
-                                                if POSPaymentLine.FindSet() then
-                                                    repeat
-                                                        if POSPaymentLine."Amount (LCY)" < 0 then
-                                                            IssuedVouchersLCY += POSPaymentLine."Amount (LCY)"
-                                                        else
-                                                            RedeemedVoucherLCY += POSPaymentLine."Amount (LCY)";
-                                                    until POSPaymentLine.Next() = 0;
-                                            until POSPaymentMethod.Next() = 0;
+                                        ItemCost := POSSalesLineValue."Unit Cost (LCY)" * POSSalesLineValue.Quantity;
+                                        ItemCostTotal += ItemCost;
+
+                                        if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Invoice then
+                                            if POSSalesLineValue."Amount Incl. VAT (LCY)" > 0 then
+                                                CreditRealSaleAmtLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                        if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::"Credit Memo" then begin
+                                            CreditRealReturnAmtLCY += POSSalesLineValue."Amount Incl. VAT (LCY)";
+                                            CreditSalesMemoExcVAT += POSSalesLineValue."Amount Excl. VAT";
+                                            CreditMemoCount += 1;
+                                        end;
+                                        if (POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::"Credit Memo") or (POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Invoice) then
+                                            NetCreditTurnover += POSSalesLineValue."Amount Excl. VAT (LCY)";
+                                        if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::Order then
+                                            CreditUnrealSaleAmtLCY += POSSalesLineValue."Amount Excl. VAT (LCY)";
+                                        if POSEntryValue."Sales Document Type" = POSEntryValue."Sales Document Type"::"Return Order" then
+                                            CreditUnrealReturnAmtLCY += POSSalesLineValue."Amount Excl. VAT (LCY)";
                                     end;
+                                    CreditSalesExcVAT += POSSalesLineValue."Amount Excl. VAT";
                                 until POSSalesLineValue.Next() = 0;
                         end;
+                        AssignVoucherValuesForPaymentLine(POSEntryValue."Entry No.");
                     until POSEntryValue.Next() = 0;
 
-                ProfitLcy := NetTurnoverLCY - itemCostTotal;
-                ProfitPct := (itemCostTotal / NetTurnoverLCY);
+                NetTurnoverLCY := NetDirectTurnover + NetCreditTurnover;
+                ProfitLcy := NetTurnoverLCY - ItemCostTotal;
+                if NetTurnoverLCY <> 0 then
+                    ProfitPct := ProfitLcy / NetTurnoverLCY;
+
+                Turnover := (DirectSalesExcVAT + CreditSalesExcVAT) - (DirectReturnExcVAT + CreditSalesMemoExcVAT);
+                ItemQty := ItemSoldQty - ItemReturnQty;
+                SalesTicket := SumOfDirectSalesTicket + CreditSalesCount + CreditMemoCount;
+
+                DirectTurnover := DirectSalesExcVAT + DirectReturnExcVAT;
 
                 POSEntryValue.Reset();
                 POSEntryValue.SetFilter("Entry Date", '=%1', "POS Entry"."Entry Date");
                 POSEntryValue.SetFilter("Entry Type", '=%1', POSEntryValue."Entry Type"::"Cancelled Sale");
-                if POSEntryValue.FindSet() then
-                    CancellesSalesCount_ := POSEntryValue.Count;
+                CancelledSalesCount := POSEntryValue.Count;
             end;
         }
     }
@@ -745,7 +771,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
     {
         ProfitExclVatLbl = 'Price Excl. VAT';
         NetTurnoverLCYLbl = 'Net Turnover (LCY)';
-        ItemCostTotalLbl = 'item Cost Total';
         ProfitLCYLbl = 'Profit (LCY)';
         ProfitPCTLbl = 'Profit Pct';
         AdjustedCostDetailsLbl = 'Adjusted Cost Details';
@@ -756,7 +781,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         TurnoverBasketLbl = 'Turnover Basket';
         TurnoverAvgSalesTicketLbl = 'Turnover (avg.)/SalesTicket';
         ItemQTYLbl = 'Item (Qty)';
-        itemQTYSalesTicket = 'Item (Qty)/Sales Ticket';
         ItemLineslbl = 'Item Lines';
         itemLineSalesQtyLbl = 'Item Lines/Sales (Qty)';
         SalesQTYLbl = 'Sales (Qty)';
@@ -765,6 +789,23 @@ report 6014462 "NPR Sales Statistics A4 POS"
         PaymentDetailsLbl = 'Payment Details';
         PaymentMethodLbl = 'Payment Method';
         AmountLbl = 'Amount LCY';
+        ItemQTYSalesTicket = 'Item (Qty)/Sales Ticket';
+        ItemCostTotalLbl = 'Item Cost Total';
+        DirectTurnoverLCYlbl = 'Direct Turnover (LCY)';
+        IssuedGiftVouchersLCYlbl = 'Issued Gift Vouchers (LCY)';
+        IssuedCreditVouchersLCYlbl = 'Issued Credit Vouchers (LCY)';
+        RedeemedGiftVoucherslbl = 'Redeemed Gift Vouchers';
+        RedeemedCreditVoucherslbl = 'Redeemed Credit Vouchers';
+        DirectTurnoverDirectSalesTicketLbl = 'Direct Turnover/Direct Sales Ticket';
+        GrossDirectTurnoverLCYLbl = 'Gross Direct Turnover (LCY)';
+        OrderLbl = 'Order';
+        NetCreditUnrealSaleAmtLbl = 'Net Credit Unreal. Sale Amt';
+        NetCreditUnrealSaleReturnAmtLbl = 'Net Credit Unreal. Return Sale Amt';
+        NetDirectTurnoverLbl = 'Net Direct Turnover';
+        NetCreditTurnoverLbl = 'Net Credit Turnover';
+        OtherPaymentsLCYLbl = 'Other Payments (LCY)';
+        RedeemedVouchersLCYLbl = 'Redeemed Vouchers (LCY)';
+        IssuedVouchersLCYLbl = 'Issued Vouchers (LCY)';
     }
 
     trigger OnPreReport()
@@ -781,6 +822,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
         POSSalesLineValue: Record "NPR POS Entry Sales Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Salesperson: Record "Salesperson/Purchaser";
+        NPRNpRvVoucherType: Record "NPR NpRv Voucher Type";
         PrintDiscountAmt: Boolean;
         PrintDiscountPerc: Boolean;
         PrintDiscountTotal: Boolean;
@@ -788,11 +830,11 @@ report 6014462 "NPR Sales Statistics A4 POS"
         PrintReceipts: Boolean;
         PrintSales: Boolean;
         PrintTerminals: Boolean;
+        PrintOldVouchers: Boolean;
         AdjitemCostTotal: Decimal;
         AdjProfitLCY: Decimal;
         AdjProfitPct: Decimal;
         AdjSalesExclVAT: Decimal;
-        CancellesSalesCount_: Decimal;
         CashDraweropnCount_: Decimal;
         CreditItemQuantitySum: Decimal;
         CreditItemSalesLCY: Decimal;
@@ -816,25 +858,45 @@ report 6014462 "NPR Sales Statistics A4 POS"
         GLPaymentLCY: Decimal;
         IssuedVouchersLCY: Decimal;
         IssuesVouchersLCy: Decimal;
-        itemCostTotal: Decimal;
         ItemLineSalesQty: Decimal;
-        ItemQty: Decimal;
-        ItemQtySalesTicket: Decimal;
         LocalCurrencyLCY: Decimal;
         NetCostLCY: Decimal;
         NetTurnoverLCY: Decimal;
         ProfitLcy: Decimal;
         ProfitPct: Decimal;
         RedeemedVoucherLCY: Decimal;
-        ReturnSalesCount_: Decimal;
         RoundingLCY: Decimal;
-        SalesCount_: Decimal;
         TotalDiscountLCY: Decimal;
         TurnoverAvgSalesTicket: Decimal;
         TurnoverLCY: Decimal;
+        ItemCostTotal: Decimal;
+        IssuedGiftVoucherLCY: Decimal;
+        IssuedCreditVoucherLCY: Decimal;
+        NetDirectTurnover: Decimal;
+        NetCreditTurnover: Decimal;
+        CreditUnrealReturnAmtLCY: Decimal;
+        ItemCost: Decimal;
+        RedeemedCreditVoucherLCY: Decimal;
+        RedeemedGiftVoucherLCY: Decimal;
+        Turnover: Decimal;
+        DirectSalesExcVAT: Decimal;
+        CreditSalesExcVAT: Decimal;
+        DirectReturnExcVAT: Decimal;
+        CreditSalesMemoExcVAT: Decimal;
+        DirectTurnover: Decimal;
+        CancelledSalesCount: Integer;
+        DirectSalesCount: Integer;
+        ItemQty: Integer;
+        CreditSalesCount: Integer;
+        DirectSalesReturnCount: Integer;
+        CreditMemoCount: Integer;
+        ItemSoldQty: Integer;
+        ItemReturnQty: Integer;
+        SalesTicket: Integer;
+        SalesPersonSalesCount: Integer;
+        SumOfDirectSalesTicket: Integer;
         DirectItemReturnsLineCount: Integer;
         DirectItemSalesLineCount: Integer;
-        I: Integer;
         ItemLines: Integer;
         VarMain: Integer;
         VarTax: Integer;
@@ -851,7 +913,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         Closinglbl: Label 'Closing';
         Countinglbl: Label 'Counting';
         CreatedCreditVoucherLCYlbl_: Label 'Created Credit Voucher (LCY)';
-        CreditNetTurnOverLCYlbl_: Label 'Credit Net Turnover (LCY)';
         CreditRealAmtLCYlbl_: Label 'Credit Real. Sale Amt. (LCY)';
         CreditRealReturnAmtLCYlbl_: Label 'Credit Real. Return Amt. (LCY)';
         CreditTurnoverLCYlbl_: Label 'Credit Turnover (LCY)';
@@ -864,7 +925,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         DebitSalesCountlbl_: Label 'Credit Item Quantity Sum';
         DebitSalesLCYlbl_: Label 'Credit Item Sales (LCY)';
         DebtorPaymentLCYlbl_: Label 'Debtor Payment (LCY)';
-        DirectNetTurnoverLCYlbl_: Label 'Direct Net Turnover (LCY)';
         DirectReturnSalesLCYlbl_: Label 'Direct Item Returns (LCY)';
         DirectSalesLCYlbl_: Label 'Direct Item Sales (LCY)';
         DirectTurnoverLCYlbl_: Label 'Direct Turnover (LCY)';
@@ -877,7 +937,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         ForeignCurrencyLCYlbl_: Label 'Foreign Currency (LCY)';
         GLPaymentLCYlbl_: Label 'GL Payment (LCY)';
         InvoicedSalesLCYlbl_: Label 'Credit Net Sales Amount (LCY)';
-        IssuedVoucherLCYlbl_: Label 'Issued Vouchers (LCY)';
         LineDiscountLCYlbl_: Label 'Line Discount (LCY)';
         LineDiscountPerclbl_: Label 'Line Discount %';
         LocalCurrencyLCYlbl_: Label 'Local Currency (LCY)';
@@ -897,7 +956,6 @@ report 6014462 "NPR Sales Statistics A4 POS"
         ReceiptsCountlbl_: Label 'Receipts Count';
         Receiptslbl: Label 'Receipts';
         RedeemedCreditVoucherLClbl_: Label 'Redeemed Credit Voucher (LCY)';
-        RedeemedVoucherLCYlbl_: Label 'Redeemed Vouchers (LCY)';
         ReportTitleLbl: Label 'Sales Statistics';
         ReturnSalesCountlbl_: Label 'Direct Item Returns Line Count';
         RoundingLCYlbl_: Label 'Rounding (LCY)';
@@ -920,17 +978,62 @@ report 6014462 "NPR Sales Statistics A4 POS"
         TotalDiscountLCYlbl_: Label 'Total Discount (LCY)';
         TotalDiscountPerclbl_: Label 'Total Discount %';
         Turnoverlbl: Label 'Turnover (LCY)';
-        TurnoverLCYlbl_: Label 'Turnover (LCY)';
         VATIdentifierlbl_: Label 'VAT Identifier';
         VATTaxSummarylbl: Label 'VAT & TAX Summary';
         Voucherslbl: Label 'Vouchers';
         Workshiftlbl: Label 'Workshift';
         VarReportTitle: Text;
 
+    [Obsolete('Not used anymore.', 'NPR25.0')]
     procedure Divider("Tal 1": Decimal; "Tal 2": Decimal): Decimal
     begin
         if "Tal 2" = 0 then
             exit(0);
         exit(("Tal 1" / "Tal 2"));
     end;
+
+    local procedure AssignVoucherValuesForPaymentLine(EntryNo: Integer)
+    begin
+        POSPaymentMethod.Reset();
+        POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::VOUCHER);
+        if POSPaymentMethod.FindSet() then
+            repeat
+                POSPaymentLine.Reset();
+                POSPaymentLine.SetRange("POS Entry No.", EntryNo);
+                POSPaymentLine.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
+                if POSPaymentLine.FindSet() then
+                    repeat
+                        case POSPaymentLine."Voucher Category" of
+                            NPRNpRvVoucherType."Voucher Category"::"Gift Voucher":
+                                if POSPaymentLine."Amount (LCY)" > 0 then
+                                    RedeemedGiftVoucherLCY += POSPaymentLine."Amount (LCY)";
+                            NPRNpRvVoucherType."Voucher Category"::"Credit Voucher":
+                                if POSPaymentLine."Amount (LCY)" > 0 then
+                                    RedeemedCreditVoucherLCY += POSPaymentLine."Amount (LCY)"
+                                else
+                                    IssuedCreditVoucherLCY += Abs(POSPaymentLine."Amount (LCY)");
+                            else
+                                PrintOldVouchers := true;
+                        end;
+                        if POSPaymentLine."Amount (LCY)" < 0 then
+                            IssuedVouchersLCY += Abs(POSPaymentLine."Amount (LCY)")
+                        else
+                            RedeemedVoucherLCY += POSPaymentLine."Amount (LCY)";
+                    until POSPaymentLine.Next() = 0;
+            until POSPaymentMethod.Next() = 0;
+    end;
+
+    local procedure AssignVoucherValuesForSalesLine(_POSSalesLineValue: Record "NPR POS Entry Sales Line")
+    begin
+        IssuedVouchersLCY += _POSSalesLineValue."Amount Incl. VAT (LCY)";
+        case _POSSalesLineValue."Voucher Category" of
+            _POSSalesLineValue."Voucher Category"::"Gift Voucher":
+                IssuedGiftVoucherLCY += _POSSalesLineValue."Amount Incl. VAT (LCY)";
+            _POSSalesLineValue."Voucher Category"::"Credit Voucher":
+                IssuedCreditVoucherLCY += _POSSalesLineValue."Amount Incl. VAT (LCY)";
+            else
+                PrintOldVouchers := true;
+        end;
+    end;
+
 }

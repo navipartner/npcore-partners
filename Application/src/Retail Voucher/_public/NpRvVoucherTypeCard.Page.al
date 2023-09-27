@@ -38,6 +38,11 @@
                         ToolTip = 'Specifies the value of the Description field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Voucher Category"; Rec."Voucher Category")
+                    {
+                        ToolTip = 'Specifies the category of vouchers of this type. Voucher categories are used for reporting purposes.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
                 group(Control6014424)
                 {
