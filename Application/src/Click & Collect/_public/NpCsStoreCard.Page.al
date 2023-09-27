@@ -1,9 +1,10 @@
 ﻿page 6151196 "NPR NpCs Store Card"
 {
     Caption = 'Collect Store Card';
+    ContextSensitiveHelpPage = 'docs/retail/click_and_collect/how-to/setup/setup/';
     PageType = Card;
-    UsageCategory = None;
     SourceTable = "NPR NpCs Store";
+    UsageCategory = None;
 
     layout
     {
@@ -17,25 +18,25 @@
                     ShowCaption = false;
                     field("Code"; Rec.Code)
                     {
-                        ShowMandatory = true;
-                        ToolTip = 'Specifies the value of the Code field';
                         ApplicationArea = NPRRetail;
+                        ShowMandatory = true;
+                        ToolTip = 'Specifies unique identifier for this store. ';
                     }
                     field("Company Name"; Rec."Company Name")
                     {
-                        ToolTip = 'Specifies the value of the Company Name field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies name of the company associated with this store.';
                     }
                     field(Name; Rec.Name)
                     {
-                        ToolTip = 'Specifies the value of the Name field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies name of the store.';
                     }
                     field("HeyLoyalty Name"; HeyLoyaltyName)
                     {
-                        Caption = 'HeyLoyalty Name';
-                        ToolTip = 'Specifies the name used for the store at HeyLoyalty.';
                         ApplicationArea = NPRHeyLoyalty;
+                        Caption = 'HeyLoyalty Name';
+                        ToolTip = 'Specifies name used for the store at HeyLoyalty, a loyalty platform.';
 
                         trigger OnValidate()
                         begin
@@ -46,8 +47,8 @@
                     }
                     field("Local Store"; Rec."Local Store")
                     {
-                        ToolTip = 'Specifies the value of the Local Store field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies whether this is a local store or not.';
 
                         trigger OnValidate()
                         begin
@@ -56,14 +57,14 @@
                     }
                     field("Opening Hour Set"; Rec."Opening Hour Set")
                     {
-                        ToolTip = 'Specifies the value of the Opening Hour Set field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies set of opening hours for this store.';
                     }
                     field("Magento Description"; Format(Rec."Magento Description".HasValue))
                     {
-                        Caption = 'Magento Description';
-                        ToolTip = 'Specifies the value of the Magento Description field';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Magento Description';
+                        ToolTip = 'Specifies description associated with this store in Magento, an e-commerce platform.';
 
                         trigger OnAssistEdit()
                         var
@@ -93,20 +94,20 @@
                     ShowCaption = false;
                     field("Store Stock Item Url"; Rec."Store Stock Item Url")
                     {
-                        ToolTip = 'Specifies the value of the Store Stock Item Url field';
-                        Importance = Additional;
                         ApplicationArea = NPRRetail;
+                        Importance = Additional;
+                        ToolTip = 'Specifies URL for store stock items.';
                     }
                     field("Store Stock Status Url"; Rec."Store Stock Status Url")
                     {
-                        ToolTip = 'Specifies the value of the Store Stock Status Url field';
-                        Importance = Additional;
                         ApplicationArea = NPRRetail;
+                        Importance = Additional;
+                        ToolTip = 'Specifies URL for store stock status.';
                     }
                     field("Service Url"; Rec."Service Url")
                     {
-                        ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies URL for the service associated with this store.';
                     }
                     group(Authorization)
                     {
@@ -115,29 +116,28 @@
                         field(AuthType; Rec.AuthType)
                         {
                             ApplicationArea = NPRRetail;
-                            Tooltip = 'Specifies the Authorization Type.';
+                            Tooltip = 'Specifies the type of authorization used for this store.';
 
                             trigger OnValidate()
                             begin
                                 CurrPage.Update();
                             end;
                         }
-
                         group(BasicAuth)
                         {
                             ShowCaption = false;
                             Visible = IsBasicAuthVisible;
                             field("Service Username"; Rec."Service Username")
                             {
-                                ToolTip = 'Specifies the value of the Service Username field';
                                 ApplicationArea = NPRRetail;
+                                ToolTip = 'Specifies username for the service associated with this store.';
                             }
                             field("API Password"; pw)
                             {
-                                ToolTip = 'Specifies the value of the User Password field';
                                 ApplicationArea = NPRRetail;
                                 Caption = 'API Password';
                                 ExtendedDatatype = Masked;
+                                ToolTip = 'Specifies password for the service associated with this store.';
                                 trigger OnValidate()
                                 begin
                                     if pw <> '' then
@@ -156,20 +156,19 @@
                             field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
                             {
                                 ApplicationArea = NPRRetail;
-                                ToolTip = 'Specifies the OAuth2.0 Setup Code.';
+                                ToolTip = 'Specifies OAuth2.0 Setup Code for this store.';
                             }
                         }
                     }
-
                     field("Geolocation Latitude"; Rec."Geolocation Latitude")
                     {
-                        ToolTip = 'Specifies the value of the Geolocation Latitude field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies latitude coordinate for the geolocation of this store.';
                     }
                     field("Geolocation Longitude"; Rec."Geolocation Longitude")
                     {
-                        ToolTip = 'Specifies the value of the Geolocation Longitude field';
                         ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies longitude coordinate for the geolocation of this store.';
                     }
                 }
             }
@@ -178,23 +177,23 @@
                 Caption = 'Order';
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
-                    ToolTip = 'Specifies the value of the Salesperson Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies code of the salesperson associated with this store.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
-                    ToolTip = 'Specifies the value of the Location Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies code representing the location of this store.';
                 }
                 field("Bill-to Customer No."; Rec."Bill-to Customer No.")
                 {
-                    ToolTip = 'Specifies the value of the Bill-to Customer No. field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies customer number used for billing this store.';
                 }
                 field("Prepayment Account No."; Rec."Prepayment Account No.")
                 {
-                    ToolTip = 'Specifies the value of the Prepayment Account No. field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies account number used for prepayment associated with this store.';
                 }
             }
             group("Store Notification")
@@ -202,13 +201,13 @@
                 Caption = 'Store Notification';
                 field("E-mail"; Rec."E-mail")
                 {
-                    ToolTip = 'Specifies the value of the E-mail field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies email address associated with this store for notifications.';
                 }
                 field("Mobile Phone No."; Rec."Mobile Phone No.")
                 {
-                    ToolTip = 'Specifies the value of the Mobile Phone No. field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies mobile phone number associated with this store for notifications.';
                 }
             }
             group(Contact)
@@ -216,77 +215,77 @@
                 Caption = 'Contact';
                 field("Contact Name"; Rec."Contact Name")
                 {
-                    ToolTip = 'Specifies the value of the Contact Name field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies name of the primary contact person for this store.';
                 }
                 field("Contact Name 2"; Rec."Contact Name 2")
                 {
-                    ToolTip = 'Specifies the value of the Contact Name 2 field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies name of the secondary contact person for this store.';
                 }
                 field("Contact Address"; Rec."Contact Address")
                 {
-                    ToolTip = 'Specifies the value of the Contact Address field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies address of the primary contact person for this store.';
                 }
                 field("Contact Address 2"; Rec."Contact Address 2")
                 {
-                    ToolTip = 'Specifies the value of the Contact Address 2 field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies address of the secondary contact person for this store.';
                 }
                 field("Contact Post Code"; Rec."Contact Post Code")
                 {
-                    ToolTip = 'Specifies the value of the Contact Post Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies postal code of the contact person for this store.';
                 }
                 field("Contact City"; Rec."Contact City")
                 {
-                    ToolTip = 'Specifies the value of the Contact City field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies city of the contact person for this store.';
                 }
                 field("Contact Country/Region Code"; Rec."Contact Country/Region Code")
                 {
-                    ToolTip = 'Specifies the value of the Contact Country/Region Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies country or region code of the contact person for this store.';
                 }
                 field("Contact County"; Rec."Contact County")
                 {
-                    ToolTip = 'Specifies the value of the Contact County field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies county of the contact person for this store.';
                 }
                 field("Contact Phone No."; Rec."Contact Phone No.")
                 {
-                    ToolTip = 'Specifies the value of the Contact Phone No. field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies phone number of the contact person for this store.';
                 }
                 field("Contact E-mail"; Rec."Contact E-mail")
                 {
-                    ToolTip = 'Specifies the value of the Contact E-mail field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies email address of the contact person for this store.';
                 }
                 field("Contact Fax No."; Rec."Contact Fax No.")
                 {
-                    ToolTip = 'Specifies the value of the Contact Fax No. field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies fax number of the contact person for this store.';
                 }
                 field("Store Url"; Rec."Store Url")
                 {
-                    ToolTip = 'Specifies the value of the Store Url field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies URL associated with this store for external access.';
                 }
             }
             part(Workflows; "NPR NpCs Store Card Workflows")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Workflows';
                 SubPageLink = "Store Code" = FIELD(Code);
-                ApplicationArea = NPRRetail;
             }
             part("POS Relations"; "NPR NpCs Store Card POSRelat.")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'POS Relations';
                 SubPageLink = "Store Code" = FIELD(Code);
                 Visible = Rec."Local Store";
-                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -297,14 +296,14 @@
         {
             action("Validate Store Setup")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Validate Store Setup';
                 Image = Approve;
                 Promoted = true;
-                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ToolTip = 'Executes the Validate Store Setup action';
-                ApplicationArea = NPRRetail;
+                PromotedOnly = true;
+                ToolTip = 'Validate the setup of this store for compatibility.';
 
                 trigger OnAction()
                 var
@@ -318,14 +317,14 @@
             }
             action("Update Contact Information")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Update Contact Information';
                 Image = User;
                 Promoted = true;
-                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ToolTip = 'Executes the Update Contact Information action';
-                ApplicationArea = NPRRetail;
+                PromotedOnly = true;
+                ToolTip = 'Update contact information for this store.';
 
                 trigger OnAction()
                 var
@@ -337,14 +336,14 @@
             }
             action("Show Address")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Show Address';
                 Image = Map;
                 Promoted = true;
-                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ToolTip = 'Executes the Show Address action';
-                ApplicationArea = NPRRetail;
+                PromotedOnly = true;
+                ToolTip = 'Display the address of this store on a map.';
 
                 trigger OnAction()
                 var
@@ -355,14 +354,14 @@
             }
             action("Show Geolocation")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Show Geolocation';
                 Image = Map;
                 Promoted = true;
-                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ToolTip = 'Executes the Show Geolocation action';
-                ApplicationArea = NPRRetail;
+                PromotedOnly = true;
+                ToolTip = 'Display the geolocation coordinates of this store on a map.';
 
                 trigger OnAction()
                 var
@@ -376,10 +375,10 @@
         {
             action("Stores by Distance")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Stores by Distance';
                 Image = List;
-                ToolTip = 'Executes the Stores by Distance action';
-                ApplicationArea = NPRRetail;
+                ToolTip = 'View nearby stores based on distance from this store.';
 
                 trigger OnAction()
                 var
@@ -392,12 +391,12 @@
             }
             action("Store Stock Items")
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Store Stock Items';
                 Image = List;
                 RunObject = Page "NPR NpCs Store Stock Items";
                 RunPageLink = "Store Code" = FIELD(Code);
-                ToolTip = 'Executes the Store Stock Items action';
-                ApplicationArea = NPRRetail;
+                ToolTip = 'View stock items associated with this store.';
             }
         }
     }
@@ -430,6 +429,6 @@
         pw: Text[200];
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        Text000: Label 'Error in Store Setup\\Close anway?';
+        Text000: Label 'Error in Store Setup\\Close anyway?';
         Text001: Label 'Store Setup validated successfully';
 }
