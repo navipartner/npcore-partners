@@ -173,6 +173,7 @@
 
         Rec."Variant Code" := Line."Variant Code";
         Rec.Validate("No.", Line."No.");
+        Rec."Voucher Category" := Line."Voucher Category";
         if Line."Unit of Measure Code" <> '' then
             Rec.Validate("Unit of Measure Code", Line."Unit of Measure Code");
 
