@@ -19,6 +19,11 @@
         {
             repeater(Group)
             {
+                field("External Order No."; Rec."External Order No.")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the External Order No. field';
+                }
                 field("Created Date Time"; Rec."Created Date Time")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -28,11 +33,6 @@
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Member No. field';
-                }
-                field("External Order No."; Rec."External Order No.")
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the External Order No. field';
                 }
                 field("Request Status"; Rec."Request Status")
                 {
