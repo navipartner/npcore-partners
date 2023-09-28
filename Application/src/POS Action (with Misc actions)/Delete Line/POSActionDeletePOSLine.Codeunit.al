@@ -29,7 +29,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-'let main=async({workflow:a,parameters:i,captions:e})=>{debugger;switch(a.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(e.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:e.title,caption:e.Prompt.substitute(t._current[10])})||a.respond()};'
+'let main=async({workflow:a,parameters:i,captions:e})=>{debugger;switch(a.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(e.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:e.title,caption:e.Prompt.substitute(t._current[10])})||await a.respond()};'
         )
     end;
 
