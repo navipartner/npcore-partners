@@ -34,7 +34,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
                 caption: captions.TicketPrompt, 
                 title: windowTitle
             });
-
+            
             if (!ticketNumber) 
                 return;
 
@@ -76,7 +76,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             caption: captions.ReferencePrompt, 
             title: windowTitle
         });
-        if (!ticketReference) 
+        if (ticketReference === null) // cancel returns null
             return;
     }
     responseObj.TicketQuantity = ticketQuantity;
