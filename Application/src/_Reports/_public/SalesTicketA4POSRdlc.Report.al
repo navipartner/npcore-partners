@@ -1,7 +1,7 @@
 ﻿report 6150613 "NPR Sales Ticket A4 - POS Rdlc"
 {
-#IF NOT BC17
-    Extensible = True;
+#if not BC17
+    Extensible = true;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/Sales Ticket A4 - POS.rdlc';
     WordLayout = './src/_Reports/layouts/Sales Ticket A4 - POS Word.docx';
@@ -16,14 +16,21 @@
     {
         dataitem("NPR POS Entry"; "NPR POS Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
             RequestFilterFields = "Entry No.";
+
+            column(EntryNo_POS_Entry; "Entry No.")
+            {
+            }
             column(Entry_Date_POS_Entry; Format("Entry Date", 0, 0))
             {
             }
             column(Document_No_POS_Entry; "Document No.")
             {
                 IncludeCaption = true;
+            }
+            column(DocumentDate_No_POS_Entry; "Document Date")
+            {
             }
             column(DiscountAmount_POS_Entry; "Discount Amount")
             {
@@ -72,16 +79,25 @@
             }
             dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
             {
-                DataItemLink = Code = FIELD("Salesperson Code");
-                DataItemTableView = SORTING(Code);
+                DataItemLink = Code = field("Salesperson Code");
+                DataItemTableView = sorting(Code);
+                column(Code_SalespersonPurchaser; "Code")
+                {
+                }
                 column(Name_SalespersonPurchaser; Name)
                 {
                 }
             }
             dataitem("NPR POS Entry Sales Line"; "NPR POS Entry Sales Line")
             {
-                DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = Sorting("POS Entry No.", "Line No.");
+                DataItemLink = "POS Entry No." = field("Entry No.");
+                DataItemTableView = sorting("POS Entry No.", "Line No.");
+                column(POSEntryNo_POS_Entry_Sales_Line; "POS Entry No.")
+                {
+                }
+                column(LineNo_POS_Entry_Sales_Line; "Line No.")
+                {
+                }
                 column(Type_POS_Entry_Sales_Line; Type)
                 {
                 }
@@ -125,8 +141,8 @@
                 }
                 dataitem(Item_Variant; "Item Variant")
                 {
-                    DataItemLink = Code = FIELD("Variant Code"), "Item No." = FIELD("No.");
-                    DataItemTableView = SORTING("Item No.", Code);
+                    DataItemLink = Code = field("Variant Code"), "Item No." = field("No.");
+                    DataItemTableView = sorting("Item No.", Code);
                     column(Description_Item_Variant; Description)
                     {
                     }
@@ -143,7 +159,7 @@
             }
             dataitem("NPR DE POS Audit Log Aux. Info"; "NPR DE POS Audit Log Aux. Info")
             {
-                DataItemLink = "POS Entry No." = FIELD("Entry No.");
+                DataItemLink = "POS Entry No." = field("Entry No.");
 
                 column(POSEntryNo_NPRDEPOSAuditLogAuxInfo; "POS Entry No.")
                 {
@@ -178,27 +194,128 @@
                     IncludeCaption = true;
                 }
             }
+
+            dataitem("NPR POS Entry Payment Line"; "NPR POS Entry Payment Line")
+            {
+                DataItemTableView = sorting("POS Entry No.", "Line No.");
+                column(LineNo_POS_Payment_Line; "Line No.")
+                {
+                }
+                column(POS_Entry_No_POS_Payment_Line; "POS Entry No.")
+                {
+                }
+                column(POSPaymentMethodCode_POS_Payment_Line; "POS Payment Method Code")
+                {
+                    IncludeCaption = true;
+                }
+                column(Description_POS_Payment_Line; Description)
+                {
+                    IncludeCaption = true;
+                }
+                column(CurrencyCode_POS_Payment_Line; "Currency Code")
+                {
+                }
+                column(Amount_POS_Payment_Line; Amount)
+                {
+                    IncludeCaption = true;
+                }
+                column(AmountSalesCurrency_POS_Payment_Line; "Amount (Sales Currency)")
+                {
+                    IncludeCaption = true;
+                }
+
+                trigger OnPreDataItem()
+                begin
+                    "NPR POS Entry Payment Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
+                    Clear(AmounTotalPOSPaymentLine);
+                    Clear(AmountSalesCurrencyTotalPOSPaymentLine);
+                end;
+
+                trigger OnAfterGetRecord()
+                var
+                begin
+                    AmounTotalPOSPaymentLine += Amount;
+                    AmountSalesCurrencyTotalPOSPaymentLine += "Amount (Sales Currency)";
+                end;
+            }
+
+            dataitem("NPR POS Entry Tax Line"; "NPR POS Entry Tax Line")
+            {
+                DataItemTableView = sorting("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
+                column(POSEntryNo_POS_Tax_Amount_Line; "POS Entry No.")
+                {
+                }
+                column(VATIdentifier_POS_Tax_Amount_Line; "VAT Identifier")
+                {
+                    IncludeCaption = true;
+                }
+                column(TaxCalculationType_POS_Tax_Amount_Line; "Tax Calculation Type")
+                {
+                    IncludeCaption = true;
+                }
+                column(Tax_POS_Tax_Amount_Line; "Tax %")
+                {
+                    IncludeCaption = true;
+                }
+                column(Quantity_POS_Tax_Amount_Line; Quantity)
+                {
+                    IncludeCaption = true;
+                }
+                column(LineAmount_POS_Tax_Amount_Line; "Line Amount")
+                {
+                    IncludeCaption = true;
+                }
+                column(TaxBaseAmount_POS_Tax_Amount_Line; "Tax Base Amount")
+                {
+                    IncludeCaption = true;
+                }
+                column(TaxAmount_POS_Tax_Amount_Line; "Tax Amount")
+                {
+                    IncludeCaption = true;
+                }
+                column(TotalTaxText_POS_Tax_Amount_Line; TotalTaxAmountLabel)
+                {
+                }
+
+                trigger OnPreDataItem()
+                begin
+                    "NPR POS Entry Tax Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
+                    Clear(QuantityTotalPOSTaxAmountLine);
+                    Clear(LineAmountTotalPOSTaxAmountLine);
+                    Clear(TaxBaseAmountTotalPOSTaxAmountLine);
+                    Clear(TaxAmountTotalPOSTaxAmountLine);
+                end;
+
+                trigger OnAfterGetRecord()
+                begin
+                    QuantityTotalPOSTaxAmountLine += Quantity;
+                    LineAmountTotalPOSTaxAmountLine += "Line Amount";
+                    TaxBaseAmountTotalPOSTaxAmountLine += "Tax Base Amount";
+                    TaxAmountTotalPOSTaxAmountLine += "Tax Amount";
+                end;
+            }
+
             trigger OnAfterGetRecord()
             var
-                FormatAddress: Codeunit "Format Address";
-                NPRTextFunctions: codeunit "NPR Text Functions";
-                NPRPOSStore: Record "NPR POS Store";
-                Customer: Record Customer;
                 Contact: Record Contact;
+                Customer: Record Customer;
+                POSStore: Record "NPR POS Store";
+                FormatAddress: Codeunit "Format Address";
+                TextFunctions: Codeunit "NPR Text Functions";
             begin
-                if NPRPOSStore.Get("NPR POS Entry"."POS Store Code") then begin
-                    CompanyInformation.Name := NPRPOSStore.Name;
-                    CompanyInformation."Name 2" := NPRPOSStore."Name 2";
-                    CompanyInformation.Address := NPRPOSStore.Address;
-                    CompanyInformation."Address 2" := NPRPOSStore."Address 2";
-                    CompanyInformation.City := NPRPOSStore.City;
-                    CompanyInformation."Post Code" := NPRPOSStore."Post Code";
-                    CompanyInformation."Phone No." := NPRPOSStore."Phone No.";
-                    CompanyInformation."E-Mail" := NPRPOSStore."E-Mail";
-                    CompanyInformation."Home Page" := NPRPOSStore."Home Page";
-                    CompanyInformation."VAT Registration No." := NPRPOSStore."VAT Registration No.";
+                if POSStore.Get("NPR POS Entry"."POS Store Code") then begin
+                    CompanyInformation.Name := POSStore.Name;
+                    CompanyInformation."Name 2" := POSStore."Name 2";
+                    CompanyInformation.Address := POSStore.Address;
+                    CompanyInformation."Address 2" := POSStore."Address 2";
+                    CompanyInformation.City := POSStore.City;
+                    CompanyInformation."Post Code" := POSStore."Post Code";
+                    CompanyInformation."Phone No." := POSStore."Phone No.";
+                    CompanyInformation."E-Mail" := POSStore."E-Mail";
+                    CompanyInformation."Home Page" := POSStore."Home Page";
+                    CompanyInformation."VAT Registration No." := POSStore."VAT Registration No.";
                     FormatAddress.Company(AddrArray, CompanyInformation);
-                    StoreAddress := NPRTextFunctions.AddressArrayToMultilineString(AddrArray);
+                    StoreAddress := TextFunctions.AddressArrayToMultilineString(AddrArray);
                 end;
 
                 Clear(AddrArray);
@@ -210,54 +327,12 @@
                         Contact.Get("NPR POS Entry"."Contact No.");
                         FormatAddress.ContactAddr(AddrArray, Contact);
                     end;
-                CustomerAddress := NPRTextFunctions.AddressArrayToMultilineString(AddrArray);
-
-            end;
-        }
-        dataitem("NPR POS Entry Payment Line"; "NPR POS Entry Payment Line")
-        {
-            DataItemTableView = SORTING("POS Entry No.", "Line No.");
-            column(POS_Entry_No_POS_Payment_Line; "POS Entry No.")
-            {
-            }
-            column(POSPaymentMethodCode_POS_Payment_Line; "POS Payment Method Code")
-            {
-                IncludeCaption = true;
-            }
-            column(Description_POS_Payment_Line; Description)
-            {
-                IncludeCaption = true;
-            }
-            column(CurrencyCode_POS_Payment_Line; "Currency Code")
-            {
-            }
-            column(Amount_POS_Payment_Line; Amount)
-            {
-                IncludeCaption = true;
-            }
-
-            column(AmountSalesCurrency_POS_Payment_Line; "Amount (Sales Currency)")
-            {
-                IncludeCaption = true;
-            }
-
-            trigger OnPreDataItem()
-            begin
-                "NPR POS Entry Payment Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
-                Clear(AmounTotalPOSPaymentLine);
-                Clear(AmountSalesCurrencyTotalPOSPaymentLine);
-            end;
-
-            trigger OnAfterGetRecord()
-            var
-            begin
-                AmounTotalPOSPaymentLine += Amount;
-                AmountSalesCurrencyTotalPOSPaymentLine += "Amount (Sales Currency)";
+                CustomerAddress := TextFunctions.AddressArrayToMultilineString(AddrArray);
             end;
         }
         dataitem("NPR POS Entry Payment Line Totals"; Integer) // Because we have Word Layout!
         {
-            DataItemTableView = Sorting(Number) Where(Number = Const(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(AmountTotal_POS_Payment_Line; AmounTotalPOSPaymentLine)
             {
             }
@@ -265,61 +340,9 @@
             {
             }
         }
-        dataitem("NPR POS Entry Tax Line"; "NPR POS Entry Tax Line")
-        {
-            DataItemTableView = SORTING("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
-            column(VATIdentifier_POS_Tax_Amount_Line; "VAT Identifier")
-            {
-                IncludeCaption = true;
-            }
-            column(TaxCalculationType_POS_Tax_Amount_Line; "Tax Calculation Type")
-            {
-                IncludeCaption = true;
-            }
-            column(Tax_POS_Tax_Amount_Line; "Tax %")
-            {
-                IncludeCaption = true;
-            }
-            column(Quantity_POS_Tax_Amount_Line; Quantity)
-            {
-                IncludeCaption = true;
-            }
-            column(LineAmount_POS_Tax_Amount_Line; "Line Amount")
-            {
-                IncludeCaption = true;
-            }
-            column(TaxBaseAmount_POS_Tax_Amount_Line; "Tax Base Amount")
-            {
-                IncludeCaption = true;
-            }
-            column(TaxAmount_POS_Tax_Amount_Line; "Tax Amount")
-            {
-                IncludeCaption = true;
-            }
-            column(TotalTaxText_POS_Tax_Amount_Line; TotalTaxAmountLabel)
-            {
-            }
-
-            trigger OnPreDataItem()
-            begin
-                "NPR POS Entry Tax Line".SetRange("POS Entry No.", "NPR POS Entry"."Entry No.");
-                Clear(QuantityTotalPOSTaxAmountLine);
-                Clear(LineAmountTotalPOSTaxAmountLine);
-                Clear(TaxBaseAmountTotalPOSTaxAmountLine);
-                Clear(TaxAmountTotalPOSTaxAmountLine);
-            end;
-
-            trigger OnAfterGetRecord()
-            begin
-                QuantityTotalPOSTaxAmountLine += Quantity;
-                LineAmountTotalPOSTaxAmountLine += "Line Amount";
-                TaxBaseAmountTotalPOSTaxAmountLine += "Tax Base Amount";
-                TaxAmountTotalPOSTaxAmountLine += "Tax Amount";
-            end;
-        }
         dataitem("NPR POS Entry Tax Line Totals"; Integer) // Because we have Word Layout!
         {
-            DataItemTableView = Sorting(Number) Where(Number = Const(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(QuantityTotal_POS_Tax_Amount_Line; QuantityTotalPOSTaxAmountLine)
             {
             }
@@ -339,6 +362,7 @@
     {
         SaveValues = true;
     }
+
     labels
     {
         DocumentDateLabel = 'Document Date';
@@ -359,6 +383,7 @@
         PhoneNoLabel = 'Phone No.';
         EmailLabel = 'Email';
         HomePageLabel = 'Home Page';
+        TotalVATCaptionLbl = 'Total VAT';
     }
 
     trigger OnPreReport()
@@ -371,17 +396,17 @@
     var
         CompanyInformation: Record "Company Information";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        AddrArray: Array[8] of Text[100];
-        StoreAddress: Text;
-        CustomerAddress: Text;
-        TotalAmountLabel: Label 'Total %1 Excl. VAT';
-        TotalAmountInclVATLabel: Label 'Total %1 Incl. VAT';
-        TotalTaxAmountLabel: Label 'VAT';
         AmounTotalPOSPaymentLine: Decimal;
         AmountSalesCurrencyTotalPOSPaymentLine: Decimal;
-        QuantityTotalPOSTaxAmountLine: Decimal;
         LineAmountTotalPOSTaxAmountLine: Decimal;
-        TaxBaseAmountTotalPOSTaxAmountLine: Decimal;
+        QuantityTotalPOSTaxAmountLine: Decimal;
         TaxAmountTotalPOSTaxAmountLine: Decimal;
+        TaxBaseAmountTotalPOSTaxAmountLine: Decimal;
         TotalQuantityUnitPrice: Decimal;
+        AddrArray: Array[8] of Text[100];
+        CustomerAddress: Text;
+        StoreAddress: Text;
+        TotalAmountInclVATLabel: Label 'Total %1 Incl. VAT';
+        TotalAmountLabel: Label 'Total %1 Excl. VAT';
+        TotalTaxAmountLabel: Label 'Total VAT';
 }
