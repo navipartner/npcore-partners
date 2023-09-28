@@ -219,19 +219,25 @@
                     trigger OnAction()
                     var
                         Ticket: Record "NPR TM Ticket";
-                        TicketRequest: Record "NPR TM Ticket Reservation Req.";
-                        TicketList: Page "NPR TM Ticket List";
+                        TempTickets: Record "NPR TM Ticket" temporary;
+                        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                     begin
-                        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Entry No.");
+                        TicketReservationRequest.Reset();
+                        TicketReservationRequest.SetCurrentKey("Session Token ID");
+                        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                        if (TicketReservationRequest.FindSet()) then
+                            repeat
+                                Ticket.Reset();
+                                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                                if (Ticket.FindSet()) then
+                                    repeat
+                                        TempTickets.TransferFields(Ticket, true);
+                                        if (not TempTickets.Insert()) then;
+                                    until (Ticket.Next() = 0);
+                            until (TicketReservationRequest.Next() = 0);
 
-                        TicketRequest.SetCurrentKey("Session Token ID");
-                        TicketRequest.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
-                        TicketRequest.SetFilter("Primary Request Line", '=%1', true);
-                        if (TicketRequest.FindFirst()) then
-                            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
-
-                        TicketList.SetTableView(Ticket);
-                        TicketList.Run();
+                        Page.Run(Page::"NPR TM Ticket List", TempTickets);
                     end;
 
                 }

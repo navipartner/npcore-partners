@@ -167,8 +167,11 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         IsAdmitted: Boolean;
     begin
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
-        if (not Ticket.FindFirst()) then
-            Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+        if (not Ticket.FindFirst()) then begin
+            // Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
+            ShowQtyDialogOut := false;
+            exit(0);
+        end;
 
         Ticket.TestField(Blocked, false);
         TicketType.Get(Ticket."Ticket Type Code");
@@ -303,7 +306,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTicketMgt.Codeunit.js### 
-'let main=async({workflow:r,context:t,popup:i,parameters:u,captions:n})=>{var f=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],T=["Standard","MPOS NFC Scan"];let s=Number(u.Function),k=Number(u.InputMethod),d=T[k],e={};windowTitle=n.TicketTitle.substitute(f[s].toString()),e.FunctionId=s,e.DefaultTicketNumber=u.DefaultTicketNumber,await r.respond("ConfigureWorkflow",e);let a;if(t.ShowTicketDialog){if(d==="Standard"){if(a=await i.input({caption:n.TicketPrompt,title:windowTitle}),!a)return}else if(d==="MPOS NFC Scan"){var o=await r.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!o.IsSuccessful){i.error(o.ErrorMessage,"mPOS NFC Error");return}if(!o.Result.ID)return;a=o.Result.ID}}e.TicketNumber=a,await r.respond("RefineWorkflow",e);let c;if(t.ShowTicketQtyDialog&&(c=await i.numpad({caption:n.TicketQtyPrompt.substitute(t.TicketMaxQty),title:windowTitle}),!c))return;let l;t.ShowReferenceDialog&&(l=await i.input({caption:n.ReferencePrompt,title:windowTitle}),!l)||(e.TicketQuantity=c,e.TicketReference=l,await r.respond("DoAction",e),t.Verbose&&await i.message({caption:t.VerboseMessage,title:windowTitle}))};'
+'let main=async({workflow:r,context:t,popup:i,parameters:u,captions:n})=>{var f=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],T=["Standard","MPOS NFC Scan"];let s=Number(u.Function),k=Number(u.InputMethod),d=T[k],e={};windowTitle=n.TicketTitle.substitute(f[s].toString()),e.FunctionId=s,e.DefaultTicketNumber=u.DefaultTicketNumber,await r.respond("ConfigureWorkflow",e);let a;if(t.ShowTicketDialog){if(d==="Standard"){if(a=await i.input({caption:n.TicketPrompt,title:windowTitle}),!a)return}else if(d==="MPOS NFC Scan"){var o=await r.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!o.IsSuccessful){i.error(o.ErrorMessage,"mPOS NFC Error");return}if(!o.Result.ID)return;a=o.Result.ID}}e.TicketNumber=a,await r.respond("RefineWorkflow",e);let c;if(t.ShowTicketQtyDialog&&(c=await i.numpad({caption:n.TicketQtyPrompt.substitute(t.TicketMaxQty),title:windowTitle}),!c))return;let l;t.ShowReferenceDialog&&(l=await i.input({caption:n.ReferencePrompt,title:windowTitle}),l===null)||(e.TicketQuantity=c,e.TicketReference=l,await r.respond("DoAction",e),t.Verbose&&await i.message({caption:t.VerboseMessage,title:windowTitle}))};'
         )
     end;
     //WORKFLOW 3 END
