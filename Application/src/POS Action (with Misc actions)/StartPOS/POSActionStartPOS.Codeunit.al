@@ -58,7 +58,7 @@ codeunit 6150858 "NPR POS Action: Start POS" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionStartPOS.js###
-'let main=async({workflow:n,context:e,captions:i,popup:a})=>{debugger;const{ConfirmBin:r,BinContents:t,BalancingIsNotAllowed:o,EoDActionCode:s}=await n.respond("OnBeforeStartPOS");r&&(await n.respond("OpenCashDrawer"),e.confirm=await a.confirm({title:i.bincontenttitle,caption:t}),e.confirm?await n.respond("ConfirmBin"):o?a.error(i.BalancingIsNotAllowedError):n.run(s,{parameters:{Type:1}}))};'
+'let main=async({workflow:n,context:e,captions:i,popup:a})=>{debugger;const{ConfirmBin:r,BinContents:t,BalancingIsNotAllowed:o,EoDActionCode:s}=await n.respond("OnBeforeStartPOS");r&&(await n.respond("OpenCashDrawer"),e.confirm=await a.confirm({title:i.bincontenttitle,caption:t}),e.confirm?await n.respond("ConfirmBin"):o?a.error(i.BalancingIsNotAllowedError):await n.run(s,{parameters:{Type:1}}))};'
         )
     end;
 }

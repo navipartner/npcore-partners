@@ -31,7 +31,7 @@ let main = async ({workflow, parameters, context, popup}) =>
         if (IsWorkflowCall)
             return MposFunctionResult;
         else
-            workflow.respond(functionName, {mposResponse: MposFunctionResult});
+            await workflow.respond(functionName, {mposResponse: MposFunctionResult});
     } catch (e)
     {
         if (IsWorkflowCall)

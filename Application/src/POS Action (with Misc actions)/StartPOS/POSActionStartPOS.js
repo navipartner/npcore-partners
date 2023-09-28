@@ -8,7 +8,7 @@ let main = async ({workflow, context, captions, popup}) => {
             if (BalancingIsNotAllowed) {
                 popup.error(captions.BalancingIsNotAllowedError);
             } else {
-                workflow.run(EoDActionCode, {parameters: {Type: 1}})
+                await workflow.run(EoDActionCode, {parameters: {Type: 1}})
             }
         } else {
             await workflow.respond("ConfirmBin");

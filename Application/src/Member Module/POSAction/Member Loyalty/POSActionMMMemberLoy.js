@@ -19,5 +19,5 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     if (result.workflowName == "") {
         return;
     }
-    workflow.run(result.workflowName, { parameters: result.parameters });
+    await workflow.run(result.workflowName, { parameters: result.parameters });
 };

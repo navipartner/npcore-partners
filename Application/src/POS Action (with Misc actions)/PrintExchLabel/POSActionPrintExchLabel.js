@@ -17,7 +17,7 @@ let main = async ({workflow, parameters, captions, popup, context}) => {
     if (result === null) { return };
     
     if (parameters.Setting != parameters.Setting["All Lines"] ){ 
-        workflow.respond("PrintExchangeLabels", { UserSelection: result });
+        await workflow.respond("PrintExchangeLabels", { UserSelection: result });
     }
     else{
         var getPrintLineKeysResult = await workflow.respond("GetPrintLineKeys");

@@ -1,4 +1,4 @@
-﻿codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
+codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -48,7 +48,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMMMemberLoy.js###
-'let main=async({workflow:e,context:r,parameters:n,popup:l,captions:o})=>{await e.respond("OnBeforeWorkflow");var m=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"],t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(r.show_dialog=!1);let u=o.LoyaltyWindowTitle.substitute(m[t]),i="";if(r.show_dialog&&(i=await l.input({caption:o.MemberCardPrompt,title:u}),i===null))return;let a=await e.respond("do_work",{membercard_number:i});a.workflowName!=""&&e.run(a.workflowName,{parameters:a.parameters})};'
+'let main=async({workflow:e,context:r,parameters:n,popup:l,captions:o})=>{await e.respond("OnBeforeWorkflow");var m=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"],t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(r.show_dialog=!1);let u=o.LoyaltyWindowTitle.substitute(m[t]),a="";if(r.show_dialog&&(a=await l.input({caption:o.MemberCardPrompt,title:u}),a===null))return;let i=await e.respond("do_work",{membercard_number:a});i.workflowName!=""&&await e.run(i.workflowName,{parameters:i.parameters})};'
         )
     end;
 

@@ -192,7 +192,7 @@ codeunit 6150788 "NPR POS Action: PrintExchLabel" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPrintExchLabel.js###
-'let main=async({workflow:t,parameters:e,captions:i,popup:l,context:d})=>{debugger;if(await t.respond("AddPresetValuesToContext"),e.Setting==e.Setting.Package||e.Setting==e.Setting.Selection)var n=await l.calendarPlusLines({title:i.title,caption:i.calendar,date:d.defaultdate,dataSource:"BUILTIN_SALELINE",filter:g=>g.fields[5]==1&&parseFloat(g.fields[12])>0});else var n=await l.datepad({title:i.title,caption:i.validfrom,required:!0,value:d.defaultdate});if(n!==null)if(e.Setting!=e.Setting["All Lines"])t.respond("PrintExchangeLabels",{UserSelection:n});else for(var r=await t.respond("GetPrintLineKeys"),a=0;a<r.printLineKeys.length;a++)t.context.printLineKey=r.printLineKeys[a],await t.respond("PrintExchangeLabelPerQty",{UserSelection:n})};'
+'let main=async({workflow:t,parameters:e,captions:i,popup:l,context:d})=>{debugger;if(await t.respond("AddPresetValuesToContext"),e.Setting==e.Setting.Package||e.Setting==e.Setting.Selection)var n=await l.calendarPlusLines({title:i.title,caption:i.calendar,date:d.defaultdate,dataSource:"BUILTIN_SALELINE",filter:g=>g.fields[5]==1&&parseFloat(g.fields[12])>0});else var n=await l.datepad({title:i.title,caption:i.validfrom,required:!0,value:d.defaultdate});if(n!==null)if(e.Setting!=e.Setting["All Lines"])await t.respond("PrintExchangeLabels",{UserSelection:n});else for(var r=await t.respond("GetPrintLineKeys"),a=0;a<r.printLineKeys.length;a++)t.context.printLineKey=r.printLineKeys[a],await t.respond("PrintExchangeLabelPerQty",{UserSelection:n})};'
         )
     end;
 }

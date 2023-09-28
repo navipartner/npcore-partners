@@ -53,7 +53,7 @@ codeunit 6150687 "NPR POSAction: RV Select Table" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRVSelectTable.js###
-'let main=async({workflow:e,parameters:a,context:t})=>{await e.respond("SelectWaiterPad")?e.run("RV_GET_WAITER_PAD",{parameters:{WaiterPadCode:t.waiterPadNo}}):e.run("RV_NEW_WAITER_PAD",{parameters:{SeatingCode:a.SeatingCode,SwitchToSaleView:!0}})};'
+'let main=async({workflow:e,parameters:a,context:t})=>{await e.respond("SelectWaiterPad")?await e.run("RV_GET_WAITER_PAD",{parameters:{WaiterPadCode:t.waiterPadNo}}):await e.run("RV_NEW_WAITER_PAD",{parameters:{SeatingCode:a.SeatingCode,SwitchToSaleView:!0}})};'
         );
     end;
 }

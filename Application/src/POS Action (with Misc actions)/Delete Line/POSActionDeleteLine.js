@@ -18,5 +18,5 @@ let main = async ({ workflow, parameters, captions }) => {
             return;
         };
     };
-    workflow.respond();
+    await workflow.respond();
 };
