@@ -46,8 +46,10 @@ page 6150750 "NPR POS (Dragonglass)"
                     end;
 
                     POSSession.ErrorIfPageIdMismatch(_PageId);
-                    POSSession.DebugWithTimestamp('Method:' + method);
+
+                    POSSession.PopResponseQueue();
                     _POSBackgroundTaskManager.ClearQueues();
+
                     BindSubscription(POSPageStackCheck);
 
                     ClearLastError();
