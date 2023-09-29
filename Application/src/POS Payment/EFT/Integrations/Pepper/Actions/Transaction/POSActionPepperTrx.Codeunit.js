@@ -121,16 +121,23 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
                             hwcResponse.TellerRequest.NumPad.value = await popup.numpad (hwcResponse.TellerRequest.NumPad);
                             break;
                         case "StringPad":
-                            hwcResponse.TellerRequest.StringPad.value = await popup.stringpad (hwcResponse.TellerRequest.StringPad);
+                            hwcResponse.TellerRequest.StringPad.value = await popup.input (hwcResponse.TellerRequest.StringPad);
                             break;
                         case "OptionMenu":
                             let selection = null;
-                            do {
-                                selection = await popup.optionsMenu (hwcResponse.TellerRequest.OptionMenu);
-                                if (!selection)
+                            let optionMenu =  hwcResponse.TellerRequest.OptionMenu;
+                            optionMenu.oneTouch = (optionMenu.options.length > 0);
+
+                            while (!selection && optionMenu.oneTouch) {
+                                selection = await popup.optionsMenu(optionMenu);
+                                if (!selection) {
                                     await popup.message("Please make a selection.");
-                            } while (!selection)
-                            hwcResponse.TellerRequest.OptionMenu.id = selection.id;
+                                }
+                            }
+
+                            if (selection) {
+                                optionMenu.id = selection.id;
+                            }
                             break;
                     }
                     context.request.TellerResponse = hwcResponse.TellerRequest;
