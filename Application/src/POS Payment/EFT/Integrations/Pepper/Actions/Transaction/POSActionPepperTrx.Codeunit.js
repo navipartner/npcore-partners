@@ -156,7 +156,7 @@ let main = async ({ workflow, context, popup, runtime, hwc, data, parameters, ca
         });
 
         _dialogRef.updateStatus (captions.statusAuthorizing);
-        _dialogRef.enableAbort(true);
+        _dialogRef.enableAbort(false);
         debugger;
 
         await hwc.invoke("EFTPepper", context.request, _contextId);
