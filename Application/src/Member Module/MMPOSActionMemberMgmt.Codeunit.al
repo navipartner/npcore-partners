@@ -12,7 +12,6 @@
         MemberNumberPrompt: Label 'Enter Member Number';
         MembershipNumberPrompt: Label 'Enter Membership Number';
         MembershipTitle: Label '%1 - Membership Management.';
-        SelectingMemberError: Label 'There was an error selecting member %1:\\%2';
         RENEW_NOT_VALID: Label 'There are no valid renewal products for this membership at this time.';
         EXTEND_NOT_VALID: Label 'There are no valid extend products for this membership at this time.';
         UPGRADE_NOT_VALID: Label 'There are no valid upgrade products for this membership at this time.';
@@ -501,29 +500,6 @@
 
     end;
 
-    local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]): Boolean
-    var
-        Membership: Record "NPR MM Membership";
-        MemberCard: Record "NPR MM Member Card";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MemberEntryNo: Integer;
-        ExternalMemberCardNo: Text[100];
-    begin
-
-        if (ExternalMemberNo = '') then
-            if (not ChooseMember(ExternalMemberNo)) then
-                exit(false);
-
-        MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo);
-
-        if (Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(ExternalMemberNo))) then
-            if (MemberCard.Get(MembershipManagement.GetMemberCardEntryNo(MemberEntryNo, Membership."Membership Code", Today))) then
-                ExternalMemberCardNo := MemberCard."External Card No.";
-
-        exit(AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo));
-
-    end;
-
     procedure AssignMembershipToPOSSale(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
     begin
         exit(AssignMembershipToPOSWorker(SalePOS, MembershipEntryNo, ExternalMemberCardNo));
@@ -809,18 +785,6 @@
         exit(SelectLocalMemberCardViaMemberUI(ExtMemberCardNo));
     end;
 
-    local procedure ChooseMember(var ExtMemberNo: Code[20]): Boolean
-    var
-        Member: Record "NPR MM Member";
-    begin
-        ExtMemberNo := '';
-
-        if (ChooseMemberWithSearchUIWorkList(Member)) then
-            ExtMemberNo := Member."External Member No.";
-
-        exit(ExtMemberNo <> '');
-    end;
-
     local procedure ChooseMemberWithSearchUIWorkList(var Member: Record "NPR MM Member"): Boolean
     var
         MemberList: Page "NPR MM Members";
@@ -951,80 +915,5 @@
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR MM POS Action: MemberMgmt.");
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
-    local procedure OnAfterLogin_SelectMemberRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
-    var
-        SalePOS: Record "NPR POS Sale";
-        Member: Record "NPR MM Member";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        POSSale: Codeunit "NPR POS Sale";
-        POSMemberCardEdit: Page "NPR MM Member Card";
-        ExternalMemberNo: Code[20];
-        MembershipSelected: Boolean;
-    begin
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-
-        if (POSSalesWorkflowStep."Subscriber Function" <> 'OnAfterLogin_SelectMemberRequired') then
-            exit;
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-        SalePOS.Find();
-        POSSale.Refresh(SalePOS);
-
-        ClearLastError();
-
-        repeat
-            MembershipSelected := false;
-
-            if (ExternalMemberNo = '') then
-                ChooseMember(ExternalMemberNo);
-
-            if (Member.Get(MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo))) then begin
-
-                Clear(POSMemberCardEdit);
-
-                POSMemberCardEdit.SetRecord(Member);
-                POSMemberCardEdit.LookupMode(true);
-                ClearLastError();
-                if (POSMemberCardEdit.RunModal() = Action::LookupOK) then
-                    MembershipSelected := AssignPOSMember(SalePOS, ExternalMemberNo);
-
-            end;
-
-            if (not MembershipSelected) then begin
-                Message(SelectingMemberError, ExternalMemberNo, GetLastErrorText);
-                ExternalMemberNo := '';
-            end;
-
-        until (MembershipSelected);
-
-        if (MembershipSelected) then begin
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(false, false);
-        end;
-
-        POSSession.RequestRefreshData();
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnAfterLoginDiscovery(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
-    begin
-
-        if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-
-        case Rec."Subscriber Function" of
-            'OnAfterLogin_SelectMemberRequired':
-                begin
-                    Rec.Description := CopyStr('On After Login, Select Member (Required)', 1, MaxStrLen(Rec.Description));
-                    Rec."Sequence No." := CurrCodeunitId();
-                    Rec.Enabled := false;
-                end;
-        end;
-
     end;
 }

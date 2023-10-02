@@ -32,73 +32,9 @@ codeunit 6150726 "NPR POSAction: Ins. Customer" implements "NPR IPOS Workflow"
         );
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnAfterLogin', '', true, true)]
-    local procedure SelectCustomerRequired(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
-    var
-        Customer: Record Customer;
-        SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        PrevRec: Text;
-        CustomerHasBeenBlockedMsg: Label 'The customer has been blocked for further business and cannot be selected.';
-    begin
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'SelectCustomerRequired' then
-            exit;
-
-        OnBeforeLookupCustomerNoSetFilters(Customer);
-
-        repeat
-            while (PAGE.RunModal(0, Customer) <> ACTION::LookupOK) do
-                Clear(Customer);
-
-            if Customer.Blocked = Customer.Blocked::All then
-                Message(CustomerHasBeenBlockedMsg);
-
-        until not (Customer.Blocked = Customer.Blocked::All);
-
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(SalePOS);
-
-        PrevRec := Format(SalePOS);
-
-        SalePOS.Validate("Customer No.", Customer."No.");
-
-        if PrevRec <> Format(SalePOS) then
-            SalePOS.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertPOSSalesWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
-    var
-        Text000: Label 'Required Customer select after Login';
-    begin
-        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-
-        case Rec."Subscriber Function" of
-            'SelectCustomerRequired':
-                begin
-                    Rec.Description := CopyStr(Text000, 1, MaxStrLen(Rec.Description));
-                    Rec."Sequence No." := CurrCodeunitId();
-                    Rec.Enabled := false;
-                end;
-        end;
-    end;
-
-    local procedure CurrCodeunitId(): Integer
-    begin
-        exit(CODEUNIT::"NPR POSAction: Ins. Customer");
-    end;
-
     local procedure ParameterCardPageId_Name(): Text[30]
     begin
         exit('CardPageId');
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupCustomerNoSetFilters(var Customer: Record Customer)
-    begin
     end;
 }
 

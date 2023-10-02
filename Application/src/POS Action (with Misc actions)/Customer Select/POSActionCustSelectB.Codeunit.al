@@ -26,6 +26,30 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
         SalePOS.Modify(true);
     end;
 
+    procedure AttachCustomerRequired(SalePOS: Record "NPR POS Sale")
+    var
+        Customer: Record Customer;
+        PrevRec: Text;
+        CustomerHasBeenBlockedMsg: Label 'The customer has been blocked for further business and cannot be selected.';
+    begin
+        repeat
+            while (PAGE.RunModal(0, Customer) <> ACTION::LookupOK) do
+                Clear(Customer);
+
+            if Customer.Blocked = Customer.Blocked::All then
+                Message(CustomerHasBeenBlockedMsg);
+
+        until not (Customer.Blocked = Customer.Blocked::All);
+
+        PrevRec := Format(SalePOS);
+
+        SalePOS.Validate("Customer No.", Customer."No.");
+
+        if PrevRec <> Format(SalePOS) then
+            SalePOS.Modify(true);
+    end;
+
+
     procedure RemoveCustomer(var SalePOS: Record "NPR POS Sale")
     begin
         SalePOS.Validate("Customer No.", '');
