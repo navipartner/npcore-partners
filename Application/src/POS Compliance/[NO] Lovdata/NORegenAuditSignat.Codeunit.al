@@ -35,6 +35,9 @@ codeunit 6060013 "NPR NO Re-gen. Audit Signat."
             end;
             POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
             POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::DIRECT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", DirectSaleEndLbl, '');
+            POSAuditLog.Reset();
+            POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
+            POSAuditLog.ModifyAll("Log Timestamp", CreateDateTime(POSEntry."Entry Date", POSEntry."Starting Time"));
         until POSEntry.Next() = 0;
     end;
 }
