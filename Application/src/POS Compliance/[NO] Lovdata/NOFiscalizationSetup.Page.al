@@ -28,6 +28,58 @@ page 6151224 "NPR NO Fiscalization Setup"
                     end;
                 }
             }
+            group(SignCertificate)
+            {
+                Caption = 'Sign Certificate';
+                field("Signing Certificate Password"; Rec."Signing Certificate Password")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Signing Certificate Password field';
+                }
+                field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field';
+                }
+            }
+            group(SAFTCash)
+            {
+                field("SAF-T Audit File Sender"; Rec."SAF-T Audit File Sender")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the SAF-T Audit File Sender field.';
+                }
+                field("SAF-T Contact No."; Rec."SAF-T Contact No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the SAF-T Contact No. field.';
+                }
+            }
+        }
+    }
+    actions
+    {
+        area(Processing)
+        {
+            action(UploadCertificate)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Upload Certificate';
+                Image = ImportCodes;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Upload Certificate action';
+
+                trigger OnAction()
+                var
+                    NOAuditMgt: Codeunit "NPR NO Audit Mgt.";
+                begin
+                    NOAuditMgt.ImportCertificate();
+                end;
+            }
         }
     }
 
