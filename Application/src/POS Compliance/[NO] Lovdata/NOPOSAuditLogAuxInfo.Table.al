@@ -15,9 +15,9 @@ table 6060065 "NPR NO POS Audit Log Aux. Info"
         }
         field(2; "Audit Entry No."; Integer)
         {
+            AutoIncrement = true;
             Caption = 'Audit Entry No.';
             DataClassification = CustomerContent;
-            AutoIncrement = true;
         }
         field(3; "POS Entry No."; Integer)
         {
