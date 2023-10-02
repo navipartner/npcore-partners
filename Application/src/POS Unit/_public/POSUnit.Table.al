@@ -307,6 +307,16 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Tax Free Profile";
         }
+        field(650; "Require Select Member"; Boolean)
+        {
+            Caption = 'Require Select Member';
+            DataClassification = CustomerContent;
+        }
+        field(660; "Require Select Customer"; Boolean)
+        {
+            Caption = 'Require Select Customer';
+            DataClassification = CustomerContent;
+        }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';

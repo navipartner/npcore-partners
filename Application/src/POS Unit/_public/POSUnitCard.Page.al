@@ -63,6 +63,16 @@
                     ToolTip = 'Specifies the current status of the POS unit, updated automatically by the system.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Require Select Member"; Rec."Require Select Member")
+                {
+                    ToolTip = 'Require Select Member After POS Login';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Require Select Customer"; Rec."Require Select Customer")
+                {
+                    ToolTip = 'Require Select Customer After POS Login';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Profiles)
             {

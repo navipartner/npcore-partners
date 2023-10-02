@@ -12,6 +12,10 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         //FINISH_SALE scenario
         ShowReturnAmountDialog();
 
+        //AFTER_LOGIN scenario
+        SelectMemberOnAfterLogin();
+        SelectCustomerOnAfterLogin();
+
         //AFTER_INSERT_LINE scenario 
         AddNewOnSaleCoupons();
         UpdateDisplayOnSaleLineInsert();
@@ -41,9 +45,41 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure SelectMemberOnAfterLogin()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'SelectMemberOnAfterLogin');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectMemberOnAfterLogin')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        POSSalesWorkflowStep.SetRange("Workflow Code", 'AFTER_LOGIN');
+        POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR MM POS Action: MemberMgmt.");  //CU 6060138
+        POSSalesWorkflowStep.SetRange("Subscriber Function", 'OnAfterLogin_SelectMemberRequired');
+        if POSSalesWorkflowStep.FindFirst() then
+            if POSSalesWorkflowStep.Enabled then
+                if POSUnit.FindSet() then
+                    POSUnit.ModifyAll("Require Select Member", true);
+
+        DeletePOSWorkflowStepAfterLogin(POSSalesWorkflowStep."Subscriber Codeunit ID", 'OnAfterLogin_SelectMemberRequired');
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectMemberOnAfterLogin'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     local procedure UpgradeShowReturnAmountDialog()
     begin
         DeletePOSWorkflowStepFinishSale(6150855, 'ShowReturnAmountDialog');
+    end;
+
+    local procedure DeletePOSWorkflowStepAfterLogin(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
+    begin
+        DeletePOSWorkflowStep('AFTER_LOGIN', SubscriberCodeunitID, SubscriberFunction);
     end;
 
     local procedure DeletePOSWorkflowStepAfterInsertLine(SubscriberFunction: Text[80])
@@ -204,5 +240,32 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR UPG POS Scenarios");
+    end;
+
+    local procedure SelectCustomerOnAfterLogin()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'SelectCustomerOnAfterLogin');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectCustomerOnAfterLogin')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        POSSalesWorkflowStep.SetRange("Workflow Code", 'AFTER_LOGIN');
+        POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR POSAction: Ins. Customer");  //CU 6150726
+        POSSalesWorkflowStep.SetRange("Subscriber Function", 'SelectCustomerRequired');
+        if POSSalesWorkflowStep.FindFirst() then
+            if POSSalesWorkflowStep.Enabled then
+                if POSUnit.FindSet() then
+                    POSUnit.ModifyAll("Require Select Customer", true);
+
+        DeletePOSWorkflowStepAfterLogin(POSSalesWorkflowStep."Subscriber Codeunit ID", 'SelectCustomerRequired');
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectCustomerOnAfterLogin'));
+        LogMessageStopwatch.LogFinish();
     end;
 }

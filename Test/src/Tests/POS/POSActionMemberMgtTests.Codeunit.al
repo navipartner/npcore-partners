@@ -28,14 +28,16 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         SalePOS: Codeunit "NPR POS Sale";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         CardNo: Text[100];
+        SelectReq: Boolean;
     begin
         // [Given] 
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalePOS);
         DialogMethod := DialogMethod::NO_PROMPT;
+        SelectReq := false;
         CardNo := AddMemberCard();
         // [When]
-        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo);
+        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, SelectReq);
         // [Then]
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
@@ -104,14 +106,16 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         POSSale: Codeunit "NPR POS Sale";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         CardNo: Text[100];
+        SelectReq: Boolean;
     begin
         // [Given]
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         DialogMethod := DialogMethod::NO_PROMPT;
         CardNo := AddMemberCard();
+        SelectReq := false;
         // [When]
-        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo);
+        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, SelectReq);
         POSActionMemberMgtWF3B.EditActiveMembership();
         // [Then]
         //page is opened

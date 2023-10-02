@@ -23,7 +23,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionLogin.js###
-'let main=async({workflow:a})=>{debugger;let e=await a.respond("prepareWorkflow");e.workflowName!=""&&(e.workflowName=="START_POS"?await a.run(e.workflowName):await a.run(e.workflowName,{parameters:e.parameters}))};'
+'let main=async({workflow:r,context:l})=>{debugger;let e=await r.respond("prepareWorkflow");const a=e.preWorkflows;if(a)for(const o of Object.entries(a)){let[t,s]=o;if(t){let{mainParameters:m,customParameters:f}=s;await r.run(t,{context:{customParameters:f},parameters:m})}}e.workflowName!=""&&(e.workflowName=="START_POS"?await r.run(e.workflowName):await r.run(e.workflowName,{parameters:e.parameters}))};'
         )
     end;
 
@@ -40,6 +40,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
         Text001: Label 'Unknown login type requested by JavaScript: %1.';
         Password: Text;
         Type: Text;
+        LoginEvents: Codeunit "NPR POS Login Events";
     begin
         Type := Context.GetString('type');
 
@@ -56,18 +57,75 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
                     if ((SalespersonPurchaser.FindFirst() and (Password <> ''))) then begin
                         OnAfterFindSalesperson(SalespersonPurchaser);
                         Setup.SetSalesperson(SalespersonPurchaser);
-
                         BusinessLogic.OpenPosUnit(FrontEnd, Setup, POSSession, ActionContext);
                     end else begin
                         Error('Illegal password.');
                     end;
-
                 end;
             else
                 Error(Text001, Type);
         end;
         HandleWorkflowResponse(Response, ActionContext);
+        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context));
+        LoginEvents.OnAfterLogin(POSSession);
+
         exit(Response);
+    end;
+
+    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper") PreWorkflows: JsonObject
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
+        LoginEvents: Codeunit "NPR POS Login Events";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        PreWorkflows.ReadFrom('{}');
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+
+        if POSUnit."Require Select Member" then
+            AddMemberWorkflow(PreWorkflows);
+        if POSUnit."Require Select Customer" then
+            AddCustomerWorkflow(PreWorkflows);
+
+        LoginEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
+    end;
+
+    local procedure AddMemberWorkflow(PreWorkflows: JsonObject)
+    var
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        CustomParameters: JsonObject;
+    begin
+        MainParameters.Add('Function', 'Select Membership');
+        MainParameters.Add('DialogPrompt', 'No Dialog');
+
+        CustomParameters.Add('SelectionRequired', true);
+
+        ActionParameters.Add('mainParameters', MainParameters);
+        ActionParameters.Add('customParameters', CustomParameters);
+
+        PreWorkflows.Add('MM_MEMBERMGMT_WF3', ActionParameters);
+    end;
+
+    local procedure AddCustomerWorkflow(var PreWorkflows: JsonObject)
+    var
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        CustomParameters: JsonObject;
+    begin
+        MainParameters.Add('Operation', 'Attach');
+        CustomParameters.Add('SelectionRequired', true);
+
+        ActionParameters.Add('mainParameters', MainParameters);
+        ActionParameters.Add('customParameters', CustomParameters);
+
+        PreWorkflows.Add('CUSTOMER_SELECT', ActionParameters);
     end;
 
     internal procedure HandleWorkflowResponse(var Response: JsonObject; ActionContextIn: JsonObject): Boolean
