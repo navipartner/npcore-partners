@@ -69,9 +69,11 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         POSActionMemberMgtWF3B: Codeunit "NPR POS Action Member MgtWF3-B";
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text[100];
+        SelectReq: Boolean;
     begin
         if not Context.GetIntegerParameter('Function', FunctionId) then
             FunctionId := 0;
+        GetCustomParam(Context, SelectReq);
         GetFrontEndInputs(Context, ExternalMemberCardNo, FrontEndInputMethod);
 
         JsonText := '{}';
@@ -79,7 +81,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
             0:
                 POSActionMemberMgtWF3B.POSMemberArrival(FrontEndInputMethod, ExternalMemberCardNo);
             1:
-                POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo);
+                POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo, SelectReq);
             2:
                 JsonText := GetMembershipEntryLookupJson(FrontEndInputMethod, ExternalMemberCardNo);
             3:
@@ -373,6 +375,21 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
 //###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js### 
 'let main=async({workflow:o,context:i,popup:l,captions:u,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);let b=u.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(i.memberCardInput=await l.input({caption:u.MemberCardPrompt,title:u.windowTitle}),i.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(i.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let t=JSON.parse(await o.respond("GetMembershipAlterationLookup"));i.memberCardInput=t.cardnumber;let n=JSON.parse(t.data);if(n.length==0){await l.error({title:u.windowTitle,caption:t.notFoundMessage});return}let a=data.createArrayDriver(n),r=data.createDataSource(a);r.loadAll=!1;let c=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout),result:d=>d?d.map(s=>s?s.itemno:null):null},source:r});if(c===null)return;i.itemNumber=c[0].itemno}let m=await o.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let t=JSON.parse(m),n=data.createArrayDriver(JSON.parse(t.data)),a=data.createDataSource(n),r=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout)},source:a})}};'
         )
+    end;
+
+    local procedure GetCustomParam(var Context: Codeunit "NPR POS JSON Helper"; var SelectReq: Boolean)
+    var
+        PrevScopeID: Guid;
+    begin
+        if Context.HasProperty('customParameters') then begin
+            PrevScopeID := Context.StoreScope();
+
+            Context.SetScope('customParameters');
+            if not Context.GetBoolean('SelectionRequired', SelectReq) then
+                SelectReq := false;
+
+            Context.RestoreScope(PrevScopeID);
+        end;
     end;
 }
 

@@ -286,28 +286,99 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
-    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]) MembershipEntryNo: Integer
+    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; SelectReq: Boolean) MembershipEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
+        MembershipSelected: Boolean;
+        Member: Record "NPR MM Member";
+        ExtMemberNo: Code[20];
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        POSMemberCardEdit: Page "NPR MM Member Card";
+        SelectingMemberError: Label 'There was an error selecting member %1:\\%2';
     begin
-        GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
-
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find();
         POSSale.Refresh(SalePOS);
 
-        if (AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo)) then begin
-            POSSale.Refresh(SalePOS);
-            POSSale.Modify(false, false);
-        end;
+        if SelectReq then begin
 
-        exit(Membership."Entry No.");
+            ClearLastError();
+            repeat
+                MembershipSelected := false;
+
+                if ChooseMemberWithSearchUIWorkList(Member) then
+                    ExtMemberNo := Member."External Member No.";
+
+                if (Member.Get(MembershipManagement.GetMemberFromExtMemberNo(ExtMemberNo))) then begin
+
+                    Clear(POSMemberCardEdit);
+
+                    POSMemberCardEdit.SetRecord(Member);
+                    POSMemberCardEdit.LookupMode(true);
+                    ClearLastError();
+                    if (POSMemberCardEdit.RunModal() = Action::LookupOK) then
+                        MembershipSelected := AssignPOSMember(SalePOS, ExtMemberNo);
+                end;
+
+                if (not MembershipSelected) then begin
+                    Message(SelectingMemberError, ExtMemberNo, GetLastErrorText());
+                    ExtMemberNo := '';
+                end;
+
+            until (MembershipSelected);
+
+        end else begin
+            GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
+
+            if (AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo)) then begin
+                POSSale.Refresh(SalePOS);
+                POSSale.Modify(false, false);
+            end;
+
+            exit(Membership."Entry No.");
+        end;
     end;
+
+    local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MemberCard: Record "NPR MM Member Card";
+        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberEntryNo: Integer;
+        ExternalMemberCardNo: Text[100];
+    begin
+
+        if (ExternalMemberNo = '') then
+            if (not ChooseMember(ExternalMemberNo)) then
+                exit(false);
+
+        MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo(ExternalMemberNo);
+
+        if (Membership.Get(MembershipManagement.GetMembershipFromExtMemberNo(ExternalMemberNo))) then
+            if (MemberCard.Get(MembershipManagement.GetMemberCardEntryNo(MemberEntryNo, Membership."Membership Code", Today))) then
+                ExternalMemberCardNo := MemberCard."External Card No.";
+
+        exit(AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo));
+
+    end;
+
+    local procedure ChooseMember(var ExtMemberNo: Code[20]): Boolean
+    var
+        Member: Record "NPR MM Member";
+    begin
+        ExtMemberNo := '';
+
+        if (ChooseMemberWithSearchUIWorkList(Member)) then
+            ExtMemberNo := Member."External Member No.";
+
+        exit(ExtMemberNo <> '');
+    end;
+
 
 
     internal procedure ExecuteMembershipAlteration(POSSaleLine: Codeunit "NPR POS Sale Line"; AlterationType: Option; ExternalMemberCardNo: Text[100]; ItemNo: Code[20])

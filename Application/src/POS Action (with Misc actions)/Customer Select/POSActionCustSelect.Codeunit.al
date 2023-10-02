@@ -58,6 +58,8 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         CustomerTableView: Text;
         SpecificCustomerNo: Text;
         CustomerOverdueCheck: Boolean;
+        SelectReq: Boolean;
+
     begin
         CustomerTableView := Context.GetStringParameter(ParameterCustomerTableView_Name());
         CustomerLookupPage := Context.GetIntegerParameter(ParameterCustomerLookupPage_Name());
@@ -65,10 +67,15 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         SpecificCustomerNo := Context.GetStringParameter(ParameterCustomerNo_Name());
         CustomerOverdueCheck := Context.GetBooleanParameter(ParameterCheckCustomerBalance_Name());
 
+        GetCustomParam(Context, SelectReq);
+
         Sale.GetCurrentSale(SalePOS);
         case Operation of
             Operation::Attach:
-                PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo, CustomerOverdueCheck);
+                If SelectReq then
+                    PosActionBusinessLogic.AttachCustomerRequired(SalePOS)
+                else
+                    PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo, CustomerOverdueCheck);
             Operation::Remove:
                 PosActionBusinessLogic.RemoveCustomer(SalePOS);
         end;
@@ -232,5 +239,20 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     local procedure ParameterCheckCustomerBalance_Name(): Text[30]
     begin
         exit('CheckCustomerBalance');
+    end;
+
+    local procedure GetCustomParam(var Context: Codeunit "NPR POS JSON Helper"; var SelectReq: Boolean)
+    var
+        PrevScopeID: Guid;
+    begin
+        if Context.HasProperty('customParameters') then begin
+            PrevScopeID := Context.StoreScope();
+
+            Context.SetScope('customParameters');
+            if not Context.GetBoolean('SelectionRequired', SelectReq) then
+                SelectReq := false;
+
+            Context.RestoreScope(PrevScopeID);
+        end;
     end;
 }

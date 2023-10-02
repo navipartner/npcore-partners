@@ -82,12 +82,14 @@
         exit('AFTER_LOGIN');
     end;
 
+    [Obsolete('Use OnAfterLogin in cdu 6151544 "NPR POS Login Events"', 'NPR27.0')]
     local procedure OnAfterLogin_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
     begin
         Commit();
         if not Codeunit.Run(Codeunit::"NPR POS View Change WF Mgt.", POSSalesWorkflowStep) then;
     end;
 
+    [Obsolete('Use OnAfterLogin in cdu 6151544 "NPR POS Login Events"', 'NPR27.0')]
     internal procedure InvokeOnAfterLoginWorkflow(var POSSession: Codeunit "NPR POS Session")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -117,6 +119,7 @@
         POSSession.AddServerStopwatch('AFTER_LOGIN_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
+    [Obsolete('Use OnAfterLogin in cdu 6151544 "NPR POS Login Events"', 'NPR27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterLogin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     begin

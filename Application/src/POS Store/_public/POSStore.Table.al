@@ -256,6 +256,7 @@
             TableRelation = "NPR POS Posting Profile";
             NotBlank = true;
         }
+
         field(800; "Geolocation Latitude"; Decimal)
         {
             Caption = 'Geolocation Latitude';
