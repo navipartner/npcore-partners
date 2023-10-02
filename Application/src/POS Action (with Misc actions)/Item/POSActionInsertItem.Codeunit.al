@@ -37,6 +37,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ParamSkipItemAvailabilityCheck_DescLbl: Label 'Enable/Disable skip Item Availability Check';
         ParamUsePreSetUnitPrice_CaptionLbl: Label 'usePreSetUnitPrice';
         ParamUsePreSetUnitPrice_DescLbl: Label 'Enable/Disable preset of Unit Price';
+        ParamUnitOfMeasure_CaptionLbl: Label 'Unit of Measure';
+        ParamUnitOfMeasure_DescLbl: Label 'Specifies Unit of Measure for Item';
 
     begin
         WorkflowConfig.SetNonBlockingUI();
@@ -63,6 +65,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                        ParamItemIdentifierType_DescLbl,
                        ParamItemIdentifierOptions_CaptionLbl);
         WorkflowConfig.AddTextParameter('itemNo', '', ParamItemNo_CaptionLbl, ParamItemNo_DescLbl);
+        WorkflowConfig.AddTextParameter('unitOfMeasure', '', ParamUnitOfMeasure_CaptionLbl, ParamUnitOfMeasure_DescLbl);
         WorkflowConfig.AddDecimalParameter('itemQuantity', 1, ParamItemQty_CaptionLbl, ParamItemQty_DescLbl);
         WorkflowConfig.AddBooleanParameter('EditDescription', false, ParamEditDescription_CaptionLbl, ParamEditDescription_DescLbl);
         WorkflowConfig.AddBooleanParameter('EditDescription2', false, ParamEditDescription2_CaptionLbl, ParamEditDescription2_DescLbl);
@@ -131,8 +134,10 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ChildBOMLinesWithoutSerialNoJsonArray: JsonArray;
         CustomDescription: Text;
         CustomDescription2: Text;
+        UnitOfMeasure: Text;
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
+        UnitOfMeasure := Context.GetStringParameter('unitOfMeasure');
         ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');
         ItemQuantity := Context.GetDecimalParameter('itemQuantity');
         UsePresetUnitPrice := Context.GetBooleanParameter('usePreSetUnitPrice');
@@ -215,6 +220,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                                          ItemReference,
                                          ItemIdentifierType,
                                          ItemQuantity,
+                                         CopyStr(UnitOfMeasure, 1, 10),
                                          UnitPrice,
                                          CustomDescription,
                                          CustomDescription2,
@@ -413,6 +419,21 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ItemProcessingEvents.OnAddPostWorkflowsToRun(Context, SaleLinePOS, PostWorkflows);
     end;
 
+    local procedure GetValueFromPOSParameters(var POSParameterValue: Record "NPR POS Parameter Value"; ValueName: Text) POSParameterValueTExt: Text
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
+    begin
+        TempPOSParameterValue := POSParameterValue;
+        TempPOSParameterValue.CopyFilters(POSParameterValue);
+
+        POSParameterValue.SetRange(Name, ValueName);
+        if POSParameterValue.FindFirst() then
+            POSParameterValueTExt := POSParameterValue.Value;
+
+        POSParameterValue := TempPOSParameterValue;
+        POSParameterValue.CopyFilters(TempPOSParameterValue);
+    end;
+
     procedure ActionCode(): Text
     begin
         exit(Format(enum::"NPR POS Workflow"::ITEM));
@@ -564,6 +585,82 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
         if not ItemReference.IsEmpty() then
             InScope := true;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, true)]
+    local procedure OnLookupUnitOfMeasureCode(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        ItemNo: Text;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+        if POSParameterValue.Name <> 'unitOfMeasure' then
+            exit;
+        if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
+            exit;
+
+        Handled := true;
+
+        ItemNo := GetValueFromPOSParameters(POSParameterValue, 'itemNo');
+        if ItemNo = '' then
+            exit;
+
+        ItemUnitOfMeasure.Reset();
+        ItemUnitOfMeasure.SetRange("Item No.", ItemNo);
+
+        if ItemUnitOfMeasure.IsEmpty() then
+            exit;
+
+        if Page.RunModal(0, ItemUnitOfMeasure) = Action::LookupOK then
+            POSParameterValue.Value := ItemUnitOfMeasure.Code;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
+    local procedure OnValidateUnitOfMeasureCode(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        UOMErr: Label 'Inserted Unit of Measure does not exist for Item No. parameter field';
+        ItemNo: Text;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+        if POSParameterValue.Name <> 'unitOfMeasure' then
+            exit;
+        if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
+            exit;
+        if POSParameterValue.Value = '' then
+            exit;
+
+        ItemNo := GetValueFromPOSParameters(POSParameterValue, 'itemNo');
+
+        if not ItemUnitOfMeasure.Get(ItemNo, POSParameterValue.Value) then
+            Error(UOMErr);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnAfterValidateEvent', 'Value', true, false)]
+    local procedure OnAfterValidateItemNoValue(var Rec: Record "NPR POS Parameter Value")
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
+    begin
+        if Rec."Action Code" <> ActionCode() then
+            exit;
+        if Rec.Name <> 'itemNo' then
+            exit;
+        if Rec."Data Type" <> Rec."Data Type"::Text then
+            exit;
+
+        TempPOSParameterValue := Rec;
+        TempPOSParameterValue.CopyFilters(Rec);
+
+        Rec.SetRange(Name, 'unitOfMeasure');
+        if Rec.FindFirst() then begin
+            Rec.Value := '';
+            Rec.Modify(true);
+        end;
+
+        Rec := TempPOSParameterValue;
+        Rec.CopyFilters(TempPOSParameterValue);
     end;
 
     local procedure CurrCodeunitId(): Integer
