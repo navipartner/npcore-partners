@@ -478,6 +478,91 @@ codeunit 85147 "NPR POS Discount Tests"
         Commit();
     end;
 
+    local procedure InitializeSalesDocMgt(var SaleLine: Codeunit "NPR POS Sale Line"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
+    var
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
+        AmountExclVAT: Decimal;
+        AmountInclVAT: Decimal;
+        VATAmount: Decimal;
+        DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
+        DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict,"Blanket Order";
+        LocationSource: Option Undefined,"POS Store","POS Sale",SpecificLocation;
+        PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
+    begin
+        RetailSalesDocMgt.SetAsk(false);
+        RetailSalesDocMgt.SetPrint(false);
+        RetailSalesDocMgt.SetInvoice(false);
+        RetailSalesDocMgt.SetReceive(true);
+        RetailSalesDocMgt.SetShip(true);
+        RetailSalesDocMgt.SetSendPostedPdf2Nav(false);
+        RetailSalesDocMgt.SetRetailPrint(false);
+        RetailSalesDocMgt.SetAutoReserveSalesLine(false);
+        RetailSalesDocMgt.SetTransferSalesPerson(true);
+        RetailSalesDocMgt.SetTransferPostingsetup(true);
+        RetailSalesDocMgt.SetTransferDimensions(true);
+        RetailSalesDocMgt.SetTransferTaxSetup(true);
+        RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
+        RetailSalesDocMgt.SetSendDocument(false);
+        RetailSalesDocMgt.SetSendICOrderConf(false);
+        RetailSalesDocMgt.SetCustomerCreditCheck(false);
+        RetailSalesDocMgt.SetWarningCustomerCreditCheck(false);
+        RetailSalesDocMgt.SetPrintProformaInvoice(false);
+
+        RetailSalesDocMgt.SetAsyncPosting(false);
+
+        SaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
+
+        POSActionDocExportB.SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive::Invoice, DocumentTypeNegative::CreditMemo);
+        POSActionDocExportB.SetLocationSource(RetailSalesDocMgt, LocationSource::"POS Store", '');
+        POSActionDocExportB.SetPaymentMethodCode(RetailSalesDocMgt, PaymentMethodCodeSource::"Sales Header Default", '');
+    end;
+
+    local procedure GetCreatedSalesInvoiceHeader(SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    begin
+        SalesInvoiceHeader.SetRange("Pre-Assigned No.", SalesHeader."No.");
+        SalesInvoiceHeader.FindFirst();
+    end;
+
+    local procedure GetCreatedSalesInvoiceLine(SaleLinePOS: Record "NPR POS Sale Line"; SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesInvoiceLine: Record "Sales Invoice Line")
+    begin
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
+        SalesInvoiceLine.SetRange("No.", SaleLinePOS."No.");
+
+        SalesInvoiceLine.FindFirst();
+    end;
+
+    local procedure AddDiscountToPOSSaleLine(var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; var DiscountAmount: Decimal; var DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra)
+    var
+        InputIncludesTax: Option Always,IfPricesInclTax,Never;
+        PresetMultiLineDiscTarget: Option Auto,"Positive Only","Negative Only",All,Ask;
+    begin
+        POSActionDiscountB.StoreAdditionalParams('', '', '', '', '', InputIncludesTax::Always);
+        POSActionDiscountB.ProcessRequest(DiscountType, DiscountAmount, SalePOS, SaleLinePOS, PresetMultiLineDiscTarget);
+    end;
+
+    local procedure ProcessSalesDocument(var SalesInvoiceLine: Record "Sales Invoice Line")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        InitializeSalesDocMgt(SaleLine, RetailSalesDocMgt);
+        RetailSalesDocMgt.ProcessPOSSale(POSSale);
+        RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeader);
+        GetCreatedSalesInvoiceHeader(SalesHeader, SalesInvoiceHeader);
+        GetCreatedSalesInvoiceLine(SaleLinePOS, SalesInvoiceHeader, SalesInvoiceLine);
+    end;
+
     [Test]
     internal procedure ClearLineDiscount()
     var
@@ -605,4 +690,735 @@ codeunit 85147 "NPR POS Discount Tests"
         POSActionDiscountB.StoreAdditionalParams('', '', '', '', '', 0); //CleanUp
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyZeroLineAmountDiscountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 0 line amount
+        // - Add item
+        // - Apply 0 line amount
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 0;
+        DiscountType := DiscountType::LineAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyPartialLineAmountDiscountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Partial line amount
+        // - Add item
+        // - Apply line amount that is bigger than 0 but lower than the amount of the line
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := LibraryRandom.RandDecInRange(1, Round(SaleLinePOS.Amount - 1, 1, '='), 4);
+        DiscountType := DiscountType::LineAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyZeroTotalAmountDiscountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 0 total amount
+        // - Add item
+        // - Apply 0 total amount
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 0;
+        DiscountType := DiscountType::TotalAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyPartialTotalAmountDiscountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Partial total amount
+        // - Add item
+        // - Apply total amount that is bigger than 0 but lower than the amount on the line
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := LibraryRandom.RandDecInRange(1, Round(SaleLinePOS.Amount - 1, 1, '='), 4);
+        DiscountType := DiscountType::TotalAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyFullLineDiscountAmountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Full line discount amount
+        // - Add item
+        // - Apply line discount amount equal to the line amount of the line
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := SaleLinePOS.Amount;
+        DiscountType := DiscountType::LineDiscountAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyPartialLineDiscountAmountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Partial line discount amount
+        // - Add item
+        // - Apply line discount amount bigger than 0, but lower than the line amount
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := LibraryRandom.RandDecInRange(1, Round(SaleLinePOS.Amount - 1, 1, '='), 4);
+        DiscountType := DiscountType::LineDiscountAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyFullTotalDiscountAmountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Full total discount amount
+        // - Add item
+        // - Apply total discount amount equal to the total amount of the line
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := SaleLinePOS.Amount;
+        DiscountType := DiscountType::TotalDiscountAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyPartialTotalDiscountAmountToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] Partial total discount amount
+        // - Add item
+        // - Apply total discount amount bigger than 0 but lower than the line amount
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := LibraryRandom.RandDecInRange(1, Round(SaleLinePOS.Amount - 1, 1, '='), 4);
+        DiscountType := DiscountType::TotalDiscountAmount;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyLineDiscountOfHundredPctToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 50% line discount percent
+        // - Add item
+        // - Apply 100% line discount percent
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 100;
+        DiscountType := DiscountType::LineDiscountPercentABS;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyLineDiscountOfFiftyPctToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 50% line discount percent
+        // - Add item
+        // - Apply 50% line discount percent
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 50;
+        DiscountType := DiscountType::LineDiscountPercentABS;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyTotalDiscountOfHundredPctToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 100% total discount percent
+        // - Add item
+        // - Apply 100% total discount percent
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 100;
+        DiscountType := DiscountType::DiscountPercentABS;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ApplyTotalDiscountOfFiftyPctToSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        DiscountAmount: Decimal;
+        Quantity: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        // [SCENARIO] 50% total discount percent
+        // - Add item
+        // - Apply 50% total discount percent
+        // - Invoice customer
+        // - Check if the discount in the posted sales invoice is correct
+
+        // [GIVEN] POS & Payment setup with Sale
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Quantity := LibraryRandom.RandIntInRange(1, 100);
+        LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(SaleLine);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Set prices including VAT on POS Sale Line
+        SalePOS.Validate("Prices Including VAT", true);
+        SalePOS.Modify(true);
+
+        // [GIVEN] Discount Amount and Type
+        DiscountAmount := 50;
+        DiscountType := DiscountType::DiscountPercentABS;
+
+        // [GIVEN] Sale with discount 
+        AddDiscountToPOSSaleLine(SalePOS, SaleLinePOS, DiscountAmount, DiscountType);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Process and Post Sales Document
+        ProcessSalesDocument(SalesInvoiceLine);
+
+        // [THEN] Check discount amount on the POS Sale Line and Sales Invoice Line
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreNearlyEqual(SaleLinePOS."Discount Amount", SalesInvoiceLine."Line Discount Amount", 0.01, 'Discount Amount must be equal on the POS and Invoice Line');
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", SalesInvoiceLine."Line Discount %", 0.01, 'Discount % must be equal on the POS and Invoice Line');
+    end;
 }
