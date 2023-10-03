@@ -64,6 +64,7 @@
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
         if NpRvSalesLine.FindSet() then
             repeat
+                NpRvSalesLine."Document Line No." := POSSalesLine."Line No.";
                 IssueVouchers(NpRvSalesLine, SaleLinePos);
             until NpRvSalesLine.Next() = 0;
 
@@ -71,7 +72,7 @@
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
             if NpRvSalesLine.FindFirst() then
-                PostPayment(NpRvSalesLine, SaleLinePos);
+                PostPayment(NpRvSalesLine, SaleLinePos, POSSalesLine."Line No.");
         end;
     end;
 
@@ -87,6 +88,7 @@
         NpRvSalesLine.SetFilter(Type, '%1|%2|%3', NpRvSalesLine.Type::"New Voucher", NpRvSalesLine.Type::"Top-up", NpRvSalesLine.Type::"Partner Issue Voucher");
         if NpRvSalesLine.FindSet() then
             repeat
+                NpRvSalesLine."Document Line No." := POSPaymentLine."Line No.";
                 IssueVouchers(NpRvSalesLine, SaleLinePos);
             until NpRvSalesLine.Next() = 0;
 
@@ -94,7 +96,7 @@
             SetSalesLineFilter(SaleLinePos, NpRvSalesLine);
             NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
             if NpRvSalesLine.FindFirst() then
-                PostPayment(NpRvSalesLine, SaleLinePos);
+                PostPayment(NpRvSalesLine, SaleLinePos, POSPaymentLine."Line No.");
         end;
     end;
 
@@ -360,6 +362,7 @@
                 begin
                     VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
                     VoucherEntry."Document No." := NpRvSalesLine."Sales Ticket No.";
+                    VoucherEntry."Document Line No." := NpRvSalesLine."Document Line No.";
                 end;
             NpRvSalesLine."Document Source"::"Sales Document",
             NpRvSalesLine."Document Source"::"Payment Line":
@@ -534,7 +537,7 @@
         MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
-    internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SaleLinePOS: Record "NPR POS Sale Line")
+    internal procedure PostPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SaleLinePOS: Record "NPR POS Sale Line"; DocumentLineNo: Integer)
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -547,6 +550,7 @@
         VoucherEntry."Document Type" := VoucherEntry."Document Type"::"POS Entry";
         VoucherEntry."Register No." := SaleLinePOS."Register No.";
         VoucherEntry."Document No." := SaleLinePOS."Sales Ticket No.";
+        VoucherEntry."Document Line No." := DocumentLineNo;
         VoucherEntry."Posting Date" := SaleLinePOS.Date;
         VoucherEntry.Amount := -SaleLinePOS."Amount Including VAT";
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
