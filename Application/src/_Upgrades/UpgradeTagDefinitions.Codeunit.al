@@ -138,6 +138,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuditRoll'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -517,7 +519,14 @@
                         exit('FeaturesInstall-20230818');
                 end;
             Codeunit::"NPR Obsolete Tables Cleanup":
-                exit('NPR-ObsoleteTablesCleanup');
+                case UpgradeStep of
+                    '':
+                        exit('NPR-ObsoleteTablesCleanup');
+                    'CleanupAuxGLEntry':
+                        exit('NPR-ObsoleteTablesCleanup_CleanupAuxGLEntry');
+                    'CleanupAuditRoll':
+                        exit('NPR-ObsoleteTablesCleanup_AuditRoll');
+                end;
         end;
     end;
 }
