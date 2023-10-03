@@ -30,6 +30,9 @@ stages:
       containerDefinitions:
         - name: Auto
         
+        - name: vPrevious_CLOUD
+          alwaysRun: true
+
         - name: vLatest_CLOUD
           alwaysRun: true
 
