@@ -11,13 +11,13 @@ codeunit 6060013 "NPR NO Re-gen. Audit Signat."
         Selected: Integer;
         ChooseMsg: Label 'Choose one of the following options:';
         DirectSaleEndLbl: Label 'POS Direct Sale Ended';
-        OptionsLbl: Label 'Recreate all transactions for signing, Add missed entries to Audit Log with Signing, Cancel';
+        OptionsLbl: Label 'Recreate all transactions for signing, Cancel';
     begin
         Selected := 2;
         if GuiAllowed then
-            Selected := Dialog.StrMenu(OptionsLbl, 3, ChooseMsg);
+            Selected := Dialog.StrMenu(OptionsLbl, 2, ChooseMsg);
 
-        if (Selected = 3) or (Selected = 0) then
+        if (Selected = 2) or (Selected = 0) then
             exit;
 
         if Selected = 1 then begin
