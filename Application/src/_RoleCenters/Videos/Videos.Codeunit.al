@@ -33,6 +33,18 @@ codeunit 6059919 "NPR Videos"
         MixDiscountGeneralSettings(sender, VarModuleInfo.Id);
         MixDiscountConditionsAndMixDiscountLines(sender, VarModuleInfo.Id);
         EntertainmentTicketAdmission(sender, VarModuleInfo.Id);
+        MixDiscountTypes(sender, VarModuleInfo.Id);
+        CombinationMixDiscounts(sender, VarModuleInfo.Id);
+        VarietySetup(sender, VarModuleInfo.Id);
+        VarietyFieldsSetup(sender, VarModuleInfo.Id);
+        VarietyAdministrativeSection(sender, VarModuleInfo.Id);
+        VarietyTableAdministrativeSection(sender, VarModuleInfo.Id);
+        VarietyValuesAdministrativeSection(sender, VarModuleInfo.Id);
+        ConfigureVarietyGroups(sender, VarModuleInfo.Id);
+        AssignVarietyToItem(sender, VarModuleInfo.Id);
+        VarietyMatrixPopup(sender, VarModuleInfo.Id);
+        PriceSetup(sender, VarModuleInfo.Id);
+        SalesPriceListsAndWorksheets(sender, VarModuleInfo.Id);
     end;
 
     local procedure POSIntroduction(var Video: Codeunit Video; AppID: Guid)
@@ -231,6 +243,102 @@ codeunit 6059919 "NPR Videos"
     var
         VideoLbl: Label 'https://share.synthesia.io/embeds/videos/dddf3d9a-bac6-47e4-b784-4dd50b39cc62', locked = true;
         TitleLbl: Label 'NP POS Academy 25: Entertainment - Ticket Admission';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure MixDiscountTypes(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/GdFKN5v223g', locked = true;
+        TitleLbl: Label 'NP POS Academy 26: Mix Discount Types';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure CombinationMixDiscounts(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/NynY_ZB-jxc', locked = true;
+        TitleLbl: Label 'NP POS Academy 27: Combination Mix Discounts';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietySetup(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/pDZ9kzk3SIc', locked = true;
+        TitleLbl: Label 'NP POS Academy 28: Variety Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietyFieldsSetup(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/owAFstc4vds', locked = true;
+        TitleLbl: Label 'NP POS Academy 29: Variety Fields Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietyAdministrativeSection(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/DWCgtBz6-2c', locked = true;
+        TitleLbl: Label 'NP POS Academy 30: Variety Administrative Section';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietyTableAdministrativeSection(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/ZhXcEmrrknk', locked = true;
+        TitleLbl: Label 'NP POS Academy 31: Variety Table Administrative Section';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietyValuesAdministrativeSection(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/ksacX2zt9Uw', locked = true;
+        TitleLbl: Label 'NP POS Academy 32: Variety Values Administrative Section';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure ConfigureVarietyGroups(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/7BQ8XESFc0I', locked = true;
+        TitleLbl: Label 'NP POS Academy 33: Configure Variety Groups';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure AssignVarietyToItem(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/Xe4AwlA5DmE', locked = true;
+        TitleLbl: Label 'NP POS Academy 34: Assign a Variety to an Item';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure VarietyMatrixPopup(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/P63eJyhAMzg', locked = true;
+        TitleLbl: Label 'NP POS Academy 35: Variety Matrix Pop up';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure PriceSetup(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/-dDaY9iLQHE?si=xQv_QW6wg9XbyKvL', locked = true;
+        TitleLbl: Label 'NP POS Academy 36: Price Setup';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure SalesPriceListsAndWorksheets(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/DZFlAhoDlvI?si=LQXLZtV8zqXK4oit', locked = true;
+        TitleLbl: Label 'NP POS Academy 37: Sales Price Lists and Worksheets';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
