@@ -11,18 +11,20 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Obsolete Tables Cleanup', 'OnUpgradePerCompany');
 
-        if UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup")) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup")) then begin
+            CleanupAuxItemLedgerEntry();
+            CleanupAuxValueEntry();
+            CleanupAuxItem();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
         end;
 
-        CleanupAuxItemLedgerEntry();
-        CleanupAuxValueEntry();
-        CleanupAuxGLEntry();
-        CleanupAuxItem();
-        CleanupAuditRoll();
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry')) then
+            if CleanupAuxGLEntry() then
+                UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
 
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuditRoll')) then
+            if CleanupAuditRoll() then
+                UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuditRoll'));
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -41,11 +43,14 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
         AuxValueEntry.DeleteAll(false);
     end;
 
-    local procedure CleanupAuxGLEntry()
+    local procedure CleanupAuxGLEntry(): Boolean
     var
         AuxGLEntry: Record "NPR Aux. G/L Entry";
     begin
+        if not AuxGLEntry.WritePermission() then
+            exit(false);
         AuxGLEntry.DeleteAll(false);
+        exit(true);
     end;
 
     local procedure CleanupAuxItem()
@@ -55,10 +60,13 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
         AuxiliaryItem.DeleteAll(false);
     end;
 
-    local procedure CleanupAuditRoll()
+    local procedure CleanupAuditRoll(): Boolean
     var
         AuditRoll: Record "NPR Audit Roll";
     begin
+        if not AuditRoll.WritePermission() then
+            exit(false);
         AuditRoll.DeleteAll(false);
+        exit(true);
     end;
 }
