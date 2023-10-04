@@ -9,6 +9,12 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the value of the Group Code field.';
             }
+            field("NPR Sales Channel"; Rec."NPR Sales Channel")
+            {
+                ToolTip = 'Specifies the value of the Sales Channel field';
+                Visible = false;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
 
         addafter("Posting Date")

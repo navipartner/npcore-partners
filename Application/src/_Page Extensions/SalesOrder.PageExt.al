@@ -48,6 +48,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     POSAsyncPostingMgt.ScheduledTransFromPOSOnDrillDown(Rec);
                 end;
             }
+            field("NPR Sales Channel"; Rec."NPR Sales Channel")
+            {
+                ToolTip = 'Specifies the value of the Sales Channel field';
+                Visible = false;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
 
         addafter(Control85)

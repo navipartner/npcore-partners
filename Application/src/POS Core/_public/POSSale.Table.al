@@ -781,6 +781,12 @@
                 end;
             end;
         }
+        field(6010; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 
     keys

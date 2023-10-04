@@ -298,6 +298,8 @@
         if NpXmlDomMgt.GetElementBoolean(XmlElement, 'use_customer_salesperson', false) and (Customer."Salesperson Code" <> '') then
             SalesHeader.Validate("Salesperson Code", Customer."Salesperson Code");
 
+        SalesHeader."NPR Sales Channel" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'sales_channel', MaxStrLen(SalesHeader."NPR Sales Channel"), false), 1, MaxStrLen(SalesHeader."NPR Sales Channel"));
+
         if XmlElement.SelectSingleNode('.//*[local-name()="shipment"]', Node) then begin
             ShipmentMapping.SetRange("External Shipment Method Code", NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'shipment_method', MaxStrLen(ShipmentMapping."External Shipment Method Code"), true));
             ShipmentMapping.FindFirst();

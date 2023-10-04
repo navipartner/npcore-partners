@@ -91,6 +91,12 @@
                     ApplicationArea = NPRRetail;
                     Description = 'Initially created for BE localization';
                 }
+
+                field("Sales Channel"; Rec."Sales Channel")
+                {
+                    ToolTip = 'Specifies the value of the Sales Channel field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 group("Posting Difference")
                 {
                     Caption = 'Posting Difference';

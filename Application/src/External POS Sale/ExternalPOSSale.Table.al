@@ -308,6 +308,12 @@
             Caption = 'POS Entry System Id';
             DataClassification = SystemMetadata;
         }
+        field(6010; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 
     keys
@@ -471,12 +477,16 @@
     end;
 
     trigger OnInsert()
+    var
+        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         GetPOSUnit();
         GetPOSStore();
         Rec."POS Store Code" := POSStore.Code;
         Rec."Location Code" := POSStore."Location Code";
         Rec."User ID" := CopyStr(UserId, 1, MaxStrLen(Rec."User ID"));
+        if POSStore.GetProfile(POSPostingProfile) then
+            Rec."Sales Channel" := POSPostingProfile."Sales Channel";
     end;
 
     var

@@ -189,6 +189,11 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Description field.';
                 }
+                field("Sales Channel"; Rec."Sales Channel")
+                {
+                    ToolTip = 'Specifies the value of the Sales Channel field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field(JournalName; Rec.JournalName)
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -332,7 +337,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         Membership.TestField("Customer No.");
         AmountExclVat := ExcludeVat(MembershipLoyaltyJnl.AmountInclVat, MembershipLoyaltyJnl.ItemNo);
         DiscAmtExclVat := ExcludeVat(MembershipLoyaltyJnl.AmountInclVat - MembershipLoyaltyJnl.UnitPrice * MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.ItemNo);
-        LoyaltyPointManagement.RegisterPoints(MembershipLoyaltyJnl.DocumentDate, Membership."Entry No.", MembershipLoyaltyJnl.POSUnitNo, MembershipLoyaltyJnl.ItemNo, MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.DocumentNo, AmountExclVat, DiscAmtExclVat, true);
+        LoyaltyPointManagement.RegisterPoints(MembershipLoyaltyJnl.DocumentDate, Membership."Entry No.", MembershipLoyaltyJnl.POSUnitNo, MembershipLoyaltyJnl.ItemNo, MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.DocumentNo, AmountExclVat, DiscAmtExclVat, true, MembershipLoyaltyJnl."Sales Channel");
     end;
 
     local procedure WithdrawPoints(MembershipLoyaltyJnl: Record "NPR MM MembershipLoyaltyJnl")
@@ -385,7 +390,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
             exit;
         end;
 
-        LoyaltyPointManagement.CalculatePointsForTransactions(Membership."Entry No.", MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.ItemNo, '', MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.AmountInclVAT, false, AwardedAmount, AwardedPoints, PointsEarned, RuleReference);
+        LoyaltyPointManagement.CalculatePointsForTransactions(Membership."Entry No.", MembershipLoyaltyJnl.DocumentDate, MembershipLoyaltyJnl.ItemNo, '', MembershipLoyaltyJnl.Quantity, MembershipLoyaltyJnl.AmountInclVAT, false, MembershipLoyaltyJnl."Sales Channel", AwardedAmount, AwardedPoints, PointsEarned, RuleReference);
     end;
 
     local procedure ExcludeVat(ParamAmountInclVat: Decimal; ParamItemNo: Code[20]) AmountBase: Decimal

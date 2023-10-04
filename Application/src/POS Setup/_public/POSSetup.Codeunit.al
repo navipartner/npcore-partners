@@ -108,6 +108,12 @@
         exit(POSPostingProfile."POS Sales Rounding Account");
     end;
 
+    internal procedure SalesChannel(): Code[20]
+    var
+    begin
+        exit(POSPostingProfile."Sales Channel");
+    end;
+
     internal procedure ExchangeLabelDefaultDate(): Code[10]
     var
         ExchangeLabelSetup: Record "NPR Exchange Label Setup";

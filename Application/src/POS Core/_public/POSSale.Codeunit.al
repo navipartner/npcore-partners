@@ -73,6 +73,7 @@ codeunit 6150705 "NPR POS Sale"
         _Rec."Sales Ticket No." := GetNextReceiptNo(_Rec."Register No.");
         _Rec.Date := Today();
         _Rec."Start Time" := Time;
+        _Rec."Sales Channel" := _Setup.SalesChannel();
 
         if WorkDate() <> Today() then begin
             WorkDate := Today();

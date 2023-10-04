@@ -250,6 +250,14 @@
             Caption = 'Post POS Sale Documents with Job Queue';
             DataClassification = CustomerContent;
         }
+
+        field(180; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
+
     }
 
     keys

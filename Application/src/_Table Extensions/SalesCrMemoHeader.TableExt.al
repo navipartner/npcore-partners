@@ -114,5 +114,11 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR Group Code".Code;
         }
+        field(6151440; "NPR Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 }

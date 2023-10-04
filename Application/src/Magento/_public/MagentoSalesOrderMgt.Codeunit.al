@@ -533,8 +533,8 @@
         SalesHeader."Sell-to Country/Region Code" := CopyStr(NpXmlDomMgt.GetElementCode(XmlElement2, 'country_code', MaxStrLen(SalesHeader."Sell-to Country/Region Code"), false), 1, MaxStrLen(SalesHeader."Sell-to Country/Region Code"));
         SalesHeader."Sell-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(XmlElement2, 'contact', MaxStrLen(SalesHeader."Sell-to Contact"), false), 1, MaxStrLen(SalesHeader."Sell-to Contact"));
 
-        SalesHeader."NPR Magento Coupon" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'magento_coupon', MAXSTRLEN(SalesHeader."NPR Magento Coupon"), FALSE), 1, MaxStrLen(SalesHeader."NPR Magento Coupon"));
-
+        SalesHeader."NPR Magento Coupon" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'magento_coupon', MaxStrLen(SalesHeader."NPR Magento Coupon"), false), 1, MaxStrLen(SalesHeader."NPR Magento Coupon"));
+        SalesHeader."NPR Sales Channel" := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'sales_channel', MaxStrLen(SalesHeader."NPR Sales Channel"), false), 1, MaxStrLen(SalesHeader."NPR Sales Channel"));
 
         RecRef.GetTable(SalesHeader);
         SetFieldText(RecRef, 171, NpXmlDomMgt.GetXmlText(XmlElement2, 'phone', MaxStrLen(Customer."Phone No."), false));

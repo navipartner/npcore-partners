@@ -69,5 +69,11 @@ tableextension 6014452 "NPR Item Journal Line" extends "Item Journal Line"
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
+        field(6151440; "NPR Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 }
