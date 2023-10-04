@@ -577,6 +577,11 @@
         LogoPickerClearLogoLbl: label 'Clear Logo';
         LogoPickerMaximumFileSizeInfo: Label 'Maximum file size for image uploads is 10 megabytes.';
         GridEditorSelectGridToEditLbl: Label 'Select grid to edit : ';
+        WizardModalContinueLbl: Label 'Continue';
+        WizardModalBackLbl: Label 'Back';
+        WizardModalNeedHelpLbl: Label 'Need help?';
+        WizardModalSupportTextLbl: Label 'Feel free to contact us and we will guide you through the process.';
+        WizardModalConfirmSelectionLbl: Label 'Confirm selection';
         WizardModalChooseCategoryLbl: Label 'Choose Category';
         WizardModalChooseLanguageLbl: Label 'Choose Language';
         WizardModalChooseLayoutLbl: Label 'Choose Layout';
@@ -932,6 +937,11 @@
         Captions.Add('Logo_Picker_ClearLogo', LogoPickerClearLogoLbl);
         Captions.Add('Logo_Picker_MaximumFileSizeInfo', LogoPickerMaximumFileSizeInfo);
         Captions.Add('Grid_Editor_SelectGridToEdit', GridEditorSelectGridToEditLbl);
+        Captions.Add('Wizard_Modal_Continue', WizardModalContinueLbl);
+        Captions.Add('Wizard_Modal_Back', WizardModalBackLbl);
+        Captions.Add('Wizard_Modal_NeedHelp', WizardModalNeedHelpLbl);
+        Captions.Add('Wizard_Modal_SupportText', WizardModalSupportTextLbl);
+        Captions.Add('Wizard_Modal_ConfirmSelection', WizardModalConfirmSelectionLbl);
         Captions.Add('Wizard_Modal_ChooseCategory', WizardModalChooseCategoryLbl);
         Captions.Add('Wizard_Modal_ChooseLanguage', WizardModalChooseLanguageLbl);
         Captions.Add('Wizard_Modal_ChooseLayout', WizardModalChooseLayoutLbl);
