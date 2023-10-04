@@ -420,7 +420,7 @@
         POSUnitEvent.SetActiveEvent(Rec."No.", EventNo);
     end;
 
-    internal procedure DeleteActiveEventForCurrPOSUnit()
+    procedure DeleteActiveEventForCurrPOSUnit()
     var
         POSUnitEvent: Record "NPR POS Unit Event";
     begin
