@@ -164,8 +164,8 @@
 
         // strict check is 0-9, a-z, A-Z, and ~!$%^&*_=+}{'?-.
         EMail := DelChr(EMail, '<=>', '0123456789');
-        EMail := DelChr(EMail, '<=>', 'abcdefghijklmnopqrstuvwqyz');
-        EMail := DelChr(EMail, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+        EMail := DelChr(EMail, '<=>', 'abcdefghijklmnopqrstuvwxyz');
+        EMail := DelChr(EMail, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         EMail := DelChr(EMail, '<=>', '~!$%^&*_=+}{?-.@');
         ValidEmail := StrLen(EMail) = 0;
         if (not ValidEmail) then
