@@ -54,6 +54,10 @@ page 6150698 "NPR APIV1 PBIItemAttValMapStr"
                     EntitySetName = 'itemAttributeValues';
                     SubPageLink = "Attribute ID" = field("Item Attribute ID"), ID = field("Item Attribute Value ID");
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

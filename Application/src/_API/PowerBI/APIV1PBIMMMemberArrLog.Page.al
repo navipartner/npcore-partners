@@ -48,6 +48,10 @@ page 6150795 "NPR APIV1 PBIMMMemberArrLog"
                 {
                     Caption = 'Response Type', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

@@ -59,6 +59,10 @@ page 6059967 "NPR APIV1 PBITMDetTicketAccess"
                 {
                     Caption = 'Ticket No.';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

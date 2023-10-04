@@ -132,6 +132,10 @@ page 6060083 "NPR APIV1 PBIPurch. Rcpt. Line"
                 {
                     Caption = 'Expected Receipt Date', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

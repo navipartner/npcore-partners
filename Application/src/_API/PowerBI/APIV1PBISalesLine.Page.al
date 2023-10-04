@@ -56,6 +56,10 @@ page 6150779 "NPR APIV1 PBISalesLine"
                 {
                     Caption = 'Amount Including VAT', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

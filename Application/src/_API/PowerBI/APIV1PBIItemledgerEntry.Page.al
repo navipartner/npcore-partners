@@ -148,6 +148,10 @@ page 6059929 "NPR APIV1 PBIItemledgerEntry"
                 {
                     Caption = 'SystemCreatedAt', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

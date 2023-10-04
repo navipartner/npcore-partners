@@ -76,6 +76,10 @@ page 6060001 "NPR APIV1 PBIPOSBinEntry"
                 {
                     Caption = 'POS Payment Line No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

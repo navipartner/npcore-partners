@@ -116,6 +116,10 @@ page 6151166 "NPR APIV2 PBIItem"
                 {
                     Caption = 'Ticket Type';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

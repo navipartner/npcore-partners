@@ -48,6 +48,10 @@ page 6060003 "NPR APIV1 PBIPOSEntryTaxLine"
                 {
                     Caption = 'Amount Including Tax', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

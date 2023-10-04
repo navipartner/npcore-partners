@@ -112,6 +112,10 @@ page 6060038 "NPR APIV1 PBIPurch Header Arc"
                 {
                     Caption = 'Version No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }
