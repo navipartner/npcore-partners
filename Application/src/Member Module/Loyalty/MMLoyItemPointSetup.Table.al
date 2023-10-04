@@ -27,8 +27,19 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Item Group,Item,Vendor';
-            OptionMembers = "Item Group",Item,Vendor;
+            OptionCaption = 'Item Group,Item,Vendor,All Items';
+            OptionMembers = "Item Group",Item,Vendor,AllItems;
+            trigger OnValidate()
+            var
+            begin
+                Rec."No." := '';
+                case Type of
+                    Type::AllItems:
+                        Description := 'Applies to all items.'
+                    else
+                        Description := '';
+                end;
+            end;
         }
         field(11; "No."; Code[20])
         {
@@ -56,6 +67,8 @@
                     Type::Vendor:
                         if (Vendor.Get("No.")) then
                             Description := Vendor.Name;
+                    Type::AllItems:
+                        Error(FieldMustBeEmptyForTypeAllItemsErr, Rec.FieldCaption("No."));
                 end;
             end;
         }
@@ -122,6 +135,12 @@
             DataClassification = CustomerContent;
             InitValue = 1;
         }
+        field(40; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 
     keys
@@ -150,5 +169,8 @@
                 "Line No." += LoyaltyItemPointSetup."Line No.";
         end;
     end;
+
+    var
+        FieldMustBeEmptyForTypeAllItemsErr: Label 'Field ''%1'' must be empty for type All Items';
 }
 

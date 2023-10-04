@@ -583,6 +583,13 @@
             FieldClass = FlowField;
             CalcFormula = exist("NPR POS Info POS Entry" WHERE("POS Entry No." = FIELD("Entry No.")));
         }
+        field(6010; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
+
     }
 
     keys

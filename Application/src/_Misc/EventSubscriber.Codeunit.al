@@ -26,6 +26,12 @@
             ItemJournalLine."NPR Document Time" := Time;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Item Journal Line", 'OnAfterCopyItemJnlLineFromSalesHeader', '', false, false)]
+    local procedure ItemJnlLineOnAfterCopyItemJnlLineFromSalesHeader(var ItemJnlLine: Record "Item Journal Line"; SalesHeader: Record "Sales Header")
+    begin
+        ItemJnlLine."NPR Sales Channel" := SalesHeader."NPR Sales Channel";
+    end;
+
     [EventSubscriber(ObjectType::Page, Page::"Feature Management", 'OnOpenFeatureMgtPage', '', false, false)]
     local procedure NPRFeatureManagementOnOpenFeatureMgtPage(var IgnoreFilter: Boolean)
     begin

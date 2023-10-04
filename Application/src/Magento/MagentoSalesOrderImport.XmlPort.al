@@ -193,6 +193,11 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
+                textelement(sales_channel)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 textelement(payments)
                 {
                     tableelement(temppaymentline; "NPR Magento Payment Line")

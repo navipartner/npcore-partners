@@ -228,6 +228,7 @@
         POSEntry."NPRE Number of Guests" := POSSale."NPRE Number of Guests";
         POSEntry."External Document No." := POSSale."External Document No.";
         POSEntry."Responsibility Center" := POSSale."Responsibility Center";
+        POSEntry."Sales Channel" := POSSale."Sales Channel";
 
         OnBeforeInsertPOSEntry(POSSale, POSEntry);
 
@@ -1916,6 +1917,7 @@
         POSEntry."Tax Area Code" := ExtSalePOS."Tax Area Code";
         POSEntry."Prices Including VAT" := ExtSalePOS."Prices Including VAT";
         POSEntry."External Document No." := ExtSalePOS."External Document No.";
+        POSEntry."Sales Channel" := ExtSalePOS."Sales Channel";
 
         OnBeforeInsertPOSEntryFromExternalPOSSale(ExtSalePOS, POSEntry);
 

@@ -34,7 +34,7 @@
 
         end;
 
-        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, CopyStr(ItemJournalLine."NPR Register Number", 1, 10));
+        CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::VALUE_ENTRY, CopyStr(ItemJournalLine."NPR Register Number", 1, 10), ItemJournalLine."NPR Sales Channel");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR MM Membership Events", 'OnAfterInsertMembershipEntry', '', true, true)]
@@ -124,11 +124,12 @@
           MembershipEntry."Document No.",
           MembershipEntry.Amount,
           0,
+          '',
           LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY
           );
     end;
 
-    internal procedure RegisterPoints(PostingDate: Date; MembershipEntryNo: Integer; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; Adjustment: Boolean) EntryCreated: Boolean
+    internal procedure RegisterPoints(PostingDate: Date; MembershipEntryNo: Integer; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; Adjustment: Boolean; SalesChannel: Code[20]) EntryCreated: Boolean
     var
         Membership: Record "NPR MM Membership";
         ValueEntry: Record "Value Entry";
@@ -159,10 +160,10 @@
         ValueEntry.Adjustment := Adjustment;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        EntryCreated := CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY, PosUnitNo);
+        EntryCreated := CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY, PosUnitNo, SalesChannel);
     end;
 
-    internal procedure CalculatePointsForTransactions(MembershipEntryNo: Integer; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; AmountBase: Decimal; AmountIsDiscounted: Boolean; var AwardedAmount: Decimal; var AwardedPoints: Integer; var PointsEarned: Integer; RuleReference: Integer) RuleType: Integer
+    internal procedure CalculatePointsForTransactions(MembershipEntryNo: Integer; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; AmountBase: Decimal; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var AwardedAmount: Decimal; var AwardedPoints: Integer; var PointsEarned: Integer; RuleReference: Integer) RuleType: Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -173,7 +174,7 @@
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
 
-        RuleType := CalculateAwardedPoints(LoyaltySetup, ReferenceDate, ItemNo, VariantCode, AmountBase, AmountIsDiscounted, AwardedAmount, AwardedPoints, RuleReference);
+        RuleType := CalculateAwardedPoints(LoyaltySetup, ReferenceDate, ItemNo, VariantCode, AmountBase, AmountIsDiscounted, SalesChannel, AwardedAmount, AwardedPoints, RuleReference);
         PointsEarned := Round(AwardedAmount, 1) + Round(AwardedPoints * Quantity, 1);
 
         exit(RuleType);
@@ -224,6 +225,7 @@
                         PosEntry."Document No.",
                         PosEntrySalesLine."Amount Excl. VAT (LCY)",
                         PosEntrySalesLine."Line Dsc. Amt. Excl. VAT (LCY)",
+                        PosEntry."Sales Channel",
                         LoyaltyPostingSourceEnum::POS_ENDOFSALE
                     );
                 until (PosEntrySalesLine.Next() = 0);
@@ -247,7 +249,7 @@
         exit(false);
     end;
 
-    local procedure SimulateValueEntry(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; DataSource: Option)
+    local procedure SimulateValueEntry(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; SalesChannel: Code[20]; DataSource: Option)
     var
         ValueEntry: Record "Value Entry";
         Item: Record Item;
@@ -273,7 +275,7 @@
         ValueEntry."Discount Amount" := DiscountAmount;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        CreatePointEntryFromValueEntry(ValueEntry, DataSource, POSUnitNo);
+        CreatePointEntryFromValueEntry(ValueEntry, DataSource, POSUnitNo, SalesChannel);
     end;
 
     procedure SimulatePointEntryForTestFramework(PostingDate: Date; PosUnitNo: Code[10]; ItemNo: Code[20]; Quantity: Decimal; CustomerNo: Code[20]; DocumentNo: Code[20]; Amount: Decimal; DiscountAmount: Decimal; DataSource: Option)
@@ -299,10 +301,10 @@
         ValueEntry."Discount Amount" := DiscountAmount;
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
-        CreatePointEntryFromValueEntry(ValueEntry, DataSource, PosUnitNo);
+        CreatePointEntryFromValueEntry(ValueEntry, DataSource, PosUnitNo, '');
     end;
 
-    local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option; POSUnitNo: Code[10]): Boolean
+    local procedure CreatePointEntryFromValueEntry(ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option; POSUnitNo: Code[10]; SalesChannel: Code[20]): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipPointsEntry: Record "NPR MM Members. Points Entry";
@@ -407,7 +409,7 @@
         if (AwardPoints) or (MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND) or (MembershipPointsEntry.Adjustment) then begin
             MembershipPointsEntry."Point Constraint" := CalculateAwardedPoints(LoyaltySetup,
               MembershipPointsEntry."Posting Date", MembershipPointsEntry."Item No.", MembershipPointsEntry."Variant Code",
-              Abs(MembershipPointsEntry."Amount (LCY)"), (ValueEntry."Discount Amount" <> 0),
+              Abs(MembershipPointsEntry."Amount (LCY)"), (ValueEntry."Discount Amount" <> 0), SalesChannel,
               MembershipPointsEntry."Awarded Amount (LCY)", MembershipPointsEntry."Awarded Points", MembershipPointsEntry."Loyalty Item Point Line No.");
 
             MembershipPointsEntry."Awarded Points" *= MembershipPointsEntry.Quantity;
@@ -466,7 +468,7 @@
         exit(AmountBase);
     end;
 
-    local procedure CalculateAwardedPoints(LoyaltySetup: Record "NPR MM Loyalty Setup"; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountBase: Decimal; AmountIsDiscounted: Boolean; var AwardedAmount: Decimal; var AwardedPoints: Integer; var RuleReference: Integer): Integer
+    local procedure CalculateAwardedPoints(LoyaltySetup: Record "NPR MM Loyalty Setup"; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountBase: Decimal; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var AwardedAmount: Decimal; var AwardedPoints: Integer; var RuleReference: Integer): Integer
     var
         Item: Record Item;
     begin
@@ -496,13 +498,16 @@
         AwardedPoints := 0;
         Item.Get(ItemNo);
 
-        if (CheckItemRule(LoyaltySetup.Code, ReferenceDate, ItemNo, VariantCode, AmountIsDiscounted, RuleReference) = RuleType::EXCLUDE) then
+        if (CheckItemRule(LoyaltySetup.Code, ReferenceDate, ItemNo, VariantCode, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::EXCLUDE) then
             exit(RuleType::EXCLUDE);
 
-        if (CheckItemGroupRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, RuleReference) = RuleType::EXCLUDE) then
+        if (CheckItemGroupRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::EXCLUDE) then
             exit(RuleType::EXCLUDE);
 
-        if (CheckItemVendorRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, RuleReference) = RuleType::EXCLUDE) then
+        if (CheckItemVendorRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::EXCLUDE) then
+            exit(RuleType::EXCLUDE);
+
+        if (CheckSalesChannel(LoyaltySetup.Code, ReferenceDate, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::EXCLUDE) then
             exit(RuleType::EXCLUDE);
 
         // This item will award points by default as sales amount
@@ -518,13 +523,16 @@
         end;
 
         // Check include rules
-        if (CheckItemRule(LoyaltySetup.Code, ReferenceDate, ItemNo, VariantCode, AmountIsDiscounted, RuleReference) = RuleType::INCLUDE) then
+        if (CheckItemRule(LoyaltySetup.Code, ReferenceDate, ItemNo, VariantCode, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::INCLUDE) then
             exit(ApplyRule(LoyaltySetup.Code, RuleReference, AmountBase, AwardedAmount, AwardedPoints));
 
-        if (CheckItemGroupRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, RuleReference) = RuleType::INCLUDE) then
+        if (CheckItemGroupRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::INCLUDE) then
             exit(ApplyRule(LoyaltySetup.Code, RuleReference, AmountBase, AwardedAmount, AwardedPoints));
 
-        if (CheckItemVendorRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, RuleReference) = RuleType::INCLUDE) then
+        if (CheckItemVendorRule(LoyaltySetup.Code, ReferenceDate, ItemNo, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::INCLUDE) then
+            exit(ApplyRule(LoyaltySetup.Code, RuleReference, AmountBase, AwardedAmount, AwardedPoints));
+
+        if (CheckSalesChannel(LoyaltySetup.Code, ReferenceDate, AmountIsDiscounted, SalesChannel, RuleReference) = RuleType::INCLUDE) then
             exit(ApplyRule(LoyaltySetup.Code, RuleReference, AmountBase, AwardedAmount, AwardedPoints));
 
         // No rule implies include in loyalty when amount based
@@ -732,7 +740,7 @@
 
     end;
 
-    local procedure CheckItemRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountIsDiscounted: Boolean; var RuleReference: Integer): Integer
+    local procedure CheckItemRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var RuleReference: Integer): Integer
     var
         LoyaltyItemPointSetup: Record "NPR MM Loy. Item Point Setup";
     begin
@@ -746,6 +754,7 @@
         LoyaltyItemPointSetup.SetFilter("Variant Code", '=%1', VariantCode);
         LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
         LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Sales Channel", '=%1', SalesChannel);
         if (LoyaltyItemPointSetup.FindFirst()) then begin
             if (AmountIsDiscounted) then begin
                 LoyaltyItemPointSetup.SetFilter("Allow On Discounted Sale", '=%1', true);
@@ -763,6 +772,7 @@
         LoyaltyItemPointSetup.SetFilter("No.", '=%1', ItemNo);
         LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
         LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Sales Channel", '=%1', SalesChannel);
         if (LoyaltyItemPointSetup.FindFirst()) then begin
             if (AmountIsDiscounted) then begin
                 LoyaltyItemPointSetup.SetFilter("Allow On Discounted Sale", '=%1', true);
@@ -778,7 +788,7 @@
         exit(RuleType::NO_RULE);
     end;
 
-    local procedure CheckItemGroupRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; AmountIsDiscounted: Boolean; var RuleReference: Integer): Integer
+    local procedure CheckItemGroupRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var RuleReference: Integer): Integer
     var
         LoyaltyItemPointSetup: Record "NPR MM Loy. Item Point Setup";
         Item: Record Item;
@@ -794,6 +804,7 @@
         LoyaltyItemPointSetup.SetFilter("No.", '=%1', Item."Item Category Code");
         LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
         LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Sales Channel", '=%1', SalesChannel);
         if (LoyaltyItemPointSetup.FindFirst()) then begin
             if (AmountIsDiscounted) then begin
                 LoyaltyItemPointSetup.SetFilter("Allow On Discounted Sale", '=%1', true);
@@ -809,7 +820,7 @@
         exit(RuleType::NO_RULE);
     end;
 
-    local procedure CheckItemVendorRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; AmountIsDiscounted: Boolean; var RuleReference: Integer): Integer
+    local procedure CheckItemVendorRule(LoyaltyCode: Code[20]; ReferenceDate: Date; ItemNo: Code[20]; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var RuleReference: Integer): Integer
     var
         LoyaltyItemPointSetup: Record "NPR MM Loy. Item Point Setup";
         Item: Record Item;
@@ -825,6 +836,7 @@
         LoyaltyItemPointSetup.SetFilter("No.", '=%1', Item."Vendor No.");
         LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
         LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Sales Channel", '=%1', SalesChannel);
         if (LoyaltyItemPointSetup.FindFirst()) then begin
             if (AmountIsDiscounted) then begin
                 LoyaltyItemPointSetup.SetFilter("Allow On Discounted Sale", '=%1', true);
@@ -836,6 +848,34 @@
         end;
 
         // No Rule Found
+        RuleReference := 0;
+        exit(RuleType::NO_RULE);
+    end;
+
+    local procedure CheckSalesChannel(LoyaltyCode: Code[20]; ReferenceDate: Date; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var RuleReference: Integer): Integer
+    var
+        LoyaltyItemPointSetup: Record "NPR MM Loy. Item Point Setup";
+    begin
+        LoyaltyItemPointSetup.Reset();
+        LoyaltyItemPointSetup.SetFilter(Code, '=%1', LoyaltyCode);
+        LoyaltyItemPointSetup.SetFilter(Blocked, '=%1', false);
+        LoyaltyItemPointSetup.SetFilter(Type, '=%1', LoyaltyItemPointSetup.Type::AllItems);
+
+        LoyaltyItemPointSetup.SetFilter("No.", '=%1', '');
+        LoyaltyItemPointSetup.SetFilter("Valid From Date", '=%1|<=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Valid Until Date", '=%1|>=%2', 0D, ReferenceDate);
+        LoyaltyItemPointSetup.SetFilter("Sales Channel", '=%1', SalesChannel);
+        if (LoyaltyItemPointSetup.FindFirst()) then begin
+            if (AmountIsDiscounted) then begin
+                LoyaltyItemPointSetup.SetFilter("Allow On Discounted Sale", '=%1', true);
+                if (LoyaltyItemPointSetup.FindFirst()) then;
+            end;
+
+            RuleReference := LoyaltyItemPointSetup."Line No.";
+            exit(LoyaltyItemPointSetup.Constraint);
+        end;
+
+        // No rule found
         RuleReference := 0;
         exit(RuleType::NO_RULE);
     end;

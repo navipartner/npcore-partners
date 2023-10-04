@@ -21,6 +21,12 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
                     POSAsyncPostingMgt.ScheduledTransFromPOSOnDrillDown(Rec);
                 end;
             }
+            field("NPR Sales Channel"; Rec."NPR Sales Channel")
+            {
+                ToolTip = 'Specifies the value of the Sales Channel field';
+                Visible = false;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
 
         addlast("Invoice Details")

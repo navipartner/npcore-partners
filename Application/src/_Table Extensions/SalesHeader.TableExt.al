@@ -142,5 +142,13 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
                                                       "Orig. Sales Document Type" = field("Document Type"),
                                                      "Post Sales Document Status" = filter("Error while Posting" | "Unposted")));
         }
+
+        field(6151440; "NPR Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
+
     }
 }
