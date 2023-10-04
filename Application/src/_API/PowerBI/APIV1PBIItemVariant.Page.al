@@ -96,6 +96,10 @@ page 6060036 "NPR APIV1 PBIItem Variant"
                 {
                     Caption = 'NPR Blocked', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

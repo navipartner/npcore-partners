@@ -40,6 +40,10 @@ page 6150677 "NPR APIV1 PBIItemAttValueMap"
                 {
                     caption = 'Item Attribute Value Id', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

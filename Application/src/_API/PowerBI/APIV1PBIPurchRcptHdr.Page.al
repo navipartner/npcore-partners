@@ -104,6 +104,10 @@ page 6060064 "NPR APIV1 PBIPurch. Rcpt. Hdr"
                 {
                     Caption = 'Vendor Posting Group', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

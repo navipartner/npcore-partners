@@ -168,6 +168,10 @@ page 6060062 "NPR APIV1 PBIPurchase Line Arc"
                 {
                     Caption = 'Allow Invoice Disc.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

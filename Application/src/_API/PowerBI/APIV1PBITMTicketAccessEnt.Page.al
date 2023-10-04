@@ -68,6 +68,10 @@ page 6059968 "NPR APIV1 PBITMTicketAccessEnt"
                 {
                     Caption = 'Status', Locked = True;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

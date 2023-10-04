@@ -184,6 +184,10 @@ page 6060039 "NPR APIV1 PBIPurchase Line"
                 {
                     Caption = 'Pay-to Vendor No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }
