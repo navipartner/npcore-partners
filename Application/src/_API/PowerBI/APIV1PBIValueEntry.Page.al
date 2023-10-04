@@ -149,6 +149,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Source Posting Group';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

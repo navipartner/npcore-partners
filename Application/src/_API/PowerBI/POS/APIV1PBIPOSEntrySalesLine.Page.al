@@ -114,6 +114,10 @@ page 6060002 "NPR APIV1 PBIPOSEntrySalesLine"
                 {
                     Caption = 'Variant Code';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

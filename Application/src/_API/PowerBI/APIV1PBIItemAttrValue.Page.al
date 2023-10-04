@@ -48,6 +48,10 @@ page 6150644 "NPR APIV1 PBIItemAttrValue"
                 {
                     Caption = 'Blocked', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

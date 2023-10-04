@@ -64,6 +64,10 @@ page 6150776 "NPR APIV1 PBIReservationEntry"
                 {
                     Caption = 'Expected Receipt Date', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

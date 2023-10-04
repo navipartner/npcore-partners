@@ -120,6 +120,10 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Description', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

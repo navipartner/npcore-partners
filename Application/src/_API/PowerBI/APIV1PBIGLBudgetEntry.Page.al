@@ -104,6 +104,10 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
                 {
                     Caption = 'Dimension Set Id', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

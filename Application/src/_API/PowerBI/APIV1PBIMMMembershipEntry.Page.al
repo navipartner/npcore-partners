@@ -116,6 +116,10 @@ page 6059932 "NPR APIV1 PBIMMMembershipEntry"
                 {
                     Caption = 'Source Type', Locked = True;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

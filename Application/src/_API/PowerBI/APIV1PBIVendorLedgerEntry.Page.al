@@ -72,6 +72,10 @@ page 6059981 "NPR APIV1 PBIVendorLedgerEntry"
                 {
                     Caption = 'Entry No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

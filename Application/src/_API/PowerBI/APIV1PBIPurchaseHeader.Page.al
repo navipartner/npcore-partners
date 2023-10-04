@@ -116,6 +116,10 @@ page 6060037 "NPR APIV1 PBIPurchase Header"
                 {
                     Caption = 'Quote No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

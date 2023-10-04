@@ -68,6 +68,10 @@ page 6059913 "NPR APIV1 PBICustLedgerEntry"
                 {
                     Caption = 'Sell-to Customer No.', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }

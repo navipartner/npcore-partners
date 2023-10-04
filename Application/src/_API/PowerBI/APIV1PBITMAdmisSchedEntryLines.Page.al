@@ -55,7 +55,10 @@ page 6150784 "NPR APIV1 PBITMAdmisSchedLines"
                 {
                     Caption = 'Admission Base Calendar Code';
                 }
-
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
             }
         }
     }
