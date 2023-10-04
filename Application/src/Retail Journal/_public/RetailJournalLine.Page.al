@@ -66,6 +66,21 @@
                     ToolTip = 'Specifies the value of the Unit of Measure field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Gross Weight"; Rec."Gross Weight")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the gross weight of the item.';
+                }
+                field("Net Weight"; Rec."Net Weight")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the net weight of the item.';
+                }
+                field("Unit Volume"; Rec."Unit Volume")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the volume of one unit of the item.';
+                }
                 field(ItemUnitPrice; '')
                 {
                     Caption = 'Unit price(Item Card)';
