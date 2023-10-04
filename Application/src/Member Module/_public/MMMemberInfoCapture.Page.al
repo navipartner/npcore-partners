@@ -1062,8 +1062,8 @@
                 exit(false);
 
             Name := DelChr(Name, '<=>', '0123456789');
-            Name := DelChr(Name, '<=>', 'abcdefghijklmnopqrstuvwqyz');
-            Name := DelChr(Name, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+            Name := DelChr(Name, '<=>', 'abcdefghijklmnopqrstuvwxyz');
+            Name := DelChr(Name, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             Name := DelChr(Name, '<=>', '~!$%^&*_=+}{?-.@');
             ValidEmail := StrLen(Name) = 0;
         end;
@@ -1078,8 +1078,8 @@
                 exit(false);
 
             Domain := DelChr(Domain, '<=>', '0123456789');
-            Domain := DelChr(Domain, '<=>', 'abcdefghijklmnopqrstuvwqyz');
-            Domain := DelChr(Domain, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWQYZ');
+            Domain := DelChr(Domain, '<=>', 'abcdefghijklmnopqrstuvwxyz');
+            Domain := DelChr(Domain, '<=>', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
             Domain := DelChr(Domain, '<=>', '-.@');
             ValidEmail := StrLen(Domain) = 0;
         end;
