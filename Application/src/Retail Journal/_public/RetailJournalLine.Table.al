@@ -41,6 +41,9 @@
                         "Unit of Measure" := Item."Base Unit of Measure";
                     "Unit Price" := Item."Unit Price";
                     "Unit List Price" := Item."Unit List Price";
+                    "Gross Weight" := Item."Gross Weight";
+                    "Net Weight" := Item."Net Weight";
+                    "Unit Volume" := Item."Unit Volume";
 
                     UpdateBarcode();
                 end else begin
@@ -548,6 +551,21 @@
                     MultipleLines := true;
                 until (ExchangeLabel.Next() = 0) or (not ExchangeLabel."Packaged Batch");
             end;
+        }
+        field(110; "Gross Weight"; Decimal)
+        {
+            Caption = 'Gross Weight';
+            DataClassification = CustomerContent;
+        }
+        field(120; "Net Weight"; Decimal)
+        {
+            Caption = 'Net Weight';
+            DataClassification = CustomerContent;
+        }
+        field(130; "Unit Volume"; Decimal)
+        {
+            Caption = 'Unit Volume';
+            DataClassification = CustomerContent;
         }
         field(6059970; "Is Master"; Boolean)
         {
