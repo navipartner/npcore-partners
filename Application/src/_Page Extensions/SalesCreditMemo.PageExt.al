@@ -28,6 +28,12 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                     POSAsyncPostingMgt.ScheduledTransFromPOSOnDrillDown(Rec);
                 end;
             }
+            field("NPR Sales Channel"; Rec."NPR Sales Channel")
+            {
+                ToolTip = 'Specifies the value of the Sales Channel field';
+                Visible = false;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
         }
 
         addlast("Credit Memo Details")

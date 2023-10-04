@@ -179,6 +179,14 @@
                     ToolTip = 'View or edit detailed information about the loyalty item points setups such as type, contraint, points etc.';
                     ApplicationArea = NPRRetail;
                 }
+                action("Loyalty Sales Channel Setup")
+                {
+
+                    Caption = 'Loyalty Sales Channel Setup';
+                    RunObject = Page "NPR MM Loyalty Sales Channels";
+                    ToolTip = 'View or edit detailed information about the sales channels.';
+                    ApplicationArea = NPRRetail;
+                }
                 action("Loyalty Store Setup Server")
                 {
 

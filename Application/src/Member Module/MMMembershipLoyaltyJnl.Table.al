@@ -82,6 +82,12 @@ table 6014690 "NPR MM MembershipLoyaltyJnl"
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+          field(1040; "Sales Channel"; Code[20])
+        {
+            Caption = 'Sales Channel';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Loyalty Sales Channel".Code;
+        }
     }
 
     keys

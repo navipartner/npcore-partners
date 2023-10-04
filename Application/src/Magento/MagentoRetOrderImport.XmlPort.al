@@ -41,6 +41,11 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
+                textelement(sales_channel)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 tableelement(tempcustomer; Customer)
                 {
                     MaxOccurs = Once;

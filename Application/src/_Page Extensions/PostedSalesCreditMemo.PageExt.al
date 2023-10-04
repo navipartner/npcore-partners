@@ -10,6 +10,15 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Posted Sales Credit Memo';
             }
         }
+        addafter("External Document No.")
+        {
+            field("NPR Sales Channel"; Rec."NPR Sales Channel")
+            {
+                ToolTip = 'Specifies the value of the Sales Channel field';
+                Visible = false;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
+        }
     }
     actions
     {

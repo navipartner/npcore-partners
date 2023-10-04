@@ -114,6 +114,12 @@
                     ToolTip = 'Specifies the value of the Contact No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Sales Channel"; Rec."Sales Channel")
+                {
+                    ToolTip = 'Specifies the value of the Sales Channel field';
+                    Visible = false;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field(LastOpenSalesDocumentNo; LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';

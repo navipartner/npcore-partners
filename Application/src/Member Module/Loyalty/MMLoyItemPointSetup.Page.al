@@ -47,6 +47,11 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Sales Channel"; Rec."Sales Channel")
+                {
+                    ToolTip = 'Specifies the value of the Sales Channel field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field(Constraint; Rec.Constraint)
                 {
                     ToolTip = 'Specifies the value of the Constraint field';
