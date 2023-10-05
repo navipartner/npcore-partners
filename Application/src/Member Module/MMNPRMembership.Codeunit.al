@@ -1161,6 +1161,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             StrSubstNo('<newsletter>%1</newsletter>', Format(MemberInfoCapture."News Letter", 0, 0)) +
             StrSubstNo('<username>%1</username>', XmlSafe(MemberInfoCapture."User Logon ID")) +
             StrSubstNo('<password>%1</password>', XmlSafe(MemberInfoCapture."Password SHA1")) +
+            StrSubstNo('<store_code>%1</store_code>', XmlSafe(MemberInfoCapture."Store Code")) +
             MemberCardXml +
             GuardianXml +
             StrSubstNo('<gdpr_approval>%1</gdpr_approval>', Format(MemberInfoCapture."GDPR Approval", 0, 9)) +
