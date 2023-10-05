@@ -18,17 +18,17 @@ codeunit 6060011 "NPR Welcome Video"
             1036, 2060, 3084, 4108: //French
                 Video.Play(WelcomeVideoFRLinkTxt);
             1034, 2058, 3082: //Spanish
-                Video.Play(WelcomeVideoESLinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             1031, 2055, 3079: //German
-                Video.Play(WelcomeVideoDELinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             9242, 1050: //Serbian, Croatian
-                Video.Play(WelcomeVideoSRPHRVLinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             1040, 2064: //Italian
-                Video.Play(WelcomeVideoITLinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             1053: //Swedish
-                Video.Play(WelcomeVideoSVLinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             1030: //Danish
-                Video.Play(WelcomeVideoDALinkTxt);
+                Video.Play(WelcomeVideoENLinkTxt);
             1043: //Dutch (NL)
                 Video.Play(WelcomeVideoNLLinkTxt);
             else
@@ -43,10 +43,4 @@ codeunit 6060011 "NPR Welcome Video"
         WelcomeVideoENLinkTxt: Label 'https://share.synthesia.io/embeds/videos/d500f2a7-72ec-43fb-8c54-175326038b55', Locked = true;
         WelcomeVideoNLLinkTxt: Label 'https://www.youtube.com/embed/lGXBHhRE6Q4', Locked = true;
         WelcomeVideoFRLinkTxt: Label 'https://www.youtube.com/embed/w43FyjgNIss', Locked = true;
-        WelcomeVideoESLinkTxt: Label '', Locked = true;
-        WelcomeVideoDELinkTxt: Label '', Locked = true;
-        WelcomeVideoSRPHRVLinkTxt: Label '', Locked = true;
-        WelcomeVideoITLinkTxt: Label '', Locked = true;
-        WelcomeVideoSVLinkTxt: Label '', Locked = true;
-        WelcomeVideoDALinkTxt: Label '', Locked = true;
 }
