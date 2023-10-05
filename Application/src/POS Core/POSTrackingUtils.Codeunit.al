@@ -3,11 +3,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
     Access = Internal;
 
 
-    local procedure SerialNumberCanBeUsedByItem(ItemNo: Code[20];
-                                                var VariantCode: Code[10];
-                                                SerialNumber: Code[50];
-                                                var UserInformationErrorWarning: Text;
-                                                SerialSelectionFromList: Boolean) CanBeUsed: Boolean
+    local procedure SerialNumberCanBeUsedByItem(ItemNo: Code[20]; var VariantCode: Code[10]; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
     var
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
@@ -19,12 +15,14 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ActiveLbl: Label 'active';
         WrongSerial_InstrLbl: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
     begin
+        Item.SetLoadFields(Description, "Item Tracking Code");
         if not Item.Get(ItemNo) then
             exit;
 
         if Item."Item Tracking Code" = '' then
             exit;
 
+        ItemTrackingCode.SetLoadFields("SN Specific Tracking");
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then
             exit;
 
@@ -48,10 +46,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         CanBeUsed := ItemLedgerEntry.FindSet(false);
         if not CanBeUsed then begin
 
-            UserInformationErrorWarning := StrSubstNo(WrongSerialOnILELbl,
-                                                      SerialNumber,
-                                                      Item."No.",
-                                                      Item.Description);
+            UserInformationErrorWarning := StrSubstNo(WrongSerialOnILELbl, SerialNumber, Item."No.", Item.Description);
 
             if SerialSelectionFromList then
                 UserInformationErrorWarning += WrongSerial_InstrLbl;
@@ -61,10 +56,10 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
         SaleLinePOS.Reset();
         SaleLinePOS.SetCurrentKey("Serial No.");
+        SaleLinePOS.SetLoadFields("Line Type", "No.", "Serial No.", "Variant Code");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("No.", ItemNo);
         SaleLinePOS.SetRange("Serial No.", SerialNumber);
-
         repeat
             SaleLinePOS.SetRange("Variant Code", ItemLedgerEntry."Variant Code");
             CanBeUsed := SaleLinePOS.IsEmpty();
@@ -76,35 +71,24 @@ codeunit 6151032 "NPR POS Tracking Utils"
             exit;
 
         SaleLinePOS.FindFirst();
-        SalePOS.Get(SaleLinePOS."Register No.",
-                    SaleLinePOS."Sales Ticket No.");
+        SalePOS.SetLoadFields("Register No.", "Sales Ticket No.");
+        SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
 
-        UserInformationErrorWarning := StrSubstNo(WrongSerialOnSLPLbl,
-                                                  SerialNumber,
-                                                  Item."No.",
-                                                  Item.Description,
-                                                  ActiveLbl,
-                                                  SaleLinePOS."Sales Ticket No.",
-                                                  SaleLinePOS."Register No.");
+        UserInformationErrorWarning := StrSubstNo(WrongSerialOnSLPLbl, SerialNumber, Item."No.", Item.Description, ActiveLbl, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Register No.");
 
         if SerialSelectionFromList then
             UserInformationErrorWarning += WrongSerial_InstrLbl;
 
     end;
 
-    local procedure SelectSerialNoFromList(ItemNo: Code[20];
-                                           var VariantCode: Code[10];
-                                           LocationCode: Code[10];
-                                           var SerialNo: Text[50])
+    local procedure SelectSerialNoFromList(ItemNo: Code[20]; var VariantCode: Code[10]; LocationCode: Code[10]; var SerialNo: Text[50])
     var
-        Item: Record Item;
+        RequiresSerialNo: Boolean;
+        RequiresSpecificSerialNo: Boolean;
         SaleLinePOS: Record "NPR POS Sale Line";
-        UseSpecificTracking: Boolean;
     begin
-        if not Item.Get(ItemNo) then
-            Clear(Item);
-
-        if not ItemRequiresSerialNumber(Item, UseSpecificTracking) then
+        ItemRequiresSerialNumber(ItemNo, RequiresSerialNo, RequiresSpecificSerialNo);
+        if not RequiresSerialNo then
             exit;
 
         SaleLinePOS.Init();
@@ -121,39 +105,22 @@ codeunit 6151032 "NPR POS Tracking Utils"
     end;
 
     #region ValidateSerialNo
-    internal procedure ValidateSerialNo(ItemNo: Code[20];
-                                        var VariantCode: Code[10];
-                                        var SerialNumberInput: Text[50];
-                                        SerialSelectionFromList: Boolean;
-                                        Setup: Codeunit "NPR POS Setup")
+    internal procedure ValidateSerialNo(ItemNo: Code[20]; var VariantCode: Code[10]; var SerialNumberInput: Text[50]; SerialSelectionFromList: Boolean; POSStore: Record "NPR POS Store")
     var
-        Item: Record Item;
-        POSStore: Record "NPR POS Store";
         AskForSerialNoContinuously: Boolean;
-        UseSpecTracking: Boolean;
+        RequiresSerialNo: Boolean;
+        RequiresSpecificSerialNo: Boolean;
         UserInformationErrorWarning: Text;
     begin
-        Item.Get(ItemNo);
-
-        if not ItemRequiresSerialNumber(Item,
-                                        UseSpecTracking)
-        then
+        ItemRequiresSerialNumber(ItemNo, RequiresSerialNo, RequiresSpecificSerialNo);
+        if not RequiresSerialNo then
             exit;
 
-        if SerialSelectionFromList and
-           UseSpecTracking
-        then
+        if SerialSelectionFromList and RequiresSpecificSerialNo then
             SerialNumberInput := '';
 
         AskForSerialNoContinuously := true;
-        while (not SerialNumberCanBeUsedByItem(ItemNo,
-                                               VariantCode,
-                                               SerialNumberInput,
-                                               UserInformationErrorWarning,
-                                               SerialSelectionFromList)) and
-            AskForSerialNoContinuously
-        do begin
-
+        while (not SerialNumberCanBeUsedByItem(ItemNo, VariantCode, SerialNumberInput, UserInformationErrorWarning, SerialSelectionFromList)) and AskForSerialNoContinuously do begin
 
             AskForSerialNoContinuously := SerialSelectionFromList;
             if SerialSelectionFromList then begin
@@ -163,28 +130,20 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
                 SerialNumberInput := '';
 
-                Setup.GetPOSStore(POSStore);
-
-                SelectSerialNoFromList(ItemNo,
-                                       VariantCode,
-                                       POSStore."Location Code",
-                                        SerialNumberInput);
+                SelectSerialNoFromList(ItemNo, VariantCode, POSStore."Location Code", SerialNumberInput);
 
                 if SerialNumberInput = '' then
                     Error('');
 
             end else
-                if (SerialNumberInput <> '') and
-                   (UserInformationErrorWarning <> '')
-                then
+                if (SerialNumberInput <> '') and (UserInformationErrorWarning <> '') then
                     Error(UserInformationErrorWarning);
 
         end;
     end;
     #endregion ValidateSerialNo
 
-    internal procedure ItemRequiresSerialNumber(Item: Record Item;
-                                                var UseSpecificTracking: Boolean) RequiresSerialNo: Boolean
+    internal procedure ItemRequiresSerialNumber(var Item: Record Item; var UseSpecificTracking: Boolean) RequiresSerialNo: Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
     begin
@@ -192,6 +151,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         if Item."Item Tracking Code" = '' then
             exit;
 
+        ItemTrackingCode.SetLoadFields("Lot Specific Tracking", "SN Specific Tracking", "SN Sales Outbound Tracking");
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then
             exit;
 
@@ -200,5 +160,16 @@ codeunit 6151032 "NPR POS Tracking Utils"
         UseSpecificTracking := ItemTrackingCode."SN Specific Tracking";
 
         RequiresSerialNo := ItemTrackingCode."SN Sales Outbound Tracking";
+    end;
+
+    internal procedure ItemRequiresSerialNumber(ItemNo: Code[20]; var RequiresSerialNo: Boolean; var UseSpecificSerialNo: Boolean)
+    var
+        Item: Record Item;
+    begin
+        Item.SetLoadFields("No.", "Item Tracking Code");
+        if not Item.Get(ItemNo) then
+            exit;
+
+        RequiresSerialNo := ItemRequiresSerialNumber(Item, UseSpecificSerialNo);
     end;
 }

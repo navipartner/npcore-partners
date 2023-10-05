@@ -1,102 +1,40 @@
-let main = async ({ workflow, context, scope, popup, parameters, captions }) => {
+let main = async ({ workflow, context, popup, parameters, captions }) => {
 
     debugger;
-    workflow.context.GetPrompt = false;
+    context.additionalInformationCollected = false;
 
     if (parameters.EditDescription) {
-        workflow.context.Desc1 = await popup.input({ title: captions.editDesc_title, caption: captions.editDesc_lead, value: context.defaultDescription })
-        if (workflow.context.Desc1 === null) {
-            return (" ");
-        }
+        context.desc1 = await popup.input({ title: captions.editDesc_title, caption: captions.editDesc_lead, value: context.defaultDescription })
+        if (context.desc1 === null) return;
     }
 
     if (parameters.EditDescription2) {
-        workflow.context.Desc2 = await popup.input({ title: captions.editDesc2_title, caption: captions.editDesc2_lead, value: context.defaultDescription })
-        if (workflow.context.Desc2 === null) {
-            return (" ");
-        }
+        context.desc2 = await popup.input({ title: captions.editDesc2_title, caption: captions.editDesc2_lead, value: context.defaultDescription })
+        if (context.desc2 === null) return;
     }
 
-    const {childBOMLinesWithoutSerialNo, ItemGroupSale, useSpecTracking, GetPromptSerial, Success, AddItemAddOn, BaseLineNo, postAddWorkflows} = await workflow.respond("addSalesLine");
+    const { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
 
-    if (!Success) {
-        workflow.context.GetPrompt = true;
+    if (requiresAdditionalInformationCollection) {
 
-        if (ItemGroupSale && !parameters.usePreSetUnitPrice) {
-            workflow.context.UnitPrice = await popup.numpad({ title: captions.UnitpriceTitle, caption: captions.UnitPriceCaption })
-            if (workflow.context.UnitPrice === null) {
-                return (" ");
-            }
+        if (requiresUnitPriceInputPrompt) {
+            context.unitPriceInput = await popup.numpad({ title: captions.UnitPriceTitle, caption: captions.unitPriceCaption })
+            if (context.unitPriceInput === null) return;
         }
 
-        if (useSpecTracking && !parameters.SelectSerialNo) {
-            workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
-            if (workflow.context.SerialNo === null) {
-                return (" ");
-            }
+        if (requiresSerialNoInputPrompt) {
+            context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
+            if (context.serialNoInput === null) return;
         }
 
-        if (!useSpecTracking && GetPromptSerial) {
-            workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
-            if (workflow.context.SerialNo === null) {
-                return (" ");
-            }
-        }
-        workflow.context.useSpecTracking = useSpecTracking;
+        context.additionalInformationCollected = true;
         await workflow.respond("addSalesLine");
     }
-    else {
 
-        for(var bomLineKey = 0; bomLineKey < childBOMLinesWithoutSerialNo.length; bomLineKey++) {
-            
-            var ContinueExecution = true;
-            var response;
+    await processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions);
 
-            while (ContinueExecution) {
-                ContinueExecution = false;
-
-                if ((bomLineKey != "remove") && (bomLineKey != "add") && (bomLineKey != "addRange") && (bomLineKey != "aggregate")) {
-                    
-                    workflow.context.SerialNo = '';
-                    workflow.context.childBOMLineWithoutSerialNo = childBOMLinesWithoutSerialNo[bomLineKey];
-
-                    if (parameters.SelectSerialNo && workflow.context.childBOMLineWithoutSerialNo.useSpecTracking){
-                        response = await workflow.respond("assignSerialNo");
-                        
-                        if(!response.AssignSerialNoSuccess && response.AssignSerialNoSuccessErrorText)
-                        {
-                            if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
-                                ContinueExecution = true;
-                            }
-    
-                        }
-                    } 
-                    else{
-                        workflow.context.SerialNo = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, workflow.context.childBOMLineWithoutSerialNo.description, workflow.context.childBOMLineWithoutSerialNo.parentBOMDescription)})
-                            
-                        if (workflow.context.SerialNo) {
-
-                            response = await workflow.respond("assignSerialNo");
-                                    
-                            if(!response.AssignSerialNoSuccess && response.AssignSerialNoSuccessErrorText)
-                            {
-                                if (await popup.confirm({title: captions.serialNoError_title, caption: response.AssignSerialNoSuccessErrorText})) {
-                                    ContinueExecution = true;
-                                }
-        
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        
-        
-    }
-
-    if (AddItemAddOn) {
-        await workflow.run('RUN_ITEM_ADDONS', { context: { BaseLineNo: BaseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
+    if (addItemAddOn) {
+        await workflow.run('RUN_ITEM_ADDONS', { context: { baseLineNo: baseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
         await workflow.respond("checkAvailability");
     }
 
@@ -109,6 +47,42 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
         };
     };
 
+}
+
+async function processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions) {
+    if (!bomComponentLinesWithoutSerialNo) return
+
+    for (var i = 0; i < bomComponentLinesWithoutSerialNo.length; i++) {
+
+        let continueExecution = true;
+        let response;
+
+        while (continueExecution) {
+            continueExecution = false;
+
+            context.serialNoInput = '';
+            context.bomComponentLineWithoutSerialNo = bomComponentLinesWithoutSerialNo[i];
+
+            if (parameters.SelectSerialNo && context.bomComponentLineWithoutSerialNo.requiresSpecificSerialNo) {
+                response = await workflow.respond("assignSerialNo");
+
+                if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
+                    if (await popup.confirm({ title: captions.serialNoError_title, caption: response.assignSerialNoSuccessErrorText })) continueExecution = true;
+                }
+            }
+            else {
+                context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, context.bomComponentLineWithoutSerialNo.description, context.bomComponentLineWithoutSerialNo.parentBOMDescription) })
+
+                if (context.serialNoInput) {
+                    response = await workflow.respond("assignSerialNo");
+
+                    if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
+                        if (await popup.confirm({ title: captions.serialNoError_title, caption: response.assignSerialNoSuccessErrorText })) continueExecution = true;
+                    }
+                }
+            }
+        }
+    }
 }
 
 function format(fmt, ...args) {

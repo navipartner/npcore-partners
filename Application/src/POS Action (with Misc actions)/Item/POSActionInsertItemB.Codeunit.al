@@ -8,7 +8,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
     var
-        FirstRec: Text;
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
         SentryScope: Codeunit "NPR Sentry Scope";
         SentryActionSpan: Codeunit "NPR Sentry Span";
@@ -17,21 +16,23 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SentryScope.TryGetActiveSpan(SentryActionSpan);
         SentryActionSpan.StartChildSpan('bc.workflow.ITEM.get', 'bc.workflow.ITEM.get', SentryGetItemSpan);
 
+        if not Item.AreFieldsLoaded(GTIN) then
+            Item.AddLoadFields(GTIN);
+
         Clear(ItemReference);
         case ItemIdentifierType of
             ItemIdentifierType::ItemNo:
                 Item.Get(ItemIdentifier);
             ItemIdentifierType::ItemCrossReference:
                 begin
+                    ItemReference.SetCurrentKey("Reference Type", "Reference No.");
                     ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-                    ItemReference.FindFirst();
-                    FirstRec := Format(ItemReference);
-                    ItemReference.FindLast();
-                    if FirstRec <> Format(ItemReference) then begin
+                    ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
+                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
-                    end;
+
                     Item.Get(ItemReference."Item No.");
                 end;
 
@@ -43,15 +44,13 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
+                    ItemReference.SetCurrentKey("Reference Type", "Reference No.");
                     ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
-                    ItemReference.FindFirst();
-                    FirstRec := Format(ItemReference);
-                    ItemReference.FindLast();
-                    if FirstRec <> Format(ItemReference) then begin
+                    ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
+                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
-                    end;
 
                     Item.Get(ItemReference."Item No.");
                 end;
@@ -171,61 +170,14 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         _SkipCalcDiscount := SkipCalcDiscount;
     end;
 
-    procedure AddItemLine(Item: Record Item;
-                          ItemReference: Record "Item Reference";
-                          ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
-                          ItemQuantity: Decimal;
-                          UnitPrice: Decimal;
-                          CustomDescription: Text;
-                          CustomDescription2: Text;
-                          InputSerial: Text;
-                          POSSession: Codeunit "NPR POS Session";
-                          FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        AddItemLine(Item,
-                    ItemReference,
-                    ItemIdentifierType,
-                    ItemQuantity,
-                    '',
-                    UnitPrice,
-                    CustomDescription,
-                    CustomDescription2,
-                    InputSerial,
-                    POSSession,
-                    FrontEnd,
-                    false,
-                    '',
-                    0,
-                    '');
+        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, '', UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '');
     end;
 
-    procedure AddItemLine(Item: Record Item;
-                          ItemReference: Record "Item Reference";
-                          ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
-                          ItemQuantity: Decimal;
-                          UnitOfMeasure: Code[10];
-                          UnitPrice: Decimal;
-                          CustomDescription: Text;
-                          CustomDescription2: Text;
-                          InputSerial: Text;
-                          POSSession: Codeunit "NPR POS Session";
-                          FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasure: Code[10]; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
-        AddItemLine(Item,
-                    ItemReference,
-                    ItemIdentifierType,
-                    ItemQuantity,
-                    UnitOfMeasure,
-                    UnitPrice,
-                    CustomDescription,
-                    CustomDescription2,
-                    InputSerial,
-                    POSSession,
-                    FrontEnd,
-                    false,
-                    '',
-                    0,
-                    '');
+        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitOfMeasure, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '');
     end;
 
     procedure GetLineNo(): Integer;
@@ -278,7 +230,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         AccessorySaleLinePOS: Record "NPR POS Sale Line";
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
-
         AccessorySparePart.SetRange(Type, AccessorySparePart.Type::Accessory);
         AccessorySparePart.SetRange(Code, Item."No.");
         if (not AccessorySparePart.FindSet()) then
@@ -498,44 +449,81 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         Item.SetLoadFields("No.");
     end;
 
-
-    #region GetChildBOMLines
-    internal procedure GetChildBOMLines(SaleLinePOS: Record "NPR POS Sale Line";
-                                        var ChildBOMSaleLinePOS: Record "NPR POS Sale Line")
+    internal procedure GetBOMComponentLines(SaleLinePOS: Record "NPR POS Sale Line"; var BOMComponentSaleLinePOS: Record "NPR POS Sale Line")
     begin
-
-        ChildBOMSaleLinePOS.Reset();
-        ChildBOMSaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
-        ChildBOMSaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-        ChildBOMSaleLinePOS.SetRange("Serial No.", '');
-        ChildBOMSaleLinePOS.SetRange("Parent BOM Item No.", SaleLinePOS."No.");
-        ChildBOMSaleLinePOS.SetRange("Parent BOM Line No.", SaleLinePOS."Line No.");
-        ChildBOMSaleLinePOS.SetFilter("Line Type", '%1|%2', ChildBOMSaleLinePOS."Line Type"::Item, ChildBOMSaleLinePOS."Line Type"::"BOM List");
-
+        BOMComponentSaleLinePOS.SetRange("Register No.", SaleLinePOS."Register No.");
+        BOMComponentSaleLinePOS.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        BOMComponentSaleLinePOS.SetRange("Serial No.", '');
+        BOMComponentSaleLinePOS.SetRange("Parent BOM Item No.", SaleLinePOS."No.");
+        BOMComponentSaleLinePOS.SetRange("Parent BOM Line No.", SaleLinePOS."Line No.");
+        BOMComponentSaleLinePOS.SetFilter("Line Type", '%1|%2', BOMComponentSaleLinePOS."Line Type"::Item, BOMComponentSaleLinePOS."Line Type"::"BOM List");
     end;
-    #endregion GetChildBOMLines
 
-    #region AssingSerialNo
-    internal procedure AssingSerialNo(var SaleLinePOS: Record "NPR POS Sale Line";
-                                      var SerialNoInput: Text[50];
-                                      SerialSelectionFromList: Boolean;
-                                      Setup: Codeunit "NPR POS Setup")
+    internal procedure AssingSerialNo(var SaleLinePOS: Record "NPR POS Sale Line"; var SerialNoInput: Text[50]; SerialSelectionFromList: Boolean; POSStore: Record "NPR POS Store")
     var
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
     begin
-        POSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.",
-                                          SaleLinePOS."Variant Code",
-                                          SerialNoInput,
-                                          SerialSelectionFromList,
-                                          Setup);
+        POSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", SerialNoInput, SerialSelectionFromList, POSStore);
 
         SaleLinePOS.Validate("Serial No.", SerialNoInput);
         SaleLinePOS.Modify(true);
     end;
-    #endregion AssingSerialNo
-    internal procedure AddBenefitItems(SalePOS: Record "NPR POS Sale";
-                                       var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
-                                       FrontEnd: Codeunit "NPR POS Front End Management")
+
+    internal procedure GetItemAdditionalInformationRequirements(ItemNo: Code[20]; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean)
+    var
+        Item: Record Item;
+    begin
+        Item.SetLoadFields("NPR Group sale", "Assembly BOM", "NPR Explode BOM auto");
+        Item.SetAutoCalcFields("Assembly BOM");
+        if not Item.Get(ItemNo) then
+            Clear(Item);
+
+        GetItemAdditionalInformationRequirements(Item, RequiresSerialNoInput, RequiresSpecificSerialNo, requiresUnitPriceInput);
+    end;
+
+    internal procedure GetItemAdditionalInformationRequirements(var Item: Record Item; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean);
+    var
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+    begin
+        RequiresUnitPriceInput := Item."NPR Group sale";
+
+        if not (Item."Assembly BOM" and Item."NPR Explode BOM auto") then
+            RequiresSerialNoInput := POSTrackingUtils.ItemRequiresSerialNumber(Item, RequiresSpecificSerialNo);
+    end;
+
+    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean)
+    begin
+        RequiresSerialNoInputPrompt := RequiresSerialNoInput and ((GetSerialNoFromList and not RequiresSpecificSerialNo) or not GetSerialNoFromList);
+        RequiresUnitPriceInputPrompt := RequiresUnitPriceInput and not UsePresetUnitPrice;
+        ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt;
+    end;
+
+    internal procedure CheckBOMComponentsNeedSerialNoInput(var Item: Record Item) RequiresSerialNoInput: Boolean;
+    var
+        BOMComponent: Record "BOM Component";
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        RequiresSpecificlSerialNo: Boolean;
+    begin
+        if not Item."Assembly BOM" then
+            exit;
+
+        if not Item."NPR Explode BOM auto" then
+            exit;
+
+        BOMComponent.Reset();
+        BOMComponent.SetLoadFields(Type, "Parent Item No.", "No.");
+        BOMComponent.SetRange(Type, BOMComponent.Type::Item);
+        BOMComponent.SetRange("Parent Item No.", Item."No.");
+        if not BOMComponent.FindSet(false) then
+            exit;
+
+        repeat
+            POSTrackingUtils.ItemRequiresSerialNumber(BOMComponent."No.", RequiresSerialNoInput, RequiresSpecificlSerialNo);
+        until (BOMComponent.Next() = 0) or RequiresSerialNoInput;
+
+    end;
+
+    internal procedure AddBenefitItems(SalePOS: Record "NPR POS Sale"; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         Item: Record Item;
         TempItemReference: Record "Item Reference" temporary;
@@ -561,33 +549,15 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             UnitPrice := TempNPRTotalDiscBenItemBuffer."Unit Price";
             if not SalePOS."Prices Including VAT" then begin
 
-                if not VATPostingSetup.Get(SalePOS."VAT Bus. Posting Group",
-                                           Item."VAT Prod. Posting Group")
-                then
+                if not VATPostingSetup.Get(SalePOS."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then
                     Clear(VATPostingSetup);
 
-                UnitPrice := NPRTotalDiscountManagement.CalcAmountWithoutVAT(UnitPrice,
-                                                                             VATPostingSetup."VAT %",
-                                                                             GeneralLedgerSetup."Amount Rounding Precision");
+                UnitPrice := NPRTotalDiscountManagement.CalcAmountWithoutVAT(UnitPrice, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
             end;
             TempItemReference."Item No." := TempNPRTotalDiscBenItemBuffer."Item No.";
             TempItemReference."Variant Code" := TempNPRTotalDiscBenItemBuffer."Variant Code";
 
-            AddItemLine(Item,
-                        TempItemReference,
-                        ItemIdentifierType::ItemNo,
-                        TempNPRTotalDiscBenItemBuffer.Quantity,
-                        UnitPrice,
-                        '',
-                        '',
-                        '',
-                        POSSession,
-                        FrontEnd,
-                        true,
-                        TempNPRTotalDiscBenItemBuffer."Total Discount Code",
-                        TempNPRTotalDiscBenItemBuffer."Total Discount Step",
-                        TempNPRTotalDiscBenItemBuffer."Benefit List Code");
+            AddItemLine(Item, TempItemReference, ItemIdentifierType::ItemNo, TempNPRTotalDiscBenItemBuffer.Quantity, UnitPrice, '', '', '', POSSession, FrontEnd, true, TempNPRTotalDiscBenItemBuffer."Total Discount Code", TempNPRTotalDiscBenItemBuffer."Total Discount Step", TempNPRTotalDiscBenItemBuffer."Benefit List Code");
         until TempNPRTotalDiscBenItemBuffer.Next() = 0;
-
     end;
 }

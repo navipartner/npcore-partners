@@ -4,10 +4,10 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
 
     var
         _SaleLinePOS: Record "NPR POS Sale Line";
-        _Setup: Codeunit "NPR POS Setup";
         _SerialSelectionFromList: Boolean;
         _FunctionToExecute: Text;
         _SerialNoInput: Text[50];
+        _POSStore: Record "NPR POS Store";
 
 
     trigger OnRun()
@@ -61,20 +61,19 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
     end;
     #endregion GetSerialSelectionFromList
 
-    #region SetSetup
-    internal procedure SetSetup(Setup: Codeunit "NPR POS Setup")
+    #region SetPOSStore
+    internal procedure SetPOSStore(POSStore: Record "NPR POS Store")
     begin
-        _Setup := Setup;
+        _POSStore := POSStore;
     end;
-    #endregion SetSetup
+    #endregion SetPOSStore
 
-    #region GetSetup
-    internal procedure GetSetup(var Setup: Codeunit "NPR POS Setup")
+    #region GetPOSStore
+    internal procedure GetPOSStore(var POSStore: Record "NPR POS Store")
     begin
-        Setup := _Setup;
+        POSStore := _POSStore;
     end;
-    #endregion GetSetup
-
+    #endregion GetPOSStore
     #region SetFunctionToExecute
     internal procedure SetFunctionToExecute(FunctionToExecute: Text)
     begin
@@ -97,7 +96,7 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
         POSActionInsertItemB.AssingSerialNo(_SaleLinePOS,
                                             _SerialNoInput,
                                             _SerialSelectionFromList,
-                                            _Setup);
+                                            _POSStore);
 
     end;
     #endregion AssingSerialNo
