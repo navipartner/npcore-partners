@@ -451,6 +451,7 @@
 
             NpRvSalesLine.DeleteAll();
         end;
+        NpRvVoucherMgt.ExtendVoucherEndingDate(NpRvVoucherEntry."Posting Date", NpRvVoucher);
     end;
 
     internal procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)

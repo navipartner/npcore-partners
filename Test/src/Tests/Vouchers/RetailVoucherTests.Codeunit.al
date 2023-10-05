@@ -1297,4 +1297,42 @@ codeunit 85024 "NPR Retail Voucher Tests"
         asserterror POSActionCheckVoucherB.CheckVoucher(_VoucherTypeDefault.Code, ReferenceNo);
         Assert.ExpectedError(StrSubstNo(NotFoundErr, ReferenceNo, _VoucherTypeDefault.Code));
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TopupExtendsVoucher()
+    // [SCENARIO] Test if topup extends voucher
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        Assert: Codeunit "Assert";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        TransactionEnded: Boolean;
+        VoucherAmount: Decimal;
+        ReferenceNo: Text[50];
+        DFormula: DateFormula;
+        NewEndingDT: DateTime;
+    begin
+        Initialize();
+
+        // [GIVEN] Voucher Amount and Reference number
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        ReferenceNo := GetRandomVoucherReferenceNo();
+
+        // [WHEN] Issue voucher
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        _VoucherTypePartial."Top-up Extends Ending Date" := true;
+        Evaluate(DFormula, '<11Y>'); //any big valid period
+        _VoucherTypePartial."Valid Period" := DFormula;
+        _VoucherTypePartial.Modify();
+
+        //Topup voucher
+        NpRvVoucherMgt.TopUpVoucher(_POSSession, NpRvVoucher."No.", '', VoucherAmount, 0, 0);
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, VoucherAmount, '');
+        // [THEN] Check if new ending date is created
+        NpRvVoucher.Get(NpRvVoucher."No.");
+        NewEndingDT := CreateDateTime(CalcDate(_VoucherTypePartial."Valid Period", DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
+        Assert.AreNearlyEqual(0, NewEndingDT - NpRvVoucher."Ending Date", 2000, 'Voucher Ending Date not according to test scenario.');
+    end;
+
 }

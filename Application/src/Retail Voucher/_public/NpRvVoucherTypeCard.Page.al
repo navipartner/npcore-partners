@@ -141,6 +141,11 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies if vouchers created at sales order will have manually entered reference number.';
                     }
+                    field("Top-up Extends Ending Date"; Rec."Top-up Extends Ending Date")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if Top-up or Partner Top-up extends Ending Date using.';
+                    }
 
                     group(Control6014407)
                     {

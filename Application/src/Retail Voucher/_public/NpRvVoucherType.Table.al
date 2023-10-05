@@ -179,6 +179,11 @@
             Caption = 'Validate Customer No.';
             DataClassification = CustomerContent;
         }
+        field(330; "Top-up Extends Ending Date"; Boolean)
+        {
+            Caption = 'Top-up Extends Ending Date';
+            DataClassification = CustomerContent;
+        }
         field(630; "Voucher Category"; Enum "NPR Voucher Category")
         {
             Caption = 'Voucher Category';
