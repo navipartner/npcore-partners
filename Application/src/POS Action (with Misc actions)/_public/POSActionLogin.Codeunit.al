@@ -80,6 +80,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
         POSUnit: Record "NPR POS Unit";
         LoginEvents: Codeunit "NPR POS Login Events";
         POSSession: Codeunit "NPR POS Session";
+        POSFunctProfile: Record "NPR POS Functionality Profile";
     begin
         PreWorkflows.ReadFrom('{}');
         POSSession.GetSale(POSSale);
@@ -88,11 +89,13 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
 
-        if POSUnit."Require Select Member" then
-            AddMemberWorkflow(PreWorkflows);
-        if POSUnit."Require Select Customer" then
-            AddCustomerWorkflow(PreWorkflows);
+        if POSFunctProfile.Get(POSUnit."POS Functionality Profile") then begin
 
+            if POSFunctProfile."Require Select Member" then
+                AddMemberWorkflow(PreWorkflows);
+            if POSFunctProfile."Require Select Customer" then
+                AddCustomerWorkflow(PreWorkflows);
+        end;
         LoginEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
 

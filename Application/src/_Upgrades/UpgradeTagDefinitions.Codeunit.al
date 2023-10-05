@@ -454,9 +454,9 @@
                     'PopupDimension':
                         exit('NPR-PopupDimension-20230531');
                     'SelectMemberOnAfterLogin':
-                        exit('NPR-SelectMemberOnAfterLogin-20230622');
+                        exit('NPR-SelectMemberOnAfterLogin-20231004');
                     'SelectCustomerOnAfterLogin':
-                        exit('NPR-SelectCustomerOnAfterLogin-20230623');
+                        exit('NPR-SelectCustomerOnAfterLogin-20231004');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of
