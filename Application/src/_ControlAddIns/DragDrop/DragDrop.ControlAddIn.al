@@ -1,12 +1,12 @@
 controladdin "NPR DragDrop"
 {
     Scripts =
-        'src\_ControlAddIns\DragDrop\Script\jquery-2.1.3.min.js',
-        'src\_ControlAddIns\DragDrop\Script\jquery-ui.min.js',
-        'src\_ControlAddIns\DragDrop\Script\Script.js';
+        'src/_ControlAddIns/DragDrop/Script/jquery-2.1.3.min.js',
+        'src/_ControlAddIns/DragDrop/Script/jquery-ui.min.js',
+        'src/_ControlAddIns/DragDrop/Script/Script.js';
 
     StyleSheets =
-        'src\_ControlAddIns\DragDrop\Stylesheet\Styles.css';
+        'src/_ControlAddIns/DragDrop/Stylesheet/Styles.css';
 
     RequestedHeight = 250;
     RequestedWidth = 0;

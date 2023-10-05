@@ -2,23 +2,23 @@
 	"folders": [
 		{
 			"name": "APPLICATION",
-			"path": ".\\Application"
+			"path": "./Application"
 		},
 		{
 			"name": "TEST",
-			"path": ".\\Test"
+			"path": "./Test"
 		},
 		{
 			"name": "PERFORMANCE TOOLKIT",
-			"path": ".\\Performance Toolkit"
+			"path": "./Performance Toolkit"
 		},
 		{
 			"name": "DOCUMENTATION",
-			"path": ".\\Documentation"
+			"path": "./Documentation"
 		},
 		{
 			"name": "INTEGRATION TEST",
-			"path": ".\\IntegrationTest"
+			"path": "./IntegrationTest"
 		}
 	],
 	"settings": {
