@@ -489,6 +489,7 @@ codeunit 6060147 "NPR MM NPR Membership"
     begin
         ScannerStationId := '';
         CreateMemberSoapXmlRequest(MembershipInfo, ScannerStationId, SoapAction, XmlDocRequest);
+        OnBeforeSOAPRequest(XmlDocRequest, SoapAction);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
 
@@ -1697,6 +1698,12 @@ codeunit 6060147 "NPR MM NPR Membership"
     local procedure GetXmlAttributeText20(Element: XmlElement; AttributeName: Text; Required: Boolean): Text[20]
     begin
         exit(CopyStr(_NpXmlDomMgt.GetXmlAttributeText(Element, AttributeName, Required), 1, 20));
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSOAPRequest(var XMLDocRequest: XmlDocument; SOAPAction: Text)
+    begin
     end;
 }
 #pragma warning restore
