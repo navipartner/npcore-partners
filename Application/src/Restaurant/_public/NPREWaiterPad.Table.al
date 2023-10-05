@@ -273,4 +273,21 @@
 
         exit(ColorTable.RGBHexCode(IncludeHashMark));
     end;
+
+    internal procedure WaiterPadFrontEndStatus() StatusCode: Code[10]
+    var
+        ServingStep: Record "NPR NPRE Flow Status";
+        WaiterPadStatus: Record "NPR NPRE Flow Status";
+    begin
+        if ServingStep.get("Serving Step Code", ServingStep."Status Object"::WaiterPadLineMealFlow) then
+            if ServingStep."Available in Front-End" then
+                StatusCode := ServingStep.Code;
+
+        if WaiterPadStatus.get(Status, WaiterPadStatus."Status Object"::WaiterPad) then
+            if WaiterPadStatus."Available in Front-End" then
+                if (WaiterPadStatus."Flow Order" > ServingStep."Flow Order") or (StatusCode = '') then
+                    StatusCode := WaiterPadStatus.Code;
+
+        exit(StatusCode);
+    end;
 }
