@@ -311,11 +311,23 @@
         {
             Caption = 'Require Select Member';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'New field "POS Functionality Profile" created, use this instead.';
         }
         field(660; "Require Select Customer"; Boolean)
         {
             Caption = 'Require Select Customer';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'New field "POS Functionality Profile" created, use this instead.';
+        }
+        field(670; "POS Functionality Profile"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Functionality Profile';
+            TableRelation = "NPR POS Functionality Profile";
         }
         field(5058; "Open Register Password"; Code[20])
         {
