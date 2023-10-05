@@ -47,7 +47,6 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
         SwitchToSaleView := Context.GetBooleanParameter('SwitchToSaleView');
         BusinessLogic.NewWaiterPad(Sale, Setup, SeatingCode(Context), TableName(Context), PartySize(Context), SwitchToSaleView, WaiterPad, RestaurantCode);
         FrontendAssistant.RefreshWaiterPadData(POSSession, FrontEnd, RestaurantCode, '');
-        FrontendAssistant.RefreshWaiterPadContent(POSSession, FrontEnd, WaiterPad);
         if SwitchToSaleView then
             SelectSalesView(POSSession);
     end;

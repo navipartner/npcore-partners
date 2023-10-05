@@ -162,7 +162,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         DataSource.AddColumn('TableId', 'Pre-selected seating internal Id', DataType::String, true);
         DataSource.AddColumn('TableNo', 'Pre-selected seating number', DataType::String, true);
         DataSource.AddColumn('WaiterPadNo', 'Pre-selected waiter pad No.', DataType::String, true);
-        DataSource.AddColumn('NoOfGuests', 'Number of guests', DataType::Integer, true);
+        DataSource.AddColumn('NoOfGuests', 'Number of guests', DataType::String, true);
         DataSource.AddColumn('TableStatus', 'Seating status', DataType::String, true);
         DataSource.AddColumn('WPadStatus', 'Waiter pad status', DataType::String, true);
         DataSource.AddColumn('MealFlowStatus', 'Meal flow status', DataType::String, true);
@@ -205,7 +205,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         DataRow.Add('TableId', SalePOS."NPRE Pre-Set Seating Code");
         DataRow.Add('TableNo', Seating."Seating No.");
         DataRow.Add('WaiterPadNo', SalePOS."NPRE Pre-Set Waiter Pad No.");
-        DataRow.Add('NoOfGuests', SalePOS."NPRE Number of Guests");
+        DataRow.Add('NoOfGuests', Format(SalePOS."NPRE Number of Guests", 0, 9));
         DataRow.Add('TableStatus', Seating."Status Description FF");
         DataRow.Add('WPadStatus', WaiterPad."Status Description FF");
         DataRow.Add('MealFlowStatus', WaiterPad."Serving Step Description");
