@@ -46,19 +46,6 @@
         NPREWaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(NPREWaiterPad, POSSession);
     end;
 
-    procedure RequestWaiterPad(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; WaiterPadCode: Code[20])
-    var
-        WaiterPad: Record "NPR NPRE Waiter Pad";
-        NPREFrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
-    begin
-        if not WaiterPad.Get(WaiterPadCode) then begin
-            Message(NotFoundErr, WaiterPadCode);
-            exit;
-        end;
-        WaiterPad.SetRecFilter();
-        NPREFrontendAssistant.RefreshWaiterPadContent(POSSession, FrontEnd, WaiterPad);
-    end;
-
     local procedure SelectSalesView(POSSession: Codeunit "NPR POS Session")
     begin
         POSSession.ChangeViewSale();

@@ -198,7 +198,7 @@
                 if Seating.FindSet() then
                     repeat
                         SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
-                        if SeatingWaiterPadLink.FindSet() then
+                        if SeatingWaiterPadLink.FindSet() then begin
                             repeat
                                 Clear(WaiterPadSeatingContent);
                                 Clear(WaiterPadContent);
@@ -218,12 +218,11 @@
                                     WaiterPadContent.Add('caption', WaiterPad.Description)
                                 else
                                     WaiterPadContent.Add('caption', WaiterPad."No.");
-                                WaiterPadContent.Add('statusId', WaiterPad.Status);
-                                WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                                WaiterPadContent.Add('servingStepColor', WaiterPad.RGBColorCodeHex(false));
                                 WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
                                 WaiterPadList.Add(WaiterPadContent);
                             until SeatingWaiterPadLink.Next() = 0;
+                            Seating.Mark(true);
+                        end;
                     until Seating.Next() = 0;
             until SeatingLocation.Next() = 0;
 
@@ -231,6 +230,11 @@
         Request.GetContent().Add('waiterPadSeatingLinks', WaiterPadSeatingList);
 
         FrontEnd.InvokeFrontEndMethod2(Request);
+
+        Seating.MarkedOnly(true);
+        if Seating.IsEmpty() then
+            exit;
+        RefreshStatus(FrontEnd, RestaurantCode, '', Seating.GetSelectionFilter());
     end;
 
     local procedure RefreshRestaurantLayout(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20])
@@ -402,6 +406,7 @@
         WaiterPadSeatingList: JsonArray;
         WaiterPadSeatingContent: JsonObject;
     begin
+        //Not currently used
         Request.SetMethod('UpdateWaiterPadContent');
 
         if WaiterPad.FindSet() then
@@ -415,9 +420,6 @@
                     WaiterPadContent.Add('caption', WaiterPad.Description)
                 else
                     WaiterPadContent.Add('caption', WaiterPad."No.");
-                WaiterPadContent.Add('statusId', WaiterPad.Status);
-                WaiterPadContent.Add('servingStepCode', WaiterPad."Serving Step Code");
-                WaiterPadContent.Add('servingStepColor', WaiterPad.RGBColorCodeHex(false));
                 WaiterPadContent.Add('numberOfGuests', WaiterPad."Number of Guests");
 
                 // links to tables
@@ -433,6 +435,7 @@
                         WaiterPadSeatingContent.Add('statusId', Seating.Status);
                         WaiterPadSeatingContent.Add('primary', SeatingWaiterPadLink.Primary);
                         WaiterPadSeatingList.Add(WaiterPadSeatingContent);
+                        Seating.Mark(true);
                     until SeatingWaiterPadLink.Next() = 0;
                 WaiterPadContent.Add('seatings', WaiterPadSeatingList);
 
@@ -467,6 +470,11 @@
 
         Request.GetContent().Add('waiterPads', WaiterPadList);
         FrontEnd.InvokeFrontEndMethod2(Request);
+
+        Seating.MarkedOnly(true);
+        if Seating.IsEmpty() then
+            exit;
+        RefreshStatus(FrontEnd, '', '', Seating.GetSelectionFilter());
     end;
 
     procedure RefreshStatus(FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantFilter: Text; SeatingLocationFilter: Text; SeatingFilter: Text)
@@ -502,7 +510,7 @@
                             repeat
                                 if WaiterPad.Get(SeatingWaiterPadLink."Waiter Pad No.") and not WaiterPad.Closed then
                                     if not WaiterPadStatus.Contains(WaiterPad."No.") then
-                                        WaiterPadStatus.Add(WaiterPad."No.", StatusAndColor(WaiterPad.Status, WaiterPad.RGBColorCodeHex(false)));
+                                        WaiterPadStatus.Add(WaiterPad."No.", StatusAndColor(WaiterPad.WaiterPadFrontEndStatus(), WaiterPad.RGBColorCodeHex(false)));
                             until SeatingWaiterPadLink.Next() = 0;
                     until Seating.Next() = 0;
             until SeatingLocation.Next() = 0;

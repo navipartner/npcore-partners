@@ -294,4 +294,13 @@
             exit('');
         exit(SeatingLocation."Restaurant Code");
     end;
+
+    internal procedure GetSelectionFilter(): Text
+    var
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Rec);
+        exit(SelectionFilterManagement.GetSelectionFilter(RecRef, Rec.FieldNo(Code)));
+    end;
 }
