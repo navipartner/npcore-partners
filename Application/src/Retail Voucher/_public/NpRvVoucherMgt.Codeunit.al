@@ -390,6 +390,8 @@
         end;
 
         ApplyEntry(VoucherEntry);
+        if VoucherEntry."Entry Type" = VoucherEntry."Entry Type"::"Top-up" then
+            ExtendVoucherEndingDate(VoucherEntry."Posting Date", Voucher);
     end;
 
 
@@ -1746,6 +1748,17 @@
                             POSLine,
                             EndSale,
                             ActionContext)
+    end;
+
+    procedure ExtendVoucherEndingDate(PostingDate: Date; NpRvVoucher: Record "NPR NpRv Voucher")
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        NpRvVoucherType.Get(NpRvVoucher."Voucher Type");
+        if not NpRvVoucherType."Top-up Extends Ending Date" then
+            exit;
+        NpRvVoucher."Ending Date" := CreateDateTime(CalcDate(NpRvVoucherType."Valid Period", DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
+        NpRvVoucher.Modify();
     end;
     #endregion
 
