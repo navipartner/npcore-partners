@@ -214,6 +214,7 @@
         if (PosEntry.FindFirst()) then begin
             PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
             PosEntrySalesLine.SetFilter(Type, '=%1', PosEntrySalesLine.Type::Item);
+            PosEntrySalesLine.SetRange("Exclude from Posting", false);
             if (PosEntrySalesLine.FindSet()) then begin
                 repeat
                     SimulateValueEntry(
