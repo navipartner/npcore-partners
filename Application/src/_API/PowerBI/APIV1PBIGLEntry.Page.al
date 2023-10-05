@@ -124,6 +124,14 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Last Modified Date', Locked = true;
                 }
+                field(transactionNo; Rec."Transaction No.")
+                {
+                    Caption = 'Transaction No.', Locked = true;
+                }
+                field(sourceCode; Rec."Source Code")
+                {
+                    Caption = 'Source Code', Locked = true;
+                }
             }
         }
     }
