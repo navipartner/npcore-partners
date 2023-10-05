@@ -22,21 +22,16 @@ codeunit 6151033 "NPR POS Action Set Serial No B"
 
 
     #region AssignSerialNo
-    internal procedure AssignSerialNo(var SaleLinePOS: Record "NPR POS Sale Line";
-                                      var SerialNumberInput: Text[50];
-                                      SerialSelectionFromList: Boolean;
-                                      POSSetup: Codeunit "NPR POS Setup")
+    internal procedure AssignSerialNo(var SaleLinePOS: Record "NPR POS Sale Line"; var SerialNumberInput: Text[50]; SerialSelectionFromList: Boolean; POSSetup: Codeunit "NPR POS Setup")
     var
+        POSStore: Record "NPR POS Store";
         NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
         QuantityErrLbl: Label 'Quantity at %1 %2 can only be 1 or -1', Comment = '%1 - field name, %2 - field value';
     begin
         CheckTrackingOptions(SaleLinePOS);
 
-        NPRPOSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.",
-                                             SaleLinePOS."Variant Code",
-                                             SerialNumberInput,
-                                             SerialSelectionFromList,
-                                             POSSetup);
+        POSSetup.GetPOSStore(POSStore);
+        NPRPOSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", SerialNumberInput, SerialSelectionFromList, POSStore);
 
         if (SerialNumberInput <> '') and
            (Abs(SaleLinePOS.Quantity) <> 1)

@@ -28,7 +28,7 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
             'prepareRequest':
                 begin
                     EanBoxEventHandler.GetEanBox(Value, POSAction, POSSession, FrontEnd, SetupCode, EventCode);
-                    FrontEnd.WorkflowResponse(SendRequest(POSAction, SetupCode, EventCode, Value));
+                    FrontEnd.WorkflowResponse(SendRequest(Context, POSAction, SetupCode, EventCode, Value, Setup, FrontEnd));
                 end;
             'doLegacyWorkflow':  //continue for legacy
                 begin
@@ -38,11 +38,87 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
         end;
     end;
 
+    local procedure UseSimpleInsert(Context: Codeunit "NPR POS JSON Helper"; var POSAction: Record "NPR POS Action"; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management"; WorkflowInvocationParameters: JsonObject; var Response: JsonObject) Success: Boolean
+    var
+        NPRPOSActionInsertItem: Codeunit "NPR POS Action: Insert Item";
+        ValueJsonToken: JsonToken;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
+        ItemIdentifier: Text;
+        UnitOfMeasureCode: Code[10];
+        ItemQuantity: Decimal;
+        PreSetUnitPrice: Decimal;
+        UnitPrice: Decimal;
+        SelectSerialNo: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
+        UsePreSetUnitPrice: Boolean;
+    begin
+        if POSAction.Code <> NPRPOSActionInsertItem.ActionCode() then
+            exit;
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('itemIdentifierType', ValueJsonToken) then
+            exit;
+
+        ItemIdentifierType := ValueJsonToken.AsValue().AsOption();
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('itemNo', ValueJsonToken) then
+            exit;
+
+        ItemIdentifier := ValueJsonToken.AsValue().AsText();
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('unitOfMeasure', ValueJsonToken) then
+            exit;
+
+#pragma warning disable AA0139
+        UnitOfMeasureCode := ValueJsonToken.AsValue().AsCode();
+#pragma warning restore AA0139
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('SelectSerialNo', ValueJsonToken) then
+            exit;
+
+        SelectSerialNo := ValueJsonToken.AsValue().AsBoolean();
+        if SelectSerialNo then
+            exit;
+
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('itemQuantity', ValueJsonToken) then
+            exit;
+
+        ItemQuantity := ValueJsonToken.AsValue().AsDecimal();
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('usePreSetUnitPrice', ValueJsonToken) then
+            exit;
+
+        UsePreSetUnitPrice := ValueJsonToken.AsValue().AsBoolean();
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('preSetUnitPrice', ValueJsonToken) then
+            exit;
+
+        PreSetUnitPrice := ValueJsonToken.AsValue().AsDecimal();
+
+        if UsePreSetUnitPrice then
+            UnitPrice := PreSetUnitPrice;
+
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('SkipItemAvailabilityCheck', ValueJsonToken) then
+            exit;
+
+        SkipItemAvailabilityCheck := ValueJsonToken.AsValue().AsBoolean();
+
+        Success := NPRPOSActionInsertItem.SimpleItemInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitOfMeasureCode, UnitPrice, SkipItemAvailabilityCheck, SelectSerialNo, UsePreSetUnitPrice, Setup, FrontEnd, Response);
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTextEnter.js###
-'let main=async({workflow:e,context:a,captions:t,popup:n})=>{switch(a.id){case"EanBox":case"PaymentBox":const{workflowName:r,workflowVersion:o,setupcode:d,eventcode:s,parameters:i}=await e.respond("prepareRequest");o>1&&await e.run(r,{parameters:i}),o==1&&await e.respond("doLegacyWorkflow",{actionCode:r,setupcode:d,eventcode:s});return;default:n.error("Control "+a.id+" "+t.NotHandled);return}};'
+'let main=async({workflow:e,context:a,captions:o,popup:n})=>{switch(a.id){case"EanBox":case"PaymentBox":const{workflowName:r,workflowVersion:t,setupcode:s,eventcode:d,parameters:i,simpleInsertUsed:c}=await e.respond("prepareRequest");if(c)return;t>1&&await e.run(r,{parameters:i}),t==1&&await e.respond("doLegacyWorkflow",{actionCode:r,setupcode:s,eventcode:d});return;default:n.error("Control "+a.id+" "+o.NotHandled);return}};'
         );
     end;
 
@@ -68,21 +144,27 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
         Request.Add('workflowName', Name);
     end;
 
-    procedure SendRequest(var POSAction: Record "NPR POS Action"; SetupCode: code[20]; EventCode: Code[20]; EanBoxValue: Text) Request: JsonObject
+    procedure SendRequest(Context: Codeunit "NPR POS JSON Helper"; var POSAction: Record "NPR POS Action"; SetupCode: code[20]; EventCode: Code[20]; EanBoxValue: Text; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management") Request: JsonObject
     var
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
         WorkflowVersion: Integer;
         WorkflowInvocationParameters: JsonObject;
         WorkflowInvocationContext: JsonObject;
-        EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
     begin
+        EanBoxSetupEvent.get(SetupCode, EventCode);
+        EanBoxEventHandler.SetEanParametersToPOSAction(EanBoxValue, POSAction, EanBoxSetupEvent);
+        POSAction.GetWorkflowInvocationContext(WorkflowInvocationParameters, WorkflowInvocationContext);
+
+        if FeatureFlagsManagement.IsEnabled('textEnterFastItem') then
+            if UseSimpleInsert(Context, POSAction, Setup, FrontEnd, WorkflowInvocationParameters, Request) then
+                exit;
+
         WorkflowVersion := GetWorkflowVersion(POSAction);
         Request := InitRequest(WorkflowVersion, POSAction.Code);
-        EanBoxSetupEvent.get(SetupCode, EventCode);
 
         IF POSAction."Workflow Implementation" <> POSAction."Workflow Implementation"::LEGACY then begin
-            EanBoxEventHandler.SetEanParametersToPOSAction(EanBoxValue, POSAction, EanBoxSetupEvent);
-            POSAction.GetWorkflowInvocationContext(WorkflowInvocationParameters, WorkflowInvocationContext);
             Request.Add('parameters', WorkflowInvocationParameters);
         end else begin
             Request.add('setupcode', EanBoxSetupEvent."Setup Code");
