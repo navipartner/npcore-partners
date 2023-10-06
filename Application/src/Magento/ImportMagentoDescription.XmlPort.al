@@ -23,9 +23,11 @@ xmlport 6014404 "NPR ImportMagentoDescription"
                 }
                 textelement(ItemMagentoDescription)
                 {
+                    TextType = BigText;
                 }
                 textelement(ItemMagentoShortDescription)
                 {
+                    TextType = BigText;
                 }
                 trigger OnBeforeInsertRecord()
                 var
@@ -34,32 +36,42 @@ xmlport 6014404 "NPR ImportMagentoDescription"
                     InStr: InStream;
                     OutStr: OutStream;
                     ModifyItem: Boolean;
-                    Msg: Label 'Description updated successfully';
                 begin
                     if not Item.Get(ItemNo) then
                         exit;
                     ModifyItem := false;
-                    if StrLen(ItemMagentoDescription) > 0 then begin
+                    if ItemMagentoDescription.Length > 0 then begin
                         TempBlob.CreateOutStream(OutStr);
-                        OutStr.WriteText(ItemMagentoDescription);
+                        ItemMagentoDescription.Write(OutStr);
                         TempBlob.CreateInStream(InStr);
                         Item."NPR Magento Desc.".ImportStream(InStr, Format(Item."No.") + '-' + Format(CreateGuid()));
                         ModifyItem := true;
                     end;
-                    if StrLen(ItemMagentoShortDescription) > 0 then begin
+                    if ItemMagentoShortDescription.Length > 0 then begin
                         Clear(TempBlob);
                         TempBlob.CreateOutStream(OutStr);
-                        OutStr.WriteText(ItemMagentoShortDescription);
+                        ItemMagentoShortDescription.Write(OutStr);
                         TempBlob.CreateInStream(InStr);
                         Item."NPR Magento Short Desc.".ImportStream(InStr, Format(Item."No.") + '-' + Format(CreateGuid()));
                         ModifyItem := true;
                     end;
                     if ModifyItem then begin
                         Item.Modify();
-                        Message(Msg);
+                        ModifiedCount += 1;
                     end;
                 end;
             }
         }
     }
+
+    trigger OnPostXmlPort()
+    var
+        Msg: Label 'Description updated successfully. Number of modified items: %1';
+    begin
+        if ModifiedCount > 0 then
+            Message(Msg, ModifiedCount);
+    end;
+
+    var
+        ModifiedCount: Integer;
 }
