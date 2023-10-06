@@ -113,14 +113,14 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             exit(false);
 
         Context.GetInteger('FunctionId', FunctionId);
-        if (FunctionId in [4, 5]) then // Edit Reservation, // Edit TicketHolder
-            exit(GetRequestToken(SaleLineRec."Sales Ticket No.", SaleLineRec."Line No.", Token));
+        if (FunctionId in [3, 5]) then // Edit Reservation, // Edit TicketHolder
+            exit(not GetRequestToken(SaleLineRec."Sales Ticket No.", SaleLineRec."Line No.", Token));
 
         exit((
             FunctionId in [
-                1, // Admission Count
-                2, // Register Arrival
-                3, // Revoke Reservation
+                1, // Register Arrival
+                2, // Revoke Ticket Reservation
+                4, // Reconfirm Reservation 
                 6, // Change Confirmed Ticket Quantity
                 8, // Convert To Membership
                 9, // Register Departure
@@ -783,7 +783,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         POSUnit: Record "NPR POS Unit";
         Token: Text[100];
     begin
-        if (not IsTicketSalesLine(SaleLinePOS)) then
+        if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
 
         if ((SaleLinePOS.Quantity > 0) and (NewQuantity < 0)) or

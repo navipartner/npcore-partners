@@ -864,6 +864,7 @@
     procedure UpdateReservationQuantity(Token: Text[100]; Quantity: Integer)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        ChangeQuantityNotPossible: Label 'Quantity for configurable tickets must be changed in the edit ticket reservation page.';
     begin
 
         TicketReservationRequest.Reset();
@@ -876,7 +877,15 @@
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::SELECTED, TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+        if (not TicketReservationRequest.IsEmpty()) then
+            Error(ChangeQuantityNotPossible);
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.ModifyAll(Quantity, Quantity);
+
     end;
 
     procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean
@@ -1792,6 +1801,7 @@
         Ticket: Record "NPR TM Ticket";
         TicketCount: Integer;
         RevokeQuantity: Integer;
+        ChangeQuantityNotPossible: Label 'Quantity for configurable tickets must be changed in the edit ticket reservation page.';
     begin
 
         if (not (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
@@ -1801,14 +1811,18 @@
 
         ReservationRequest.SetCurrentKey("Session Token ID");
         ReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        ReservationRequest.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        ReservationRequest.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
         if (ReservationRequest.FindFirst()) then begin
 
             if (SaleLinePOS.Quantity > 0) then begin
                 if (ReservationRequest.Quantity = SaleLinePOS.Quantity) then
                     exit;
 
-                if (ReservationRequest."Item No." <> SaleLinePOS."No.") or (ReservationRequest."Variant Code" <> SaleLinePOS."Variant Code") then begin
+                if (ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::REQUIRED) then
+                    Error(ChangeQuantityNotPossible);
 
+                if (ReservationRequest."Item No." <> SaleLinePOS."No.") or (ReservationRequest."Variant Code" <> SaleLinePOS."Variant Code") then begin
                     if (ReservationRequest."Admission Created") then
                         Error(EXTERNAL_ITEM_CHANGE);
 
@@ -1844,8 +1858,8 @@
 
                 end;
             end;
-
         end;
+
     end;
 
     procedure OnDeleteSaleLinePos(SaleLinePOS: Record "NPR POS Sale Line")
