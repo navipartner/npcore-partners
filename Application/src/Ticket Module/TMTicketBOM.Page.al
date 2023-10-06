@@ -406,6 +406,7 @@
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         TicketReservationRequest.FindFirst();
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
         Ticket.FindFirst();
@@ -468,6 +469,7 @@
             if (Confirm(EXPORT_TO_EXCEL, true)) then begin
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
                 TicketReservationRequest.FindFirst();
                 TicketRequestManager.ExportTicketRequestListToClientExcel(TicketReservationRequest);
             end;
@@ -477,7 +479,6 @@
             TicketReservationRequest.Reset();
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
             TicketReservationRequest.FindFirst();
-
             if (Confirm(OFFLINE_VALIDATION)) then begin
                 ImportReferenceNo := OfflineTicketValidationMgr.AddRequestToOfflineValidation(TicketReservationRequest);
                 OfflineTicketValidation.SetFilter("Import Reference No.", '=%1', ImportReferenceNo);
@@ -489,6 +490,7 @@
         if (ShowTicketResultList(PaymentType)) then begin
             TicketReservationRequest.Reset();
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
             TicketReservationRequest.FindFirst();
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             Commit();
@@ -499,15 +501,30 @@
 
     local procedure CreateTicketRequest(PaymentType: Option; Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]): Text[100]
     var
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
     begin
 
         TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNo);
         TicketAdmissionBOM.SetFilter("Variant Code", '=%1', VariantCode);
-        TicketAdmissionBOM.FindSet();
+        TicketAdmissionBOM.SetFilter("Admission Inclusion", '=%1', TicketAdmissionBOM."Admission Inclusion"::REQUIRED);
+        MakeTicketReservation(PaymentType, Token, ItemNo, VariantCode, TicketAdmissionBOM);
+
+        TicketAdmissionBOM.SetFilter("Admission Inclusion", '<>%1', TicketAdmissionBOM."Admission Inclusion"::REQUIRED);
+        MakeTicketReservation(PaymentType, Token, ItemNo, VariantCode, TicketAdmissionBOM);
+
+        Commit();
+        exit(Token);
+    end;
+
+    local procedure MakeTicketReservation(PaymentType: Option; Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]; var TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM")
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
+    begin
+        if (not TicketAdmissionBOM.FindSet()) then
+            exit;
+
         repeat
             Admission.Get(TicketAdmissionBOM."Admission Code");
             TicketReservationRequest."Entry No." := 0;
@@ -529,9 +546,6 @@
             TicketReservationRequest."Created Date Time" := CurrentDateTime;
             TicketReservationRequest.Insert();
         until (TicketAdmissionBOM.Next() = 0);
-        Commit();
-
-        exit(Token);
     end;
 
     local procedure FinalizeReservation(Token: Text[100]; ItemNo: Code[20]; VariantCode: Code[10]): Boolean
@@ -690,5 +704,7 @@
 
         exit(1);
     end;
+
+
 }
 

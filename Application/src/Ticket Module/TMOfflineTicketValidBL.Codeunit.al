@@ -168,6 +168,7 @@
 
         ImportBatchNo := GetNextImportBatchNo();
 
+        TicketReservationRequest2.SetFilter("Admission Created", '=%1', true);
         TicketReservationRequest2.FindSet();
         repeat
             // All tickets in the ticket request must relate to same schedules entry time request.
