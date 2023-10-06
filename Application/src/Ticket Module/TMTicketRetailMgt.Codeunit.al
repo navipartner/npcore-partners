@@ -94,6 +94,7 @@
                 DisplayTicketReservationRequestPhone.LoadTicketRequest(Token);
                 DisplayTicketReservationRequestPhone.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
                 DisplayTicketReservationRequestPhone.AllowQuantityChange(HaveSalesLine);
+                DisplayTicketReservationRequestPhone.SetAllowCustomizableTicketQtyChange(true);
                 DisplayTicketReservationRequestPhone.LookupMode(false);
                 DisplayTicketReservationRequestPhone.Editable(true);
 
@@ -122,6 +123,7 @@
                 DisplayTicketReservationRequest.LoadTicketRequest(Token);
                 DisplayTicketReservationRequest.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
                 DisplayTicketReservationRequest.AllowQuantityChange(HaveSalesLine);
+                DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
                 DisplayTicketReservationRequest.LookupMode(true);
                 DisplayTicketReservationRequest.Editable(true);
 
@@ -286,6 +288,7 @@
             DisplayTicketReservationRequest.LoadTicketRequest(Token);
             DisplayTicketReservationRequest.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
             DisplayTicketReservationRequest.AllowQuantityChange(true);
+            DisplayTicketReservationRequest.SetAllowCustomizableTicketQtyChange(true);
             DisplayTicketReservationRequest.LookupMode(true);
             DisplayTicketReservationRequest.Editable(true);
 
