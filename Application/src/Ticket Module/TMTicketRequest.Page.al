@@ -377,8 +377,9 @@
                     TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
                     TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                 begin
-
-                    CurrPage.SetSelectionFilter(TicketReservationRequest);
+                    TicketReservationRequest.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
+                    TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+                    TicketReservationRequest.FindFirst();
                     TicketRequestManager.ExportTicketRequestListToClientExcel(TicketReservationRequest);
                 end;
             }
