@@ -527,6 +527,12 @@
                     'CleanupAuditRoll':
                         exit('NPR-ObsoleteTablesCleanup_AuditRoll');
                 end;
+            Codeunit::"NPR Upgrade Access Tokens":
+                case UpgradeStep of
+                    'ClearAccessToken':
+                        exit('ClearAccessToken-02102023');
+                end;
+
         end;
     end;
 }

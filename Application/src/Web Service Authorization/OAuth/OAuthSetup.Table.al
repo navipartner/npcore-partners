@@ -38,6 +38,9 @@
         {
             Caption = 'Access Token Secret Key';
             DataClassification = EndUserIdentifiableInformation;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
 
         field(25; "Get Access Token URL"; Text[250])
@@ -68,6 +71,9 @@
             Caption = 'Access Token Due DateTime';
             Editable = false;
             DataClassification = SystemMetadata;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
 
         field(41; "Access Token Duration Offset"; Integer)
@@ -77,6 +83,9 @@
             MinValue = 0;
             MaxValue = 1000;
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
     }
     keys
@@ -108,12 +117,6 @@
                         Rec."Client Secret" := CreateGuid();
                     SetSecret("Client Secret", NewSecretValue);
                 end;
-            Rec.FieldNo("Access Token"):
-                begin
-                    if IsNullGuid("Access Token") then
-                        Rec."Access Token" := CreateGuid();
-                    SetSecret("Access Token", NewSecretValue);
-                end;
         End;
     end;
 
@@ -136,9 +139,6 @@
             Rec.FieldNo("Client Secret"):
                 if not IsNullGuid(Rec."Client Secret") then
                     if IsolatedStorage.Get("Client Secret", DataScope::Company, SecretValue) then;
-            Rec.FieldNo("Access Token"):
-                if not IsNullGuid(Rec."Access Token") then
-                    if IsolatedStorage.Get("Access Token", DataScope::Company, SecretValue) then;
         End;
     end;
 
@@ -161,11 +161,6 @@
                     IsolatedStorage.Delete("Client Secret", DataScope::Company);
                     Clear("Client Secret");
                 end;
-            Rec.FieldNo("Access Token"):
-                begin
-                    IsolatedStorage.Delete("Access Token", DataScope::Company);
-                    Clear("Access Token");
-                end;
         End;
     end;
 
@@ -175,13 +170,14 @@
             Rec.RemoveSecret(Rec.FieldNo("Client ID"));
         if Rec.HasSecret(Rec.FieldNo("Client Secret")) then
             Rec.RemoveSecret(Rec.FieldNo("Client Secret"));
-        if Rec.HasSecret(Rec.FieldNo("Access Token")) then
-            Rec.RemoveSecret(Rec.FieldNo("Access Token"));
+
+
     end;
 
     procedure GetOauthToken(): Text
     var
         TypeHelper: Codeunit "Type Helper";
+        APIOAuth2Token: Codeunit "NPR API OAuth2 Token";
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
         ResponseMessage: HttpResponseMessage;
@@ -194,14 +190,16 @@
         ClientSecret: Text;
         LocScope: Text;
     begin
-        if CheckExistingTokenIsValid() then // if existing token is not expired use it
-            exit(Rec.GetSecret(Rec.FieldNo("Access Token")));
-
-        Client.SetBaseAddress(GetTokenBaseAddress());
-        RequestMessage.Method('POST');
         ClientId := GetSecret(FieldNo("Client ID"));
         ClientSecret := GetSecret(FieldNo("Client Secret"));
         LocScope := GetScope();
+
+        if APIOAuth2Token.CheckExistingTokenIsValid(ClientId, ClientSecret) then
+            exit(APIOAuth2Token.GetOAuthToken(ClientId));
+
+        Client.SetBaseAddress(GetTokenBaseAddress());
+        RequestMessage.Method('POST');
+
         RequestBody := StrSubstNo('grant_type=client_credentials&client_id=%1&client_secret=%2&scope=%3',
                         TypeHelper.UrlEncode(ClientId),
                         TypeHelper.UrlEncode(ClientSecret),
@@ -217,32 +215,11 @@
             Error(ErrorTxt);
 
         ResponseMessage.Content().ReadAs(APIResult);
-        SaveNewToken(APIResult);
-        exit(Rec.GetSecret(Rec.FieldNo("Access Token")));
+        APIOAuth2Token.CacheNewToken(APIResult, ClientId);
+        exit(APIOAuth2Token.GetOAuthToken(ClientId));
     end;
 
-    local procedure SaveNewToken(JsonResponseTxt: Text)
-    var
-        JsonObj: JsonObject;
-        JsonTok: JsonToken;
-    begin
-        JsonObj.ReadFrom(JsonResponseTxt);
-        if JsonObj.SelectToken('access_token', JsonTok) then
-            Rec.SetSecret(FieldNo("Access Token"), JsonTok.AsValue().AsText());
-        if JsonObj.SelectToken('expires_in', JsonTok) then
-            Rec."Access Token Due DateTime" := CurrentDateTime + (JsonTok.AsValue().AsInteger() * 1000);
-
-        Rec.Modify();
-    end;
-
-    local procedure CheckExistingTokenIsValid(): Boolean
-    begin
-        if Rec."Access Token Due DateTime" = 0DT then
-            exit(false);
-        Exit((Rec."Access Token Due DateTime" - Rec."Access Token Duration Offset" * 1000) > CurrentDateTime);
-    end;
-
-    local procedure GetTokenBaseAddress(): text
+    internal procedure GetTokenBaseAddress(): text
     begin
         Rec.TestField("Get Access Token URL");
         if StrPos(Rec."Get Access Token URL".ToLower(), '{aadtenantid}') > 0 then begin
@@ -269,5 +246,10 @@
 
         ErrorTxt := StrSubstNo(GetTokenErrorTxt, Response.HttpStatusCode, Response.ReasonPhrase);
         exit(false);
+    end;
+
+    internal procedure ValidateConnection(): Boolean
+    begin
+        exit(GetOauthToken() <> '');
     end;
 }
