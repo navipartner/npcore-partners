@@ -1912,7 +1912,6 @@
 
     procedure ExportTicketRequestListToClientExcel(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
-        TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         DataTypeMgt: Codeunit "Data Type Management";
         TempBlob: Codeunit "Temp Blob";
         RecRef: RecordRef;
@@ -1922,14 +1921,6 @@
     begin
 
         // The link to ticket is only on the first request
-        TicketReservationRequest.FindFirst();
-        TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
-        TicketReservationRequest2.FindFirst();
-
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.SetFilter("Entry No.", '=%1', TicketReservationRequest2."Entry No.");
-        TicketReservationRequest.FindFirst();
-
         TempBlob.CreateOutStream(OutStr);
         DataTypeMgt.GetRecordRef(TicketReservationRequest, RecRef);
         Report.SaveAs(Report::"NPR TM Ticket Batch Resp.", '', ReportFormat::Excel, OutStr, RecRef);
