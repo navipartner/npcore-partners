@@ -76,11 +76,21 @@
                 {
                     ToolTip = 'Specifies the value of the Access Token Duration Offset field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteReason = 'Cached via SingleInstance codeunit';
+
                 }
                 field("Access Token Due DateTime"; Rec."Access Token Due DateTime")
                 {
                     ToolTip = 'Specifies the value of the Access Token Due DateTime field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteReason = 'Cached via SingleInstance codeunit';
+
                 }
                 field(Enabled; Rec.Enabled)
                 {
@@ -101,11 +111,10 @@
                 ApplicationArea = NPRRetail;
                 Image = CreateElectronicReminder;
                 ToolTip = 'Generates a Token.';
-                trigger OnAction()
-                var
-                begin
-                    Rec.GetOauthToken();
-                end;
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR27.0';
+                ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
             }
 
             action(ClearToken)
@@ -114,14 +123,28 @@
                 ApplicationArea = NPRRetail;
                 Image = ClearLog;
                 ToolTip = 'Clear an existing Token.';
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR27.0';
+                ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
+            }
+            action(ValidateConnection)
+            {
+                Caption = 'Validate Connection';
+                ApplicationArea = NPRRetail;
+                Image = LinkWeb;
+                ToolTip = 'Validates the parameters on the page, and checks if an access token can be successfully generated.';
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
                 trigger OnAction()
                 var
+                    SuccessMsg: Label 'Connection successfully established. OAuth Token has been retrieved.';
                 begin
-                    if not Rec.HasSecret(Rec.FieldNo("Access Token")) then
-                        Error('Token does not exist.');
-                    Rec.RemoveSecret(Rec.FieldNo("Access Token"));
-                    Rec."Access Token Due DateTime" := 0DT;
-                    Rec.Modify();
+                    if not Rec.ValidateConnection() then
+                        Error(GetLastErrorText());
+                    Message(SuccessMsg);
                 end;
             }
         }
@@ -134,12 +157,17 @@
                 ApplicationArea = NPRRetail;
                 Image = GetEntries;
                 ToolTip = 'Reads a Token.';
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = 'NPR27.0';
+                ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
                 trigger OnAction()
                 var
                 begin
                     Message(Rec.GetSecret(Rec.FieldNo("Access Token")));
                 end;
             }
+
         }
     }
 
