@@ -21,6 +21,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         CustomerNoParam();
         POSWorkflow();
         SecurityParameter();
+        UpgradePOSNamedActionsProfileItemActionParameters();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -444,5 +445,40 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         RefreshPOSAction(Enum::"NPR POS Workflow"::REVERSE_DIRECT_SALE);
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'RefreshReverseDirectSalePOSAction'));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradePOSNamedActionsProfileItemActionParameters()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'UpgradePOSNamedActionsProfileItemActionParameters');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradePOSNamedActionsProfileItemActionParameters')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        RefreshPOSItemNamedActionSetup();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradePOSNamedActionsProfileItemActionParameters'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure RefreshPOSItemNamedActionSetup()
+    var
+        ItemInsertActionRefreshNeeded: Boolean;
+
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        POSSetup: Record "NPR POS Setup";
+    begin
+
+        POSSetup.Reset();
+        if not POSSetup.FindSet(false) then
+            exit;
+        repeat
+            ItemInsertActionRefreshNeeded := ParamMgt.RefreshParametersRequired(POSSetup.RecordId, '', POSSetup.FieldNo("Item Insert Action Code"), POSSetup."Item Insert Action Code");
+            if ItemInsertActionRefreshNeeded then
+                ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Item Insert Action Code"), POSSetup."Item Insert Action Code");
+        until POSSetup.Next() = 0;
     end;
 }
