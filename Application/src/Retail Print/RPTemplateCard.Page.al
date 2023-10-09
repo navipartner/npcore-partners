@@ -4,6 +4,10 @@
     UsageCategory = None;
     Caption = 'Template Card';
     SourceTable = "NPR RP Template Header";
+#if not BC17
+    AboutTitle = 'Template Card';
+    AboutText = 'The Template Card serves as a versatile tool for configuring and managing template settings within your system. These templates play a crucial role in ensuring seamless and efficient printing processes.';
+#endif
 
     layout
     {
@@ -11,6 +15,10 @@
         {
             group(General)
             {
+#if not BC17
+                AboutTitle = 'General Information';
+                AboutText = 'In the "General" section, you will find key configuration options for the specific Template. Assign a unique code for easy identification and select the printer type from supported options. Add comments for context, track version changes, and view the last modification date and time. You can also enable or disable log output. These settings allow you to customize and manage the template efficiently.';
+#endif
                 Editable = NOT Rec.Archived;
                 field("Code"; Rec.Code)
                 {
@@ -91,7 +99,10 @@
                 Caption = 'Line Settings';
                 Editable = NOT Rec.Archived;
                 Visible = Rec."Printer Type" = 1;
-
+#if not BC17
+                AboutTitle = 'Line Settings';
+                AboutText = 'Within the "Lines Settings" section, you can further tailor the template to your needs. This section includes fields for selecting the line device that best suits your requirements, as well as options for defining distribution settings for templates with two, three, or four columns. These versatile settings empower you to optimize your template for various content layouts and printing needs, making it a valuable tool for your system.';
+#endif
                 field("Line Device"; Rec."Line Device")
                 {
                     ApplicationArea = NPRRetail;
@@ -169,7 +180,10 @@
                 Caption = 'Matrix Settings';
                 Editable = NOT Rec.Archived;
                 Visible = Rec."Printer Type" = 0;
-
+#if not BC17
+                AboutTitle = 'Matrix Settings';
+                AboutText = 'The "Matrix Settings" section allows you to select the appropriate matrix device for your template. You can choose from a variety of options, including Zebra, Blaster, Citizen, Epson and Boca. Selecting the right matrix device ensures that your template is compatible with the hardware you intend to use for printing.';
+#endif
                 field("Matrix Device"; Rec."Matrix Device")
                 {
                     ToolTip = 'Select the device the template is built for';
@@ -180,6 +194,10 @@
             {
                 Caption = 'Processing';
                 Editable = NOT Rec.Archived;
+#if not BC17
+                AboutTitle = 'Processing Section';
+                AboutText = 'In the "Processing" section, you can configure the template''s processing settings. This typically involves setting up two preprocessing codeunits. These codeunits define how the template processes data before it''s sent to the selected matrix device for printing. It''s essential to define these codeunits accurately to achieve the desired output.';
+#endif
                 field("Pre Processing Codeunit"; Rec."Pre Processing Codeunit")
                 {
 
@@ -197,6 +215,10 @@
             {
                 Caption = 'Media';
                 Editable = NOT Rec.Archived;
+#if not BC17
+                AboutTitle = 'Media Section';
+                AboutText = 'The "Media" section is where you specify the media-related parameters for your template. This includes defining the type of media roll to be used with the template and providing a detailed description of the media roll. Accurate media settings are crucial for ensuring that your template prints correctly on the chosen media, whether it''s labels, receipts, or other printable materials.';
+#endif
                 field("Media Roll Picture"; tmpMediaInfo.Image)
                 {
 
