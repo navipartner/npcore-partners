@@ -1,6 +1,5 @@
 table 6060086 "NPR MM Loyalty Sales Channel"
 {
-    Access = Internal;
     Caption = 'Sales Channel';
     DataClassification = CustomerContent;
 
