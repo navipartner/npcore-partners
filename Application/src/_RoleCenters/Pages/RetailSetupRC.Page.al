@@ -216,62 +216,6 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the EFT BIN Groups';
                     ApplicationArea = NPRRetail;
                 }
-                action("Pepper Terminal Types")
-                {
-                    Caption = 'Pepper Terminal Types';
-                    RunObject = Page "NPR Pepper Terminal Types";
-
-                    ToolTip = 'View or edit the Pepper Terminal Types';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Terminals")
-                {
-                    Caption = 'Pepper Terminals';
-                    RunObject = Page "NPR Pepper Terminal List";
-
-                    ToolTip = 'View or edit the Pepper Terminals';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Versions")
-                {
-                    Caption = 'Pepper Versions';
-                    RunObject = Page "NPR Pepper Version List";
-
-                    ToolTip = 'View or edit the Pepper Versions';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Instances")
-                {
-                    Caption = 'Pepper Instances';
-                    RunObject = Page "NPR Pepper Instances";
-
-                    ToolTip = 'View or edit the Pepper Instances';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Configurations")
-                {
-                    Caption = 'Pepper Configurations';
-                    RunObject = Page "NPR Pepper Config. List";
-
-                    ToolTip = 'View or edit the Pepper Configurations';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Card Types")
-                {
-                    Caption = 'Pepper Card Types';
-                    RunObject = Page "NPR Pepper Card Types";
-
-                    ToolTip = 'View or edit the Pepper Card Types';
-                    ApplicationArea = NPRRetail;
-                }
-                action("Pepper Card Type Group")
-                {
-                    Caption = 'Pepper Card Type Group';
-                    RunObject = Page "NPR Pepper Card Type Group";
-
-                    ToolTip = 'View or edit the Pepper Card Type Group';
-                    ApplicationArea = NPRRetail;
-                }
             }
             group("Coupons & Vouchers")
             {
