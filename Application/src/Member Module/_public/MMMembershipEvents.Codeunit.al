@@ -88,4 +88,24 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterSetMemberSmartSearchFilter(SearchTerm: Text; SearchContext: Integer; var Member: Record "NPR MM Member")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterSetMembershipSmartSearchFilter(SearchTerm: Text; SearchContext: Integer; var Membership: Record "NPR MM Membership")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterSetMemberCardSmartSearchFilter(SearchTerm: Text; SearchContext: Integer; var MemberCard: Record "NPR MM Member Card")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeValidateSmartSearchTerm(SearchTerm: Text; SearchContext: Integer; var Handled: Boolean; var IsValidSearchTerm: Boolean)
+    begin
+    end;
+
 }
