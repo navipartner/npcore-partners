@@ -58,7 +58,15 @@
                     }
                 }
             }
-
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
+            usercontrol(Logo; "NPR Welcome Logo")
+            {
+                ApplicationArea = NPRRetail;
+                trigger InsertLogoEvent()
+                begin
+                end;
+            }
+#endif
         }
     }
 

@@ -19,7 +19,7 @@ page 6151245 "NPR Retail Setup RC"
 
 
             }
-
+            //NOTE: If this part is to be deleted from RoleCenter, Logo will be deleted as well
             part(Control14; "NPR Retail - Setups")
             {
                 ApplicationArea = NPRRetail;
