@@ -3,7 +3,7 @@ page 6151271 "NPR MM Loyalty Sales Channels"
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     Caption = 'Sales Channels';
     Editable = true;
-    Extensible = false;
+    Extensible = true;
     PageType = List;
     SourceTable = "NPR MM Loyalty Sales Channel";
     UsageCategory = Administration;
