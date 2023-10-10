@@ -49,7 +49,7 @@ codeunit 6150877 "NPR Upgrade Variety Setup"
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Upgrade Variety Setup', 'MoveVariantValueCodeToVarietyValue');
 
-        if (UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Variety Setup", 'MoveVariantValueCode2'))) then begin
+        if (UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Variety Setup", 'MoveVariantValueCode'))) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
@@ -92,7 +92,7 @@ codeunit 6150877 "NPR Upgrade Variety Setup"
                 end;
         until MagentoPictureLink.Next() = 0;
 
-        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Variety Setup", 'MoveVariantValueCode2'));
+        UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Upgrade Variety Setup", 'MoveVariantValueCode'));
         LogMessageStopwatch.LogFinish();
     end;
 }
