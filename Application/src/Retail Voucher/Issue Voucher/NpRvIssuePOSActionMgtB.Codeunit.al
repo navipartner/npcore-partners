@@ -75,8 +75,6 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
 
         if SaleLinePOS.Quantity < 0 then
             Error(QtyNotPositiveErr);
-        POSSaleLine.InsertLine(SaleLinePOS);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS."Unit Price" := Amount;
 
         case DiscountType of
@@ -97,7 +95,7 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         if SaleLinePOS."Discount Amount" > 0 then
             SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
         SaleLinePOS.Description := TempVoucher.Description;
-        SaleLinePOS.Modify(true);
+        POSSaleLine.InsertLine(SaleLinePOS);
     end;
 
     procedure SelectVoucherType(var VoucherTypeCode: Text): Boolean
