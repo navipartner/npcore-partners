@@ -108,6 +108,7 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
     procedure OnAfterCreateMemberSoapRequest(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var XmlDoc: XmlDocument; SOAPAction: Text)
     begin
     end;
