@@ -97,6 +97,11 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForAllWithStartingTime')) then begin
+            SetEndingTimeForAllWithStartingTime();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForAllWithStartingTime'));
+        end;
+
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold')) then begin
             SetManuallySetOnHold();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
@@ -370,6 +375,19 @@
             until JobQueueEntry.Next() = 0;
     end;
 
+    local procedure SetEndingTimeForAllWithStartingTime()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetFilter("Starting Time", '<>%1', 0T);
+        JobQueueEntry.SetRange("Ending Time", 0T);
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                JobQueueEntry."Ending Time" := JobQueueEntry."Starting Time" + 2 * 60 * 60 * 1000;  //+2h
+                JobQueueEntry.Modify();
+            until JobQueueEntry.Next() = 0;
+    end;
+
     local procedure SetManuallySetOnHold()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -412,4 +430,5 @@
     begin
         MembershipStatMgmt.CreateJobQueueEntry();
     end;
+
 }

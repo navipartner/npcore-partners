@@ -168,7 +168,7 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
             JobQueueDescription,
             NotBeforeDateTime,
             040000T,
-            0T,
+            060000T,
             NextRunDateFormula,
             '',
             JobQueueEntry)

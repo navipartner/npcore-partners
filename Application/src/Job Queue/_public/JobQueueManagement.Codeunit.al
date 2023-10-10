@@ -219,7 +219,7 @@
         Parameters."Record ID to Process" := RecordIdToProcess;
         Parameters."Earliest Start Date/Time" := EarliestStartDateTime;
         Parameters."Starting Time" := StartingTime;
-        Parameters."Ending Time" := EndingTime;
+        Parameters."Ending Time" := GetEndingTime(StartingTime, EndingTime);
         if Format(NextRunDateFormula) <> '' then
             Parameters."Next Run Date Formula" := NextRunDateFormula
         else begin
@@ -509,7 +509,7 @@
             '',
             NowWithDelayInSeconds(360),
             233000T,
-            0T,
+            013000T,
             NextRunDateFormula,
             CreateAndAssignRetentionPolicyJobQueueCategory(),
             JobQueueEntry)
@@ -648,6 +648,17 @@
             JobQueueEntry.Validate("Starting Time", 233000T);
             JobQueueEntry."Ending Time" := 060000T;
         end;
+    end;
+
+    local procedure GetEndingTime(StartTime: Time; EndTime: Time): Time
+    begin
+        if EndTime <> 0T then
+            exit(EndTime);
+
+        if StartTime <> 0T then
+            exit(StartTime + 2 * 60 * 60 * 1000);   //2 hours
+
+        exit(0T);
     end;
 
     procedure SetJobTimeout(NoOfHours: Integer; NoOfMinutes: Integer)

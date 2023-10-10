@@ -45,7 +45,7 @@
             JobQueueDescription(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Adjust Cost - Item Entries"),
             NotBeforeDateTime,
             010000T,
-            0T,
+            030000T,
             NextRunDateFormula,
             SalesSetup."Job Queue Category Code",
             JobQueueEntryGlobal)
