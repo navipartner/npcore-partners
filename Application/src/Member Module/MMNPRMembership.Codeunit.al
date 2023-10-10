@@ -482,6 +482,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     local procedure CreateRemoteMemberWorker(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; var MembershipInfo: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
+        MembershipEvents: Codeunit "NPR MM Membership Events";
         ScannerStationId: Text;
         SoapAction: Text;
         XmlDocRequest: XmlDocument;
@@ -489,7 +490,7 @@ codeunit 6060147 "NPR MM NPR Membership"
     begin
         ScannerStationId := '';
         CreateMemberSoapXmlRequest(MembershipInfo, ScannerStationId, SoapAction, XmlDocRequest);
-        OnBeforeSOAPRequest(XmlDocRequest, SoapAction);
+        MembershipEvents.OnAfterCreateMemberSoapRequest(MembershipInfo, XmlDocRequest, SoapAction);
         if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             exit(false);
 
@@ -1701,9 +1702,6 @@ codeunit 6060147 "NPR MM NPR Membership"
     end;
 
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSOAPRequest(var XMLDocRequest: XmlDocument; SOAPAction: Text)
-    begin
-    end;
+
 }
 #pragma warning restore
