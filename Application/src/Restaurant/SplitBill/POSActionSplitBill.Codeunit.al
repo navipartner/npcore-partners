@@ -2,6 +2,7 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
+
     internal procedure ActionCode(): Code[20]
     begin
         exit(Format("NPR POS Workflow"::SPLIT_BILL));
@@ -30,6 +31,10 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
         ParamReturnToDefaultView_DescLbl: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed.';
         LabelPopupCaptionLbl: Label 'Please configure your bills';
         LabelSeatingIDLbl: Label 'Seating Code';
+        ParamChooseBill_OptionLbl: Label 'Active,FirstNew,Ask', locked = true;
+        ParamChooseBill_CptLbl: Label 'Load After Split';
+        ParamChooseBill_DescLbl: Label 'Specifies which bill to load to POS sale after the Split Bill process is completed.';
+        ParamChooseBill_OptionCptLbl: Label 'Active,First New,Ask';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -52,6 +57,12 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('ReturnToDefaultView', false, ParamReturnToDefaultView_CptLbl, ParamReturnToDefaultView_DescLbl);
         WorkflowConfig.AddLabel('PopupCaption', LabelPopupCaptionLbl);
         WorkflowConfig.AddLabel('SeatingIDLbl', LabelSeatingIDLbl);
+        WorkflowConfig.AddOptionParameter('ChooseBill',
+                                        ParamChooseBill_OptionLbl,
+                                        CopyStr(SelectStr(1, ParamChooseBill_OptionLbl), 1, 250),
+                                        ParamChooseBill_CptLbl,
+                                        ParamChooseBill_DescLbl,
+                                        ParamChooseBill_OptionCptLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -59,6 +70,7 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
         BusinessLogic: Codeunit "NPR POSAction Split Bill-B";
         CurrWaiterPadNo: Code[20];
         NothingToDoErr: Label 'Nothing has been changed';
+        ChooseBill: Option Active,FirstNew,Ask;
     begin
         case Step of
             'AddPresetValuesToContext':
@@ -75,9 +87,10 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
             'DoSplit':
                 begin
                     BusinessLogic.CleanupSale(SaleLine);
-                    if not ProcessWaiterPadSplit(Context, CurrWaiterPadNo) then
+                    ChooseBill := Context.GetIntegerParameter('ChooseBill');
+                    if not ProcessWaiterPadSplit(Context, CurrWaiterPadNo, ChooseBill) then
                         Error(NothingToDoErr);
-                    UpdateFrontEndView(Context, Sale, CurrWaiterPadNo);
+                    UpdateFrontEndView(Context, Sale, CurrWaiterPadNo, ChooseBill);
                 end;
         end;
     end;
@@ -149,7 +162,7 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
             Context.SetContext('bills', BillCollection);
     end;
 
-    local procedure ProcessWaiterPadSplit(Context: Codeunit "NPR POS JSON Helper"; var CurrWaiterPadNo: Code[20]) ChangesFound: Boolean
+    local procedure ProcessWaiterPadSplit(Context: Codeunit "NPR POS JSON Helper"; var CurrWaiterPadNo: Code[20]; ChooseBill: Option Active,FirstNew,Ask) ChangesFound: Boolean
     var
         BusinessLogic: Codeunit "NPR POSAction Split Bill-B";
         Bills: JsonToken;
@@ -158,10 +171,10 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
         CurrWaiterPadNo := CopyStr(Context.GetString('waiterPadNo'), 1, MaxStrLen(CurrWaiterPadNo));
         ContextJToken.ReadFrom(Context.ToString());
         if ContextJToken.SelectToken('bills', Bills) then
-            ChangesFound := BusinessLogic.ProcessWaiterPadSplit(CurrWaiterPadNo, Bills);
+            ChangesFound := BusinessLogic.ProcessWaiterPadSplit(CurrWaiterPadNo, Bills, ChooseBill);
     end;
 
-    local procedure UpdateFrontEndView(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; WaiterPadNo: Code[20])
+    local procedure UpdateFrontEndView(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; WaiterPadNo: Code[20]; ChooseBill: Option Active,FirstNew,Ask)
     var
         BusinessLogic: Codeunit "NPR POSAction Split Bill-B";
         CurrentView: Codeunit "NPR POS View";
@@ -174,7 +187,7 @@ codeunit 6150670 "NPR POSAction: Split Bill" implements "NPR IPOS Workflow"
         InSale := CurrentView.GetType() in [CurrentView.GetType() ::Sale, CurrentView.GetType() ::Payment];
         ReturnToDefaultView := Context.GetBooleanParameter('ReturnToDefaultView');
         if InSale then
-            BusinessLogic.UpdateSaleAfterSplit(Sale, WaiterPadNo, ReturnToDefaultView, CleanupMessageText);
+            BusinessLogic.UpdateSaleAfterSplit(Sale, WaiterPadNo, ReturnToDefaultView, CleanupMessageText, ChooseBill);
         if ReturnToDefaultView then
             Sale.SelectViewForEndOfSale()
         else

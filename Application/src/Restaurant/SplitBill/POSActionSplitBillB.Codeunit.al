@@ -171,7 +171,7 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         SaleLine.DeleteWPadSupportedLinesOnly();
     end;
 
-    procedure ProcessWaiterPadSplit(var WaiterPadNo: Code[20]; Bills: JsonToken) ChangesFound: Boolean
+    procedure ProcessWaiterPadSplit(var WaiterPadNo: Code[20]; Bills: JsonToken; ChooseBill: Option Active,FirstNew,Ask) ChangesFound: Boolean
     var
         CurrWaiterPad: Record "NPR NPRE Waiter Pad";
         FromWaiterPad: Record "NPR NPRE Waiter Pad";
@@ -223,16 +223,13 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         end;
 
         CurrWaiterPad.Find();
-        if not CurrWaiterPad.Closed then begin
-            WaiterPadNo := CurrWaiterPad."No.";
-            exit;
-        end;
-        foreach TouchedWaiterPadNo in TouchedToWaiterPadList do begin
-            CurrWaiterPad.Get(TouchedWaiterPadNo);
-            if not CurrWaiterPad.Closed then begin
-                WaiterPadNo := CurrWaiterPad."No.";
-                exit;
-            end;
+
+        case true of
+            ChooseBill = ChooseBill::Active,
+            ChooseBill = ChooseBill::Ask:
+                WaiterPadNo := ActiveWaiterPad(CurrWaiterPad, TouchedToWaiterPadList);
+            ChooseBill = ChooseBill::FirstNew:
+                WaiterPadNo := FirstNewWaiterPad(CurrWaiterPad, TouchedToWaiterPadList);
         end;
     end;
 
@@ -249,10 +246,12 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
         WaiterPadMgt.MoveNumberOfGuests(CurrentWaiterPad, WaiterPad, 1);
     end;
 
-    procedure UpdateSaleAfterSplit(Sale: Codeunit "NPR POS Sale"; WaiterPadNo: Code[20]; var ReturnToDefaultView: Boolean; var CleanupMessageText: Text)
+    procedure UpdateSaleAfterSplit(Sale: Codeunit "NPR POS Sale"; WaiterPadNo: Code[20]; var ReturnToDefaultView: Boolean; var CleanupMessageText: Text; ChooseBill: Option Active,FirstNew,Ask)
     var
         SalePOS: Record "NPR POS Sale";
         WaiterPad: Record "NPR NPRE Waiter Pad";
+        CurrentWaiterPad: Record "NPR NPRE Waiter Pad";
+        Seating: Record "NPR NPRE Seating";
         POSSession: Codeunit "NPR POS Session";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
@@ -268,9 +267,50 @@ codeunit 6151362 "NPR POSAction Split Bill-B"
             end;
 
         if not ReturnToDefaultView and (WaiterPadNo <> '') then begin
+            If ChooseBill = ChooseBill::Ask then begin
+                Commit();
+                CurrentWaiterPad.Get(WaiterPadNo);
+                CurrentWaiterPad.CalcFields("Current Seating FF");
+                Seating.Get(CurrentWaiterPad."Current Seating FF");
+                if WaiterPadPOSMgt.SelectWaiterPad(Seating, CurrentWaiterPad) then
+                    WaiterPadNo := CurrentWaiterPad."No.";
+            end;
             WaiterPad.Get(WaiterPadNo);
             if not WaiterPad.Closed then
                 WaiterPadPOSMgt.GetSaleFromWaiterPadToPOS(WaiterPad, POSSession);
         end;
     end;
+
+    local procedure ActiveWaiterPad(var CurrWaiterPad: Record "NPR NPRE Waiter Pad"; TouchedToWaiterPadList: List of [Code[20]]): Code[20]
+    var
+        TouchedWaiterPadNo: Code[20];
+    begin
+        if not CurrWaiterPad.Closed then
+            exit(CurrWaiterPad."No.");
+
+        foreach TouchedWaiterPadNo in TouchedToWaiterPadList do begin
+            CurrWaiterPad.Get(TouchedWaiterPadNo);
+            if not CurrWaiterPad.Closed then
+                exit(CurrWaiterPad."No.")
+        end;
+    end;
+
+    local procedure FirstNewWaiterPad(var CurrWaiterPad: Record "NPR NPRE Waiter Pad"; TouchedToWaiterPadList: List of [Code[20]]): Code[20]
+    var
+        TouchedWaiterPadNo: Code[20];
+        WaiterPadNo: Code[20];
+    begin
+        WaiterPadNo := CurrWaiterPad."No.";
+        foreach TouchedWaiterPadNo in TouchedToWaiterPadList do begin
+            if WaiterPadNo <> TouchedWaiterPadNo then begin
+                CurrWaiterPad.Get(TouchedWaiterPadNo);
+                if not CurrWaiterPad.Closed then
+                    exit(CurrWaiterPad."No.")
+            end;
+        end;
+        CurrWaiterPad.Get(WaiterPadNo);
+        if not CurrWaiterPad.Closed then
+            exit(CurrWaiterPad."No.");
+    end;
+
 }
