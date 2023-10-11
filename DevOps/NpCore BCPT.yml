@@ -18,7 +18,7 @@ stages:
   - template: /YAML/ZAL Build Definitions/BCPT.yml@scriptsRepo
     parameters:
       pool:
-        name: NP PerfTest
+        name: 'NP PerfTest'
         demands: 
         - docker
         - Agent.OS -equals Windows_NT
