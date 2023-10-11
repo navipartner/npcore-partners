@@ -490,6 +490,8 @@
         NewLayoutModal_MobileLayoutLbl: Label 'Mobile Layout';
         NewLayoutModalLayoutAlertInvalidLayoutNameLbl: Label 'Please enter a valid layout name';
         NewLayoutModalLayoutAlertNameAlreadyExistsLbl: Label 'Layout with that name already exists.Would you like to overwrite';
+        NewLayoutModalEmptyOrDefaultTemplateLbl: Label 'Specify if the new layout should be prefilled with default template buttons or if it should be empty, i.e. contain no predefined buttons.';
+        NewLayoutModalSelectDeviceTypeLbl: Label 'Select what device type the POS unit will be run on. This effects if the layout will act as POS or MPOS design.';
         ActionsEditorDataSourcePopoverLbl: Label 'In order to render data variables inside the button, you can use "{"{"}variable{"}"}" characters, e.g.';
         ActionsEditorAvailibleDataForLbl: Label 'Available data for';
         ActionsEditorSelectDataSourceLbl: Label 'Select a data source to a list of availabe variables here';
@@ -850,6 +852,8 @@
         Captions.Add('NewLayoutModal_AlertLayoutAlreadyExists', NewLayoutModalLayoutAlertNameAlreadyExistsLbl);
         Captions.Add('NewLayoutModal_DesktopLayout', NewLayoutModal_DesktopLayoutLbl);
         Captions.Add('NewLayoutModal_MobileLayout', NewLayoutModal_MobileLayoutLbl);
+        Captions.Add('NewLayoutModal_EmptyOrDefaultTemplate', NewLayoutModalEmptyOrDefaultTemplateLbl);
+        Captions.Add('NewLayoutModal_SelectDeviceType', NewLayoutModalSelectDeviceTypeLbl);
         Captions.Add('Actions_Editor_DataSourcePopover', ActionsEditorDataSourcePopoverLbl);
         Captions.Add('Actions_Editor_AvalibleData', ActionsEditorAvailibleDataForLbl);
         Captions.Add('Actions_Editor_SelectDataSource', ActionsEditorSelectDataSourceLbl);
