@@ -10,13 +10,11 @@ stages:
 - template: /YAML/ZAL Build Definitions/PR Validation build.yml@scriptsRepo
   parameters:
     pool:
-      name: NP Core Pull Request Pipelines
+      name: 'NP BuildServers'
       demands: 
       - docker
-      # Now only 2019 is available but in the future it will be every newer version.
-      # Then we will probably remove this requirement as it will alwyas TRUE.
       - Agent.OS -equals Windows_NT
-      - Agent.OSVersion -equals 10.0.17763
+
     containerDefinitions:
         - name: Auto
 
@@ -51,7 +49,7 @@ stages:
       azureKeyVaultCertName: BusinessCentralKeyVaultReader
       azureADtenantID: ec3af438-38fc-4d9b-b8be-058101411d3a
       azureKeyVaultClientId: b38b8bef-17d2-4368-84ce-f9880a45eed0
-    objectVisibilityCheck: TRUE
+    objectVisibilityCheck: true
     obsoleteTagsCheck: true
     applicationAreaCheck:
       enabled: true
