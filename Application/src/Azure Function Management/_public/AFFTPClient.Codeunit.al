@@ -17,8 +17,8 @@
         gPassive, gForce : Boolean;
     internal procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode"; Force: Boolean)
     begin
-        gForce := Force;
         Construct(Host, Username, Password, Port, TimeoutMs, Passive, EncMode);
+        gForce := Force;
     end;
 
     procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
@@ -43,6 +43,7 @@
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         baseurl: Text;
     begin
+        Destruct();
         gHost := Host;
         gUsername := Username;
         gPassword := Password;
