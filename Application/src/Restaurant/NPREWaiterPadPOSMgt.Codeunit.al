@@ -109,6 +109,7 @@
                     POSSaleLine.DeleteAll();
                 end;
                 ClearSaleHdrNPREPresetFields(SalePOS, true);
+                RemoveSaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
                 SaleCleanupSuccessful := true;
             end;
         if not SaleLinesExist then
@@ -617,7 +618,7 @@
                         POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
                         POSInfoTransaction."Line Type" := SaleLinePOS."Line Type";
                         POSInfoTransaction."Entry No." := 0;
-                        POSInfoTransaction."POS Info Code" := POSInfoWaiterPadLink."POS Info Code";
+                        POSInfoTransaction.Validate("POS Info Code", POSInfoWaiterPadLink."POS Info Code");
                         POSInfoTransaction."POS Info" := POSInfoWaiterPadLink."POS Info";
                         POSInfoTransaction.Insert(true);
                     end;
@@ -633,6 +634,17 @@
         SaleLinePOS."Sales Ticket No." := SalesTicketNo;
         SaleLinePOS."Line No." := 0;
         CopyPOSInfo(SaleLinePOS, WaiterPadNo, 0, ToWaiterPad);
+    end;
+
+    local procedure RemoveSaleHdrPOSInfo(RegisterNo: Code[10]; SalesTicketNo: Code[20])
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+    begin
+        POSInfoTransaction.SetRange("Register No.", RegisterNo);
+        POSInfoTransaction.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSInfoTransaction.SetRange("Sales Line No.", 0);
+        if not POSInfoTransaction.IsEmpty() then
+            POSInfoTransaction.DeleteAll();
     end;
 
     procedure CopyPOSInfoWPad2WPad(FromWaiterPad: Record "NPR NPRE Waiter Pad"; FromWaiterPadLineNo: Integer; ToWaiterPad: Record "NPR NPRE Waiter Pad"; ToWaiterPadLineNo: Integer)
