@@ -56,6 +56,40 @@ codeunit 6151548 "NPR NO Audit Mgt."
     begin
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
+    #endregion
+
+    #region Subscribers - POS Audit Logging
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Run Page", 'OnBeforeRunPage', '', false, false)]
+    local procedure NPRPOSActionRunPage_OnBeforeRunPage(PageId: Integer; RunModal: Boolean; Sale: Codeunit "NPR POS Sale");
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSSale: Record "NPR POS Sale";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        AuditLogDesc: Label 'Price checked by %1';
+    begin
+        if not IsNOFiscalActive() then
+            exit;
+
+        Sale.GetCurrentSale(POSSale);
+        POSAuditLogMgt.CreateEntryExtended(POSSale.RecordId, POSAuditLog."Action Type"::PRICE_CHECK, 0, '', POSSale."Register No.", StrSubstNo(AuditLogDesc, POSSale."Salesperson Code"), '');
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Delete POS Line", 'OnBeforeDeleteSaleLinePOS', '', false, false)]
+    local procedure NPRPOSActionDeletePOSLine_OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "NPR POS Sale Line");
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSSaleLineRecord: Record "NPR POS Sale Line";
+        POSUnit: Record "NPR POS Unit";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        AuditLogDesc: Label 'POS Sales Line deleted';
+    begin
+        POSSaleLine.GetCurrentSaleLine(POSSaleLineRecord);
+        POSUnit.Get(POSSaleLineRecord."Register No.");
+        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDesc, '');
+    end;
 
     #endregion
 
