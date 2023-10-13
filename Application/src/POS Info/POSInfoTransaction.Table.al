@@ -51,6 +51,15 @@
             Caption = 'POS Info Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Info";
+
+            trigger OnValidate()
+            var
+                POSInfo: Record "NPR POS Info";
+            begin
+                if "POS Info Code" <> '' then
+                    if POSInfo.Get("POS Info Code") then
+                        CopyFromPOSInfo(POSInfo);
+            end;
         }
         field(11; "POS Info"; Text[250])
         {
