@@ -43,6 +43,7 @@
         RunModal := Context.GetBooleanParameter(ParamRunModal_Name());
         TableId := Context.GetIntegerParameter(ParamTableID_Name());
         TableView := Context.GetStringParameter(ParamTableView_Name());
+        OnBeforeRunPage(PageId, RunModal, Sale);
         BusinessLogicRun.RunPage(PageId, RunModal, TableId, TableView);
     end;
 
@@ -90,6 +91,11 @@
                         POSParameterValue.Value := CopyStr(RecRef.GetView(false), 1, MaxStrLen(POSParameterValue.Value));
                     end;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRunPage(PageId: Integer; RunModal: Boolean; Sale: Codeunit "NPR POS Sale")
+    begin
     end;
 
     local procedure ParamTableID_Name(): Text[20]
