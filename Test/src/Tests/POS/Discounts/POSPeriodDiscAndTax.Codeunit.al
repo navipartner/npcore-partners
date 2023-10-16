@@ -3,6 +3,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
     // [Feature] POS Periodic Discount
     Subtype = Test;
     EventSubscriberInstance = Manual;
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnRun()
     begin

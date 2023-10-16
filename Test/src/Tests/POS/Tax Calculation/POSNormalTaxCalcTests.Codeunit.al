@@ -3,6 +3,7 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
     // // [Feature] POS Active Normal and Reverse Charge Tax Calculation
     Subtype = Test;
     EventSubscriberInstance = Manual;
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnRun()
     begin

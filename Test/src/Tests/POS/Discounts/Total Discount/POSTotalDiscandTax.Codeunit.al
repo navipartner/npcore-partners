@@ -3,7 +3,7 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
     // [Feature] POS Total Discount
     Subtype = Test;
     EventSubscriberInstance = Manual;
-
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnRun()
     begin

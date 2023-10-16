@@ -3,6 +3,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
     // [Feature] POS Quantity Discount
     Subtype = Test;
     EventSubscriberInstance = Manual;
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnRun()
     begin
