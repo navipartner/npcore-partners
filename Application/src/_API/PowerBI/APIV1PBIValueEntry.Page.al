@@ -153,6 +153,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Last Modified Date', Locked = true;
                 }
+                field(invoicedQuantity; Rec."Invoiced Quantity")
+                {
+                    Caption = 'Invoiced Quantity', Locked = true;
+                }
             }
         }
     }
