@@ -18,6 +18,8 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";
         POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -26,7 +28,6 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
         i: Integer;
         ClearPOSInfo: Boolean;
         UserInputString: Text;
-
     begin
         //[Scenario] Apply POS info action on a sigle line in multiple lines POS Sale and check the result.
 
@@ -44,20 +45,23 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
         end;
 
         // [When] Apply POS info action on single line
+        POSSale.GetCurrentSale(SalePOS);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         POSInfo.Get('INVTEXT');
         ApplicationScope := ApplicationScope::"All Lines";
         ClearPOSInfo := false;
-        POSActionBusinessLogic.OpenPOSInfoPage(POSInfo, POSSession, UserInputString, ApplicationScope, ClearPOSInfo);
+        POSActionBusinessLogic.OpenPOSInfoPage(SalePOS, SaleLinePOS, POSInfo, UserInputString, ApplicationScope, ClearPOSInfo);
 
         // [Then] Check if the all lines have applied POS Info transactions
-        SaleLinePOS.SetRange("Register No.", POSUnit."No.");
-        SaleLinePOS.SetRange("Date", WorkDate());
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if SaleLinePOS.Findset() then
             repeat
-                POSInfoTransaction.SetRange("Register No.", POSUnit."No.");
-                POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
+                POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
+                POSInfoTransaction.SetRange("Register No.", SaleLinePOS."Register No.");
                 POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-                POSInfoTransaction.SetRange("Sale Date", WorkDate());
+                POSInfoTransaction.SetRange("Sales Line No.", SaleLinePOS."Line No.");
                 POSInfoTransaction.FindFirst();
                 Assert.AreEqual(POSInfoTransaction."POS Info Code", 'INVTEXT', 'ApplyPOSInfoActionOnSaleLines');
             until SaleLinePOS.Next() = 0;
@@ -70,5 +74,4 @@ codeunit 85109 "NPR POS Action: POS Info Tests"
     begin
         Assert.AreEqual(Message, POSInfoMessage, 'MessageHandler');
     end;
-
 }
