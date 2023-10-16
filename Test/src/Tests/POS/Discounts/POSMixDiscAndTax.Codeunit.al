@@ -3,7 +3,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
     // [Feature] POS Mixed Discount
     Subtype = Test;
     EventSubscriberInstance = Manual;
-
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnRun()
     begin
