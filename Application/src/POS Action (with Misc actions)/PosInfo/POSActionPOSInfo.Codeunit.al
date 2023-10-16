@@ -42,26 +42,46 @@ codeunit 6150829 "NPR POS Action: POS Info" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         POSInfo: Record "NPR POS Info";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        CurrentView: Codeunit "NPR POS View";
         POSsession: Codeunit "NPR POS Session";
         BusinessLogicRun: Codeunit "NPR POS Action: POS Info-B";
         ApplicationScope: Option " ","Current Line","All Lines","New Lines","Ask";
         UserInputString: Text;
         ClearPOSInfo: Boolean;
+        WrongViewErr: Label 'The POS action can only be run in POS Sale or Payment view.';
     begin
-
         POSInfo.Get(Context.GetStringParameter('POSInfoCode'));
 
         case Step of
             'SelectPosInfo':
-                if AddInfoRequired(PosInfo, Context) then
-                    exit;
+                begin
+                    POSSession.GetCurrentView(CurrentView);
+                    if not (CurrentView.GetType() in [CurrentView.GetType() ::Sale, CurrentView.GetType() ::Payment]) then
+                        Error(WrongViewErr);
+                    if AddInfoRequired(PosInfo, Context) then
+                        exit;
+                end;
             'ValidateUserInput':
                 UserInputString := ValidateUserInput(POSInfo, Context);
         end;
 
         ApplicationScope := Context.GetIntegerParameter('ApplicationScope');
         ClearPOSInfo := Context.GetBooleanParameter('ClearPOSInfo');
-        BusinessLogicRun.OpenPOSInfoPage(POSInfo, POSSession, UserInputString, ApplicationScope, ClearPOSInfo);
+
+        Sale.GetCurrentSale(SalePOS);
+
+        POSSession.GetCurrentView(CurrentView);
+        case CurrentView.GetType() of
+            CurrentView.GetType() ::Sale:
+                SaleLine.GetCurrentSaleLine(SaleLinePOS);
+            CurrentView.GetType() ::Payment:
+                PaymentLine.GetCurrentPaymentLine(SaleLinePOS);
+        end;
+
+        if BusinessLogicRun.OpenPOSInfoPage(SalePOS, SaleLinePOS, POSInfo, UserInputString, ApplicationScope, ClearPOSInfo) then
+            POSsession.RequestFullRefresh();
     end;
 
     local procedure AddInfoRequired(PosInfo: Record "NPR POS Info"; Context: Codeunit "NPR POS JSON Helper"): Boolean
