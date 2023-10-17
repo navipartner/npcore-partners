@@ -11,97 +11,171 @@
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
 
     trigger OnInstallAppPerCompany()
     begin
-        AddAllowedTables();
+        AddAllowedTables(true);
     end;
 
-    procedure AddAllowedTables()
-    var
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+    procedure AddAllowedTables(IsUpgrade: Boolean)
     begin
         // if you add a new table here, also update codeunit 6059926 "NPR Retail Logs Delete"
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Reten. Pol. Install', 'AddAllowedTables');
+        if IsUpgrade then
+            LogMessageStopwatch.LogStart(CompanyName(), 'NPR Reten. Pol. Install', 'AddAllowedTables');
 
         // if additional filters are needed on record, see codeunit 3999 procedure AddChangeLogEntryToAllowedTables() in Base App
         // if want to use Data Archive when deleting the record, also update codeunit 6059927 "NPR Reten. Pol. Data Archive"
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install")) then begin
-            AddAllowedTable(Database::"NPR Nc Task", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
 
-            AddAllowedTable(Database::"NPR Data Log Record", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR Data Log Field", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
+        AddDefaultRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR POS Entry Output Log", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR Nc Import Entry", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+        AddPOSPostingLogRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR NpCs Arch. Document", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+        AddPOSLayoutArchiveRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR NpGp POS Sales Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR Tax Free Voucher", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddPOSSavedSalesRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR POS Entry Tax Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Period Register", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Entry Sales Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Entry Payment Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR POS Balancing Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddTableListUpdateRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR Replication Error Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR BTF EndPoint Error Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+        AddHeyLoyaltyWebhookRequestsRetentionPolicy(IsUpgrade);
 
-            AddAllowedTable(Database::"NPR MM Admis. Service Entry", Enum::"Retention Period Enum"::"NPR 14 Days", Enum::"Reten. Pol. Deleting"::Default);
+        AddM2RecordChangeLogTableRetentionPolicy(IsUpgrade);
+
+        AddNPRERetentionPolicy(IsUpgrade);
+
+        if IsUpgrade then
+            LogMessageStopwatch.LogFinish();
+    end;
+
+
+    local procedure AddDefaultRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install") then
+                exit;
+
+        AddAllowedTable(Database::"NPR Nc Task", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR Data Log Record", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR Data Log Field", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR POS Entry Output Log", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR Nc Import Entry", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR NpCs Arch. Document", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR Exchange Label", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR NpGp POS Sales Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR Tax Free Voucher", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR POS Entry", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR POS Entry Tax Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR POS Period Register", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR POS Entry Sales Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR POS Entry Payment Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR POS Balancing Line", Enum::"Retention Period Enum"::"5 Years", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR Replication Error Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR BTF EndPoint Error Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+
+        AddAllowedTable(Database::"NPR MM Admis. Service Entry", Enum::"Retention Period Enum"::"NPR 14 Days", Enum::"Reten. Pol. Deleting"::Default);
 
 #IF NOT BC17 AND NOT BC18
-            AddAllowedTable(Database::"NPR EFT Receipt", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::"NPR Data Archive");
+        AddAllowedTable(Database::"NPR EFT Receipt", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::"NPR Data Archive");
 #ENDIF
-            // if you add a new table above, also update codeunit 6059926 "NPR Retail Logs Delete"
+        // if you add a new table above, also update codeunit 6059926 "NPR Retail Logs Delete"
 
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install"));
-        end;
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install");
+    end;
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog')) then begin
-            AddAllowedTable(Database::"NPR POS Posting Log", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog'));
-        end;
+    local procedure AddPOSPostingLogRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog') then
+                exit;
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive')) then begin
-            AddAllowedTable(Database::"NPR POS Layout Archive", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::Default);
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive'));
-        end;
+        AddAllowedTable(Database::"NPR POS Posting Log", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales')) then begin
-            AddPosSavedSalesRetentionPolicy();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales'));
-        end;
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSPostingLog');
+    end;
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223')) then begin
-            AddAllowedTable(Database::"NPR EFT Transaction Log", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR EFT Transaction Request", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
-            AddAllowedTable(Database::"NPR Nc Task Output", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223'));
-        end;
+    local procedure AddPOSLayoutArchiveRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive') then
+                exit;
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests')) then begin
-            AddHeyLoyaltyWebhookRequestRetentionPolicy();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests'));
-        end;
+        AddAllowedTable(Database::"NPR POS Layout Archive", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::Default);
 
-        if (not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable'))) then begin
-            AddAllowedTable(Database::"NPR M2 Record Change Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable'));
-        end;
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSLayoutArchive');
+    end;
 
-        if (not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE'))) then begin
-            AddWaiterPadRetentionPolicy();
-            AddWaiterPadPrntLogEntryRetentionPolicy();
-            AddKitchenOrderRetentionPolicy();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE'));
-        end;
+    local procedure AddPOSSavedSalesRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales') then
+                exit;
 
-        LogMessageStopwatch.LogFinish();
+        AddPosSavedSalesRetentionPolicy();
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'POSSavedSales');
+    end;
+
+    local procedure AddTableListUpdateRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223') then
+                exit;
+
+        AddAllowedTable(Database::"NPR EFT Transaction Log", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR EFT Transaction Request", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR Nc Task Output", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223');
+    end;
+
+    local procedure AddHeyLoyaltyWebhookRequestsRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests') then
+                exit;
+
+        AddHeyLoyaltyWebhookRequestRetentionPolicy();
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests');
+    end;
+
+    local procedure AddM2RecordChangeLogTableRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable') then
+                exit;
+
+        AddAllowedTable(Database::"NPR M2 Record Change Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'M2RecordChangeLogTable');
+    end;
+
+    local procedure AddNPRERetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE') then
+                exit;
+
+        AddWaiterPadRetentionPolicy();
+        AddWaiterPadPrntLogEntryRetentionPolicy();
+        AddKitchenOrderRetentionPolicy();
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE');
     end;
 
     local procedure AddAllowedTable(TableId: Integer; RtnPeriodEnum: Enum "Retention Period Enum"; RetenPolDeleting: Enum "Reten. Pol. Deleting")
@@ -369,12 +443,32 @@
         CreateRetentionPolicySetup(Database::"NPR NPRE Kitchen Order", GetRetentionPeriodCode(RtnPeriodEnum), SetupProxy.KDSActivatedForAnyRestaurant(), false);
     end;
 
+    local procedure HasUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text): Boolean
+    begin
+        exit(UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID, UpgradeStep)));
+    end;
+
+    local procedure HasUpgradeTag(UpgradeCodeunitID: Integer): Boolean
+    begin
+        exit(UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID)));
+    end;
+
+    local procedure SetUpgradeTag(UpgradeCodeunitID: Integer; UpgradeStep: Text)
+    begin
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID, UpgradeStep))
+    end;
+
+    local procedure SetUpgradeTag(UpgradeCodeunitID: Integer)
+    begin
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID));
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]
     local procedure AddAllowedTablesOnBeforeCompanyInit()
     var
         SystemInitialization: Codeunit "System Initialization";
     begin
         if SystemInitialization.IsInProgress() then
-            AddAllowedTables();
+            AddAllowedTables(true);
     end;
 }
