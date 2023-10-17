@@ -1,6 +1,6 @@
 ﻿page 6059970 "NPR Variety Setup"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Variety Setup';
     ContextSensitiveHelpPage = 'docs/retail/varieties/how-to/create_variety/';
     PageType = Card;
