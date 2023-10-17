@@ -1,13 +1,17 @@
-﻿codeunit 6151303 "NPR NpEc S.Order Import Create"
+﻿codeunit 6151303 "NPR NpEc S.Order Import Create" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
+    begin
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         Document: XmlDocument;
     begin
-        if Load(Rec, Document) then
+        if Load(ImportEntry, Document) then
             ImportSalesOrders(Document);
     end;
 

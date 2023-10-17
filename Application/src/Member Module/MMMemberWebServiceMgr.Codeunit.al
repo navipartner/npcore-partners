@@ -1,17 +1,20 @@
-﻿codeunit 6060129 "NPR MM Member WebService Mgr"
+﻿codeunit 6060129 "NPR MM Member WebService Mgr" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
-
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
+    begin
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         XmlDoc: XmlDocument;
         FunctionName: Text[100];
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        if (Rec.LoadXmlDoc(XmlDoc)) then begin
+        if (ImportEntry.LoadXmlDoc(XmlDoc)) then begin
 
             Commit();
             ClearNstCache(XmlDoc);
@@ -21,53 +24,53 @@
                 MemberInfoCapture.FindLast();
             end;
 
-            FunctionName := GetWebServiceFunction(Rec."Import Type");
+            FunctionName := GetWebServiceFunction(ImportEntry."Import Type");
             case FunctionName of
                 'CreateMembership':
-                    ImportCreateMemberships(XmlDoc, Rec."Document ID");
+                    ImportCreateMemberships(XmlDoc, ImportEntry."Document ID");
 
                 'ConfirmMembershipPayment':
-                    ImportConfirmMemberships(XmlDoc, Rec."Document ID");
+                    ImportConfirmMemberships(XmlDoc, ImportEntry."Document ID");
                 'AddMembershipMember':
-                    ImportAddMembershipMembers(XmlDoc, Rec."Document ID");
+                    ImportAddMembershipMembers(XmlDoc, ImportEntry."Document ID");
                 'AddAnonymousMember':
-                    ImportAddAnonymousMembers(XmlDoc, Rec."Document ID");
+                    ImportAddAnonymousMembers(XmlDoc, ImportEntry."Document ID");
                 'GetMembership':
-                    ImportGetMemberships(XmlDoc, Rec."Document ID");
+                    ImportGetMemberships(XmlDoc, ImportEntry."Document ID");
 
                 'GetMembershipTicketList':
-                    ImportGetMembershipTicketList(XmlDoc, Rec."Document ID");
+                    ImportGetMembershipTicketList(XmlDoc, ImportEntry."Document ID");
                 'GetMembershipMembers':
-                    ImportGetMembershipMembers(XmlDoc, Rec."Document ID");
+                    ImportGetMembershipMembers(XmlDoc, ImportEntry."Document ID");
                 'UpdateMember':
-                    ImportUpdateMembers(XmlDoc, Rec."Document ID");
+                    ImportUpdateMembers(XmlDoc, ImportEntry."Document ID");
                 'AddReplaceCard':
-                    ImportAddReplaceCard(XmlDoc, Rec."Document ID");
+                    ImportAddReplaceCard(XmlDoc, ImportEntry."Document ID");
 
                 'BlockMembership':
-                    ImportBlockMemberships(XmlDoc, Rec."Document ID");
+                    ImportBlockMemberships(XmlDoc, ImportEntry."Document ID");
                 'BlockMember':
-                    ImportBlockMembers(XmlDoc, Rec."Document ID");
+                    ImportBlockMembers(XmlDoc, ImportEntry."Document ID");
 
                 'ChangeMembership':
-                    ImportChangeMemberships(XmlDoc, Rec."Document ID");
+                    ImportChangeMemberships(XmlDoc, ImportEntry."Document ID");
                 'GetMembershipChangeItemsList':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'getchangemembershiplist/request');
+                    ImportGetChangeMembershipList(XmlDoc, ImportEntry."Document ID", 'getchangemembershiplist/request');
                 'RegretMembership':
-                    ImportRegretMemberships(XmlDoc, Rec."Document ID");
+                    ImportRegretMemberships(XmlDoc, ImportEntry."Document ID");
 
                 'GetMembershipAutoRenewProduct':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'getautorenewproduct/request'); // Same filter implementation as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, ImportEntry."Document ID", 'getautorenewproduct/request'); // Same filter implementation as for GetMembershipChangeItemsList
                 'ConfirmAutoRenewPayment':
-                    ImportGetChangeMembershipList(XmlDoc, Rec."Document ID", 'confirmautorenewpayment/request'); // Same filter implementation as for GetMembershipChangeItemsList
+                    ImportGetChangeMembershipList(XmlDoc, ImportEntry."Document ID", 'confirmautorenewpayment/request'); // Same filter implementation as for GetMembershipChangeItemsList
 
                 'SetGDPRApproval':
-                    ImportGdprApproval(XmlDoc, Rec."Document ID");
+                    ImportGdprApproval(XmlDoc, ImportEntry."Document ID");
                 'GetMembershipRoles':
-                    ImportGetMembershipMembers(XmlDoc, Rec."Document ID"); // Same as GetMembershipMembers
+                    ImportGetMembershipMembers(XmlDoc, ImportEntry."Document ID"); // Same as GetMembershipMembers
 
                 'CreateWalletMemberPass':
-                    CreateWallet(XmlDoc, Rec."Document ID");
+                    CreateWallet(XmlDoc, ImportEntry."Document ID");
 
                 'GetSetAutoRenewOption':
                     ; // Do nothing, handled by xmlport
@@ -77,7 +80,7 @@
                 'SearchMembers':
                     ; // Do nothing, handled by xmlport */
                 else
-                    Error(MISSING_CASE, Rec."Import Type", FunctionName);
+                    Error(MISSING_CASE, ImportEntry."Import Type", FunctionName);
             end;
 
             ClearLastError();

@@ -1,11 +1,10 @@
-codeunit 6014622 "NPR Replication Import Entry"
+codeunit 6014622 "NPR Replication Import Entry" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     begin
-        ProcessImportEntry(Rec);
     end;
 
     var
@@ -13,6 +12,11 @@ codeunit 6014622 "NPR Replication Import Entry"
         RecIDToRecordLb: Label 'Content from field %1 (%2%3) can''t be fetched to Record.', Comment = '%1=ImportEntry.FieldName("Document ID");%2=ImportEntry.TableCaption();%3=ImportEntry."Entry No."';
         UnexpectedRecordLbl: Label 'Expected record %1 in the %2 (%3:%4).', Comment = '%1=ServiceEndPoint.TableName();%2=ImportEntry.FieldName("Document ID");%3=ImportEntry.TableCaption();%4=ImportEntry."Entry No."';
         EmptyContentLbl: Label 'Nothing to process. Empty content in a field %1 (%2%3)', Comment = '%1=ImportEntry.FieldName("Document Source");%2=ImportEntry.TableCaption();%3=ImportEntry."Entry No."';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    begin
+        ProcessImportEntry(ImportEntry);
+    end;
 
     local procedure ProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var

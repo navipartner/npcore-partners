@@ -257,7 +257,7 @@ codeunit 6014641 "NPR BTF Service API"
         ImportType.Init();
         ImportType.Description := Copystr(ImportTypeDesc, 1, MaxStrLen(ImportType.Description));
         ImportType."Import List Update Handler" := ImportListUpdateHandler;
-        ImportType."Import Codeunit ID" := Codeunit::"NPR BTF Nc Import Entry";
+        ImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Btwentyfour";
         ImportType.Insert(true);
     end;
 

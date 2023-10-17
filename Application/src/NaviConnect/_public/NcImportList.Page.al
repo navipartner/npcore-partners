@@ -388,7 +388,6 @@
     var
         NoInputTxt: Label 'No Input';
         ScheduleForReImportQst: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?', Comment = '%1="NPR Nc Import Entry".Count()';
-        NoDocsMsg: Label 'No Documents';
         NoOfImportedDoscMsg: Label '%1 Documents have been imported\\%2 Documents failed.', Comment = '%1=ImportedCount;%2=ImportEntry.Count()';
         WebClient: Boolean;
         ImportFileTxt: Label 'Import File';
@@ -474,11 +473,12 @@
     local procedure RunDocuments()
     var
         ImportType: Record "NPR Nc Import Type";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ILookup: Interface "NPR Nc Import List ILookup";
     begin
         ImportType.Get(Rec."Import Type");
-        ImportType.TestField("Lookup Codeunit ID");
-        if not (CODEUNIT.Run(ImportType."Lookup Codeunit ID", Rec)) then
-            Message(NoDocsMsg);
+        if NcDependencyFactory.CreateNCImportListILookup(ILookup, ImportType) then
+            ILookup.RunLookupImportEntry(Rec);
     end;
 
     local procedure ShowDocumentSource()

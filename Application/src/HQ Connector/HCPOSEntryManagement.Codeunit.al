@@ -1,4 +1,4 @@
-﻿codeunit 6150915 "NPR HC POS Entry Management"
+﻿codeunit 6150915 "NPR HC POS Entry Management" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     ObsoleteState = Pending;
@@ -8,15 +8,21 @@
 
     trigger OnRun()
     var
-        Document: XmlDocument;
     begin
-        if Rec.LoadXmlDoc(Document) then
-            ProcessPOSTransaction(Document);
+
     end;
 
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         Text001: Label '%1 with %2: %3 and %4: %5 was already inserted.';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
+        Document: XmlDocument;
+    begin
+        if ImportEntry.LoadXmlDoc(Document) then
+            ProcessPOSTransaction(Document);
+    end;
 
     local procedure ProcessPOSTransaction(Document: XmlDocument)
     var

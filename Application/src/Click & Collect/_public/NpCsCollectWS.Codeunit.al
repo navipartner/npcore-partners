@@ -192,13 +192,10 @@
 
     local procedure InitSalesDocImportType(var NcImportType: Record "NPR Nc Import Type")
     var
-        SalesDocCodeunitId: Integer;
         "Code": Code[20];
     begin
-        SalesDocCodeunitId := CODEUNIT::"NPR NpCs Imp. Sales Doc.";
-
         Clear(NcImportType);
-        NcImportType.SetRange("Import Codeunit ID", SalesDocCodeunitId);
+        NcImportType.SetRange("Import List Process Handler", Enum::"NPR Nc IL Process Handler"::"Collect Sales Document");
         if NcImportType.FindFirst() then
             exit;
 
@@ -215,8 +212,8 @@
         NcImportType.Init();
         NcImportType.Code := Code;
         NcImportType.Description := CopyStr(Text000, 1, MaxStrLen(NcImportType.Description));
-        NcImportType."Import Codeunit ID" := SalesDocCodeunitId;
-        NcImportType."Lookup Codeunit ID" := CODEUNIT::"NPR NpCs Lookup Sales Document";
+        NcImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Collect Sales Document";
+        NcImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"NpCs Lookup Sales Document";
         NcImportType."Webservice Enabled" := true;
         NcImportType."Webservice Codeunit ID" := Codeunit::"NPR NpCs Collect WS";
         NcImportType.Insert(true);

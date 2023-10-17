@@ -1219,6 +1219,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ILookup: interface "NPR Nc Import List ILookup";
     begin
         // [Scenario] Lookup sales order
 
@@ -1261,8 +1263,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         Commit();
 
         // [When] Lookup sales order
-        Codeunit.Run(ImportType."Lookup Codeunit ID", ImportEntry);
-
+        if NcDependencyFactory.CreateNCImportListILookup(ILookup, ImportType) then
+            ILookup.RunLookupImportEntry(ImportEntry);
         // [Then] Handle sales order page
     end;
 
@@ -1712,6 +1714,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ILookup: interface "NPR Nc Import List ILookup";
     begin
         // [Scenario] Load purchase invoice
 
@@ -1747,7 +1751,8 @@ codeunit 85008 "NPR E-Commerce Tests"
         Commit();
 
         // [When] Lookup purchase invoice
-        Codeunit.Run(ImportType."Lookup Codeunit ID", ImportEntry);
+        if NcDependencyFactory.CreateNCImportListILookup(ILookup, ImportType) then
+            ILookup.RunLookupImportEntry(ImportEntry);
 
         // [Then] Handle purchase invoice page        
     end;
