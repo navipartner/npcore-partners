@@ -23,7 +23,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionLogin.js###
-'let main=async({workflow:r,context:l})=>{debugger;let e=await r.respond("prepareWorkflow");const a=e.preWorkflows;if(a)for(const o of Object.entries(a)){let[t,s]=o;if(t){let{mainParameters:m,customParameters:f}=s;await r.run(t,{context:{customParameters:f},parameters:m})}}e.workflowName!=""&&(e.workflowName=="START_POS"?await r.run(e.workflowName):await r.run(e.workflowName,{parameters:e.parameters}))};'
+'let main=async({workflow:r,context:o})=>{debugger;let e=await r.respond("prepareWorkflow");const a=e.preWorkflows;if(e.workflowName==""){await processPreWorkflows(a);return}if(e.workflowName=="START_POS"){const{posStarted:t}=await r.run(e.workflowName);t&&await processPreWorkflows(a)}else await r.run(e.workflowName,{parameters:e.parameters})};async function processPreWorkflows(r){if(r)for(const o of Object.entries(r)){let[e,a]=o;if(e){let{mainParameters:t,customParameters:s}=a;await workflow.run(e,{context:{customParameters:s},parameters:t})}}}'
         )
     end;
 
