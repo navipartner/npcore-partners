@@ -616,9 +616,9 @@
         ImportType."Webservice Function" := FunctionName;
 
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := Codeunit::"NPR TM Ticket WebService Mgr";
+        ImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"TM Ticket WebService Mgr";
         ImportType."Webservice Codeunit ID" := Codeunit::"NPR TM Ticket WebService";
-        ImportType."Lookup Codeunit ID" := Codeunit::"NPR TM View Ticket Requests";
+        ImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"TM View Ticket Requests";
 
         ImportType.Actionable := false;
 

@@ -1,14 +1,19 @@
-﻿codeunit 6151326 "NPR NpEc P.Invoice Look."
+﻿codeunit 6151326 "NPR NpEc P.Invoice Look." implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
+    begin
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
         TempPurchHeader: Record "Purchase Header" temporary;
         TempPurchInvHeader: Record "Purch. Inv. Header" temporary;
     begin
-        if not GetInvoiceDocuments(Rec, TempPurchHeader, TempPurchInvHeader) then
+        if not GetInvoiceDocuments(ImportEntry, TempPurchHeader, TempPurchInvHeader) then
             exit;
 
         if RunPagePurchInvoice(TempPurchHeader) then

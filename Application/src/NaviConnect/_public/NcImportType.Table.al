@@ -31,6 +31,9 @@
             Description = 'NC2.12';
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Use interface NPR Nc Import List ILookup instead';
         }
         field(20; "Import Codeunit ID"; Integer)
         {
@@ -39,6 +42,9 @@
             Description = 'NC2.12';
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Use interface NPR Nc Import List IProcess instead';
         }
         field(100; "Webservice Enabled"; Boolean)
         {
@@ -238,10 +244,35 @@
                     "Ftp Enabled" := false;
             end;
         }
+
         field(610; "Background Session Reschedule"; Boolean)
         {
             Caption = 'Background Session Reschedule';
             DataClassification = CustomerContent;
+        }
+
+        field(620; "Import List Process Handler"; Enum "NPR Nc IL Process Handler")
+        {
+            Caption = 'Import List Process Handler';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Import List Process Handler" <> "Import List Process Handler"::Default then
+                    "Import Codeunit ID" := 0;
+            end;
+        }
+
+        field(621; "Import List Lookup Handler"; Enum "NPR Nc IL Lookup Handler")
+        {
+            Caption = 'Import List Lookup Handler';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Import List Lookup Handler" <> "Import List Lookup Handler"::Default then
+                    "Lookup Codeunit ID" := 0;
+            end;
         }
     }
 

@@ -1,14 +1,11 @@
-﻿codeunit 6151420 "NPR Magento Imp. Ret. Order"
+﻿codeunit 6151420 "NPR Magento Imp. Ret. Order" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        XmlDoc: XmlDocument;
     begin
-        if Rec.LoadXmlDoc(XmlDoc) then
-            ImportSalesReturnOrders(XmlDoc);
     end;
 
     var
@@ -20,6 +17,14 @@
         Initialized: Boolean;
         Error001: Label 'Xml Element sell_to_customer is missing';
         Error002: Label 'Item %1 does not exist in %2';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
+        XmlDoc: XmlDocument;
+    begin
+        if ImportEntry.LoadXmlDoc(XmlDoc) then
+            ImportSalesReturnOrders(XmlDoc);
+    end;
 
     local procedure ImportSalesReturnOrders(XmlDoc: XmlDocument)
     var

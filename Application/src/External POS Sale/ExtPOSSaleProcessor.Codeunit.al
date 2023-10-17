@@ -1,4 +1,4 @@
-codeunit 6014625 "NPR Ext. POS Sale Processor"
+codeunit 6014625 "NPR Ext. POS Sale Processor" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
@@ -14,7 +14,11 @@ codeunit 6014625 "NPR Ext. POS Sale Processor"
 
     trigger OnRun()
     begin
-        ProcessImportEntry(Rec);
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    begin
+        ProcessImportEntry(ImportEntry);
     end;
 
     local procedure ProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
@@ -66,8 +70,8 @@ codeunit 6014625 "NPR Ext. POS Sale Processor"
         ImportType.Code := ImportTypeCode;
         ImportType.Description := Copystr(ImportTypeDescriptionLbl, 1, MaxStrLen(ImportType.Description));
         ImportType."Import List Update Handler" := ImportType."Import List Update Handler"::ExternalPOSSale;
-        ImportType."Import Codeunit ID" := Codeunit::"NPR Ext. POS Sale Processor";
-        ImportType."Lookup Codeunit ID" := Codeunit::"NPR Ext. POS Sale Lookup";
+        ImportType."Import List Process Handler" := ENUM::"NPR Nc IL Process Handler"::"External POS Sale";
+        ImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"External POS Sale Lookup";
         ImportType."Keep Import Entries for" := 7 * 24 * 60 * 60 * 1000; // 7 days
         ImportType.Insert(true);
     end;

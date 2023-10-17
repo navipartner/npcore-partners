@@ -109,7 +109,7 @@
         ImportType."Webservice Function" := FunctionName;
 
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := CODEUNIT::"NPR Endpoint Query WS Mgr";
+        ImportType."Import List Process Handler" := ENUM::"NPR Nc IL Process Handler"::"Endpoint Query WS Mgr";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Endpoint Query WebService";
 
         ImportType.Insert();

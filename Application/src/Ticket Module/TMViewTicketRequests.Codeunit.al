@@ -1,4 +1,4 @@
-﻿codeunit 6060125 "NPR TM View Ticket Requests"
+﻿codeunit 6060125 "NPR TM View Ticket Requests" implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     // #280133/BHR/20170609 CASE 280133 View Ticket from Import list (document function)
@@ -7,7 +7,11 @@
 
     trigger OnRun()
     begin
-        GetTicketReservation(Rec);
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    begin
+        GetTicketReservation(ImportEntry);
     end;
 
     local procedure GetTicketReservation(NcImportEntry: Record "NPR Nc Import Entry")

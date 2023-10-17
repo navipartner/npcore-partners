@@ -99,7 +99,7 @@
         ImportType.Description := Description;
         ImportType."Webservice Function" := FunctionName;
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := CODEUNIT::"NPR Item Wksht. WebService Mgr";
+        ImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Item Wksht. WebService Mgr";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Item Wksht. WebService";
         ImportType.Insert();
     end;

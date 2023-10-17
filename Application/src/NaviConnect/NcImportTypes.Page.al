@@ -40,16 +40,14 @@
                     ToolTip = 'Specifies the value of the Keep Import Entries for field';
                     ApplicationArea = NPRNaviConnect;
                 }
-                field("Import Codeunit ID"; Rec."Import Codeunit ID")
+                field("Import List Process Handler"; Rec."Import List Process Handler")
                 {
-
-                    ToolTip = 'Specifies the value of the Import Codeunit ID field';
+                    ToolTip = 'Specifies the process handler, which will be used to process the import list entry.';
                     ApplicationArea = NPRNaviConnect;
                 }
-                field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
+                field("Import List Lookup Handler"; Rec."Import List Lookup Handler")
                 {
-
-                    ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
+                    ToolTip = 'Specifies the process handler, which will be used to lookup created entries.';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Webservice Enabled"; Rec."Webservice Enabled")
@@ -98,7 +96,7 @@
                     ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                     Visible = false;
                 }
-                field("Sftp"; Rec.Sftp)
+                field(Sftp; Rec.Sftp)
                 {
                     ToolTip = 'Specifies the value of the Sftp field';
                     ApplicationArea = NPRNaviConnect;

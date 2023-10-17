@@ -170,7 +170,7 @@
         NcImportType.Code := CopyStr(Webservicefunction, 1, MaxStrLen(NcImportType.Code));
         NcImportType.Description := CopyStr(Webservicefunction, 1, MaxStrLen(NcImportType.Description));
         NcImportType."Keep Import Entries for" := 7 * 24 * 60 * 60 * 1000; //7 days
-        NcImportType."Import Codeunit ID" := CodeunitNo;
+        NcImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"HC POS Entry Management";
         NcImportType."Webservice Enabled" := true;
         NcImportType."Webservice Codeunit ID" := CodeunitNo;
         NcImportType."Webservice Function" := Webservicefunction;

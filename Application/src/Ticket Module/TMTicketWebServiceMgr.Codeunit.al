@@ -1,25 +1,35 @@
-﻿codeunit 6060116 "NPR TM Ticket WebService Mgr"
+﻿codeunit 6060116 "NPR TM Ticket WebService Mgr" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
-
     trigger OnRun()
+    begin
+
+    end;
+
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %2 state.';
+        MISSING_CASE: Label 'No handler for %1 [%2].';
+        MUST_BE_POSITIVE: Label 'Quantity must be positive.';
+        INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         XmlDoc: XmlDocument;
         FunctionName: Text[100];
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-
         Commit();
 
-        if (Rec.LoadXmlDoc(XmlDoc)) then begin
-            FunctionName := GetWebServiceFunction(Rec."Import Type");
+        if (ImportEntry.LoadXmlDoc(XmlDoc)) then begin
+            FunctionName := GetWebServiceFunction(ImportEntry."Import Type");
             TicketRequestManager.LockResources(FunctionName);
             case FunctionName of
                 'MakeTicketReservation':
-                    ImportTicketReservations(XmlDoc, Rec."Document ID");
+                    ImportTicketReservations(XmlDoc, ImportEntry."Document ID");
                 'ReserveConfirmArrive':
-                    ImportTicketReservationConfirmArriveDoc(XmlDoc, Rec."Document ID");
+                    ImportTicketReservationConfirmArriveDoc(XmlDoc, ImportEntry."Document ID");
                 'PreConfirmReservation':
                     ImportTicketPreConfirmation(XmlDoc);
                 'CancelReservation':
@@ -31,30 +41,23 @@
                     ImportTicketAttributes(XmlDoc);
 
                 'GetTicketChangeRequest':
-                    ImportTicketChangeRequest(XmlDoc, Rec."Document ID");
+                    ImportTicketChangeRequest(XmlDoc, ImportEntry."Document ID");
                 'ConfirmTicketChangeRequest':
-                    ImportTicketConfirmChangeRequest(XmlDoc, Rec."Document ID");
+                    ImportTicketConfirmChangeRequest(XmlDoc, ImportEntry."Document ID");
 
                 'RevokeTicketRequest':
-                    ImportTicketRevokeRequest(XmlDoc, Rec."Document ID");
+                    ImportTicketRevokeRequest(XmlDoc, ImportEntry."Document ID");
                 'ConfirmRevokeRequest':
                     ImportTicketConfirmRevokeRequest(XmlDoc);
 
                 else
-                    Error(MISSING_CASE, Rec."Import Type", FunctionName);
+                    Error(MISSING_CASE, ImportEntry."Import Type", FunctionName);
             end;
         end;
 
         Commit();
         ClearLastError();
     end;
-
-    var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        TOKEN_INCORRECT_STATE: Label 'The token %1 can''t be changed when in the %2 state.';
-        MISSING_CASE: Label 'No handler for %1 [%2].';
-        MUST_BE_POSITIVE: Label 'Quantity must be positive.';
-        INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
 
     local procedure ImportTicketReservations(Document: XmlDocument; DocumentID: Text[100])
     var

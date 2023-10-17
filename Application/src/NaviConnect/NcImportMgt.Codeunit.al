@@ -56,14 +56,16 @@
     local procedure ProcessImportEntry(var ImportEntry: Record "NPR Nc Import Entry"): Boolean
     var
         ImportType: Record "NPR Nc Import Type";
+        NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        IProcessor: Interface "NPR Nc Import List IProcess";
     begin
         ClearLastError();
         ImportType.Get(ImportEntry."Import Type");
         CleanupImportType(ImportType);
         Commit();
 
-        ImportType.TestField("Import Codeunit ID");
-        CODEUNIT.Run(ImportType."Import Codeunit ID", ImportEntry);
+        if NcDependencyFactory.CreateNCImportListProcessor(IProcessor, ImportType) then
+            IProcessor.RunProcessImportEntry(ImportEntry);
     end;
 
     procedure CleanupImportTypes()
