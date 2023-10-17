@@ -7,6 +7,6 @@ codeunit 6014497 "NPR Reten. Pol. Upgrade"
     var
         RetenPolInstall: Codeunit "NPR Reten. Pol. Install";
     begin
-        RetenPolInstall.AddAllowedTables();
+        RetenPolInstall.AddAllowedTables(true);
     end;
 }
