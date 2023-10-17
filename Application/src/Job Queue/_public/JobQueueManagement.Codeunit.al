@@ -520,6 +520,26 @@
             end;
     end;
 
+    internal procedure ScheduleFeatureFlagReport()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueDescrLbl: Label 'Get Feature Flag Report', MaxLength = 250;
+    begin
+        SetJobTimeout(4, 0);  //4 hours
+
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::codeunit,
+            Codeunit::"NPR Get Feature Flags JQ",
+            '',
+            JobQueueDescrLbl,
+            NowWithDelayInSeconds(360),
+            1,
+            '',
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
+    end;
+
     internal procedure RefreshNPRJobQueueList()
     begin
         OnRefreshNPRJobQueueList();
@@ -754,6 +774,12 @@
     local procedure RunRefreshRetentionPolicyJQ()
     begin
         RefreshRetentionPolicyJQ();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunScheduleFeatureFlagReport()
+    begin
+        ScheduleFeatureFlagReport();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
