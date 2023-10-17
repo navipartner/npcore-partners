@@ -2,7 +2,6 @@
 report 6014466 "NPR NpRv Voucher Cloud"
 {
     Extensible = False;
-    RDLCLayout = './src/_Reports/layouts/NpRv VoucherCloud.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv VoucherCloud.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
@@ -168,7 +167,7 @@ report 6014466 "NPR NpRv Voucher Cloud"
                 Language: Codeunit Language;
             begin
                 BarCodeText := "NpRv Voucher"."Reference No.";
-                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, Enum::"Barcode Symbology"::Code128);
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, Enum::"Barcode Symbology"::Code39, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, false, false));
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
