@@ -1,11 +1,15 @@
-codeunit 6014642 "NPR Ext. POS Sale Lookup"
+codeunit 6014642 "NPR Ext. POS Sale Lookup" implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     begin
-        LookupExtPOSSale(Rec);
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    begin
+        LookupExtPOSSale(ImportEntry);
     end;
 
     local procedure LookupExtPOSSale(ImportEntry: Record "NPR Nc Import Entry")

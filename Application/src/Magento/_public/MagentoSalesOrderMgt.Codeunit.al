@@ -1,17 +1,10 @@
-﻿codeunit 6151413 "NPR Magento Sales Order Mgt."
+﻿codeunit 6151413 "NPR Magento Sales Order Mgt." implements "NPR Nc Import List IProcess"
 {
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        XmlDoc: XmlDocument;
     begin
-        CurrImportEntry := Rec;
-        Clear(CurrImportType);
-        if CurrImportType.Get(CurrImportEntry."Import Type") then;
-
-        if Rec.LoadXmlDoc(XmlDoc) then
-            ImportSalesOrders(XmlDoc);
     end;
 
     var
@@ -33,6 +26,18 @@
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
         Text003: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
+        XmlDoc: XmlDocument;
+    begin
+        CurrImportEntry := ImportEntry;
+        Clear(CurrImportType);
+        if CurrImportType.Get(CurrImportEntry."Import Type") then;
+
+        if ImportEntry.LoadXmlDoc(XmlDoc) then
+            ImportSalesOrders(XmlDoc);
+    end;
 
     local procedure ImportSalesOrders(XmlDoc: XmlDocument)
     var

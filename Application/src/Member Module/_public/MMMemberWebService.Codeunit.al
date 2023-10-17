@@ -1387,7 +1387,7 @@
         ImportType."Webservice Function" := FunctionName;
 
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := Codeunit::"NPR MM Member WebService Mgr";
+        ImportType."Import List Process Handler" := ENUM::"NPR Nc IL Process Handler"::"MM Member WebService Mgr";
         ImportType."Webservice Codeunit ID" := Codeunit::"NPR MM Member WebService";
 
         ImportType.Actionable := false;

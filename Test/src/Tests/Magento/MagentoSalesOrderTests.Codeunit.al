@@ -31,7 +31,7 @@ codeunit 85058 "NPR Magento Sales Order Tests"
         Initialize();
         CreateImportEntry(ImportEntry);
         BindSubscription(SubsriberWithCommit);
-        asserterror MagentoSalesOrderMgt.Run(ImportEntry);
+        asserterror MagentoSalesOrderMgt.RunProcessImportEntry(ImportEntry);
         UnbindSubscription(SubsriberWithCommit);
 
         Assert.IsTrue(

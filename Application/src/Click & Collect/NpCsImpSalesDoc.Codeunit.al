@@ -1,30 +1,11 @@
-﻿codeunit 6151200 "NPR NpCs Imp. Sales Doc."
+﻿codeunit 6151200 "NPR NpCs Imp. Sales Doc." implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        ClickCollect: Codeunit "NPR Click & Collect";
-        Document: XmlDocument;
-        Element: XmlElement;
-        Element2: XmlElement;
-        Handled: Boolean;
     begin
-        if not Rec.LoadXmlDoc(Document) then
-            Error(Text000);
-
-        Document.GetRoot(Element);
-        if Element.IsEmpty() then
-            Error(Text000);
-
-        NpXmlDomMgt.FindElement(Element, '//sales_document', true, Element2);
-
-        ClickCollect.OnBeforeImport(Rec, Element2, Handled);
-
-        if not Handled then
-            ImportSalesDoc(Element2);
     end;
 
     var
@@ -33,6 +14,30 @@
         Text004: Label 'Item %1 could not be mapped in line no. %2';
         Text005: Label 'Order received from Store %1';
         Text006: Label 'Order updated from Store %1 to Store %2';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        ClickCollect: Codeunit "NPR Click & Collect";
+        Document: XmlDocument;
+        Element: XmlElement;
+        Element2: XmlElement;
+        Handled: Boolean;
+    begin
+        if not ImportEntry.LoadXmlDoc(Document) then
+            Error(Text000);
+
+        Document.GetRoot(Element);
+        if Element.IsEmpty() then
+            Error(Text000);
+
+        NpXmlDomMgt.FindElement(Element, '//sales_document', true, Element2);
+
+        ClickCollect.OnBeforeImport(ImportEntry, Element2, Handled);
+
+        if not Handled then
+            ImportSalesDoc(Element2);
+    end;
 
     local procedure ImportSalesDoc(Element: XmlElement)
     var

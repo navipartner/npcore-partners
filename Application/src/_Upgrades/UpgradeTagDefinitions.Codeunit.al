@@ -539,7 +539,11 @@
                     'ClearAccessToken':
                         exit('ClearAccessToken-02102023');
                 end;
-
+            Codeunit::"NPR Upg NC Import List Process":
+                case UpgradeStep of
+                    'UpdateImportTypeFields':
+                        exit('UpdateImportTypeFields-17102023');
+                end;
         end;
     end;
 }

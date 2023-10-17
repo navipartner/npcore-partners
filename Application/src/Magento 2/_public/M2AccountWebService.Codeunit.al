@@ -643,7 +643,6 @@
         ImportType."Webservice Function" := FunctionName;
 
         ImportType."Webservice Enabled" := true;
-        ImportType."Import Codeunit ID" := CODEUNIT::"NPR M2 Account WebService";
         ImportType."Webservice Codeunit ID" := CODEUNIT::"NPR M2 Account WebService";
         ImportType."Max. Retry Count" := -1;
         ImportType.Actionable := false;

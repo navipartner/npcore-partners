@@ -111,8 +111,8 @@
             NaviConnectImportType.Init();
             NaviConnectImportType.Code := 'ORDER';
             NaviConnectImportType.Description := 'magento_services';
-            NaviConnectImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Sales Order Mgt.";
-            NaviConnectImportType."Lookup Codeunit ID" := CODEUNIT::"NPR Magento Lookup SalesOrder";
+            NaviConnectImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Magento Sales Order";
+            NaviConnectImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"Magento Lookup Sales Order";
             NaviConnectImportType."Webservice Enabled" := true;
             NaviConnectImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Magento Webservice";
             NaviConnectImportType."Webservice Function" := 'ImportSalesOrders';
@@ -122,8 +122,8 @@
                 if not Confirm(Text10050, true) then
                     exit;
             NaviConnectImportType.Description := 'magento_services';
-            NaviConnectImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Sales Order Mgt.";
-            NaviConnectImportType."Lookup Codeunit ID" := CODEUNIT::"NPR Magento Lookup SalesOrder";
+            NaviConnectImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Magento Sales Order";
+            NaviConnectImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"Magento Lookup Sales Order";
             NaviConnectImportType."Webservice Enabled" := true;
             NaviConnectImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Magento Webservice";
             NaviConnectImportType."Webservice Function" := 'ImportSalesOrders';
@@ -140,8 +140,8 @@
             NcImportType.Init();
             NcImportType.Code := 'RETURN_ORD';
             NcImportType.Description := 'magento_services';
-            NcImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Imp. Ret. Order";
-            NcImportType."Lookup Codeunit ID" := CODEUNIT::"NPR Magento Lookup Ret.Order";
+            NcImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Magento Return Order";
+            NcImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"Magento Lookup Return Order";
             NcImportType."Webservice Enabled" := true;
             NcImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Magento Webservice";
             NcImportType."Webservice Function" := 'ImportSalesReturnOrders';
@@ -153,8 +153,8 @@
             if not Confirm(Text10060, true) then
                 exit;
         NcImportType.Description := 'magento_services';
-        NcImportType."Import Codeunit ID" := CODEUNIT::"NPR Magento Imp. Ret. Order";
-        NcImportType."Lookup Codeunit ID" := CODEUNIT::"NPR Magento Lookup Ret.Order";
+        NcImportType."Import List Process Handler" := Enum::"NPR Nc IL Process Handler"::"Magento Return Order";
+        NcImportType."Import List Lookup Handler" := Enum::"NPR Nc IL Lookup Handler"::"Magento Lookup Return Order";
         NcImportType."Webservice Enabled" := true;
         NcImportType."Webservice Codeunit ID" := CODEUNIT::"NPR Magento Webservice";
         NcImportType."Webservice Function" := 'ImportSalesReturnOrders';

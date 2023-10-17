@@ -1,27 +1,34 @@
-﻿codeunit 6060142 "NPR MM Loyalty WebService Mgr"
+﻿codeunit 6060142 "NPR MM Loyalty WebService Mgr" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
-
     TableNo = "NPR Nc Import Entry";
-
     trigger OnRun()
+    begin
+
+    end;
+
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        MEMBERSHIP_NOT_FOUND: Label 'The membership could not be found using the provided search criteria.';
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         XmlDoc: XmlDocument;
         FunctionName: Text[100];
     begin
 
-        if (Rec.LoadXmlDoc(XmlDoc)) then begin
-            FunctionName := GetWebServiceFunction(Rec."Import Type");
+        if (ImportEntry.LoadXmlDoc(XmlDoc)) then begin
+            FunctionName := GetWebServiceFunction(ImportEntry."Import Type");
             case FunctionName of
                 'GetLoyaltyPoints':
-                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
+                    GetLoyaltyPoints(XmlDoc, ImportEntry."Document ID");
                 'GetLoyaltyPointEntries':
-                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
+                    GetLoyaltyPoints(XmlDoc, ImportEntry."Document ID");
                 'GetLoyaltyReceiptList':
-                    GetLoyaltyPoints(XmlDoc, Rec."Document ID");
+                    GetLoyaltyPoints(XmlDoc, ImportEntry."Document ID");
 
                 else
-                    Error('Implementation for %1 %2 missing in codeunit 6060142', Rec."Import Type", FunctionName);
+                    Error('Implementation for %1 %2 missing in codeunit 6060142', ImportEntry."Import Type", FunctionName);
             end;
 
             ClearLastError();
@@ -29,9 +36,6 @@
         end;
     end;
 
-    var
-        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
-        MEMBERSHIP_NOT_FOUND: Label 'The membership could not be found using the provided search criteria.';
 
     local procedure GetLoyaltyPoints(XmlDoc: XmlDocument; DocumentID: Text[100])
     var

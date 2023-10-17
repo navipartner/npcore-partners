@@ -1,14 +1,19 @@
-﻿codeunit 6151421 "NPR Magento Lookup Ret.Order"
+﻿codeunit 6151421 "NPR Magento Lookup Ret.Order" implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
+    begin
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
         TempSalesHeader: Record "Sales Header" temporary;
         TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary;
     begin
-        if not GetReturnOrderDocuments(Rec, TempSalesHeader, TempSalesCrMemoHeader) then
+        if not GetReturnOrderDocuments(ImportEntry, TempSalesHeader, TempSalesCrMemoHeader) then
             exit;
 
         if RunPageReturnOrder(TempSalesHeader) then
@@ -16,6 +21,7 @@
         if RunPageSalesCrMemo(TempSalesCrMemoHeader) then
             exit;
     end;
+
 
     procedure GetReturnOrderDocuments(ImportEntry: Record "NPR Nc Import Entry"; var TempSalesHeader: Record "Sales Header" temporary; var TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary): Boolean
     var

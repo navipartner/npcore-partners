@@ -1,20 +1,24 @@
-﻿codeunit 6060049 "NPR Item Wksht. WebService Mgr"
+﻿codeunit 6060049 "NPR Item Wksht. WebService Mgr" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
+    begin
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         XmlDoc: XmlDocument;
         FunctionName: Text[100];
     begin
-        if LoadDoc(Rec, XmlDoc) then begin
-            FunctionName := GetWebserviceFunction(Rec."Import Type");
+        if LoadDoc(ImportEntry, XmlDoc) then begin
+            FunctionName := GetWebserviceFunction(ImportEntry."Import Type");
             case FunctionName of
                 'CreateItemWorksheetLine':
                     CreateItemWorksheetLines(XmlDoc);
                 else
-                    Error(MissingCaseErr, Rec."Import Type", FunctionName);
+                    Error(MissingCaseErr, ImportEntry."Import Type", FunctionName);
             end;
         end;
     end;

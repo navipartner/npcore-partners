@@ -1,21 +1,26 @@
-﻿codeunit 6014673 "NPR Endpoint Query WS Mgr"
+﻿codeunit 6014673 "NPR Endpoint Query WS Mgr" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
+    begin
+
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         Document: XmlDocument;
         FunctionName: Text[100];
     begin
 
-        if Load(Rec, Document) then begin
-            FunctionName := GetWebserviceFunction(Rec."Import Type");
+        if Load(ImportEntry, Document) then begin
+            FunctionName := GetWebserviceFunction(ImportEntry."Import Type");
             case FunctionName of
                 'Createendpointquery':
                     CreateEndpointQueries(Document);
                 else
-                    Error(MissingCaseErr, Rec."Import Type", FunctionName);
+                    Error(MissingCaseErr, ImportEntry."Import Type", FunctionName);
             end;
 
         end;

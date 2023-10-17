@@ -1,14 +1,19 @@
-﻿codeunit 6151302 "NPR NpEc S.Order Lookup"
+﻿codeunit 6151302 "NPR NpEc S.Order Lookup" implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
+    begin
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
         TempSalesHeader: Record "Sales Header" temporary;
         TempSalesInvHeader: Record "Sales Invoice Header" temporary;
     begin
-        if not GetOrderDocuments(Rec, TempSalesHeader, TempSalesInvHeader) then
+        if not GetOrderDocuments(ImportEntry, TempSalesHeader, TempSalesInvHeader) then
             exit;
 
         if RunPageSalesOrder(TempSalesHeader) then

@@ -42,17 +42,44 @@
                     ToolTip = 'Specifies the value of the Keep Import Entries for field';
                     ApplicationArea = NPRNaviConnect;
                 }
-                field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
+                field("Import List Lookup Handler"; Rec."Import List Lookup Handler")
                 {
-
-                    ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
+                    ToolTip = 'Specifies the process handler, which will be used to lookup created entries.';
                     ApplicationArea = NPRNaviConnect;
+                    trigger OnValidate()
+                    begin
+                        UpdateControls();
+                    end;
                 }
-                field("Import Codeunit ID"; Rec."Import Codeunit ID")
+                group(LookupCodeunit)
                 {
+                    ShowCaption = false;
+                    Visible = IsDefaultLookupHandler;
+                    field("Lookup Codeunit ID"; Rec."Lookup Codeunit ID")
+                    {
 
-                    ToolTip = 'Specifies the value of the Import Codeunit ID field';
+                        ToolTip = 'Specifies the value of the Lookup Codeunit ID field';
+                        ApplicationArea = NPRNaviConnect;
+                    }
+                }
+                field("Import List Process Handler"; Rec."Import List Process Handler")
+                {
+                    ToolTip = 'Specifies the process handler, which will be used to process the import list entry.';
                     ApplicationArea = NPRNaviConnect;
+                    trigger OnValidate()
+                    begin
+                        UpdateControls();
+                    end;
+                }
+                group(ImportCodeunit)
+                {
+                    ShowCaption = false;
+                    Visible = IsDefaultProcessHandler;
+                    field("Import Codeunit ID"; Rec."Import Codeunit ID")
+                    {
+                        ToolTip = 'Specifies the value of the Import Codeunit ID field';
+                        ApplicationArea = NPRNaviConnect;
+                    }
                 }
                 field("Send e-mail on Error"; Rec."Send e-mail on Error")
                 {
@@ -265,7 +292,7 @@
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
-                    field("Sftp"; Rec.Sftp)
+                    field(Sftp; Rec.Sftp)
                     {
 
                         ToolTip = 'Specifies the value of the Sftp field';
@@ -450,6 +477,8 @@
     local procedure UpdateControls()
     begin
         IsDefaultUpdateHandler := Rec."Import List Update Handler" = Rec."Import List Update Handler"::Default;
+        IsDefaultProcessHandler := Rec."Import List Process Handler" = Rec."Import List Process Handler"::Default;
+        IsDefaultLookupHandler := Rec."Import List Lookup Handler" = Rec."Import List Lookup Handler"::Default;
     end;
 
     var
@@ -458,4 +487,6 @@
         OStream: OutStream;
         Request: BigText;
         IsDefaultUpdateHandler: Boolean;
+        IsDefaultProcessHandler: Boolean;
+        IsDefaultLookupHandler: Boolean;
 }

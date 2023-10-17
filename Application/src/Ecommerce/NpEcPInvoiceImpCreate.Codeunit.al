@@ -1,13 +1,18 @@
-﻿codeunit 6151327 "NPR NpEc P.Invoice Imp. Create"
+﻿codeunit 6151327 "NPR NpEc P.Invoice Imp. Create" implements "NPR Nc Import List IProcess"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
+    begin
+    end;
+
+    internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
         Document: XmlDocument;
     begin
-        if Load(Rec, Document) then
+        if Load(ImportEntry, Document) then
             ImportPurchInvoices(Document);
     end;
 

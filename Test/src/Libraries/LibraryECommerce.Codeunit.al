@@ -297,29 +297,28 @@ codeunit 85010 "NPR Library - E-Commerce"
     var
         EcWebService: codeunit "NPR NpEc Webservice";
     begin
-        EcWebService.InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Imp. Delete", CODEUNIT::"NPR NpEc S.Order Lookup", ImportType);
-
+        EcWebService.InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc S.Order Imp. Delete", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", ImportType);
     end;
 
     procedure InitImportTypeCreateSalesOrder(var ImportType: Record "NPR Nc Import Type")
     var
         EcWebService: codeunit "NPR NpEc Webservice";
     begin
-        EcWebService.InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', CreateSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import Create", CODEUNIT::"NPR NpEc S.Order Lookup", ImportType);
+        EcWebService.InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', CreateSalesOrderDescLbl, Enum::"NPR Nc IL Process Handler"::"NpEc S.Order Import Create", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", ImportType);
     end;
 
     procedure InitImportTypePostSalesOrder(var ImportType: Record "NPR Nc Import Type")
     var
         EcWebService: codeunit "NPR NpEc Webservice";
     begin
-        EcWebService.InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import (Post)", CODEUNIT::"NPR NpEc S.Order Lookup", ImportType);
+        EcWebService.InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc S.Order Import (Post)", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", ImportType);
     end;
 
     procedure InitImportTypeCreatePurchInv(var ImportType: Record "NPR Nc Import Type")
     var
         EcWebService: codeunit "NPR NpEc Webservice";
     begin
-        EcWebService.InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, CODEUNIT::"NPR NpEc P.Invoice Imp. Create", CODEUNIT::"NPR NpEc P.Invoice Look.", ImportType);
+        EcWebService.InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc P.Invoice Imp. Create", Enum::"NPR Nc IL Lookup Handler"::"NpEc P.Invoice Look", ImportType);
     end;
 
     procedure InsertImportEntry(ImportType: Record "NPR Nc Import Type"; var ImportEntry: Record "NPR Nc Import Entry")

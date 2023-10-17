@@ -12,7 +12,7 @@
         NcImportType: Record "NPR Nc Import Type";
         OutStr: OutStream;
     begin
-        InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', CreateSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import Create", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
+        InitImportType('CreateSalesOrder', 'CREATE_SALES_ORDER', CreateSalesOrderDescLbl, Enum::"NPR Nc IL Process Handler"::"NpEc S.Order Import Create", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", NcImportType);
 
         InsertImportEntry(NcImportType, ImportEntry);
         sales_orders.Import();
@@ -43,8 +43,7 @@
         NcImportType: Record "NPR Nc Import Type";
         OutStr: OutStream;
     begin
-        InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Import (Post)", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
-
+        InitImportType('PostSalesOrder', 'POST_SALES_ORDER', PostSalesOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc S.Order Import (Post)", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", NcImportType);
         sales_orders.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := sales_orders.GetOrderNo() + '.xml';
@@ -63,8 +62,7 @@
         NcImportType: Record "NPR Nc Import Type";
         OutStr: OutStream;
     begin
-        InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, CODEUNIT::"NPR NpEc S.Order Imp. Delete", CODEUNIT::"NPR NpEc S.Order Lookup", NcImportType);
-
+        InitImportType('DeleteSalesOrder', 'DELETE_SALES_ORDER', DeleteSalesOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc S.Order Imp. Delete", Enum::"NPR Nc IL Lookup Handler"::"NpEc S.Order Lookup", NcImportType);
         sales_orders.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := sales_orders.GetOrderNo() + '.xml';
@@ -83,8 +81,7 @@
         NcImportType: Record "NPR Nc Import Type";
         OutStr: OutStream;
     begin
-        InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, CODEUNIT::"NPR NpEc P.Invoice Imp. Create", CODEUNIT::"NPR NpEc P.Invoice Look.", NcImportType);
-
+        InitImportType('CreatePurchaseInvoice', 'CREATE_PURCH_ORDER', CreatePurchOrderDescLbl, ENUM::"NPR Nc IL Process Handler"::"NpEc P.Invoice Imp. Create", Enum::"NPR Nc IL Lookup Handler"::"NpEc P.Invoice Look", NcImportType);
         purchase_invoices.Import();
         InsertImportEntry(NcImportType, ImportEntry);
         ImportEntry."Document Name" := purchase_invoices.GetInvoiceNo() + '.xml';
@@ -109,6 +106,7 @@
         ImportEntry.Insert(true);
     end;
 
+    [Obsolete('Pending removal use Init Import Type with Enum instead', 'NPR27.0')]
     procedure InitImportType(WebserviceFunction: Text; ImportTypeCode: Code[20]; ImportTypeDescription: Text; ImportCodeunitID: Integer; LookupCodeunitID: Integer; var NcImportType: Record "NPR Nc Import Type")
     var
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
@@ -130,6 +128,34 @@
         NcImportType.Description := CopyStr(ImportTypeDescription, 1, MaxStrLen(ImportTypeCode));
         NcImportType."Import Codeunit ID" := ImportCodeunitID;
         NcImportType."Lookup Codeunit ID" := LookupCodeunitID;
+        NcImportType."Webservice Enabled" := true;
+        NcImportType."Webservice Function" := CopyStr(WebserviceFunction, 1, MaxStrLen(NcImportType."Webservice Function"));
+        NcImportType."Webservice Codeunit ID" := CurrCodeunitId();
+        NcImportType."Keep Import Entries for" := CreateDateTime(Today, 0T) - CreateDateTime(CalcDate('<-90D>', Today), 010000T);
+        NcImportType.Insert(true);
+    end;
+
+    procedure InitImportType(WebserviceFunction: Text; ImportTypeCode: Code[20]; ImportTypeDescription: Text; ILProcessHandler: Enum "NPR Nc IL Process Handler"; ILLookupHandler: Enum "NPR Nc IL Lookup Handler"; var NcImportType: Record "NPR Nc Import Type")
+    var
+        NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
+    begin
+        NcImportType.Code := NcSetupMgt.GetImportTypeCode(CurrCodeunitId(), WebserviceFunction);
+        if (NcImportType.Code <> '') and NcImportType.Find() then
+            exit;
+
+        if NcImportType.Get(ImportTypeCode) then begin
+#pragma warning disable AA0139
+            ImportTypeCode := ImportTypeCode + '1';
+#pragma warning restore
+            while NcImportType.Get(ImportTypeCode) do
+                ImportTypeCode := IncStr(ImportTypeCode);
+        end;
+
+        NcImportType.Init();
+        NcImportType.Code := ImportTypeCode;
+        NcImportType.Description := CopyStr(ImportTypeDescription, 1, MaxStrLen(ImportTypeCode));
+        NcImportType."Import List Process Handler" := ILProcessHandler;
+        NcImportType."Import List Lookup Handler" := ILLookupHandler;
         NcImportType."Webservice Enabled" := true;
         NcImportType."Webservice Function" := CopyStr(WebserviceFunction, 1, MaxStrLen(NcImportType."Webservice Function"));
         NcImportType."Webservice Codeunit ID" := CurrCodeunitId();

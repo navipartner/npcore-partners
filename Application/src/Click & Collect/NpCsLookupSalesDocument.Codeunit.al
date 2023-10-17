@@ -1,16 +1,21 @@
-﻿codeunit 6151201 "NPR NpCs Lookup Sales Document"
+﻿codeunit 6151201 "NPR NpCs Lookup Sales Document" implements "NPR Nc Import List ILookup"
 {
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
 
     trigger OnRun()
     var
+    begin
+    end;
+
+    internal procedure RunLookupImportEntry(ImportEntry: Record "NPR Nc Import Entry")
+    var
         NpCsDocument: Record "NPR NpCs Document";
         NpCsDocumentMapping: Record "NPR NpCs Document Mapping";
         Document: XmlDocument;
         Node: XmlNode;
     begin
-        if not Rec.LoadXmlDoc(Document) then
+        if not ImportEntry.LoadXmlDoc(Document) then
             Error(Text000);
 
         if not Document.SelectSingleNode('//sales_document', Node) then
@@ -30,6 +35,7 @@
 
         Error('');
     end;
+
 
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
