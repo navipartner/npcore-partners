@@ -5,6 +5,9 @@ table 6060098 "NPR POS Functionality Profile"
     DataClassification = CustomerContent;
     LookupPageId = "NPR POS Functionality Profiles";
     DrillDownPageId = "NPR POS Functionality Profiles";
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR27.0';
+    ObsoleteReason = 'New parameter SelectCustReq and SelectMemberReq in POS Action Login created, use this instead.';
 
     fields
     {

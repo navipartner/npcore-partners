@@ -3,10 +3,16 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescriptionLbl: Label 'This is a built-in action for completing the login request passed on from the front end.';
+        ParamCustSelectReq_CptLbl: Label 'Customer selection required';
+        ParamCustSelectReq_DescLbl: Label 'Specifies if Customer selection is required after Login';
+        ParamMemberSelectReq_CptLbl: Label 'Member selection required';
+        ParamMemberSelectReq_DescLbl: Label 'Specifies if Member selection is required after Login';
 
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter('SelectCustReq', false, ParamCustSelectReq_CptLbl, ParamCustSelectReq_DescLbl);
+        WorkflowConfig.AddBooleanParameter('SelectMemberReq', false, ParamMemberSelectReq_CptLbl, ParamMemberSelectReq_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -75,27 +81,24 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
     local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper") PreWorkflows: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSUnit: Record "NPR POS Unit";
-        LoginEvents: Codeunit "NPR POS Login Events";
         POSSession: Codeunit "NPR POS Session";
-        POSFunctProfile: Record "NPR POS Functionality Profile";
+        POSSale: Codeunit "NPR POS Sale";
+        LoginEvents: Codeunit "NPR POS Login Events";
+        CustRequired: Boolean;
+        MemberRequired: Boolean;
     begin
         PreWorkflows.ReadFrom('{}');
+        CustRequired := Context.GetBooleanParameter('SelectCustReq');
+        MemberRequired := Context.GetBooleanParameter('SelectMemberReq');
+
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
+        if MemberRequired then
+            AddMemberWorkflow(PreWorkflows);
+        if CustRequired then
+            AddCustomerWorkflow(PreWorkflows);
 
-        if POSFunctProfile.Get(POSUnit."POS Functionality Profile") then begin
-
-            if POSFunctProfile."Require Select Member" then
-                AddMemberWorkflow(PreWorkflows);
-            if POSFunctProfile."Require Select Customer" then
-                AddCustomerWorkflow(PreWorkflows);
-        end;
         LoginEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
 

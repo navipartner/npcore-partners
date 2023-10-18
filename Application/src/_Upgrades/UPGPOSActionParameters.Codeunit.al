@@ -467,7 +467,6 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
     local procedure RefreshPOSItemNamedActionSetup()
     var
         ItemInsertActionRefreshNeeded: Boolean;
-
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
         POSSetup: Record "NPR POS Setup";
     begin
