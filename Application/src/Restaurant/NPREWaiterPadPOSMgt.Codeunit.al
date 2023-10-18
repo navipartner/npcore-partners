@@ -829,6 +829,17 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', true, false)]
+    local procedure AttemptToCloseWaiterPadOnSaleFinish(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+    begin
+        if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then
+            exit;
+        if WaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.") then
+            WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: SavePOSSvSl B", 'OnBeforeSaveAsQuote', '', true, false)]
     local procedure OnBeforeSaveAsPOSQuote(var SalePOS: Record "NPR POS Sale")
     begin
