@@ -166,11 +166,6 @@
                     ToolTip = 'Configure Stockout warnings on the POS.';
                     ApplicationArea = NPRRetail;
                 }
-                field("POS Functionality Profile"; Rec."POS Functionality Profile")
-                {
-                    ToolTip = 'Configure POS Functionality Profile';
-                    ApplicationArea = NPRRetail;
-                }
             }
         }
     }

@@ -125,8 +125,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpdateMembershipOnSaleLineInsert'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'MCSSaleLineUpload'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PopupDimension'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'SelectMemberOnAfterLogin'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'SelectCustomerOnAfterLogin'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'SelectionReqParam'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
@@ -460,10 +459,8 @@
                         exit('NPR-MCSSaleLineUpload-20230420');
                     'PopupDimension':
                         exit('NPR-PopupDimension-20230531');
-                    'SelectMemberOnAfterLogin':
-                        exit('NPR-SelectMemberOnAfterLogin-20231004');
-                    'SelectCustomerOnAfterLogin':
-                        exit('NPR-SelectCustomerOnAfterLogin-20231004');
+                    'SelectionReqParam':
+                        exit('NPR-SelectionReqParam-20231017');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of
