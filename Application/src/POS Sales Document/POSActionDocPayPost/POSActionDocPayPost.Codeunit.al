@@ -114,7 +114,7 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
         if not POSActionDocPayPostB.ConfirmImportInvDiscAmt(SalesHeader, ConfirmInvDiscAmt) then
             exit;
 
-        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow();
         if not OpenDocument then
             if POSSalesDocumentPost = POSSalesDocumentPost::Asynchronous then
                 POSAsyncPosting.FromPOSRelatedPOSTransExist(SalesHeader);

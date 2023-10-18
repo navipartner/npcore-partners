@@ -59,7 +59,7 @@
         Send := Context.GetBooleanParameter('SendDocument');
         Pdf2Nav := Context.GetBooleanParameter('Pdf2NavDocument');
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
-        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow();
 
         if not POSActionDocPrepayB.CheckCustomer(SalePOS, Sale, SelectCustomer) then
             exit;

@@ -24,6 +24,10 @@
             SetPosMenuPaymentButtonsAutoEnabled();
             UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'PosMenuPaymentButtonsAutoEnabled'));
         end;
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'POSDataSourceExtFieldSetup')) then begin
+            GeneratePOSDataSourceExtFieldSetup();
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'POSDataSourceExtFieldSetup'));
+        end;
 
         LogMessageStopwatch.LogFinish();
     end;
@@ -171,5 +175,63 @@
         PosMenuButton.ModifyAll(Enabled, PosMenuButton.Enabled::Auto);
         PosMenuButton.SetRange("Data Source Name", '');
         PosMenuButton.ModifyAll("Data Source Name", POSDataMgt.POSDataSource_BuiltInSaleLine());
+    end;
+
+    local procedure GeneratePOSDataSourceExtFieldSetup()
+    var
+        POSMenuButton: Record "NPR POS Menu Button";
+    begin
+        POSMenuButton.SetFilter(Caption, '*CollectInStore.*|*SalesDoc.*');
+        if POSMenuButton.FindSet() then
+            repeat
+                POSMenuButton.Caption := DelChr(POSMenuButton.Caption, '=', ' ');
+                if POSMenuButton.Caption.Contains('.OpenOrdersQty}') then
+                    AddDataSourceExtFieldSetup(POSMenuButton, Enum::"NPR POS DS Extension Module"::DocImport, 'SalesDoc', 'OpenOrdersQty');
+                if POSMenuButton.Caption.Contains('.UnprocessedOrdersExist}') then
+                    AddDataSourceExtFieldSetup(POSMenuButton, Enum::"NPR POS DS Extension Module"::ClickCollect, 'CollectInStore', 'UnprocessedOrdersExist');
+                if POSMenuButton.Caption.Contains('.UnprocessedOrdersQty}') then
+                    AddDataSourceExtFieldSetup(POSMenuButton, Enum::"NPR POS DS Extension Module"::ClickCollect, 'CollectInStore', 'UnprocessedOrdersQty');
+                if POSMenuButton.Caption.Contains('.ProcessedOrdersExist}') then
+                    AddDataSourceExtFieldSetup(POSMenuButton, Enum::"NPR POS DS Extension Module"::ClickCollect, 'CollectInStore', 'ProcessedOrdersExist');
+                if POSMenuButton.Caption.Contains('.ProcessedOrdersQty}') then
+                    AddDataSourceExtFieldSetup(POSMenuButton, Enum::"NPR POS DS Extension Module"::ClickCollect, 'CollectInStore', 'ProcessedOrdersQty');
+            until POSMenuButton.Next() = 0;
+    end;
+
+    local procedure AddDataSourceExtFieldSetup(POSMenuButton: Record "NPR POS Menu Button"; Module: Enum "NPR POS DS Extension Module"; ExtentionName: Text[50]; ExtentionField: Text[50])
+    var
+        DataSourceExtFieldSetup: Record "NPR POS DS Exten. Field Setup";
+        POSParameterValue: Record "NPR POS Parameter Value";
+        DSExtFieldSetupPublic: Codeunit "NPR DS Ext.Field Setup Public";
+        POSDataMgt: Codeunit "NPR POS Data Management";
+        LocationFrom: Enum "NPR Location Filter From";
+        LocationFilter: Text;
+        ButtonParameterFound: Boolean;
+    begin
+        DSExtFieldSetupPublic.FilterDataSourceExtFieldSetup(DataSourceExtFieldSetup, Module, POSDataMgt.POSDataSource_BuiltInSale(), ExtentionName, ExtentionField);
+        DataSourceExtFieldSetup.SetRange("Exten.Field Instance Name", ExtentionField);
+        if not DataSourceExtFieldSetup.IsEmpty() then
+            exit;
+        DataSourceExtFieldSetup.Init();
+        DataSourceExtFieldSetup."Extension Module" := Module;
+        DataSourceExtFieldSetup."Data Source Name" := POSDataMgt.POSDataSource_BuiltInSale();
+        DataSourceExtFieldSetup."Extension Name" := ExtentionName;
+        DataSourceExtFieldSetup.Validate("Extension Field", ExtentionField);
+        DataSourceExtFieldSetup."Entry No." := 0;
+        DataSourceExtFieldSetup.Insert();
+
+        LocationFrom := LocationFrom::PosStore;
+        ButtonParameterFound := POSParameterValue.Get(Database::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId(), 'Location From');
+        if not ButtonParameterFound then
+            ButtonParameterFound := POSParameterValue.Get(Database::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId(), 'LocationFrom');
+        if ButtonParameterFound and (POSParameterValue.Value = 'Location Filter Parameter') then begin
+            LocationFrom := LocationFrom::LocationFilter;
+            ButtonParameterFound := POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'Location Filter');
+            if not ButtonParameterFound then
+                ButtonParameterFound := POSParameterValue.Get(DATABASE::"NPR POS Menu Button", POSMenuButton."Menu Code", POSMenuButton.ID, POSMenuButton.RecordId, 'LocationFilter');
+            if ButtonParameterFound then
+                LocationFilter := POSParameterValue.Value;
+        end;
+        DSExtFieldSetupPublic.SetLocationFilterParams(DataSourceExtFieldSetup, LocationFrom, LocationFilter);
     end;
 }

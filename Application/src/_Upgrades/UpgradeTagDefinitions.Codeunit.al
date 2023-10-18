@@ -20,6 +20,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustSplitBillPOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'AdjustDeletePOSLinePOSActionParameters'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'PosMenuPaymentButtonsAutoEnabled'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Menus", 'POSDataSourceExtFieldSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Cross Ref"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Gift Voucher"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Credit Voucher"));
@@ -141,7 +142,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuditRoll'));
-
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile", 'MoveAsyncPostingSetup'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -285,6 +286,8 @@
                         exit('NPRDeletePOSLineActionToWF2-938526df-0edf-4c2c-9db8-19e28af11c5a');
                     'PosMenuPaymentButtonsAutoEnabled':
                         exit('NPRPosMenuPaymentButtonsAutoEnabled-20220608');
+                    'POSDataSourceExtFieldSetup':
+                        exit('NPRGeneratePOSDataSourceExtFieldSetup-20231003');
                 end;
             Codeunit::"NPR Event Report Layout Upg.":
                 exit('NPREventReportLayoutUpg-20210803');
@@ -540,6 +543,11 @@
                 case UpgradeStep of
                     'UpdateImportTypeFields':
                         exit('UpdateImportTypeFields-17102023');
+                end;
+            Codeunit::"NPR UPG POS Posting Profile":
+                case UpgradeStep of
+                    'MoveAsyncPostingSetup':
+                        exit('MoveAsyncPostingSetup_20231011');
                 end;
         end;
     end;
