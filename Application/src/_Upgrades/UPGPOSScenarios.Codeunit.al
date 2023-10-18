@@ -13,8 +13,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         ShowReturnAmountDialog();
 
         //AFTER_LOGIN scenario
-        SelectMemberOnAfterLogin();
-        SelectCustomerOnAfterLogin();
+        SelectRequiredParam();
 
         //AFTER_INSERT_LINE scenario 
         AddNewOnSaleCoupons();
@@ -42,27 +41,6 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         UpgradeShowReturnAmountDialog();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'ShowReturnAmountDialog'));
-        LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure SelectMemberOnAfterLogin()
-    var
-        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
-    begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'SelectMemberOnAfterLogin');
-
-        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectMemberOnAfterLogin')) then begin
-            LogMessageStopwatch.LogFinish();
-            exit;
-        end;
-
-        if not POSSaleWorkflowEnabled(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired') then
-            CheckPOSUnitReq('OnAfterLogin_SelectMemberRequired');
-
-        DeletePOSWorkflowStepAfterLogin(POSSalesWorkflowStep."Subscriber Codeunit ID", 'OnAfterLogin_SelectMemberRequired');
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectMemberOnAfterLogin'));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -236,80 +214,96 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         exit(Codeunit::"NPR UPG POS Scenarios");
     end;
 
-    local procedure SelectCustomerOnAfterLogin()
+    local procedure SelectRequiredParam()
     var
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        POSSetup: Record "NPR POS Setup";
+        LoginActionRefreshNeeded: Boolean;
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSAction: Record "NPR POS Action";
+        POSRefreshWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'SelectCustomerOnAfterLogin');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'SelectionReqParam');
 
-        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectCustomerOnAfterLogin')) then begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectionReqParam')) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
+        POSSetup.Reset();
+        if not POSSetup.FindSet(false) then
+            exit;
+        repeat
+            if POSAction.get(POSSetup."Login Action Code") then begin
+                POSRefreshWorkflows.RefreshSpecific(POSAction."Workflow Implementation".AsInteger());
+                LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
+                if LoginActionRefreshNeeded then
+                    ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
 
-        if not POSSaleWorkflowEnabled(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired') then
-            CheckPOSUnitReq('SelectCustomerRequired');
+                UpdateParam(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired', POSSetup);
+                DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired');
 
-        DeletePOSWorkflowStepAfterLogin(POSSalesWorkflowStep."Subscriber Codeunit ID", 'SelectCustomerRequired');
+                UpdateParam(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired', POSSetup);
+                DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired');
+            end;
+        until POSSetup.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectCustomerOnAfterLogin'));
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'SelectionReqParam'));
         LogMessageStopwatch.LogFinish();
     end;
 
-    local procedure CreatePOSFunctionality(var POSFunctionality: Record "NPR POS Functionality Profile")
-    begin
-        if not POSFunctionality.Get('DEFAULT') then begin
-            POSFunctionality.Init();
-            POSFunctionality.Code := 'DEFAULT';
-            POSFunctionality.Description := 'Default Profile';
-            POSFunctionality.Insert();
-        end;
-    end;
-
-    local procedure POSSaleWorkflowEnabled(SubscriberID: Integer; SubscriberFunction: Text) ScenarioEnabled: Boolean
+    local procedure UpdateParam(SubscriberID: Integer; SubscriberFunction: Text; POSSetup: Record "NPR POS Setup")
     var
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSUnit: Record "NPR POS Unit";
-        POSFunctionality: Record "NPR POS Functionality Profile";
+        POSFuncPRofile: Record "NPR POS Functionality Profile";
+        ParamValue: Record "NPR POS Parameter Value";
+        Enabled: Boolean;
     begin
+        Enabled := false;
         POSSalesWorkflowStep.SetRange("Workflow Code", 'AFTER_LOGIN');
         POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", SubscriberID);
         POSSalesWorkflowStep.SetRange("Subscriber Function", SubscriberFunction);
+        POSSalesWorkflowStep.SetRange(Enabled, true);
         if POSSalesWorkflowStep.FindFirst() then
-            if POSSalesWorkflowStep.Enabled then begin
-                ScenarioEnabled := true;
-                CreatePOSFunctionality(POSFunctionality);
-                if SubscriberFunction = 'SelectCustomerRequired' then
-                    POSFunctionality."Require Select Customer" := true;
-                if SubscriberFunction = 'OnAfterLogin_SelectMemberRequired' then
-                    POSFunctionality."Require Select Member" := true;
-                POSFunctionality.Modify();
-                POSUnit.SetFilter("POS Functionality Profile", '<>%1', POSFunctionality.Code);
-                if POSUnit.FindSet() then
-                    POSUnit.ModifyAll("POS Functionality Profile", POSFunctionality.Code);
-            end;
-    end;
-
-    local procedure CheckPOSUnitReq(SubscriberFunction: Text)
-    var
-        POSUnit: Record "NPR POS Unit";
-        POSFunctionality: Record "NPR POS Functionality Profile";
-    begin
+            if POSSalesWorkflowStep.Enabled then
+                Enabled := true;
 
         if SubscriberFunction = 'SelectCustomerRequired' then
             POSUnit.SetRange("Require Select Customer", true);
         if SubscriberFunction = 'OnAfterLogin_SelectMemberRequired' then
             POSUnit.SetRange("Require Select Member", true);
+        if not POSUnit.IsEmpty() then
+            Enabled := true;
 
-        if POSUnit.FindSet() then begin
-            CreatePOSFunctionality(POSFunctionality);
-            if SubscriberFunction = 'SelectCustomerRequired' then
-                POSFunctionality."Require Select Customer" := true;
+        POSUnit.Reset();
+        POSUnit.SetFilter("POS Functionality Profile", '<>%1', '');
+        POSUnit.SetRange("POS Named Actions Profile", POSSetup."Primary Key");
+        if POSUnit.FindSet(false) then
+            repeat
+                if POSFuncPRofile.Get(POSUnit."POS Functionality Profile") then begin
+                    if SubscriberFunction = 'OnAfterLogin_SelectMemberRequired' then
+                        if POSFuncPRofile."Require Select Member" then
+                            Enabled := true;
+                end;
+                if POSFuncPRofile.Get(POSUnit."POS Functionality Profile") then begin
+                    if SubscriberFunction = 'SelectCustomerRequired' then
+                        if POSFuncPRofile."Require Select Customer" then
+                            Enabled := true;
+                end;
+            until POSUnit.Next() = 0;
+
+        if Enabled then begin
+            ParamValue.SetRange("Table No.", Database::"NPR POS Setup");
+            ParamValue.SetRange(Code, '');
+            ParamValue.SetRange("Record ID", POSSetup.RecordId);
+            ParamValue.SetRange("Action Code", 'LOGIN');
             if SubscriberFunction = 'OnAfterLogin_SelectMemberRequired' then
-                POSFunctionality."Require Select Member" := true;
-            POSFunctionality.Modify();
-            POSUnit.ModifyAll("POS Functionality Profile", POSFunctionality.Code);
+                ParamValue.SetRange(Name, 'SelectMemberReq');
+            if SubscriberFunction = 'SelectCustomerRequired' then
+                ParamValue.SetRange(Name, 'SelectCustReq');
+
+            if ParamValue.FindSet() then
+                ParamValue.ModifyAll(Value, 'true');
         end;
     end;
 

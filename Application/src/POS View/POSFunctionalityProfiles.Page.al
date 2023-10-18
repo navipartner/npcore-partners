@@ -1,13 +1,15 @@
 page 6151287 "NPR POS Functionality Profiles"
 {
     PageType = List;
-    ApplicationArea = NPRRetail;
-    UsageCategory = Administration;
     SourceTable = "NPR POS Functionality Profile";
     CardPageID = "NPR POS Functionality Profile";
     Caption = 'POS Functionality Profiles';
     Extensible = false;
     Editable = false;
+    UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR27.0';
+    ObsoleteReason = 'New parameter SelectCustReq and SelectMemberReq in POS Action Login created, use this instead.';
 
     layout
     {
