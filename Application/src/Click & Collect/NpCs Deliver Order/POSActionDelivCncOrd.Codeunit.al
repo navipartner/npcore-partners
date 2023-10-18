@@ -83,7 +83,7 @@ codeunit 6151203 "NPR POS Action Deliv. CnC Ord." implements "NPR IPOS Workflow"
         );
     end;
 
-    procedure ActionCode(): Text
+    procedure ActionCode(): Code[20]
     begin
         exit(Format(Enum::"NPR POS Workflow"::DELIVER_COLLECT_ORD));
     end;
@@ -185,79 +185,5 @@ codeunit 6151203 "NPR POS Action Deliv. CnC Ord." implements "NPR IPOS Workflow"
         end;
 
         exit(LocationFilter);
-    end;
-
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-        DataType: Enum "NPR Data Type";
-    begin
-        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
-            exit;
-        if ExtensionName <> 'CollectInStore' then
-            exit;
-
-        Handled := true;
-
-        DataSource.AddColumn('ProcessedOrdersExists', 'Processed Orders Exists', DataType::Boolean, false);
-        DataSource.AddColumn('ProcessedOrdersQty', 'Processed Orders Qty.', DataType::Integer, false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-        POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
-        ProcessedOrdersExists: Boolean;
-        LocationFilter: Text;
-    begin
-        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
-            exit;
-        if ExtensionName <> 'CollectInStore' then
-            exit;
-
-        Handled := true;
-
-#pragma warning disable AA0139
-        LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
-#pragma warning restore
-        ProcessedOrdersExists := GetProcessedOrdersExists(LocationFilter);
-        DataRow.Fields().Add('ProcessedOrdersExists', ProcessedOrdersExists);
-        if ProcessedOrdersExists then
-            DataRow.Fields().Add('ProcessedOrdersQty', GetProcessedOrdersQty(LocationFilter))
-        else
-            DataRow.Fields().Add('ProcessedOrdersQty', 0);
-    end;
-
-    local procedure GetProcessedOrdersExists(LocationFilter: Text): Boolean
-    var
-        NpCsDocument: Record "NPR NpCs Document";
-    begin
-        SetProcessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.FindFirst());
-    end;
-
-    local procedure GetProcessedOrdersQty(LocationFilter: Text): Integer
-    var
-        NpCsDocument: Record "NPR NpCs Document";
-    begin
-        SetProcessedFilter(LocationFilter, NpCsDocument);
-        exit(NpCsDocument.Count());
-    end;
-
-    local procedure SetProcessedFilter(LocationFilter: Text; var NpCsDocument: Record "NPR NpCs Document")
-    var
-        NpCsPOSActionEvents: Codeunit "NPR NpCs POS Action Events";
-        IsHandled: Boolean;
-    begin
-        NpCsPOSActionEvents.OnBeforeSetProcessedFilter(LocationFilter, NpCsDocument, IsHandled);
-        if IsHandled then
-            exit;
-        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
-        NpCsDocument.SetRange("Processing Status", NpCsDocument."Processing Status"::Confirmed);
-        NpCsDocument.SetRange("Delivery Status", NpCsDocument."Delivery Status"::Ready);
-        NpCsDocument.SetFilter("Location Code", LocationFilter);
     end;
 }

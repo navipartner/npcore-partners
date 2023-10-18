@@ -2,9 +2,6 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
-    var
-        NpCsPOSActionProcOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
-
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         POSDataMgt: Codeunit "NPR POS Data Management";
@@ -130,64 +127,9 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
         exit(LocationFilter);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
-    var
-        NpCsStore: Record "NPR NpCs Store";
-        POSDataMgt: Codeunit "NPR POS Data Management";
-    begin
-        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
-            exit;
-        if NpCsStore.IsEmpty then
-            exit;
-
-        Extensions.Add('CollectInStore');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
-    var
-        DataType: Enum "NPR Data Type";
-        POSDataMgt: Codeunit "NPR POS Data Management";
-    begin
-        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
-            exit;
-        if ExtensionName <> 'CollectInStore' then
-            exit;
-
-        Handled := true;
-
-        DataSource.AddColumn('UnprocessedOrdersExists', 'Unprocessed Orders Exists', DataType::Boolean, false);
-        DataSource.AddColumn('UnprocessedOrdersQty', 'Unprocessed Orders Qty.', DataType::Integer, false);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-        POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
-        UnprocessedOrdersExists: Boolean;
-        LocationFilter: Text;
-    begin
-        if DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale() then
-            exit;
-        if ExtensionName <> 'CollectInStore' then
-            exit;
-
-        Handled := true;
-
-        LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
-        UnprocessedOrdersExists := NpCsPOSActionProcOrderB.GetUnprocessedOrdersExists(LocationFilter);
-        DataRow.Fields().Add('UnprocessedOrdersExists', UnprocessedOrdersExists);
-        if UnprocessedOrdersExists then
-            DataRow.Fields().Add('UnprocessedOrdersQty', NpCsPOSActionProcOrderB.GetUnprocessedOrdersQty(LocationFilter))
-        else
-            DataRow.Fields().Add('UnprocessedOrdersQty', 0);
-    end;
-
-
     local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper")
     var
+        NpCsPOSActionProcOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
         LocationFilter: Text;
         SortingInt: Integer;
     begin

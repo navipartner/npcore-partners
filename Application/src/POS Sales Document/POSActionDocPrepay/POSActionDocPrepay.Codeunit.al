@@ -77,7 +77,7 @@
         ConfirmInvDiscAmt := Context.GetBooleanParameter('ConfirmInvDiscAmt');
         PrepaymentValue := Context.GetDecimal('prepaymentValue');
 
-        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow(SalePOS."POS Store Code");
+        POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow();
 
         if not POSActionDocPrepayB.CheckCustomer(SalePOS, Sale, SelectCustomer) then
             exit;
