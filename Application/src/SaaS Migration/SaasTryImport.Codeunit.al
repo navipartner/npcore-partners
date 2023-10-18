@@ -21,6 +21,7 @@ codeunit 6150928 "NPR SaaS Try Import"
         end else begin
             Rec.LockTable();
             Rec.Get(Rec.Id);
+            ErrorText := GetLastErrorText();
             if ErrorText.Trim() = '' then
                 ErrorText := 'An unknown error occurred (Possibly field mismatch or permissions on azure application?)';
             Rec."Error Reason" := CopyStr(ErrorText, 1, MaxStrLen(Rec."Error Reason"));
