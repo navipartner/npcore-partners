@@ -157,12 +157,8 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     end;
 
     internal procedure SetVisibility(): Boolean
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
     begin
-        POSPostingProfile.SetCurrentKey("Post POS Sale Doc. With JQ");
-        POSPostingProfile.SetRange("Post POS Sale Doc. With JQ", true);
-        exit(not POSPostingProfile.IsEmpty());
+        exit(AsyncPostingEnabled());
     end;
 
     internal procedure IsPostingScheduledFromPOS(SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"): Boolean
@@ -210,68 +206,18 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
         end;
     end;
 
-    internal procedure UnpostedPOSEntriesExistError(POSProfileProfile: Record "NPR POS Posting Profile")
+    internal procedure AsyncPostingEnabled(): Boolean
     var
-        POSStore: Record "NPR POS Store";
-        POSEntry: Record "NPR POS Entry";
-        POSEntriesExistErr: Label 'There are unposted entries in POS Entry table in POS Store %1. Please post then before updating %2.', Comment = '%1=POSStore.Code,%2=POSProfileProfile.FieldCaption("Async. POS Sale Doc. Posting")';
+        POSSalesDocumentSetup: Record "NPR POS Sales Document Setup";
     begin
-        //prevent disabling if exist on related stores
-        POSStore.SetCurrentKey("POS Posting Profile");
-        POSStore.SetRange("POS Posting Profile", POSProfileProfile.Code);
-        if POSStore.FindSet() then
-            repeat
-                POSEntry.SetCurrentKey("POS Store Code", "Post Sales Document Status");
-                POSEntry.SetRange("POS Store Code", POSStore.Code);
-                POSEntry.SetRange("Post Sales Document Status", POSEntry."Post Sales Document Status"::Unposted);
-                if not POSEntry.IsEmpty() then
-                    Error(POSEntriesExistErr,
-                        POSStore.Code, POSProfileProfile.FieldCaption("Post POS Sale Doc. With JQ"));
-            until POSStore.Next() = 0;
+        if not POSSalesDocumentSetup.Get() then
+            exit(false);
+        exit(POSSalesDocumentSetup."Post with Job Queue");
     end;
 
-    internal procedure UnpostedPOSEntriesExistConfirm(POSProfileProfile: Record "NPR POS Posting Profile"): Boolean
-    var
-        POSStore: Record "NPR POS Store";
-        POSEntry: Record "NPR POS Entry";
-        ConfirmMgt: Codeunit "Confirm Management";
-        OperationAbortedLbl: Label 'Operation aborted by user.';
-        POSEntriesExistLbl: Label 'There are entries in the POS Entry table whose posting failed. Do you want to continue?';
+    internal procedure GetPOSSalePostingMandatoryFlow(): Enum "NPR POS Sales Document Post"
     begin
-        POSStore.SetCurrentKey("POS Posting Profile");
-        POSStore.SetRange("POS Posting Profile", POSProfileProfile.Code);
-        if POSStore.FindSet() then
-            repeat
-                POSEntry.SetCurrentKey("POS Store Code", "Post Sales Document Status");
-                POSEntry.SetRange("POS Store Code", POSStore.Code);
-                POSEntry.SetRange("Post Sales Document Status", POSEntry."Post Sales Document Status"::"Error while Posting");
-                if not POSEntry.IsEmpty() then begin
-                    if ConfirmMgt.GetResponse(POSEntriesExistLbl, false) then
-                        exit(true);
-                    Error(OperationAbortedLbl);
-                end;
-            until POSStore.Next() = 0;
-
-    end;
-
-    internal procedure AsyncPostingEnabled(POSStoreCode: Code[20]): Boolean
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        POSStore: Record "NPR POS Store";
-    begin
-        if not POSStore.Get(POSStoreCode) then
-            exit;
-        if POSStore.GetProfile(POSPostingProfile) then
-            exit(POSPostingProfile."Post POS Sale Doc. With JQ");
-    end;
-
-    internal procedure GetPOSSalePostingMandatoryFlow(POSStoreCode: Code[10]): Enum "NPR POS Sales Document Post"
-    var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        POSStore: Record "NPR POS Store";
-    begin
-        POSStore.GetProfile(POSStoreCode, POSPostingProfile);
-        if POSPostingProfile."Post POS Sale Doc. With JQ" then
+        if AsyncPostingEnabled() then
             exit(Enum::"NPR POS Sales Document Post"::Asynchronous)
         else
             exit(Enum::"NPR POS Sales Document Post"::Synchronous);

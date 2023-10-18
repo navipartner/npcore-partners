@@ -4,7 +4,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Import an open standard NAV sales document to current POS sale and delete the document.';
+        ActionDescription: Label 'Import an open standard BC sales document to current POS sale and delete the original document.';
         ParamDocType_CptLbl: Label 'Document Type';
         ParamDocTypeOpt_Lbl: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', Locked = true;
         ParamDocTypeOpt_CptLbl: Label 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
@@ -54,7 +54,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('GroupCodeFilterEnabled', false, ParamGroupCodeFilterEnabled_CptLbl, ParamGroupCodeFilterEnabled_DescLbl);
         WorkflowConfig.AddTextParameter('GroupCodeFilter', '', ParamGroupCodeFilter_CptLbl, ParamGroupCodeFilter_DescLbl);
     end;
-
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
@@ -148,63 +147,6 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure ThisExtension(): Text
-    begin
-        exit('SalesDoc');
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', true, false)]
-    local procedure OnDiscoverDataSourceExtension(DataSourceName: Text; Extensions: List of [Text])
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-    begin
-        if POSDataMgt.POSDataSource_BuiltInSale() <> DataSourceName then
-            exit;
-
-        Extensions.Add(ThisExtension());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', true, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: Codeunit "NPR Data Source"; var Handled: Boolean; Setup: Codeunit "NPR POS Setup")
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-        DataType: Enum "NPR Data Type";
-    begin
-        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
-            exit;
-
-        Handled := true;
-
-        DataSource.AddColumn('OpenOrdersQty', 'Number of open sales orders', DataType::String, true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDataSourceExtensionReadData', '', true, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: Codeunit "NPR Data Row"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
-    var
-        POSDataMgt: Codeunit "NPR POS Data Management";
-        POSMenuMgt: Codeunit "NPR POS Menu Mgt.";
-        SalesHeader: Record "Sales Header";
-        LocationFilter: Text;
-    begin
-        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSale()) or (ExtensionName <> ThisExtension()) then
-            exit;
-
-        Handled := true;
-
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
-        SalesHeader.ReadIsolation(IsolationLevel::ReadUncommitted);
-#ENDIF
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
-        SalesHeader.SetRange(Status, SalesHeader.Status::Open);
-# pragma warning disable AA0139
-        LocationFilter := POSMenuMgt.GetPOSMenuButtonLocationFilter(POSSession, ActionCode());
-# pragma warning restore
-        if LocationFilter <> '' then
-            SalesHeader.SetFilter("Location Code", LocationFilter);
-
-        DataRow.Add('OpenOrdersQty', SalesHeader.Count());
-    end;
-
     #region UnpackGroupCodeFilterSetup
     local procedure UnpackGroupCodeFilterSetup(Context: Codeunit "NPR POS JSON Helper";
                                                var GroupCodeFilterEnabled: Boolean;
@@ -224,7 +166,7 @@ codeunit 6150861 "NPR POS Action: Doc. Import" implements "NPR IPOS Workflow"
        )
     end;
 
-    procedure ActionCode(): Text
+    local procedure ActionCode(): Code[20]
     begin
         exit(Format(enum::"NPR POS Workflow"::SALES_DOC_IMP));
     end;

@@ -35,7 +35,7 @@
 
         UpdatePostSaleDocumentStatus(POSEntry, SaleCancelled);
         if POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale" then
-            if POSAsyncPostingMgt.AsyncPostingEnabled(POSEntry."POS Store Code") then
+            if POSAsyncPostingMgt.AsyncPostingEnabled() then
                 CreateBufferLines(POSEntry, Rec);
 
         POSEntryManagement.RecalculatePOSEntry(POSEntry, WasModified);

@@ -249,6 +249,9 @@
         {
             Caption = 'Post POS Sale Documents with Job Queue';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Background posting setups moved to table 6150632 "NPR POS Sales Document Setup"';
         }
 
         field(180; "Sales Channel"; Code[20])
