@@ -132,6 +132,11 @@
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
+        if WaiterPadLine.IsEmpty() then begin
+            WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
+            exit;
+        end;
+
         WaiterPadLine.SetRange("Sale Retail ID", SalePOS.SystemId);
         if WaiterPadLine.IsEmpty() then
             exit;
