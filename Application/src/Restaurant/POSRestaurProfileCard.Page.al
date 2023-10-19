@@ -33,6 +33,11 @@
                     ToolTip = 'Specifies the seating location, which is selected by default on POS Restaurant View for POS units with this profile assigned.';
                     ApplicationArea = NPRRetail;
                 }
+                field("After End-of-Sale"; Rec."After End-of-Sale")
+                {
+                    ToolTip = 'Specifies whether the next open waiter pad should be loaded in POS after End of Sale.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

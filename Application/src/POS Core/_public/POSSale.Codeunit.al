@@ -1,4 +1,4 @@
-codeunit 6150705 "NPR POS Sale"
+﻿codeunit 6150705 "NPR POS Sale"
 {
     var
         _LastSalePOSEntry: Record "NPR POS Entry";
@@ -474,9 +474,9 @@ codeunit 6150705 "NPR POS Sale"
 
         RunAfterEndSale(SalePOS); //Any error here would leave the front end with inconsistent state as view switch to new sale or login screen has not happened yet.
 
-        if StartNew then begin
-            SelectViewForEndOfSale();
-        end;
+        if StartNew then
+            if not SelectNextWaiterPadForEndOfSale() then
+                SelectViewForEndOfSale();
 
         SentryPostEndSaleSpan.Finish();
     end;
@@ -532,6 +532,43 @@ codeunit 6150705 "NPR POS Sale"
         end;
     end;
 
+    internal procedure SelectNextWaiterPadForEndOfSale(): Boolean
+    var
+        POSSession: Codeunit "NPR POS Session";
+        NPRELoadAfterEndSaleMgt: Codeunit "NPR NPRE Load AfterEndSale Mgt";
+        Success: Boolean;
+        LoadWaiterPadAfterEndSaleSuccess: Label 'The next open Waiter Pad has been loaded.';
+        LoadWaiterPadAfterEndSaleErr: Label 'An error occurred after the sale ended and the next Waiter Pad could not be loaded: %1';
+    begin
+        if not HandleRestaurantAfterEndSale() then
+            exit;
+
+        if not NPRELoadAfterEndSaleMgt.NextWaiterPadSet(_LastSalePOSEntry."Entry No.") then
+            exit;
+
+        ClearLastError();
+        Success := NPRELoadAfterEndSaleMgt.Run();
+        if Success then begin
+            POSSession.ChangeViewSale();
+            Message(LoadWaiterPadAfterEndSaleSuccess);
+        end else
+            Message(LoadWaiterPadAfterEndSaleErr, GetLastErrorText);
+
+        exit(Success);
+    end;
+
+
+    local procedure HandleRestaurantAfterEndSale(): Boolean
+    var
+        POSRestaurantProfile: Record "NPR POS NPRE Rest. Profile";
+    begin
+        POSRestaurantProfile.Init();
+        _Setup.GetPOSRestProfile(POSRestaurantProfile);
+        if POSRestaurantProfile."Restaurant Code" = '' then
+            exit;
+        exit(POSRestaurantProfile."After End-of-Sale" = POSRestaurantProfile."After End-of-Sale"::"Load Next Waiter Pad");
+
+    end;
 
     internal procedure ValidateSaleBeforeEnd(var Sale: Record "NPR POS Sale")
     var
