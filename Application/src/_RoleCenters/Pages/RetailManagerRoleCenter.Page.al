@@ -523,6 +523,19 @@
                             ToolTip = 'Executes the Customer Analysis action.';
                         }
                     }
+                    group(Cash)
+                    {
+                        Caption = 'Cash';
+                        Image = CashFlow;
+                        action("NPR Cash Summary")
+                        {
+                            Caption = 'Cash Summary';
+                            Image = Report;
+                            RunObject = Report "NPR Cash Summary";
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Opens the "Cash Summary" report, displaying the amount of cash per POS Unit, Payment Bin, and Payment Method in both local and default currencies.';
+                        }
+                    }
                 }
                 group(ItemandPrices)
                 {

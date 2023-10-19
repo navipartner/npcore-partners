@@ -3,7 +3,7 @@
     Access = Internal;
     Caption = 'POS Entry Cue.';
     DataClassification = CustomerContent;
-    
+
     fields
     {
         field(1; "Primary Key"; Code[10])
@@ -87,6 +87,11 @@
             CalcFormula = count("Incoming Document" where(Processed = const(false)));
             Caption = 'My Incoming Documents';
             FieldClass = FlowField;
+        }
+        field(30; "Transaction Amount (LCY)"; Decimal)
+        {
+            Caption = 'Transaction Amount (LCY)';
+            DataClassification = CustomerContent;
         }
     }
     keys

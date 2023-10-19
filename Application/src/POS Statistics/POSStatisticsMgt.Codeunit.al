@@ -519,6 +519,116 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         end;
     end;
 
+    internal procedure FillCashSummary(var CashSummaryBuffer: Record "NPR Cash Summary Buffer" temporary)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        FirstEntry: Integer;
+        CashSummary: Query "NPR Cash Summary";
+        TotalTransactionAmount, TotalTransactionAmountLCY : Decimal;
+        TotalCaptionLbl: Label 'Total';
+    begin
+        if not CashSummaryBuffer.IsEmpty() then
+            CashSummaryBuffer.DeleteAll();
+
+        if POSUnit.FindSet() then
+            repeat
+                Clear(TotalTransactionAmount);
+                Clear(TotalTransactionAmountLCY);
+                POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);
+                if POSPaymentMethod.FindSet() then
+                    repeat
+                        Clear(CashSummary);
+                        CashSummary.SetRange(PaymentMethodCode, POSPaymentMethod."Code");
+                        FirstEntry := 0;
+                        FirstEntry := FindLastFloat(POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
+                        if FirstEntry <> 0 then
+                            CashSummary.SetFilter(EntryNo, '>=%1', FirstEntry);
+                        CashSummary.SetRange(POSUnitNo, POSUnit."No.");
+                        CashSummary.SetRange(PaymentBinNo, POSUnit."Default POS Payment Bin");
+
+                        CashSummary.Open();
+                        while CashSummary.Read() do begin
+                            InsertCashSummaryBuffer(CashSummaryBuffer, POSUnit."No.", Format(POSUnit.Status), CashSummary.PaymentBinNo, CashSummary.PaymentMethodCode, CashSummary.TransactionAmount, CashSummary.TransactionAmountLCY);
+                            TotalTransactionAmount += CashSummary.TransactionAmount;
+                            TotalTransactionAmountLCY += CashSummary.TransactionAmountLCY;
+                        end;
+                        CashSummary.Close();
+                    until POSPaymentMethod.Next() = 0;
+
+                if (TotalTransactionAmount <> 0) or (TotalTransactionAmountLCY <> 0) then
+                    InsertCashSummaryBuffer(CashSummaryBuffer, '', '', '', TotalCaptionLbl, TotalTransactionAmount, TotalTransactionAmountLCY);
+            until POSUnit.Next() = 0;
+    end;
+
+    internal procedure CalculateTransactionAmount() Result: Decimal
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSUnit: Record "NPR POS Unit";
+        CashSummary: Query "NPR Cash Summary";
+        FirstEntry: Integer;
+    begin
+        if POSUnit.FindSet() then
+            repeat
+                POSPaymentMethod.SetRange("Processing Type", POSPaymentMethod."Processing Type"::CASH);
+                if POSPaymentMethod.FindSet() then
+                    repeat
+                        Clear(CashSummary);
+                        CashSummary.SetRange(PaymentMethodCode, POSPaymentMethod."Code");
+                        FirstEntry := 0;
+                        FirstEntry := FindLastFloat(POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
+                        if FirstEntry <> 0 then
+                            CashSummary.SetFilter(EntryNo, '>=%1', FirstEntry);
+                        CashSummary.SetRange(POSUnitNo, POSUnit."No.");
+                        CashSummary.SetRange(PaymentBinNo, POSUnit."Default POS Payment Bin");
+                        CashSummary.Open();
+                        while CashSummary.Read() do begin
+                            Result += CashSummary.TransactionAmountLCY;
+                        end;
+                        CashSummary.Close();
+                    until POSPaymentMethod.Next() = 0;
+            until POSUnit.Next() = 0;
+    end;
+
+    local procedure InsertCashSummaryBuffer(var CashSummaryBuffer: Record "NPR Cash Summary Buffer" temporary; POSUnitNo: Code[10]; Status: Text; PaymentBinNo: Code[10]; PaymentMethodCode: Text; TransactionAmount: Decimal; TransactionAmountLCY: Decimal)
+    begin
+        CashSummaryBuffer.Init();
+        CashSummaryBuffer."Entry No." := GetCashSummaryEntryNo(CashSummaryBuffer);
+        CashSummaryBuffer."POS Unit No." := POSUnitNo;
+        CashSummaryBuffer."Payment Bin No." := PaymentBinNo;
+#pragma warning disable AA0139
+        CashSummaryBuffer.Status := Status;
+        CashSummaryBuffer."Payment Method Code" := PaymentMethodCode;
+#pragma warning restore
+        CashSummaryBuffer."Transaction Amount" := TransactionAmount;
+        CashSummaryBuffer."Transaction Amount (LCY)" := TransactionAmountLCY;
+
+        CashSummaryBuffer.Insert();
+    end;
+
+    local procedure FindLastFloat(BinNo: Code[10]; PaymentMethod: Code[10]): Integer
+    var
+        BinEntry: Record "NPR POS Bin Entry";
+    begin
+        BinEntry.SetCurrentKey("Entry No.");
+        BinEntry.SetRange("Payment Bin No.", BinNo);
+        BinEntry.SetRange("Payment Method Code", PaymentMethod);
+        BinEntry.SetRange(Type, BinEntry.Type::FLOAT);
+        if BinEntry.FindLast() then
+            exit(BinEntry."Entry No.")
+        else
+            exit(0);
+    end;
+
+    local procedure GetCashSummaryEntryNo(var CashSummaryBuffer: Record "NPR Cash Summary Buffer" temporary): Integer
+    begin
+        CashSummaryBuffer.Reset();
+
+        if CashSummaryBuffer.FindLast() then
+            exit(CashSummaryBuffer."Entry No." + 10000);
+        exit(10000);
+    end;
+
     var
         _POSStoreCode: Code[10];
         _POSUnitNo: Code[10];
