@@ -2100,6 +2100,7 @@
     begin
         POSSalesLine.SetRange("Item Entry No.", 0);
         POSSalesLine.SetRange("Serial No.", SerialNo);
+        POSSalesLine.Setrange("Exclude from Posting", false);
         if not POSSalesLine.IsEmpty() then
             POSSalesLine.CalcSums(Quantity);
         TotalAuditRollQuantity := POSSalesLine.Quantity;
