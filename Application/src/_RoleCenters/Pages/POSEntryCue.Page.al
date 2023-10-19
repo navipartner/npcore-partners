@@ -164,6 +164,23 @@
                     ToolTip = 'Specifies the number of the incoming documents that are assigned to the current user.';
                 }
             }
+            cuegroup("Cash Summary")
+            {
+                Caption = 'Cash Summary';
+                field("Transaction Amount (LCY)"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Transaction Amount (LCY)"))))
+                {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
+                    Caption = 'Transaction Amount (LCY)';
+                    ToolTip = 'Specifies the total amount of cash currently stored in all POS units in the local currency.';
+                    trigger OnDrillDown()
+                    begin
+                        Page.RunModal(Page::"NPR Cash Summary");
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
         }
     }
 

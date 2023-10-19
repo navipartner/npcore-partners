@@ -10,6 +10,8 @@
     var
         POSEntryCue: Record "NPR POS Entry Cue.";
         Result: Dictionary of [Text, Text];
+        TransationAmountLCY: Decimal;
+        POSStatisticsMgt: Codeunit "NPR POS Statistics Mgt.";
     begin
         if not POSEntryCue.Get() then
             exit;
@@ -31,6 +33,8 @@
         Result.Add(Format(POSEntryCue.FieldNo("Mix Discount List")), Format(POSEntryCue."Mix Discount List", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Coupon List")), Format(POSEntryCue."Coupon List", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Voucher List")), Format(POSEntryCue."Voucher List", 0, 9));
+        TransationAmountLCY := POSStatisticsMgt.CalculateTransactionAmount();
+        Result.Add(Format(POSEntryCue.FieldNo("Transaction Amount (LCY)")), Format(TransationAmountLCY, 0, 9));
 
         Page.SetBackgroundTaskResult(Result);
     end;
