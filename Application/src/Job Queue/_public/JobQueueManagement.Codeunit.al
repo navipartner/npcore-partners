@@ -357,9 +357,9 @@
 
         if (JobQueueEntry.Status = JobQueueEntry.Status::"In Process") or JobQueueEntry."NPR Manually Set On Hold" then
             exit;
-
+        JobQueueEntry.CalcFields(Scheduled);
         HasStartDT := (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and (JobQueueEntry."Earliest Start Date/Time" <= NotBeforeDateTime);
-        if (JobQueueEntry.Status = JobQueueEntry.Status::Ready) and HasStartDT then
+        if (JobQueueEntry.Status = JobQueueEntry.Status::Ready) and HasStartDT and JobQueueEntry.Scheduled then
             exit;
 
         if not HasStartDT then begin
