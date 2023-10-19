@@ -36,6 +36,13 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR NPRE Seating Location" where("Restaurant Code" = field("Restaurant Code"));
         }
+        field(40; "After End-of-Sale"; Option)
+        {
+            Caption = 'After End-of-Sale';
+            DataClassification = CustomerContent;
+            OptionMembers = Default,"Load Next Waiter Pad";
+            OptionCaption = 'Default,Load Next Waiter Pad';
+        }
     }
 
     keys
