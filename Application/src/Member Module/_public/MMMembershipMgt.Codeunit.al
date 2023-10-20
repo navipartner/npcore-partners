@@ -2991,7 +2991,7 @@
         case Method of
             'EMAIL':
                 Address := Member."E-Mail Address";
-            'W_EMAIL':
+            'W-EMAIL':
                 Address := Member."E-Mail Address";
             'SMS':
                 Address := Member."Phone No.";
