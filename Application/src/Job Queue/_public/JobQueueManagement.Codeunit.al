@@ -477,7 +477,6 @@
         RetentionPolicyLog: Codeunit "Retention Policy Log";
         RetentionPolicyLogCategory: Enum "Retention Policy Log Category";
         RetentionPolicySetup: Record "Retention Policy Setup";
-        NextRunDateFormula: DateFormula;
         JobQueueActivatedNotificationTxt: Label 'A Job Queue Entry to apply the retention policies has been scheduled to run.';
         JobQueueReadyNotificationTxt: Label 'A Job Queue Entry to apply the retention policies was set to Ready state.';
     begin
@@ -500,7 +499,6 @@
             exit;
         end;
 
-        Evaluate(NextRunDateFormula, '<1D>');
         SetJobTimeout(6, 0); // 6hr timeout
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -508,9 +506,9 @@
             '',
             '',
             NowWithDelayInSeconds(360),
-            233000T,
-            013000T,
-            NextRunDateFormula,
+            000000T,
+            060000T,
+            2,
             CreateAndAssignRetentionPolicyJobQueueCategory(),
             JobQueueEntry)
         then
@@ -654,7 +652,7 @@
            (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
         then begin
 #IF NOT BC17
-            JobQueueEntry."Job Timeout" := 7 * 60 * 60 * 1000;  //7 hours
+            JobQueueEntry."Job Timeout" := 6 * 60 * 60 * 1000;  //6 hours
 #ENDIF
             Clear(JobQueueEntry."Next Run Date Formula");
             JobQueueEntry."Run on Mondays" := true;
@@ -665,7 +663,7 @@
             JobQueueEntry."Run on Saturdays" := true;
             JobQueueEntry."Run on Sundays" := true;
             JobQueueEntry.Validate("No. of Minutes between Runs", 2);
-            JobQueueEntry.Validate("Starting Time", 233000T);
+            JobQueueEntry.Validate("Starting Time", 000000T);
             JobQueueEntry."Ending Time" := 060000T;
         end;
     end;
