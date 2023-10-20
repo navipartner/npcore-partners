@@ -6,6 +6,7 @@ codeunit 6059988 "NPR HL App Upgrade"
     trigger OnUpgradePerCompany()
     begin
         MoveHeyLoyaltyValueMappings();
+        SetHLSetupDefaultValues();
     end;
 
     var
@@ -73,6 +74,24 @@ codeunit 6059988 "NPR HL App Upgrade"
                 until CountryRegion.Next() = 0;
 
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
+            LogMessageStopwatch.LogFinish();
+        end;
+    end;
+
+    local procedure SetHLSetupDefaultValues()
+    var
+        HLSetup: Record "NPR HL Integration Setup";
+    begin
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues')) then begin
+            LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', 'SetHLSetupDefaultValues');
+
+            if HLSetup.Get() then begin
+                HLSetup."Require GDPR Approval" := true;
+                HLSetup."Require Newsletter Subscrip." := true;
+                HLSetup.Modify();
+            end;
+
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues'));
             LogMessageStopwatch.LogFinish();
         end;
     end;

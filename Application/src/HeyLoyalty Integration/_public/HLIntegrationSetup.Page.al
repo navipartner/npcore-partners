@@ -32,7 +32,12 @@ page 6150720 "NPR HL Integration Setup"
                 {
                     ApplicationArea = NPRHeyLoyalty;
                     Importance = Additional;
-                    ToolTip = 'Specifies whether the HeyLoyalty task scheduling routine is executed immediately after a change has been registered in the system. This mode is only allowed on test/sandbox environments.';
+                    ToolTip = 'Specifies whether the HeyLoyalty task scheduling routine is executed immediately after a change has been registered in the system. This mode is only allowed in test/sandbox environments.';
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteReason = 'Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.';
+
                 }
                 group(MemberListIntegrationArea)
                 {
@@ -60,11 +65,29 @@ page 6150720 "NPR HL Integration Setup"
                         Enabled = MemberListIntegrationIsEnabled;
                         ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership code.';
                     }
+                    field("Required Contact Info"; Rec."Required Contact Info")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = MemberListIntegrationIsEnabled;
+                        ToolTip = 'Specifies required contact methods (email and/or phone) that must be specified in the member card before BC will submit the member data to HeyLoyalty.';
+                    }
+                    field("Require GDPR Approval"; Rec."Require GDPR Approval")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = MemberListIntegrationIsEnabled;
+                        ToolTip = 'Specifies whether the member must agree to GDPR before BC will submit the member data to HeyLoyalty.';
+                    }
+                    field("Require Newsletter Subscrip."; Rec."Require Newsletter Subscrip.")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = MemberListIntegrationIsEnabled;
+                        ToolTip = 'Specifies whether the member must subscribe to the e-mail newsletter ("E-Mail News Letter" field on the member card) before BC will submit the member data to HeyLoyalty.';
+                    }
                     field("Unsubscribe if Blocked"; Rec."Unsubscribe if Blocked")
                     {
                         ApplicationArea = NPRHeyLoyalty;
                         Enabled = MemberListIntegrationIsEnabled;
-                        ToolTip = 'Specifies whether member should be unsubscribed from HeyLoyalty, if the member, or their membership has been blocked in BC.';
+                        ToolTip = 'Specifies whether the member should be unsubscribed from HeyLoyalty, if the member, or their membership has been blocked in BC.';
                     }
                     field("Read Member Data from Webhook"; Rec."Read Member Data from Webhook")
                     {

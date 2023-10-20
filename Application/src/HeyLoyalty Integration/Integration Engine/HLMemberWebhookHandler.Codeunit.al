@@ -81,7 +81,7 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
             HLMember."E-Mail Address" := HLMemberMgt.GetEmailFromResponse(HLMemberJToken, ErrorOnMissingData and not Unsubscribe, '');
             if HLMember."E-Mail Address" = '' then
                 exit;
-            if not GetHLMemberByEmailAddress(HLMember) then begin
+            if not GetHLMemberByContactInfo(HLMember) then begin
                 if Unsubscribe then
                     exit;
                 HLMember.Init();
@@ -116,25 +116,47 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
         exit(HLMember.FindLast());
     end;
 
-    procedure GetHLMemberByEmailAddress(var HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
+    procedure GetHLMemberByContactInfo(var HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
         HLMember2: Record "NPR HL HeyLoyalty Member";
         Member: Record "NPR MM Member";
         MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
     begin
-        if HLMember."E-Mail Address" = '' then
-            exit(false);
+        case HLIntegrationMgt.RequiredContactInfo() of
+            "NPR HL Required Contact Method"::Email:
+                if HLMember."E-Mail Address" = '' then
+                    exit(false);
+            "NPR HL Required Contact Method"::Phone:
+                if HLMember."Phone No." = '' then
+                    exit(false);
+            else
+                if (HLMember."E-Mail Address" = '') and (HLMember."Phone No." = '') then
+                    exit(false);
+        end;
+
         HLMember2 := HLMember;
         Clear(HLMember);
-        HLMember.SetCurrentKey("E-Mail Address");
-        HLMember.SetRange("E-Mail Address", HLMember2."E-Mail Address");
-        if HLMember.IsEmpty() then
-            HLMember.SetFilter("E-Mail Address", '@' + ConvertStr(HLMember2."E-Mail Address", '@', '?'));
+        if HLMember2."E-Mail Address" <> '' then begin
+            HLMember.SetRange("E-Mail Address", HLMember2."E-Mail Address");
+            if HLMember.IsEmpty() then
+                HLMember.SetFilter("E-Mail Address", '@' + ConvertStr(HLMember2."E-Mail Address", '@', '?'));
+        end;
+        if HLMember2."Phone No." <> '' then begin
+            HLMember.SetRange("Phone No.", HLMember2."Phone No.");
+            if HLMember.IsEmpty() then
+                if HLMember2."E-Mail Address" <> '' then begin
+                    HLMember.SetRange("Phone No.");
+                    if HLMember.IsEmpty() then begin
+                        HLMember.SetRange("E-Mail Address", '');
+                        HLMember.SetRange("Phone No.", HLMember2."Phone No.");
+                    end;
+                end;
+        end;
         if HLMember.FindLast() then
             exit(true);
 
-        if not GetMemberByEmailAddress(HLMember2."E-Mail Address", Member) then
+        if not GetMemberByContactInfo(HLMember2."E-Mail Address", HLMember2."Phone No.", Member) then
             exit(false);
         MemberMgt.FindMembershipRole(Member, MembershipRole);
 
@@ -144,12 +166,30 @@ codeunit 6150799 "NPR HL Member Webhook Handler"
         exit(true);
     end;
 
-    procedure GetMemberByEmailAddress(EmailAddress: Text[80]; var Member: Record "NPR MM Member"): Boolean
+    procedure GetMemberByContactInfo(EmailAddress: Text[80]; PhoneNo: Text[30]; var Member: Record "NPR MM Member"): Boolean
     begin
-        Member.Reset();
-        Member.SetRange("E-Mail Address", EmailAddress);
-        if Member.IsEmpty() then
-            Member.SetFilter("E-Mail Address", '@' + ConvertStr(EmailAddress, '@', '?'));
+        Clear(Member);
+        if (EmailAddress = '') and (PhoneNo = '') then
+            exit(false);
+
+        if EmailAddress <> '' then begin
+            Member.SetRange("E-Mail Address", EmailAddress);
+            if Member.IsEmpty() then
+                Member.SetFilter("E-Mail Address", '@' + ConvertStr(EmailAddress, '@', '?'));
+        end;
+
+        if PhoneNo <> '' then begin
+            Member.SetRange("Phone No.", PhoneNo);
+            if Member.IsEmpty() then begin
+                if EmailAddress = '' then
+                    exit(false);
+                Member.SetRange("Phone No.");
+                if Member.IsEmpty() then begin
+                    Member.SetRange("E-Mail Address", '');
+                    Member.SetRange("Phone No.", PhoneNo);
+                end;
+            end;
+        end;
         exit(Member.FindLast());
     end;
 }

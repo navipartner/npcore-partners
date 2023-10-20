@@ -19,8 +19,8 @@ codeunit 6060000 "NPR HL Upsert Member"
         if not HLMember.Find() or HLMember.Deleted then
             exit;
 
-        if (HLMember."Member Entry No." = 0) and (HLMember."E-Mail Address" <> '') then
-            if HLWSMgt.GetMemberByEmailAddress(HLMember."E-Mail Address", Member) then begin
+        if (HLMember."Member Entry No." = 0) and ((HLMember."E-Mail Address" <> '') or (HLMember."Phone No." <> '')) then
+            if HLWSMgt.GetMemberByContactInfo(HLMember."E-Mail Address", HLMember."Phone No.", Member) then begin
                 HLMember."Member Entry No." := Member."Entry No.";
                 if MemberMgt.FindMembershipRole(Member, MembershipRole) then
                     HLMember."Membership Entry No." := MembershipRole."Membership Entry No.";
@@ -40,9 +40,23 @@ codeunit 6060000 "NPR HL Upsert Member"
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         DataLogMgt: Codeunit "NPR Data Log Management";
+        HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
     begin
         HLMember.TestField("HeyLoyalty Id");
-        HLMember.TestField("E-Mail Address");
+        case HLIntegrationMgt.RequiredContactInfo() of
+            "NPR HL Required Contact Method"::Email:
+                HLMember.TestField("E-Mail Address");
+            "NPR HL Required Contact Method"::Phone:
+                HLMember.TestField("Phone No.");
+            "NPR HL Required Contact Method"::Email_and_Phone:
+                begin
+                    HLMember.TestField("E-Mail Address");
+                    HLMember.TestField("Phone No.");
+                end;
+            else
+                if HLMember."Phone No." = '' then
+                    HLMember.TestField("E-Mail Address");
+        end;
 
         MembershipSalesSetup.SetRange("Business Flow Type", MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
         MembershipSalesSetup.SetRange(Blocked, false);
@@ -75,6 +89,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         else
             MemberInfoCapture.Country := HLMember."HL Country Name";
         MemberInfoCapture."Store Code" := HLMember."Store Code";
+        MemberInfoCapture."Customer No." := FindReusableCustomerNo(MemberInfoCapture);
 
         DataLogMgt.DisableDataLog(true);
         CreateMember(MembershipSalesSetup, MemberInfoCapture, MembershipEntry);
@@ -88,6 +103,56 @@ codeunit 6060000 "NPR HL Upsert Member"
         HLMember.Validate("Membership Code", MembershipEntry."Membership Code");
         HLMember.Modify();
         DataLogMgt.DisableDataLog(false);
+    end;
+
+    local procedure FindReusableCustomerNo(MemberInfoCapture: Record "NPR MM Member Info Capture"): Code[20]
+    var
+        Customer: Record Customer;
+    begin
+        if MemberInfoCapture."E-Mail Address" <> '' then begin
+            Customer.SetRange("E-Mail", MemberInfoCapture."E-Mail Address");
+            if Customer.IsEmpty() then
+                Customer.SetFilter("E-Mail", '@' + ConvertStr(MemberInfoCapture."E-Mail Address", '@', '?'));
+        end;
+        if MemberInfoCapture."Phone No." <> '' then
+            Customer.SetRange("Phone No.", MemberInfoCapture."Phone No.");
+        if FindReusableCustomerNo(Customer) then
+            exit(Customer."No.");
+
+        if (MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '') then begin
+            Customer.SetRange("Phone No.");
+            if FindReusableCustomerNo(Customer) then
+                exit(Customer."No.");
+
+            Customer.SetRange("Phone No.", MemberInfoCapture."Phone No.");
+            Customer.SetRange("E-Mail", '');
+            if FindReusableCustomerNo(Customer) then
+                exit(Customer."No.");
+        end;
+
+        exit('');
+    end;
+
+    local procedure FindReusableCustomerNo(var Customer: Record Customer): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+    begin
+        if Customer.Find('-') then
+            repeat
+                if not Customer.Mark() then begin
+                    Customer.Mark(true);
+                    Membership.SetRange("Customer No.", Customer."No.");
+                    Membership.SetRange(Blocked, false);
+                    if Membership.IsEmpty() then
+                        exit(true);
+
+                    Membership.FindFirst();
+                    if not MembershipMgt.IsMembershipActive(Membership."Entry No.", Today, false) then
+                        exit(true);
+                end;
+            until Customer.Next() = 0;
+        exit(false);
     end;
 
     local procedure CreateMember(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var MembershipEntry: Record "NPR MM Membership Entry")

@@ -36,15 +36,33 @@ codeunit 6059993 "NPR HL Integration Mgt."
     end;
 
     [TryFunction]
-    procedure InvokeGetHLMemberByEmail(HLMember: Record "NPR HL HeyLoyalty Member"; var ResponseJToken: JsonToken)
+    procedure InvokeGetHLMemberByContactInfo(HLMember: Record "NPR HL HeyLoyalty Member"; var ResponseJToken: JsonToken)
     var
+        HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         TypeHelper: Codeunit "Type Helper";
-        EmailAddress: Text;
-        UrlPlaceholderLbl: Label '%1?filter[email][eq][]=%2', Locked = true;
+        QueryFieldName: Option email,mobile;
+        QueryFieldValue: Text;
+        UrlPlaceholderLbl: Label '%1?filter[%2][eq][]=%3', Locked = true;
     begin
-        HLMember.TestField("E-mail Address");
-        EmailAddress := HLMember."E-Mail Address";
-        ResponseJToken.ReadFrom(SendHeyLoyaltyRequest('GET', StrSubstNo(UrlPlaceholderLbl, GetHLMembersUrl(), TypeHelper.UrlEncode(EmailAddress))));
+        case HLIntegrationMgt.RequiredContactInfo() of
+            "NPR HL Required Contact Method"::Email:
+                QueryFieldName := QueryFieldName::email;
+            "NPR HL Required Contact Method"::Phone:
+                QueryFieldName := QueryFieldName::mobile;
+            else begin
+                QueryFieldName := QueryFieldName::email;
+                if (HLMember."E-mail Address" = '') and (HLMember."Phone No." <> '') then
+                    QueryFieldName := QueryFieldName::mobile;
+            end;
+        end;
+        if QueryFieldName = QueryFieldName::email then begin
+            HLMember.TestField("E-mail Address");
+            QueryFieldValue := HLMember."E-Mail Address";
+        end else begin
+            HLMember.TestField("Phone No.");
+            QueryFieldValue := HLMember."Phone No.";
+        end;
+        ResponseJToken.ReadFrom(SendHeyLoyaltyRequest('GET', StrSubstNo(UrlPlaceholderLbl, GetHLMembersUrl(), Format(QueryFieldName), TypeHelper.UrlEncode(QueryFieldValue))));
     end;
 
     [TryFunction]
@@ -370,12 +388,14 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(TableIsIntegrated);
     end;
 
+    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
     procedure IsInstantTaskEnqueue(): Boolean
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Instant Task Enqueue");
     end;
 
+    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
     procedure ConfirmInstantTaskEnqueue(): Boolean
     var
         AllowedOnlyInTestEnvMsg: Label 'This mode is not recommended on live environments, as it may lead to incorrect data being sent to HeyLoyalty.\Are you sure you want to enable it?';
@@ -437,6 +457,24 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Unsubscribe if Blocked");
+    end;
+
+    procedure RequireGDPRApproval(): Boolean
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Require GDPR Approval");
+    end;
+
+    procedure RequireNewsletterSubscr(): Boolean
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Require Newsletter Subscrip.");
+    end;
+
+    procedure RequiredContactInfo(): Enum "NPR HL Required Contact Method"
+    begin
+        HLSetup.GetRecordOnce(false);
+        exit(HLSetup."Required Contact Info");
     end;
 
     procedure SendHeybookingErrToEmail(): Text

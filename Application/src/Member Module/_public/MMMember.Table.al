@@ -190,6 +190,14 @@
             DataClassification = CustomerContent;
             OptionCaption = ' ,Yes,No';
             OptionMembers = NOT_SPECIFIED,YES,NO;
+
+            trigger OnValidate()
+            var
+                HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
+            begin
+                if "E-Mail News Letter" = "E-Mail News Letter"::YES then
+                    HLMemberMgt.CheckAndConfirmHLResubscription(Rec);
+            end;
         }
         field(85; "Created Datetime"; DateTime)
         {
