@@ -229,7 +229,7 @@ codeunit 6059997 "NPR HL Send Members"
         ResponseJToken: JsonToken;
         HeyLoyaltyId: Text;
     begin
-        if not HLIntegrationMgt.InvokeGetHLMemberByEmail(HLMember, ResponseJToken) then begin
+        if not HLIntegrationMgt.InvokeGetHLMemberByContactInfo(HLMember, ResponseJToken) then begin
             if WithError then
                 Error(GetLastErrorText());
             exit('');

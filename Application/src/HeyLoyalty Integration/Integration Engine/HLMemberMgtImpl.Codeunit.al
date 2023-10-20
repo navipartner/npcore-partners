@@ -55,7 +55,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     begin
         if not UpdateHLMember(Member, MembershipRole, MemberDeleted, "NPR HL Auto Create HL Member"::Eligible, HLMember) then
             exit(false);
-        exit(ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime(), Enqueue));
+        exit(ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, false), CurrentDateTime(), Enqueue));
     end;
 
     procedure ScheduleHLMemberProcessing(HLMember: Record "NPR HL HeyLoyalty Member"; NotBeforeDateTime: DateTime; Enqueue: Boolean): Boolean
@@ -227,24 +227,64 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         HLMember: Record "NPR HL HeyLoyalty Member";
     begin
         if not GetHLMember(Member, MembershipRole, HLMember, "NPR HL Auto Create HL Member"::Never) then begin
-            if not MemberIsEligibleForSubscription(Member, MembershipRole, WithError) then
+            if not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, WithError) then
                 exit(false);
             Clear(HLMember);
         end;
 
+        if not CheckMemberContactInfo(Member, WithError) then
+            exit(false);
+
         if WithError then begin
-            Member.TestField("E-Mail Address");
-            if (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES) and (HLMember."Unsubscribed at" <> 0DT) then
-                Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
+            if Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES then
+                if HLIntegrationMgt.RequireNewsletterSubscr() or (HLMember."Unsubscribed at" <> 0DT) then
+                    Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
             exit(true);
         end;
 
         exit(
-            (Member."E-Mail Address" <> '') and
-            ((Member."E-Mail News Letter" = Member."E-Mail News Letter"::YES) or (HLMember."Unsubscribed at" = 0DT)));
+            (Member."E-Mail News Letter" = Member."E-Mail News Letter"::YES) or (not HLIntegrationMgt.RequireNewsletterSubscr() and (HLMember."Unsubscribed at" = 0DT))
+        );
     end;
 
-    procedure MemberIsEligibleForSubscription(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; WithError: Boolean): Boolean
+    local procedure CheckMemberContactInfo(Member: Record "NPR MM Member"; WithError: Boolean): Boolean
+    var
+        BothRequiredErr: Label 'You must specify both %1 and %2 for %3 = %4 before you can proceed with the task.', Comment = '%1 - field "E-Mail Address" caption; %2 - field "Phone No." caption; %3 - "Member" table caption; %4 - member number';
+        EitherRequiredErr: Label 'You must specify either %1 or %2 for %3 = %4 before you can proceed with the task.', Comment = '%1 - field "E-Mail Address" caption; %2 - field "Phone No." caption; %3 - "Member" table caption; %4 - member number';
+    begin
+        case HLIntegrationMgt.RequiredContactInfo() of
+            "NPR HL Required Contact Method"::Email:
+                begin
+                    if WithError then
+                        Member.TestField("E-Mail Address");
+                    exit(Member."E-Mail Address" <> '');
+                end;
+            "NPR HL Required Contact Method"::Phone:
+                begin
+                    if WithError then
+                        Member.TestField("Phone No.");
+                    exit(Member."Phone No." <> '');
+                end;
+            "NPR HL Required Contact Method"::Email_or_Phone:
+                begin
+                    if (Member."E-Mail Address" <> '') or (Member."Phone No." <> '') then
+                        exit(true);
+                    if WithError then
+                        Error(EitherRequiredErr, Member.FieldCaption("E-Mail Address"), Member.FieldCaption("Phone No."), Member.TableCaption(), Member."External Member No.");
+                    exit(false);
+                end;
+            "NPR HL Required Contact Method"::Email_and_Phone:
+                begin
+                    if (Member."E-Mail Address" <> '') and (Member."Phone No." <> '') then
+                        exit(true);
+                    if WithError then
+                        Error(BothRequiredErr, Member.FieldCaption("E-Mail Address"), Member.FieldCaption("Phone No."), Member.TableCaption(), Member."External Member No.");
+                    exit(false);
+                end;
+        end;
+    end;
+
+    procedure MemberIsEligibleForHLSync(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; HLMember: Record "NPR HL HeyLoyalty Member"; WithError: Boolean): Boolean
     var
         Membership: Record "NPR MM Membership";
     begin
@@ -258,16 +298,19 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                 Membership.TestField(Blocked, false);
                 MembershipRole.TestField(Blocked, false);
             end;
-            Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
-            MembershipRole.TestField("GDPR Approval", MembershipRole."GDPR Approval"::ACCEPTED);
+            if HLIntegrationMgt.RequireNewsletterSubscr() or (HLMember."Unsubscribed at" <> 0DT) then
+                Member.TestField("E-Mail News Letter", Member."E-Mail News Letter"::YES);
+            if HLIntegrationMgt.RequireGDPRApproval() then
+                MembershipRole.TestField("GDPR Approval", MembershipRole."GDPR Approval"::ACCEPTED);
             exit(true);
         end;
 
         exit(
             not (
                 (HLIntegrationMgt.UnsubscribeIfBlocked() and (Member.Blocked or Membership.Blocked or MembershipRole.Blocked)) or
-                (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES) or
-                (MembershipRole."GDPR Approval" <> MembershipRole."GDPR Approval"::ACCEPTED)));
+                ((HLIntegrationMgt.RequireNewsletterSubscr() or (HLMember."Unsubscribed at" <> 0DT)) and (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES)) or
+                (HLIntegrationMgt.RequireGDPRApproval() and (MembershipRole."GDPR Approval" <> MembershipRole."GDPR Approval"::ACCEPTED))
+                ));
     end;
 
     procedure UpdateHLMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; var HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
@@ -313,10 +356,12 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         HLMember."Membership Code" := Membership."Membership Code";
         HLMember."HL Membership Name" := GetMembershipHLName(HLMember."Membership Code");
 
-        HLMember."E-Mail News Letter" := Member."E-Mail News Letter";
         if HLMember."Unsubscribed at" = 0DT then
-            if HLMember.Deleted or HLMember.Anonymized or not MemberIsEligibleForSubscription(Member, MembershipRole, false) then
+            if HLMember.Deleted or HLMember.Anonymized or not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, false) or
+               ((HLMember."E-Mail News Letter" = HLMember."E-Mail News Letter"::YES) and (HLMember."E-Mail News Letter" <> Member."E-Mail News Letter"))
+            then
                 HLMember."Unsubscribed at" := CurrentDateTime();
+        HLMember."E-Mail News Letter" := Member."E-Mail News Letter";
 
         Updated :=
             AttributeMgt.UpdateHLMemberAttributesFromMember(HLMember) or
@@ -338,14 +383,12 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         HLMember.SetCurrentKey("Member Entry No.");
         HLMember.SetRange("Member Entry No.", Member."Entry No.");
         if not HLMember.FindLast() then begin
+            Clear(HLMember);
             case AutoInsert of
                 AutoInsert::Never:
-                    begin
-                        Clear(HLMember);
-                        exit(false);
-                    end;
+                    exit(false);
                 AutoInsert::Eligible:
-                    if not MemberIsEligibleForSubscription(Member, MembershipRole, false) then
+                    if not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, false) then
                         exit(false);
             end;
 
@@ -507,12 +550,25 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     end;
 
     procedure GetHLEssentialFieldValues(var HLMember: Record "NPR HL HeyLoyalty Member"; HLMemberJToken: JsonToken; Mandatory: Boolean)
+    var
+        RequiredContactMethod: Enum "NPR HL Required Contact Method";
+        EmailMandatory: Boolean;
+        PhoneMandatory: Boolean;
     begin
-        HLMember."HeyLoyalty Id" := GetHeyLoyaltyIDFromResponse(HLMemberJToken, HLMember."HeyLoyalty Id");
-        HLMember."E-Mail Address" := GetEmailFromResponse(HLMemberJToken, Mandatory, HLMember."E-Mail Address");
-#pragma warning disable AA0139
-        HLMember."Phone No." := JsonHelper.GetJText(HLMemberJToken, 'fields.mobile.value', MaxStrLen(HLMember."Phone No."), false, HLMember."Phone No.");
+        if Mandatory then begin
+            RequiredContactMethod := HLIntegrationMgt.RequiredContactInfo();
+            EmailMandatory := RequiredContactMethod in [RequiredContactMethod::Email, RequiredContactMethod::Email_and_Phone];
+            PhoneMandatory := RequiredContactMethod in [RequiredContactMethod::Phone, RequiredContactMethod::Email_and_Phone];
+        end;
 
+        HLMember."HeyLoyalty Id" := GetHeyLoyaltyIDFromResponse(HLMemberJToken, HLMember."HeyLoyalty Id");
+        HLMember."Phone No." := GetPhoneFromResponse(HLMemberJToken, PhoneMandatory, HLMember."Phone No.");
+        if Mandatory then
+            if (RequiredContactMethod = RequiredContactMethod::Email_or_Phone) and (HLMember."Phone No." = '') then
+                EmailMandatory := true;
+        HLMember."E-Mail Address" := GetEmailFromResponse(HLMemberJToken, EmailMandatory, HLMember."E-Mail Address");
+
+#pragma warning disable AA0139
         HLMember."HL Member Status" := LowerCase(JsonHelper.GetJText(HLMemberJToken, 'status.status', MaxStrLen(HLMember."HL Member Status"), false, HLMember."HL Member Status"));
 #pragma warning restore
         case LowerCase(JsonHelper.GetJText(HLMemberJToken, 'status.email', false)) of
@@ -545,6 +601,13 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     begin
 #pragma warning disable AA0139
         exit(JsonHelper.GetJText(HeyLoyaltyResponse, 'fields.email.value', 80, Mandatory and (DefaultEmail = ''), DefaultEmail));
+#pragma warning restore
+    end;
+
+    procedure GetPhoneFromResponse(HeyLoyaltyResponse: JsonToken; Mandatory: Boolean; DefaultPhone: Text[30]): Text[30]
+    begin
+#pragma warning disable AA0139
+        exit(JsonHelper.GetJText(HeyLoyaltyResponse, 'fields.mobile.value', 30, Mandatory and (DefaultPhone = ''), DefaultPhone));
 #pragma warning restore
     end;
 
@@ -653,6 +716,22 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
             Error(TooLongIDErr, HeyLoyaltyId, 50);
     end;
 
+    procedure CheckAndConfirmHLResubscription(Member: Record "NPR MM Member")
+    var
+        HLMember: Record "NPR HL HeyLoyalty Member";
+        MembershipRole: Record "NPR MM Membership Role";
+        ConfirmResubscribeQst: Label 'Member %1 has previously opted out of receiving the HeyLoyalty newsletter. Continuing may result in the member resubscribing to the newsletter. Are you sure you wish to proceed?', Comment = '%1 - member external number';
+    begin
+        if Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES then
+            exit;
+        if not GetHLMember(Member, MembershipRole, HLMember, "NPR HL Auto Create HL Member"::Never) then
+            exit;
+        if HLMember."Unsubscribed at" = 0DT then
+            exit;
+        if not Confirm(ConfirmResubscribeQst, false, Member."External Member No.") then
+            Error('');
+    end;
+
     procedure DoInitialSync(var Member: Record "NPR MM Member"; WithDialog: Boolean)
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
@@ -684,12 +763,12 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                 end;
 
                 Clear(HLMember);
-                if Member."E-Mail Address" <> '' then
+                if CheckMemberContactInfo(Member, false) then
                     if FindMembershipRole(Member, MembershipRole) then
                         if UpdateHLMember(Member, MembershipRole, false, "NPR HL Auto Create HL Member"::Eligible, HLMember) or
                            ((HLMember."Member Entry No." = Member."Entry No.") and (HLMember."HeyLoyalty Id" = ''))
                         then begin
-                            ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForSubscription(Member, MembershipRole, false), CurrentDateTime(), true);
+                            ScheduleHLMemberProcessing(HLMember, not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, false), CurrentDateTime(), true);
                             Commit();
                         end;
             until Member.Next() = 0;

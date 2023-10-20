@@ -99,7 +99,7 @@ report 6014461 "NPR HL Import Members"
         HLMemberStatusesJObject: JsonObject;
         ColumnName: Text;
         DateTimeAsDecimal: Decimal;
-        EmailNotFoundErr: Label 'Email address could not be found. Worksheet row No. %1', Comment = '%1 - excell worksheet row number';
+        ContactInfoNotFoundErr: Label 'Neither email address nor phone number could be found. Worksheet row No. %1', Comment = '%1 - excell worksheet row number';
         IdNotFoundErr: Label 'HeyLoyalty ID could not be found. Worksheet row No. %1', Comment = '%1 - excell worksheet row number';
     begin
         ExcelBuffer.SetRange("Row No.", RowNo);
@@ -143,10 +143,10 @@ report 6014461 "NPR HL Import Members"
             Error(IdNotFoundErr, RowNo);
 
         if not HLWSMgt.GetHLMemberByHeyLoyaltyID(HLMemberEssensialValuesIn."HeyLoyalty Id", HLMember) then begin
-            if HLMemberEssensialValuesIn."E-Mail Address" = '' then
-                Error(EmailNotFoundErr, RowNo);
+            if (HLMemberEssensialValuesIn."E-Mail Address" = '') and (HLMemberEssensialValuesIn."Phone No." = '') then
+                Error(ContactInfoNotFoundErr, RowNo);
             HLMember := HLMemberEssensialValuesIn;
-            if not HLWSMgt.GetHLMemberByEmailAddress(HLMember) then begin
+            if not HLWSMgt.GetHLMemberByContactInfo(HLMember) then begin
                 if HLMemberEssensialValuesIn."Unsubscribed at" <> 0DT then
                     exit(false);
                 HLMember.Init();
