@@ -161,7 +161,7 @@
     local procedure CreateRecipients(MembershipNotification: Record "NPR MM Membership Notific.")
     var
         MembershipRole: Record "NPR MM Membership Role";
-        HaveNotificationAddress: Boolean;
+        CreateNotification: Boolean;
         NotificationMethod: Option;
         NotificationAddress: Text[100];
         NotificationEngine: Option;
@@ -179,22 +179,28 @@
 
         if (MembershipRole.FindSet()) then begin
             repeat
-                HaveNotificationAddress := false;
+                CreateNotification := false;
 
-                case (MembershipRole."Member Role") of
-                    MembershipRole."Member Role"::ADMIN:
-                        HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
-                    MembershipRole."Member Role"::MEMBER:
-                        HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
-                    MembershipRole."Member Role"::DEPENDENT:
-                        if (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::ALL_MEMBERS) then
-                            HaveNotificationAddress := GetGuardianNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
-                    MembershipRole."Member Role"::GUARDIAN:
-                        if (MembershipNotification."Target Member Role" in [MembershipNotification."Target Member Role"::ALL_ADMINS, MembershipNotification."Target Member Role"::FIRST_ADMIN]) then
-                            HaveNotificationAddress := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::WALLET_UPDATE) then begin
+                    // These types do not notify the member, only server is updated
+                    CreateNotification := SetWalletNotificationAddress(NotificationMethod, NotificationAddress, NotificationEngine);
+
+                end else begin
+                    case (MembershipRole."Member Role") of
+                        MembershipRole."Member Role"::ADMIN:
+                            CreateNotification := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                        MembershipRole."Member Role"::MEMBER:
+                            CreateNotification := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                        MembershipRole."Member Role"::DEPENDENT:
+                            if (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::ALL_MEMBERS) then
+                                CreateNotification := GetGuardianNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                        MembershipRole."Member Role"::GUARDIAN:
+                            if (MembershipNotification."Target Member Role" in [MembershipNotification."Target Member Role"::ALL_ADMINS, MembershipNotification."Target Member Role"::FIRST_ADMIN]) then
+                                CreateNotification := GetMemberNotificationAddress(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
+                    end;
                 end;
 
-                if (HaveNotificationAddress) then
+                if (CreateNotification) then
                     CreateNotificationEntry(MembershipNotification, MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", NotificationMethod, NotificationAddress, NotificationEngine);
 
             until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
@@ -392,6 +398,16 @@
         exit(false);
     end;
 
+    local procedure SetWalletNotificationAddress(var NotificationMethod: Option; var NotificationAddress: Text[100]; var NotificationEngine: Option): Boolean
+    var
+        MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+    begin
+        NotificationMethod := MemberNotificationEntry."Notification Method"::WALLET;
+        NotificationAddress := '';
+        NotificationEngine := MemberNotificationEntry."Notification Engine"::NATIVE;
+        exit(true);
+    end;
+
     local procedure GetMemberNotificationAddress(MembershipNotification: Record "NPR MM Membership Notific."; MembershipEntryNo: Integer; MemberEntryNo: Integer; var NotificationMethod: Option; var NotificationAddress: Text[100]; var NotificationEngine: Option) FoundAddress: Boolean
     var
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
@@ -456,6 +472,13 @@
                     MemberNotificationEntry2."Notification Method"::NONE:
                         begin
                             SendStatus := MemberNotificationEntry2."Notification Send Status"::NOT_SENT;
+                        end;
+
+                    MemberNotificationEntry2."Notification Method"::WALLET:
+                        begin
+                            CreateNpPass(MemberNotificationEntry2);
+                            MemberNotificationEntry2.Modify();
+                            SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
                         end;
 
                     MemberNotificationEntry2."Notification Method"::EMAIL:
