@@ -447,6 +447,7 @@
         TicketManagement: Codeunit "NPR TM Ticket Management";
         WaitingListReferenceCode: Code[10];
         CreateAdmission: Boolean;
+        DateTimeLbl: Label '%1 - %2', Locked = true;
     begin
 
         Clear(AdmissionSchEntry);
@@ -477,12 +478,14 @@
                     if (AdmissionSchEntry."Admission Code" <> AdmissionCode) then
                         Error(WRONG_SCH_ENTRY, ReservationRequest."External Adm. Sch. Entry No.", AdmissionCode);
 
+                    ReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionSchEntry."Admission Start Date", AdmissionSchEntry."Admission Start Time");
                 end;
             end;
 
             ReservationRequest."Admission Created" := (ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::NOT_SELECTED);
             CreateAdmission := ReservationRequest."Admission Created";
             ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
+            ReservationRequest."Admission Description" := Admission.Description;
             ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
             ReservationRequest.Modify();
 
