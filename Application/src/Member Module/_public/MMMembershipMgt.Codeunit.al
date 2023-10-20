@@ -1001,6 +1001,7 @@
                     Member.FilterGroup(-1);
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                    Member.FilterGroup(0);
                 end;
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
