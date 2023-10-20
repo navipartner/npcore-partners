@@ -960,6 +960,8 @@
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
     begin
 
+        SelectLatestVersion();
+
         FirstEntryNo := 0;
         LastEntryNo := 0;
 
@@ -970,15 +972,15 @@
                 exit(-1);
 
         DetTicketAccessEntry.SetFilter("Entry No.", '>%1', TicketAccessStatistics."Highest Access Entry No.");
-        if (DetTicketAccessEntry.FindFirst()) then begin
-            FirstEntryNo := DetTicketAccessEntry."Entry No.";
-            StartDate := DT2Date(DetTicketAccessEntry."Created Datetime");
-        end;
+        if (not DetTicketAccessEntry.FindFirst()) then
+            exit(0);
 
-        if (DetTicketAccessEntry.FindLast()) then begin
-            LastEntryNo := DetTicketAccessEntry."Entry No.";
-            MaxDate := DT2Date(DetTicketAccessEntry."Created Datetime");
-        end;
+        FirstEntryNo := DetTicketAccessEntry."Entry No.";
+        StartDate := DT2Date(DetTicketAccessEntry."Created Datetime");
+
+        DetTicketAccessEntry.FindLast();
+        LastEntryNo := DetTicketAccessEntry."Entry No.";
+        MaxDate := DT2Date(DetTicketAccessEntry."Created Datetime");
 
         exit(LastEntryNo);
     end;
@@ -991,8 +993,9 @@
         if (TicketAccessFact.IsEmpty()) then
             exit;
 
-        TicketAccessFact.LockTable();
+        TicketAccessFact.LockTable(true);
         TicketAccessFact.FindFirst();
+
     end;
 
     local procedure InitializeLeaf(var TicketStatisticsLeaf: JsonObject; AdmissionCode: Code[20]; AccessDate: Date; MaxAdmissionEntryNo: Integer; ItemFactCode: Code[20]; TicketTypeFactCode: Code[20]; VariantFactCode: Code[10]; AdmissionHour: Integer)
