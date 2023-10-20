@@ -150,7 +150,6 @@
             part(SubForm; "NPR Campaign Discount Lines")
             {
                 SubPageLink = Code = Field(Code);
-                Visible = SubpageVisible;
                 ApplicationArea = NPRRetail;
 
             }
@@ -488,22 +487,8 @@
         }
     }
 
-    trigger OnInit()
-    begin
-        SubpageVisible := true;
-    end;
-
-    trigger OnOpenPage()
-    var
-        PeriodDiscount: Record "NPR Period Discount";
-    begin
-        if PeriodDiscount.IsEmpty then
-            SubpageVisible := false;
-    end;
-
     var
         Item: Record Item;
-        SubpageVisible: Boolean;
 
     internal procedure TransferToPeriod()
     var
