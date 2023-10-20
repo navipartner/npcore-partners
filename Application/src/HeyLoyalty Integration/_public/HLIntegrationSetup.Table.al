@@ -28,6 +28,9 @@ table 6059800 "NPR HL Integration Setup"
         {
             Caption = 'Instant Task Enqueue';
             DataClassification = SystemMetadata;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR27.0';
+            ObsoleteReason = 'Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.';
 
             trigger OnValidate()
             var
@@ -91,6 +94,23 @@ table 6059800 "NPR HL Integration Setup"
             Caption = 'Unsubscribe if Blocked';
             DataClassification = CustomerContent;
             InitValue = true;
+        }
+        field(75; "Require GDPR Approval"; Boolean)
+        {
+            Caption = 'Require GDPR Approval';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(80; "Require Newsletter Subscrip."; Boolean)
+        {
+            Caption = 'Require Newsletter Subscription';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(85; "Required Contact Info"; Enum "NPR HL Required Contact Method")
+        {
+            Caption = 'Required Contact Info';
+            DataClassification = CustomerContent;
         }
         field(100; "Heybooking Integration Enabled"; Boolean)
         {

@@ -8,8 +8,9 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         MembershipRole: Record "NPR MM Membership Role";
         HLMember: Record "NPR HL HeyLoyalty Member";
         Member: Record "NPR MM Member";
+        DataLogMgt: Codeunit "NPR Data Log Management";
         MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
-        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        RecRef: RecordRef;
         IsCascadeUpdate: Boolean;
     begin
         if NPRAttributeKey."Table ID" <> Database::"NPR MM Member" then
@@ -25,10 +26,12 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         MemberMgt.FindMembershipRole(Member, MembershipRole);
         if not MemberMgt.GetHLMember(Member, MembershipRole, HLMember, "NPR HL Auto Create HL Member"::Eligible) then
             exit;
-        if UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet) then begin
-            MemberMgt.UpdateHLMember(Member, MembershipRole, HLMember);
-            MemberMgt.ScheduleHLMemberProcessing(HLMember, HLScheduleSend.NowWithDelayInSeconds(10), true);
-        end;
+        if not HLMemberAttributeUpdateIsRequired(HLMember, NPRAttributeValueSet) then
+            exit;
+        RecRef.GetTable(Member);
+        DataLogMgt.DisableIgnoredFields(true);
+        DataLogMgt.LogDatabaseModify(RecRef);
+        DataLogMgt.DisableIgnoredFields(false);
     end;
 
     procedure UpdateHLMemberAttributesFromMember(HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
@@ -67,11 +70,36 @@ codeunit 6059990 "NPR HL Attribute Mgt."
         exit(ChangesFound);
     end;
 
-    local procedure UpdateHLMemberAttribute(HLMember: Record "NPR HL HeyLoyalty Member"; NPRAttributeValueSet: Record "NPR Attribute Value Set"): Boolean
-    var
-        HLMemberAttribute: Record "NPR HL Member Attribute";
+    local procedure HLMemberAttributeUpdateIsRequired(HLMember: Record "NPR HL HeyLoyalty Member"; NPRAttributeValueSet: Record "NPR Attribute Value Set"): Boolean
     begin
-        exit(UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet, HLMemberAttribute));
+        exit(HLMemberAttributeUpdateIsRequired(HLMember, NPRAttributeValueSet."Attribute Code", CopyStr(UpperCase(NPRAttributeValueSet."Text Value"), 1, 20)));
+    end;
+
+    local procedure HLMemberAttributeUpdateIsRequired(HLMember: Record "NPR HL HeyLoyalty Member"; AttributeCode: Code[20]; AttributeValueCode: Code[20]): Boolean
+    var
+        NPRAttributeValue: Record "NPR Attribute Lookup Value";
+        HLMemberAttribute: Record "NPR HL Member Attribute";
+        xHLMemberAttribute: Record "NPR HL Member Attribute";
+        HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+    begin
+        HLMemberAttribute."HeyLoyalty Member Entry No." := HLMember."Entry No.";
+        HLMemberAttribute."Attribute Code" := AttributeCode;
+        if not HLMemberAttribute.Find() then
+            exit(AttributeValueCode <> '');
+        if AttributeValueCode = '' then
+            exit(true);
+        xHLMemberAttribute := HLMemberAttribute;
+
+        if not NPRAttributeValue.Get(AttributeCode, AttributeValueCode) then begin
+            NPRAttributeValue."Attribute Code" := AttributeCode;
+            NPRAttributeValue."Attribute Value Code" := AttributeValueCode;
+            HLMemberAttribute."HeyLoyalty Attribute Value" := AttributeValueCode;
+        end else
+            HLMemberAttribute."HeyLoyalty Attribute Value" :=
+                HLMappedValueMgt.GetMappedValue(NPRAttributeValue.RecordId, NPRAttributeValue.FieldNo("Attribute Value Name"), false);
+        HLMemberAttribute."Attribute Value Code" := NPRAttributeValue."Attribute Value Code";
+
+        exit(Format(xHLMemberAttribute) <> Format(HLMemberAttribute));
     end;
 
     local procedure UpdateHLMemberAttribute(HLMember: Record "NPR HL HeyLoyalty Member"; NPRAttributeValueSet: Record "NPR Attribute Value Set"; var HLMemberAttribute: Record "NPR HL Member Attribute"): Boolean

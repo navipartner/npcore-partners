@@ -16,6 +16,7 @@
         DataLogActivated: Boolean;
         MonitoredTablesLoaded: Boolean;
         DataLogDisabled: Boolean;
+        IgnoredFieldCheckDisabled: Boolean;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR System Event Wrapper", 'OnAfterGetDatabaseTableTriggerSetup', '', true, false)]
     local procedure GetDatabaseTableTriggerSetup(TableId: Integer; var OnDatabaseInsert: Boolean; var OnDatabaseModify: Boolean; var OnDatabaseDelete: Boolean; var OnDatabaseRename: Boolean)
@@ -133,8 +134,9 @@
         if (not TempDataLogSetup.Get(RecRef.Number)) or (TempDataLogSetup."Log Modification" = TempDataLogSetup."Log Modification"::" ") then
             exit;
 
-        if OnlyIgroredFieldsModified(RecRef) then
-            exit;
+        if not IgnoredFieldCheckDisabled then
+            if OnlyIgroredFieldsModified(RecRef) then
+                exit;
 
         RecordEntryNo := InsertDataRecord(RecRef, TimeStamp, 1);
         if TempDataLogSetup."Log Modification" in [TempDataLogSetup."Log Modification"::Detailed, TempDataLogSetup."Log Modification"::Changes] then
@@ -254,7 +256,7 @@
             exit;
         if not DataLogSetup.ReadPermission() then
             exit;
-            
+
         TempDataLogSetup.DeleteAll();
         if DataLogSetup.FindSet() then
             repeat
@@ -276,6 +278,11 @@
     procedure DisableDataLog(Disable: Boolean)
     begin
         DataLogDisabled := Disable;
+    end;
+
+    procedure DisableIgnoredFields(Disable: Boolean)
+    begin
+        IgnoredFieldCheckDisabled := Disable;
     end;
 
     local procedure InsertDataFields(var RecRef: RecordRef; RecordEntryNo: BigInteger; LastModified: DateTime; LogChanges: Boolean)

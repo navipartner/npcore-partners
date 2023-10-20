@@ -108,6 +108,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Print Template", 'UpgradeLogoAlignment'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RegistItemWorkshLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailCampaignItems'));
@@ -419,6 +420,8 @@
                 case UpgradeStep of
                     'MoveHeyLoyaltyValueMappings':
                         exit('MoveHeyLoyaltyValueMappings_20230314');
+                    'SetHLSetupDefaultValues':
+                        exit('SetHLSetupDefaultValues_20231019');
                 end;
             Codeunit::"NPR UPG Vend Item No Expansion":
                 case UpgradeStep of

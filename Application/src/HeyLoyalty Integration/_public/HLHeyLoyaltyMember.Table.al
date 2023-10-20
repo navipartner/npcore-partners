@@ -241,6 +241,7 @@ table 6059801 "NPR HL HeyLoyalty Member"
         key(BCMember; "Member Entry No.") { }
         key(HLId; "HeyLoyalty Id") { }
         key(Email; "E-Mail Address") { }
+        key(Phone; "Phone No.", "E-Mail Address") { }
         key(Errors; "Update from HL Error") { }
     }
 
