@@ -99,7 +99,16 @@ page 6059866 "NPR TM Dynamic Price Rules"
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the VAT Percentage field.';
                 }
-
+                field(RoundingPrecision; Rec.RoundingPrecision)
+                {
+                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Rounding Precision field.';
+                }
+                field(RoundingDirection; Rec.RoundingDirection)
+                {
+                    ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Rounding Direction field.';
+                }
             }
         }
     }
