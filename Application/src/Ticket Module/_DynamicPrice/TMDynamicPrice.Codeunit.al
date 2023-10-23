@@ -230,17 +230,32 @@ codeunit 6014559 "NPR TM Dynamic Price"
                 AddonPrice := RuleAmountExVat;
         end;
 
-
         // VAT Adjust
         if (UnitPriceIncludesVAT) then begin
             BasePrice := AddVat(BasePrice, UnitPriceVatPercentage);
             AddonPrice := AddVat(AddonPrice, UnitPriceVatPercentage);
         end;
 
-        BasePrice := Round(BasePrice, 0.01);
-        AddonPrice := Round(AddonPrice, 0.01);
+        BasePrice := RoundAmount(BasePrice, PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+        AddonPrice := RoundAmount(AddonPrice, PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+    end;
 
+    procedure RoundAmount(Amount: Decimal; Precision: Decimal; Direction: Option): Decimal
+    var
+        PriceRule: Record "NPR TM Dynamic Price Rule";
+    begin
+        if (Precision <= 0) then
+            Precision := 0.01;
 
+        if ((Direction < PriceRule.RoundingDirection::Nearest) or (Direction > PriceRule.RoundingDirection::Down)) then
+            Direction := PriceRule.RoundingDirection::Nearest;
+
+        if (Direction = PriceRule.RoundingDirection::Nearest) then
+            exit(Round(Amount, Precision, '='));
+        if (Direction = PriceRule.RoundingDirection::Up) then
+            exit(Round(Amount, Precision, '>'));
+        if (Direction = PriceRule.RoundingDirection::Down) then
+            exit(Round(Amount, Precision, '<'));
     end;
 
     local procedure RemoveVat(Amount: Decimal; VATPercentage: Decimal) NewAmount: Decimal
