@@ -574,6 +574,7 @@
         TicketMakeReservationPage.SetTicketItem(Ticket."Item No.", Ticket."Variant Code");
         TicketMakeReservationPage.AllowQuantityChange(IsUnpaidTourTicket(Ticket));
         TicketMakeReservationPage.SetAllowCustomizableTicketQtyChange(true);
+        TicketMakeReservationPage.SetIgnoreScheduleSelectionFilter(true);
         TicketMakeReservationPage.LoadTicketRequest(RequestToken);
         TicketMakeReservationPage.LookupMode(true);
         PageAction := TicketMakeReservationPage.RunModal();
