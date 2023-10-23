@@ -8,7 +8,7 @@
     SourceTable = "NPR NpRv Voucher Type";
 #if NOT BC17
     AboutTitle = 'Voucher Type';
-    AboutText = 'This page is used to configure and manage NpRv Voucher Types. Voucher types enable you to create, send, set up, and validate vouchers for various purposes. Personalize voucher types to suit your business requirements and efficiently distribute value to recipients';
+    AboutText = 'This page is used to configure and manage Voucher Types. Voucher types enable you to create, send, set up, and validate vouchers for various purposes. Personalize voucher types to suit your business requirements and efficiently distribute value to recipients';
 #endif
 
     layout
@@ -20,7 +20,7 @@
                 Caption = 'General';
 #if NOT BC17
                 AboutTitle = 'General Information';
-                AboutText = 'This section is used to access general information about the NPR NpRv Voucher Type. Here, you can find details such as the voucher type''s name, description, and any relevant information that distinguishes it from other voucher types.';
+                AboutText = 'This section is used to access general information about the Voucher Type. Here, you can find details such as the voucher type''s name, description, and any relevant information that distinguishes it from other voucher types.';
 #endif
                 group(Control6014420)
                 {

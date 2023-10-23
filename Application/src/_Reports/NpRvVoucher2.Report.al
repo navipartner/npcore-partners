@@ -6,7 +6,7 @@ report 6151014 "NPR NpRv Voucher 2"
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 2.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 2.docx';
-    Caption = 'NpRv Voucher';
+    Caption = 'Voucher';
     UsageCategory = None;
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;

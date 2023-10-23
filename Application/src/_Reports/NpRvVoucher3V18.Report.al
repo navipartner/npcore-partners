@@ -2,19 +2,19 @@
 report 6151015 "NPR NpRv Voucher 3"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 3.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 3.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'NpRv Voucher';
+    Caption = 'Voucher';
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
     ObsoleteTag = 'NPR23.0';
     ObsoleteReason = 'Will be removed in the next version.';
-    
+
     dataset
     {
         dataitem("NpRv Voucher"; "NPR NpRv Voucher")
@@ -179,7 +179,7 @@ report 6151015 "NPR NpRv Voucher 3"
             end;
         }
     }
- requestpage
+    requestpage
     {
         SaveValues = true;
     }
