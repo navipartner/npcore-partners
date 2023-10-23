@@ -13,7 +13,7 @@ codeunit 85108 "NPR NpCs POSAct ProcOrder Test"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    [HandlerFunctions('OpenModalPageHandler')]
+    [HandlerFunctions('OpenPageHandler')]
     procedure NpCsProcessOrder()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -35,8 +35,8 @@ codeunit 85108 "NPR NpCs POSAct ProcOrder Test"
         ProcessOrderB.RunCollectInStoreOrders('', 1);
     end;
 
-    [ModalPageHandler]
-    procedure OpenModalPageHandler(var Page: Page "NPR NpCs Coll. Store Orders"; var ActionResponse: Action)
+    [PageHandler]
+    procedure OpenPageHandler(var Page: Page "NPR NpCs Coll. Store Orders")
     begin
         Page.GetRecord(NpCsDocument);
         Assert.IsTrue(true, 'Page did not opened.');

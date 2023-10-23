@@ -28,6 +28,6 @@ codeunit 6151325 "NPR POSAction Proc. CnC OrderB"
                     NpCsDocument.Ascending(false);
                 end;
         end;
-        Page.RunModal(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
+        Page.Run(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
     end;
 }
