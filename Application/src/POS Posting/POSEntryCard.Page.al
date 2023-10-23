@@ -478,7 +478,7 @@
             }
             group("NpRv Vouchers")
             {
-                Caption = 'NpRv Vouchers';
+                Caption = 'Vouchers';
                 action("Voucher Lines")
                 {
                     Caption = 'Voucher Lines';

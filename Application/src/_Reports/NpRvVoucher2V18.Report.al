@@ -2,11 +2,11 @@
 report 6151014 "NPR NpRv Voucher 2"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 2.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 2.docx';
-    Caption = 'NpRv Voucher';
+    Caption = 'Voucher';
     UsageCategory = None;
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;
@@ -179,7 +179,7 @@ report 6151014 "NPR NpRv Voucher 2"
             end;
         }
     }
-     requestpage
+    requestpage
     {
         SaveValues = true;
     }

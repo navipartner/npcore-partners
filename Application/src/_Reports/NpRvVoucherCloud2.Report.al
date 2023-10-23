@@ -6,7 +6,7 @@ report 6014492 "NPR NpRv Voucher Cloud 2"
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DefaultLayout = Word;
-    Caption = 'NpRv Voucher Cloud 2';
+    Caption = 'Voucher Cloud 2';
     DataAccessIntent = ReadOnly;
 
     dataset
