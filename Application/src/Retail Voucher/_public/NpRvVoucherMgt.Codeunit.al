@@ -1384,19 +1384,45 @@
             Error(WrongCustomerTok, Voucher."Reference No.", Voucher."Customer No.", SalePOS."Customer No.");
     end;
 
-    internal procedure GetVoucherTypeFromReferenceNumber(VoucherNumber: Text): Code[20]
+    internal procedure GetVoucherTypeFromReferenceNumber(VoucherNumber: Text) VoucherType: Code[20]
     var
         Voucher: Record "NPR NpRv Voucher";
     begin
+        Voucher.Reset();
+        Voucher.SetCurrentKey("Reference No.");
+        Voucher.SetRange(Open, true);
         Voucher.SetRange("Reference No.", VoucherNumber);
-        if Voucher.Count() = 1 then begin
-            Voucher.FindFirst();
-            exit(Voucher."Voucher Type");
-        end else begin
-            Voucher.SetRange("Reference No.", VoucherNumber);
-            if Page.RunModal(0, Voucher) = Action::LookupOK then
-                exit(Voucher."Voucher Type");
+        if Voucher.Find('-') and (Voucher.Next() = 0) then begin
+            VoucherType := Voucher."Voucher Type";
+            exit;
         end;
+
+        if Page.RunModal(0, Voucher) <> Action::LookupOK then
+            exit;
+
+        VoucherType := Voucher."Voucher Type";
+    end;
+
+    internal procedure GetVoucher(VoucherNumber: Text; VoucherType: Text; SelectFromList: Boolean; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
+    begin
+        Voucher.Reset();
+        Voucher.SetCurrentKey("Reference No.");
+        Voucher.SetRange(Open, true);
+        Voucher.SetFilter("Voucher Type", VoucherType);
+        Voucher.SetFilter("Reference No.", VoucherNumber);
+        if SelectFromList and (VoucherNumber = '') then begin
+            Found := Page.RunModal(0, Voucher) = Action::LookupOK;
+            exit;
+        end;
+
+        Found := Voucher.Find('-') and (Voucher.Next() = 0);
+        if Found then
+            exit;
+
+        if VoucherNumber = '' then
+            exit;
+
+        Found := Page.RunModal(0, Voucher) = Action::LookupOK;
     end;
 
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
