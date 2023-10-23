@@ -97,6 +97,7 @@
         AzureAdTenant: Codeunit "Azure AD Tenant";
         PosUnits: Integer;
     begin
+        PosUnit.SetFilter(Status, '<>%1', PosUnit.Status::INACTIVE);
         PosUnits := PosUnit.Count();
         if EnvironmentInformation.IsSaaS() then begin
             InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
@@ -139,6 +140,7 @@
         AzureAdTenant: Codeunit "Azure AD Tenant";
         PosStores: Integer;
     begin
+        PosStore.SetRange(Inactive, false);
         PosStores := PosStore.Count();
         if EnvironmentInformation.IsSaaS() then begin
             InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
