@@ -67,18 +67,24 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         ReferenceNo: Text;
         VoucherType: Text;
         SuggestedAmount: Decimal;
+        VoucherListEnabled: Boolean;
     begin
         if Context.GetString('VoucherRefNo', ReferenceNo) then;
         if Context.GetString('voucherType', VoucherType) then;
+        if Context.GetBooleanParameter('EnableVoucherList', VoucherListEnabled) then;
 
-        if VoucherType = '' then
-            VoucherType := NPRNpRvVoucherMgt.GetVoucherTypeFromReferenceNumber(ReferenceNo);
+
+        if NPRNpRvVoucherMgt.GetVoucher(ReferenceNo, VoucherType, VoucherListEnabled, NPRNpRvVoucher) then begin
+            VoucherType := NPRNpRvVoucher."Voucher Type";
+            ReferenceNo := NPRNpRvVoucher."Reference No.";
+        end;
 
         if VoucherType = '' then begin
             Response.Add('voucherType', '');
             Response.Add('askForAmount', false);
             Response.Add('suggestedAmount', 0);
             Response.Add('paymentDescription', '');
+            Response.Add('selectedVoucherReferenceNo', ReferenceNo);
             exit;
         end;
 
@@ -87,12 +93,6 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
 
         if not NPRNpRvVoucherModule.Get(NPRNpRvVoucherModule.Type::"Apply Payment", NPRNpRvVoucherType."Apply Payment Module") then
             Clear(NPRNpRvVoucherModule);
-
-        NPRNpRvVoucher.Reset();
-        NPRNpRvVoucher.SetCurrentKey("Reference No.");
-        NPRNpRvVoucher.SetRange("Reference No.", ReferenceNo);
-        if not NPRNpRvVoucher.FindFirst() then
-            Clear(NPRNpRvVoucher);
 
         NPRNpRvVoucher.CalcFields(Amount);
 
@@ -107,6 +107,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         Response.Add('askForAmount', NPRNpRvVoucherModule."Ask For Amount");
         Response.Add('suggestedAmount', SuggestedAmount);
         Response.Add('paymentDescription', NPRPOSPaymentMethod.Description);
+        Response.Add('selectedVoucherReferenceNo', ReferenceNo);
     end;
 
     local procedure GetVoucherType(): Code[20]
@@ -141,11 +142,11 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     internal procedure HandleParameters(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var SelectedAmount: Decimal)
     var
         VoucherListEnabled: Boolean;
-        POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
+        BlankReferenceNoErr: Label 'Reference No. can''t be blank';
     begin
         GetParameterValues(Context, VoucherTypeCode, ParamEndSale, ReferenceNo, VoucherListEnabled, SelectedAmount);
         if ReferenceNo = '' then
-            POSActionScanActionB.CheckReferenceNo(ReferenceNo, VoucherListEnabled, VoucherTypeCode);
+            Error(BlankReferenceNoErr);
     end;
 
     internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean; var SelectedAmount: Decimal)
@@ -288,7 +289,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:r,popup:i,context:s,captions:o})=>{debugger;let t,n={tryEndSale:!1,legacy:!1};if(r.VoucherTypeCode)e.context.voucherType=r.VoucherTypeCode;else if(r.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return n;if(r.ReferenceNo?t=r.ReferenceNo:t=await i.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),!t||(setVoucherTypeFromReferenceNoResponse=await e.respond("calculateVoucherInformation",{VoucherRefNo:t}),e.context.voucherType=setVoucherTypeFromReferenceNoResponse.voucherType,!e.context.voucherType))return n;var f=setVoucherTypeFromReferenceNoResponse.askForAmount,u=setVoucherTypeFromReferenceNoResponse.suggestedAmount,h=setVoucherTypeFromReferenceNoResponse.paymentDescription,m=setVoucherTypeFromReferenceNoResponse.amountPrompt;let c=u;if(f)for(var p=!0;p;){if(c=u,u>0&&(c=await i.numpad({title:h,caption:m,value:u}),c===null))return n;p=c>u,p&&await i.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,c,u))}let a=await e.respond("prepareRequest",{VoucherRefNo:t,selectedAmount:c});return a.tryEndSale?(r.EndSale&&!a.endSaleWithoutPosting&&await e.respond("endSale"),n):(a.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:a.workflowName}):await e.run(a.workflowName,{parameters:a.parameters}),n)};function strSubstNo(e,...r){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(i,s,o)=>{if(s)return s.replace(/(?:{{)|(?:}})/g,t=>t[0]);if(o>=r.length)throw new Error("argument index is out of range in format");return r[o]})}'
+'let main=async({workflow:e,parameters:t,popup:c,context:l,captions:o})=>{debugger;let r,n={tryEndSale:!1,legacy:!1};if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return n;if(t.ReferenceNo?r=t.ReferenceNo:r=await c.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),r===null)return n;const{selectedVoucherReferenceNo:s,askForAmount:h,suggestedAmount:i,paymentDescription:p,amountPrompt:d,voucherType:y}=await e.respond("calculateVoucherInformation",{VoucherRefNo:r});if(e.context.voucherType=y,!e.context.voucherType||(r=s,!r))return n;let u=i;if(h)for(var f=!0;f;){if(u=i,i>0&&(u=await c.numpad({title:p,caption:d,value:i}),u===null))return n;f=u>i,f&&await c.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,u,i))}let a=await e.respond("prepareRequest",{VoucherRefNo:r,selectedAmount:u});return a.tryEndSale?(t.EndSale&&!a.endSaleWithoutPosting&&await e.respond("endSale"),n):(a.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:a.workflowName}):await e.run(a.workflowName,{parameters:a.parameters}),n)};function strSubstNo(e,...t){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(c,l,o)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,r=>r[0]);if(o>=t.length)throw new Error("argument index is out of range in format");return t[o]})}'
         );
     end;
 
