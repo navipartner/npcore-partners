@@ -527,7 +527,7 @@
             }
             group("NpRv Vouchers")
             {
-                Caption = 'NpRv Vouchers';
+                Caption = 'Vouchers';
                 Image = Voucher;
                 action("Voucher Lines")
                 {

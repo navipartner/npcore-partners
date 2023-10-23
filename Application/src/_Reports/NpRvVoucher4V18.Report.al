@@ -2,13 +2,13 @@
 report 6151016 "NPR NpRv Voucher 4"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     RDLCLayout = './src/_Reports/layouts/NpRv Voucher 4.rdlc';
     WordLayout = './src/_Reports/layouts/NpRv Voucher 4.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'NpRv Voucher';
+    Caption = 'Voucher';
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
@@ -179,7 +179,7 @@ report 6151016 "NPR NpRv Voucher 4"
             end;
         }
     }
-     requestpage
+    requestpage
     {
         SaveValues = true;
     }

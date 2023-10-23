@@ -4,7 +4,7 @@ report 6014452 "NPR NpRv VoucherV20"
     UsageCategory = None;
 #else
     ApplicationArea = NPRRetail;
-    Caption = 'NpRv VoucherV20';
+    Caption = 'VoucherV20';
     UsageCategory = ReportsAndAnalysis;
     DefaultRenderingLayout = "Excel Layout";
     Extensible = true;

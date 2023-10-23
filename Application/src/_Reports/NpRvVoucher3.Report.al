@@ -8,7 +8,7 @@ report 6151015 "NPR NpRv Voucher 3"
     WordLayout = './src/_Reports/layouts/NpRv Voucher 3.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
-    Caption = 'NpRv Voucher';
+    Caption = 'Voucher';
     DefaultLayout = Word;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
