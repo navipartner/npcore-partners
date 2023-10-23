@@ -10,13 +10,14 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
     begin
         Voucher.SetCurrentKey("Voucher Type");
         Voucher.SetRange("Voucher Type", VoucherTypeCode);
+        Voucher.SetRange(Open, true);
 
         Clear(NpRvVouchers);
         NpRvVouchers.LookupMode := true;
         NpRvVouchers.SetTableView(Voucher);
         if NpRvVouchers.RunModal() = Action::LookupOK then begin
             NpRvVouchers.GetRecord(Voucher);
-            ReferenceNo := CopyStr(Voucher."Reference No.", MaxStrLen(Voucher."Reference No."));
+            ReferenceNo := CopyStr(Voucher."Reference No.", 1, MaxStrLen(Voucher."Reference No."));
         end;
         if ReferenceNo = '' then
             Error(BlankReferenceNoErr);

@@ -10,24 +10,20 @@ let main = async ({ workflow, parameters, popup, context, captions }) => {
         if (!workflow.context.voucherType) return response;
     }
 
-
     if (parameters.ReferenceNo) {
         voucher_input = parameters.ReferenceNo;
     } else {
         voucher_input = await popup.input({ title: captions.VoucherPaymentTitle, caption: captions.ReferenceNo })
     };
 
-    if (!voucher_input) return response;
+    if (voucher_input === null) return response;
 
-
-    setVoucherTypeFromReferenceNoResponse = await workflow.respond("calculateVoucherInformation", { VoucherRefNo: voucher_input });
-    workflow.context.voucherType = setVoucherTypeFromReferenceNoResponse.voucherType;
+    const { selectedVoucherReferenceNo, askForAmount, suggestedAmount, paymentDescription, amountPrompt, voucherType } = await workflow.respond("calculateVoucherInformation", { VoucherRefNo: voucher_input });
+    workflow.context.voucherType = voucherType;
     if (!workflow.context.voucherType) return response;
 
-    var askForAmount = setVoucherTypeFromReferenceNoResponse.askForAmount;
-    var suggestedAmount = setVoucherTypeFromReferenceNoResponse.suggestedAmount;
-    var paymentDescription = setVoucherTypeFromReferenceNoResponse.paymentDescription
-    var amountPrompt = setVoucherTypeFromReferenceNoResponse.amountPrompt
+    voucher_input = selectedVoucherReferenceNo
+    if (!voucher_input) return response;
 
     let selectedAmount = suggestedAmount;
     if (askForAmount) {
