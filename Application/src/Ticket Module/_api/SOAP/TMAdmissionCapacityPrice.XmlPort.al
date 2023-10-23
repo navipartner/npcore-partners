@@ -238,10 +238,6 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                         textattribute(xCustomerPriceOut)
                         {
                             XmlName = 'customer_price';
-                            trigger OnBeforePassVariable()
-                            begin
-                                xCustomerPriceOut := Format((xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice - xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice * xAdmCapacityPriceBufferResponse.DiscountPct / 100), 0, 9)
-                            end;
                         }
 
 
@@ -264,16 +260,23 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             NonWorking: Boolean;
                             HavePriceRule: Boolean;
                             BasePrice, AddonPrice : Decimal;
+                            CustomerPriceOut: Decimal;
                         begin
 
                             _RemainingCapacity := 0;
                             _CapacityStatusCode := 1;
                             _DynamicCustomerPrice := 0;
+                            CustomerPriceOut := 0;
+
+                            xDynPriceOptionOut := '';
+                            xDynAmountOut := '';
+                            xDynPercentageOut := '';
+                            xDynamicUnitPriceOut := '';
+                            xCustomerPriceOut := '';
 
                             HavePriceRule := TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, Today(), Time(), PriceRule);
                             if (HavePriceRule) then
                                 TicketPrice.EvaluatePriceRule(PriceRule, xAdmCapacityPriceBufferResponse.UnitPrice, xAdmCapacityPriceBufferResponse.UnitPriceIncludesVat, xAdmCapacityPriceBufferResponse.UnitPriceVatPercentage, false, BasePrice, AddonPrice);
-
 
                             if (TmpAdmScheduleEntryResponse."Admission Is" = TmpAdmScheduleEntryResponse."Admission Is"::CLOSED) then
                                 _CapacityStatusCode := -5;
@@ -301,12 +304,12 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                                 NonWorking,
                                 _CalendarExceptionText);
 
-                            // Dynamic Price Calculations
-                            xDynPriceOptionOut := '';
-                            xDynAmountOut := '';
-                            xDynPercentageOut := '';
-
                             _DynamicCustomerPrice := xAdmCapacityPriceBufferResponse.UnitPrice;
+                            if (not HavePriceRule) then begin
+                                CustomerPriceOut := xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice - xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice * xAdmCapacityPriceBufferResponse.DiscountPct / 100;
+                                xCustomerPriceOut := Format(TicketPrice.RoundAmount(CustomerPriceOut, _GeneralLedgerSetup."Inv. Rounding Precision (LCY)", _GeneralLedgerSetup."Inv. Rounding Type (LCY)"), 0, 9);
+                            end;
+
                             if (HavePriceRule) then begin
                                 case (PriceRule.PricingOption) of
                                     PriceRule.PricingOption::NA:
@@ -332,10 +335,14 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                                 end;
                                 xDynAmountOut := Format(PriceRule.Amount, 0, 9);
                                 xDynPercentageOut := Format(PriceRule.Percentage, 0, 9);
-                            end;
 
-                            if (_DynamicCustomerPrice < 0) then
-                                _DynamicCustomerPrice := 0;
+                                if (_DynamicCustomerPrice < 0) then
+                                    _DynamicCustomerPrice := 0;
+
+                                CustomerPriceOut := xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice - xAdmCapacityPriceBufferResponse.Quantity * _DynamicCustomerPrice * xAdmCapacityPriceBufferResponse.DiscountPct / 100;
+                                xCustomerPriceOut := Format(TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection), 0, 9);
+
+                            end;
 
                             if (NonWorking) then
                                 _CapacityStatusCode := -6;
@@ -375,9 +382,12 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
         _CapacityStatusCode: Integer;
         _ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message yet.';
         _CalendarExceptionText: Text;
+        _GeneralLedgerSetup: Record "General Ledger Setup";
 
     internal procedure AddResponse()
     begin
+        _GeneralLedgerSetup.Get();
+
         xAdmCapacityPriceBufferRequest.Reset();
         if (not xAdmCapacityPriceBufferRequest.FindSet()) then
             exit;
@@ -514,6 +524,8 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
             AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
             AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
             AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
+        end else begin
+            Error('<errorText>%1</errorText><callStack>%2</callStack>', GetLastErrorText(), GetLastErrorCallStack());
         end;
         WorkDate(Today());
     end;

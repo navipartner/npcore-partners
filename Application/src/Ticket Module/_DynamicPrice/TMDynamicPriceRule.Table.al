@@ -91,6 +91,19 @@ table 6014670 "NPR TM Dynamic Price Rule"
             MinValue = 0;
             MaxValue = 100;
         }
+        field(90; RoundingPrecision; Decimal)
+        {
+            Caption = 'Rounding Precision';
+            DataClassification = CustomerContent;
+            InitValue = 0.01;
+        }
+        field(91; RoundingDirection; Option)
+        {
+            Caption = 'Rounding Direction';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Nearest,Up,Down';
+            OptionMembers = Nearest,Up,Down;
+        }
 
     }
     keys
