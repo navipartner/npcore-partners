@@ -12,8 +12,12 @@ codeunit 6059962 "NPR POS Act. Voucher Top-up-B"
         TopupNotAllowErr: Label 'Top-up is not allowed for Retail Voucher %1';
     begin
         NpRvVoucherMgt.TrimTypeAndReference(VoucherTypeFilter, VoucherTypeCode, ReferenceNo, VoucherReferenceNumber);
-
         NpRvVoucher.SetFilter("Voucher Type", VoucherTypeCode);
+
+        if VoucherReferenceNumber = '' then
+            if Page.RunModal(0, NpRvVoucher) = Action::LookupOK then
+                VoucherReferenceNumber := NpRvVoucher."Reference No.";
+
         NpRvVoucher.SetFilter("Reference No.", '=%1', VoucherReferenceNumber);
         if NpRvVoucher.FindFirst() then
             NpRvModuleValidGlobal.UpdateVoucherAmount(NpRvVoucher)
