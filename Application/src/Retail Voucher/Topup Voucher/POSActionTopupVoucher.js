@@ -4,8 +4,8 @@ let main = async ({ workflow, parameters, popup, captions }) => {
   if (parameters.ReferenceNo) {
     referenceNo = parameters.ReferenceNo;
     }else    
-      referenceNo = await popup.input({ title: captions.TopupVoucherTitle, caption: captions.ReferenceNo,value: "",notBlank: true });  
-  if (referenceNo == null || referenceNo == "") return;
+      referenceNo = await popup.input({ title: captions.TopupVoucherTitle, caption: captions.ReferenceNo,value: ""});  
+  if (referenceNo == null) return;
 
     const { VoucherNo } = await workflow.respond("validate_voucher", {referenceNo:referenceNo});
     if (VoucherNo == null || VoucherNo == "") return;
