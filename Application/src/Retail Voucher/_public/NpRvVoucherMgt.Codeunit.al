@@ -587,7 +587,7 @@
             VoucherEntry."Partner Code" := NpRvVoucherType."Partner Code";
     end;
 
-    internal procedure ApplyEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry")
+    procedure ApplyEntry(var VoucherEntry: Record "NPR NpRv Voucher Entry")
     var
         VoucherEntryApply: Record "NPR NpRv Voucher Entry";
     begin

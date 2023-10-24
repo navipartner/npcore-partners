@@ -1,30 +1,22 @@
-﻿table 6151024 "NPR NpRv Partner"
+﻿table 6151020 "NPR NpRv Global Vouch. Setup"
 {
-    Access = Internal;
-    Caption = 'Retail Voucher Partner';
+    Caption = 'Global Voucher Setup';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpRv Partners";
-    LookupPageID = "NPR NpRv Partners";
 
     fields
     {
-        field(1; "Code"; Code[20])
+        field(1; "Voucher Type"; Code[20])
         {
-            Caption = 'Code';
+            Caption = 'Voucher Type';
             DataClassification = CustomerContent;
             NotBlank = true;
-
-            trigger OnValidate()
-            var
-                NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
-            begin
-                NpRvPartnerMgt.InitLocalPartner(Rec);
-            end;
+            TableRelation = "NPR NpRv Voucher Type";
         }
-        field(5; Name; Text[50])
+        field(3; "Service Company Name"; Text[30])
         {
-            Caption = 'Name';
+            Caption = 'Service Company Name';
             DataClassification = CustomerContent;
+            Description = 'NPR5.49';
             TableRelation = Company;
 
             ValidateTableRelation = false;
@@ -32,44 +24,32 @@
             trigger OnValidate()
             var
                 Company: Record Company;
-                NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
-                ServiceUrl: Text;
-                ServiceURLErr: Label 'ServiceURL returned in GetGlobalVoucherWSUrl function is too big to be stored in "Service Url" field. Please contact administrator.';
+                Url: Text;
             begin
-                if StrLen(Name) <= MaxStrLen(Company.Name) then
-                    if Company.Get(Name) then begin
-                        ServiceUrl := NpRvPartnerMgt.GetGlobalVoucherWSUrl(Company.Name);
-                        if StrLen(ServiceUrl) > MaxStrLen("Service Url") then
-                            Error(ServiceURLErr) else
-                            "Service Url" := CopyStr(ServiceUrl, 1, MaxStrLen("Service Url"));
-                    end;
+                if not Company.Get("Service Company Name") then
+                    exit;
+
+                Url := GetUrl(CLIENTTYPE::SOAP, Company.Name, OBJECTTYPE::Codeunit, CODEUNIT::"NPR NpRv Global Voucher WS");
+                "Service Url" := CopyStr(Url, 1, MaxStrLen("Service Url"));
             end;
         }
-        field(10; "Service Url"; Text[250])
+        field(5; "Service Url"; Text[250])
         {
             Caption = 'Service Url';
             DataClassification = CustomerContent;
         }
-        field(106; AuthType; Enum "NPR API Auth. Type")
+
+        field(6; AuthType; Enum "NPR API Auth. Type")
         {
             Caption = 'Auth. Type';
             DataClassification = CustomerContent;
         }
-        field(15; "Service Username"; Code[50])
+        field(10; "Service Username"; Text[30])
         {
             Caption = 'Service Username';
-            TableRelation = User."User Name";
-            ValidateTableRelation = false;
-            DataClassification = EndUserIdentifiableInformation;
-
-            trigger OnValidate()
-            var
-                UserSelection: Codeunit "User Selection";
-            begin
-                UserSelection.ValidateUserName("Service Username");
-            end;
+            DataClassification = CustomerContent;
         }
-        field(20; "Service Password"; Text[100])
+        field(15; "Service Password"; Text[100])
         {
             Caption = 'Service Password';
             DataClassification = CustomerContent;
@@ -77,25 +57,22 @@
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Use Isolated Storage';
         }
-
-        field(25; "API Password Key"; GUID)
+        field(16; "API Password Key"; GUID)
         {
-            Caption = 'API Password Key';
+            Caption = 'User Password Key';
             DataClassification = EndUserPseudonymousIdentifiers;
         }
-
-        field(117; "OAuth2 Setup Code"; Code[20])
+        field(17; "OAuth2 Setup Code"; Code[20])
         {
             DataClassification = CustomerContent;
             TableRelation = "NPR OAuth Setup";
             Caption = 'OAuth2.0 Setup Code';
         }
-
     }
 
     keys
     {
-        key(Key1; "Code")
+        key(Key1; "Voucher Type")
         {
         }
     }
@@ -125,3 +102,4 @@
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 }
+
