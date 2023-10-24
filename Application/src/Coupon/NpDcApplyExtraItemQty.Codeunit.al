@@ -1,6 +1,7 @@
 ﻿codeunit 6151601 "NPR NpDc Apply: Extra ItemQty."
 {
     Access = Internal;
+
     var
         Text000: Label 'Extra Coupon Item has not been defined for Coupon %1 (%2)';
         Text001: Label 'Extra Item per Validation Qty.';
@@ -9,6 +10,7 @@
     var
         CouponType: Record "NPR NpDc Coupon Type";
         ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -17,9 +19,13 @@
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineNo: Integer;
-        DiscountAmt: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
+        DiscountAmount: Decimal;
         ExtraItemQty: Decimal;
+        UnitPriceIncludingVAT: Decimal;
     begin
         if POSSession.IsActiveSession(FrontEndMgt) then begin
             FrontEndMgt.GetSession(POSSession);
@@ -45,13 +51,26 @@
                 SaleLineOut.OnAfterDeletePOSSaleLine(SaleLinePOS);
                 exit;
             end;
+            UnitPriceIncludingVAT := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS);
+            DiscountAmountIncludingVAT := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
+            if DiscountAmountIncludingVAT > UnitPriceIncludingVAT * ExtraItemQty then
+                DiscountAmountIncludingVAT := UnitPriceIncludingVAT * ExtraItemQty;
 
-            DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
-            if DiscountAmt > SaleLinePOS."Unit Price" * ExtraItemQty then
-                DiscountAmt := SaleLinePOS."Unit Price" * ExtraItemQty;
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
 
-            if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
-                SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT,
+                                                                                 SaleLinePOS."VAT %",
+                                                                                 GeneralLedgerSetup."Amount Rounding Precision");
+            if SaleLinePOS."Price Includes VAT" then
+                DiscountAmount := DiscountAmountIncludingVAT
+            else
+                DiscountAmount := DiscountAmountExcludingVAT;
+
+            if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmount then begin
+                SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
                 SaleLinePOSCouponApply.Modify();
             end;
             if SaleLinePOS.Quantity <> ExtraItemQty then begin
@@ -84,9 +103,22 @@
         SaleLinePOS.Insert(true);
         SaleLineOut.InvokeOnAfterInsertSaleLineWorkflow(SaleLinePOS);
 
-        DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
-        if DiscountAmt > SaleLinePOS."Amount Including VAT" then
-            DiscountAmt := SaleLinePOS."Amount Including VAT";
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+
+        DiscountAmountIncludingVAT := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
+        if DiscountAmountIncludingVAT > SaleLinePOS."Amount Including VAT" then
+            DiscountAmountIncludingVAT := SaleLinePOS."Amount Including VAT";
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT,
+                                                                             SaleLinePOS."VAT %",
+                                                                             GeneralLedgerSetup."Amount Rounding Precision");
+        if SaleLinePOS."Price Includes VAT" then
+            DiscountAmount := DiscountAmountIncludingVAT
+        else
+            DiscountAmount := DiscountAmountExcludingVAT;
 
         SaleLinePOSCouponApply.Init();
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";
@@ -99,7 +131,9 @@
         SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
         SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
         SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
-        SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+        SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
+        SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+        SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
         SaleLinePOSCouponApply.Insert();
     end;
 
@@ -108,6 +142,7 @@
         Coupon: Record "NPR NpDc Coupon";
         CouponType: Record "NPR NpDc Coupon Type";
         ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         if not Coupon.Get(SaleLinePOSCoupon."Coupon No.") then
             exit(0);
@@ -118,7 +153,7 @@
                         exit(0);
                     if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
                         exit(0);
-                    DiscountAmount := SaleLinePOS."Unit Price" * (Coupon."Discount %" / 100) * ExtraItemQty;
+                    DiscountAmount := NPRPOSSaleTaxCalc.UnitPriceInclTax(SaleLinePOS) * (Coupon."Discount %" / 100) * ExtraItemQty;
                     exit(DiscountAmount);
                 end;
             Coupon."Discount Type"::"Discount Amount":
@@ -319,7 +354,7 @@
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR NpDc ModuleApply: Xtr Item");
+        exit(CODEUNIT::"NPR NpDc Apply: Extra ItemQty.");
     end;
 
     local procedure FindExtraCouponItem(CouponType: Record "NPR NpDc Coupon Type"; var ExtraCouponItem: Record "NPR NpDc Extra Coupon Item"): Boolean
@@ -372,7 +407,7 @@
         exit(IsSubscriber(CouponType));
     end;
 
-    local procedure ModuleCode(): Code[20]
+    internal procedure ModuleCode(): Code[20]
     begin
         exit('EXTRA_ITEM_QTY');
     end;

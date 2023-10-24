@@ -64,9 +64,13 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
 
     local procedure ApplyCoupontDiscountPercent(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPercent: Decimal; MaxDiscountAmount: Decimal)
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         AppliedQuantity: Decimal;
         DiscountAmount: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
         MaxQuantityToApply: Decimal;
         RemainingQuantity: Decimal;
         LineNo: Integer;
@@ -93,9 +97,19 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                 QuantityToApply := RemainingQuantity;
 
             TempSaleLinePOS."Amount Including VAT" := (TempSaleLinePOS."Amount Including VAT" / TempSaleLinePOS.Quantity) * QuantityToApply;
-            DiscountAmount := TempSaleLinePOS."Amount Including VAT" * (DiscountPercent / 100);
-            if (MaxDiscountAmount > 0) and (DiscountAmount > MaxDiscountAmount) then
-                DiscountAmount := MaxDiscountAmount;
+            DiscountAmountIncludingVAT := TempSaleLinePOS."Amount Including VAT" * (DiscountPercent / 100);
+            if (MaxDiscountAmount > 0) and (DiscountAmountIncludingVAT > MaxDiscountAmount) then
+                DiscountAmountIncludingVAT := MaxDiscountAmount;
+
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
+
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT, TempSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+            if TempSaleLinePOS."Price Includes VAT" then
+                DiscountAmount := DiscountAmountIncludingVAT
+            else
+                DiscountAmount := DiscountAmountExcludingVAT;
 
             if DiscountAmount > 0 then begin
                 LineNo := GetNextLineNo(TempSaleLinePOS);
@@ -112,6 +126,8 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                 SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
                 SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
                 SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
                 SaleLinePOSCouponApply.Insert(true);
 
 
@@ -123,9 +139,13 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
 
     local procedure ApplyCouponDiscountAmount(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; MaxDiscountAmount: Decimal)
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         AppliedQuantity: Decimal;
         LineDiscountAmount: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
         MaxQuantityToApply: Decimal;
         RemainingQuantity: Decimal;
         LineNo: Integer;
@@ -150,9 +170,20 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                 QuantityToApply := RemainingQuantity;
 
             if TempSaleLinePOS."Amount Including VAT" > MaxDiscountAmount then
-                LineDiscountAmount := MaxDiscountAmount
+                DiscountAmountIncludingVAT := MaxDiscountAmount
             else
-                LineDiscountAmount := TempSaleLinePOS."Amount Including VAT";
+                DiscountAmountIncludingVAT := TempSaleLinePOS."Amount Including VAT";
+
+
+            if not GeneralLedgerSetup.Get() then
+                Clear(GeneralLedgerSetup);
+
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT, TempSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+            if TempSaleLinePOS."Price Includes VAT" then
+                LineDiscountAmount := DiscountAmountIncludingVAT
+            else
+                LineDiscountAmount := DiscountAmountExcludingVAT;
 
             if LineDiscountAmount > 0 then begin
                 LineNo := GetNextLineNo(TempSaleLinePOS);
@@ -169,6 +200,8 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                 SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
                 SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
                 SaleLinePOSCouponApply."Discount Amount" := LineDiscountAmount;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
                 SaleLinePOSCouponApply.Insert(true);
 
                 LineDiscountAmount := 0;

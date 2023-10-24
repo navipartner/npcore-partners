@@ -100,6 +100,17 @@
             Description = 'NPR5.55';
             MinValue = 0;
         }
+
+        field(90; "Discount Amount Including VAT"; Decimal)
+        {
+            Caption = 'Discount Amount Including VAT';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Discount Amount Excluding VAT"; Decimal)
+        {
+            Caption = 'Discount Amount Excluding VAT';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -119,7 +130,7 @@
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Sale Date", "Application Sequence No.")
         {
-        }        
+        }
     }
 
     var

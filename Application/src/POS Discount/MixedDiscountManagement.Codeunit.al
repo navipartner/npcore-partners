@@ -346,6 +346,7 @@
 
     procedure CalcLineDiscAmount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; BatchQty: Decimal; TotalQty: Decimal; TotalVATAmount: Decimal; TotalAmountInclVAT: Decimal; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; InvQtyDict: Dictionary of [Guid, Decimal]) LineDiscAmount: Decimal
     var
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         TotalAmountAfterDisc: Decimal;
         AvgDiscPct: Decimal;
     begin
@@ -362,10 +363,10 @@
                         TotalAmountAfterDisc := TotalAmountInclVAT - BatchQty * TempMixedDiscount."Total Discount Amount";
                     if AmountExclVat(TempMixedDiscount) then begin
                         AvgDiscPct := 1 - (TotalAmountAfterDisc / (TotalAmountInclVAT - TotalVATAmount));
-                        LineDiscAmount := UnitPriceExclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                        LineDiscAmount := NPRPOSSaleTaxCalc.UnitPriceExclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
                     end else begin
                         AvgDiscPct := 1 - TotalAmountAfterDisc / TotalAmountInclVAT;
-                        LineDiscAmount := UnitPriceInclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                        LineDiscAmount := NPRPOSSaleTaxCalc.UnitPriceInclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
                     end;
                 end;
             TempMixedDiscount."Discount Type"::"Total Discount %":
@@ -2071,9 +2072,11 @@
     end;
 
     local procedure CalculateAmounts(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         if SaleLinePOS."Price Includes VAT" then begin
-            TestVATRatePositive(SaleLinePOS);
+            NPRPOSSaleTaxCalc.TestVATRatePositive(SaleLinePOS);
             SaleLinePOS."Amount Including VAT" := SaleLinePOS."MR Anvendt antal" * SaleLinePOS."Unit Price";
             SaleLinePOS.Amount := SaleLinePOS."Amount Including VAT" / (1 + SaleLinePOS."VAT %" / 100);
         end else begin
@@ -2084,26 +2087,5 @@
         SaleLinePOS."Amount Including VAT" := Round(SaleLinePOS."Amount Including VAT", GLSetup."Amount Rounding Precision");
     end;
 
-    local procedure UnitPriceInclTax(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
-    begin
-        if SaleLinePOS."Price Includes VAT" then
-            exit(SaleLinePOS."Unit Price");
-        exit(SaleLinePOS."Unit Price" * (1 + SaleLinePOS."VAT %" / 100));
-    end;
 
-    local procedure UnitPriceExclTax(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
-    begin
-        if not SaleLinePOS."Price Includes VAT" then
-            exit(SaleLinePOS."Unit Price");
-        TestVATRatePositive(SaleLinePOS);
-        exit(SaleLinePOS."Unit Price" / (1 + SaleLinePOS."VAT %" / 100));
-    end;
-
-    local procedure TestVATRatePositive(SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        MustBePositiveErr: Label 'must be positive';
-    begin
-        if SaleLinePOS."VAT %" < 0 then
-            SaleLinePOS.FieldError("VAT %", MustBePositiveErr);
-    end;
 }
