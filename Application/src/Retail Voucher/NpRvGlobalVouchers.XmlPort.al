@@ -139,7 +139,7 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
         }
     }
 
-    internal procedure GetSourceTable(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
+    procedure GetSourceTable(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
     begin
         TempNpRvVoucherBuffer2.Copy(NpRvVoucherBuffer, true);
     end;

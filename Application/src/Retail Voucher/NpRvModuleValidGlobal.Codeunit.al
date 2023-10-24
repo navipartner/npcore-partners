@@ -1,5 +1,4 @@
-﻿
-codeunit 6151019 "NPR NpRv Module Valid.: Global"
+﻿codeunit 6151019 "NPR NpRv Module Valid.: Global"
 {
     Access = Internal;
 
