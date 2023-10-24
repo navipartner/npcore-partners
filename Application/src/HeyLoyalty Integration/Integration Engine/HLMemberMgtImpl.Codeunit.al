@@ -24,6 +24,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         if not HLIntegrationMgt.IsIntegratedTable("NPR HL Integration Area"::Members, DataLogEntry."Table ID") then
             exit;
 
+        SelectLatestVersion();
         case true of
             DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Rename:
                 exit;  //renames are not processed
@@ -105,11 +106,14 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                 begin
                     RecRef.SetTable(Member);
                     ProcessRec := Member.Find();
-                    if not ProcessRec and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete) then
-                        if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
-                            RecRef.SetTable(Member);
-                            ProcessRec := true;
-                        end;
+                    if DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete then
+                        if ProcessRec then
+                            exit(false)  //the member record hasn't been actually deleted
+                        else
+                            if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
+                                RecRef.SetTable(Member);
+                                ProcessRec := true;
+                            end;
                 end;
             Database::"NPR HL Selected MCF Option":
                 begin

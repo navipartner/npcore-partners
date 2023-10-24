@@ -109,6 +109,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG PG To Interface"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'RemoveDeletedCheckmark'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'UpdateHeyLoyaltyDataLogSubscribers'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RegistItemWorkshLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailCampaignItems'));
@@ -422,6 +424,10 @@
                         exit('MoveHeyLoyaltyValueMappings_20230314');
                     'SetHLSetupDefaultValues':
                         exit('SetHLSetupDefaultValues_20231019');
+                    'RemoveDeletedCheckmark':
+                        exit('RemoveDeletedCheckmark_20231024');
+                    'UpdateHeyLoyaltyDataLogSubscribers':
+                        exit('UpdateHeyLoyaltyDataLogSubscribers_20231024');
                 end;
             Codeunit::"NPR UPG Vend Item No Expansion":
                 case UpgradeStep of

@@ -68,7 +68,7 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
                 IntegrationArea::Members:  //handled by Codeunit::"NPR HL Member Mgt."
                     begin
                         DataLogSubscriber."Direct Data Processing" := false;
-                        DataLogSubscriber."Delayed Data Processing (sec)" := 5;
+                        DataLogSubscriber."Delayed Data Processing (sec)" := 20;
                     end;
             end;
         if Format(DataLogSubscriber) <> Format(xDataLogSubscriber) then
