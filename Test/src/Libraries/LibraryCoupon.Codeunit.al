@@ -29,16 +29,15 @@ codeunit 85051 "NPR Library Coupon"
         end;
     end;
 
-    procedure IssueCouponMultipleQuantity(CouponType: Record "NPR NpDc Coupon Type"; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    procedure IssueCouponMultipleQuantity(CouponCode: Code[20]; CouponType: Record "NPR NpDc Coupon Type"; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary)
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
 
     begin
-
         Coupon.Init();
         Coupon.Validate("Coupon Type", CouponType.Code);
-        Coupon."No." := '';
+        Coupon."No." := CouponCode;
         Coupon.Insert(true);
 
         CouponMgt.PostIssueCoupon2(Coupon, Quantity, CouponType."Discount Amount");
@@ -49,21 +48,46 @@ codeunit 85051 "NPR Library Coupon"
 
     end;
 
-
+    procedure IssueCouponMultipleQuantity(CouponType: Record "NPR NpDc Coupon Type"; Quantity: Integer; var TempCoupon: Record "NPR NpDc Coupon" temporary)
+    begin
+        IssueCouponMultipleQuantity('', CouponType, Quantity, TempCoupon);
+    end;
 
     procedure CreateDiscountPctCouponType(CouponTypeCode: Code[20]; DiscountPct: Decimal): Code[20]
     var
         NpDcCouponType: Record "NPR NpDc Coupon Type";
     begin
-        exit(CreateDiscountPctCouponType(CouponTypeCode, NpDcCouponType, DiscountPct));
+        exit(CreateDiscountPctCouponType(CouponTypeCode, NpDcCouponType, DiscountPct, '[S]'));
     end;
 
     procedure CreateDiscountPctCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"; DiscountPct: Decimal): Code[20]
     begin
+        exit(CreateDiscountPctCouponType(CouponTypeCode, CouponType, DiscountPct, '[S]'));
+    end;
+
+    procedure CreateDiscountPctCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"; DiscountPct: Decimal; ReferenceNoPattern: Code[20]): Code[20]
+    begin
         CreateCouponType(CouponTypeCode, CouponType);
-        CouponType."Reference No. Pattern" := '[S]';
+        CouponType."Reference No. Pattern" := ReferenceNoPattern;
         CouponType."Discount Type" := CouponType."Discount Type"::"Discount %";
         CouponType."Discount %" := DiscountPct;
+        CouponType.Enabled := true;
+        CouponType.Modify(true);
+
+        exit(CouponType.Code);
+    end;
+
+    procedure CreateDiscountAmountCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"; DiscountAmount: Decimal): Code[20]
+    begin
+        exit(CreateDiscountAmountCouponType(CouponTypeCode, CouponType, DiscountAmount, '[S]'));
+    end;
+
+    procedure CreateDiscountAmountCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"; DiscountAmount: Decimal; ReferenceNoPattern: Code[20]): Code[20]
+    begin
+        CreateCouponType(CouponTypeCode, CouponType);
+        CouponType."Reference No. Pattern" := ReferenceNoPattern;
+        CouponType."Discount Type" := CouponType."Discount Type"::"Discount Amount";
+        CouponType."Discount Amount" := DiscountAmount;
         CouponType.Enabled := true;
         CouponType.Modify(true);
 
@@ -95,6 +119,78 @@ codeunit 85051 "NPR Library Coupon"
         ExtraCouponItem."Unit Price" := Item."Unit Price";
         ExtraCouponItem."Profit %" := Item."Profit %";
         ExtraCouponItem.Modify();
+    end;
+
+    procedure SetExtraQtyItemCoupon(var CouponType: Record "NPR NpDc Coupon Type";
+                                    ExtraItem: Record Item;
+                                    DiscountedItem: Record Item;
+                                    ValidationQty: Decimal)
+    var
+        NPRNpDcExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        NPRNpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NPRNpDcApplyExtraItemQty: Codeunit "NPR NpDc Apply: Extra ItemQty.";
+    begin
+        CouponType."Apply Discount Module" := NPRNpDcApplyExtraItemQty.ModuleCode();
+        CouponType.Modify();
+
+        if (not NPRNpDcExtraCouponItem.Get(CouponType.Code, 10000)) then begin
+            NPRNpDcExtraCouponItem.Init();
+            NPRNpDcExtraCouponItem."Coupon Type" := CouponType.Code;
+            NPRNpDcExtraCouponItem."Line No." := 10000;
+            NPRNpDcExtraCouponItem.Insert();
+        end;
+
+        NPRNpDcExtraCouponItem."Discount Type" := CouponType."Discount Type";
+        NPRNpDcExtraCouponItem."Discount Amount" := CouponType."Discount Amount";
+        NPRNpDcExtraCouponItem."Discount %" := CouponType."Discount %";
+
+
+        NPRNpDcExtraCouponItem."Item No." := DiscountedItem."No.";
+        NPRNpDcExtraCouponItem."Item Description" := DiscountedItem.Description;
+        NPRNpDcExtraCouponItem."Unit Price" := DiscountedItem."Unit Price";
+        NPRNpDcExtraCouponItem."Profit %" := DiscountedItem."Profit %";
+        NPRNpDcExtraCouponItem.Modify();
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := 10000;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", ExtraItem."No.");
+        NPRNpDcCouponListItem.Insert(true);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem."Line No." := -1;
+        NPRNpDcCouponListItem.Validate("Validation Quantity", ValidationQty);
+        NPRNpDcCouponListItem.Insert(true);
+
+    end;
+
+    procedure SetItemListCoupon(var CouponType: Record "NPR NpDc Coupon Type";
+                                DiscountedItem: Record Item;
+                                ValidationQty: Decimal)
+    var
+        NPRNpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NPRNpDcModuleApplyItemList: Codeunit "NPR NpDc Module Apply ItemList";
+    begin
+        CouponType."Apply Discount Module" := NPRNpDcModuleApplyItemList.ModuleCode();
+        CouponType.Modify();
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := 10000;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", DiscountedItem."No.");
+        NPRNpDcCouponListItem.Insert(true);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem."Line No." := -1;
+        NPRNpDcCouponListItem.Validate("Max. Quantity", ValidationQty);
+        NPRNpDcCouponListItem.Insert(true);
+
     end;
 
     local procedure CreateCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"): Code[20]
