@@ -101,6 +101,7 @@
         SaleLinePOSCoupon2: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcModuleApplyDefault: Codeunit "NPR NpDc Module Apply: Default";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         Handled: Boolean;
         DiscountType: Integer;
     begin
@@ -154,6 +155,7 @@
             SaleLinePOS."Discount Type" := DiscountType;
             SaleLinePOS.Modify();
         until SaleLinePOS.Next() = 0;
+        POSSaleLine.OnUpdateLine(SaleLinePOS);
     end;
 
     internal procedure RemoveDiscount(SalePOS: Record "NPR POS Sale")
