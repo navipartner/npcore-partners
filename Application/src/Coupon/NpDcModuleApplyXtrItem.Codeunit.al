@@ -10,6 +10,7 @@
     var
         CouponType: Record "NPR NpDc Coupon Type";
         ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -18,8 +19,11 @@
         POSSetup: Codeunit "NPR POS Setup";
         FrontEndMgt: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         LineNo: Integer;
-        DiscountAmt: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
+        DiscountAmount: Decimal;
         POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
     begin
         CouponType.Get(SaleLinePOSCoupon."Coupon Type");
@@ -27,12 +31,23 @@
             Error(Text000, SaleLinePOSCoupon."Coupon No.", SaleLinePOSCoupon."Coupon Type");
 
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply, SaleLinePOS) then begin
-            DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
-            if DiscountAmt > SaleLinePOS."Amount Including VAT" then
-                DiscountAmt := SaleLinePOS."Amount Including VAT";
+            DiscountAmountIncludingVAT := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
+            if DiscountAmountIncludingVAT > SaleLinePOS."Amount Including VAT" then
+                DiscountAmountIncludingVAT := SaleLinePOS."Amount Including VAT";
 
-            if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
-                SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT,
+                                                                                 SaleLinePOS."VAT %",
+                                                                                 GeneralLedgerSetup."Amount Rounding Precision");
+
+            if SaleLinePOS."Price Includes VAT" then
+                DiscountAmount := DiscountAmountIncludingVAT
+            else
+                DiscountAmount := DiscountAmountExcludingVAT;
+
+            if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmount then begin
+                SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
                 SaleLinePOSCouponApply.Modify();
             end;
 
@@ -76,12 +91,19 @@
 
         if (SaleLinePOSCouponApply.FindFirst()) then begin
             SaleLineOut.GetCurrentSaleLine(SaleLinePOS);
-            DiscountAmt := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
+            DiscountAmountIncludingVAT := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon);
 
-            if DiscountAmt > SaleLinePOS."Amount Including VAT" then
-                DiscountAmt := SaleLinePOS."Amount Including VAT";
+            if DiscountAmountIncludingVAT > SaleLinePOS."Amount Including VAT" then
+                DiscountAmountIncludingVAT := SaleLinePOS."Amount Including VAT";
 
-            SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+            if SaleLinePOS."Price Includes VAT" then
+                DiscountAmount := DiscountAmountIncludingVAT
+            else
+                DiscountAmount := DiscountAmountExcludingVAT;
+
+            SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
             SaleLinePOSCouponApply.Modify();
         end;
     end;
@@ -113,6 +135,7 @@
         Coupon: Record "NPR NpDc Coupon";
         CouponType: Record "NPR NpDc Coupon Type";
         ExtraCouponItem: Record "NPR NpDc Extra Coupon Item";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
     begin
         if not Coupon.Get(SaleLinePOSCoupon."Coupon No.") then
             exit(0);
@@ -123,7 +146,7 @@
                         exit(0);
                     if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
                         exit(0);
-                    DiscountAmount := SaleLinePOS."Unit Price" * (Coupon."Discount %" / 100);
+                    DiscountAmount := NPRPOSSaleTaxCalc.UnitPriceInclTax(SaleLinePOS) * (Coupon."Discount %" / 100);
                     if (Coupon."Max. Discount Amount" > 0) and (DiscountAmount > Coupon."Max. Discount Amount") then
                         DiscountAmount := Coupon."Max. Discount Amount";
                     exit(DiscountAmount);

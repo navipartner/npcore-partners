@@ -168,6 +168,60 @@
         CalculateTax(Rec, SalePOS, CurrencyFactor);
     end;
 
+    internal procedure CalcAmountWithoutVAT(Amount: Decimal;
+                                               VATPercent: Decimal;
+                                               RoundingPrecision: Decimal) AmountWithoutVAT: Decimal
+    begin
+        if VATPercent = 0 then
+            AmountWithoutVAT := Amount
+        else
+            AmountWithoutVAT := Amount / (1 + VATPercent / 100);
+
+        if RoundingPrecision = 0 then
+            exit;
+
+        AmountWithoutVAT := Round(AmountWithoutVAT, RoundingPrecision);
+    end;
+
+    internal procedure CalcAmountWithVAT(Amount: Decimal;
+                                      VATPercent: Decimal;
+                                      RoundingPrecision: Decimal) AmountWithVAT: Decimal
+    begin
+        if VATPercent = 0 then
+            AmountWithVAT := Amount
+        else
+            AmountWithVAT := Amount * (1 + VATPercent / 100);
+
+        if RoundingPrecision = 0 then
+            exit;
+
+        AmountWithVAT := Round(AmountWithVAT, RoundingPrecision);
+    end;
+
+    internal procedure UnitPriceInclTax(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
+    begin
+        if SaleLinePOS."Price Includes VAT" then
+            exit(SaleLinePOS."Unit Price");
+        exit(SaleLinePOS."Unit Price" * (1 + SaleLinePOS."VAT %" / 100));
+    end;
+
+    internal procedure UnitPriceExclTax(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
+    begin
+        if not SaleLinePOS."Price Includes VAT" then
+            exit(SaleLinePOS."Unit Price");
+        TestVATRatePositive(SaleLinePOS);
+        exit(SaleLinePOS."Unit Price" / (1 + SaleLinePOS."VAT %" / 100));
+    end;
+
+    internal procedure TestVATRatePositive(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        MustBePositiveErr: Label 'must be positive';
+    begin
+        if SaleLinePOS."VAT %" < 0 then
+            SaleLinePOS.FieldError("VAT %", MustBePositiveErr);
+    end;
+
+
     [IntegrationEvent(false, false)]
     procedure OnGetVATPostingSetup(VATPostingSetup: Record "VAT Posting Setup"; var Handled: Boolean)
     begin
