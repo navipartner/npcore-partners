@@ -2,24 +2,24 @@
 {
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
-    UsageCategory = None;
     SourceTable = "NPR POS Entry";
+    UsageCategory = None;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             field("Currency Code"; Rec."Currency Code")
             {
 
-                ToolTip = 'Specifies the value of the Currency Code field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Currency Code field';
             }
             field("Item Sales (LCY)"; Rec."Item Sales (LCY)")
             {
 
-                ToolTip = 'Specifies the value of the Item Sales (LCY) field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Item Sales (LCY) field';
 
                 trigger OnDrillDown()
                 begin
@@ -29,39 +29,39 @@
             field("Customer Sales (LCY)"; Rec."Customer Sales (LCY)")
             {
 
-                ToolTip = 'Specifies the value of the Customer Sales (LCY) field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Customer Sales (LCY) field';
             }
             field("G/L Sales (LCY)"; Rec."G/L Sales (LCY)")
             {
 
-                ToolTip = 'Specifies the value of the G/L Sales (LCY) field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the G/L Sales (LCY) field';
             }
             field("Discount Amount"; Rec."Discount Amount")
             {
 
+                ApplicationArea = NPRRetail;
                 Caption = 'Disc. Amt Excl. VAT';
                 ToolTip = 'Specifies the value of the Disc. Amt Excl. VAT field';
-                ApplicationArea = NPRRetail;
             }
             field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
             {
 
-                ToolTip = 'Specifies the value of the Amount Incl. Tax field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Amount Incl. Tax field';
             }
             field("Amount Excl. Tax"; Rec."Amount Excl. Tax")
             {
 
-                ToolTip = 'Specifies the value of the Amount Excl. Tax field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Amount Excl. Tax field';
             }
             field("Tax Amount"; Rec."Tax Amount")
             {
 
-                ToolTip = 'Specifies the value of the Tax Amount field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Tax Amount field';
 
                 trigger OnDrillDown()
                 begin
@@ -71,40 +71,40 @@
             field("Rounding Amount (LCY)"; Rec."Rounding Amount (LCY)")
             {
 
-                ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Rounding Amount (LCY) field';
             }
             field("Payment Amount"; Rec."Payment Amount")
             {
 
-                ToolTip = 'Specifies the value of the Payment Amount field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Payment Amount field';
             }
             field("Sales Quantity"; Rec."Sales Quantity")
             {
 
+                ApplicationArea = NPRRetail;
                 DecimalPlaces = 0 : 2;
                 ToolTip = 'Specifies the value of the Sales Quantity field';
-                ApplicationArea = NPRRetail;
             }
             field("Return Sales Quantity"; Rec."Return Sales Quantity")
             {
 
+                ApplicationArea = NPRRetail;
                 DecimalPlaces = 0 : 2;
                 ToolTip = 'Specifies the value of the Return Sales Quantity field';
-                ApplicationArea = NPRRetail;
             }
             field("Sale Lines"; Rec."Sale Lines")
             {
 
-                ToolTip = 'Specifies the value of the Sale Lines field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Sale Lines field';
             }
             field("Payment Lines"; Rec."Payment Lines")
             {
 
-                ToolTip = 'Specifies the value of the Payment Lines field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Payment Lines field';
             }
             field("EFT Transaction Requests"; Rec."EFT Transaction Requests")
             {
@@ -115,29 +115,29 @@
             field("Tax Lines"; Rec."Tax Lines")
             {
 
-                ToolTip = 'Specifies the value of the Tax Lines field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Tax Lines field';
             }
             field("No. of Print Output Entries"; Rec."No. of Print Output Entries")
             {
 
-                ToolTip = 'Specifies the value of the No. of Print Output Entries field';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the No. of Print Output Entries field';
             }
             field("POS Info Exist"; Rec."POS Info Exist")
             {
-                ToolTip = 'Specifies if there are any POS informations related to the POS Entry';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies if there are any POS informations related to the POS Entry';
             }
             field("Images Exist"; Rec."Images Exist")
             {
-                ToolTip = 'Specifies if there are any images related to the POS Entry';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies if there are any images related to the POS Entry';
             }
             field("Costumer Input"; Rec."Costumer Input")
             {
-                ToolTip = 'Specifies if there are any customer input related to the POS Entry';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies if there are any customer input related to the POS Entry';
             }
             group(CleanCashTransactions)
             {
@@ -145,8 +145,8 @@
                 Visible = ShowCleanCash;
                 field("Clean Cash Transactions"; Rec."Clean Cash Transactions")
                 {
-                    ToolTip = 'Specifies the details of Clean Cash transactions';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the details of Clean Cash transactions';
 
                     trigger OnDrillDown()
                     var
@@ -165,8 +165,8 @@
                 Visible = ShowDEAudit;
                 field("DE POS Audit Log"; Rec."DE POS Audit Log")
                 {
-                    ToolTip = 'Specifies the details of DE POS Audit Log information';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the details of DE POS Audit Log information';
 
                     trigger OnDrillDown()
                     var
@@ -181,15 +181,15 @@
             }
             group(FRAuditLog)
             {
-                ShowCaption = false;
-                Visible = false;
+                ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
                 ObsoleteState = Pending;
                 ObsoleteTag = 'NPR23.0';
-                ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
+                ShowCaption = false;
+                Visible = false;
                 field("FR POS Audit Log"; Rec."FR POS Audit Log")
                 {
-                    ToolTip = 'Specifies the details of FR POS Audit Log information';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the details of FR POS Audit Log information';
                 }
             }
             group(RSPosAuditLog)
@@ -198,9 +198,9 @@
                 Visible = ShowRSAudit;
                 field("RS POS Audit Log"; Rec."RS POS Audit Log")
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'RS POS Audit Log Exists';
                     ToolTip = 'Specifies the details of RS POS Audit Log information';
-                    ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
                         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
@@ -213,11 +213,31 @@
                     end;
                 }
             }
+
+            group(CROPOSAuditLog)
+            {
+                ShowCaption = false;
+                Visible = ShowCroAudit;
+                field("CRO POS Audit Log"; Rec."CRO POS Audit Log")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'CRO POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of CRO POS Audit Log information';
+                    trigger OnDrillDown()
+                    var
+                        CROPOSAuditLogInfo: Record "NPR CRO POS Aud. Log Aux. Info";
+                    begin
+                        CROPOSAuditLogInfo.FilterGroup(10);
+                        CROPOSAuditLogInfo.SetRange("Audit Entry Type", CROPOSAuditLogInfo."Audit Entry Type"::"POS Entry");
+                        CROPOSAuditLogInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        CROPOSAuditLogInfo.FilterGroup(0);
+                        Page.RunModal(Page::"NPR CRO POS Aud. Log Aux. Info", CROPOSAuditLogInfo);
+                    end;
+                }
+            }
         }
     }
-    actions
-    {
-    }
+
 
     trigger OnAfterGetRecord()
     begin
@@ -236,7 +256,7 @@
     begin
         TaxAmountLine.Reset();
         TaxAmountLine.SetRange("POS Entry No.", Rec."Entry No.");
-        PAGE.Run(0, TaxAmountLine);
+        Page.Run(0, TaxAmountLine);
     end;
 
     local procedure SaleDetail(Type: Integer)
@@ -249,7 +269,7 @@
             1:
                 SalesLine.SetRange(Type, SalesLine.Type::Item);
         end;
-        PAGE.Run(0, SalesLine);
+        Page.Run(0, SalesLine);
     end;
 
     local procedure UpdateDiscountAmt()
@@ -258,24 +278,25 @@
     begin
         POSSalesLine.Reset();
         POSSalesLine.SetRange("POS Entry No.", Rec."Entry No.");
-        if POSSalesLine.FindSet() then begin
+        if POSSalesLine.FindSet() then
             repeat
                 Rec."Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
             until POSSalesLine.Next() = 0;
-        end;
     end;
 
     local procedure SetAuditFieldsVisibility()
     var
-        POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
         CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
+        CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
     begin
         Clear(ShowCleanCash);
         Clear(ShowDEAudit);
         Clear(ShowRSAudit);
+        Clear(ShowCroAudit);
         if not POSUnit.Get(Rec."POS Unit No.") then
             exit;
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
@@ -287,11 +308,14 @@
                 ShowDEAudit := true;
             RSAuditMgt.HandlerCode():
                 ShowRSAudit := true;
+            CROAuditMgt.HandlerCode():
+                ShowCroAudit := true;
         end;
     end;
 
     var
         ShowCleanCash: Boolean;
+        ShowCroAudit: Boolean;
         ShowDEAudit: Boolean;
         ShowRSAudit: Boolean;
 }
