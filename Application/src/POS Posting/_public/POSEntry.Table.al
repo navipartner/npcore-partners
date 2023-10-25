@@ -548,6 +548,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(850; "CRO POS Audit Log"; Boolean)
+        {
+            Editable = false;
+            Caption = 'CRO POS Audit Log Aux. Info';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR CRO POS Aud. Log Aux. Info" where("Audit Entry Type" = const("POS Entry"), "POS Entry No." = field("Entry No.")));
+        }
         field(5052; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';

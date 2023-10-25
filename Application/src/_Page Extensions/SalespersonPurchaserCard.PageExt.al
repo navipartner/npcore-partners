@@ -37,5 +37,27 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 }
             }
         }
+        addafter(Name)
+        {
+            field("NPR CRO OIB Code"; CROAuxSalespersonPurchaser."NPR CRO Salesperson OIB")
+            {
+                ToolTip = 'Specifies the value of the Salesperson OIB field.';
+                Caption = 'Salesperson OIB';
+                ApplicationArea = NPRCROFiscal;
+                trigger OnValidate()
+                begin
+                    CROAuxSalespersonPurchaser.Validate("NPR CRO Salesperson OIB");
+                    CROAuxSalespersonPurchaser.SaveCROAuxSalespersonFields();
+                end;
+            }
+        }
     }
+
+    var
+        CROAuxSalespersonPurchaser: Record "NPR CRO Aux Salesperson/Purch.";
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        CROAuxSalespersonPurchaser.ReadCROAuxSalespersonFields(Rec);
+    end;
 }
