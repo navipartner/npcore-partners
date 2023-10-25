@@ -130,6 +130,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'MCSSaleLineUpload'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PopupDimension'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'SelectionReqParam'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DimPopupEvery'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
@@ -473,6 +474,8 @@
                         exit('NPR-PopupDimension-20230531');
                     'SelectionReqParam':
                         exit('NPR-SelectionReqParam-20231017');
+                    'DimPopupEvery':
+                        exit('NPR-DimPopupEvery-20231031');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of
