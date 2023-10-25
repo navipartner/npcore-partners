@@ -15,9 +15,9 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         }
         field(2; "Audit Entry No."; Integer)
         {
+            AutoIncrement = true;
             Caption = 'Audit Entry No.';
             DataClassification = CustomerContent;
-            AutoIncrement = true;
         }
         field(3; "POS Entry No."; Integer)
         {
@@ -48,6 +48,97 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             Caption = 'Source Document No.';
             DataClassification = CustomerContent;
         }
+        field(8; "JIR Code"; Text[36])
+        {
+            Caption = 'JIR';
+            DataClassification = CustomerContent;
+        }
+        field(9; "ZKI Code"; Text[32])
+        {
+            Caption = 'ZKI';
+            DataClassification = CustomerContent;
+        }
+        field(10; "Bill No."; Code[20])
+        {
+            Caption = 'Bill No.';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if "Bill No." <> xRec."Bill No." then begin
+                    CROFiscalSetup.Get();
+                    NoSeriesMgt.TestManual(CROFiscalSetup."Bill No. Series");
+                    "No. Series" := '';
+                end;
+            end;
+        }
+        field(11; "Log Timestamp"; Time)
+        {
+            Caption = 'Log Timestamp';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(12; "Cashier ID"; BigInteger)
+        {
+            Caption = 'Cashier ID';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR CRO Aux Salesperson/Purch."."NPR CRO Salesperson OIB";
+        }
+        field(13; "No. Series"; Code[20])
+        {
+            Caption = 'No. Series';
+            DataClassification = CustomerContent;
+        }
+        field(14; "Payment Method Code"; Code[10])
+        {
+            Caption = 'Payment Method Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method";
+            trigger OnValidate()
+            var
+                CROPOSPaymMethMapp: Record "NPR CRO POS Paym. Method Mapp.";
+            begin
+                if CROPOSPaymMethMapp.Get("Payment Method Code") then
+                    "CRO Payment Method" := CROPOSPaymMethMapp."CRO Payment Method"
+                else
+                    "CRO Payment Method" := "NPR CRO POS Payment Method"::Other;
+            end;
+        }
+        field(15; "CRO Payment Method"; Enum "NPR CRO POS Payment Method")
+        {
+            Caption = 'Payment Method';
+            DataClassification = CustomerContent;
+        }
+        field(16; "Receipt Content"; Media)
+        {
+            Caption = 'Receipt Content';
+            DataClassification = CustomerContent;
+        }
+        field(17; "Verification URL"; Text[1024])
+        {
+            Caption = 'Verification URL';
+            DataClassification = CustomerContent;
+        }
+        field(18; "Total Amount"; Decimal)
+        {
+            Caption = 'Total Amount';
+            DataClassification = CustomerContent;
+        }
+        field(19; "Receipt Fiscalized"; Boolean)
+        {
+            Caption = 'Receipt Fiscalized';
+            DataClassification = CustomerContent;
+            InitValue = false;
+        }
+        field(20; "Receipt Printed"; Boolean)
+        {
+            Caption = 'Receipt Printed';
+            DataClassification = CustomerContent;
+        }
+        field(21; "Paragon Number"; Text[40])
+        {
+            Caption = 'Paragon Number';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -57,6 +148,16 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         }
     }
 
+    trigger OnInsert()
+    var
+    begin
+        if "Bill No." = '' then begin
+            CROFiscalSetup.Get();
+            CROFiscalSetup.TestField("Bill No. Series");
+            NoSeriesMgt.InitSeries(CROFiscalSetup."Bill No. Series", xRec."No. Series", 0D, "Bill No.", "No. Series");
+        end;
+    end;
+
     procedure GetAuditFromPOSEntry(POSEntryNo: Integer): Boolean
     begin
         Rec.Reset();
@@ -64,4 +165,8 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         Rec.SetRange("POS Entry No.", POSEntryNo);
         exit(Rec.FindFirst());
     end;
+
+    var
+        CROFiscalSetup: Record "NPR CRO Fiscalization Setup";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
 }

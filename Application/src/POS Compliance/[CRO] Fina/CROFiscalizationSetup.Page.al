@@ -13,9 +13,9 @@ page 6151214 "NPR CRO Fiscalization Setup"
     {
         area(Content)
         {
-            group(General)
+            group(Enabling)
             {
-                Caption = 'General Settings';
+                Caption = 'Enable Fiscalization';
 
                 field("Enable CRO Fiscal"; Rec."Enable CRO Fiscal")
                 {
@@ -27,6 +27,85 @@ page 6151214 "NPR CRO Fiscalization Setup"
                             EnabledValueChanged := true;
                     end;
                 }
+            }
+
+            group(CertificateInfo)
+            {
+                Caption = 'Digital Certificate Information';
+
+                field("Signing Certificate Password"; Rec."Signing Certificate Password")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Signing Certificate Password field.';
+                }
+                field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field.';
+                }
+                field("Certificate Subject OIB"; Rec."Certificate Subject OIB")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Certificate Subject OIB field.';
+                }
+            }
+
+            group(FiscEnvironmentInfo)
+            {
+                Caption = 'Fiscalization Environment Setup';
+
+                field("Environment URL"; Rec."Environment URL")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Environment URL field.';
+                }
+            }
+
+            group(NoSeries)
+            {
+                Caption = 'No. Series Setup';
+
+                field("Bill No. Series"; Rec."Bill No. Series")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Bill No. Series field.';
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action("Upload Certificate")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Upload Certificate';
+                Image = Import;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Upload Certificate action.';
+                trigger OnAction()
+                var
+                    CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
+                begin
+                    CROAuditMgt.ImportCertificate();
+                end;
+            }
+            action(POSPaymentMethod)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'POS Payment Methods';
+                Image = SetupPayment;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = page "NPR CRO POS Paym. Method Mapp.";
+                ToolTip = 'Opens POS Payment Method list page.';
             }
         }
     }

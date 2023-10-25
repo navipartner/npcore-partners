@@ -846,6 +846,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'CALCULATE_DISCOUNTS', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Calc Discounts";
     }
+    value(184; CRO_AUDIT_LOOKUP)
+    {
+        Caption = 'CRO_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROAudit Lkp";
+    }
+    value(185; CRO_INSERT_PARAGON)
+    {
+        Caption = 'CRO_INSERT_PARAGON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROParagon Ins";
+    }
     value(169; DISCOUNT)
     {
         Caption = 'DISCOUNT', Locked = true, MaxLength = 20;
