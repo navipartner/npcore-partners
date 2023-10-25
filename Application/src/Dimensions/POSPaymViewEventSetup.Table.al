@@ -34,7 +34,8 @@
             BlankZero = true;
             Caption = 'Popup every';
             DataClassification = CustomerContent;
-            MinValue = 0;
+            MinValue = 1;
+            InitValue = 1;
         }
         field(40; "Popup Start Time"; Time)
         {

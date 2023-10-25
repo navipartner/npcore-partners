@@ -25,6 +25,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
         //PAYMENT_VIEW scenario
         PopupDimension();
+        DimPopupEvery();
+
     end;
 
     local procedure ShowReturnAmountDialog()
@@ -305,6 +307,30 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             if ParamValue.FindSet() then
                 ParamValue.ModifyAll(Value, 'true');
         end;
+    end;
+
+    procedure DimPopupEvery()
+    var
+        POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'DimPopupEvery');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DimPopupEvery')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        if POSPaymentViewEventSetup.Get() then
+            if POSPaymentViewEventSetup."Popup every" = 0 then begin
+                if POSPaymentViewEventSetup."Dimension Popup Enabled" then
+                    POSPaymentViewEventSetup."Dimension Popup Enabled" := false;
+                POSPaymentViewEventSetup."Popup every" := 1;
+                POSPaymentViewEventSetup.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DimPopupEvery'));
+        LogMessageStopwatch.LogFinish();
     end;
 
 }
