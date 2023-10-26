@@ -429,6 +429,16 @@
             Caption = 'Perpetual Rounding Amt. (LCY)';
             DataClassification = CustomerContent;
         }
+        field(2200; "POS Period Register No."; Integer)
+        {
+            Caption = 'POS Period Register No.';
+            DataClassification = CustomerContent;
+        }
+        field(2210; "Salesperson Code"; Code[20])
+        {
+            Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
+        }
         field(3002; "POS Unit No. Filter"; Code[10])
         {
             Caption = 'POS Unit No. Filter';

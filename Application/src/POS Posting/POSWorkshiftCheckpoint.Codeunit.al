@@ -569,9 +569,10 @@
         POSWorkshiftCheckpoint.Insert();
         Commit();
 
-        if (POSUnitNo <> '') then
+        if (POSUnitNo <> '') then begin
             CalculateCheckpointStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint);
-
+            UpdateWorkshiftCheckpoint(POSWorkshiftCheckpoint);
+        end;
         POSWorkshiftCheckpoint.Modify();
         Commit();
 
@@ -1345,6 +1346,18 @@
             POSWorkshiftTaxCheckpoint."Entry No." := 0;
             POSWorkshiftTaxCheckpoint.Insert();
         until (TempPOSWorkshiftTaxCheckpoint.Next() = 0);
+    end;
+
+    local procedure UpdateWorkshiftCheckpoint(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    var
+        POSPeriodRegister: Record "NPR POS Period Register";
+    begin
+        POSPeriodRegister.SetCurrentKey("POS Unit No.");
+        POSPeriodRegister.SetRange("POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
+        if not POSPeriodRegister.FindLast() then
+            exit;
+        POSWorkshiftCheckpoint."POS Period Register No." := POSPeriodRegister."No.";
+        POSWorkshiftCheckpoint."Salesperson Code" := TryGetSalesperson();
     end;
 
     [IntegrationEvent(false, false)]
