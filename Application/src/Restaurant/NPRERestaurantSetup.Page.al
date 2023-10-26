@@ -97,6 +97,12 @@
                         ToolTip = 'Specifies if each time, when a new set of products are saved to a waiter pad, system should resend to kitchen both new and existing products from the waiter pad. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Print on POS Sale Cancel"; Rec."Print on POS Sale Cancel")
+                    {
+                        Enabled = Rec."Kitchen Printing Active";
+                        ToolTip = 'Specifies whether quantity updates for items included in a cancelled POS sale should be sent (printed) to kitchen. Typically, in this scenario, requests for items with zero quantity will be printed to kitchen after the sale is cancelled. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
                 group(KDS)
                 {

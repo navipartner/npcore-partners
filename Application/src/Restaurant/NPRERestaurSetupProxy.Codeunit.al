@@ -86,6 +86,12 @@
             else
                 _Restaurant."Kitchen Printing Active" := _Restaurant."Kitchen Printing Active"::No;
 
+        if _Restaurant."Print on POS Sale Cancel" = _Restaurant."Print on POS Sale Cancel"::Default then
+            if _NPRESetup."Print on POS Sale Cancel" then
+                _Restaurant."Print on POS Sale Cancel" := _Restaurant."Print on POS Sale Cancel"::Yes
+            else
+                _Restaurant."Print on POS Sale Cancel" := _Restaurant."Print on POS Sale Cancel"::No;
+
         if _Restaurant."KDS Active" = _Restaurant."KDS Active"::Default then
             if _NPRESetup."KDS Active" then
                 _Restaurant."KDS Active" := _Restaurant."KDS Active"::Yes
@@ -144,6 +150,12 @@
     begin
         MakeSureIsInitialized();
         exit(_Restaurant."Kitchen Printing Active" = _Restaurant."Kitchen Printing Active"::Yes);
+    end;
+
+    procedure PrintOnSaleCancelActivated(): Boolean
+    begin
+        MakeSureIsInitialized();
+        exit(_Restaurant."Print on POS Sale Cancel" = _Restaurant."Print on POS Sale Cancel"::Yes);
     end;
 
     procedure KDSActivated(): Boolean

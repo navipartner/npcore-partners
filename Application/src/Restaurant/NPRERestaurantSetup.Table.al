@@ -75,6 +75,12 @@
             Caption = 'Kitchen Printing Active';
             DataClassification = CustomerContent;
         }
+        field(25; "Print on POS Sale Cancel"; Boolean)
+        {
+            Caption = 'Print on POS Sale Cancel';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
         field(30; "KDS Active"; Boolean)
         {
             Caption = 'KDS Active';
