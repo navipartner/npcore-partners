@@ -47,6 +47,13 @@
             OptionCaption = '<Default>,No,Yes';
             OptionMembers = Default,No,Yes;
         }
+        field(45; "Print on POS Sale Cancel"; Option)
+        {
+            Caption = 'Print on POS Sale Cancel';
+            DataClassification = CustomerContent;
+            OptionCaption = '<Default>,No,Yes';
+            OptionMembers = Default,No,Yes;
+        }
         field(50; "KDS Active"; Option)
         {
             Caption = 'KDS Active';

@@ -7,7 +7,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
-
+        UpgradeStep: Text;
 
     trigger OnUpgradePerCompany()
     begin
@@ -15,6 +15,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         UpdatePrimarySeating();
         UpdateKitchenRequestSeatingAndWaiter();
         UpdateDefaultNumberOfGuests();
+        SetPrintOnSaleCancel();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -23,9 +24,10 @@ codeunit 6151316 "NPR NPRE Upgrade"
         xKitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus')) then
+        UpgradeStep := 'RefreshKitchenOrderStatus';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', 'RefreshKitchenOrderStatus');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
 
         if KitchenOrder.FindSet(true) then
             repeat
@@ -35,7 +37,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
                     KitchenOrder.Modify();
             until KitchenOrder.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -44,9 +46,10 @@ codeunit 6151316 "NPR NPRE Upgrade"
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating')) then
+        UpgradeStep := 'UpdatePrimarySeating';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', 'UpdatePrimarySeating');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
 
         SeatingWaiterPadLink2.SetCurrentKey("Waiter Pad No.", Primary);
         SeatingWaiterPadLink2.SetRange(Primary, true);
@@ -64,7 +67,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
                 SeatingWaiterPadLink.SetRange("Waiter Pad No.");
             until SeatingWaiterPadLink.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -74,9 +77,10 @@ codeunit 6151316 "NPR NPRE Upgrade"
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter')) then
+        UpgradeStep := 'UpdateKitchenRequestSeatingAndWaiter';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', 'UpdateKitchenRequestSeatingAndWaiter');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
 
         SeatingWaiterPadLink.SetCurrentKey("Waiter Pad No.", Primary);
         SeatingWaiterPadLink.SetRange(Primary, true);
@@ -89,7 +93,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
                     WaiterPad.Validate("Assigned Waiter Code");
             until WaiterPad.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -97,9 +101,10 @@ codeunit 6151316 "NPR NPRE Upgrade"
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests')) then
+        UpgradeStep := 'UpdateDefaultNumberOfGuests';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', 'UpdateDefaultNumberOfGuests');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
 
         if RestaurantSetup.Get() then
             if RestaurantSetup."Default Number of Guests" = RestaurantSetup."Default Number of Guests"::Default then begin
@@ -107,7 +112,25 @@ codeunit 6151316 "NPR NPRE Upgrade"
                 RestaurantSetup.Modify();
             end;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure SetPrintOnSaleCancel()
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+    begin
+        UpgradeStep := 'SetPrintOnSaleCancel';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
+
+        if RestaurantSetup.Get() then begin
+            RestaurantSetup."Print on POS Sale Cancel" := true;
+            RestaurantSetup.Modify();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 }
