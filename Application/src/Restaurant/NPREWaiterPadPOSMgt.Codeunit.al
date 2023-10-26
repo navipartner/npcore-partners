@@ -146,6 +146,7 @@
             CleanupWaiterPadLine(WaiterPadLine, false);
         until WaiterPadLine.Next() = 0;
         Commit();
+        RestaurantPrint.SetIsCancelledSale(true);
         RestaurantPrint.PrintWaiterPadLinesToKitchen(WaiterPad, WaiterPadLine, PrintTemplate."Print Type"::"Kitchen Order", '', false, false);  //Includes commit
         WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Cancelled Sale");
     end;

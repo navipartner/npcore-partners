@@ -1,15 +1,11 @@
 ﻿codeunit 6150664 "NPR NPRE Restaurant Print"
 {
     var
-        PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
+        _PrintTemplate: Record "NPR NPRE Print Templ.";
+        _SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        _IsCancelledSale: Boolean;
         NoMoreMealGroupsLbl: Label 'No more meal groups left to be sent to the kitchen.';
         NothingToSendLbl: Label 'Nothing to send.';
-        LinesHaveAlreadyBeenSent: Label 'One or more lines for %1 ''%2'' and %3 ''%4'' have already been sent to kitchent.\\Please select what do you want to do:\';
-        ResendOptions: Label 'Send only new lines,Send all lines including previously sent';
-        GlobalPrintTemplate: Record "NPR NPRE Print Templ.";
-        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
-        NowhereToSend: Label 'Neither Kitchen Printing nor KDS is activated. You need to activate at least one of them to be able to use this functionality.';
-        ServingReqestedMsg: Label 'Serving of %1 requested for seating %2 (waiter pad %3).';
 
     internal procedure PrintWaiterPadPreReceiptPressed(WaiterPad: Record "NPR NPRE Waiter Pad")
     begin
@@ -18,15 +14,16 @@
 
     internal procedure PrintWaiterPadPreOrderToKitchenPressed(WaiterPad: Record "NPR NPRE Waiter Pad"; ForceResend: Boolean)
     begin
-        PrintWaiterPadToKitchen(WaiterPad, GlobalPrintTemplate."Print Type"::"Kitchen Order", '', ForceResend, true);
+        PrintWaiterPadToKitchen(WaiterPad, _PrintTemplate."Print Type"::"Kitchen Order", '', ForceResend, true);
     end;
 
     internal procedure LinesAddedToWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
     var
         Confirmed: Boolean;
+        PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
     begin
-        SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        case SetupProxy.AutoSendKitchenOrder() of
+        _SetupProxy.InitializeUsingWaiterPad(WaiterPad);
+        case _SetupProxy.AutoSendKitchenOrder() of
             Enum::"NPR NPRE Auto Send Kitch.Order"::No:
                 Confirmed := false;
             Enum::"NPR NPRE Auto Send Kitch.Order"::Yes:
@@ -35,7 +32,7 @@
                 Confirmed := Confirm(PrintKitchOderConfMsg, true);
         end;
         if Confirmed then
-            PrintWaiterPadToKitchen(WaiterPad, GlobalPrintTemplate."Print Type"::"Kitchen Order", '', false, false);
+            PrintWaiterPadToKitchen(WaiterPad, _PrintTemplate."Print Type"::"Kitchen Order", '', false, false);
     end;
 
     local procedure PrintWaiterPadToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; PrintType: Integer; FlowStatusCode: Code[10]; ForceResend: Boolean; ShowMsgIfNothingToSend: Boolean): Boolean
@@ -130,9 +127,10 @@
         OutputType: Integer;
         AskResendConfirmation: Boolean;
         OutputTypeIsActive: Boolean;
+        NowhereToSend: Label 'Neither Kitchen Printing nor KDS is activated. You need to activate at least one of them to be able to use this functionality.';
     begin
-        SetupProxy.InitializeUsingWaiterPad(WaiterPad);
-        if not (SetupProxy.KitchenPrintingActivated() or SetupProxy.KDSActivated()) then
+        _SetupProxy.InitializeUsingWaiterPad(WaiterPad);
+        if not (_SetupProxy.KitchenPrintingActivated() or _SetupProxy.KDSActivated()) then
             Error(NowhereToSend);
 
         WaiterPadLine.Copy(WaiterPadLineIn);
@@ -143,9 +141,9 @@
             exit(false);
 
         if not ForceResend then begin
-            AskResendConfirmation := SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Ask;
+            AskResendConfirmation := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Ask;
             if not AskResendConfirmation then
-                ForceResend := SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
+                ForceResend := _SetupProxy.ResendAllOnNewLines() = Enum::"NPR NPRE Send All on New Lines"::Yes;
         end;
 
         WPadLineBuffer.Reset();
@@ -154,9 +152,12 @@
         InitTempPrintCategoryList(TempPrintCategory);
 
         for OutputType := WaiterPadLine."Output Type Filter"::Print to WaiterPadLine."Output Type Filter"::KDS do begin
-            OutputTypeIsActive :=
-              ((OutputType = WaiterPadLine."Output Type Filter"::Print) and SetupProxy.KitchenPrintingActivated()) or
-              ((OutputType = WaiterPadLine."Output Type Filter"::KDS) and SetupProxy.KDSActivated());
+            case OutputType of
+                WaiterPadLine."Output Type Filter"::Print:
+                    OutputTypeIsActive := _SetupProxy.KitchenPrintingActivated() and (not _IsCancelledSale or _SetupProxy.PrintOnSaleCancelActivated());
+                WaiterPadLine."Output Type Filter"::KDS:
+                    OutputTypeIsActive := _SetupProxy.KDSActivated();
+            end;
             if OutputTypeIsActive then
                 BufferEligibleForSendingWPadLines(
                   WaiterPadLine, OutputType, PrintType, FlowStatus, TempPrintCategory, ForceResend, AskResendConfirmation, WPadLineBuffer);
@@ -171,6 +172,8 @@
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         PrintCategoryFilter: Text;
         SelectedSendOption: Option Cancel,"Only New",All;
+        LinesHaveAlreadyBeenSent: Label 'One or more lines for %1 ''%2'' and %3 ''%4'' have already been sent to kitchent.\\Please select what do you want to do:\';
+        ResendOptions: Label 'Send only new lines,Send all lines including previously sent';
     begin
         if WaiterPadLine.IsEmpty or FlowStatus.IsEmpty or PrintCategory.IsEmpty then
             exit;
@@ -240,7 +243,7 @@
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
     begin
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
-        if FindAndPrintTemplates(WaiterPad, WaiterPadLine, GlobalPrintTemplate."Print Type"::"Pre Receipt", '', '') then begin
+        if FindAndPrintTemplates(WaiterPad, WaiterPadLine, _PrintTemplate."Print Type"::"Pre Receipt", '', '') then begin
             SetWaiterPadPreReceiptPrinted(WaiterPad, true, true);
             WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::Undefined);
         end;
@@ -477,6 +480,7 @@
     procedure RequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10]): Text
     var
         FlowStatus: Record "NPR NPRE Flow Status";
+        ServingReqestedMsg: Label 'Serving of %1 requested for seating %2 (waiter pad %3).';
     begin
         if AutoSelectFlowStatus then begin
             FlowStatus.SetCurrentKey("Status Object", "Flow Order");
@@ -498,7 +502,7 @@
 
         SetWaiterPadMealFlowStatus(WaiterPad, FlowStatusCode);
 
-        while not PrintWaiterPadToKitchen(WaiterPad, GlobalPrintTemplate."Print Type"::"Serving Request", FlowStatusCode, false, not AutoSelectFlowStatus) and AutoSelectFlowStatus do begin
+        while not PrintWaiterPadToKitchen(WaiterPad, _PrintTemplate."Print Type"::"Serving Request", FlowStatusCode, false, not AutoSelectFlowStatus) and AutoSelectFlowStatus do begin
             if FlowStatus.Next() = 0 then
                 Error(NoMoreMealGroupsLbl);
             FlowStatusCode := FlowStatus.Code;
@@ -560,7 +564,7 @@
         PrintCategory: Record "NPR NPRE Print/Prod. Cat.";
     begin
         if not PrintCategoryTmp.IsTemporary() then
-            SetupProxy.ThrowNonTempException('CU6150664.InitTempPrintCategoryList');
+            _SetupProxy.ThrowNonTempException('CU6150664.InitTempPrintCategoryList');
         PrintCategoryTmp.Reset();
         PrintCategoryTmp.DeleteAll();
         if PrintCategory.FindSet() then
@@ -579,7 +583,7 @@
         FlowStatus: Record "NPR NPRE Flow Status";
     begin
         if not FlowStatusTmp.IsTemporary() then
-            SetupProxy.ThrowNonTempException('CU6150664.InitTempFlowStatusList');
+            _SetupProxy.ThrowNonTempException('CU6150664.InitTempFlowStatusList');
 
         FlowStatusTmp.Reset();
         FlowStatusTmp.DeleteAll();
@@ -603,5 +607,10 @@
         WaiterPad."Pre-receipt Printed" := Printed;
         if ModifyRec then
             WaiterPad.Modify();
+    end;
+
+    internal procedure SetIsCancelledSale(Cancelled: Boolean)
+    begin
+        _IsCancelledSale := Cancelled;
     end;
 }
