@@ -9,10 +9,13 @@
         ReportSelections: Record "Report Selections";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RecRef: RecordRef;
+        ReportId: Integer;
     begin
         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst();
+        ReportId := ReportSelections."Report ID";
+        OnGeneratePdfCreditMemoOnAfterFindReportId(ReportSelections, ReportId);
 
         SalesCrMemoHeader.Get(DocumentNo);
         SalesCrMemoHeader.TestField("Bill-to Customer No.", CustomerNo);
@@ -20,7 +23,7 @@
 
         RecRef.GetTable(SalesCrMemoHeader);
         RecRef.SetRecFilter();
-        PdfCrMemo := ReportToBase64(ReportSelections."Report ID", RecRef);
+        PdfCrMemo := ReportToBase64(ReportId, RecRef);
 
         exit(PdfCrMemo);
     end;
@@ -51,10 +54,13 @@
         SalesInvHeader: Record "Sales Invoice Header";
         ReportSelections: Record "Report Selections";
         RecRef: RecordRef;
+        ReportId: Integer;
     begin
         ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst();
+        ReportId := ReportSelections."Report ID";
+        OnGeneratePdfInvoiceOnAfterFindReportId(ReportSelections, ReportId);
 
         SalesInvHeader.Get(DocumentNo);
         SalesInvHeader.TestField("Bill-to Customer No.", CustomerNo);
@@ -62,7 +68,7 @@
 
         RecRef.GetTable(SalesInvHeader);
         RecRef.SetRecFilter();
-        PdfSalesInvoice := ReportToBase64(ReportSelections."Report ID", RecRef);
+        PdfSalesInvoice := ReportToBase64(ReportId, RecRef);
 
         exit(PdfSalesInvoice);
     end;
@@ -422,5 +428,15 @@
             exit;
 
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR Magento Webservice", 'magento_services', true);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGeneratePdfInvoiceOnAfterFindReportId(ReportSelections: Record "Report Selections"; var ReportId: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGeneratePdfCreditMemoOnAfterFindReportId(ReportSelections: Record "Report Selections"; var ReportId: Integer)
+    begin
     end;
 }
