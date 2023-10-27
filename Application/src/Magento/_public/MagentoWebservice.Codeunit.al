@@ -15,7 +15,6 @@
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst();
         ReportId := ReportSelections."Report ID";
-        OnGeneratePdfCreditMemoOnAfterFindReportId(ReportSelections, ReportId);
 
         SalesCrMemoHeader.Get(DocumentNo);
         SalesCrMemoHeader.TestField("Bill-to Customer No.", CustomerNo);
@@ -23,6 +22,7 @@
 
         RecRef.GetTable(SalesCrMemoHeader);
         RecRef.SetRecFilter();
+        OnGeneratePdfCreditMemoOnBeforeGenerateReport(ReportSelections, RecRef, ReportId);
         PdfCrMemo := ReportToBase64(ReportId, RecRef);
 
         exit(PdfCrMemo);
@@ -60,7 +60,6 @@
         ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst();
         ReportId := ReportSelections."Report ID";
-        OnGeneratePdfInvoiceOnAfterFindReportId(ReportSelections, ReportId);
 
         SalesInvHeader.Get(DocumentNo);
         SalesInvHeader.TestField("Bill-to Customer No.", CustomerNo);
@@ -68,6 +67,7 @@
 
         RecRef.GetTable(SalesInvHeader);
         RecRef.SetRecFilter();
+        OnGeneratePdfInvoiceOnBeforeGenerateReport(ReportSelections, RecRef, ReportId);
         PdfSalesInvoice := ReportToBase64(ReportId, RecRef);
 
         exit(PdfSalesInvoice);
@@ -431,12 +431,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGeneratePdfInvoiceOnAfterFindReportId(ReportSelections: Record "Report Selections"; var ReportId: Integer)
+    local procedure OnGeneratePdfInvoiceOnBeforeGenerateReport(ReportSelections: Record "Report Selections"; RecRef: RecordRef; var ReportId: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGeneratePdfCreditMemoOnAfterFindReportId(ReportSelections: Record "Report Selections"; var ReportId: Integer)
+    local procedure OnGeneratePdfCreditMemoOnBeforeGenerateReport(ReportSelections: Record "Report Selections"; RecRef: RecordRef; var ReportId: Integer)
     begin
     end;
 }
