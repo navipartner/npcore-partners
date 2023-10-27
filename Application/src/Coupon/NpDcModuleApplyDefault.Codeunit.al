@@ -33,7 +33,7 @@
             ApplyDiscountLine(SaleLinePOSCoupon, DiscountAmt, TotalAmt, SaleLinePOS, AppliedDiscountAmt);
         until SaleLinePOS.Next() = 0;
 
-        if AppliedDiscountAmt < DiscountAmt then begin
+        if AppliedDiscountAmt <> DiscountAmt then begin
             SaleLinePOS.FindSet();
             repeat
                 ApplyDiscountAdjustment(SaleLinePOSCoupon, DiscountAmt, SaleLinePOS, AppliedDiscountAmt);
@@ -106,19 +106,21 @@
         LineDiscountBaseAmt: Decimal;
     begin
         AdjustmentAmountIncludingVAT := DiscountAmt - AppliedDiscountAmt;
-        if AdjustmentAmountIncludingVAT <= 0 then
+        if AdjustmentAmountIncludingVAT = 0 then
             exit;
 
         if not FindSaleLinePOSCouponApply2(SaleLinePOSCoupon, SaleLinePOS, SaleLinePOSCouponApply) then
             exit;
 
-        LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
+        if AdjustmentAmountIncludingVAT > 0 then begin
+            LineDiscountBaseAmt := SaleLinePOS."Amount Including VAT";
 
-        if AdjustmentAmountIncludingVAT > LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount Including VAT" then
-            AdjustmentAmountIncludingVAT := LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount Including VAT";
+            if AdjustmentAmountIncludingVAT > LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount Including VAT" then
+                AdjustmentAmountIncludingVAT := LineDiscountBaseAmt - SaleLinePOSCouponApply."Discount Amount Including VAT";
 
-        if AdjustmentAmountIncludingVAT <= 0 then
-            exit;
+            if AdjustmentAmountIncludingVAT <= 0 then
+                exit;
+        end;
 
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
@@ -126,6 +128,7 @@
         AdjustmentAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(AdjustmentAmountIncludingVAT,
                                                                                SaleLinePOS."VAT %",
                                                                                GeneralLedgerSetup."Amount Rounding Precision");
+
         if SaleLinePOS."Price Includes VAT" then
             AdjustmentAmount := AdjustmentAmountIncludingVAT
         else
