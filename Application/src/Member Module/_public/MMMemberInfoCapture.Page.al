@@ -1552,9 +1552,11 @@
 
         if (Member.Image.HasValue()) then begin
             TempBlob.CreateOutStream(OutStr);
-            Member.Image.ExportStream(OutStr);
-            TempBlob.CreateInStream(InStr);
-            Rec.Image.ImportStream(InStr, Rec.FieldName(Image));
+            if (Member.Image.ExportStream(OutStr)) then begin
+                TempBlob.CreateInStream(InStr);
+                if (not InStr.EOS) then
+                    Rec.Image.ImportStream(InStr, Rec.FieldName(Image));
+            end
         end else
             Clear(Rec.Image);
 
