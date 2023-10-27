@@ -1019,18 +1019,38 @@
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
         Err002: Label '%2 %1 has already been sold to a customer but is not yet posted';
         POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSSale: Record "NPR POS Entry";
+        ReservationEntry: Record "Reservation Entry";
     begin
+        POSSalesLine.Reset();
         POSSalesLine.SetRange("Item Entry No.", 0);
         POSSalesLine.SetRange("Serial No.", SerialNo);
-        if not POSSalesLine.IsEmpty() then
-            POSSalesLine.CalcSums(Quantity);
-        TotalAuditRollQuantity := POSSalesLine.Quantity;
+        POSSalesLine.SetLoadFields("POS Entry No.", "Item Entry No.", "Serial No.", Quantity);
+        if POSSalesLine.FindSet(false) then
+            repeat
+                POSSale.SetLoadFields("Entry No.", "Sales Document Type", "Sales Document No.");
+                POSSale.Get(POSSalesLine."POS Entry No.");
+                if POSSale."Sales Document No." <> '' then begin
+                    ReservationEntry.Reset();
+                    ReservationEntry.SetCurrentKey("Serial No.", "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line");
+                    ReservationEntry.SetRange("Source Type", Database::"Sales Line");
+                    ReservationEntry.SetRange("Source Subtype", POSSale."Sales Document Type");
+                    ReservationEntry.SetRange("Source ID", POSSale."Sales Document No.");
+                    ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Surplus);
+                    ReservationEntry.SetRange("Serial No.", POSSalesLine."Serial No.");
+                    if not ReservationEntry.IsEmpty then begin
+                        ReservationEntry.CalcSums(Quantity);
+                        TotalAuditRollQuantity += -ReservationEntry.Quantity;
+                    end;
+                end else
+                    TotalAuditRollQuantity += POSSalesLine.Quantity;
+            until POSSalesLine.Next() = 0;
 
         if Positive then begin
-            if POSSalesLine.Quantity = -1 then
+            if TotalAuditRollQuantity = -1 then
                 Error(Err001, SerialNo, FieldName("Serial No."));
         end else begin
-            if POSSalesLine.Quantity = 1 then
+            if TotalAuditRollQuantity = 1 then
                 Error(Err002, SerialNo, FieldName("Serial No."));
         end;
     end;
