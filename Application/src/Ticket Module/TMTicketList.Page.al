@@ -6,6 +6,7 @@
     Editable = true;
     InsertAllowed = false;
     PageType = List;
+    CardPageId = "NPR TM Ticket Card";
     SourceTable = "NPR TM Ticket";
     SourceTableView = ORDER(Descending);
     UsageCategory = Lists;
