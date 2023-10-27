@@ -1,15 +1,9 @@
 ﻿table 6059973 "NPR Variety Value"
 {
-    // NPR4.16/JDH/20151022 CASE 225661 Changed NotBlank to yes, to avoid blank primary key value
-    // VRT1.10/JDH/20151202 CASE 201022 Added Blocking of a Variety Table
-    // VRT1.11/JDH /20160602 CASE 242940 Added Captions
-    // NPR5.38/BR  /20171212 CASE 268786 Fixed Error messages
-    // NPR5.47/JDH /20180913 CASE 327541  Changed field length of Table to 40 characters
-
     Caption = 'Variety Value';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR Variety Value";
-    LookupPageID = "NPR Variety Value";
+    DrillDownPageId = "NPR Variety Value";
+    LookupPageId = "NPR Variety Value";
 
     fields
     {
@@ -25,7 +19,7 @@
             Caption = 'Table';
             DataClassification = CustomerContent;
             NotBlank = true;
-            TableRelation = "NPR Variety Table".Code WHERE(Type = FIELD(Type));
+            TableRelation = "NPR Variety Table".Code where(Type = field(Type));
         }
         field(3; Value; Code[50])
         {
@@ -94,36 +88,24 @@
     var
         VRTCheck: Codeunit "NPR Variety Check";
     begin
-        //-VRT1.10
         if CheckTableLocked() then
-            //-NPR5.38 [268786]
-            //ERROR(Text001);
             Error(Text003, Value, Table);
-        //+NPR5.38 [268786]
-        //+VRT1.10
 
         VRTCheck.CheckDeleteVarietyValue(Rec);
     end;
 
     trigger OnInsert()
     begin
-        //-VRT1.10
         if CheckTableLocked() then
-            //-NPR5.38 [268786]
-            //ERROR(Text001);
             Error(Text002, Value, Table);
-        //+NPR5.38 [268786]
-        //+VRT1.10
 
         AssignSortOrder();
     end;
 
     trigger OnRename()
     begin
-        //-VRT1.10
         if CheckTableLocked() then
             Error(Text001);
-        //+VRT1.10
     end;
 
     var
@@ -135,7 +117,13 @@
     var
         VRTValue: Record "NPR Variety Value";
         NewSortOrder: Integer;
+        Handled: Boolean;
     begin
+        OnBeforeSetSortOrder(Rec, NewSortOrder, Handled);
+        if Handled then begin
+            "Sort Order" := NewSortOrder;
+            exit;
+        end;
         NewSortOrder := FindNewSortOrder(Rec.Value);
 
         if NewSortOrder = 0 then begin
@@ -223,11 +211,13 @@
     var
         VRTTable: Record "NPR Variety Table";
     begin
-        //-VRT1.10
         VRTTable.Get(Type, Table);
         exit(VRTTable."Lock Table");
-        //+VRT1.10
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetSortOrder(VarietyValue: Record "NPR Variety Value"; var SortOrder: Integer; var Handled: Boolean)
+    begin
+    end;
 }
 
