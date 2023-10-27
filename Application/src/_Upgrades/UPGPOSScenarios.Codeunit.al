@@ -236,16 +236,18 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             exit;
         repeat
             if POSAction.get(POSSetup."Login Action Code") then begin
-                POSRefreshWorkflows.RefreshSpecific(POSAction."Workflow Implementation".AsInteger());
-                LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
-                if LoginActionRefreshNeeded then
-                    ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
+                if POSAction."Workflow Implementation" <> POSAction."Workflow Implementation"::LEGACY then begin
+                    POSRefreshWorkflows.RefreshSpecific(POSAction."Workflow Implementation".AsInteger());
+                    LoginActionRefreshNeeded := ParamMgt.RefreshParametersRequired(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
+                    if LoginActionRefreshNeeded then
+                        ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Login Action Code"), POSSetup."Login Action Code");
 
-                UpdateParam(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired', POSSetup);
-                DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired');
+                    UpdateParam(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired', POSSetup);
+                    DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR MM POS Action: MemberMgmt.", 'OnAfterLogin_SelectMemberRequired');
 
-                UpdateParam(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired', POSSetup);
-                DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired');
+                    UpdateParam(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired', POSSetup);
+                    DeletePOSWorkflowStepAfterLogin(Codeunit::"NPR POSAction: Ins. Customer", 'SelectCustomerRequired');
+                end;
             end;
         until POSSetup.Next() = 0;
 
