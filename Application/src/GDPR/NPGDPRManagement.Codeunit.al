@@ -198,7 +198,6 @@
     var
         Customer: Record Customer;
     begin
-
         AnonymizePrimaryContact(CustNo);
         AnonymizeSalesInvoices(CustNo);
         AnonymizeSalesCrMemos(CustNo);
@@ -207,7 +206,8 @@
         AnonymizeJobs(CustNo);
         AnonymizeIssuedReminders(CustNo);
 
-        Customer.Get(CustNo);
+        if not Customer.Get(CustNo) then
+            exit;
 
         Customer.Name := '------';
         Customer."Search Name" := '------';
