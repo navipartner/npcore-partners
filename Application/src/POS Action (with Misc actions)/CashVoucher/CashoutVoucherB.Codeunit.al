@@ -42,13 +42,17 @@ codeunit 6184634 "NPR Cashout Voucher B"
         POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
 
         if CommisionType = CommisionType::Percentage then begin
-            CommisionAmount := Round(POSLine."Amount Including VAT" * Commision / 100, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+            CommisionAmount := POSLine."Amount Including VAT" * Commision / 100;
             Description := StrSubstNo(CommisionLbl, Format(Commision), '%');
         end
         else begin
-            CommisionAmount := Round(Commision, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+            CommisionAmount := Commision;
             Description := StrSubstNo(CommisionLbl, Format(Commision), GLSetup."LCY Code");
         end;
+
+        if POSPaymentMethod."Rounding Precision" > 0 then
+            CommisionAmount := Round(CommisionAmount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType());
+
 #pragma warning disable AA0139
         exit(PayInPayOutMgr.CreatePayInOutPayment(SaleLine, 1, GLAccount, Description, CommisionAmount, ''));
 #pragma warning restore
