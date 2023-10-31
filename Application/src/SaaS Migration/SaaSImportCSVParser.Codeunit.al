@@ -57,6 +57,7 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Dimension Set Tree Node" = rimd,
                   TableData "Tenant Media Thumbnails" = rimd,
                   TableData "Tenant Media" = rimd,
+                  TableData "Item Application Entry" = rimd,
                   TableData "Item Register" = rimd;
 
 
@@ -110,7 +111,8 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                 //De-escape after our split
                 FormattedValueToFieldRef(FormattedValue.Replace('\|', '|').Replace('\"', '"'), FieldReference);
             end;
-            RecRef.Insert(false, true);
+            if not RecRef.Insert(false, true) then
+                RecRef.Modify();
         end;
 
         RecRef.Close();
