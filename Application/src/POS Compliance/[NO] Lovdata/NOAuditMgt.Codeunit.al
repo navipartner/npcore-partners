@@ -91,6 +91,28 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDesc, '');
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Cancel Sale B", 'OnBeforeDeletePOSSaleLine', '', false, false)]
+    local procedure NPRPOSActionCancelSaleB_OnBeforeDeletePOSSaleLine(POSSaleLine: Codeunit "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale");
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSUnit: Record "NPR POS Unit";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        AuditLogDesc: Label 'POS Sales Line canceled';
+        POSSaleLineRecord: Record "NPR POS Sale Line";
+        Amount: Decimal;
+    begin
+        POSSaleLine.GetCurrentSaleLine(POSSaleLineRecord);
+        if not POSUnit.Get(POSSaleLineRecord."Register No.") then
+            exit;
+
+        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSaleLineRecord.CalcSums("Amount Including VAT");
+        Amount := POSSaleLineRecord."Amount Including VAT";
+        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDesc, Format(Amount));
+    end;
+
     #endregion
 
     #region NO Fiscal - Audit Profile Mgt

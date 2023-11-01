@@ -92,6 +92,7 @@
             column(CreditUnrealSaleAmtLCY_; "POS Workshift Checkpoint"."Credit Unreal. Sale Amt. (LCY)") { }
             column(EFTLCY_; "POS Workshift Checkpoint"."EFT (LCY)") { }
             column(LocalCurrencyLCY_; "POS Workshift Checkpoint"."Local Currency (LCY)") { }
+            column(DiscountsCount_; "Discounts Count") { }
             column(VarMain_; VarMain) { }
             column(NetTurnoverLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Net Turnover (LCY)")) { }
             column(DirectReturnSalesLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Direct Item Returns (LCY)")) { }
@@ -149,6 +150,7 @@
             column(CreditUnrealSaleAmtLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Credit Unreal. Sale Amt. (LCY)")) { }
             column(EFTLCYlbl_; "POS Workshift Checkpoint".FieldCaption("EFT (LCY)")) { }
             column(LocalCurrencyLCYlbl_; "POS Workshift Checkpoint".FieldCaption("Local Currency (LCY)")) { }
+            column(DiscountsCountLbl_; "POS Workshift Checkpoint".FieldCaption("Discounts Count")) { }
             column(StoreCode_; POSEntry."POS Store Code") { }
             column(DocumentNo_; POSEntry."Document No.") { }
             column(StartingTime_; POSEntry."Starting Time") { }
@@ -166,7 +168,7 @@
             column(PricesIncVAT_; Format(POSEntry."Prices Including VAT")) { }
             column(PricesIncVATLbl_; POSEntry.FieldCaption("Prices Including VAT")) { }
             column(OtherPaymentslbl; OtherPaymentslbl) { }
-            column(CompanyName_; CompanyName) { }
+            column(CompanyName_; CompanyName()) { }
             column(POSEntryDescription_; POSEntry.Description) { }
             column(ReportTitle_; VarReportTitle) { }
             column(PrintSales_; PrintSales) { }
@@ -242,6 +244,7 @@
                 column(CurrencyCodelbl_; BinCounting.FieldCaption("Currency Code")) { }
                 column(PaymentTypeNolbl_; BinCounting.FieldCaption("Payment Type No.")) { }
                 column(FloatAmountlbl_; BinCounting.FieldCaption("Float Amount")) { }
+                column(PaymentsCountLbl_; BinCounting.FieldCaption("Payments Count")) { }
                 column(Commentlbl_; BinCounting.FieldCaption(Comment)) { }
                 column(PaymentMethodNo_; BinCounting."Payment Method No.") { }
                 column(Description_; BinCounting.Description) { }
@@ -261,6 +264,7 @@
                 column(TransferredAmount_; BinCounting."Transfer In Amount" + BinCounting."Transfer Out Amount") { }
                 column(VarBin_; VarBin) { }
                 column(BinEntryNo_; BinCounting."Entry No.") { }
+                column(PaymentsCount_; "Payments Count") { }
                 column(ifBankDenominExists; ifBankDenominExists) { }
                 column(ifMoveBinDenominExists; ifMoveBinDenominExists) { }
                 column(ifCountingDenominExists; ifCountingDenominExists) { }

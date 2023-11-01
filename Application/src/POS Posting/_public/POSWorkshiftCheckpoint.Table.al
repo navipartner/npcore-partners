@@ -507,6 +507,11 @@
             Caption = 'FF Total Rounding Amt. (LCY)';
             FieldClass = FlowField;
         }
+        field(3200; "Discounts Count"; Integer)
+        {
+            Caption = 'Discounts Count';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

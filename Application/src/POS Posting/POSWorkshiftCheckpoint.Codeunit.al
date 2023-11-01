@@ -748,10 +748,10 @@
         POSEntry: Record "NPR POS Entry";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-
         SetGeneralStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
         GetTransferStatistics(POSWorkshiftCheckpoint, FromPosEntryNo);
         AggregateVat_PE(POSWorkshiftCheckpoint."Entry No.", POSStoreCode, POSUnitNo, FromPosEntryNo);
+        SetRegisterStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
 
         POSSalesLine.SetFilter("POS Entry No.", '%1..', FromPosEntryNo);
         POSSalesLine.SetFilter("POS Unit No.", '=%1', POSUnitNo);
@@ -1034,6 +1034,9 @@
 
         POSWorkshiftCheckpoint."Total Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)";
         POSWorkshiftCheckpoint."Total Net Discount (LCY)" += POSSalesLine."Line Dsc. Amt. Excl. VAT (LCY)";
+
+        if POSSalesLine."Discount Type" <> POSSalesLine."Discount Type"::" " then
+            POSWorkshiftCheckpoint."Discounts Count" += 1;
 
         case POSSalesLine."Discount Type" of
             POSSalesLine."Discount Type"::"BOM List":
@@ -1346,6 +1349,58 @@
             POSWorkshiftTaxCheckpoint."Entry No." := 0;
             POSWorkshiftTaxCheckpoint.Insert();
         until (TempPOSWorkshiftTaxCheckpoint.Next() = 0);
+    end;
+
+    local procedure SetRegisterStatistics(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        if not POSEntry.Get(FromPosEntryNo) then
+            exit;
+        SetManualCashDrawerOpen(POSWorkshiftCheckpoint, POSEntry);
+
+        POSEntry.Reset();
+        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
+        POSEntry.SetRange("POS Store Code", POSStoreCode);
+        POSEntry.SetRange("POS Unit No.", POSUnitNo);
+        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
+        POSEntry.SetRange("System Entry", false);
+
+        if POSEntry.IsEmpty() then
+            exit;
+
+        POSEntry.FindSet();
+        repeat
+            SetCopyReceiptsQtyAndAmount(POSWorkshiftCheckpoint, POSEntry);
+        until POSEntry.Next() = 0;
+    end;
+
+    local procedure SetManualCashDrawerOpen(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FirstPOSEntry: Record "NPR POS Entry")
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+    begin
+        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
+        POSAuditLog.SetFilter(SystemCreatedAt, '%1..', FirstPOSEntry.SystemCreatedAt);
+        POSAuditLog.SetRange("Active POS Unit No.", FirstPOSEntry."POS Unit No.");
+        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
+
+        POSWorkshiftCheckpoint."Cash Drawer Open Count" := POSAuditLog.Count();
+    end;
+
+    local procedure SetCopyReceiptsQtyAndAmount(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var POSEntry: Record "NPR POS Entry")
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+    begin
+        POSEntry.SetLoadFields("Amount Incl. Tax");
+        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
+        POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
+        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_COPY);
+
+        if POSAuditLog.IsEmpty() then
+            exit;
+
+        POSWorkshiftCheckpoint."Receipt Copies Count" += 1;
+        POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" += POSEntry."Amount Incl. Tax";
     end;
 
     local procedure UpdateWorkshiftCheckpoint(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
