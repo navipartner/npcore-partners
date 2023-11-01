@@ -134,7 +134,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
         if not CROAuditMgt.SignXML(CROPOSAuditLogAuxInfo, BaseValue, SignedValue) then
             exit;
-        if not SendToTA(SignedValue, ResponseText) then
+        if not SendToTA(CROPOSAuditLogAuxInfo, SignedValue, ResponseText) then
             exit;
 
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
@@ -147,12 +147,13 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         CROPOSAuditLogAuxInfo.Modify();
     end;
 
-    local procedure SendToTA(XMLMessageText: Text; var ResponseText: Text): Boolean
+    local procedure SendToTA(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; XMLMessageText: Text; var ResponseText: Text): Boolean
     var
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         Url: Text;
+        IsHandled: Boolean;
     begin
         CROFiscalizationSetup.Get();
         Content.WriteFrom(XMLMessageText);
@@ -164,6 +165,9 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        OnBeforeSendHttpRequestForNormalSale(ResponseText, CROPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit(true);
         if CROAuditMgt.SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true);
     end;
@@ -211,4 +215,19 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BaseValue := BaseValue.Replace('"', '\"');
     end;
     #endregion
+
+    #region CRO Tax Communication - Test Procedures
+
+    internal procedure TestGetJIRCodeFromResponse(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; ResponseText: Text)
+    begin
+        CROPOSAuditLogAuxInfo."JIR Code" := CopyStr(GetJIRCodeFromResponse(ResponseText), 1, MaxStrLen(CROPOSAuditLogAuxInfo."JIR Code"));
+        CROPOSAuditLogAuxInfo.Modify();
+    end;
+
+    #endregion
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForNormalSale(var ResponseText: Text; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
 }
