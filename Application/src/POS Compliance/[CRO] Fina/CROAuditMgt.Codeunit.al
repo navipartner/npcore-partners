@@ -395,6 +395,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
+        IsHandled: Boolean;
     begin
         CROFiscalSetup.SetAutoCalcFields("Signing Certificate");
         CROFiscalSetup.Get();
@@ -415,6 +416,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        OnBeforeSendHttpRequestForXMLSigning(ResponseText, CROPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit(true);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
@@ -596,6 +600,28 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Message(CAPTION_CERT_SUCCESS, CROFiscalSetup."Signing Certificate Thumbprint");
     end;
 #endif
+    #endregion
+
+    #region CRO Audit Mgt - Test Procedures
+
+    internal procedure TestGetSignatureFromResponse(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; ResponseText: Text): Boolean
+    var
+        XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true;
+        Document: XmlDocument;
+        ChildNode: XmlNode;
+        Node: XmlNode;
+    begin
+        XmlDocument.ReadFrom(ResponseText, Document);
+        Document.GetChildElements().Get(1, ChildNode);
+        ChildNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'SignatureValue'), Node);
+        if Node.AsXmlElement().InnerText() <> '' then
+            exit(true);
+    end;
 
     #endregion
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForXMLSigning(var ResponseText: Text; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
 }
