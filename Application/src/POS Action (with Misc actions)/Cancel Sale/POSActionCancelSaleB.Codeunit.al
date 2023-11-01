@@ -26,6 +26,7 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
         HandleLinkedDocuments(SalePOS);
 
         POSSession.GetSaleLine(POSSaleLine);
+        OnBeforeDeletePOSSaleLine(POSSaleLine, SalePOS);
         POSSaleLine.DeleteAll();
 
         Line."Line Type" := Line."Line Type"::Comment;
@@ -91,5 +92,10 @@ codeunit 6059872 "NPR POSAction: Cancel Sale B"
                     until SalesLine.Next() = 0;
             end;
         until SaleLinePOS.Next() = 0;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeletePOSSaleLine(POSSaleLine: Codeunit "NPR POS Sale Line"; SalePOS: Record "NPR POS Sale")
+    begin
     end;
 }

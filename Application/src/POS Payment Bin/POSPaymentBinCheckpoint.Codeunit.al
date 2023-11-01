@@ -31,6 +31,7 @@
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
         POSBinMovement: Boolean;
         LastCheckpointEntryNo: Integer;
+        FromEntryNo: Integer;
         PaymentBinCheckpointDescriptionLbl: Label '[%1] %2', Locked = true;
         POSBinEntryCalc: Query "NPR POS Bin Entry Calc.";
     begin
@@ -88,6 +89,9 @@
         PaymentBinCheckpoint.CalcFields("Payment Bin Entry Amount", "Payment Bin Entry Amount (LCY)");
         PaymentBinCheckpoint."Calculated Amount Incl. Float" := PaymentBinCheckpoint."Payment Bin Entry Amount";
         PaymentBinCheckpoint."New Float Amount" := PaymentBinCheckpoint."Payment Bin Entry Amount";
+
+        FromEntryNo := FindFromEntryNo(POSUnit."No.");
+        SetPaymentsCount(PaymentBinCheckpoint, POSUnit."POS Store Code", POSUnit."No.", PaymentMethodCode, FromEntryNo);
 
         if (PaymentMethodCode = 'K') then begin
             LastCheckpointEntryNo := LastCheckpointEntryNo; // debug stop
@@ -183,6 +187,51 @@
                 PaymentBinCheckpoint.Delete();
             end;
         end;
+    end;
+
+    local procedure FindFromEntryNo(POSUnitNo: Code[10]): Integer
+    var
+        PreviousUnitCheckpoint: Record "NPR POS Workshift Checkpoint";
+        FromEntryNo: Integer;
+    begin
+        FromEntryNo := 1;
+        PreviousUnitCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
+        PreviousUnitCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnitNo);
+        PreviousUnitCheckpoint.SetFilter(Open, '=%1', false);
+        PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::ZREPORT);
+
+        if PreviousUnitCheckpoint.FindLast() then
+            FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
+
+        PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::WORKSHIFT_CLOSE);
+        PreviousUnitCheckpoint.SetFilter("Entry No.", '%1..', PreviousUnitCheckpoint."Entry No.");
+        if PreviousUnitCheckpoint.FindLast() then begin
+            PreviousUnitCheckpoint.Get(PreviousUnitCheckpoint."Consolidated With Entry No.");
+            FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
+        end;
+        exit(FromEntryNo);
+    end;
+
+    local procedure SetPaymentsCount(var PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."; POSStoreCode: Code[10]; POSUnitNo: Code[10]; PaymentMethodCode: Code[10]; FromEntryNo: Integer)
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntry.SetRange("POS Store Code", POSStoreCode);
+        POSEntry.SetFilter("Entry No.", '%1..', FromEntryNo);
+        POSEntry.SetFilter("System Entry", '=%1', false);
+        POSEntry.SetFilter("POS Unit No.", '=%1', POSUnitNo);
+
+        if POSEntry.IsEmpty() then
+            exit;
+
+        POSEntry.SetLoadFields("Entry No.");
+        POSEntry.FindSet();
+            repeat
+                POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryPaymentLine.SetRange("POS Payment Method Code", PaymentMethodCode);
+                PaymentBinCheckpoint."Payments Count" += POSEntryPaymentLine.Count();
+            until POSEntry.Next() = 0;
     end;
 
     procedure TransferToPaymentBin(FromWorkshiftCheckpointEntryNo: Integer; FromUnitNo: Code[10]; ToUnitNo: Code[10])
