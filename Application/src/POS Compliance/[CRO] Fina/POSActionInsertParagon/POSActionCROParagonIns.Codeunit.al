@@ -43,4 +43,17 @@ codeunit 6184558 "NPR POS Action: CROParagon Ins" implements "NPR IPOS Workflow"
         'let main = async ({ workflow, popup, captions }) => {let Paragon = await popup.input({ title: captions.title, caption: captions.paragonprompt});if (Paragon.length > 40) {await popup.error(captions.lengtherror);return(" ");}if (Paragon === null || Paragon === "") return;return await workflow.respond("InsertParagonNumber", { ParagonNo: Paragon });}'
     )
     end;
+
+    #region CRO Compliance Test Procedure
+    internal procedure InputAuditParagonNumberTest(ParagonNo: Text; Sale: Record "NPR POS Sale")
+    var
+        POSSale: Record "NPR POS Sale";
+        CROPOSSale: Record "NPR CRO POS Sale";
+    begin
+        CROPOSSale."POS Sale SystemId" := POSSale.SystemId;
+        CROPOSSale."CRO Paragon Number" := CopyStr(ParagonNo, 1, MaxStrLen(CROPOSSale."CRO Paragon Number"));
+        if not CROPOSSale.Insert() then
+            CROPOSSale.Modify();
+    end;
+    #endregion
 }
