@@ -205,6 +205,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Workshift Checkpoint";
         }
+        field(260; "Payments Count"; Integer)
+        {
+            Caption = 'Payments Count';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

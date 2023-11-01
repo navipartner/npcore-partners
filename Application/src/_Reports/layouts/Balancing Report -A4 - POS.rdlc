@@ -10225,6 +10225,9 @@ End Function
         <Field Name="LocalCurrencyLCY_Format">
           <DataField>LocalCurrencyLCY_Format</DataField>
         </Field>
+        <Field Name="DiscountsCount_">
+          <DataField>DiscountsCount_</DataField>
+        </Field>
         <Field Name="VarMain_">
           <DataField>VarMain_</DataField>
         </Field>
@@ -10395,6 +10398,9 @@ End Function
         </Field>
         <Field Name="LocalCurrencyLCYlbl_">
           <DataField>LocalCurrencyLCYlbl_</DataField>
+        </Field>
+        <Field Name="DiscountsCountLbl_">
+          <DataField>DiscountsCountLbl_</DataField>
         </Field>
         <Field Name="StoreCode_">
           <DataField>StoreCode_</DataField>
@@ -10621,6 +10627,9 @@ End Function
         <Field Name="FloatAmountlbl_">
           <DataField>FloatAmountlbl_</DataField>
         </Field>
+        <Field Name="PaymentsCountLbl_">
+          <DataField>PaymentsCountLbl_</DataField>
+        </Field>
         <Field Name="Commentlbl_">
           <DataField>Commentlbl_</DataField>
         </Field>
@@ -10698,6 +10707,9 @@ End Function
         </Field>
         <Field Name="BinEntryNo_">
           <DataField>BinEntryNo_</DataField>
+        </Field>
+        <Field Name="PaymentsCount_">
+          <DataField>PaymentsCount_</DataField>
         </Field>
         <Field Name="ifBankDenominExists">
           <DataField>ifBankDenominExists</DataField>

@@ -538,7 +538,7 @@
                     if Item."Item Tracking Code" <> '' then begin
                         ItemTrackingCode.Get(Item."Item Tracking Code");
 #IF BC17
-                          ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
+                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
 #ELSE
                         ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
 #endif
