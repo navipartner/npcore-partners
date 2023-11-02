@@ -583,6 +583,7 @@
 
     local procedure PerformRecoveryInstead(SalePOS: Record "NPR POS Sale"; IntegrationType: Text; var EFTTransactionRequestToRecover: Record "NPR EFT Transaction Request"): Boolean
     var
+        POSUnit: Record "NPR POS Unit";
         EFTInterface: Codeunit "NPR EFT Interface";
         Skip: Boolean;
     begin
@@ -610,6 +611,10 @@
         EFTInterface.OnBeforeLookupPrompt(EFTTransactionRequestToRecover, Skip);
         if Skip then
             exit(false);
+
+        if (POSUnit.Get(SalePOS."Register No.")) then
+            if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+                exit(false);
 
         exit(Confirm(CAPTION_RECOVER_PROMPT, true, EFTTransactionRequestToRecover."Integration Type", EFTTransactionRequestToRecover."Sales Ticket No.", EFTTransactionRequestToRecover."Processing Type", EFTTransactionRequestToRecover."Amount Input", EFTTransactionRequestToRecover."Currency Code", EFTTransactionRequestToRecover."Reference Number Output"));
     end;

@@ -513,10 +513,16 @@
     var
         POSSession: Codeunit "NPR POS Session";
         POSViewProfile: Record "NPR POS View Profile";
+        POSUnit: Record "NPR POS Unit";
     begin
+        _Setup.GetPOSUnit(POSUnit);
+        if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then begin
+            POSSession.StartPOSSession();
+            exit;
+        end;
+
         POSViewProfile.Init();
         _Setup.GetPOSViewProfile(POSViewProfile);
-
         if (POSViewProfile."After End-of-Sale View" = POSViewProfile."After End-of-Sale View"::INITIAL_SALE_VIEW) then begin
             POSSession.StartTransaction();
 

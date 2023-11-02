@@ -3,11 +3,13 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
     Access = Internal;
 
     var
-        _ExistingSale: Option None,Same,Diff_Paid,Diff_Unpaid;
+        _ExistingSale: Option None,Same,Partial;
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
         ActionDescription: Label 'This action allows you to create a POS sale and fully pay it via terminal';
+        ParamSaleIdentifierTitle: Label 'Sale Identifier';
+        ParamSaleIdentifierDesc: Label 'The identifier of the sale to be created';
         SaleContentTitle: Label 'Sale Contents';
         SaleCOntentDesc: Label 'The contents of the sale to be created';
         PaymentTypeTitle: Label 'Payment Type';
@@ -16,69 +18,86 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.SetWorkflowTypeUnattended();
-        WorkflowConfig.AddTextParameter('saleContents', '', SaleContentTitle, SaleCOntentDesc);
+        WorkflowConfig.AddTextParameter('saleSystemId', '', ParamSaleIdentifierTitle, ParamSaleIdentifierDesc);
+        WorkflowConfig.AddTextParameter('saleContents', '', SaleContentTitle, SaleContentDesc);
         WorkflowConfig.AddTextParameter('paymentType', '', PaymentTypeTitle, PaymentTypeDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
+    begin
+        case Step of
+            'createAndPreparePayment':
+                FrontEnd.WorkflowResponse(CreateAndPreparePayment(Context));
+            'printTickets':
+                FrontEnd.WorkflowResponse(PrintTickets(Context));
+        end;
+    end;
+
+    procedure CreateAndPreparePayment(Context: codeunit "NPR POS JSON Helper"): JsonObject
+    var
         SaleContents: JsonObject;
-        SaleId: Guid;
+        SaleSystemId: Guid;
         TicketToken: Text;
         JToken: JsonToken;
-        POSActionSavePOSSvSlB: Codeunit "NPR POS Action: SavePOSSvSl B";
-        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
-        POSActionCancelSaleB: Codeunit "NPR POSAction: Cancel Sale B";
         ExistingSale: Integer;
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         TMTicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         POSSaleRec: Record "NPR POS Sale";
     begin
-        SaleContents.ReadFrom(Context.GetStringParameter('saleContents'));
 
-        SaleContents.Get('saleId', JToken);
-        Evaluate(SaleId, JToken.AsValue().AsText());
+        if (not Evaluate(SaleSystemId, Context.GetStringParameter('saleSystemId'))) then
+            Clear(SaleSystemId);
 
-        SaleContents.Get('ticketToken', JToken);
-        TicketToken := JToken.AsValue().AsText();
+        if (SaleContents.ReadFrom(Context.GetStringParameter('saleContents'))) then begin
+            SaleContents.Get('ticketToken', JToken);
+            TicketToken := JToken.AsValue().AsText();
+        end;
 
-        ExistingSale := CheckForExistingSale(SaleId, TicketToken);
+        ExistingSale := CheckForExistingSale(SaleSystemId, TicketToken);
 
         case ExistingSale of
             _ExistingSale::Same:
                 begin
                     //try end sale again with payment (skips actual payment if 0 remaining)
-                    FrontEnd.WorkflowResponse(GetPaymentWorkflow(Context));
-                    exit;
+                    exit(GetPaymentWorkflow(Context));
                 end;
 
-            _ExistingSale::Diff_Paid:
+            _ExistingSale::Partial:
                 begin
-                    // TODO: Log to sentry as this is not something you should normally be able to make happen.
-                    // We should probably make the reload button call backend so it is harder to trigger.
+                    // When there are sales lines and payment lines with unmatched amount, we are in trouble
+                    Commit();
 
-                    //save sale so it can be error-handled on a full size POS (it contains money!).
-                    POSActionSavePOSSvSlB.SaveSale(POSSavedSaleEntry);
-                end;
-
-            _ExistingSale::Diff_Unpaid:
-                begin
-                    //delete old sale
-                    POSActionCancelSaleB.CancelSale();
+                    // Sale needs to be handled by a human
+                    // This should cause a client lock-down and when SS client is restarted, the sale is resumed and moved to parked sales
+                    Error('This sale needs to be handled by help desk.');
                 end;
         end;
 
-        POSSession.StartTransaction(SaleId);
-
+        // Order is resent could have been edited
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRec);
         TMTicketRetailMgt.CreatePOSLinesForReservationRequest(TicketToken, POSSaleRec);
 
-        FrontEnd.WorkflowResponse(GetPaymentWorkflow(Context));
+        exit(GetPaymentWorkflow(Context));
     end;
 
-    local procedure CheckForExistingSale(SaleId: Guid; TicketToken: Guid): Integer
+    local procedure PrintTickets(Context: codeunit "NPR POS JSON Helper"): JsonObject
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        SaleContents: JsonObject;
+        JToken: JsonToken;
+        TicketToken: Text[100];
+    begin
+        SaleContents.ReadFrom(Context.GetStringParameter('saleContents'));
+        SaleContents.Get('ticketToken', JToken);
+        TicketToken := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(TicketToken));
+
+        TicketManagement.PrintTicketsFromToken(TicketToken);
+    end;
+
+    local procedure CheckForExistingSale(SaleSystemId: Guid; TicketToken: Text): Integer
     var
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
@@ -86,34 +105,66 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSaleRec: Record "NPR POS Sale";
         TMTicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
+        SaleAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        Subtotal: Decimal;
     begin
+
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
+        POSSession.GetPaymentLine(POSPaymentLine);
         POSSale.GetCurrentSale(POSSaleRec);
+
         if POSSaleRec."Sales Ticket No." = '' then
-            Exit(_ExistingSale::None);
+            Error('Required workflow SS_INIT_SALE did not create a sale. This is a programming error.'); // Will cause front-end to lock-down
 
-        if POSSaleLine.IsEmpty() then
-            Exit(_ExistingSale::None);
+        if (not IsNullGuid(SaleSystemId)) then
+            if (POSSaleRec.SystemId <> SaleSystemId) then
+                Error('Backend and frontend disagree on which sale is current sale. This is a programming error.'); // Will cause front-end to lock-down
 
-        if POSSaleRec.SystemId = SaleId then begin
-            if TMTicketRetailMgt.IsFullyLinkedToTicket(TicketToken, POSSaleRec) then begin
-                exit(_ExistingSale::Same);
-            end;
+        if (POSSaleLine.IsEmpty() and POSPaymentLine.IsEmpty()) then
+            exit(_ExistingSale::None); // Apply incoming request
+
+        if (POSPaymentLine.IsEmpty()) then begin
+            POSSaleLine.DeleteAll();
+            exit(_ExistingSale::None); // Reapply incoming request
         end;
 
-        if POSPaymentLine.IsEmpty() then begin
-            Exit(_ExistingSale::Diff_Unpaid);
-        end else begin
-            Exit(_ExistingSale::Diff_Paid);
+        // There are payments lines
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if (PaidAmount = 0) then begin
+            POSSaleLine.DeleteAll(); // Previous payment was declined and order was edited
+            exit(_ExistingSale::None); // Reapply incoming request
         end;
+
+        // There is some paid amount, apply pending changes, delete pos sales lines and apply incoming request
+        POSSaleLine.DeleteAll();
+        TMTicketRetailMgt.CreatePOSLinesForReservationRequest(TicketToken, POSSaleRec); // Reapply incoming request
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if (SaleAmount = PaidAmount) then
+            exit(_ExistingSale::Same);
+
+        // Worst case, go to lock-down sales amount and paid amount are different
+        exit(_ExistingSale::Partial);
     end;
 
     local procedure GetPaymentWorkflow(JSON: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         workflowParameters: JsonObject;
+        paymentType: Text;
+        EFTSetup: Record "NPR EFT Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
-        workflowParameters.Add('paymentType', JSON.GetStringParameter('paymentType'));
+        POSSession.GetSetup(POSSetup);
+        paymentType := JSON.GetStringParameter('paymentType');
+        if paymentType = '' then begin
+            EFTSetup.SetRange("POS Unit No.", POSSetup.GetPOSUnitNo());
+            EFTSetup.FindFirst();
+            paymentType := EFTSetup."Payment Type POS";
+        end;
+        workflowParameters.Add('PaymentType', paymentType);
 
         Response.Add('paymentWorkflow', Format(Enum::"NPR POS Workflow"::"SS-PAYMENT"));
         Response.Add('paymentWorkflowParameters', workflowParameters)
@@ -123,7 +174,7 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSSCreateAndPay.js###
-'let main=async({parameters:a})=>{let{paymentWorkflow:e,paymentWorkflowParameters:r}=await workflow.respond("createAndPreparePayment",a.saleContents);await workflow.run(e,{parameters:r})};'
+'let main=async({parameters:e})=>{let{paymentWorkflow:a,paymentWorkflowParameters:n}=await workflow.respond("createAndPreparePayment",e.SaleContents),t=await workflow.run(a,{parameters:n});if(!t.success)throw console.info("[SS Create And Pay] payment result: "+t.success),new Error("DECLINED");await workflow.respond("printTickets",e.SaleContents)};'
         )
     end;
 }

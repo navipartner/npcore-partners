@@ -902,7 +902,23 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     {
         Caption = 'READ_BEID', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: BelgianEid";
-	}
+    }
+    value(6184573; SS_EFT_RECONCILE)
+    {
+        Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction SS EFTReconcile";
+    }
+    value(6184574; SS_INIT_SALE)
+    {
+        Caption = 'SS_INIT_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction SS InitSale";
+    }
+    value(6184580; SS_PRINT_RECEIPT)
+    {
+        Caption = 'SS_PRINT_RECEIPT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction SS PrintReceipt";
+    }
+
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;

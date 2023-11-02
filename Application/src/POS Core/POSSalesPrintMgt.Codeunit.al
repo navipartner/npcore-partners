@@ -61,6 +61,10 @@
         POSUnit: Record "NPR POS Unit";
     begin
         POSUnit.Get(POSEntry."POS Unit No.");
+
+        if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+            exit(true);
+
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
             exit(false);
 

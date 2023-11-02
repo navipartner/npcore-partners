@@ -50,7 +50,6 @@ codeunit 6151291 "NPR POS Action: SS Payment" implements "NPR IPOS Workflow"
             end;
         end;
 
-
         Response.Add('dispatchToWorkflow', WorkflowName);
         Response.Add('paymentType', POSPaymentMethod."Code");
         Response.Add('amount', Amount);
@@ -78,7 +77,7 @@ codeunit 6151291 "NPR POS Action: SS Payment" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSSPayment.js###
-'let main=async({workflow:t,runtime:a})=>{a.suspendTimeout();const{dispatchToWorkflow:n,paymentType:p,amount:e}=await t.respond("preparePaymentWorkflow");if(e===0){await t.respond("tryEndSale");return}(await t.run(n,{context:{paymentType:p,amount:e}})).tryEndSale&&await t.respond("tryEndSale")};'
+'let main=async({workflow:e,runtime:a})=>{a.suspendTimeout();const{dispatchToWorkflow:n,paymentType:s,amount:t}=await e.respond("preparePaymentWorkflow");return t===0?await e.respond("tryEndSale"):(await e.run(n,{context:{paymentType:s,amount:t}})).tryEndSale?await e.respond("tryEndSale"):{success:!1}};'
         );
     end;
 }

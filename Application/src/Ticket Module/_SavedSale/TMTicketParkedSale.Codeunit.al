@@ -84,6 +84,9 @@ codeunit 6150817 "NPR TM TicketParkedSale"
         CancelTicketReservation: Label 'This sales contains ticket items! When sale is parked, the tickets will be cancelled to release capacity. Do you want to continue?';
         HasTicketItem: Boolean;
     begin
+        if (not GuiAllowed()) then
+            exit;
+
         HasTicketItem := false;
         SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");

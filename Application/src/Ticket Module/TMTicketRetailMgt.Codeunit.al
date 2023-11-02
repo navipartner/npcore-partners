@@ -321,62 +321,157 @@
 
     procedure CreatePOSLinesForReservationRequest(TicketToken: Text; POSSale: Record "NPR POS Sale")
     var
-        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        TicketUnitPrice: Decimal;
+        AddonPrice: Decimal;
         POSSaleLineRec: Record "NPR POS Sale Line";
         LineNo: Integer;
+        ExternalLineNumber: Integer;
+        ListOfLines: List of [Integer];
+        NewUnitPrice: Decimal;
     begin
         POSSession.GetSaleLine(POSSaleLine);
 
-        TMTicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
-        TMTicketReservationReq.SetRange("Session Token ID", TicketToken);
-        TMTicketReservationReq.FindSet(true);
+        TicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationReq.SetFilter("Session Token ID", '=%1', CopyStr(TicketToken, 1, MaxStrLen(TicketReservationReq."Session Token ID")));
+        TicketReservationReq.SetFilter("Request Status", '=%1', TicketReservationReq."Request Status"::REGISTERED);
+        if (TicketReservationReq.IsEmpty()) then
+            exit;
+
 
         POSSaleLine.SetUsePresetLineNo(true);
 
-        repeat
+        // Find the different orders in the request - will have different line numbers
+        TicketReservationReq.Reset();
+        TicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationReq.SetFilter("Session Token ID", '=%1', CopyStr(TicketToken, 1, MaxStrLen(TicketReservationReq."Session Token ID")));
+        if (TicketReservationReq.FindSet()) then begin
+            repeat
+                if (not ListOfLines.Contains(TicketReservationReq."Ext. Line Reference No.")) then
+                    ListOfLines.Add(TicketReservationReq."Ext. Line Reference No.");
+            until (TicketReservationReq.Next() = 0);
+        end;
+
+
+        foreach ExternalLineNumber in ListOfLines do begin
+            // Find the main ticket item line
+            TicketReservationReq.Reset();
+            TicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+            TicketReservationReq.SetFilter("Session Token ID", '=%1', CopyStr(TicketToken, 1, MaxStrLen(TicketReservationReq."Session Token ID")));
+            TicketReservationReq.SetFilter("Ext. Line Reference No.", '=%1', ExternalLineNumber);
+            TicketReservationReq.SetFilter("Request Status", '=%1', TicketReservationReq."Request Status"::REGISTERED);
+            TicketReservationReq.SetFilter("Primary Request Line", '=%1', true);
+            TicketReservationReq.SetFilter("Admission Inclusion", '=%1', TicketReservationReq."Admission Inclusion"::REQUIRED);
+            TicketReservationReq.FindFirst();
+
+            TicketReservationReq.TestField("Admission Created");
             POSSaleLine.GetNewSaleLine(POSSaleLineRec);
             LineNo += 10000;
 
             POSSaleLineRec."Line Type" := POSSaleLineRec."Line Type"::Item;
-            POSSaleLineRec."No." := TMTicketReservationReq."Item No.";
-            POSSaleLineRec."Variant Code" := TMTicketReservationReq."Variant Code";
-            POSSaleLineRec.Quantity := TMTicketReservationReq.Quantity;
+            POSSaleLineRec."No." := TicketReservationReq."Item No.";
+            POSSaleLineRec."Variant Code" := TicketReservationReq."Variant Code";
+            POSSaleLineRec.Quantity := TicketReservationReq.Quantity;
             POSSaleLineRec."Line No." := LineNo;
 
-            TMTicketReservationReq."Line No." := LineNo;
-            TMTicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
-            TMTicketReservationReq.Modify();
+            TicketReservationReq."Line No." := LineNo;
+            TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
+            TicketReservationReq.Modify();
             POSSaleLine.InsertLine(POSSaleLineRec);
-        until TMTicketReservationReq.Next() = 0;
+
+            // Update the remaining non-primary required admissions with same receipt number
+            TicketReservationReq.SetFilter("Primary Request Line", '=%1', false);
+            TicketReservationReq.FindSet();
+            repeat
+                TicketReservationReq."Line No." := LineNo;
+                TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
+                TicketReservationReq.Modify();
+            until TicketReservationReq.Next() = 0;
+
+            // Each additional experience will have its own sales lines as they are charged on-top of the required experiences
+            TicketReservationReq.SetFilter("Admission Inclusion", '=%1', TicketReservationReq."Admission Inclusion"::SELECTED);
+            if (TicketReservationReq.FindSet()) then begin
+                repeat
+                    TicketReservationReq.TestField("Admission Created");
+
+                    POSSaleLine.GetNewSaleLine(POSSaleLineRec);
+                    LineNo += 10000;
+
+                    Admission.Get(TicketReservationReq."Admission Code");
+                    POSSaleLineRec."Line Type" := POSSaleLineRec."Line Type"::Item;
+                    POSSaleLineRec."No." := Admission."Additional Experience Item No.";
+                    POSSaleLineRec."Variant Code" := '';
+                    POSSaleLineRec.Quantity := TicketReservationReq.Quantity;
+                    POSSaleLineRec."Line No." := LineNo;
+                    POSSaleLine.InsertLine(POSSaleLineRec);
+
+                    if (TicketPrice.CalculateScheduleEntryPrice(POSSaleLineRec."No.", '', TicketReservationReq."Admission Code", TicketReservationReq."External Adm. Sch. Entry No.", POSSaleLineRec."Unit Price", POSSaleLineRec."Price Includes VAT", POSSaleLineRec."VAT %", Today(), Time(), TicketUnitPrice, AddonPrice)) then begin
+                        if (TicketUnitPrice <> 0) then
+                            NewUnitPrice := TicketUnitPrice + AddonPrice;
+                        if (TicketUnitPrice = 0) then
+                            NewUnitPrice := POSSaleLineRec."Unit Price" + AddonPrice;
+                        if (NewUnitPrice < 0) then
+                            NewUnitPrice := 0;
+                        POSSaleLineRec.Validate("Unit Price", NewUnitPrice);
+                        POSSaleLineRec.UpdateAmounts(POSSaleLineRec);
+                        POSSaleLineRec."Eksp. Salgspris" := false;
+                        POSSaleLineRec."Custom Price" := false;
+                        POSSaleLineRec.Modify();
+                    end;
+
+                    TicketReservationReq."Line No." := LineNo;
+                    TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
+                    TicketReservationReq.Modify();
+
+                until TicketReservationReq.Next() = 0;
+            end;
+        end;
     end;
 
     procedure IsFullyLinkedToTicket(TicketToken: Text; POSSale: Record "NPR POS Sale"): Boolean
     var
-        TMTicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
         POSSaleLine: Record "NPR POS Sale Line";
     begin
         POSSaleLine.SetRange("Register No.", POSSale."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
         POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
 
-        TMTicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
-        TMTicketReservationReq.SetRange("Session Token ID", TicketToken);
-        TMTicketReservationReq.FindSet();
+        TicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationReq.SetRange("Session Token ID", TicketToken);
+        TicketReservationReq.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationReq."Admission Inclusion"::REQUIRED, TicketReservationReq."Admission Inclusion"::SELECTED);
+        TicketReservationReq.FindSet();
 
         repeat
-            if not POSSaleLine.Get(POSSale."Register No.", POSSale."Sales Ticket No.", POSSale.Date, POSSaleLine."Sale Type", TMTicketReservationReq."Line No.") then
+            if not POSSaleLine.Get(POSSale."Register No.", POSSale."Sales Ticket No.", POSSale.Date, POSSaleLine."Sale Type", TicketReservationReq."Line No.") then
                 exit(false);
-            if POSSaleLine."Sales Ticket No." <> TMTicketReservationReq."Receipt No." then
+
+            if POSSaleLine."Sales Ticket No." <> TicketReservationReq."Receipt No." then
                 exit(false);
+
             if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Item then
                 exit(false);
-            if POSSaleLine."No." <> TMTicketReservationReq."Item No." then
+
+            if (TicketReservationReq."Admission Inclusion" = TicketReservationReq."Admission Inclusion"::REQUIRED) then
+                if POSSaleLine."No." <> TicketReservationReq."Item No." then
+                    exit(false);
+
+            if (TicketReservationReq."Admission Inclusion" = TicketReservationReq."Admission Inclusion"::SELECTED) then begin
+                if (not Admission.Get(TicketReservationReq."Admission Code")) then
+                    exit(false);
+
+                if POSSaleLine."No." <> Admission."Additional Experience Item No." then
+                    exit(false);
+            end;
+
+            if POSSaleLine.Quantity <> TicketReservationReq.Quantity then
                 exit(false);
-            if POSSaleLine.Quantity <> TMTicketReservationReq.Quantity then
-                exit(false);
-        until TMTicketReservationReq.Next() = 0;
+        until TicketReservationReq.Next() = 0;
 
         exit(true);
     end;

@@ -837,6 +837,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         TicketUnitPrice: Decimal;
         Token: Text[100];
+        TokenLineNumber: Integer;
     begin
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
@@ -844,9 +845,9 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then
             exit;
 
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
+        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
 
-            if (TicketPrice.GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
+            if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
                 SaleLinePOS."Unit Price" := TicketUnitPrice;
         end;
     end;
@@ -858,6 +859,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         ResponseCode: Integer;
         ResponseMessage: Text;
         Token: Text[100];
+        TokenLineNumber: Integer;
         ExternalMemberNo: Code[20];
         TicketUnitPrice: Decimal;
         POSSession: Codeunit "NPR POS Session";
@@ -866,7 +868,10 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
     begin
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
+        if (not GuiAllowed()) then
+            exit(0); // Self Service mode over REST API.
+
+        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
             if (TicketRequestManager.IsRequestStatusReservation(Token)) then
                 exit(0);
 
@@ -897,7 +902,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
 
                 AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
-                if (TicketPrice.GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
+                if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
                     SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
                     SaleLinePOS.UpdateAmounts(SaleLinePOS);
                     SaleLinePOS."Eksp. Salgspris" := false;
@@ -1449,6 +1454,27 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
 
         if (TicketReservationRequest.FindFirst()) then
             Token := TicketReservationRequest."Session Token ID";
+
+        exit(Token <> '');
+    end;
+
+    procedure GetRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        Token := '';
+
+        if (ReceiptNo = '') then
+            exit(false);
+
+        TicketReservationRequest.SetCurrentKey("Receipt No.");
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
+        TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
+
+        if (TicketReservationRequest.FindFirst()) then begin
+            Token := TicketReservationRequest."Session Token ID";
+            TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
+        end;
 
         exit(Token <> '');
     end;

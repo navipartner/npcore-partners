@@ -1281,8 +1281,8 @@
             end;
 
         end else begin
-            ReservationRequest."External Adm. Sch. Entry No." := ExternalAdmissionScheduleEntryNo;
-            if (ReservationRequest."Scheduled Time Description" = '') then begin
+            if (ReservationRequest."External Adm. Sch. Entry No." <> ExternalAdmissionScheduleEntryNo) then begin
+                ReservationRequest."External Adm. Sch. Entry No." := ExternalAdmissionScheduleEntryNo;
                 AdmSchEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmissionScheduleEntryNo);
                 AdmSchEntry.SetFilter(Cancelled, '=%1', false);
                 if (AdmSchEntry.FindLast()) then

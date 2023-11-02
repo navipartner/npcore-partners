@@ -549,13 +549,32 @@
         First: Boolean;
         EFTInterface: Codeunit "NPR EFT Interface";
         Handled: Boolean;
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if "Entry No." = 0 then
+        if Rec."Entry No." = 0 then
             exit;
 
+        if (not IsReprint) then begin
+            // End of Sale
+            POSSession.GetSetup(POSSetup);
+            POSSetup.GetPOSUnit(POSUnit);
+
+            if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+                if (Rec.Successful) then
+                    exit;
+
+            if (POSAuditProfile.Get(POSUnit."POS Audit Profile")) then
+                if (POSAuditProfile.DoNotPrintEftReceiptOnSale) then
+                    if (Rec."Signature Type" <> Rec."Signature Type"::"On Receipt") then
+                        exit;
+        end;
+
         if IsReprint then begin
-            "No. of Reprints" += 1;
-            Modify();
+            Rec."No. of Reprints" += 1;
+            Rec.Modify();
         end;
 
         EFTInterface.OnPrintReceipt(Rec, Handled);
@@ -563,7 +582,7 @@
             exit;
 
         CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
-        CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', "Entry No.");
+        CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', Rec."Entry No.");
         if not CreditCardTransaction.FindSet() then
             exit;
 

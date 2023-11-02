@@ -51,7 +51,7 @@
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('OpenParameters', BuildOpenParameters(EftTransactionRequest));
-        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline");
+        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline" and (not EftTransactionRequest."Self Service"));
         HwcRequest.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
 
@@ -83,6 +83,7 @@
         TrxParameters.Add('OptionalData', GetOptionalDataTrx(EftTransactionRequest, EFTNETSBAXIPaymentSetup));
         //TrxParameters.Add('GetStoreboxToken', false); //TODO: implement storebox integration
         HwcRequest.Add('TransactionParameters', TrxParameters);
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure RefundTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
@@ -99,7 +100,7 @@
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('OpenParameters', BuildOpenParameters(EftTransactionRequest));
-        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline");
+        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline" and (not EftTransactionRequest."Self Service"));
         HwcRequest.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
 
@@ -109,6 +110,7 @@
         TrxParameters.Add('Type3', 48);
         TrxParameters.Add('OptionalData', GetOptionalDataTrx(EftTransactionRequest, EFTNETSBAXIPaymentSetup));
         HwcRequest.Add('TransactionParameters', TrxParameters);
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure DepositTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
@@ -125,7 +127,7 @@
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('OpenParameters', BuildOpenParameters(EftTransactionRequest));
-        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline");
+        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline" and (not EftTransactionRequest."Self Service"));
         HwcRequest.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
 
@@ -135,6 +137,7 @@
         TrxParameters.Add('Type3', 48);
         TrxParameters.Add('OptionalData', GetOptionalDataTrx(EftTransactionRequest, EFTNETSBAXIPaymentSetup));
         HwcRequest.Add('TransactionParameters', TrxParameters);
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure VoidTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
@@ -151,7 +154,7 @@
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('OpenParameters', BuildOpenParameters(EftTransactionRequest));
-        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline");
+        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline" and (not EftTransactionRequest."Self Service"));
         HwcRequest.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
 
@@ -161,6 +164,7 @@
         TrxParameters.Add('Type3', 48);
         TrxParameters.Add('OptionalData', GetOptionalDataTrx(EftTransactionRequest, EFTNETSBAXIPaymentSetup));
         HwcRequest.Add('TransactionParameters', TrxParameters);
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure BalanceEnquiry(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
@@ -177,7 +181,7 @@
         HwcRequest.Add('Type', 'Transaction');
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('OpenParameters', BuildOpenParameters(EftTransactionRequest));
-        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline");
+        HwcRequest.Add('OfflinePhoneAuth', EFTNETSBAXIPaymentSetup."Force Offline" and (not EftTransactionRequest."Self Service"));
         HwcRequest.Add('TypeCaption', BALANCE_ENQUIRY);
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
 
@@ -303,6 +307,7 @@
         AdminParameters.Add('AdmCode', 12592);
         AdminParameters.Add('TimeoutMs', EFTNETSBAXIPaymentSetup."Administration Timeout Seconds" * 1000);
         HwcRequest.Add('AdministrationParameters', AdminParameters);
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure Reconciliation(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
@@ -325,6 +330,7 @@
         HwcRequest.Add('AdministrationParameters', AdminParameters);
         HwcRequest.Add('TypeCaption', ReconciliationLbl);
         HwcRequest.Add('AmountCaption', ' ');
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
     end;
 
     local procedure DownloadSoftware(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
