@@ -148,7 +148,7 @@
         UnitPriceLCY: Decimal;
     begin
         UnitCostLCY := CalculateAmountToLCY(_ItemWkshLine."Purchase Price Currency Code", _ItemWkshLine."Direct Unit Cost");
-        
+
         Item.Validate("Vendor Item No.", _ItemWkshLine."Vend Item No.");
         if not MapStandardItemWorksheetLineField(Item, _ItemWkshLine, _ItemWkshLine.FieldNo("Vendor No.")) then
             Item.Validate("Vendor No.", _ItemWkshLine."Vendor No.");
@@ -240,11 +240,11 @@
         if (Item."Last Direct Cost" <> _ItemWkshLine."Direct Unit Cost") and (_ItemWkshLine."Direct Unit Cost" <> 0) then begin
             UnitCostLCY := CalculateAmountToLCY(_ItemWkshLine."Purchase Price Currency Code", _ItemWkshLine."Direct Unit Cost");
             Item.Validate("Last Direct Cost", UnitCostLCY);
-            
+
             if Item."Unit Cost" = 0 then
                 Item."Unit Cost" := UnitCostLCY;
         end;
-        
+
         Item.Modify(true);
         ValidateFields(Item, _ItemWkshLine, true, false);
 
@@ -805,7 +805,7 @@
     var
         UnitPriceLCY: Decimal;
     begin
-    
+
         if _ItemWkshLine."Sales Price" <> Item."Unit Price" then begin
             UnitPriceLCY := CalculateAmountToLCY(_ItemWkshLine."Sales Price Currency Code", _ItemWkshLine."Sales Price");
             Item.Validate("Unit Price", UnitPriceLCY);
@@ -851,9 +851,9 @@
             PriceListLine.Modify();
         end;
 
-        CreateSalesPriceListLine(PriceListHeader, SalesUnitOfMeasure, SalesPriceStartDate, _ItemWkshLine."Item No.", '', _ItemWkshLine."Sales Price");    
+        CreateSalesPriceListLine(PriceListHeader, SalesUnitOfMeasure, SalesPriceStartDate, _ItemWkshLine."Item No.", '', _ItemWkshLine."Sales Price");
 #ELSE
-        CreateSalesPriceListLine(PriceListHeader, _ItemWkshLine."Item No.", '', _ItemWkshLine."Sales Price");    
+        CreateSalesPriceListLine(PriceListHeader, _ItemWkshLine."Item No.", '', _ItemWkshLine."Sales Price");
 #ENDIF
     end;
 
@@ -878,7 +878,7 @@
     begin
         if ItemWorksheetTemplate."Sales Price Handl." = ItemWorksheetTemplate."Sales Price Handl."::Item then
             exit;
-            
+
         if _ItemWkshVariantLine."Sales Price" = 0 then
             exit;
 
@@ -899,9 +899,9 @@
             PriceListLine.Modify();
         end;
 
-        CreateSalesPriceListLine(PriceListHeader, SalesUnitOfMeasure, SalesPriceStartDate, _ItemWkshVariantLine."Item No.", _ItemWkshVariantLine."Variant Code", _ItemWkshVariantLine."Sales Price");    
+        CreateSalesPriceListLine(PriceListHeader, SalesUnitOfMeasure, SalesPriceStartDate, _ItemWkshVariantLine."Item No.", _ItemWkshVariantLine."Variant Code", _ItemWkshVariantLine."Sales Price");
 #ELSE
-        CreateSalesPriceListLine(PriceListHeader, _ItemWkshVariantLine."Item No.", _ItemWkshVariantLine."Variant Code", _ItemWkshVariantLine."Sales Price");    
+        CreateSalesPriceListLine(PriceListHeader, _ItemWkshVariantLine."Item No.", _ItemWkshVariantLine."Variant Code", _ItemWkshVariantLine."Sales Price");
 #ENDIF
     end;
 
@@ -937,10 +937,10 @@
             PriceListLine.Modify();
         end;
 
-        CreatePurchasePriceListLine(PriceListHeader, PurchaseUnitOfMeasure, PurchasePriceStartDate, _ItemWkshLine."Item No.", '', _ItemWkshLine."Direct Unit Cost"); 
+        CreatePurchasePriceListLine(PriceListHeader, PurchaseUnitOfMeasure, PurchasePriceStartDate, _ItemWkshLine."Item No.", '', _ItemWkshLine."Direct Unit Cost");
 #ELSE
         CreatePurchasePriceListLine(PriceListHeader, _ItemWkshLine."Item No.", '', _ItemWkshLine."Direct Unit Cost");
-#ENDIF   
+#ENDIF
     end;
 
     local procedure ProcessVariantLinePurchasePrice(Item: Record Item)
@@ -1099,7 +1099,7 @@
                                 if TargetFieldRec."No." <> 0 then begin
                                     ItemFldRef := ItemRecRef.Field(TargetFieldRec."No.");
                                     if not IsBlankFieldRef(ItemWorksheetFldRef, ItemFldRef) then begin
-                                        if Format(ItemFldRef.Value) <> Format(ItemWorksheetFldRef.Value) then begin
+                                        if ValuesAreDifferent(ItemFldRef, ItemWorksheetFldRef) then begin
                                             //Difference between new value and old value
                                             if DoInsertChangeRecords then
                                                 InsertChangeRecord(VarItemWkshLine, ItemWorksheetFieldSetup, ItemWorksheetFldRef, ItemFldRef);
@@ -1118,6 +1118,22 @@
         if DoValidateFields then
             ItemRecRef.Modify(true);
         VarItem.Get(VarItem."No.");
+    end;
+
+    local procedure ValuesAreDifferent(ItemFldRef: FieldRef; ItemWorksheetFldRef: FieldRef) DifferenceExists: Boolean;
+    var
+        ItemFieldItegerValue: Integer;
+        ItemWorksheetIntegerValue: Integer;
+        ComapreStringValue: Boolean;
+    begin
+        ComapreStringValue := (UpperCase(Format(ItemFldRef.Type)) <> 'ENUM') and (UpperCase(Format(ItemFldRef.Type)) <> 'OPTION');
+        if not ComapreStringValue then
+            ComapreStringValue := not (TryParseOptionToInteger(ItemFieldItegerValue, ItemFldRef) and TryParseOptionToInteger(ItemWorksheetIntegerValue, ItemWorksheetFldRef));
+
+        if not ComapreStringValue then
+            DifferenceExists := ItemWorksheetIntegerValue <> ItemFieldItegerValue
+        else
+            DifferenceExists := Format(ItemFldRef.Value) <> Format(ItemWorksheetFldRef.Value);
     end;
 
     internal procedure MapStandardItemWorksheetLineField(var VarItem: Record Item; ItemWorksheetLine: Record "NPR Item Worksheet Line"; SourceFieldNo: Integer): Boolean
@@ -1417,6 +1433,12 @@
         exit(true);
     end;
 
+    [TryFunction]
+    local procedure TryParseOptionToInteger(var TempInteger: Integer; FldRef: FieldRef)
+    begin
+        TempInteger := FldRef.Value;
+    end;
+
     local procedure InsertChangeRecord(ParItemWorksheetLine: Record "NPR Item Worksheet Line"; ParItemWorksheetFieldSetup: Record "NPR Item Worksh. Field Setup"; SourceFldRef: FieldRef; TargetFldRef: FieldRef)
     var
         ItemWorksheetFieldChange: Record "NPR Item Worksh. Field Change";
@@ -1483,7 +1505,7 @@
     local procedure CreateSalesPriceListLine(var PriceListHeader: Record "Price List Header"; ItemNo: Code[20]; VariantCode: Code[10]; SalesPrice: Decimal)
 #ENDIF
     var
-        PriceListLine: Record "Price List Line"; 
+        PriceListLine: Record "Price List Line";
         xPriceListHeader: Record "Price List Header";
     begin
         xPriceListHeader := PriceListHeader;
@@ -1533,7 +1555,7 @@
     local procedure CreatePurchasePriceListLine(var PriceListHeader: Record "Price List Header"; ItemNo: Code[20]; VariantCode: Code[10]; UnitCost: Decimal)
 #ENDIF    
     var
-        PriceListLine: Record "Price List Line"; 
+        PriceListLine: Record "Price List Line";
         xPriceListHeader: Record "Price List Header";
     begin
         xPriceListHeader := PriceListHeader;
@@ -1572,11 +1594,11 @@
         PriceListLine.Status := xPriceListHeader.Status;
 #IF NOT BC17
         PriceListLine."Direct Unit Cost" := UnitCost;
-        
+
         if PriceListLine."Direct Unit Cost" <> 0 then
 #ELSE
         PriceListLine."Unit Cost" := UnitCost;
-        
+
         if PriceListLine."Unit Cost" <> 0 then
 #ENDIF
             PriceListLine."Cost Factor" := 0;
@@ -1598,10 +1620,10 @@
             SalesUnitOfMeasure := Item."Sales Unit of Measure";
 
         SalesPriceStartDate := WorkDate() + 1;
-        
+
         if _ItemWkshLine."Sales Price Start Date" = 0D then
             exit;
-        
+
         if _ItemWkshLine."Sales Price Start Date" < WorkDate() then
             Error(SalesDateInPastLbl, _ItemWkshLine."Sales Price Start Date");
 
@@ -1637,11 +1659,11 @@
     begin
         if FromCurrencyCode = '' then
             exit(Amount);
-        
+
         GeneralLedgerSetup.Get();
         if FromCurrencyCode = GeneralLedgerSetup."LCY Code" then
             exit(Amount);
-        
+
         ExchRateDate := Today();
         CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchRateDate, FromCurrencyCode);
         Amount := Round(CurrencyExchangeRate.ExchangeAmtFCYToLCY(ExchRateDate, FromCurrencyCode, Amount, CurrencyFactor));
