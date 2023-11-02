@@ -2670,6 +2670,7 @@
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
         SaleLinePOS."No." := Admission."Additional Experience Item No.";
         SaleLinePOS.Description := Admission.Description;
+        SaleLinePOS."Description 2" := ReservationRequest."Scheduled Time Description";
         SaleLinePOS.Quantity := ReservationRequest.Quantity;
 
         POSSession.GetSaleLine(SaleLine);
