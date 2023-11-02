@@ -907,6 +907,14 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
                     SaleLinePOS.UpdateAmounts(SaleLinePOS);
                     SaleLinePOS."Eksp. Salgspris" := false;
                     SaleLinePOS."Custom Price" := false;
+
+                    TicketReservationRequest.Reset();
+                    TicketReservationRequest.SetCurrentKey("Session Token ID");
+                    TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                    TicketReservationRequest.SetFilter(Default, '=%1', true);
+                    if (TicketReservationRequest.FindFirst()) then
+                        SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
+
                     SaleLinePOS.Modify();
                 end;
 

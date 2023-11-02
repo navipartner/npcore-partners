@@ -751,6 +751,16 @@ page 6151184 "NPR TM TicketMakeReservePhone"
         exit(gQuantityChanged);
     end;
 
+    procedure GetDefaultAdmissionScheduleDescription(): Text[30]
+    begin
+        Rec.SetFilter("Admission Inclusion", '%1', Rec."Admission Inclusion"::REQUIRED);
+        Rec.SetFilter(Default, '=%1', true);
+        if (Rec.FindFirst()) then
+            exit(Rec."Scheduled Time Description");
+
+        exit('');
+    end;
+
     internal procedure SetTicketBatchMode()
     begin
         gBatchTicketCreateMode := true;

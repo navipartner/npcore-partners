@@ -61,6 +61,7 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         AdmissionScheduleMgt: Codeunit "NPR TM Admission Sch. Mgt.";
         NewQuantity: Integer;
+        TimeSlotDescription: Text[30];
         ResolvedByTable: Integer;
         ResultCode: Integer;
     begin
@@ -116,6 +117,7 @@
 
             until (ResultCode = 0);
             DisplayTicketReservationRequestPhone.GetChangedTicketQuantity(NewQuantity);
+            TimeSlotDescription := DisplayTicketReservationRequestPhone.GetDefaultAdmissionScheduleDescription();
 
         end else begin
             repeat
@@ -145,10 +147,12 @@
 
             until (ResultCode = 0);
             DisplayTicketReservationRequest.GetChangedTicketQuantity(NewQuantity);
+            TimeSlotDescription := DisplayTicketReservationRequest.GetDefaultAdmissionScheduleDescription();
         end;
 
         if (HaveSalesLine) then begin
             SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+            SaleLinePOS."Description 2" := TimeSlotDescription;
             SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS.Modify();
             Commit();
@@ -376,6 +380,7 @@
             POSSaleLineRec."No." := TicketReservationReq."Item No.";
             POSSaleLineRec."Variant Code" := TicketReservationReq."Variant Code";
             POSSaleLineRec.Quantity := TicketReservationReq.Quantity;
+            POSSaleLineRec."Description 2" := TicketReservationReq."Scheduled Time Description";
             POSSaleLineRec."Line No." := LineNo;
 
             TicketReservationReq."Line No." := LineNo;
@@ -407,6 +412,7 @@
                     POSSaleLineRec."Variant Code" := '';
                     POSSaleLineRec.Quantity := TicketReservationReq.Quantity;
                     POSSaleLineRec."Line No." := LineNo;
+                    POSSaleLineRec."Description 2" := TicketReservationReq."Scheduled Time Description";
                     POSSaleLine.InsertLine(POSSaleLineRec);
 
                     if (TicketPrice.CalculateScheduleEntryPrice(POSSaleLineRec."No.", '', TicketReservationReq."Admission Code", TicketReservationReq."External Adm. Sch. Entry No.", POSSaleLineRec."Unit Price", POSSaleLineRec."Price Includes VAT", POSSaleLineRec."VAT %", Today(), Time(), TicketUnitPrice, AddonPrice)) then begin
@@ -432,48 +438,5 @@
         end;
     end;
 
-    procedure IsFullyLinkedToTicket(TicketToken: Text; POSSale: Record "NPR POS Sale"): Boolean
-    var
-        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
-        POSSaleLine: Record "NPR POS Sale Line";
-    begin
-        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
-        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
-        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
-
-        TicketReservationReq.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
-        TicketReservationReq.SetRange("Session Token ID", TicketToken);
-        TicketReservationReq.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationReq."Admission Inclusion"::REQUIRED, TicketReservationReq."Admission Inclusion"::SELECTED);
-        TicketReservationReq.FindSet();
-
-        repeat
-            if not POSSaleLine.Get(POSSale."Register No.", POSSale."Sales Ticket No.", POSSale.Date, POSSaleLine."Sale Type", TicketReservationReq."Line No.") then
-                exit(false);
-
-            if POSSaleLine."Sales Ticket No." <> TicketReservationReq."Receipt No." then
-                exit(false);
-
-            if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Item then
-                exit(false);
-
-            if (TicketReservationReq."Admission Inclusion" = TicketReservationReq."Admission Inclusion"::REQUIRED) then
-                if POSSaleLine."No." <> TicketReservationReq."Item No." then
-                    exit(false);
-
-            if (TicketReservationReq."Admission Inclusion" = TicketReservationReq."Admission Inclusion"::SELECTED) then begin
-                if (not Admission.Get(TicketReservationReq."Admission Code")) then
-                    exit(false);
-
-                if POSSaleLine."No." <> Admission."Additional Experience Item No." then
-                    exit(false);
-            end;
-
-            if POSSaleLine.Quantity <> TicketReservationReq.Quantity then
-                exit(false);
-        until TicketReservationReq.Next() = 0;
-
-        exit(true);
-    end;
 }
 
