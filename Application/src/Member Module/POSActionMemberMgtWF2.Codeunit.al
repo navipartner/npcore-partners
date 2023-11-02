@@ -64,7 +64,7 @@
                     '   title: lookupProperties.title,' +
                     '   configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(lookupProperties.layout), result: rows => rows ? rows.map (row => row ? row.itemno : null) : null}, source: source});' +
 
-                    'if (result === null) {return;}' +
+                    'if (result === null || result.length === 0) {return;}' +
                     '$context.itemNumber = result[0].itemno;' +
                 '}' +
 
