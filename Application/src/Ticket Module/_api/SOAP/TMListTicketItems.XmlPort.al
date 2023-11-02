@@ -195,7 +195,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
                                             admission_is_id := Format(_TicketBomResponse."Admission Inclusion", 0, 9);
                                         end;
                                     }
-                                    fieldattribute(recommended_price; _TicketBomResponse."Admission Unit Price")
+                                    textattribute(adm_recommended_price)
                                     {
                                         XmlName = 'recommended_price';
                                         Occurrence = Optional;
@@ -216,6 +216,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
                                     begin
                                         admission_is := Format(_TicketBomResponse."Admission Inclusion");
                                     end;
+
                                 }
                                 fieldelement(description; _TicketBomResponse.Description)
                                 {
@@ -358,8 +359,11 @@ xmlport 6060112 "NPR TM List Ticket Items"
                                 }
                                 trigger OnAfterGetRecord()
                                 begin
+                                    adm_recommended_price := '';
                                     _TMAdmission.Get(_TicketBomResponse."Admission Code");
                                     _TicketDescription.Get(_TicketBomResponse."Item No.", _TicketBomResponse."Variant Code", _TicketBomResponse."Admission Code");
+                                    if (_AdmCapacityPriceBuffer.Get(1, _TMAdmission."Admission Code")) then
+                                        adm_recommended_price := Format(_AdmCapacityPriceBuffer.UnitPrice, 0, 9);
                                 end;
                             }
                         }
@@ -372,8 +376,6 @@ xmlport 6060112 "NPR TM List Ticket Items"
                             _ItemResponse.Get(TmpItemVariant."Item No.");
                             item_number := _ItemResponse."No.";
                             description := _ItemResponse.Description;
-                            recommended_price := Format(_ItemResponse."Unit Price", 0, 9);
-                            includes_vat := Format(_ItemResponse."Price Includes VAT", 0, 9);
 
                             Clear(_ItemVariant);
                             variant_code := '';
@@ -382,6 +384,19 @@ xmlport 6060112 "NPR TM List Ticket Items"
                             if (_ItemVariant.Get(TmpItemVariant."Item No.", TmpItemVariant.Code)) then begin
                                 variant_code := _ItemVariant.Code;
                                 variant_description := _ItemVariant.Description;
+                            end;
+
+                            CalculatePrice(TmpItemVariant."Item No.", TmpItemVariant.Code);
+                            _AdmCapacityPriceBuffer.Reset();
+                            _AdmCapacityPriceBuffer.SetFilter(ItemNumber, '=%1', TmpItemVariant."Item No.");
+                            _AdmCapacityPriceBuffer.SetFilter(VariantCode, '=%1', TmpItemVariant.Code);
+                            _AdmCapacityPriceBuffer.SetFilter(DefaultAdmission, '=%1', true);
+                            if (_AdmCapacityPriceBuffer.FindFirst()) then begin
+                                recommended_price := Format(_AdmCapacityPriceBuffer.UnitPrice, 0, 9);
+                                includes_vat := Format(_AdmCapacityPriceBuffer.UnitPriceIncludesVat, 0, 9);
+                            end else begin
+                                recommended_price := Format(_ItemResponse."Unit Price", 0, 9);
+                                includes_vat := Format(_ItemResponse."Price Includes VAT", 0, 9);
                             end;
 
                             TicketTypeCode := _ItemResponse."NPR Ticket Type";
@@ -416,6 +431,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
         _TMAdmission: Record "NPR TM Admission";
         _ItemResponse: Record Item;
         _TicketDescription: Record "NPR TM TempTicketDescription";
+        _AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
 
     internal procedure GetRequestedStoreCode(): Text
     begin
@@ -522,6 +538,78 @@ xmlport 6060112 "NPR TM List Ticket Items"
         exit(StrSubstNo(PathLbl,
           GetMagentoPath(RootNodeNo, MagentoItemGroup."Parent Category Id"),
           MagentoItemGroup."Seo Link"));
+    end;
+
+    local procedure CalculatePrice(ItemNumber: Code[20]; VariantCode: Code[10])
+    var
+        TicketBom: Record "NPR TM Ticket Admission Bom";
+        Admission: Record "NPR TM Admission";
+    begin
+        _AdmCapacityPriceBuffer.Reset();
+        _AdmCapacityPriceBuffer.DeleteAll();
+
+        TicketBom.SetFilter("Item No.", '=%1', ItemNumber);
+        TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
+        if (TicketBom.FindSet()) then begin
+            repeat
+                _AdmCapacityPriceBuffer.Init();
+                _AdmCapacityPriceBuffer.EntryNo := 1;
+                _AdmCapacityPriceBuffer.ItemNumber := ItemNumber;
+                _AdmCapacityPriceBuffer.VariantCode := VariantCode;
+                _AdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
+                _AdmCapacityPriceBuffer.ReferenceDate := Today();
+                _AdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
+                _AdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
+                _AdmCapacityPriceBuffer.Quantity := 1;
+
+                if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
+                    if (TicketBom.Default) then
+                        CalculateErpPrice(_AdmCapacityPriceBuffer);
+
+                if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
+                    Admission.Get(TicketBom."Admission Code");
+                    _AdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
+                    _AdmCapacityPriceBuffer.VariantCode := '';
+                    if (_AdmCapacityPriceBuffer.ItemNumber <> '') then
+                        CalculateErpPrice(_AdmCapacityPriceBuffer);
+                end;
+
+                if (not _AdmCapacityPriceBuffer.Insert()) then
+                    _AdmCapacityPriceBuffer.Init();
+
+            until (TicketBom.Next() = 0);
+        end
+    end;
+
+    local procedure CalculateErpPrice(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer")
+    var
+        M2PriceService: Codeunit "NPR M2 POS Price WebService";
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+    begin
+        TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
+        TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
+        TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
+        TempSalePOS.Insert();
+
+        TempSaleLinePOS."Sales Ticket No." := TempSalePOS."Sales Ticket No.";
+        TempSaleLinePOS."Line No." := AdmCapacityPriceBuffer.EntryNo;
+        TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
+        TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
+        TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
+        TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity;
+        TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
+        TempSaleLinePOS."Allow Line Discount" := true;
+        TempSaleLinePOS.Insert();
+        WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
+        if (M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS)) then begin
+            AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
+            AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
+            AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
+            AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
+            AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
+        end;
+        WorkDate(Today());
     end;
 }
 

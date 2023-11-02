@@ -15,21 +15,25 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
         context.request.TransactionParameters.PhoneAuthCode = phoneApprovalCode;
     }
 
-    let _dialogRef = await popup.simplePayment({
-        showStatus: context.request.Type === "Transaction",
-        title: context.request.TypeCaption,
-        amount: context.request.AmountCaption,
-        onAbort: async () => {
-            await hwc.invoke(
-                "EFTNetsBaxi",
-                {
-                    Type: "RequestAbort",
-                    EntryNo: context.request.EntryNo,
-                },
-                _contextId,
-            );
-        },
-    });
+    let _dialogRef;
+    if (!context.request.Unattended) {
+        _dialogRef = await popup.simplePayment({
+            showStatus: context.request.Type === "Transaction",
+            title: context.request.TypeCaption,
+            amount: context.request.AmountCaption,
+            onAbort: async () => {
+                await hwc.invoke(
+                    "EFTNetsBaxi",
+                    {
+                        Type: "RequestAbort",
+                        EntryNo: context.request.EntryNo,
+                    },
+                    _contextId,
+                );
+            },
+        });
+    }
+    
 
     let _contextId;
     let bcResponse;
@@ -50,7 +54,7 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
                         break;
 
                     case "DisplayUpdate":
-                        _dialogRef.updateStatus(hwcResponse.DisplayUpdateResponse.Text);
+                        _dialogRef && _dialogRef.updateStatus(hwcResponse.DisplayUpdateResponse.Text);
                         break;
 
                     case "Open":
@@ -72,8 +76,8 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
         });
 
         if (context.request.Type === "Transaction") {
-            _dialogRef.updateStatus(captions.statusInitializing);
-            _dialogRef.enableAbort(true);
+            _dialogRef && _dialogRef.updateStatus(captions.statusInitializing);
+            _dialogRef && _dialogRef.enableAbort(true);
         }
 
         await hwc.invoke(
@@ -84,9 +88,7 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
         await hwc.waitForContextCloseAsync(_contextId);
     }
     finally {
-        if (_dialogRef) {
-            _dialogRef.close();
-        }
+        _dialogRef && _dialogRef.close();        
     }
     return ({ "success": context.success, "tryEndSale": context.success });
 }

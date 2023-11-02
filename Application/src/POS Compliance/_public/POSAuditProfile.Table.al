@@ -120,6 +120,12 @@
             Caption = 'Do Not Print Receipt on Sale';
             DataClassification = CustomerContent;
         }
+        field(101; DoNotPrintEftReceiptOnSale; Boolean)
+        {
+            Caption = 'Do Not Print EFT Receipt on Sale';
+            DataClassification = CustomerContent;
+        }
+
         field(110; "Sales Ticket No. Series"; Code[20])
         {
             Caption = 'Sales Ticket No. Series';

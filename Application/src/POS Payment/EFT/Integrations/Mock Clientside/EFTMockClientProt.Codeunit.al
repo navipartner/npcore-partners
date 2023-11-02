@@ -50,6 +50,8 @@
         if (not HwcRequest.Contains('Captions')) then
             HwcRequest.Add('Captions', AssignCaptions());
 
+        HwcRequest.Add('Unattended', EftTransactionRequest."Self Service");
+
     end;
 
     local procedure PaymentTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)

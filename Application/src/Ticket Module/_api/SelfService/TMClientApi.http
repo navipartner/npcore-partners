@@ -4,9 +4,9 @@
 
 ###
 @baseUrl = https://{{hostname}}/BC/ODataV4
-@serviceName = REST
+@serviceName = dragonglass
 @functionName = InvokeMethod
-
+### https://np597676.dynamics-retail.net/BC/ODataV4/dragonglass_InvokeMethod
 # @name companies
 GET {{baseUrl}}/Company
 Authorization: Basic {{username}} {{password}}
@@ -14,9 +14,8 @@ Authorization: Basic {{username}} {{password}}
 ###
 @companyId = {{companies.response.body.$.value[0].Id}}
 
-@ticketToken = 3A3800F28C884BF795895C80BE7EB025
 @itemNumber = 31100
-@referenceDate = 2023-09-07
+@referenceDate = 2023-10-11
 @quantity = 1
 @admissionCode = CASTLE
 ###
@@ -28,7 +27,13 @@ Company: {{companyId}}
 
 {
     "method": "NPRetail.TM.GetTicketReservation",
-    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetTicketReservation\"}, \"NPRetail.TM.GetTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetTicketReservation\"}, 
+        \"NPRetail.TM.GetTicketReservation\": [
+            {
+                \"token\": \"{{ticketToken}}\"
+            }
+        ]}",
     "lastServerId": ""
 }
 
@@ -40,7 +45,13 @@ Company: {{companyId}}
 
 {
     "method": "NPRetail.TM.PreConfirmTicketReservation",
-    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.PreConfirmTicketReservation\"}, \"NPRetail.TM.PreConfirmTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.PreConfirmTicketReservation\"}, 
+        \"NPRetail.TM.PreConfirmTicketReservation\": [
+            {
+                \"token\": \"{{ticketToken}}\"
+            }
+        ]}",
     "lastServerId": ""
 }
 
@@ -52,7 +63,13 @@ Company: {{companyId}}
 
 {
     "method": "NPRetail.TM.CancelTicketReservation",
-    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.CancelTicketReservation\"}, \"NPRetail.TM.CancelTicketReservation\": [{\"token\": \"{{ticketToken}}\"}]}",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.CancelTicketReservation\"}, 
+        \"NPRetail.TM.CancelTicketReservation\": [
+            {
+                \"token\": \"{{ticketToken}}\"
+            }
+        ]}",
     "lastServerId": ""
 }
 
@@ -65,7 +82,18 @@ Company: {{companyId}}
 
 {
     "method": "NPRetail.TM.GetAdmissionCapacity",
-    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetAdmissionCapacity\"}, \"NPRetail.TM.GetAdmissionCapacity\": [{\"requestId\":\"\",\"itemReference\":\"{{itemNumber}}\",\"admissionCode\":\"\",\"referenceDate\":\"{{referenceDate}}\",\"customerNumber\":\"\",\"quantity\":{{quantity}}}]}",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetAdmissionCapacity\"}, 
+        \"NPRetail.TM.GetAdmissionCapacity\": [
+            { 
+                \"requestId\":\"\",
+                \"itemReference\":\"{{itemNumber}}\",
+                \"admissionCode\":\"\",
+                \"referenceDate\":\"{{referenceDate}}\",
+                \"customerNumber\":\"\",
+                \"quantity\":{{quantity}}
+            }
+        ]}",
     "lastServerId": ""
 }
 
@@ -77,9 +105,50 @@ Company: {{companyId}}
 
 {
     "method": "NPRetail.TM.MakeTicketReservation",
-    "parameters": "{\"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.MakeTicketReservation\"}, \"NPRetail.TM.MakeTicketReservation\": [{\"token\": \"\", \"lines\": [{\"itemReference\":\"{{itemNumber}}\",\"admissionCode\":\"{{admissionCode}}\",\"quantity\":1,\"scheduleId\":-1,\"memberNumber\":\"\",\"notificationAddress\":\"\"}]}  ]}",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.MakeTicketReservation\"}, 
+        \"NPRetail.TM.MakeTicketReservation\": [
+            {
+                \"token\": \"\", 
+                \"lines\": [
+                    {\"itemReference\":\"{{itemNumber}}\",
+                    \"admissionCode\":\"{{admissionCode}}\",
+                    \"quantity\":1,
+                    \"scheduleId\":-1,
+                    \"memberNumber\":\"\",
+                    \"notificationAddress\":\"\"}
+                ]}  
+            ]}",
     "lastServerId": ""
 }
+
+
+@ticketToken = 3A3800F28C884BF795895C80BE7EB04D
+###
+# @name MakeTicketRequest
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.MakeTicketReservation",
+    "parameters": "{
+        \"_dragonglassResponseContext\":{\"invocationId\":\"{{$guid}}\",\"method\":\"NPRetail.TM.MakeTicketReservation\"},
+        \"NPRetail.TM.MakeTicketReservation\":[
+            {
+                \"token\":\"{{ticketToken}}\",
+                \"lines\":[
+                    {\"itemReference\":\"31100\",\"admissionCode\":\"CASTLE\",\"quantity\":1,\"scheduleId\":1560,\"memberNumber\":\"\",\"notificationAddress\":\"\"},
+                    {\"itemReference\":\"31100\",\"admissionCode\":\"DUNGEON\",\"quantity\":1,\"scheduleId\":1916,\"memberNumber\":\"\",\"notificationAddress\":\"\"},
+                    {\"itemReference\":\"31100\",\"admissionCode\":\"TREASURE\",\"quantity\":1,\"scheduleId\":1924,\"memberNumber\":\"\",\"notificationAddress\":\"\"},
+                    {\"itemReference\":\"31100\",\"admissionCode\":\"OPTIONAL2\",\"quantity\":1,\"scheduleId\":2730,\"memberNumber\":\"\",\"notificationAddress\":\"\"}
+                ]}
+            ]
+        }",
+    "lastServerId": ""
+}
+
 
 ###
 POST {{baseUrl}}/{{serviceName}}_{{functionName}}
@@ -88,8 +157,45 @@ Content-Type: application/json
 Company: {{companyId}}
 
 {
-    "method": "NPRetail.TM.MakeTicketReservation",
-    "parameters": "{\"_dragonglassResponseContext\":{\"invocationId\":\"{{$guid}}\",\"method\":\"NPRetail.TM.MakeTicketReservation\"},\"NPRetail.TM.MakeTicketReservationx\":[{\"token\":\"\",\"lines\":[{\"itemReference\":\"31100\",\"admissionCode\":\"CASTLE\",\"quantity\":1,\"scheduleId\":13427,\"memberNumber\":\"\",\"notificationAddress\":\"\"},{\"itemReference\":\"31100\",\"admissionCode\":\"OPTIONAL2\",\"quantity\":0,\"scheduleId\":32508,\"memberNumber\":\"\",\"notificationAddress\":\"\"}]}]}",
+    "method": "OnAction20",
+    "parameters": "
+    {   
+        \"name\": \"SS_CREATE_AND_PAY\",
+        \"step\": \"\",
+        \"id\": 1,
+        \"actionId\": 1,
+        \"context\": {
+            \"parameters\": {
+                \"paymentType\": \"T\",
+                \"saleContents\": {
+                    \"saleId\": \"{{$guid}}\",
+                    \"ticketToken\": \"{{ticketToken}}\"
+                }
+            }
+        }
+    }",
     "lastServerId": ""
 }
  
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "OnAction20",
+    "parameters": "
+    {   
+        \"name\": \"SS-PAYMENT\",
+        \"step\": \"\",
+        \"id\": 1,
+        \"actionId\": 1,
+        \"context\": {
+            \"parameters\": {
+                \"paymentType\": \"T\",
+            }
+        }
+    }",
+    "lastServerId": ""
+}

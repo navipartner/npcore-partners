@@ -86,6 +86,11 @@
                     ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
                     ApplicationArea = NPRRetail;
                 }
+                field(DoNotPrintEftReceiptOnSale; Rec.DoNotPrintEftReceiptOnSale)
+                {
+                    ToolTip = 'Specifies the value of the Do Not Print EFT Receipt on Sale field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Require Item Return Reason"; Rec."Require Item Return Reason")
                 {
                     ApplicationArea = NPRRetail;

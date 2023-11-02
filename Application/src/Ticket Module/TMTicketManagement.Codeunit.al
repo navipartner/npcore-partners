@@ -164,6 +164,25 @@
         PrintTicketBatch(Ticket);
     end;
 
+    procedure PrintTicketsFromToken(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token Id");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+        if (TicketReservationRequest.FindSet()) then begin
+            repeat
+                Ticket.Reset();
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                if (not Ticket.IsEmpty()) then
+                    PrintTicketBatch(Ticket);
+            until (TicketReservationRequest.Next() = 0);
+        end
+    end;
+
     procedure PrintTicketsFromExternalOrderNumber(ExternalOrderNumber: Code[20])
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";

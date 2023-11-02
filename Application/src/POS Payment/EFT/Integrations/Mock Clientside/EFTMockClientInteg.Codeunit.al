@@ -247,6 +247,7 @@
         EftTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
         Mechanism: Enum "NPR EFT Request Mechanism";
         Workflow: Text;
+        Context: JsonObject;
     begin
         if not (EndOfDayType = 1) then
             exit;
@@ -264,7 +265,8 @@
         end;
 
         EftTransactionMgt.PrepareEndWorkshift(EFTSetup, PosSale, Request, Mechanism, Workflow);
-        EftWorkflows.Add(Workflow, Request);
+        Context.Add('request', Request);
+        EftWorkflows.Add(Workflow, Context);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR EFTType Paym. BLOB Param.", 'OnGetParameterNameCaption', '', false, false)]
