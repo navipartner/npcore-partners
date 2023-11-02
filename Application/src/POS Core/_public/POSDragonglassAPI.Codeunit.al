@@ -61,14 +61,26 @@ codeunit 6060078 "NPR POS Dragonglass API"
 
     local procedure GetSaleKey(Context: JsonObject; var POSUnitNoOut: Text; var SalesTicketNoOut: Text)
     var
-        SalePosition: JsonToken;
+        JToken: JsonToken;
         TempPOSSale: Record "NPR POS Sale" temporary;
+        POSSaleRec: Record "NPR POS Sale";
+        SaleSystemId: Guid;
     begin
-        if not Context.SelectToken('data.positions.BUILTIN_SALE', SalePosition) then
-            exit;
 
-        TempPOSSale.SetPosition(SalePosition.AsValue().AsText());
-        POSUnitNoOut := TempPOSSale."Register No.";
-        SalesTicketNoOut := TempPOSSale."Sales Ticket No.";
+        if (Context.SelectToken('context.parameters.saleSystemId', JToken)) then begin
+            if (Evaluate(SaleSystemId, JToken.AsValue().AsText())) then
+                if (not POSSaleRec.GetBySystemId(SaleSystemId)) then
+                    exit;
+            POSUnitNoOut := POSSaleRec."Register No.";
+            SalesTicketNoOut := POSSaleRec."Sales Ticket No.";
+            exit;
+        end;
+
+        if (Context.SelectToken('data.positions.BUILTIN_SALE', JToken)) then begin
+            TempPOSSale.SetPosition(JToken.AsValue().AsText());
+            POSUnitNoOut := TempPOSSale."Register No.";
+            SalesTicketNoOut := TempPOSSale."Sales Ticket No.";
+            exit;
+        end;
     end;
 }

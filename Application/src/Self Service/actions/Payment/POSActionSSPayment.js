@@ -4,12 +4,14 @@ let main = async ({ workflow, runtime }) => {
     const { dispatchToWorkflow, paymentType, amount } = await workflow.respond("preparePaymentWorkflow");
 
     if (amount === 0) {
-        await workflow.respond("tryEndSale");
-        return;
+      return await workflow.respond("tryEndSale");
     }
-
-    let paymentResult = await workflow.run(dispatchToWorkflow, { context: { paymentType: paymentType, amount: amount } });
+    
+    const paymentResult = await workflow.run(dispatchToWorkflow, { context: { paymentType, amount } });
+    
     if (paymentResult.tryEndSale) {
-        await workflow.respond("tryEndSale");
+      return await workflow.respond("tryEndSale");
     }
+    
+    return {"success": false};
 }

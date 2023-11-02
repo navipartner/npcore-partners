@@ -79,6 +79,11 @@
                     ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
                     ApplicationArea = NPRRetail;
                 }
+                field(DoNotPrintEftReceiptOnSale; Rec.DoNotPrintEftReceiptOnSale)
+                {
+                    ToolTip = 'Specifies the value of the Do Not Print EFT Receipt on Sale field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
                     ToolTip = 'Specifies the value of the Allow Printing Receipt Copy field';

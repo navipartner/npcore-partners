@@ -1,7 +1,7 @@
 codeunit 6014559 "NPR TM Dynamic Price"
 {
     Access = Internal;
-    procedure CalculateTicketTokenUnitPrice(Token: Text[100]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; ReferenceDate: Date; ReferenceTime: Time) TicketUnitPrice: Decimal
+    procedure CalculateTicketTokenUnitPrice(Token: Text[100]; TokenLineNumber: Integer; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; ReferenceDate: Date; ReferenceTime: Time) TicketUnitPrice: Decimal
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         BasePrice: Decimal;
@@ -10,6 +10,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
                 CalculateScheduleEntryPrice(
@@ -82,9 +83,9 @@ codeunit 6014559 "NPR TM Dynamic Price"
     end;
 
 
-    procedure GetTicketUnitPrice(Token: Text[100]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; var NewTicketPrice: Decimal): Boolean
+    procedure GetTicketUnitPrice(Token: Text[100]; TokenLineNumber: Integer; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; var NewTicketPrice: Decimal): Boolean
     begin
-        NewTicketPrice := CalculateTicketTokenUnitPrice(Token, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, Today(), Time());
+        NewTicketPrice := CalculateTicketTokenUnitPrice(Token, TokenLineNumber, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, Today(), Time());
         exit((OriginalUnitPrice <> NewTicketPrice) and (NewTicketPrice >= 0));
     end;
 
