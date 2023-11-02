@@ -29,9 +29,20 @@ let main = async ({workflow, context, popup, captions,parameters}) => {
         let driver = data.createArrayDriver(lookupDataArray);
         let source = data.createDataSource(driver);
         source.loadAll = false;
-        let result = await popup.lookup({title: lookupProperties.title, configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(lookupProperties.layout), result: rows => rows ? rows.map (row => row ? row.itemno : null) : null}, source: source});
+        let result = await popup.lookup({
+            title: lookupProperties.title, 
+            configuration: {
+                className: "custom-lookup", 
+                styleSheet: "", 
+                layout: JSON.parse(lookupProperties.layout), 
+                result: rows => rows ? rows.map (row => row ? row.itemno : null) : null
+            }, 
+            source: source
+        });
 
-        if (result === null) {return;}
+        if (result === null || result.length === 0) 
+            return;
+        
         context.itemNumber = result[0].itemno;
     }
 
