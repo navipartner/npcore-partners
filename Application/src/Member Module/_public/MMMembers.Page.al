@@ -9,13 +9,7 @@
     InsertAllowed = false;
     ModifyAllowed = true;
     Editable = true;
-
-#if BC23
-    PageType = List; 
-#else
     PageType = Worksheet;
-#endif
-
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
     UsageCategory = Lists;
