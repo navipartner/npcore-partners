@@ -4,8 +4,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
-        TextExtDocNoLabel: Label 'Enter External Document No.';
-        TextAttentionLabel: Label 'Enter Attention';
         TextYourRefLabel: Label 'Enter a value for the field ''Your Reference''';
         TextConfirmTitle: Label 'Confirm action';
         TextConfirmLead: Label 'Export active sale to NAV sales document?';
@@ -195,8 +193,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('GroupCodesEnabled', false, CaptioneGroupCodesEnabled, DescGroupCodesEnabled);
         WorkflowConfig.AddTextParameter('GroupCode', '', CaptionGroupCode, DescGroupCode);
         //labels
-        WorkflowConfig.AddLabel('ExtDocNo', TextExtDocNoLabel);
-        WorkflowConfig.AddLabel('Attention', TextAttentionLabel);
+        WorkflowConfig.AddLabel('ExtDocNo', GetExternalDocumentNo());
+        WorkflowConfig.AddLabel('Attention', GetAttention());
         WorkflowConfig.AddLabel('YourRef', TextYourRefLabel);
         WorkflowConfig.AddLabel('confirmTitle', TextConfirmTitle);
         WorkflowConfig.AddLabel('confirmLead', TextConfirmLead);
@@ -604,6 +602,23 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     end;
 
 
+    local procedure GetExternalDocumentNo() ExternalDocumentNoText: Text
+    var
+        TextExtDocNoLabel: Label 'Enter External Document No.';
+        POSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
+    begin
+        ExternalDocumentNoText := TextExtDocNoLabel;
+        POSActionDocExpEvents.OnAddExternalDocNoLabel(ExternalDocumentNoText);
+    end;
+
+    local procedure GetAttention() AttentionText: Text
+    var
+        TextAttentionLabel: Label 'Enter Attention';
+        POSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
+    begin
+        AttentionText := TextAttentionLabel;
+        POSActionDocExpEvents.OnAddAttentionLabel(AttentionText);
+    end;
 
     local procedure ReadAdditionalParameters(Context: Codeunit "NPR POS JSON Helper"; var PrepaymentIsAmount: Boolean; var PayAndPost: Boolean; var FullPosting: Boolean)
     var
