@@ -128,6 +128,11 @@
             DataClassification = CustomerContent;
             Description = 'MAG3.00';
         }
+        field(220; "Transaction ID"; Text[250])
+        {
+            Caption = 'Transaction ID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -153,7 +158,10 @@
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
     begin
-        Request."Transaction ID" := Rec."No.";
+        if (Rec."Transaction ID" <> '') then
+            Request."Transaction ID" := Rec."Transaction ID"
+        else
+            Request."Transaction ID" := Rec."No.";
         Request."Request Amount" := Rec.Amount;
         Request."Payment Gateway Code" := Rec."Payment Gateway Code";
         Request."Document Table No." := Rec."Document Table No.";
