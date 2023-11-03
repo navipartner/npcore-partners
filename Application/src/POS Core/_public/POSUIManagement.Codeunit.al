@@ -631,6 +631,8 @@
         GlobalSettingsSystemWorkFlowLoginLbl: Label 'Login :';
         GlobalSettingsSystemWorkFlowSelectWorkflowLbl: Label 'Select Workflow';
         GlobalSettingsSystemWorkNoEditableVariablesLbl: Label 'No Editable Variables';
+        ColorPickerDeleteColorLbl: Label 'Delete Color';
+        ColorPickerSaveColorLbl: Label 'Save Color';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -994,6 +996,8 @@
         Captions.Add('Dialog_ItemSelection_InvalidConfiguration', DialogItemSelectionInvalidConfigurationLbl);
         Captions.Add('Number_Of_Guests_ForWaiterPad', NumberOfGuestsForWaiterPadLbl);
         Captions.Add('Number_Of_Guests_At_Active_Table_ForTable', NumberOfGuestsAtActiveTableLbl);
+        Captions.Add('Color_Picker_DeleteColor', ColorPickerDeleteColorLbl);
+        Captions.Add('Color_Picker_SaveColor', ColorPickerSaveColorLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
