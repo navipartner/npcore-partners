@@ -213,7 +213,6 @@ xmlport 6151403 "NPR Magento Ret. Order Import"
                             MaxOccurs = Once;
                             MinOccurs = Zero;
                         }
-
                         trigger OnBeforeInsertRecord()
                         begin
                             LineNo += 1;

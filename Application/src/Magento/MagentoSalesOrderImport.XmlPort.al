@@ -257,7 +257,6 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                             MaxOccurs = Once;
                             MinOccurs = Zero;
                         }
-
                         trigger OnBeforeInsertRecord()
                         begin
                             LineNo += 1;

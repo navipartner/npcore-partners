@@ -48,4 +48,9 @@ enum 6151416 "NPR PG Integrations" implements "NPR IPaymentGateway"
         Caption = 'Vipps';
         Implementation = "NPR IPaymentGateway" = "NPR PG Vipps Integration Mgt.";
     }
+    value(9; Stripe)
+    {
+        Caption = 'Stripe';
+        Implementation = "NPR IPaymentGateway" = "NPR PG Stripe Integration Mgt.";
+    }
 }
