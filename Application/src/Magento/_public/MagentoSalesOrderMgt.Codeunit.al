@@ -342,11 +342,10 @@
         PaymentAmount: Decimal;
         ShopperReference: Text;
     begin
-        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."No."), false));
+        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), false));
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
-
         ShopperReference := NpXmlDomMgt.GetXmlText(XmlElement, 'shopper_reference', MaxStrLen(PaymentLine."No."), false);
 
         PaymentMapping.SetRange("External Payment Method Code", CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
@@ -369,6 +368,7 @@
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
         PaymentLine."No." := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."No."));
+        PaymentLine."Transaction ID" := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."Transaction ID"));
         PaymentLine."Posting Date" := SalesHeader."Posting Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;

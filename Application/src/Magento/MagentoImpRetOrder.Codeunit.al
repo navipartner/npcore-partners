@@ -188,7 +188,7 @@
         TransactionId: Text;
         PaymentAmount: Decimal;
     begin
-        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."No."), true));
+        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), true));
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
@@ -213,12 +213,14 @@
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
         PaymentLine."No." := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."No."));
+        PaymentLine."Transaction ID" := CopyStr(TransactionId, 1, MaxStrLen(PaymentLine."Transaction ID"));
         PaymentLine."Posting Date" := SalesHeader."Posting Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
         PaymentLine.Amount := PaymentAmount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
+
         if not PaymentLine.Insert(true) then begin
             if PaymentLineNoWasUsed(SalesHeader, LineNo) then
                 PaymentLine."Line No." := LineNo;

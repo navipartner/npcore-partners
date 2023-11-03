@@ -109,6 +109,12 @@
                     ToolTip = 'Specifies the value of the Charge ID';
                     ApplicationArea = NPRRetail;
                 }
+                field("Transaction ID"; Rec."Transaction ID")
+                {
+
+                    ToolTip = 'Specifies the value of the Transaction ID';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Date Refunded"; Rec."Date Refunded")
                 {
 
@@ -226,7 +232,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Document Table No." = 112) OR (Rec."Document Table No." = 114);
-
                 ToolTip = 'Executes the Find entries action';
                 ApplicationArea = NPRRetail;
 
@@ -246,7 +251,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Shows the interaction log entries associated with the currently selected line';
                 ApplicationArea = NPRRetail;
 
