@@ -20,6 +20,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintEODPart(Printer, POSWorkshiftCheckpoint);
         PrintItemCategoryPart(Printer, POSWorkshiftCheckpoint);
         PrintSalespersonPart(Printer, POSWorkshiftCheckpoint);
+        PrintTotalsPart(Printer, POSWorkshiftCheckpoint);
         PrintMoreInfoPart(Printer, POSWorkshiftCheckpoint);
 
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
@@ -61,7 +62,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, StrSubstNo(CompanyAddressInfoLbl, CompanyInfo.Address, CompanyInfo.City, CompanyInfo."Post Code"), 'A11', false, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        if FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
+        if NOReportStatisticsMgt.FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
             PreviousZReportDateTime := PreviousZReport.SystemCreatedAt
         else
             PreviousZReportDateTime := POSWorkshiftCheckpoint.SystemCreatedAt;
@@ -120,7 +121,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, RedeemedVoucherCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."Redeemed Vouchers (LCY)")), 'A11', false, 'LEFT', true, false);
 
-        if FindCashBalacingLine(POSWorkshiftCheckpoint."Entry No.", CashBinCheckpoint) then begin
+        if NOReportStatisticsMgt.FindCashBalacingLine(POSWorkshiftCheckpoint."Entry No.", CashBinCheckpoint) then begin
             InitialFloatCash := CashBinCheckpoint."Float Amount";
             EndingFloatCash := CashBinCheckpoint."Counted Amount Incl. Float";
         end;
@@ -132,7 +133,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(EndingFloatCash)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, InBankCaptionLbl, 'A11', true, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(GetBankDepositAmount(POSWorkshiftCheckpoint."Entry No."))), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(NOReportStatisticsMgt.GetBankDepositAmount(POSWorkshiftCheckpoint."Entry No."))), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, EndFloatCashCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(EndingFloatCash)), 'A11', false, 'LEFT', true, false);
@@ -187,7 +188,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         FromEntryNo: Integer;
     begin
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        FromEntryNo := FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
+        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
 
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, ItemCategoryCaptionLbl, 'A11', true, 'CENTER', true, false);
@@ -252,7 +253,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         FromEntryNo: Integer;
     begin
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        FromEntryNo := FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
+        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
 
         SalespersonQuery.SetFilter(EntryNo, '%1..%2', FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.");
         SalespersonQuery.SetFilter(EntryType, '%1|%2', SalespersonQuery.EntryType::"Direct Sale", SalespersonQuery.EntryType::"Credit Sale");
@@ -269,13 +270,11 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        POSTaxLine: Record "NPR POS Entry Tax Line";
         CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSUnit: Record "NPR POS Unit";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousZReportDateTime: DateTime;
-        Amount, Amount2, Amount3 : Decimal;
+        Amount, Amount2 : Decimal;
         AmountCards, AmountOther, CopyTicketAmount, DiscountAmount, ReturnAmount : Decimal;
         CountCards, CountOther, CountReturned : Integer;
         FromEntryNo: Integer;
@@ -283,21 +282,21 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         SalespersonLbl: Label '%1 (%2)', Comment = '%1 - Name, %2 - Code', Locked = true;
     begin
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        FromEntryNo := FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
+        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
 
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, StrSubstNo(SalespersonLbl, SalespersonPurchaser.Name, SalespersonPurchaser.Code), 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", SalespersonPurchaser.Code);
+        NOReportStatisticsMgt.SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", SalespersonPurchaser.Code);
         Clear(Amount);
         Clear(Quantity);
-        CalcCardsAmountAndQuantity(POSEntry, AmountCards, CountCards);
+        NOReportStatisticsMgt.CalcCardsAmountAndQuantity(POSEntry, AmountCards, CountCards);
 
         PrintThermalLine(Printer, CaptionValueFormat(QuantityCardCaptionLbl, Format(CountCards)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(TotalCardsCaptionLbl, FormatNumber(AmountCards)), 'A11', false, 'LEFT', true, false);
 
-        CalcOtherPaymentsAmountAndQuantity(POSEntry, AmountOther, CountOther);
+        NOReportStatisticsMgt.CalcOtherPaymentsAmountAndQuantity(POSEntry, AmountOther, CountOther);
 
         PrintThermalLine(Printer, CaptionValueFormat(QuantityOtherCaptionLbl, Format(CountOther)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(TotalOtherCaptionLbl, FormatNumber(AmountOther)), 'A11', false, 'LEFT', true, false);
@@ -309,13 +308,13 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, StrSubstNo(SalespersonLbl, SalespersonPurchaser.Name, SalespersonPurchaser.Code), 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        if FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
+        if NOReportStatisticsMgt.FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
             PreviousZReportDateTime := PreviousZReport.SystemCreatedAt
         else
             PreviousZReportDateTime := POSWorkshiftCheckpoint.SystemCreatedAt;
 
         Clear(Quantity);
-        Quantity := GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE);
+        Quantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE);
 
         PrintThermalLine(Printer, CaptionValueFormat(ZeroLinesCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
@@ -324,34 +323,20 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, GeneralInfoCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        Clear(Amount);
-        Clear(Quantity);
-        Clear(Amount2);
-        Clear(Quantity2);
-        Clear(Amount3);
-        Clear(Quantity3);
-        CalcReturnsAndSalesAmountAndQuantity(POSEntry, POSSalesLine, Amount, Amount2, ReturnAmount, Quantity);
+        NOReportStatisticsMgt.CalcReturnsAndSalesAmount(POSEntry, Amount, ReturnAmount);
 
         PrintThermalLine(Printer, CaptionValueFormat(BrutoSalesCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ReturnCaptionLbl, FormatNumber(ReturnAmount)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(Amount - Abs(ReturnAmount))), 'A11', true, 'LEFT', true, false);
 
-        Clear(Amount);
-        Clear(Amount2);
-        CalcTaxAmounts(POSEntry, POSTaxLine, Amount, Amount2);
-
         PrintThermalLine(Printer, CaptionValueFormat(SumOfVATCaptionLbl, FormatNumber(Amount2)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(VAT25PctCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
+        PrintTaxAmountsSection(Printer, POSEntry, POSWorkshiftCheckpoint."Entry No.", false);
+
+        PrintThermalLine(Printer, SumOfVATOnReturnCaptionLbl, 'A11', false, 'LEFT', true, false);
+        PrintTaxAmountsSection(Printer, POSEntry, POSWorkshiftCheckpoint."Entry No.", true);
 
         Clear(Amount);
-        Clear(Amount2);
-        CalcReturnTaxAmounts(POSEntry, POSTaxLine, Amount, Amount2);
-
-        PrintThermalLine(Printer, CaptionValueFormat(SumOfVATOnReturnCaptionLbl, FormatNumber(Amount2)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(ReturnVAT25PctCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
-
-        Clear(Amount);
-        if FindCashBalacingLine(POSWorkshiftCheckpoint."Entry No.", CashBinCheckpoint) then
+        if NOReportStatisticsMgt.FindCashBalacingLine(POSWorkshiftCheckpoint."Entry No.", CashBinCheckpoint) then
             Amount := CashBinCheckpoint."Float Amount";
 
         PrintThermalLine(Printer, CaptionValueFormat(InitialFloatCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
@@ -359,41 +344,35 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(QuantityOtherCaptionLbl, Format(CountOther)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(QuantityCardCaptionLbl, Format(CountCards)), 'A11', false, 'LEFT', true, false);
 
-        Clear(Quantity);
-        Clear(Quantity2);
-        Clear(Quantity3);
-        CalcReturnSaleDiscountQuantity(POSEntry, POSSalesLine, DiscountAmount, CountReturned, Quantity, Quantity2, Quantity3);
+        NOReportStatisticsMgt.CalcReturnSaleDiscountQuantity(POSEntry, DiscountAmount, CountReturned, Quantity, Quantity2, Quantity3);
 
         PrintThermalLine(Printer, CaptionValueFormat(SoldProductsCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
 
+        PrintThermalLine(Printer, CaptionValueFormat(ReturnedProductsQuantityCaptionLbl, Format(Quantity2)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(TrainingReceiptQtyCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ProvisionalReceiptQtyCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(DeliveryReceiptQtyCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
 
-        PrintThermalLine(Printer, CaptionValueFormat(ReturnedProductsQuantityCaptionLbl, Format(Quantity2)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(SalesQuantityCaptionLbl, Format(CountCards + CountOther)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ReturnQuantityCaptionLbl, Format(CountReturned)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(DiscountQuantityCaptionLbl, Format(Quantity3)), 'A11', false, 'LEFT', true, false);
 
         Clear(Quantity);
-        Quantity := GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
+        Quantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
 
         PrintThermalLine(Printer, CaptionValueFormat(POSOpeningQuantityCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
 
-        Clear(Quantity);
-        Clear(Quantity2);
-        Clear(Quantity3);
-        CalcCopyAndPrintReceiptsQuantity(POSEntry, CopyTicketAmount, Quantity, Quantity2);
+        NOReportStatisticsMgt.CalcCopyAndPrintReceiptsQuantity(POSEntry, CopyTicketAmount, Quantity, Quantity2);
 
         Clear(Quantity3);
-        Quantity3 := GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::CANCEL_SALE_END);
+        Quantity3 := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::CANCEL_SALE_END);
 
         PrintThermalLine(Printer, CaptionValueFormat(NotEndedSalesQuantityCaptionLbl, Format(Quantity3)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(PrintedReceiptsQuantityCaptionLbl, Format(Quantity2)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(CopiedReceiptsQuantityCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
 
         Clear(Quantity);
-        Quantity := GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::PRICE_CHECK);
+        Quantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::PRICE_CHECK);
 
         PrintThermalLine(Printer, CaptionValueFormat(PriceLookupQuantityCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
 
@@ -421,13 +400,9 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         // TODO: total pro forma
         PrintThermalLine(Printer, CaptionValueFormat(ProformaReceiptsAmountCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
 
-        CalcCancelledReceiptsAmount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount);
+        NOReportStatisticsMgt.CalcCancelledReceiptsAmount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount);
 
         PrintThermalLine(Printer, CaptionValueFormat(TotalOnCancelledCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
-
-        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesAmountCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(TotalReturnAmountCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesNetoCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
@@ -437,21 +412,17 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         FromEntryNo: Integer;
-        ApplicationLbl: Label '%1.%2.%3.%4 (%5)', Comment = '%1 - specifies App Major version, %2 - specifies App Minor version, %3 - specifies App Build version, %4 - specifies App Revision version, %5 - specifes current date and time', Locked = true;
-        NpGuid: Label '992c2309-cca4-43cb-9e41-911f482ec088', Locked = true;
-        Info: ModuleInfo;
         AppVerTxt: Text;
-        DatetimeTxt: Text;
         PrintTxt: Text;
     begin
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        FromEntryNo := FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
+        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
 
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, MoreInfoCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", '');
+        NOReportStatisticsMgt.SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", '');
 
         if POSEntry.FindFirst() then begin
             PrintTxt := Format(POSEntry.SystemCreatedAt);
@@ -460,7 +431,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         else
             PrintThermalLine(Printer, CaptionValueFormat(FirstSaleCaptionLbl, ''), 'A11', false, 'LEFT', true, false);
 
-        SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", '');
+        NOReportStatisticsMgt.SetFilterOnPOSEntry(POSEntry, POSUnit, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", '');
 
         if POSEntry.FindLast() then begin
             PrintTxt := Format(POSEntry.SystemCreatedAt);
@@ -468,14 +439,19 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         end else
             PrintThermalLine(Printer, CaptionValueFormat(LastSaleCaptionLbl, ''), 'A11', false, 'LEFT', true, false);
 
-        NavApp.GetModuleInfo(NpGuid, Info);
-
-        DatetimeTxt := Format(CurrentDateTime(), 0, '<Year><Month,2><Day,2><Hours24,2><Minutes,2>');
-        DatetimeTxt := DelChr(DatetimeTxt, '=', ':,-');
-
-        AppVerTxt := StrSubstNo(ApplicationLbl, Info.DataVersion.Major, Info.DataVersion.Minor, Info.DataVersion.Build, Info.DataVersion.Revision, DatetimeTxt);
+        NOReportStatisticsMgt.GetAppVersionText(AppVerTxt);
 
         PrintThermalLine(Printer, CaptionValueFormat(AppVersionCaptionLbl, AppVerTxt), 'A11', false, 'LEFT', true, false);
+    end;
+
+    local procedure PrintTotalsPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    begin
+        POSWorkshiftCheckpoint.CalcFields("FF Total Dir. Item Return(LCY)", "FF Total Dir. Item Sales (LCY)");
+        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesAmountCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)")), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(TotalReturnAmountCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Return(LCY)")), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesNetoCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)" - Abs(POSWorkshiftCheckpoint."FF Total Dir. Item Return(LCY)"))), 'A11', false, 'LEFT', true, false);
+
+        PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
     #endregion Printing Parts of The Receipts
@@ -541,285 +517,30 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     #endregion Printer Helper Functions
 
-    #region Find, Get and Filter data
-
-    local procedure FindPreviousZReport(var PreviousZReport: Record "NPR POS Workshift Checkpoint"; POSUnitNo: Code[10]; WorkshiftEntryNo: Integer): Boolean
-    begin
-        PreviousZReport.Reset();
-        PreviousZReport.SetCurrentKey("POS Unit No.", Open, "Type");
-        PreviousZReport.SetFilter(Type, '=%1|=%2', PreviousZReport.Type::ZREPORT, PreviousZReport.Type::WORKSHIFT_CLOSE);
-        PreviousZReport.SetFilter(Open, '=%1', false);
-        PreviousZReport.SetFilter("POS Unit No.", '=%1', POSUnitNo);
-        PreviousZReport.SetFilter("Entry No.", '..%1', WorkshiftEntryNo - 1);
-
-        exit(PreviousZReport.FindLast());
-    end;
-
-    local procedure FindCashBalacingLine(WorkshiftCheckpointEntryNo: Integer; var PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."): Boolean
-    begin
-        PaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpointEntryNo);
-        PaymentBinCheckpoint.SetRange("Payment Method No.", 'K');
-
-        exit(PaymentBinCheckpoint.FindFirst());
-    end;
-
-    local procedure GetBankDepositAmount(WorkshiftCheckpointEntryNo: Integer) Result: Decimal
+    local procedure PrintTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer; IsReturn: Boolean)
     var
-        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-    begin
-        PaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpointEntryNo);
-        PaymentBinCheckpoint.SetRange("Include In Counting", PaymentBinCheckpoint."Include In Counting"::YES);
-
-        PaymentBinCheckpoint.SetLoadFields("Bank Deposit Amount");
-        if not PaymentBinCheckpoint.FindSet() then
-            exit;
-
-        repeat
-            Result += PaymentBinCheckpoint."Bank Deposit Amount";
-        until PaymentBinCheckpoint.Next() = 0;
-    end;
-
-    local procedure FindFromEntryNo(POSUnitNo: Code[10]; WorkshiftEntryNo: Integer): Integer
-    var
-        PreviousUnitCheckpoint: Record "NPR POS Workshift Checkpoint";
-        FromEntryNo: Integer;
-    begin
-        FromEntryNo := 1;
-        PreviousUnitCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
-        PreviousUnitCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnitNo);
-        PreviousUnitCheckpoint.SetFilter(Open, '=%1', false);
-        PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::ZREPORT);
-        PreviousUnitCheckpoint.SetFilter("Entry No.", '..%1', WorkshiftEntryNo - 1);
-
-        PreviousUnitCheckpoint.SetLoadFields("POS Entry No.", Type, "Consolidated With Entry No.");
-        if (PreviousUnitCheckpoint.FindLast()) then
-            FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
-
-        PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::WORKSHIFT_CLOSE);
-        PreviousUnitCheckpoint.SetFilter("Entry No.", '%1..', PreviousUnitCheckpoint."Entry No.");
-
-        if not PreviousUnitCheckpoint.FindLast() then
-            exit(FromEntryNo);
-
-        PreviousUnitCheckpoint.Get(PreviousUnitCheckpoint."Consolidated With Entry No.");
-        FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
-
-        exit(FromEntryNo);
-    end;
-
-    local procedure SetFilterOnPOSEntry(var POSEntry: Record "NPR POS Entry"; POSUnit: Record "NPR POS Unit"; FromEntryNo: Integer; ToPOSEntryNo: Integer; SalespersonCode: Code[20])
-    begin
-        POSEntry.Reset();
-        POSEntry.SetRange("POS Store Code", POSUnit."POS Store Code");
-        if SalespersonCode <> '' then
-            POSEntry.SetRange("Salesperson Code", SalespersonCode);
-        POSEntry.SetFilter("Entry No.", '%1..%2', FromEntryNo, ToPOSEntryNo);
-        POSEntry.SetFilter("System Entry", '=%1', false);
-        POSEntry.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
-        POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
-    end;
-
-    local procedure GetPOSAuditLogCount(SalespersonPurchaserCode: Code[20]; POSUnitNo: Code[10]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; ActionType: Option): Integer
-    var
-        POSAuditLog: Record "NPR POS Audit Log";
-    begin
-        POSAuditLog.Reset();
-        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
-        POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
-        POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
-        POSAuditLog.SetRange("Active POS Unit No.", POSUnitNo);
-        POSAuditLog.SetRange("Action Type", ActionType);
-
-        if POSAuditLog.IsEmpty() then
-            exit(POSAuditLog.Count())
-    end;
-
-    #endregion Find, Get and Filter data
-
-    #region Figures Calculation
-
-    local procedure CalcCardsAmountAndQuantity(var POSEntry: Record "NPR POS Entry"; var AmountCards: Decimal; var CountCards: Integer)
-    var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
-    begin
-        POSPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
-        POSEntry.SetLoadFields("Document No.", "POS Unit No.");
-        if POSEntry.FindSet() then
-            repeat
-                EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
-                EFTTransactionRequest.SetRange("Register No.", POSEntry."POS Unit No.");
-                EFTTransactionRequest.SetRange(Successful, true);
-                if not EFTTransactionRequest.IsEmpty() then begin
-                    CountCards += 1;
-                    POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                    if POSPaymentLine.FindSet() then
-                        repeat
-                            POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
-                            if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::EFT then
-                                AmountCards += POSPaymentLine.Amount;
-                        until POSPaymentLine.Next() = 0;
-                end;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcOtherPaymentsAmountAndQuantity(var POSEntry: Record "NPR POS Entry"; var AmountOther: Decimal; var CountOther: Integer)
-    var
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSWorkshTaxCheckp: Record "NPR POS Worksh. Tax Checkp.";
         Amount: Decimal;
     begin
-        POSPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
-        POSEntry.SetLoadFields("Entry No.");
-        if POSEntry.FindSet() then
-            repeat
-                Clear(Amount);
-                POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if POSPaymentLine.FindSet() then
-                    repeat
-                        POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
-                        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
-                            Amount += POSPaymentLine.Amount;
-                    until POSPaymentLine.Next() = 0;
-                if Amount > 0 then begin
-                    AmountOther += Amount;
-                    CountOther += 1;
-                end
-            until POSEntry.Next() = 0;
+        POSWorkshTaxCheckp.SetCurrentKey("Workshift Checkpoint Entry No.");
+        POSWorkshTaxCheckp.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpointEntryNo);
+
+        if POSWorkshTaxCheckp.IsEmpty() then
+            exit;
+
+        POSWorkshTaxCheckp.SetLoadFields("Tax %", "Workshift Checkpoint Entry No.");
+        POSWorkshTaxCheckp.FindSet();
+        repeat
+            if IsReturn then
+                NOReportStatisticsMgt.CalcReturnTaxAmount(POSEntry, Amount, POSWorkshTaxCheckp."Tax %", true)
+            else
+                NOReportStatisticsMgt.CalcTaxAmount(POSEntry, Amount, POSWorkshTaxCheckp."Tax %", true);
+            PrintThermalLine(Printer, CaptionValueFormat(StrSubstNo(VATPctCaptionLbl, POSWorkshTaxCheckp."Tax %"), FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
+        until POSWorkshTaxCheckp.Next() = 0;
     end;
-
-    local procedure CalcReturnsAndSalesAmountAndQuantity(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; var Amount: Decimal; var Amount2: Decimal; var ReturnAmount: Decimal; var Quantity: Integer)
-    begin
-        POSSalesLine.SetLoadFields(Type, "Exclude from Posting", Quantity, "Amount Incl. VAT", "Amount Excl. VAT");
-        POSEntry.SetLoadFields("Entry No.");
-        if POSEntry.FindSet() then
-            repeat
-                POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSSalesLine.SetRange("Type", POSSalesLine.Type::Item);
-                POSSalesLine.SetFilter("Exclude from Posting", '=%1', false);
-                if (POSSalesLine.FindSet()) then
-                    repeat
-                        if POSSalesLine.Quantity > 0 then begin
-                            Amount += POSSalesLine."Amount Incl. VAT";
-                            Amount2 += POSSalesLine."Amount Excl. VAT";
-                            Quantity += POSSalesLine.Quantity;
-                        end
-                        else begin
-                            ReturnAmount += POSSalesLine."Amount Incl. VAT";
-                            Quantity += POSSalesLine.Quantity;
-                        end;
-                    until POSSalesLine.Next() = 0;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcTaxAmounts(var POSEntry: Record "NPR POS Entry"; var POSTaxLine: Record "NPR POS Entry Tax Line"; var Amount: Decimal; var Amount2: Decimal)
-    begin
-        POSTaxLine.SetLoadFields("Tax Amount", "Tax %");
-        POSEntry.SetLoadFields("Entry No.");
-        if POSEntry.FindSet() then
-            repeat
-                POSTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if (POSTaxLine.FindSet()) then
-                    repeat
-                        if POSTaxLine."Tax %" = 25 then
-                            Amount += POSTaxLine."Tax Amount";
-                        Amount2 += POSTaxLine."Tax Amount";
-                    until POSTaxLine.Next() = 0;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcReturnTaxAmounts(var POSEntry: Record "NPR POS Entry"; var POSTaxLine: Record "NPR POS Entry Tax Line"; var Amount: Decimal; var Amount2: Decimal)
-    begin
-        POSTaxLine.SetLoadFields("Tax Amount", Quantity);
-        POSEntry.SetLoadFields("Entry No.");
-        if POSEntry.FindSet() then
-            repeat
-                POSTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if (POSTaxLine.FindSet()) then
-                    repeat
-                        if POSTaxLine.Quantity < 0 then begin
-                            if POSTaxLine."Tax %" = 25 then
-                                Amount += POSTaxLine."Tax Amount";
-                            Amount2 += POSTaxLine."Tax Amount";
-                        end;
-                    until POSTaxLine.Next() = 0;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcReturnSaleDiscountQuantity(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line"; var DiscountAmount: Decimal; var CountReturned: Integer; var Quantity: Integer; var Quantity2: Integer; var Quantity3: Integer)
-    var
-        Count: Integer;
-    begin
-        POSSalesLine.SetLoadFields(Quantity, "Line Discount Amount Incl. VAT", "Discount Type");
-        POSEntry.SetLoadFields("Entry No.");
-        if POSEntry.FindSet() then
-            repeat
-                Clear(Count);
-                POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSSalesLine.SetRange("Type", POSSalesLine.Type::Item);
-                POSSalesLine.SetFilter("Exclude from Posting", '=%1', false);
-                if (POSSalesLine.FindSet()) then
-                    repeat
-                        if POSSalesLine.Quantity > 0 then
-                            Quantity += POSSalesLine.Quantity
-                        else begin
-                            Quantity2 += POSSalesLine.Quantity;
-                            Count += 1;
-                        end;
-                        if POSSalesLine."Discount Type" <> POSSalesLine."Discount Type"::" " then begin
-                            Quantity3 += POSSalesLine.Quantity;
-                            DiscountAmount += POSSalesLine."Line Discount Amount Incl. VAT";
-                        end;
-                    until POSSalesLine.Next() = 0;
-                if Count > 0 then
-                    CountReturned += 1;
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcCopyAndPrintReceiptsQuantity(var POSEntry: Record "NPR POS Entry"; var CopyTicketAmount: Decimal; var Quantity: Integer; var Quantity2: Integer)
-    var
-        POSAuditLog: Record "NPR POS Audit Log";
-    begin
-        POSAuditLog.Reset();
-        POSEntry.SetLoadFields("Amount Incl. Tax");
-        POSAuditLog.SetLoadFields("Acted on POS Entry No.", "Action Type");
-        if POSEntry.FindSet() then
-            repeat
-                POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
-                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_COPY);
-
-                if not POSAuditLog.IsEmpty() then begin
-                    CopyTicketAmount += POSEntry."Amount Incl. Tax";
-                    Quantity += POSAuditLog.Count();
-                end;
-
-                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_PRINT);
-                Quantity2 += POSAuditLog.Count();
-            until POSEntry.Next() = 0;
-    end;
-
-    local procedure CalcCancelledReceiptsAmount(SalespersonPurchaserCode: Code[20]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; var Amount: Decimal)
-    var
-        POSAuditLog: Record "NPR POS Audit Log";
-        ConvertVar: Decimal;
-    begin
-        POSAuditLog.Reset();
-        POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
-        POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
-        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
-
-        POSAuditLog.SetLoadFields("Additional Information");
-        if POSAuditLog.FindSet() then
-            repeat
-                if Evaluate(ConvertVar, POSAuditLog."Additional Information") then
-                    Amount += ConvertVar;
-            until POSAuditLog.Next() = 0;
-    end;
-
-    #endregion Figures Calculation
 
     var
+        NOReportStatisticsMgt: Codeunit "NPR NO Report Statistics Mgt.";
         EndOfDayCaptionLbl: Label 'EOD', Locked = true;
         LCYCaptionLbl: Label 'NOK', Locked = true;
         LastZReportCaptionLbl: Label 'Siste Z-rapport', Locked = true;
@@ -856,7 +577,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         ZeroLinesCaptionLbl: Label 'Linjeantall redusert til 0', Locked = true;
         GeneralInfoCaptionLbl: Label 'Generell info', Locked = true;
         SumOfVATCaptionLbl: Label 'Sum MVA', Locked = true;
-        VAT25PctCaptionLbl: Label 'MVA 25%', Locked = true;
+        VATPctCaptionLbl: Label 'MVA %1%', Comment = '%1 - specifies VAT %', Locked = true;
         ReturnedProductsQuantityCaptionLbl: Label 'Antall returnerte produkter', Locked = true;
         SalesQuantityCaptionLbl: Label 'Antall salg', Locked = true;
         ReturnQuantityCaptionLbl: Label 'Antall returer', Locked = true;
@@ -872,7 +593,6 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         LastSaleCaptionLbl: Label 'Siste salg', Locked = true;
         AppVersionCaptionLbl: Label 'App versjon', Locked = true;
         SumOfVATOnReturnCaptionLbl: Label 'Sum MVA fra returer', Locked = true;
-        ReturnVAT25PctCaptionLbl: Label 'Returer MVA 25%', Locked = true;
         TotalPrepaidCaptionLbl: Label 'Totalt forhåndsbetalinger', Locked = true;
         POSOpeningQuantityCaptionLbl: Label 'Antall skuffåpninger', Locked = true;
         ProformaReceiptsCaptionLbl: Label 'Antall utskrevne pro forma kvittering', Locked = true;
