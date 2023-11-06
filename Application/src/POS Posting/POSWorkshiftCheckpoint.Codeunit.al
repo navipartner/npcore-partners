@@ -1369,6 +1369,7 @@
         if POSEntry.IsEmpty() then
             exit;
 
+        POSEntry.SetLoadFields("Amount Incl. Tax");
         POSEntry.FindSet();
         repeat
             SetCopyReceiptsQtyAndAmount(POSWorkshiftCheckpoint, POSEntry);
@@ -1391,7 +1392,6 @@
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        POSEntry.SetLoadFields("Amount Incl. Tax");
         POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
         POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_COPY);

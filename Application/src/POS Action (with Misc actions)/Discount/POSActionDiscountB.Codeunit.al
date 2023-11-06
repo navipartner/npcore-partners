@@ -171,6 +171,7 @@
 
     internal procedure FinishRequest(DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra; InputValue: decimal; var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
+        OnBeforeSetDiscount(DiscountType, SalePOS, SaleLinePOS, InputValue);
         case DiscountType of
             DiscountType::TotalAmount:
                 SetTotalAmount(SalePOS, InputValue);
@@ -589,7 +590,13 @@
     begin
         exit(2);
     end;
-# pragma warning restore
+
+#pragma warning restore
 
     #endregion
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetDiscount(DiscountType: Option; var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal)
+    begin
+    end;
 }
