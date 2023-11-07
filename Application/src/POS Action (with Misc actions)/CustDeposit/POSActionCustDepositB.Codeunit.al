@@ -117,15 +117,6 @@ codeunit 6059978 "NPR POS Action: Cust.Deposit B"
         SaleLinePOS.Modify();
     end;
 
-    procedure SetCopyDesc(SaleLine: Codeunit "NPR POS Sale Line"; CopyDesc: Boolean)
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-    begin
-        SaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS."Copy Description" := CopyDesc;
-        SaleLinePOS.Modify();
-    end;
-
     local procedure SelectCustomer(POSSale: Codeunit "NPR POS Sale"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
