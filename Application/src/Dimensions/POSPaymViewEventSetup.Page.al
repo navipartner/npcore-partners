@@ -26,7 +26,7 @@
                 }
                 field("Popup per"; Rec."Popup per")
                 {
-                    ToolTip = 'Specifies whether the popup will be triggered per a POS Store, POS Unit, or in all cases.';
+                    ToolTip = 'Specifies the base for calculation of the frequency used in field Popup every. e.g. if we put Store & every 3, then after every 3 transactions on a POS store, there will be a popup that appears. Same logic goes for POS Unit.  Popup will appears after every 3 transactions on that POS Unit. And All, it will look at every 3 transactions for the whole business irrespective of the POS Unit or POS Store.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Popup every"; Rec."Popup every")
@@ -59,11 +59,25 @@
                     ToolTip = 'Specifies whether the popup will be skipped if a value for the dimension has already been assigned to the POS sale.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Enable Selected POS Units"; Rec."Enable Selected POS Units")
+                {
+                    ToolTip = 'Specifies if popup will be enabled only for selected POS Units.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(FilterGr)
             {
                 Caption = 'Popup Filter';
                 part("NPR Popup Dim. Filter"; "NPR Popup Dim. Filter")
+                {
+                    ApplicationArea = NPRRetail;
+                }
+            }
+            group(POSUnitFilter)
+            {
+                Caption = 'POS Unit Filter';
+                Visible = Rec."Enable Selected POS Units";
+                part("NPR POS Unit Filter"; "NPR Pop Up Dim POS Unit Filter")
                 {
                     ApplicationArea = NPRRetail;
                 }
