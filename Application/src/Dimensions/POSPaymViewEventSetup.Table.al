@@ -65,6 +65,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
         }
+        field(90; "Enable Selected POS Units"; Boolean)
+        {
+            Caption = 'Show Only for Selected POS Units';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

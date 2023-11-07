@@ -53,6 +53,8 @@
     end;
 
     local procedure SkipPopup(SalePOS: Record "NPR POS Sale"; var POSPaymentViewEventSetup: Record "NPR POS Paym. View Event Setup"): Boolean
+    var
+        POSUnitFilter: Record "NPR Pop Up Dim POS Unit Filter";
     begin
         if not POSPaymentViewEventSetup.Get() then
             exit(true);
@@ -73,6 +75,12 @@
 
         if SkipOnItemFilter(SalePOS) then
             exit(true);
+
+        if POSPaymentViewEventSetup."Enable Selected POS Units" then
+            if not POSUnitFilter.Get(SalePOS."Register No.") then
+                exit(true)
+            else
+                exit(not POSUnitFilter.Enable);
 
         exit(false);
     end;
