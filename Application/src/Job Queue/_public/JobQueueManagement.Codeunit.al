@@ -477,6 +477,9 @@
         RetentionPolicyLog: Codeunit "Retention Policy Log";
         RetentionPolicyLogCategory: Enum "Retention Policy Log Category";
         RetentionPolicySetup: Record "Retention Policy Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
+        NextRunDateFormula: DateFormula;
+#ENDIF
         JobQueueActivatedNotificationTxt: Label 'A Job Queue Entry to apply the retention policies has been scheduled to run.';
         JobQueueReadyNotificationTxt: Label 'A Job Queue Entry to apply the retention policies was set to Ready state.';
     begin
@@ -499,16 +502,23 @@
             exit;
         end;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
+        Evaluate(NextRunDateFormula, '<1D>');
+#ENDIF
         SetJobTimeout(6, 0); // 6hr timeout
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
-            3997,
+            3997,  //Codeunit::"Retention Policy JQ"
             '',
             '',
             NowWithDelayInSeconds(360),
             000000T,
             060000T,
+#IF BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22
             2,
+#ELSE
+            NextRunDateFormula,
+#ENDIF
             CreateAndAssignRetentionPolicyJobQueueCategory(),
             JobQueueEntry)
         then
@@ -647,13 +657,18 @@
     end;
 
     internal procedure UpdateRetentionPolicyJQRecurrence(var JobQueueEntry: Record "Job Queue Entry")
+    var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
+        NextRunDateFormula: DateFormula;
+#ENDIF
     begin
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
+        if JobQueueEntry."Recurring Job" and
+           (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
         then begin
 #IF NOT BC17
             JobQueueEntry."Job Timeout" := 6 * 60 * 60 * 1000;  //6 hours
 #ENDIF
+#IF BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22
             Clear(JobQueueEntry."Next Run Date Formula");
             JobQueueEntry."Run on Mondays" := true;
             JobQueueEntry."Run on Tuesdays" := true;
@@ -665,6 +680,12 @@
             JobQueueEntry.Validate("No. of Minutes between Runs", 2);
             JobQueueEntry.Validate("Starting Time", 000000T);
             JobQueueEntry."Ending Time" := 060000T;
+#ELSE
+            Evaluate(NextRunDateFormula, '<1D>');
+            JobQueueEntry.Validate("Starting Time", 000000T);
+            JobQueueEntry."Ending Time" := 060000T;
+            JobQueueEntry.Validate("Next Run Date Formula", NextRunDateFormula);
+#ENDIF
         end;
     end;
 
