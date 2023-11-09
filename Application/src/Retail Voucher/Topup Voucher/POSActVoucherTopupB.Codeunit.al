@@ -5,7 +5,6 @@ codeunit 6059962 "NPR POS Act. Voucher Top-up-B"
     var
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         VoucherTypeCode: Code[20];
         VoucherReferenceNumber: Text[50];
         NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found';
@@ -20,7 +19,7 @@ codeunit 6059962 "NPR POS Act. Voucher Top-up-B"
 
         NpRvVoucher.SetFilter("Reference No.", '=%1', VoucherReferenceNumber);
         if NpRvVoucher.FindFirst() then
-            NpRvModuleValidGlobal.UpdateVoucherAmount(NpRvVoucher)
+            NpRvVoucherMgt.UpdateVoucherAmount(NpRvVoucher)
         else
             if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, VoucherReferenceNumber, NpRvVoucher) then
                 Error(NotFoundErr, VoucherReferenceNumber, VoucherTypeCode);

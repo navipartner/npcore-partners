@@ -4,13 +4,12 @@ codeunit 6059908 "NPR POS Action:Check Voucher B"
     internal procedure CheckVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]): Boolean
     var
         Voucher: Record "NPR NpRv Voucher";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NpRvVoucherCard: Page "NPR NpRv Voucher Card";
         NotFoundErr: Label 'Reference No. %1 and Voucher Type %2 not found', Comment = '%1=Voucher Reference No;%2=Voucher Type Code';
     begin
         if NpRvVoucherMgt.FindVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
-            NpRvModuleValidGlobal.UpdateVoucherAmount(Voucher)
+            NpRvVoucherMgt.UpdateVoucherAmount(Voucher)
         else
             if not NpRvVoucherMgt.FindPartnerVoucher(VoucherTypeCode, ReferenceNo, Voucher) then
                 Error(NotFoundErr, ReferenceNo, VoucherTypeCode);

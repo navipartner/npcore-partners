@@ -320,7 +320,6 @@
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         VoucherEntry.Init();
         VoucherEntry."Entry No." := 0;
@@ -384,9 +383,9 @@
 
         case VoucherEntry."Entry Type" of
             VoucherEntry."Entry Type"::"Issue Voucher":
-                NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
+                CreateGlobalVoucher(Voucher);
             VoucherEntry."Entry Type"::"Top-up":
-                NpRvModuleValidGlobal.TopUpVoucher(VoucherEntry, Voucher);
+                TopUpVoucher(VoucherEntry, Voucher);
         end;
 
         ApplyEntry(VoucherEntry);
@@ -500,7 +499,6 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         if not FindMagentoPaymentLine(NpRvSalesLine, MagentoPaymentLine) then
             exit;
@@ -531,8 +529,8 @@
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
         VoucherEntry.Insert();
 
-        NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
-        NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+        RedeemVoucher(VoucherEntry, Voucher);
+        RedeemPartnerVouchers(VoucherEntry, Voucher);
 
         ApplyEntry(VoucherEntry);
         ArchiveClosedVoucher(Voucher);
@@ -544,7 +542,6 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         Voucher.Get(NpRvSalesLine."Voucher No.");
 
@@ -564,8 +561,8 @@
         OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
         VoucherEntry.Insert();
 
-        NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
-        NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+        RedeemVoucher(VoucherEntry, Voucher);
+        RedeemPartnerVouchers(VoucherEntry, Voucher);
 
         ApplyEntry(VoucherEntry);
         ArchiveClosedVoucher(Voucher);
@@ -879,20 +876,19 @@
 
     local procedure ProcessGlobalVoucherEntry(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
     var
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         case VoucherEntry."Entry Type" of
             VoucherEntry."Entry Type"::"Issue Voucher":
-                NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
+                CreateGlobalVoucher(Voucher);
             VoucherEntry."Entry Type"::Payment:
                 begin
-                    NpRvModuleValidGlobal.RedeemVoucher(VoucherEntry, Voucher);
-                    NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+                    RedeemVoucher(VoucherEntry, Voucher);
+                    RedeemPartnerVouchers(VoucherEntry, Voucher);
                 end;
             VoucherEntry."Entry Type"::"Partner Payment":
-                NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+                RedeemPartnerVouchers(VoucherEntry, Voucher);
             VoucherEntry."Entry Type"::"Top-up":
-                NpRvModuleValidGlobal.TopUpVoucher(VoucherEntry, Voucher);
+                TopUpVoucher(VoucherEntry, Voucher);
         end;
     end;
 
@@ -942,7 +938,6 @@
         NpRvModuleMgt.OnRunFindVoucher(VoucherTypeCode, ReferenceNo, Voucher, Handled);
     end;
 
-
     internal procedure ValidateVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
         NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
@@ -956,6 +951,53 @@
         NpRvModuleValidateDefault.ValidateVoucher(TempNpRvVoucherBuffer);
     end;
 
+    procedure RedeemVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        Handled: Boolean;
+    begin
+        NpRvModuleMgt.OnRunRedeemVoucher(VoucherEntry, Voucher, Handled);
+    end;
+
+    procedure RedeemPartnerVouchers(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+    begin
+        NpRvModuleValidGlobal.RedeemPartnerVouchers(VoucherEntry, Voucher);
+    end;
+
+    procedure CreateGlobalVoucher(Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        Handled: Boolean;
+    begin
+        NpRvModuleMgt.OnRunCreateGlobalVoucher(Voucher, Handled);
+    end;
+
+    internal procedure TopUpVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        Handled: Boolean;
+    begin
+        NpRvModuleMgt.OnRunTopUpVoucher(VoucherEntry, Voucher, Handled);
+    end;
+
+    internal procedure UpdateVoucherAmount(Voucher: Record "NPR NpRv Voucher")
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        Handled: Boolean;
+    begin
+        NpRvModuleMgt.OnRunUpdateVoucherAmount(Voucher, Handled);
+    end;
+
+    [TryFunction]
+    internal procedure TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup")
+    var
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        Handled: Boolean;
+    begin
+        NpRvModuleMgt.OnRunTryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup, Handled);
+    end;
 
     internal procedure Voucher2Buffer(var NpRvVoucher: Record "NPR NpRv Voucher"; var TempNpRvGlobalVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     var
@@ -1155,7 +1197,6 @@
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         VoucherType: Record "NPR NpRv Voucher Type";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
     begin
         if VoucherMgt.InitialEntryExists(Voucher) then
             exit;
@@ -1177,7 +1218,7 @@
         VoucherEntry."Closed by Entry No." := 0;
         VoucherEntry.Insert();
 
-        NpRvModuleValidGlobal.CreateGlobalVoucher(Voucher);
+        CreateGlobalVoucher(Voucher);
     end;
 
     internal procedure PrepareVoucherBuffer(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text)
@@ -1447,7 +1488,6 @@
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -1469,7 +1509,7 @@
         if Amount > ReturnAmount then
             Error(MaximumReturnAmountErr, ReturnAmount);
 
-        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
+        GenerateTempVoucher(VoucherType, TempVoucher);
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -1515,7 +1555,7 @@
         NpRvSalesLine.Description := TempVoucher.Description;
         NpRvSalesLine.Insert();
 
-        NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
+        SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
         if NpRvSalesLineReference.IsEmpty then begin
             NpRvSalesLineReference.Init();
             NpRvSalesLineReference.Id := CreateGuid();
