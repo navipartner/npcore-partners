@@ -174,6 +174,91 @@
             Handled := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunRedeemVoucher', '', true, true)]
+    local procedure OnRunRedeemVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        NpRvVoucherType.Get(Voucher."Voucher Type");
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        RedeemVoucher(VoucherEntry, Voucher);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunCreateGlobalVoucher', '', true, true)]
+    local procedure OnRunCreateGlobalVoucher(Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        NpRvVoucherType.Get(Voucher."Voucher Type");
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        CreateGlobalVoucher(Voucher);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunTopUpVoucher', '', true, true)]
+    local procedure OnRunTopUpVoucher(VoucherEntry: Record "NPR NpRv Voucher Entry"; Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        NpRvVoucherType.Get(Voucher."Voucher Type");
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        TopUpVoucher(VoucherEntry, Voucher);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunUpdateVoucherAmount', '', true, true)]
+    local procedure OnRunUpdateVoucherAmount(Voucher: Record "NPR NpRv Voucher"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        NpRvVoucherType.Get(Voucher."Voucher Type");
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        UpdateVoucherAmount(Voucher);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunTryValidateGlobalVoucherSetup', '', true, true)]
+    local procedure OnRunTryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup"; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     begin
@@ -700,7 +785,7 @@
               '<RedeemPartnerVouchers xmlns="urn:microsoft-dynamics-schemas/codeunit/' + NpRvPartnerMgt.GetServiceName(NpRvPartner) + '">' +
                 '<vouchers>' +
                   '<voucher reference_no="' + Voucher."Reference No." + '"' +
-                  ' voucher_type="' + Voucher."Voucher Type" + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/global_voucher_service">' +
+                  ' voucher_type="' + Voucher."Voucher Type" + '" xmlns="urn:microsoft-dynamics-schemas/codeunit/' + NpRvPartnerMgt.GetServiceName(NpRvPartner) + '">' +
                     '<amount>' + Format(-VoucherEntry.Amount, 0, 9) + '</amount>' +
                     '<redeem_date>' + Format(VoucherEntry."Posting Date", 0, 9) + '</redeem_date>' +
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
@@ -868,7 +953,6 @@
         NpRvVoucherEntry.Insert();
         Commit();
     end;
-
 
     internal procedure UpdateVoucherAmount(NpRvVoucher: Record "NPR NpRv Voucher")
     var
