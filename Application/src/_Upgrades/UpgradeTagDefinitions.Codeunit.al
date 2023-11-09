@@ -279,7 +279,7 @@
                     'SetManuallySetOnHold':
                         exit('SetManuallySetOnHold-20230818');
                     'UpdateRetentionJobQueue':
-                        exit('UpdateRetentionJobQueue-20231020');
+                        exit('UpdateRetentionJobQueue-20231108');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
