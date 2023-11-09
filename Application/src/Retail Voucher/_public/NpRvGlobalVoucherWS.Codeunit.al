@@ -80,7 +80,7 @@
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         TempNpRvVoucherBuffer.TestField("Voucher Type");
         TempNpRvVoucherBuffer.TestField("Reference No.");
@@ -133,7 +133,7 @@
         NpRvVoucherEntry.Insert();
 
         if NpRvVoucherEntry."Entry Type" = NpRvVoucherEntry."Entry Type"::"Issue Voucher" then
-            NpRvModuleValidGlobal.CreateGlobalVoucher(NpRvVoucher);
+            NpRvVoucherMgt.CreateGlobalVoucher(NpRvVoucher);
     end;
 
     procedure FindVouchers(var vouchers: XMLport "NPR NpRv Global Vouchers")
@@ -316,7 +316,6 @@
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         InUseQty: Integer;
     begin
         if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
@@ -350,8 +349,8 @@
         NpRvVoucherEntry.Insert();
 
         if NpRvVoucherEntry."Entry Type" = NpRvVoucherEntry."Entry Type"::Payment then
-            NpRvModuleValidGlobal.RedeemVoucher(NpRvVoucherEntry, NpRvVoucher);
-        NpRvModuleValidGlobal.RedeemPartnerVouchers(NpRvVoucherEntry, NpRvVoucher);
+            NpRvVoucherMgt.RedeemVoucher(NpRvVoucherEntry, NpRvVoucher);
+        NpRvVoucherMgt.RedeemPartnerVouchers(NpRvVoucherEntry, NpRvVoucher);
 
         NpRvVoucherMgt.ApplyEntry(NpRvVoucherEntry);
         Voucher2Buffer(NpRvVoucher, NpRvVoucherBuffer);
@@ -539,7 +538,6 @@
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
         InUseQty: Integer;
     begin
         if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
@@ -569,7 +567,7 @@
         NpRvVoucherEntry."Closed by Entry No." := 0;
         NpRvVoucherEntry.Insert();
 
-        NpRvModuleValidGlobal.RedeemPartnerVouchers(NpRvVoucherEntry, NpRvVoucher);
+        NpRvVoucherMgt.RedeemPartnerVouchers(NpRvVoucherEntry, NpRvVoucher);
 
         NpRvVoucherMgt.ApplyEntry(NpRvVoucherEntry);
 

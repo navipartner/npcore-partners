@@ -104,9 +104,9 @@
 
                 trigger OnAction()
                 var
-                    NpRvModuleValidateGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+                    NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
                 begin
-                    if NpRvModuleValidateGlobal.TryValidateGlobalVoucherSetup(Rec) then
+                    if NpRvVoucherMgt.TryValidateGlobalVoucherSetup(Rec) then
                         Message(Text001)
                     else
                         Error(GetLastErrorText);
@@ -117,9 +117,9 @@
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
-        NpRvModuleValidateGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
-        if not NpRvModuleValidateGlobal.TryValidateGlobalVoucherSetup(Rec) then
+        if not NpRvVoucherMgt.TryValidateGlobalVoucherSetup(Rec) then
             exit(Confirm(Text000, false));
     end;
 

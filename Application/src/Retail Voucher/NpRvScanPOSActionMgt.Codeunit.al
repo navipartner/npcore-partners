@@ -266,7 +266,7 @@
     var
         Voucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         EanBoxTxt: Text[50];
     begin
         if EanBoxSetupEvent."Event Code" <> VoucherPaymentActionCode() then
@@ -281,10 +281,13 @@
             exit;
         end;
 
-        if NpRvModuleValidGlobal.FindVoucher(EanBoxTxt, NpRvVoucherType, Voucher) then begin
-            InScope := true;
-            exit;
-        end;
+        if NpRvVoucherType.FindSet() then
+            repeat
+                if NpRvVoucherMgt.FindPartnerVoucher(NpRvVoucherType.Code, EanBoxTxt, Voucher) then begin
+                    InScope := true;
+                    exit;
+                end;
+            until NpRvVoucherType.Next() = 0;
     end;
 
 
