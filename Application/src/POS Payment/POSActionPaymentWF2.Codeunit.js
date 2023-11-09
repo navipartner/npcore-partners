@@ -23,6 +23,11 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
         if (suggestedAmount === null) return; // user cancelled dialog
     };
 
+    if(remainingAmount == 0){
+        await workflow.respond("tryEndSale");
+        return;
+    }
+
     let paymentResult = await workflow.run(dispatchToWorkflow, { context: { paymentType: paymentType, suggestedAmount: suggestedAmount } });
 
     if (paymentResult.legacy) {
