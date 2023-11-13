@@ -30,6 +30,8 @@
 
         AddDefaultRetentionPolicy(IsUpgrade);
 
+        AddNcTaskRetentionPolicy(IsUpgrade);
+
         AddPOSPostingLogRetentionPolicy(IsUpgrade);
 
         AddPOSLayoutArchiveRetentionPolicy(IsUpgrade);
@@ -54,8 +56,6 @@
         if IsUpgrade then
             if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install") then
                 exit;
-
-        AddAllowedTable(Database::"NPR Nc Task", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
 
         AddAllowedTable(Database::"NPR Data Log Record", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR Data Log Field", Enum::"Retention Period Enum"::"1 Week", Enum::"Reten. Pol. Deleting"::Default);
@@ -88,6 +88,18 @@
 
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install");
+    end;
+
+    local procedure AddNcTaskRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NcTask') then
+                exit;
+
+        AddNcTaskRetentionPolicy();
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NcTask');
     end;
 
     local procedure AddPOSPostingLogRetentionPolicy(IsUpgrade: Boolean)
@@ -314,6 +326,48 @@
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR POS Saved Sale Entry", RecRef.SystemCreatedAtNo(), TableFilters);
 
         CreateRetentionPolicySetup(Database::"NPR POS Saved Sale Entry", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
+    end;
+
+    local procedure AddNcTaskRetentionPolicy()
+    var
+        NcTask: Record "NPR Nc Task";
+        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        if RetentionPolicySetup.Get(Database::"NPR Nc Task") then
+            if RetentionPolicySetup.WritePermission() then
+                RetentionPolicySetup.Delete(true);
+        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Nc Task") then
+            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR Nc Task");
+
+        NcTask.SetRange(Processed, false);
+        NcTask.SetRange("Process Error", false);
+        RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
+        RecRef.GetTable(NcTask);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, true, RecRef);
+
+        NcTask.SetRange(Processed, false);
+        NcTask.SetRange("Process Error", true);
+        RtnPeriodEnum := RtnPeriodEnum::"1 Month";
+        RecRef.GetTable(NcTask);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        NcTask.SetRange(Processed, true);
+        NcTask.SetRange("Process Error");
+        RtnPeriodEnum := RtnPeriodEnum::"NPR 14 Days";
+        RecRef.GetTable(NcTask);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+#IF NOT BC17 AND NOT BC18
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Nc Task", RecRef.SystemCreatedAtNo(), 0, Enum::"Reten. Pol. Filtering"::"NPR Nc Task", Enum::"Reten. Pol. Deleting"::"NPR Nc Task", TableFilters);
+#ELSE
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Nc Task", RecRef.SystemCreatedAtNo(), TableFilters);
+#ENDIF
+
+        CreateRetentionPolicySetup(Database::"NPR Nc Task", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
     end;
 
     local procedure AddHeyLoyaltyWebhookRequestRetentionPolicy()
