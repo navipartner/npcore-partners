@@ -58,7 +58,8 @@ codeunit 6150877 "NPR Upgrade Variety Setup"
         if MagentoPictureLink.IsEmpty() then
             exit;
 
-        MagentoSetup.Get();
+        if not MagentoSetup.Get() then
+            MagentoSetup.Init();
 
         MagentoPictureLink.FindSet();
         repeat
