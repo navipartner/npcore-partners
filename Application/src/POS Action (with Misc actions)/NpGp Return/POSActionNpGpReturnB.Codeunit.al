@@ -302,6 +302,8 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             SaleLinePOS.Validate("Unit Price", TempNpGpPOSSalesLine."Unit Price");
             SaleLinePOS."Unit of Measure Code" := TempNpGpPOSSalesLine."Unit of Measure Code";
             SaleLinePOS."Currency Code" := TempNpGpPOSSalesLine."Currency Code";
+            SaleLinePOS.Validate("VAT %", TempNpGpPOSSalesLine."VAT %");
+
             SaleLinePOS.Cost := SaleLinePOS.Amount;
             SaleLinePOS."Location Code" := NpGpCrossCompanySetup."Location Code";
             SaleLinePOS."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
@@ -309,6 +311,9 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
             SaleLinePOS."Return Reason Code" := ReturnReasonCode;
             POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+
+
+
 
             POSCrossRefMgt.InitReference(SaleLinePOS.SystemId, TempNpGpPOSSalesLine."Global Reference", CopyStr(SaleLinePOS.TableName(), 1, 250), SaleLinePOS."Sales Ticket No." + '_' + Format(SaleLinePOS."Line No."));
         until not FullSale or (TempNpGpPOSSalesLine.Next() = 0);
