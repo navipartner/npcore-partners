@@ -121,7 +121,7 @@
         CloseDialog();
     end;
 
-    internal procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
+    procedure ParseDataToXmlDocNode(var RecRef: RecordRef; RecordSetExists: Boolean; var Node: XmlNode) Success: Boolean
     var
         NpXmlElement: Record "NPR NpXml Element";
         RecRef2: RecordRef;

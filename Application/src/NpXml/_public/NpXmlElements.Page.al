@@ -1,6 +1,5 @@
 ﻿page 6151553 "NPR NpXml Elements"
 {
-    Extensible = False;
     AutoSplitKey = true;
     Caption = 'Xml Elements';
     DelayedInsert = true;
