@@ -349,6 +349,8 @@ codeunit 6151543 "NPR TM Client API BL"
     local procedure GetRequestDetails(var JBuilder: Codeunit "Json Text Reader/Writer"; Token: Text[100]; Success: Boolean; ResponseMessage: Text)
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        HaveScheduleEntry: Boolean;
     begin
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -368,6 +370,14 @@ codeunit 6151543 "NPR TM Client API BL"
 
         JBuilder.WriteStartArray('lines');
         repeat
+
+            HaveScheduleEntry := false;
+            if (TicketRequest."External Adm. Sch. Entry No." > 0) then begin
+                AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketRequest."External Adm. Sch. Entry No.");
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                HaveScheduleEntry := AdmissionScheduleEntry.FindFirst()
+            end;
+
             JBuilder.WriteStartObject('');
             JBuilder.WriteRawProperty('id', TicketRequest."Entry No.");
             JBuilder.WriteStringProperty('itemReference', TicketRequest."External Item Code");
@@ -377,7 +387,17 @@ codeunit 6151543 "NPR TM Client API BL"
 
             JBuilder.WriteStartObject('schedule');
             JBuilder.WriteRawProperty('id', TicketRequest."External Adm. Sch. Entry No.");
-            JBuilder.WriteStringProperty('description', TicketRequest."Scheduled Time Description");
+            if (HaveScheduleEntry) then begin
+                JBuilder.WriteStringProperty('description', StrSubstNo('%1 - %2', Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), Format(AdmissionScheduleEntry."Admission Start Time", 0, 9)));
+                JBuilder.WriteStringProperty('startDate', Format(AdmissionScheduleEntry."Admission Start Date", 0, 9));
+                JBuilder.WriteStringProperty('startTime', Format(AdmissionScheduleEntry."Admission Start Time", 0, 9));
+                JBuilder.WriteStringProperty('endDate', Format(AdmissionScheduleEntry."Admission End Date", 0, 9));
+                JBuilder.WriteStringProperty('endTime', Format(AdmissionScheduleEntry."Admission End Time", 0, 9));
+                JBuilder.WriteStringProperty('duration', Format(AdmissionScheduleEntry."Event Duration", 0, 9));
+            end else begin
+                JBuilder.WriteStringProperty('description', '');
+            end;
+
             JBuilder.WriteEndObject();
 
             JBuilder.WriteStartObject('included');
@@ -759,7 +779,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteStringProperty('salesFromDate', Format(AdmissionScheduleEntry."Sales From Date", 0, 9));
             JBuilder.WriteStringProperty('salesFromTime', Format(AdmissionScheduleEntry."Sales From Time", 0, 9));
             JBuilder.WriteStringProperty('salesUntilDate', Format(AdmissionScheduleEntry."Sales Until Date", 0, 9));
-            JBuilder.WriteStringProperty('sales_until_time', Format(AdmissionScheduleEntry."Sales Until Time", 0, 9));
+            JBuilder.WriteStringProperty('salesUntilTime', Format(AdmissionScheduleEntry."Sales Until Time", 0, 9));
 
             JBuilder.WriteStartObject('dynamicPrice');
             JBuilder.WriteRawProperty('option', DynamicPriceOptionId);
