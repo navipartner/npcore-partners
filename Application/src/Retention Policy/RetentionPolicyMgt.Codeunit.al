@@ -8,7 +8,7 @@ codeunit 6184619 "NPR Retention Policy Mgt."
 
     #region Setting filters on table
 
-    procedure FindAndDeleteRecords(var NcTask: Record "NPR Nc Task"; var ProcessedCount: Integer; Operation: Option Find,Delete)
+    procedure FindOrDeleteRecords(var NcTask: Record "NPR Nc Task"; var ProcessedCount: Integer; Operation: Option Find,Delete)
     var
         NcTaskArray: Array[2] of Record "NPR Nc Task";
         RetentionPeriod: Record "Retention Period";
@@ -162,37 +162,30 @@ codeunit 6184619 "NPR Retention Policy Mgt."
 
     #region Subscribers
 
-    [EventSubscriber(ObjectType::Table, Database::"Retention Policy Setup Line", 'OnBeforeModifyEvent', '', false, false)]
-    local procedure RetentionPolicySetupLine_OnBeforeModifyEvent(var Rec: Record "Retention Policy Setup Line"; var xRec: Record "Retention Policy Setup Line"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Page, Page::"Retention Policy Setup Lines", 'OnModifyRecordEvent', '', false, false)]
+    local procedure RetentionPolicySetupLines_OnModifyRecordEvent(var Rec: Record "Retention Policy Setup Line"; var xRec: Record "Retention Policy Setup Line")
     begin
-        if not RunTrigger then
-            exit;
-
         if not IsNPRTable(Rec."Table ID") then
             exit;
 
-        if Rec.GetTableFilterText() <> xRec.GetTableFilterText() then
-            Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Retention Policy Setup Line", 'OnBeforeDeleteEvent', '', false, false)]
-    local procedure RetentionPolicySetupLine_OnBeforeDeleteEvent(var Rec: Record "Retention Policy Setup Line"; RunTrigger: Boolean)
-    begin
-        if not RunTrigger then
+        if Rec.GetTableFilterText() = xRec.GetTableFilterText() then
             exit;
 
+        Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Retention Policy Setup Lines", 'OnInsertRecordEvent', '', false, false)]
+    local procedure RetentionPolicySetupLines_OnInsertRecordEvent(var Rec: Record "Retention Policy Setup Line")
+    begin
         if not IsNPRTable(Rec."Table ID") then
             exit;
 
         Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Retention Policy Setup Line", 'OnBeforeInsertEvent', '', false, false)]
-    local procedure RetentionPolicySetupLine_OnBeforeInsertEvent(var Rec: Record "Retention Policy Setup Line"; RunTrigger: Boolean)
+    [EventSubscriber(ObjectType::Page, Page::"Retention Policy Setup Lines", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure RetentionPolicySetupLines_OnDeleteRecordEvent(var Rec: Record "Retention Policy Setup Line")
     begin
-        if not RunTrigger then
-            exit;
-
         if not IsNPRTable(Rec."Table ID") then
             exit;
 

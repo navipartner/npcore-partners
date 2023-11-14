@@ -10,7 +10,7 @@ codeunit 6184618 "NPR Nc Task Delete Impl." implements "Reten. Pol. Deleting"
         Operation: Option Find,Delete;
         NumberOfRecords: Integer;
     begin
-        RetentionPolicyMgt.FindAndDeleteRecords(NcTask, NumberOfRecords, Operation::Delete);
+        RetentionPolicyMgt.FindOrDeleteRecords(NcTask, NumberOfRecords, Operation::Delete);
     end;
 }
 #endif

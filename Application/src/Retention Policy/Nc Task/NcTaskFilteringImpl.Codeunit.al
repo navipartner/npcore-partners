@@ -27,7 +27,7 @@ codeunit 6184620 "NPR Nc Task Filtering Impl." implements "Reten. Pol. Filtering
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RecordReference.Initialize(FilterRecordRef, RecordReferenceIndirectPermission);
 #endif
-        RetentionPolicyMgt.FindAndDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
+        RetentionPolicyMgt.FindOrDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
         NcTask.MarkedOnly(true);
         FilterRecordRef.Copy(NcTask);
         exit(NumberOfRecords > 0);
@@ -55,7 +55,7 @@ codeunit 6184620 "NPR Nc Task Filtering Impl." implements "Reten. Pol. Filtering
         NcTask: Record "NPR Nc Task";
         NumberOfRecords: Integer;
     begin
-        RetentionPolicyMgt.FindAndDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
+        RetentionPolicyMgt.FindOrDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
         exit(NumberOfRecords);
     end;
 }
