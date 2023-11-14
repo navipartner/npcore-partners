@@ -17,7 +17,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddTextParameter('VoucherTypeCode', '', ParameterVoucherTypeCode_CaptLbl, ParameterVoucherTypeCode_CaptLbl);
-        WorkflowConfig.AddBooleanParameter('ContactInfo', true, ParameterContactInfo_CaptLbl, ParameterContactInfo_CaptLbl);
+        WorkflowConfig.AddBooleanParameter('ContactInfo', false, ParameterContactInfo_CaptLbl, ParameterContactInfo_CaptLbl);
         WorkflowConfig.AddBooleanParameter('ScanReferenceNos', false, ParameterScanReference_CaptLbl, ParameterScanReference_CaptLbl);
         WorkflowConfig.AddBooleanParameter('EndSale', true, EndSaleNameLbl, EndSaleDescLbl);
         WorkflowConfig.AddLabel('IssueVoucherPrompt', Text001);

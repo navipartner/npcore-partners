@@ -91,6 +91,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'UpdateSecureMethodsDiscount'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'SecurityParameter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'UpgradePOSNamedActionsProfileItemActionParameters'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Action Parameters", 'UpgradeIssueReturnVoucherContactInfoParameter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Fix POS Entry SystemId"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRShippingProvider'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Upgrade Shipping Provider", 'NPRPackageDimensions'));
@@ -369,6 +370,8 @@
                         exit('NPR-SecurityParameter-20230711');
                     'UpgradePOSNamedActionsProfileItemActionParameters':
                         exit('NPR-UpgradePOSNamedActionsProfileItemActionParameters-20231006');
+                    'UpgradeIssueReturnVoucherContactInfoParameter':
+                        exit('NPR-UpgradeIssueReturnVoucherContactInfoParameter-20231114');
                 end;
             Codeunit::"NPR Fix POS Entry SystemId":
                 exit('NPRFixPOSEntrySystemId_20220126');

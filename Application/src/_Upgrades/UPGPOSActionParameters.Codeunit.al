@@ -22,6 +22,7 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
         POSWorkflow();
         SecurityParameter();
         UpgradePOSNamedActionsProfileItemActionParameters();
+        UpgradeIssueReturnVoucherContactInfoParameter();
     end;
 
     local procedure SalesDocExpPaymentMethodCode()
@@ -479,5 +480,32 @@ codeunit 6059777 "NPR UPG POS Action Parameters"
             if ItemInsertActionRefreshNeeded then
                 ParamMgt.RefreshParameters(POSSetup.RecordId, '', POSSetup.FieldNo("Item Insert Action Code"), POSSetup."Item Insert Action Code");
         until POSSetup.Next() = 0;
+    end;
+
+    local procedure UpgradeIssueReturnVoucherContactInfoParameter()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Action Parameters', 'UpgradeIssueReturnVoucherContactInfoParameter');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeIssueReturnVoucherContactInfoParameter')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        RefreshIssueReturnVoucherContactInfoParam();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeIssueReturnVoucherContactInfoParameter'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure RefreshIssueReturnVoucherContactInfoParam()
+    var
+        POSActionParameter: Record "NPR POS Action Parameter";
+    begin
+        if not POSActionParameter.Get('ISSUE_RETURN_VCHR_2', 'ContactInfo') then
+            exit;
+        POSActionParameter."Default Value" := 'false';
+        POSActionParameter.Modify();
     end;
 }
