@@ -3,7 +3,6 @@
     ApplicationArea = NPRRetail;
     Caption = 'POS Posting Setup';
     ContextSensitiveHelpPage = 'docs/retail/posting_setup/explanation/pos_posting_setup/';
-    Extensible = False;
     PageType = List;
     SourceTable = "NPR POS Posting Setup";
     UsageCategory = Administration;
