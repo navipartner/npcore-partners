@@ -326,6 +326,7 @@
     procedure CreatePOSLinesForReservationRequest(TicketToken: Text; POSSale: Record "NPR POS Sale")
     var
         TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -386,6 +387,17 @@
             TicketReservationReq."Line No." := LineNo;
             TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
             TicketReservationReq.Modify();
+
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationReq."Entry No.");
+            if (Ticket.FindSet()) then begin
+                repeat
+                    Ticket."Sales Receipt No." := POSSaleLineRec."Sales Ticket No.";
+                    Ticket."Line No." := LineNo;
+                    Ticket.Modify();
+                until (Ticket.Next() = 0);
+            end;
+
             POSSaleLine.InsertLine(POSSaleLineRec);
 
             // Update the remaining non-primary required admissions with same receipt number
