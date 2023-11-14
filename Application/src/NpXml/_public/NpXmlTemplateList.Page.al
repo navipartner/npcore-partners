@@ -1,6 +1,5 @@
 ﻿page 6151552 "NPR NpXml Template List"
 {
-    Extensible = False;
     Caption = 'Xml Templates';
     CardPageID = "NPR NpXml Template Card";
     Editable = false;
