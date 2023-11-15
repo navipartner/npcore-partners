@@ -15,17 +15,29 @@
         gHost, gUsername, gPassword, gEncmode : Text;
         gPort, gTimeoutMs : Integer;
         gPassive, gForce : Boolean;
-    internal procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode"; Force: Boolean)
-    begin
-        Construct(Host, Username, Password, Port, TimeoutMs, Passive, EncMode);
-        gForce := Force;
-    end;
 
+    [Obsolete('New procedure created with new additional parameter', 'NPR28.0')]
     procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
     var
         EncModeText: Text;
     begin
-        gForce := False;
+        gForce := false;
+        case EncMode of
+            EncMode::Implicit:
+                EncModeText := 'implicit';
+            EncMode::Explicit:
+                EncModeText := 'explicit';
+            else
+                EncModeText := 'none';
+        end;
+        CommonConstruct(Host, Username, Password, Port, TimeoutMs, Passive, EncModeText);
+    end;
+
+    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode"; Force: Boolean)
+    var
+        EncModeText: Text;
+    begin
+        gForce := Force;
         case EncMode of
             EncMode::Implicit:
                 EncModeText := 'implicit';
