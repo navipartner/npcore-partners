@@ -454,8 +454,59 @@ codeunit 6151543 "NPR TM Client API BL"
                     JBuilder,
                     GetAsText(Request, 'requestId', ''),
                     GetAsText(Request, 'itemReference', ValidationErrorList),
+                    0,
                     GetAsText(Request, 'admissionCode', ''),
                     GetAsDate(Request, 'referenceDate', ValidationErrorList),
+                    GetAsText(Request, 'customerNumber', ''),
+                    GetAsInteger(Request, 'quantity', ValidationErrorList)
+                );
+            end;
+
+        JBuilder.WriteEndArray(); // response
+        JBuilder.WriteEndObject(); // root
+
+        ResponseText := JBuilder.GetJSonAsText();
+        exit(ResponseText);
+    end;
+
+    internal procedure GetScheduleCapacityAction(ScheduleCapacityRequest: JsonArray) ResponseText: Text
+    var
+        Request: JsonObject;
+        ScheduleRequest: JsonToken;
+        ValidationErrorList: List of [Text];
+        JBuilder: Codeunit "Json Text Reader/Writer";
+    begin
+        JBuilder.WriteStartObject('');
+        JBuilder.WriteStartArray('request');
+
+        // Validate request - fail fast
+        foreach ScheduleRequest in ScheduleCapacityRequest do begin
+            Request := ScheduleRequest.AsObject();
+
+            JBuilder.WriteStartObject('');
+            JBuilder.WriteStringProperty('requestId', GetAsText(Request, 'requestId', ''));
+            JBuilder.WriteStringProperty('scheduleId', GetAsInteger(Request, 'scheduleId', ValidationErrorList));
+            JBuilder.WriteStringProperty('itemReference', GetAsText(Request, 'itemReference', ValidationErrorList));
+            JBuilder.WriteStringProperty('customerNumber', GetAsText(Request, 'customerNumber', ''));
+            JBuilder.WriteNumberProperty('quantity', GetAsInteger(Request, 'quantity', ValidationErrorList));
+            JBuilder.WriteEndObject();
+        end;
+        JBuilder.WriteEndArray(); // request
+        JBuilder.WriteStartArray('response');
+
+        if (ValidationErrorList.Count() > 0) then
+            DumpValidationErrorList(JBuilder, 'Invalid parameter', -101, ValidationErrorList);
+
+        if (ValidationErrorList.Count() = 0) then
+            foreach ScheduleRequest in ScheduleCapacityRequest do begin
+                Request := ScheduleRequest.AsObject();
+                GenerateAdmissionSchedules(
+                    JBuilder,
+                    GetAsText(Request, 'requestId', ''),
+                    GetAsText(Request, 'itemReference', ValidationErrorList),
+                    GetAsInteger(Request, 'scheduleId', ValidationErrorList),
+                    '',
+                    0D,
                     GetAsText(Request, 'customerNumber', ''),
                     GetAsInteger(Request, 'quantity', ValidationErrorList)
                 );
@@ -590,15 +641,26 @@ codeunit 6151543 "NPR TM Client API BL"
 
     end;
 
-    local procedure GenerateAdmissionSchedules(var JBuilder: Codeunit "Json Text Reader/Writer"; RequestId: Text; ItemReference: Text; AdmissionCode: Text; ReferenceDate: Date; CustomerNumber: Text; Quantity: Integer)
+    local procedure GenerateAdmissionSchedules(var JBuilder: Codeunit "Json Text Reader/Writer"; RequestId: Text; ItemReference: Text; ScheduleId: Integer; AdmissionCode: Text; ReferenceDate: Date; CustomerNumber: Text; Quantity: Integer)
     var
         AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        AdmissionSchedule: Record "NPR TM Admis. Schedule Entry";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ItemResolver: Integer;
         BomIndex: Integer;
     begin
+
+        if (ScheduleId > 0) and (ReferenceDate = 0D) then begin
+            AdmissionSchedule.SetFilter("External Schedule Entry No.", '=%1', ScheduleId);
+            AdmissionSchedule.SetFilter(Cancelled, '=%1', false);
+            if (AdmissionSchedule.FindFirst()) then begin
+                AdmissionCode := AdmissionSchedule."Admission Code";
+                ReferenceDate := AdmissionSchedule."Admission Start Date";
+            end;
+        end;
+
         AdmCapacityPriceBuffer.RequestId := CopyStr(RequestId, 1, MaxStrLen(AdmCapacityPriceBuffer.RequestId));
         AdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
         AdmCapacityPriceBuffer.CustomerNo := CopyStr(CustomerNumber, 1, MaxStrLen(AdmCapacityPriceBuffer.CustomerNo));
@@ -656,7 +718,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteNumberProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage);
 
             JBuilder.WriteStartArray('schedule');
-            GenerateAdmissionScheduleEntries(JBuilder, AdmCapacityPriceBuffer);
+            GenerateAdmissionScheduleEntries(JBuilder, AdmCapacityPriceBuffer, ScheduleId);
             JBuilder.WriteEndArray();
             JBuilder.WriteEndObject();
 
@@ -665,7 +727,7 @@ codeunit 6151543 "NPR TM Client API BL"
         until (TicketBom.Next() = 0)
     end;
 
-    local procedure GenerateAdmissionScheduleEntries(var JBuilder: Codeunit "Json Text Reader/Writer"; AdmCapacityPriceBufferResponse: Record "NPR TM AdmCapacityPriceBuffer")
+    local procedure GenerateAdmissionScheduleEntries(var JBuilder: Codeunit "Json Text Reader/Writer"; AdmCapacityPriceBufferResponse: Record "NPR TM AdmCapacityPriceBuffer"; ScheduleId: Integer)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         PriceRule: Record "NPR TM Dynamic Price Rule";
@@ -687,6 +749,9 @@ codeunit 6151543 "NPR TM Client API BL"
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', AdmCapacityPriceBufferResponse.ReferenceDate);
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmCapacityPriceBufferResponse.AdmissionCode);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (ScheduleId > 0) then
+            AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ScheduleId);
+
         if (not AdmissionScheduleEntry.FindSet()) then
             exit;
 
