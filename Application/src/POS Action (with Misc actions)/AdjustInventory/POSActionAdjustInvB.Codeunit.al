@@ -41,11 +41,21 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
     end;
 
     local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary; CustomDescription: Text[100])
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         TempItemJnlLine.Init();
         TempItemJnlLine.Validate("Item No.", SaleLinePOS."No.");
         TempItemJnlLine.Validate("Posting Date", Today);
-        TempItemJnlLine."Document No." := SaleLinePOS."Sales Ticket No.";
+
+        POSUnit.Get(SalePOS."Register No.");
+        POSUnit.TestField("POS Audit Profile");
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sales Ticket No. Series");
+        TempItemJnlLine."Document No." := NoSeriesMgt.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today(), true);
+
         TempItemJnlLine."NPR Register Number" := SaleLinePOS."Register No.";
 
         TempItemJnlLine."NPR Document Time" := Time;
