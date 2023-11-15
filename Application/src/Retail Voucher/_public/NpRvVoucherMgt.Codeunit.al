@@ -1799,6 +1799,7 @@
 
         InsertNpRvSalesLine(TempNpRvVoucherBuffer, SalePOS, NpRvSalesLine, VoucherType, POSLine);
 
+        ActionContext.Add('paymentNo', VoucherType."Payment Type");
         ApplyPayment(POSSession, NpRvSalesLine, EndSale, ActionContext);
     end;
 

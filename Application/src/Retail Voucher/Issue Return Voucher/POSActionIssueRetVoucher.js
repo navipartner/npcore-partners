@@ -1,7 +1,7 @@
 let main = async ({ workflow, parameters, popup, captions }) => {
     debugger;
     let amountInput;
-    await workflow.respond('validateRequest');
+    const { endSaleWorkflowEnabled } = await workflow.respond('validateRequest');
 
     if (parameters.VoucherTypeCode) {
         workflow.context.voucherType = parameters.VoucherTypeCode
@@ -28,7 +28,7 @@ let main = async ({ workflow, parameters, popup, captions }) => {
 
     workflow.context = Object.assign(workflow.context, send);
 
-    await workflow.respond("issueReturnVoucher", { ReturnVoucherAmount: ReturnVoucherAmount });
+    const { paymentNo } = await workflow.respond("issueReturnVoucher", { ReturnVoucherAmount: ReturnVoucherAmount });
 
     if (parameters.ContactInfo) {
         await workflow.respond("contactInfo");
@@ -37,7 +37,11 @@ let main = async ({ workflow, parameters, popup, captions }) => {
         await workflow.respond("scanReference");
     }
     if (parameters.EndSale) {
-        await workflow.respond("endSale");
+        if (endSaleWorkflowEnabled) {
+            await workflow.run('END_SALE', { parameters: {calledFromWorkflow: 'ISSUE_RETURN_VCHR_2', paymentNo: paymentNo } });
+        } else {
+            await workflow.respond("endSale");
+        }
     }
     return;
 }

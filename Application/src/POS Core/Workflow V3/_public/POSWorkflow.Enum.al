@@ -826,6 +826,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ASSIGN_SERIAL_NO', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Serial No";
     }
+    value(179; END_SALE)
+    {
+        Caption = 'END_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action End Sale";
+    }
     value(180; "RS_INSERT_CUST_IDENT")
     {
         Caption = 'INSERT_CUST_IDENT', Locked = true, MaxLength = 20;
