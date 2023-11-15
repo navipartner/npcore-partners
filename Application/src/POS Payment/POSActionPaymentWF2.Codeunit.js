@@ -5,7 +5,7 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
 
     const { HideAmountDialog, HideZeroAmountDialog } = parameters;
     const { preWorkflows } = await workflow.respond("preparePreWorkflows");
-  
+
     if (preWorkflows) {
         for (const preWorkflow of Object.entries(preWorkflows)) {
             let [preWorkflowName, preWorkflowParameters] = preWorkflow;
@@ -14,9 +14,9 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
             };
         };
     };
-    
-    const { dispatchToWorkflow, paymentType, remainingAmount, paymentDescription, amountPrompt} = await workflow.respond("preparePaymentWorkflow");
-    
+
+    const { dispatchToWorkflow, paymentType, remainingAmount, paymentDescription, amountPrompt, endSaleWorkflowEnabled } = await workflow.respond("preparePaymentWorkflow");
+
     let suggestedAmount = remainingAmount;
     if ((!HideAmountDialog) && ((!HideZeroAmountDialog) || (remainingAmount > 0))) {
         suggestedAmount = await popup.numpad({ title: paymentDescription, caption: amountPrompt, value: remainingAmount });
@@ -34,6 +34,10 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
         context.fallbackAmount = suggestedAmount;
         await workflow.respond("doLegacyPaymentWorkflow");
     } else if (paymentResult.tryEndSale) {
-        await workflow.respond("tryEndSale");
+        if (endSaleWorkflowEnabled) {
+            await workflow.run('END_SALE', { parameters: { calledFromWorkflow: 'PAYMENT_2', paymentNo: parameters.paymentNo } });
+        } else {
+            await workflow.respond("tryEndSale");
+        }
     }
 };

@@ -46,18 +46,25 @@ let main = async ({ workflow, parameters, popup, context, captions }) => {
 
     let result = await workflow.respond("prepareRequest", { VoucherRefNo: voucher_input, selectedAmount: selectedAmount });
     if (result.tryEndSale) {
-        if ((parameters.EndSale) && (!result.endSaleWithoutPosting)) {
-            await workflow.respond("endSale");
-        };
-        return response;
-    };
-
-    if (result.workflowVersion == 1) {
-        await workflow.respond("doLegacyWorkflow", { workflowName: result.workflowName });
+        if (parameters.EndSale) {
+            if (result.endSaleWorkflowEnabled) {
+                await workflow.run('END_SALE', { parameters: { calledFromWorkflow: 'SCAN_VOUCHER_2', paymentNo: result.paymentNo } });
+            } else {
+                if (!result.endSaleWithoutPosting) {
+                    await workflow.respond("endSale");
+                };
+            }
+        }
     } else {
-        await workflow.run(result.workflowName, { parameters: result.parameters })
-    };
 
+        if (result.workflowVersion == 1) {
+            await workflow.respond("doLegacyWorkflow", { workflowName: result.workflowName });
+        } else {
+            if (result.workflowName) {
+                await workflow.run(result.workflowName, { parameters: result.parameters })
+            }
+        };
+    }
     return response;
 
 };
