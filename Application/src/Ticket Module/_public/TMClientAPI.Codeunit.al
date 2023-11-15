@@ -42,6 +42,8 @@ codeunit 6151537 "NPR TM Client API"
                 JObject.ReadFrom(ClientApi.MakeReservationAction(RequestArray));
             'NPRetail.TM.GetAdmissionCapacity':
                 JObject.ReadFrom(ClientApi.GetAdmissionCapacityAction(RequestArray));
+            'NPRetail.TM.GetScheduleCapacity':
+                JObject.ReadFrom(ClientApi.GetScheduleCapacityAction(RequestArray));
             'NPRetail.TM.ConfirmTicketReservation':
                 JObject.ReadFrom(ClientApi.ConfirmRequestAction(RequestArray));
         end;

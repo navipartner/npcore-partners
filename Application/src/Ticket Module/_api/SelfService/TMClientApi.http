@@ -8,19 +8,21 @@
 @functionName = InvokeMethod
 ### https://np597676.dynamics-retail.net/BC/ODataV4/dragonglass_InvokeMethod
 # @name companies
-GET {{baseUrl}}/Company
+GET {{baseUrl}}/Company?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 
 ###
 @companyId = {{companies.response.body.$.value[0].Id}}
 
+@ticketToken = 3A3800F28C884BF795895C80BE7EB04D
+@scheduleId=33400
 @itemNumber = 31100
 @referenceDate = 2023-10-11
 @quantity = 1
 @admissionCode = CASTLE
 ###
 
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -38,7 +40,7 @@ Company: {{companyId}}
 }
 
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -56,7 +58,7 @@ Company: {{companyId}}
 }
 
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -75,7 +77,7 @@ Company: {{companyId}}
 
 
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -98,7 +100,29 @@ Company: {{companyId}}
 }
 
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.GetScheduleCapacity",
+    "parameters": "{
+        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.GetScheduleCapacity\"}, 
+        \"NPRetail.TM.GetScheduleCapacity\": [
+            { 
+                \"requestId\":\"\",
+                \"scheduleId\":\"{{scheduleId}}\",
+                \"itemReference\":\"{{itemNumber}}\",
+                \"customerNumber\":\"\",
+                \"quantity\":{{quantity}}
+            }
+        ]}",
+    "lastServerId": ""
+}
+
+###
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -123,10 +147,9 @@ Company: {{companyId}}
 }
 
 
-@ticketToken = 3A3800F28C884BF795895C80BE7EB04D
 ###
 # @name MakeTicketRequest
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -151,7 +174,7 @@ Company: {{companyId}}
 
 
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
@@ -178,7 +201,7 @@ Company: {{companyId}}
 }
  
 ###
-POST {{baseUrl}}/{{serviceName}}_{{functionName}}
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 Content-Type: application/json
 Company: {{companyId}}
