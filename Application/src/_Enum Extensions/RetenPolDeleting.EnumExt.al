@@ -6,10 +6,10 @@ enumextension 6014404 "NPR Reten. Pol. Deleting" extends "Reten. Pol. Deleting"
         Caption = 'Data Archive';
         Implementation = "Reten. Pol. Deleting" = "NPR Reten. Pol. Delete. Impl.";
     }
-    value(6014401; "NPR Nc Task")
+    value(6014401; "NPR Reten. Pol. Deleting")
     {
-        Caption = 'Nc Task';
-        Implementation = "Reten. Pol. Deleting" = "NPR Nc Task Delete Impl.";
+        Caption = 'NPR Custom Reten. Pol. Del.';
+        Implementation = "Reten. Pol. Deleting" = "NPR Reten. Pol. Deleting Impl.";
     }
 }
 #ENDIF

@@ -8,7 +8,23 @@ codeunit 6184619 "NPR Retention Policy Mgt."
 
     #region Setting filters on table
 
-    procedure FindOrDeleteRecords(var NcTask: Record "NPR Nc Task"; var ProcessedCount: Integer; Operation: Option Find,Delete)
+    internal procedure FindOrDeleteRecords(var RecRef: RecordRef; var ProcessedCount: Integer; Operation: Option Find,Delete)
+    var
+        NcTask: Record "NPR Nc Task";
+        UnsupportedTableIDErr: Label 'NaviPartner retention policy implementation does not support table %1 %2. Please contact your system vendor.', Comment = '%1 - table number, %2 - table caption';
+    begin
+        case RecRef.Number() of
+            Database::"NPR Nc Task":
+                begin
+                    FindOrDeleteRecords(NcTask, ProcessedCount, Operation);
+                    RecRef.Copy(NcTask);
+                end;
+            else
+                Error(UnsupportedTableIDErr, RecRef.Number(), RecRef.Caption());
+        end;
+    end;
+
+    local procedure FindOrDeleteRecords(var NcTask: Record "NPR Nc Task"; var ProcessedCount: Integer; Operation: Option Find,Delete)
     var
         NcTaskArray: Array[2] of Record "NPR Nc Task";
         RetentionPeriod: Record "Retention Period";
@@ -102,7 +118,7 @@ codeunit 6184619 "NPR Retention Policy Mgt."
         exit(true);
     end;
 
-    procedure GetYoungestExpirationDate(RetentionPolicySetup: Record "Retention Policy Setup") Result: Date
+    internal procedure GetYoungestExpirationDate(RetentionPolicySetup: Record "Retention Policy Setup") Result: Date
     var
         RetentionPolicySetupLine: Record "Retention Policy Setup Line";
         RetentionPeriod: Record "Retention Period";
@@ -125,7 +141,7 @@ codeunit 6184619 "NPR Retention Policy Mgt."
         until RetentionPolicySetupLine.Next() = 0;
     end;
 
-    procedure CalculateExpirationDate(RetentionPeriod: Record "Retention Period") Result: Date
+    internal procedure CalculateExpirationDate(RetentionPeriod: Record "Retention Period") Result: Date
     var
         RetentionPeriodInterface: Interface "Retention Period";
     begin
@@ -153,7 +169,7 @@ codeunit 6184619 "NPR Retention Policy Mgt."
 
     #region Constants 
 
-    procedure MaxNumberOfRecordsToDelete(): Integer
+    internal procedure MaxNumberOfRecordsToDelete(): Integer
     begin
         exit(10000);
     end;
