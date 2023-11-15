@@ -792,7 +792,7 @@
 
         XmlDoc.WriteTo(OutStr);
         TmpBlob.CreateInStream(InS);
-        FtpClient.Construct(FtpConn."Server Host", FtpConn.Username, FtpConn.Password, FtpConn."Server Port", 10000, FtpConn."FTP Passive Transfer Mode", FtpConn."FTP Enc. Mode");
+        FtpClient.Construct(FtpConn."Server Host", FtpConn.Username, FtpConn.Password, FtpConn."Server Port", 10000, FtpConn."FTP Passive Transfer Mode", FtpConn."FTP Enc. Mode", FtpConn."Force Behavior");
         FTPResponse := FtpClient.UploadFile(InS, GetFTPandSFTPRemotePath(NPXmlTemplate, Filename));
         FtpClient.Destruct();
         FTPResponse.Get('StatusCode', JToken);

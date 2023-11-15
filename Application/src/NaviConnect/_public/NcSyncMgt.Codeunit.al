@@ -76,7 +76,7 @@
         if (not FTPConn.Get(ImportType."FTP Connection")) then
             Error(NoConLbl);
 
-        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode");
+        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode", FTPConn."Force Behavior");
         DirPath := ManagePathSlashes(ImportType."Ftp Path");
         Path := DirPath + Filename;
         FTPResponse := FTPClient.DownloadFile(Path);
@@ -369,7 +369,7 @@
             exit;
         if (not FTPConn.Get(ImportType."FTP Connection")) then
             Error(NoConLbl);
-        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode");
+        FTPClient.Construct(FTPConn."Server Host", FTPConn.Username, FTPConn.Password, FTPConn."Server Port", 10000, FTPConn."FTP Passive Transfer Mode", FTPConn."FTP Enc. Mode", FTPConn."Force Behavior");
 
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
