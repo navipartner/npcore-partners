@@ -1,5 +1,5 @@
 #IF NOT BC17 AND NOT BC18
-codeunit 6184620 "NPR Nc Task Filtering Impl." implements "Reten. Pol. Filtering"
+codeunit 6184620 "NPR Reten. Pol. Filtering Impl" implements "Reten. Pol. Filtering"
 {
     Access = Internal;
 
@@ -21,15 +21,13 @@ codeunit 6184620 "NPR Nc Task Filtering Impl." implements "Reten. Pol. Filtering
         RecordReference: Codeunit "Record Reference";
 #endif
         NumberOfRecords: Integer;
-        NcTask: Record "NPR Nc Task";
     begin
         FilterRecordRef.Open(RetentionPolicySetup."Table ID");
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RecordReference.Initialize(FilterRecordRef, RecordReferenceIndirectPermission);
 #endif
-        RetentionPolicyMgt.FindOrDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
-        NcTask.MarkedOnly(true);
-        FilterRecordRef.Copy(NcTask);
+        RetentionPolicyMgt.FindOrDeleteRecords(FilterRecordRef, NumberOfRecords, Operation::Find);
+        FilterRecordRef.MarkedOnly(true);
         exit(NumberOfRecords > 0);
     end;
 
@@ -52,10 +50,9 @@ codeunit 6184620 "NPR Nc Task Filtering Impl." implements "Reten. Pol. Filtering
 
     procedure Count(RecordRef: RecordRef): Integer
     var
-        NcTask: Record "NPR Nc Task";
         NumberOfRecords: Integer;
     begin
-        RetentionPolicyMgt.FindOrDeleteRecords(NcTask, NumberOfRecords, Operation::Find);
+        RetentionPolicyMgt.FindOrDeleteRecords(RecordRef, NumberOfRecords, Operation::Find);
         exit(NumberOfRecords);
     end;
 }

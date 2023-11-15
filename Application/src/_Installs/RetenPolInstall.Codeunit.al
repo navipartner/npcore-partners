@@ -362,7 +362,7 @@
         RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
 
 #IF NOT BC17 AND NOT BC18
-        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Nc Task", RecRef.SystemCreatedAtNo(), 0, Enum::"Reten. Pol. Filtering"::"NPR Nc Task", Enum::"Reten. Pol. Deleting"::"NPR Nc Task", TableFilters);
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Nc Task", RecRef.SystemCreatedAtNo(), 0, Enum::"Reten. Pol. Filtering"::"NPR Reten. Pol. Filtering", Enum::"Reten. Pol. Deleting"::"NPR Reten. Pol. Deleting", TableFilters);
 #ELSE
         RetenPolAllowedTables.AddAllowedTable(Database::"NPR Nc Task", RecRef.SystemCreatedAtNo(), TableFilters);
 #ENDIF
