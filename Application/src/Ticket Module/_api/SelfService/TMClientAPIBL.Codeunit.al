@@ -378,11 +378,17 @@ codeunit 6151543 "NPR TM Client API BL"
                 HaveScheduleEntry := AdmissionScheduleEntry.FindFirst()
             end;
 
+            if (not TicketRequest."Admission Created") then begin
+                TicketRequest."External Adm. Sch. Entry No." := 0;
+                HaveScheduleEntry := false;
+            end;
+
             JBuilder.WriteStartObject('');
             JBuilder.WriteRawProperty('id', TicketRequest."Entry No.");
             JBuilder.WriteStringProperty('itemReference', TicketRequest."External Item Code");
             JBuilder.WriteStringProperty('admissionCode', TicketRequest."Admission Code");
             JBuilder.WriteStringProperty('admissionDescription', TicketRequest."Admission Description");
+            JBuilder.WriteBooleanProperty('admissionCreated', TicketRequest."Admission Created");
             JBuilder.WriteRawProperty('quantity', TicketRequest.Quantity);
 
             JBuilder.WriteStartObject('schedule');
@@ -655,10 +661,10 @@ codeunit 6151543 "NPR TM Client API BL"
         if (ScheduleId > 0) and (ReferenceDate = 0D) then begin
             AdmissionSchedule.SetFilter("External Schedule Entry No.", '=%1', ScheduleId);
             AdmissionSchedule.SetFilter(Cancelled, '=%1', false);
-            if (AdmissionSchedule.FindFirst()) then begin
-                AdmissionCode := AdmissionSchedule."Admission Code";
-                ReferenceDate := AdmissionSchedule."Admission Start Date";
-            end;
+            if (not AdmissionSchedule.FindFirst()) then
+                Error('Invalid Schedule Id.');
+            AdmissionCode := AdmissionSchedule."Admission Code";
+            ReferenceDate := AdmissionSchedule."Admission Start Date";
         end;
 
         AdmCapacityPriceBuffer.RequestId := CopyStr(RequestId, 1, MaxStrLen(AdmCapacityPriceBuffer.RequestId));
