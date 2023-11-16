@@ -646,7 +646,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
             exit(NOFiscalSetup."Enable NO Fiscal");
     end;
 
-    procedure IsNOAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
+    internal procedure IsNOAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
