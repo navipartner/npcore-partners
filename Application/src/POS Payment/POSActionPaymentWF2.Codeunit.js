@@ -24,7 +24,11 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
     };
 
     if(remainingAmount == 0){
-        await workflow.respond("tryEndSale");
+        if (endSaleWorkflowEnabled) {
+            await workflow.run('END_SALE', { parameters: { calledFromWorkflow: 'PAYMENT_2', paymentNo: parameters.paymentNo } });
+        } else {
+            await workflow.respond("tryEndSale");
+        }
         return;
     }
 

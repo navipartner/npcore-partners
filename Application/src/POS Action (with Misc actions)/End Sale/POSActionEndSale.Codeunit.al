@@ -59,7 +59,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     var
         PreWorkflows: JsonObject;
     begin
-        PreWorkflows := PreparePreWorkflows(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup);
+        PreWorkflows := AddPreWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup);
         if PreWorkflows.Keys.Count <> 0 then begin
             Response.Add('preWorkflows', PreWorkflows);
             exit;
@@ -77,32 +77,23 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         Response.Add('success', Success);
 
 
-        PostWorkflows := PreparePostWorkflows(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup);
+        PostWorkflows := AddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, Success);
         Response.Add('postWorkflows', PostWorkflows);
-    end;
-
-    local procedure PreparePreWorkflows(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
-    begin
-        Response := AddPreWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup);
     end;
 
     local procedure AddPreWorkflowsToRun(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") PreWorkflows: JsonObject
     var
         EndSaleEvents: Codeunit "NPR End Sale Events";
+
     begin
         EndSaleEvents.OnAddPreWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, PreWorkflows);
     end;
 
-    local procedure PreparePostWorkflows(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
-    begin
-        Response := AddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup);
-    end;
-
-    local procedure AddPostWorkflowsToRun(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") PostWorkflows: JsonObject
+    local procedure AddPostWorkflowsToRun(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; EndSaleSuccess: Boolean) PostWorkflows: JsonObject
     var
         EndSaleEvents: Codeunit "NPR End Sale Events";
     begin
-        EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, PostWorkflows);
+        EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
     end;
 
 
