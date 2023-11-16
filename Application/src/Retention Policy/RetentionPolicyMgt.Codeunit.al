@@ -5,6 +5,7 @@ codeunit 6184619 "NPR Retention Policy Mgt."
 
     var
         ModifyErrMsgLbl: Label 'The retention policy setup for table %1 %2 has been predefined by NaviPartner, and cannot be changed. However, you can modify the Retention Period for lines that are not locked.', Comment = '%1 - table number, %2 - table caption';
+        InvalidRetentionPeriodErrLbl: Label 'Changing Retention period to %1 is not permitted by NaviPartner. You have the option to select retention periods that will guarantee the proper cleanup of data after the specified time.', Comment = '%1 - Retention Period';
 
     #region Setting filters on table
 
@@ -184,10 +185,11 @@ codeunit 6184619 "NPR Retention Policy Mgt."
         if not IsNPRTable(Rec."Table ID") then
             exit;
 
-        if Rec.GetTableFilterText() = xRec.GetTableFilterText() then
-            exit;
+        if Rec.GetTableFilterText() <> xRec.GetTableFilterText() then
+            Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
 
-        Error(ModifyErrMsgLbl, Rec."Table ID", GetTableCaption(Rec."Table ID"));
+        if not ShouldProcessLine(Rec) then
+            Error(InvalidRetentionPeriodErrLbl, Rec."Retention Period");
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Retention Policy Setup Lines", 'OnInsertRecordEvent', '', false, false)]
