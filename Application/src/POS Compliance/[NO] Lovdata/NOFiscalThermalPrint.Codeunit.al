@@ -1,9 +1,26 @@
 codeunit 6184562 "NPR NO Fiscal Thermal Print"
 {
     Access = Internal;
+    TableNo = "NPR POS Workshift Checkpoint";
+
+    trigger OnRun()
+    begin
+        PrintEndOfDayReceipt(Rec);
+    end;
 
     internal procedure PrintEndOfDayReceipt(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    var
+        POSUnit: Record "NPR POS Unit";
+        NOAuditMgt: Codeunit "NPR NO Audit Mgt.";
+        NOFiscalizationNotEnabledErrLbl: Label 'Norway fiscalization is not enabled on the POS Unit: %1 (%2).', Comment = '%1 - specifies POS Unit Name, %2 - specifies POS Unit No.';
+        POSUnitMissingErrLbl: Label 'POS Unit is missing on the Workshift.';
     begin
+        if not POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.") then
+            Error(POSUnitMissingErrLbl);
+
+        if not NOAuditMgt.IsNOAuditEnabled(POSUnit."POS Audit Profile") then
+            Error(NOFiscalizationNotEnabledErrLbl, POSUnit.Name, POSUnit."No.");
+
         PrintThermalReceipt(POSWorkshiftCheckpoint);
     end;
 
@@ -39,27 +56,29 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
     var
         CompanyInfo: Record "Company Information";
         POSAuditLog: Record "NPR POS Audit Log";
-        ZReportPOSEntry: Record "NPR POS Entry";
+        POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
         SalespersonPurchaser2: Record "Salesperson/Purchaser";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        ZReportPOSEntry: Record "NPR POS Entry";
         FirstLoginDatetime: DateTime;
         PreviousZReportDateTime: DateTime;
-        CompanyAddressInfoLbl: Label '%1, %2 %3', Comment = '%1 - specifies Company Address, %2 - specifies Company City, %3 - specifies Company Post Code', Locked = true;
-        VATRegistationNoLbl: Label '%1 MVA', Locked = true;
-        PrintTxt: Text;
         PrintTxt2: Text;
         PrintTxt3: Text;
+        PrintTxt: Text;
+        POSStoreAddressInfoLbl: Label '%1, %2 %3', Comment = '%1 - specifies POS Store Address, %2 - specifies POS Store City, %3 - specifies POS Store Post Code', Locked = true;
+        VATRegistationNoLbl: Label '%1 MVA', Comment = '%1 - specifies Company Information VAT Registration No.', Locked = true;
     begin
         CompanyInfo.Get();
         ZReportPOSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
+        POSStore.Get(POSUnit."POS Store Code");
         SalespersonPurchaser.Get(ZReportPOSEntry."Salesperson Code");
         PrintTxt := Format(POSWorkshiftCheckpoint.SystemCreatedAt);
 
         PrintThermalLine(Printer, CompanyInfo.Name, 'A11', false, 'CENTER', true, false);
-        PrintThermalLine(Printer, StrSubstNo(CompanyAddressInfoLbl, CompanyInfo.Address, CompanyInfo.City, CompanyInfo."Post Code"), 'A11', false, 'CENTER', true, false);
+        PrintThermalLine(Printer, StrSubstNo(POSStoreAddressInfoLbl, POSStore.Address, POSStore.City, POSStore."Post Code"), 'A11', false, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
         if NOReportStatisticsMgt.FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
@@ -111,8 +130,9 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
         PrintThermalLine(Printer, NetoSalesCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."Direct Item Sales (LCY)" - Abs(POSWorkshiftCheckpoint."Direct Item Returns (LCY)"))), 'A11', true, 'LEFT', true, false);
-
-        PrintThermalLine(Printer, TipsCaptionLbl, 'A11', true, 'LEFT', true, false); // TODO: Tips, not implemented
+        
+        // TODO: Tips, not implemented
+        PrintThermalLine(Printer, TipsCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(0.00)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, IssuedVoucherCaptionLbl, 'A11', true, 'LEFT', true, false);
@@ -142,8 +162,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintCardTerminalsPart(Printer, POSWorkshiftCheckpoint."Entry No.", TotalEndingCards, CardDifference);
 
         PrintThermalLine(Printer, StartOtherCaptionLbl, 'A11', true, 'LEFT', true, false);
-        // TODO: Field source is not certain 
-        PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(0)), 'A11', false, 'LEFT', true, false);
+        PrintOtherPaymentsPart(Printer, POSWorkshiftCheckpoint."Entry No.");
 
         // TODO: Related to Members with Loyalty cards
         PrintThermalLine(Printer, LoyaltiesCaptionLbl, 'A11', true, 'LEFT', true, false);
@@ -178,6 +197,23 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
                 TotalCards += PaymentBinCheckpoint."Counted Amount Incl. Float";
                 TotalDifference += PaymentBinCheckpoint."Counted Amount Incl. Float" - PaymentBinCheckpoint."Calculated Amount Incl. Float";
             end;
+        until PaymentBinCheckpoint.Next() = 0;
+    end;
+
+    local procedure PrintOtherPaymentsPart(var Printer: Codeunit "NPR RP Line Print Mgt."; WorkshiftCheckpointEntryNo: Integer)
+    var
+        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+    begin
+        PaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpointEntryNo);
+
+        if not PaymentBinCheckpoint.FindSet() then
+            exit;
+
+        repeat
+            POSPaymentMethod.Get(PaymentBinCheckpoint."Payment Method No.");
+            if not ((POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::EFT) or (POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH)) then
+                PrintThermalLine(Printer, CaptionValueFormat(PaymentBinCheckpoint."Payment Method No.", FormatNumber(PaymentBinCheckpoint."Counted Amount Incl. Float")), 'A11', false, 'LEFT', true, false);
         until PaymentBinCheckpoint.Next() = 0;
     end;
 
@@ -268,9 +304,9 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     local procedure PrintSalespersonInfo(var Printer: Codeunit "NPR RP Line Print Mgt."; SalespersonPurchaser: Record "Salesperson/Purchaser"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
+        CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
-        CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSUnit: Record "NPR POS Unit";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousZReportDateTime: DateTime;
@@ -541,76 +577,76 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     var
         NOReportStatisticsMgt: Codeunit "NPR NO Report Statistics Mgt.";
-        EndOfDayCaptionLbl: Label 'EOD', Locked = true;
-        LCYCaptionLbl: Label 'NOK', Locked = true;
-        LastZReportCaptionLbl: Label 'Siste Z-rapport', Locked = true;
-        DateCaptionLbl: Label 'Dato', Locked = true;
-        ZReportEntryNoCaptionLbl: Label 'Z-rapport Serienummer', Locked = true;
-        POSUnitNoCaptionLbl: Label 'Kasse-ID', Locked = true;
-        POSUnitNameCaptionLbl: Label 'Kassenavn', Locked = true;
-        VATRegNumberCaptionLbl: Label 'MVA nummer', Locked = true;
-        POSOpenedByCaptionLbl: Label 'Åpnet av', Locked = true;
-        POSClosedByCaptionLbl: Label 'Lukket av', Locked = true;
+        AppVersionCaptionLbl: Label 'App versjon', Locked = true;
         BrutoSalesCaptionLbl: Label 'Bruttoomsetning', Locked = true;
-        ReturnCaptionLbl: Label 'Returer', Locked = true;
-        NetoSalesCaptionLbl: Label 'Omsetning', Locked = true;
-        TipsCaptionLbl: Label 'Driks', Locked = true;
-        IssuedVoucherCaptionLbl: Label 'Solgt gavekort', Locked = true;
-        RedeemedVoucherCaptionLbl: Label 'Innløst gavekort', Locked = true;
-        InitialFloatCaptionLbl: Label 'Kontanter ved start', Locked = true;
-        EndFloatCaptionLbl: Label 'Kontanter ved slutt', Locked = true;
-        InBankCaptionLbl: Label 'Innskudd til bank', Locked = true;
-        EndFloatCashCaptionLbl: Label 'Kontanter ved dagens slutt', Locked = true;
-        StartCardCaptionLbl: Label 'Kort ved slutt', Locked = true;
-        StartOtherCaptionLbl: Label 'Annet ved slutt', Locked = true;
-        LoyaltiesCaptionLbl: Label 'Lojalitetspoeng', Locked = true;
+        CancelledQuantityCaptionLbl: Label 'Antall kansellerte ordrer', Locked = true;
+        CategorizedSalesCaptionLbl: Label '04999 - Øvrige', Locked = true;
+        CopiedReceiptsQuantityCaptionLbl: Label 'Antall kopi kvitteringer', Locked = true;
+        CopyReceiptsAmountCaptionLbl: Label 'Totalt kopi kvitteringer', Locked = true;
+        CorrectionsCaptionLbl: Label 'Korreksjoner pr bruker', Locked = true;
+        DateCaptionLbl: Label 'Dato', Locked = true;
+        DeliveryReceiptAmountCaptionLbl: Label 'Totalt leverings kvitteringer', Locked = true;
+        DeliveryReceiptQtyCaptionLbl: Label 'Antall leverings kvitteringer', Locked = true;
         DifferenceCaptionLbl: Label 'Avvik kontant', Locked = true;
         DifferenceCardCaptionLbl: Label 'Avvik kort', Locked = true;
-        TotalDifferenceCaptionLbl: Label 'Avvik total', Locked = true;
-        ItemCategoryCaptionLbl: Label 'Artikkelgruppe', Locked = true;
-        SoldProductsCaptionLbl: Label 'Antall solgte produkter', Locked = true;
-        QuantityCardCaptionLbl: Label 'Antall kort', Locked = true;
-        TotalCardsCaptionLbl: Label 'Totalt kort', Locked = true;
-        QuantityOtherCaptionLbl: Label 'Antall annet', Locked = true;
-        TotalOtherCaptionLbl: Label 'Totalt annet', Locked = true;
-        CorrectionsCaptionLbl: Label 'Korreksjoner pr bruker', Locked = true;
-        ZeroLinesCaptionLbl: Label 'Linjeantall redusert til 0', Locked = true;
-        GeneralInfoCaptionLbl: Label 'Generell info', Locked = true;
-        SumOfVATCaptionLbl: Label 'Sum MVA', Locked = true;
-        VATPctCaptionLbl: Label 'MVA %1%', Comment = '%1 - specifies VAT %', Locked = true;
-        ReturnedProductsQuantityCaptionLbl: Label 'Antall returnerte produkter', Locked = true;
-        SalesQuantityCaptionLbl: Label 'Antall salg', Locked = true;
-        ReturnQuantityCaptionLbl: Label 'Antall returer', Locked = true;
         DiscountQuantityCaptionLbl: Label 'Antall rabatterte salg', Locked = true;
-        NotEndedSalesQuantityCaptionLbl: Label 'Antall uavsluttede handeler', Locked = true;
-        PrintedReceiptsQuantityCaptionLbl: Label 'Antall utskrevne kvitteringer', Locked = true;
-        CopiedReceiptsQuantityCaptionLbl: Label 'Antall kopi kvitteringer', Locked = true;
-        CancelledQuantityCaptionLbl: Label 'Antall kansellerte ordrer', Locked = true;
-        TotalDiscountAmountCaptionLbl: Label 'Totalt rabatter', Locked = true;
-        TotalReturnAmountCaptionLbl: Label 'Totalt returnert', Locked = true;
-        MoreInfoCaptionLbl: Label 'Tilleggsinfo', Locked = true;
+        EndFloatCaptionLbl: Label 'Kontanter ved slutt', Locked = true;
+        EndFloatCashCaptionLbl: Label 'Kontanter ved dagens slutt', Locked = true;
+        EndOfDayCaptionLbl: Label 'EOD', Locked = true;
         FirstSaleCaptionLbl: Label 'Første salg', Locked = true;
+        GeneralInfoCaptionLbl: Label 'Generell info', Locked = true;
+        InBankCaptionLbl: Label 'Innskudd til bank', Locked = true;
+        InitialFloatCaptionLbl: Label 'Kontanter ved start', Locked = true;
+        IssuedVoucherCaptionLbl: Label 'Solgt gavekort', Locked = true;
+        ItemCategoryCaptionLbl: Label 'Artikkelgruppe', Locked = true;
         LastSaleCaptionLbl: Label 'Siste salg', Locked = true;
-        AppVersionCaptionLbl: Label 'App versjon', Locked = true;
-        SumOfVATOnReturnCaptionLbl: Label 'Sum MVA fra returer', Locked = true;
-        TotalPrepaidCaptionLbl: Label 'Totalt forhåndsbetalinger', Locked = true;
+        LastZReportCaptionLbl: Label 'Siste Z-rapport', Locked = true;
+        LCYCaptionLbl: Label 'NOK', Locked = true;
+        LoyaltiesCaptionLbl: Label 'Lojalitetspoeng', Locked = true;
+        MoreInfoCaptionLbl: Label 'Tilleggsinfo', Locked = true;
+        NetoSalesCaptionLbl: Label 'Omsetning', Locked = true;
+        NotEndedSalesQuantityCaptionLbl: Label 'Antall uavsluttede handeler', Locked = true;
+        POSClosedByCaptionLbl: Label 'Lukket av', Locked = true;
+        POSLawCategoriesCaptionLbl: Label 'Kassalov-kategorier', Locked = true;
+        POSOpenedByCaptionLbl: Label 'Åpnet av', Locked = true;
         POSOpeningQuantityCaptionLbl: Label 'Antall skuffåpninger', Locked = true;
-        ProformaReceiptsCaptionLbl: Label 'Antall utskrevne pro forma kvittering', Locked = true;
-        ProformaReceiptsAmountCaptionLbl: Label 'Omsetning pro forma kvittering', Locked = true;
+        POSUnitNameCaptionLbl: Label 'Kassenavn', Locked = true;
+        POSUnitNoCaptionLbl: Label 'Kasse-ID', Locked = true;
         PrepaidQuantityCaptionLbl: Label 'Antall forhåndsbetalinger', Locked = true;
+        PriceLookupQuantityCaptionLbl: Label 'Antall prisoppslag', Locked = true;
+        PrintedReceiptsQuantityCaptionLbl: Label 'Antall utskrevne kvitteringer', Locked = true;
+        ProformaReceiptsAmountCaptionLbl: Label 'Omsetning pro forma kvittering', Locked = true;
+        ProformaReceiptsCaptionLbl: Label 'Antall utskrevne pro forma kvittering', Locked = true;
+        ProvisionalReceiptAmountCaptionLbl: Label 'Totalt foreløpige kvitteringer', Locked = true;
+        ProvisionalReceiptQtyCaptionLbl: Label 'Antall foreløpige kvitteringer', Locked = true;
+        QuantityCardCaptionLbl: Label 'Antall kort', Locked = true;
+        QuantityOtherCaptionLbl: Label 'Antall annet', Locked = true;
+        RedeemedVoucherCaptionLbl: Label 'Innløst gavekort', Locked = true;
+        ReturnCaptionLbl: Label 'Returer', Locked = true;
+        ReturnedProductsQuantityCaptionLbl: Label 'Antall returnerte produkter', Locked = true;
+        ReturnQuantityCaptionLbl: Label 'Antall returer', Locked = true;
+        SalesQuantityCaptionLbl: Label 'Antall salg', Locked = true;
+        SoldProductsCaptionLbl: Label 'Antall solgte produkter', Locked = true;
+        StartCardCaptionLbl: Label 'Kort ved slutt', Locked = true;
+        StartOtherCaptionLbl: Label 'Annet ved slutt', Locked = true;
+        SumOfVATCaptionLbl: Label 'Sum MVA', Locked = true;
+        SumOfVATOnReturnCaptionLbl: Label 'Sum MVA fra returer', Locked = true;
+        ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
+        TipsCaptionLbl: Label 'Driks', Locked = true;
+        TotalCardsCaptionLbl: Label 'Totalt kort', Locked = true;
+        TotalDifferenceCaptionLbl: Label 'Avvik total', Locked = true;
+        TotalDiscountAmountCaptionLbl: Label 'Totalt rabatter', Locked = true;
         TotalOnCancelledCaptionLbl: Label 'Totalt fra kansellerte salg', Locked = true;
+        TotalOtherCaptionLbl: Label 'Totalt annet', Locked = true;
+        TotalPrepaidCaptionLbl: Label 'Totalt forhåndsbetalinger', Locked = true;
+        TotalReturnAmountCaptionLbl: Label 'Totalt returnert', Locked = true;
         TotalSalesAmountCaptionLbl: Label 'Totalt salg', Locked = true;
         TotalSalesNetoCaptionLbl: Label 'Totalt netto', Locked = true;
-        POSLawCategoriesCaptionLbl: Label 'Kassalov-kategorier', Locked = true;
-        UncategorizedSalesCaptionLbl: Label '04999 - Other', Locked = true;
-        CategorizedSalesCaptionLbl: Label '04999 - Øvrige', Locked = true;
-        PriceLookupQuantityCaptionLbl: Label 'Antall prisoppslag', Locked = true;
-        CopyReceiptsAmountCaptionLbl: Label 'Totalt kopi kvitteringer', Locked = true;
-        ProvisionalReceiptQtyCaptionLbl: Label 'Antall foreløpige kvitteringer', Locked = true;
-        TrainingReceiptQtyCaptionLbl: Label 'Antall opplærings kvitteringer', Locked = true;
-        DeliveryReceiptQtyCaptionLbl: Label 'Antall leverings kvitteringer', Locked = true;
-        ProvisionalReceiptAmountCaptionLbl: Label 'Totalt foreløpige kvitteringer', Locked = true;
         TrainingReceiptAmountCaptionLbl: Label 'Totalt opplærings kvitteringer', Locked = true;
-        DeliveryReceiptAmountCaptionLbl: Label 'Totalt leverings kvitteringer', Locked = true;
-        ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
+        TrainingReceiptQtyCaptionLbl: Label 'Antall opplærings kvitteringer', Locked = true;
+        UncategorizedSalesCaptionLbl: Label '04999 - Other', Locked = true;
+        VATPctCaptionLbl: Label 'MVA %1%', Comment = '%1 - specifies VAT %', Locked = true;
+        VATRegNumberCaptionLbl: Label 'MVA nummer', Locked = true;
+        ZeroLinesCaptionLbl: Label 'Linjeantall redusert til 0', Locked = true;
+        ZReportEntryNoCaptionLbl: Label 'Z-rapport Serienummer', Locked = true;
 }
