@@ -244,7 +244,7 @@
                     'POSSavedSales':
                         exit('NPR-RetenPolTables-POSSavedSales-20221223');
                     'RetenTableListUpdate_20230223':
-                        exit('NPR-RetenPolTables-Update-20230223');
+                        exit('NPR-RetenPolTables-Update-20231115');
                     'HeyLoyaltyWebhookRequests':
                         exit('HeyLoyaltyWebhookRequests-20230525');
                     'M2RecordChangeLogTable':

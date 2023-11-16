@@ -146,7 +146,7 @@
 
         AddAllowedTable(Database::"NPR EFT Transaction Log", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
         AddAllowedTable(Database::"NPR EFT Transaction Request", Enum::"Retention Period Enum"::"1 Year", Enum::"Reten. Pol. Deleting"::Default);
-        AddAllowedTable(Database::"NPR Nc Task Output", Enum::"Retention Period Enum"::"3 Months", Enum::"Reten. Pol. Deleting"::Default);
+        RemoveRetentionPolicy(Database::"NPR Nc Task Output");
 
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'RetenTableListUpdate_20230223');
@@ -295,23 +295,13 @@
     local procedure AddPosSavedSalesRetentionPolicy()
     var
         POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
-        RetentionPolicySetup: Record "Retention Policy Setup";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Line") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Line") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Line");
-
-        if RetentionPolicySetup.Get(Database::"NPR POS Saved Sale Entry") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR POS Saved Sale Entry") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR POS Saved Sale Entry");
+        RemoveRetentionPolicy(Database::"NPR POS Saved Sale Line");
+        RemoveRetentionPolicy(Database::"NPR POS Saved Sale Entry");
 
         POSSavedSaleEntry.SetRange("Contains EFT Approval", true);
         RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
@@ -331,17 +321,12 @@
     local procedure AddNcTaskRetentionPolicy()
     var
         NcTask: Record "NPR Nc Task";
-        RetentionPolicySetup: Record "Retention Policy Setup";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR Nc Task") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Nc Task") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR Nc Task");
+        RemoveRetentionPolicy(Database::"NPR Nc Task");
 
         NcTask.SetRange(Processed, false);
         NcTask.SetRange("Process Error", false);
@@ -373,18 +358,13 @@
     local procedure AddHeyLoyaltyWebhookRequestRetentionPolicy()
     var
         HLWebhookRequest: Record "NPR HL Webhook Request";
-        RetentionPolicySetup: Record "Retention Policy Setup";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR HL Webhook Request") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR HL Webhook Request") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR HL Webhook Request");
+        RemoveRetentionPolicy(Database::"NPR HL Webhook Request");
 
         HLWebhookRequest.SetFilter("Processing Status", '<>%1', HLWebhookRequest."Processing Status"::Processed);
         RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
@@ -404,18 +384,13 @@
     local procedure AddWaiterPadRetentionPolicy()
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
-        RetentionPolicySetup: Record "Retention Policy Setup";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR NPRE Waiter Pad") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR NPRE Waiter Pad") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR NPRE Waiter Pad");
+        RemoveRetentionPolicy(Database::"NPR NPRE Waiter Pad");
 
         WaiterPad.SetRange(Closed, false);
         RtnPeriodEnum := RtnPeriodEnum::"3 Months";
@@ -434,18 +409,13 @@
     local procedure AddWaiterPadPrntLogEntryRetentionPolicy()
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
-        RetentionPolicySetup: Record "Retention Policy Setup";
         WPadPrntLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         RecRef: RecordRef;
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR NPRE W.Pad Prnt LogEntry") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR NPRE W.Pad Prnt LogEntry") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR NPRE W.Pad Prnt LogEntry");
+        RemoveRetentionPolicy(Database::"NPR NPRE W.Pad Prnt LogEntry");
 
         WPadPrntLogEntry.SetRange("Waiter Pad Line Exists", true);
         RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
@@ -463,7 +433,6 @@
 
     local procedure AddKitchenOrderRetentionPolicy()
     var
-        RetentionPolicySetup: Record "Retention Policy Setup";
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
@@ -471,11 +440,7 @@
         RtnPeriodEnum: Enum "Retention Period Enum";
         TableFilters: JsonArray;
     begin
-        if RetentionPolicySetup.Get(Database::"NPR NPRE Kitchen Order") then
-            if RetentionPolicySetup.WritePermission() then
-                RetentionPolicySetup.Delete(true);
-        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR NPRE Kitchen Order") then
-            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR NPRE Kitchen Order");
+        RemoveRetentionPolicy(Database::"NPR NPRE Kitchen Order");
 
         KitchenOrder.SetRange("On Hold", true);
         RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
@@ -515,6 +480,18 @@
     local procedure SetUpgradeTag(UpgradeCodeunitID: Integer)
     begin
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(UpgradeCodeunitID));
+    end;
+
+    local procedure RemoveRetentionPolicy(TableId: Integer)
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+    begin
+        if RetentionPolicySetup.Get(TableId) then
+            if RetentionPolicySetup.WritePermission() then
+                RetentionPolicySetup.Delete(true);
+        if RetenPolAllowedTables.IsAllowedTable(TableId) then
+            RetenPolAllowedTables.RemoveAllowedTable(TableId);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnBeforeOnRun', '', false, false)]
