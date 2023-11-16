@@ -37,10 +37,24 @@ page 6150864 "NPR APIV1 PBIMMLoyLedgEntry"
                 field(balance; Rec.Balance) { }
                 field(companyName; Rec."Company Name") { }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
-                field(systemModifiedAt; Rec.SystemModifiedAt) { }
+                field(systemModifiedAt; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt)) { }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt) { }
                 field(systemRowVersion; Rec.SystemRowVersion) { }
 #ENDIF
             }
         }
     }
+
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
+
+    var
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
+#ENDIF
 }

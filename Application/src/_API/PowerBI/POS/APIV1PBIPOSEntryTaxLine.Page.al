@@ -48,11 +48,26 @@ page 6060003 "NPR APIV1 PBIPOSEntryTaxLine"
                 {
                     Caption = 'Amount Including Tax', Locked = true;
                 }
-                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
+                }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
                 }
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
+
+    var
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }

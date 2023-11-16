@@ -40,7 +40,26 @@ page 6060157 "NPR APIV1 PBIItemAttribute"
                 {
                     Caption = 'Unit of Measure', Locked = true;
                 }
+                field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
+                {
+                    Caption = 'Last Modified Date', Locked = true;
+                }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
+                }
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
+
+    var
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }

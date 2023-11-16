@@ -104,13 +104,25 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
                 {
                     Caption = 'Dimension Set Id', Locked = true;
                 }
-                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
+                }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
                 }
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
 
     trigger OnAfterGetRecord()
     begin
@@ -119,5 +131,6 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
 
     var
         DimMgt: Codeunit DimensionManagement;
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
         ShortcutDimCode: array[8] of Code[20];
 }
