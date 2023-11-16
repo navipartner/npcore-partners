@@ -18,7 +18,6 @@ query 6014468 "NPR NO Sales By Item Category"
             dataitem(POSEntrySalesLine; "NPR POS Entry Sales Line")
             {
                 DataItemLink = "POS Entry No." = POSEntry."Entry No.";
-                DataItemTableFilter = Quantity = filter('>0');
 
                 column(ItemCategoryCode; "Item Category Code") { }
                 column(Quantity; Quantity) { Method = Sum; }
