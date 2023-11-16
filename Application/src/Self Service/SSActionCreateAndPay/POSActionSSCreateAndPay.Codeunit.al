@@ -29,8 +29,6 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         case Step of
             'createAndPreparePayment':
                 FrontEnd.WorkflowResponse(CreateAndPreparePayment(Context));
-            'printTickets':
-                FrontEnd.WorkflowResponse(PrintTickets(Context));
         end;
     end;
 
@@ -81,20 +79,6 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         TMTicketRetailMgt.CreatePOSLinesForReservationRequest(TicketToken, POSSaleRec);
 
         exit(GetPaymentWorkflow(Context));
-    end;
-
-    local procedure PrintTickets(Context: codeunit "NPR POS JSON Helper"): JsonObject
-    var
-        TicketManagement: Codeunit "NPR TM Ticket Management";
-        SaleContents: JsonObject;
-        JToken: JsonToken;
-        TicketToken: Text[100];
-    begin
-        SaleContents.ReadFrom(Context.GetStringParameter('saleContents'));
-        SaleContents.Get('ticketToken', JToken);
-        TicketToken := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(TicketToken));
-
-        TicketManagement.PrintTicketsFromToken(TicketToken);
     end;
 
     local procedure CheckForExistingSale(SaleSystemId: Guid; TicketToken: Text): Integer
@@ -174,7 +158,7 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSSCreateAndPay.js###
-'let main=async({parameters:e})=>{let{paymentWorkflow:a,paymentWorkflowParameters:n}=await workflow.respond("createAndPreparePayment",e.SaleContents),t=await workflow.run(a,{parameters:n});if(!t.success)throw console.info("[SS Create And Pay] payment result: "+t.success),new Error("DECLINED");await workflow.respond("printTickets",e.SaleContents)};'
+'let main=async({parameters:a})=>{let{paymentWorkflow:r,paymentWorkflowParameters:t}=await workflow.respond("createAndPreparePayment",a.SaleContents),e=await workflow.run(r,{parameters:t});if(!e.success)throw console.info("[SS Create And Pay] payment result: "+e.success),new Error("DECLINED")};'
         )
     end;
 }

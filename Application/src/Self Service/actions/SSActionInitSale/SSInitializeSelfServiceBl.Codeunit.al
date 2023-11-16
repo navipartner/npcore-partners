@@ -68,6 +68,7 @@ codeunit 6184576 "NPR SS InitializeSelfServiceBl"
     var
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        UserSetup: Record "User Setup";
         Language: Record Language;
         POSOpenPOSUnit: Codeunit "NPR POS Manage POS Unit";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
@@ -79,6 +80,10 @@ codeunit 6184576 "NPR SS InitializeSelfServiceBl"
         POSSession.GetSetup(Setup);
         Setup.GetPOSUnit(POSUnit);
         POSUnit.Get(POSUnit."No.");
+
+        if (UserSetup.Get(UserId())) then
+            if (UserSetup."Salespers./Purch. Code" <> '') then
+                SalesPersonCode := UserSetup."Salespers./Purch. Code";
 
         SalespersonPurchaser.Get(SalespersonCode);
         Setup.SetSalesperson(SalespersonPurchaser);

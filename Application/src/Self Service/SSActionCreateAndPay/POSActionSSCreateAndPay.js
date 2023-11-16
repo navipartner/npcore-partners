@@ -8,5 +8,4 @@ let main = async ({ parameters }) => {
         throw new Error("DECLINED"); // Self-Service handles the DECLINED exception nicely without lock-down
     }
 
-    await workflow.respond("printTickets", parameters.SaleContents);
 };
