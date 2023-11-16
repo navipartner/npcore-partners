@@ -120,7 +120,7 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Description', Locked = true;
                 }
-                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
                 }
@@ -132,9 +132,22 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Source Code', Locked = true;
                 }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
+                }
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
+
     trigger OnAfterGetRecord()
     begin
         DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
@@ -142,5 +155,6 @@ page 6059925 "NPR APIV1 PBIGLEntry"
 
     var
         DimMgt: Codeunit DimensionManagement;
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
         ShortcutDimCode: array[8] of Code[20];
 }

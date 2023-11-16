@@ -149,9 +149,13 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Source Posting Group';
                 }
-                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;
+                }
+                field(lastModifiedDateTimeFilter; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
                 }
                 field(invoicedQuantity; Rec."Invoiced Quantity")
                 {
@@ -160,4 +164,15 @@ page 6059969 "NPR APIV1 PBIValueEntry"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        CurrRecordRef: RecordRef;
+    begin
+        CurrRecordRef.GetTable(Rec);
+        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
+    end;
+
+    var
+        PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }
