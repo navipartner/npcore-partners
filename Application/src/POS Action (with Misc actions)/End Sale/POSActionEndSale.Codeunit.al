@@ -5,16 +5,16 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built in function ends the pos sale';
-        EndSaleWithBalancingDescriptionLbl: Label 'Ends the sale with balancing.';
+        CalledFromWorkflowDescriptionLbl: Label 'The workflow name from where end of sale was called';
+        CalledFromWorkflowNameLbl: Label 'Called from Workflow';
+        EndSaleWithBalancingDescriptionLbl: Label 'Ends the sale with balancing';
         EndSaleWithBalancingNameLbl: Label 'End Sale with Balancing';
-        PaymentMethodCodeDescriptionLbl: Label 'The Payment Method Code with which the transaction is going to be ended.';
+        PaymentMethodCodeDescriptionLbl: Label 'The Payment Method Code with which the transaction is going to be ended';
         PaymentMethodCodeNameLbl: Label 'Payment Method Code';
-        selectViewForEndOfSaleDescriptionLbl: Label 'Select view for end of sale without starting a new sale';
-        selectViewForEndOfSaleNameLbl: Label 'Select View for End of Sale without start sale';
-        StartNewSaleDescriptionLbl: Label 'Starts new sale after the sale was ended without balancing.';
+        SelectViewForEndOfSaleDescriptionLbl: Label 'Select view for end of sale without starting a new sale';
+        SelectViewForEndOfSaleNameLbl: Label 'Select View for End of Sale';
+        StartNewSaleDescriptionLbl: Label 'Starts new sale after the sale was ended without balancing';
         StartNewSaleNameLbl: Label 'Start New Sale';
-        CalledFromWorkflowDescriptionLbl: Label 'The workflow name from where end of sale was called.';
-        CalledFromWorkflowNameLbl: Label 'Called from workflow.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -22,7 +22,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('paymentNo', '', PaymentMethodCodeNameLbl, PaymentMethodCodeDescriptionLbl);
         WorkflowConfig.AddBooleanParameter('endSaleWithBalancing', true, EndSaleWithBalancingNameLbl, EndSaleWithBalancingDescriptionLbl);
         WorkflowConfig.AddBooleanParameter('startNewSale', false, StartNewSaleNameLbl, StartNewSaleDescriptionLbl);
-        WorkflowConfig.AddBooleanParameter('selectViewForEndOfSale', false, selectViewForEndOfSaleNameLbl, selectViewForEndOfSaleDescriptionLbl);
+        WorkflowConfig.AddBooleanParameter('selectViewForEndOfSale', false, SelectViewForEndOfSaleNameLbl, SelectViewForEndOfSaleDescriptionLbl);
         WorkflowConfig.AddTextParameter('calledFromWorkflow', '', CalledFromWorkflowNameLbl, CalledFromWorkflowDescriptionLbl);
     end;
 
@@ -48,11 +48,11 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         Context.GetStringParameter('paymentNo', PaymentMethodCodeText);
         Context.GetBooleanParameter('endSaleWithBalancing', EndSaleWithBalancing);
         Context.GetBooleanParameter('startNewSale', StartNewSale);
-        Context.GetBooleanParameter('selectViewForEndOfSale', selectViewForEndOfSale);
+        Context.GetBooleanParameter('selectViewForEndOfSale', SelectViewForEndOfSale);
 
 #pragma warning disable AA0139
-        Success := POSActionEndSaleB.EndSale(Sale, POSSession, StartNewSale, PaymentMethodCodeText, EndSaleWithBalancing, selectViewForEndOfSale);
-#pragma warning restore ALAA0139
+        Success := POSActionEndSaleB.EndSale(Sale, POSSession, StartNewSale, PaymentMethodCodeText, EndSaleWithBalancing, SelectViewForEndOfSale);
+#pragma warning restore AA0139
     end;
 
     local procedure EndSaleWithPreWorkflows(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
@@ -76,7 +76,6 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         Success := EndSale(Context, Sale);
         Response.Add('success', Success);
 
-
         PostWorkflows := AddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, Success);
         Response.Add('postWorkflows', PostWorkflows);
     end;
@@ -84,7 +83,6 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     local procedure AddPreWorkflowsToRun(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup") PreWorkflows: JsonObject
     var
         EndSaleEvents: Codeunit "NPR End Sale Events";
-
     begin
         EndSaleEvents.OnAddPreWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, PreWorkflows);
     end;
@@ -96,6 +94,38 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean)
+    var
+        POSActionEndSaleB: Codeunit "NPR POS Action End Sale B";
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'paymentNo':
+                POSActionEndSaleB.LookUpPaymentNoParameter(POSParameterValue);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', false, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        POSActionEndSaleB: Codeunit "NPR POS Action End Sale B";
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'paymentNo':
+                POSActionEndSaleB.ValidatePaymentNoParameter(POSParameterValue);
+        end;
+    end;
+
+    local procedure ActionCode(): Text[20]
+    begin
+        exit('END_SALE');
+    end;
 
     local procedure GetActionScript(): Text
     begin
