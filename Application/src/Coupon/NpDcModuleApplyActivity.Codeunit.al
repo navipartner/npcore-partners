@@ -245,6 +245,7 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempAppliedSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        CouponCanBeApplied: Boolean;
         TemporaryParameterTempAllPosSaleLineForCouponErrorLbl: Label 'The provided parameter TempAllPosSaleLineForCoupon must be temporary.';
         TemporaryParameterTempPosSaleLineForApplicationErrorLbl: Label 'The provided parameter TempPosSaleLineForApplication must be temporary.';
     begin
@@ -295,12 +296,16 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                     end;
 
                     if not TempAppliedSaleLinePOS.Get(SaleLinePOS.RecordId) then begin
-                        TempAppliedSaleLinePOS.Reset();
-                        TempAppliedSaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
-                        TempAppliedSaleLinePOS.SetRange("Benefit Item", false);
-                        TempAppliedSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
-                        TempAppliedSaleLinePOS.SetFilter("Serial No.", SaleLinePOS."Serial No.");
-                        if TempAppliedSaleLinePOS.IsEmpty then begin
+                        CouponCanBeApplied := SaleLinePOS."Serial No." = '';
+                        if not CouponCanBeApplied then begin
+                            TempAppliedSaleLinePOS.Reset();
+                            TempAppliedSaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+                            TempAppliedSaleLinePOS.SetRange("Benefit Item", false);
+                            TempAppliedSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
+                            TempAppliedSaleLinePOS.SetFilter("Serial No.", SaleLinePOS."Serial No.");
+                            CouponCanBeApplied := TempAppliedSaleLinePOS.IsEmpty();
+                        end;
+                        if CouponCanBeApplied then begin
                             TempPosSaleLineForApplication.Init();
                             TempPosSaleLineForApplication := SaleLinePOS;
                             TempPosSaleLineForApplication.Insert();
@@ -310,7 +315,6 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                             TempAppliedSaleLinePOS.Insert();
                             Found := true;
                         end;
-
                     end;
                 until SaleLinePOS.Next() = 0;
         until CouponListItem.Next() = 0;
