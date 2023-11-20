@@ -42,6 +42,24 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 end;
             }
         }
+        addafter(AttachAsPDF)
+        {
+            action("NPR Print Prepayment Invoice")
+            {
+                Caption = 'Print Prepayment Invoice';
+                ToolTip = 'Runs a Prepayment Invoice report.';
+                ApplicationArea = NPRRSLocal;
+                Image = Print;
+
+                trigger OnAction()
+                var
+                    PrepaymentSalesCrMemo: Report "NPR Prepayment Sales Cr. Memo";
+                begin
+                    PrepaymentSalesCrMemo.SetFilters(Rec."No.", Rec."Posting Date");
+                    PrepaymentSalesCrMemo.RunModal();
+                end;
+            }
+        }
     }
 
     var
