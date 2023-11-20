@@ -8,31 +8,72 @@ pageextension 6014444 "NPR SalesPriceList" extends "Sales Price List"
             {
                 ToolTip = 'Specifies the value of the Retail Price List field.';
                 ApplicationArea = NPRRetail;
-                trigger OnValidate()
-                begin
-                    CheckIfRetailPriceList();
-                end;
             }
             field("NPR Location Code"; Rec."NPR Location Code")
             {
                 ToolTip = 'Specifies Location Code for Sales Price List';
                 ApplicationArea = NPRRetail;
-                Editable = LocationCodeEnabled;
+                Editable = Rec."NPR Retail Price List";
+            }
+        }
+#if (BC17 or BC18 or BC19)
+    }
+#else
+        modify(Status)
+        {
+            trigger OnAfterValidate()
+            begin
+                CheckPriceListStatus();
+            end;
+        }
+    }
+    actions
+    {
+        addafter(SuggestLines)
+        {
+            action("NPR PostNivelation")
+            {
+                ApplicationArea = NPRRSRLocal;
+                Image = Document;
+                Caption = 'Post Nivelation Document';
+                ToolTip = 'Creates and posts the nivelation document for the current Price List.';
+
+                trigger OnAction()
+                var
+                    ChangePriceNivelationMgt: Codeunit "NPR RS Change Price Nivelation";
+                begin
+                    ChangePriceNivelationMgt.CreateAndPostPriceChangeNivelationDocument(Rec);
+                end;
+            }
+            action("NPR Verify Price List")
+            {
+                ApplicationArea = NPRRSRLocal;
+                Image = Confirm;
+                Caption = 'Verify Price List';
+                ToolTip = 'Sets the current price list status to Active, and sets the ending date of previosly active price lists.';
+
+                trigger OnAction()
+                var
+                    UpdatePriceList: Codeunit "NPR RS Update Sales Price List";
+                    VerifySuccesfullMsg: Label 'Price List is successfully verified.';
+                    UnsuccesfullVerifyingErr: Label 'Price List has not been verified successfully.';
+                begin
+                    if not UpdatePriceList.UpdatePriceListStatus(Rec) then
+                        Error(UnsuccesfullVerifyingErr);
+                    Message(VerifySuccesfullMsg);
+                end;
             }
         }
     }
-    trigger OnOpenPage()
-    begin
-        CheckIfRetailPriceList();
-    end;
-
+    local procedure CheckPriceListStatus(): Boolean
     var
-        LocationCodeEnabled: Boolean;
-
-    local procedure CheckIfRetailPriceList()
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+        CannotChangeActiveStatusErr: Label 'Once Active, you cannot change the price status again.';
     begin
-        LocationCodeEnabled := Rec."NPR Retail Price List";
-        if not LocationCodeEnabled then
-            Clear(Rec."NPR Location Code");
+        if not RSRLocalizationMgt.IsRSLocalizationActive() then
+            exit;
+        if xRec.Status in ["Price Status"::Active] then
+            Error(CannotChangeActiveStatusErr);
     end;
+#endif
 }

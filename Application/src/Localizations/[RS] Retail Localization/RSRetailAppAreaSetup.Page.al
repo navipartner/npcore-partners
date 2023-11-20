@@ -1,6 +1,5 @@
 page 6150836 "NPR RS Retail App. Area Setup"
 {
-    Extensible = false;
     Caption = 'RS Retail Application Area Setup';
     PageType = List;
     SourceTable = "Application Area Setup";
@@ -8,6 +7,7 @@ page 6150836 "NPR RS Retail App. Area Setup"
     ObsoleteReason = 'Not used anymore.';
     ObsoleteState = Pending;
     ObsoleteTag = 'NPR24.0';
+    Extensible = false;
 
     layout
     {
@@ -30,7 +30,7 @@ page 6150836 "NPR RS Retail App. Area Setup"
                     ToolTip = 'Specifies the value of the User ID field';
                     ApplicationArea = NPRRetail;
                 }
-                field("NPR RS Fiscal"; Rec."NPR RS R Local")
+                field("NPR RS R Local"; Rec."NPR RS R Local")
                 {
                     ToolTip = 'Specifies the value of the NPR RS Retail Localization field.';
                     ApplicationArea = NPRRetail;
