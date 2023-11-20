@@ -265,4 +265,16 @@ codeunit 6151495 "NPR Feature Flags Management"
         if not Session.StartSession(SessionId, Codeunit::"NPR Get Feature Flags JQ", CompanyName) then
             exit;
     end;
+
+    internal procedure GetFeatureFlagsManual()
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        GetFeatureFlagsJQ: Codeunit "NPR Get Feature Flags JQ";
+        ConfirmTextLbl: Label 'Are you sure that you want to retrieve the feature flags?';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(ConfirmTextLbl, true) then
+            exit;
+
+        GetFeatureFlagsJQ.Run();
+    end;
 }

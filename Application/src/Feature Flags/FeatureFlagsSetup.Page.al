@@ -17,8 +17,9 @@ page 6151158 "NPR Feature Flags Setup"
             group(General)
             {
                 Caption = 'General';
-                field(Identifier; Rec.Identifier)
+                field(Identifier; UpperCase(Rec.Identifier))
                 {
+                    Caption = 'Identifier';
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Identifier field.';
                     Editable = false;
@@ -30,6 +31,29 @@ page 6151158 "NPR Feature Flags Setup"
                 ApplicationArea = NPRRetail;
                 Editable = false;
                 UpdatePropagation = Both;
+            }
+        }
+    }
+    actions
+    {
+        area(Processing)
+        {
+            action(GetFeatureFlags)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Get Feature Flags';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = GetLines;
+                ToolTip = 'Executes the Get Feature Flags action.';
+                trigger OnAction()
+                var
+                    FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+                begin
+                    FeatureFlagsManagement.GetFeatureFlagsManual();
+                end;
             }
         }
     }
