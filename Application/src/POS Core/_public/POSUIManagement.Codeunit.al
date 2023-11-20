@@ -607,6 +607,8 @@
         GlobalSettingsImportOldLayoutLbl: Label 'Import Legacy JSON layout';
         GlobalSettingsImportOldLayoutImportButtonLabelLbl: Label 'Import';
         GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl: Label 'Importing...';
+        GlobalSettingsImportOldLayoutSuccessTitleLbl: Label 'Layout imported successfully!';
+        GlobalSettingsImportOldLayoutSuccessMessageLbl: Label 'Please be sure to double check the layout and save it.';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsAddNewLbl: Label 'Add New';
         DialogItemSelectionQuantityOutOfLbl: Label 'Quantity:';
@@ -629,10 +631,19 @@
         GlobalSettingsSystemWorkflowsLbl: Label 'System workflows';
         GlobalSettingsSystemWorkflowsDefineWorkflowLbl: Label 'Define which workflow should run in certain situation';
         GlobalSettingsSystemWorkFlowLoginLbl: Label 'Login :';
+        GlobalSettingsSystemWorkFlowItemLbl: Label 'Item :';
         GlobalSettingsSystemWorkFlowSelectWorkflowLbl: Label 'Select Workflow';
         GlobalSettingsSystemWorkNoEditableVariablesLbl: Label 'No Editable Variables';
         ColorPickerDeleteColorLbl: Label 'Delete Color';
         ColorPickerSaveColorLbl: Label 'Save Color';
+        ScheduleDialogAdmissionsTableAdmissionCodeLbl: Label 'Admission Code';
+        ScheduleDialogAdmissionsTableScheduledTimeDescriptionLbl: Label 'Scheduled time description';
+        ScheduleDialogAdmissionsTableAdmissionDescriptionLbl: Label 'Admission description';
+        ScheduleDialogScheduleAdmissionLbl: Label 'Admission';
+        ScheduleDialogTimeSlotsTableTimeSlotLbl: Label 'Time Slot';
+        ScheduleDialogTimeSlotsTableRemainingCapacityLbl: Label 'Remaining Capacity';
+        ScheduleDialogTimeSlotsTablePriceLbl: Label 'Price';
+        ScheduleDialogDialogScheduleRequestErrorLbl: Label 'Something went wrong when creating your ticket, please check the selected times and try again.';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -973,12 +984,15 @@
         Captions.Add('Global_Settings_SystemWorkflows', GlobalSettingsSystemWorkflowsLbl);
         Captions.Add('Global_Settings_SystemWorkflowsDefineWorkflow', GlobalSettingsSystemWorkflowsDefineWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkFlowLogin', GlobalSettingsSystemWorkFlowLoginLbl);
+        Captions.Add('Global_Settings_SystemWorkFlowItem', GlobalSettingsSystemWorkFlowItemLbl);
         Captions.Add('Global_Settings_SystemWorkFlowSelectWorkflow', GlobalSettingsSystemWorkFlowSelectWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkNoEditableVariables', GlobalSettingsSystemWorkNoEditableVariablesLbl);
         Captions.Add('Global_Settings_SystemWorkFlowEditVariables', GlobalSettingsEditVariablesLbl);
         Captions.Add('Global_Settings_ImportOldLayout', GlobalSettingsImportOldLayoutLbl);
         Captions.Add('Global_Settings_ImportOldLayout_ImportButtonLabel', GlobalSettingsImportOldLayoutImportButtonLabelLbl);
         Captions.Add('Global_Settings_ImportOldLayout_IsImportingStatusLabel', GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl);
+        Captions.Add('Global_Settings_ImportOldLayout_SuccessTitle', GlobalSettingsImportOldLayoutSuccessTitleLbl);
+        Captions.Add('Global_Settings_ImportOldLayout_SuccessMessage', GlobalSettingsImportOldLayoutSuccessMessageLbl);
         Captions.Add('Dialog_ItemSelection_QuantityOutOf', DialogItemSelectionQuantityOutOfLbl);
         Captions.Add('Dialog_ItemSelection_OutOf', DialogItemSelectionOutOfLbl);
         Captions.Add('Dialog_ItemSelection_EnterTheNumber', DialogItemSelectionEnterTheNumberLbl);
@@ -998,6 +1012,14 @@
         Captions.Add('Number_Of_Guests_At_Active_Table_ForTable', NumberOfGuestsAtActiveTableLbl);
         Captions.Add('Color_Picker_DeleteColor', ColorPickerDeleteColorLbl);
         Captions.Add('Color_Picker_SaveColor', ColorPickerSaveColorLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_AdmissionCode', ScheduleDialogAdmissionsTableAdmissionCodeLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_ScheduledTimeDescription', ScheduleDialogAdmissionsTableScheduledTimeDescriptionLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_AdmissionDescription', ScheduleDialogAdmissionsTableAdmissionDescriptionLbl);
+        Captions.Add('ScheduleDialog_Schedule_Admission', ScheduleDialogScheduleAdmissionLbl);
+        Captions.Add('ScheduleDialog_TimeSlots_Table_TimeSlot', ScheduleDialogTimeSlotsTableTimeSlotLbl);
+        Captions.Add('ScheduleDialog_TimeSlots_Table_RemainingCapacity', ScheduleDialogTimeSlotsTableRemainingCapacityLbl);
+        Captions.Add('ScheduleDialog_TimeSlots_Table_Price', ScheduleDialogTimeSlotsTablePriceLbl);
+        Captions.Add('ScheduleDialog_Dialog_Schedule_RequestError', ScheduleDialogDialogScheduleRequestErrorLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
