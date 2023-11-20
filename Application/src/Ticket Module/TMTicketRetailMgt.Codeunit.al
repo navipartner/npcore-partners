@@ -402,12 +402,13 @@
 
             // Update the remaining non-primary required admissions with same receipt number
             TicketReservationReq.SetFilter("Primary Request Line", '=%1', false);
-            TicketReservationReq.FindSet();
-            repeat
-                TicketReservationReq."Line No." := LineNo;
-                TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
-                TicketReservationReq.Modify();
-            until TicketReservationReq.Next() = 0;
+            if (TicketReservationReq.FindSet()) then begin
+                repeat
+                    TicketReservationReq."Line No." := LineNo;
+                    TicketReservationReq."Receipt No." := POSSaleLineRec."Sales Ticket No.";
+                    TicketReservationReq.Modify();
+                until TicketReservationReq.Next() = 0;
+            end;
 
             // Each additional experience will have its own sales lines as they are charged on-top of the required experiences
             TicketReservationReq.SetFilter("Admission Inclusion", '=%1', TicketReservationReq."Admission Inclusion"::SELECTED);
