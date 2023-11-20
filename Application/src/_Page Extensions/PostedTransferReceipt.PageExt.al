@@ -43,6 +43,22 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
                     LabelLibrary.PrintLabel(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
                 end;
             }
+
+            action("NPR PrintRetailPrice")
+            {
+                Caption = 'Print Transfer Receipt Calculation';
+                ToolTip = 'Runs a Transfer Receipt Calculation report.';
+                ApplicationArea = NPRRSRLocal;
+                Image = Print;
+
+                trigger OnAction()
+                var
+                    TransRecPurchPriceCalc: Report "NPR RS Ret. Trans. Rec. Calc.";
+                begin
+                    TransRecPurchPriceCalc.SetFilters(Rec."No.", Rec."Posting Date");
+                    TransRecPurchPriceCalc.RunModal();
+                end;
+            }
         }
     }
 }
