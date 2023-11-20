@@ -6,7 +6,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         {
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
-
                 ToolTip = 'Specifies the Sell-to Customer Name 2 that will appear on the new sales document.';
                 ApplicationArea = NPRRetail;
             }
@@ -15,7 +14,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         {
             field("NPR Magento Payment Amount"; Rec."NPR Magento Payment Amount")
             {
-
                 ToolTip = 'Specifies the sum of Payment Lines attached to the Posted Sales Invoice.';
                 ApplicationArea = NPRRetail;
             }
@@ -24,7 +22,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         {
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
-
                 ToolTip = 'Specifies the additional name of the customer that you shipped the items on the invoice to.';
                 ApplicationArea = NPRRetail;
             }
@@ -33,7 +30,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         {
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
-
                 ToolTip = 'Specifies the additinal name of the customer that the invoice was sent to.';
                 ApplicationArea = NPRRetail;
             }
@@ -66,7 +62,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             {
                 Caption = 'Send SMS';
                 Image = SendConfirmation;
-
                 ToolTip = 'Specifies whether a notification SMS should be sent to a responsible person. The messages are sent using SMS templates.';
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
@@ -96,7 +91,40 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                     CurrPage.Update(false);
                 end;
             }
+        }
+        addafter(AttachAsPDF)
+        {
+            action("NPR Print Sales Invoice")
+            {
+                Caption = 'Print Sales Invoice';
+                ToolTip = 'Runs a Sales Invoice report.';
+                ApplicationArea = NPRRSLocal;
+                Image = Print;
 
+                trigger OnAction()
+                var
+                    PrepaymentSalesInvoice: Report "NPR Retail Sales Invoice";
+                begin
+                    PrepaymentSalesInvoice.SetFilters(Rec."No.", Rec."Order Date");
+                    PrepaymentSalesInvoice.RunModal();
+                end;
+            }
+
+            action("NPR Print Prepayment Invoice")
+            {
+                Caption = 'Print Prepayment Invoice';
+                ToolTip = 'Runs a Prepayment Invoice report.';
+                ApplicationArea = NPRRSLocal;
+                Image = Print;
+
+                trigger OnAction()
+                var
+                    PrepaymentSalesInvoice: Report "NPR Prepayment Sales Invoice";
+                begin
+                    PrepaymentSalesInvoice.SetFilters(Rec."No.", Rec."Order Date");
+                    PrepaymentSalesInvoice.RunModal();
+                end;
+            }
         }
     }
     var
@@ -114,5 +142,4 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     begin
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(Rec);
     end;
-
 }
