@@ -1,8 +1,7 @@
 page 6151159 "NPR Feature Flags"
 {
     PageType = List;
-    ApplicationArea = NPRRetail;
-    UsageCategory = Lists;
+    UsageCategory = None;
     SourceTable = "NPR Feature Flag";
     Caption = 'Feature Flags';
     InsertAllowed = false;
