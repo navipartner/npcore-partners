@@ -49,8 +49,7 @@ codeunit 6151349 "NPR Enable Application Areas"
     local procedure EnableLocalizationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
     begin
         TempApplicationAreaSetup."NPR RS Local" := IsRSLocalizationEnabled();
-        // TO-DO once logic for RS Retail Localization is added
-        // TempApplicationAreaSetup."NPR RS R Local"
+        TempApplicationAreaSetup."NPR RS R Local" := IsRSRLocalizationEnabled();
     end;
 
     local procedure EnableFiscalisationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -78,6 +77,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(RSLocalisationSetup."Enable RS Local");
+    end;
+
+    local procedure IsRSRLocalizationEnabled(): Boolean
+    var
+        RSRLocalizationSetup: Record "NPR RS R Localization Setup";
+    begin
+        if not RSRLocalizationSetup.Get() then
+            exit(false);
+
+        exit(RSRLocalizationSetup."Enable RS Retail Localization");
     end;
 
     local procedure IsRSFiscalisationEnabled(): Boolean
