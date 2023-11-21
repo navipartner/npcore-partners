@@ -45,15 +45,15 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
     begin
         case Step of
             'PrepareWorkflow':
-                FrontEnd.WorkflowResponse(PrepareWorkflow(Context, Setup));
+                FrontEnd.WorkflowResponse(PrepareWorkflow(Context, Sale, Setup));
             'RunLegacyAction':
                 RunLegacyAction(Context, Sale, Setup);
             'ProcessBinTranser':
-                ProcessBinTransfer(Context, Sale);
+                FrontEnd.WorkflowResponse(ProcessBinTransfer(Context, Sale));
         end;
     end;
 
-    local procedure PrepareWorkflow(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
+    local procedure PrepareWorkflow(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         BinNo: Code[10];
@@ -67,21 +67,23 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
 
         TransferDirection := Context.GetIntegerParameter(TransferDirectionParamName);
         LegacyAction := not FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
-        //if LegacyAction then
-        //    LegacyAction := TransferDirection <> TransferDirection::TransferIn;  //Transfer INs are not supported by the legacy POS action
         Response.Add('legacyAction', LegacyAction);
-        if not LegacyAction then
-            Response.Add('binTransferContextData', POSActionBinTransferB.GetBinTransferContextData(PosUnitNo, BinNo, TransferDirection));
+        if LegacyAction then
+            exit;
+        Response.Add('binTransferContextData', POSActionBinTransferB.GetBinTransferContextData(PosUnitNo, BinNo, TransferDirection));
+        Response.Add('postWorkflows', AddPostWorkflowsToRun(Context, Sale));
     end;
 
-    local procedure ProcessBinTransfer(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
+    local procedure ProcessBinTransfer(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale") Response: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         ReturnedData: JsonToken;
         BinNo: Code[10];
         PosUnitNo: Code[10];
+        CheckpointEntryNo: Integer;
         PrintTransfer: Boolean;
+        Success: Boolean;
     begin
         ReturnedData := Context.GetJToken('returnedData');
 #pragma warning disable AA0139
@@ -91,7 +93,10 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         if Context.GetBooleanParameter(PrintTransferNameLbl, PrintTransfer) then;
 
         POSSale.GetCurrentSale(SalePOS);
-        if POSActionBinTransferB.ProcessBinTransfer(ReturnedData, SalePOS, PosUnitNo, BinNo, PrintTransfer) then
+        Success := POSActionBinTransferB.ProcessBinTransfer(ReturnedData, SalePOS, PosUnitNo, BinNo, PrintTransfer, CheckpointEntryNo);
+        Response.Add('success', Success);
+        Response.Add('checkpointEntryNo', CheckpointEntryNo);
+        if Success then
             POSSession.ChangeViewLogin();
     end;
 
@@ -175,11 +180,21 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         exit(POSPaymentBin."No.");
     end;
 
+    local procedure AddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") PostWorkflows: JsonObject
+    var
+        SalePOS: Record "NPR POS Sale";
+        BinTransferEvents: Codeunit "NPR POS Action Publishers";
+    begin
+        PostWorkflows.ReadFrom('{}');
+        Sale.GetCurrentSale(SalePOS);
+        BinTransferEvents.OnAddPostWorkflowsToRun(Context, SalePOS, PostWorkflows);
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionBinTransfer.js###
-'let main=async({workflow:a})=>{let{legacyAction:e,binTransferContextData:n}=await a.respond("PrepareWorkflow");if(e)await a.respond("RunLegacyAction");else{let t=await popup.binTransfer(n);await a.respond("ProcessBinTranser",t)}};'
+'let main=async({workflow:e})=>{let{legacyAction:n,binTransferContextData:s,postWorkflows:a}=await e.respond("PrepareWorkflow");if(n)return await e.respond("RunLegacyAction");{let t=await popup.binTransfer(s);var o=await e.respond("ProcessBinTranser",t)}if(a)for(const t of Object.entries(a)){let[r,i]=t;r&&await e.run(r,{context:{transferResult:o},parameters:i})}};'
         );
     end;
 }
