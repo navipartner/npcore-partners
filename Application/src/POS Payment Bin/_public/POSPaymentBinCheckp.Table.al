@@ -210,6 +210,17 @@
             Caption = 'Payments Count';
             DataClassification = CustomerContent;
         }
+        field(270; "Bin Transfer Journal Entry No."; Integer)
+        {
+            Caption = 'Bin Transfer Journal Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR BinTransferJournal".EntryNo;
+        }
+        field(280; "Transfer In"; Boolean)
+        {
+            Caption = 'Transfer In';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

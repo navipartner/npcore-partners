@@ -113,6 +113,27 @@
                     }
                 }
             }
+            group(BinTransfer)
+            {
+                Visible = BinTransferVisible;
+                field("Bin Transfer: Require Journal"; Rec."Bin Transfer: Require Journal")
+                {
+                    Caption = 'Require Journal for Trans. INs';
+                    ToolTip = 'Specifies if system will require a prestaged bin transfer journal line for a POS user to select from when performing a Bin TransferIN transaction.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
+    begin
+        BinTransferVisible := FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
+    end;
+
+    var
+        BinTransferVisible: Boolean;
 }

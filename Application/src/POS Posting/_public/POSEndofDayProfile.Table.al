@@ -159,6 +159,11 @@
             Caption = 'Require Denomin. (Move to Bin)';
             DataClassification = CustomerContent;
         }
+        field(100; "Bin Transfer: Require Journal"; Boolean)
+        {
+            Caption = 'Bin Transfer: Require Journal';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

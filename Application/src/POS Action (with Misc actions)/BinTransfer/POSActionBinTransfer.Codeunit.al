@@ -3,65 +3,123 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
     Access = Internal;
 
     var
+        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
         PrintTransferNameLbl: Label 'PrintTransfer', Locked = true;
+        TransferDirectionParamName: Label 'TransferDirection', Locked = true;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Transfer funds from one bin to another using the POS.';
-        SourceBinSelectionLbl: Label 'SourceBinSelection', Locked = true;
-        SourceBinOptionsLbl: Label 'PosUnitDefaultBin,UserSelection,FixedParameter', Locked = true;
-        SourceBinSelection_NameLbl: Label 'Source Bin Selection';
-        SourceBinOptions_CptLbl: Label 'POS Unit Default Bin,User Selection,Fixed Parametar';
-        SourceBin_NameLbl: Label 'SourceBin';
-        SourceBin_CptLbl: Label 'Source Bin';
-        PrintTransferCaptionNameLbl: Label 'Print Transfer Out';
+        ActionDescription: Label 'Transfer funds in or out of POS bin.';
+        BinSelectionLbl: Label 'SourceBinSelection', Locked = true;
+        BinOptionsLbl: Label 'PosUnitDefaultBin,UserSelection,FixedParameter', Locked = true;
+        BinSelection_CptLbl: Label 'Bin Selection';
+        BinSelection_CptDescLbl: Label 'Specifies how the POS unit bin will be selected for transfer transactions. This bin will be the destination for transfer INs, or the source for transfer OUTs.';
+        BinOptions_CptLbl: Label 'POS Unit Default Bin,User Selection (Ask),Fixed Bin';
+        Bin_NameLbl: Label 'SourceBin';
+        Bin_CptLbl: Label 'Fixed Bin';
+        Bin_CptDescLbl: Label 'Specifies the pre-defined POS unit bin for transfer transactions. This bin will be the destination for transfer INs, or the source for transfer OUTs. The parameter is only used when "Bin Selection" is set to "Fixed Bin".';
+        PrintTransferCaptionNameLbl: Label 'Print Transfer';
         PrintTransferCaptionDescriptionLbl: Label 'Print template from Report Selection - Retail, after transferring out content from bin. Template need to be built on top of "Workshift Checkpoint" table.';
-        TransferDirection: Label 'TransferDirection', Locked = true;
         TransferDirectionCaption: Label 'Transfer Direction';
-        TransferDirectionDescription: Label 'Transfer Direction';
+        TransferDirectionDescription: Label 'Bin transfer direction (In our Out of selected bin)';
         TransferDirectionOption: Label ',TransferOut,TransferIn', Locked = true;
         TransferDirectionOptionCaption: Label ',Transfer Out,Transfer In';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddOptionParameter(
-            SourceBinSelectionLbl,
-            SourceBinOptionsLbl,
+            BinSelectionLbl,
+            BinOptionsLbl,
 #pragma warning disable AA0139
-            SelectStr(1, SourceBinOptionsLbl),
+            SelectStr(1, BinOptionsLbl),
 #pragma warning restore 
-            SourceBinSelection_NameLbl,
-            SourceBinSelection_NameLbl,
-            SourceBinOptions_CptLbl);
+            BinSelection_CptLbl,
+            BinSelection_CptDescLbl,
+            BinOptions_CptLbl);
         WorkflowConfig.AddBooleanParameter(PrintTransferNameLbl, false, PrintTransferCaptionNameLbl, PrintTransferCaptionDescriptionLbl);
-        WorkflowConfig.AddTextParameter(SourceBin_NameLbl, '', SourceBin_CptLbl, SourceBin_CptLbl);
-        WorkflowConfig.AddOptionParameter(TransferDirection, TransferDirectionOption, '', TransferDirectionCaption, TransferDirectionDescription, TransferDirectionOptionCaption);
+        WorkflowConfig.AddTextParameter(Bin_NameLbl, '', Bin_CptLbl, Bin_CptDescLbl);
+        WorkflowConfig.AddOptionParameter(TransferDirectionParamName, TransferDirectionOption, '', TransferDirectionCaption, TransferDirectionDescription, TransferDirectionOptionCaption);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
-
         case Step of
-            'SelectBin':
-                FrontEnd.WorkflowResponse(SelectSourceBin(Context));
-            'TransferOut':
-                FrontEnd.WorkflowResponse(TransferContentsOutFromBin(Context, Sale));
-            'TransferIn':
-                FrontEnd.WorkflowResponse(TransferContentsInToBin(Setup));
+            'PrepareWorkflow':
+                FrontEnd.WorkflowResponse(PrepareWorkflow(Context, Setup));
+            'RunLegacyAction':
+                RunLegacyAction(Context, Sale, Setup);
+            'ProcessBinTranser':
+                ProcessBinTransfer(Context, Sale);
         end;
     end;
 
-    procedure TransferContentsOutFromBin(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"): JsonObject
+    local procedure PrepareWorkflow(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        BinNo: Code[10];
+        PosUnitNo: Code[10];
+        TransferDirection: Option "",TransferOut,TransferIn;
+        LegacyAction: Boolean;
+    begin
+        SelectPosUnitBin(Context, Setup, PosUnitNo, BinNo);
+        Context.SetContext('PosUnitNo', PosUnitNo);
+        Context.SetContext('PosUnitBinNo', BinNo);
+
+        TransferDirection := Context.GetIntegerParameter(TransferDirectionParamName);
+        LegacyAction := not FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
+        //if LegacyAction then
+        //    LegacyAction := TransferDirection <> TransferDirection::TransferIn;  //Transfer INs are not supported by the legacy POS action
+        Response.Add('legacyAction', LegacyAction);
+        if not LegacyAction then
+            Response.Add('binTransferContextData', POSActionBinTransferB.GetBinTransferContextData(PosUnitNo, BinNo, TransferDirection));
+    end;
+
+    local procedure ProcessBinTransfer(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        ReturnedData: JsonToken;
+        BinNo: Code[10];
+        PosUnitNo: Code[10];
+        PrintTransfer: Boolean;
+    begin
+        ReturnedData := Context.GetJToken('returnedData');
+#pragma warning disable AA0139
+        PosUnitNo := Context.GetString('PosUnitNo');
+        BinNo := Context.GetString('PosUnitBinNo');
+#pragma warning restore AA0139
+        if Context.GetBooleanParameter(PrintTransferNameLbl, PrintTransfer) then;
+
+        POSSale.GetCurrentSale(SalePOS);
+        if POSActionBinTransferB.ProcessBinTransfer(ReturnedData, SalePOS, PosUnitNo, BinNo, PrintTransfer) then
+            POSSession.ChangeViewLogin();
+    end;
+
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    local procedure RunLegacyAction(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup")
+    var
+        TransferDirection: Option "",TransferOut,TransferIn;
+    begin
+        TransferDirection := Context.GetIntegerParameter(TransferDirectionParamName);
+        case TransferDirection of
+            TransferDirection::TransferIn:
+                TransferContentsInToBin(Setup);
+            TransferDirection::TransferOut:
+                TransferContentsOutFromBin(Context, Sale);
+        end;
+    end;
+
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    local procedure TransferContentsOutFromBin(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
     var
         CheckpointEntryNo: Integer;
         POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
         FromBinNo: Code[10];
         POSSession: Codeunit "NPR POS Session";
-        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
         PrintTransfer: Boolean;
         PosUnit: Record "NPR POS Unit";
     begin
-        FromBinNo := CopyStr(Context.GetString('FROM_BIN'), 1, MaxStrLen(FromBinNo));
+        FromBinNo := CopyStr(Context.GetString('PosUnitBinNo'), 1, MaxStrLen(FromBinNo));
         POSActionBinTransferB.GetPosUnitFromBin(FromBinNo, PosUnit);
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(PosUnit."POS Store Code", PosUnit."No.", PosUnit.Status);
 
@@ -70,27 +128,29 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
             POSActionBinTransferB.PrintBinTransfer(CheckpointEntryNo);
     end;
 
-    local procedure SelectSourceBin(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure SelectPosUnitBin(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup"; var PosUnitNo: Code[10]; var BinNo: Code[10])
     var
-        FromBinNo: Code[10];
-        SourceBinSelection: Integer;
-        POSSession: Codeunit "NPR POS Session";
-        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
+        POSUnit: Record "NPR POS Unit";
+        SourceBinSelection: Option PosUnitDefaultBin,UserSelection,FixedParameter;
     begin
-
         SourceBinSelection := Context.GetIntegerParameter('SourceBinSelection');
+        if SourceBinSelection in [SourceBinSelection::PosUnitDefaultBin, SourceBinSelection::UserSelection] then
+            Setup.GetPOSUnit(POSUnit);
         case SourceBinSelection of
-            1:
-                FromBinNo := POSActionBinTransferB.UserSelectBin(POSSession);
-            2:
-                FromBinNo := GetFixedBin(Context);
+            SourceBinSelection::UserSelection:
+                BinNo := POSActionBinTransferB.UserSelectBin(POSUnit);
+            SourceBinSelection::FixedParameter:
+                begin
+                    BinNo := GetFixedBin(Context);
+                    POSActionBinTransferB.GetPosUnitFromBin(BinNo, PosUnit);
+                end;
             else
-                FromBinNo := POSActionBinTransferB.GetDefaultUnitBin(POSSession);
+                BinNo := POSActionBinTransferB.GetDefaultUnitBin(POSUnit);
         end;
-        Response.ReadFrom('{}');
-        Response.Add('FROM_BIN', FromBinNo);
+        PosUnitNo := POSUnit."No.";
     end;
 
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
     local procedure TransferContentsInToBin(PosSetup: Codeunit "NPR POS Setup"): JsonObject
     var
         BinTransferJournalPage: Page "NPR BinTransferJournalPos";
@@ -103,18 +163,23 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
     end;
 
     local procedure GetFixedBin(Context: Codeunit "NPR POS JSON Helper"): Code[10]
+    var
+        POSPaymentBin: Record "NPR POS Payment Bin";
+        BinNo: Code[10];
+        MissingFixedBinErr: Label 'You must specify a value for the "Fixed Bin" parameter, when "Bin Selection" paremeter is set to value "Fixed Bin".';
     begin
-
-        exit(CopyStr(Context.GetStringParameter('SourceBin'), 1, 10));
+        BinNo := CopyStr(Context.GetStringParameter('SourceBin'), 1, 10);
+        if BinNo = '' then
+            Error(MissingFixedBinErr);
+        POSPaymentBin.Get(BinNo);
+        exit(POSPaymentBin."No.");
     end;
 
     local procedure GetActionScript(): Text
     begin
-
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionBinTransfer.js###
-'let main=async({workflow:e,parameters:n})=>{debugger;if(n.TransferDirection==n.TransferDirection.TransferIn)return await e.respond("TransferIn");{let r=await e.respond("SelectBin");return await e.respond("TransferOut",r)}};'
+'let main=async({workflow:a})=>{let{legacyAction:e,binTransferContextData:n}=await a.respond("PrepareWorkflow");if(e)await a.respond("RunLegacyAction");else{let t=await popup.binTransfer(n);await a.respond("ProcessBinTranser",t)}};'
         );
     end;
 }
-

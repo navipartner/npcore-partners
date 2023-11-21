@@ -2,8 +2,7 @@ page 6151238 "NPR BinTransferJournalPos"
 {
     Caption = 'POS Payment Bin Transfer Journal (POS)';
     PageType = List;
-    ApplicationArea = NPRRetail;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR BinTransferJournal";
     Extensible = false;
     Editable = false;
