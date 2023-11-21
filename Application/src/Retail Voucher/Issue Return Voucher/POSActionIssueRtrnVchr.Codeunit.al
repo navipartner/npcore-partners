@@ -33,7 +33,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionIssueRetVoucher.js###
-'let main=async({workflow:e,parameters:a,popup:i,captions:n})=>{debugger;let u;const{endSaleWorkflowEnabled:c}=await e.respond("validateRequest");if(a.VoucherTypeCode?e.context.voucherType=a.VoucherTypeCode:e.context.voucherType=await e.respond("setVoucherType"),e.context.voucherType==null||e.context.voucherType=="")return;if(e.context.IsUnattendedPOS)u=e.context.voucher_amount;else if(u=await i.numpad({title:n.IssueReturnVoucherTitle,caption:n.Amount,value:e.context.voucher_amount,notBlank:!0}),u===0||u===null)return;let d=await e.respond("validateAmount",{amountInput:u});if(d==0)return;let t=await e.respond("select_send_method");t.SendMethodEmail&&(t.SendToEmail=await i.input({title:n.SendViaEmail,caption:n.Email,value:t.SendToEmail,notBlank:!0})),t.SendMethodSMS&&(t.SendToPhoneNo=await i.input({title:n.SendViaSMS,caption:n.Phone,value:t.SendToPhoneNo,notBlank:!0})),e.context=Object.assign(e.context,t);const{paymentNo:o}=await e.respond("issueReturnVoucher",{ReturnVoucherAmount:d});a.ContactInfo&&await e.respond("contactInfo"),a.ScanReferenceNos&&await e.respond("scanReference"),a.EndSale&&(c?await e.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:o}}):await e.respond("endSale"))};'
+'let main=async({workflow:e,parameters:a,popup:i,captions:n})=>{debugger;let u;const{posLifeCycleEventsWorkflowsEnabled:d}=await e.respond("validateRequest");if(a.VoucherTypeCode?e.context.voucherType=a.VoucherTypeCode:e.context.voucherType=await e.respond("setVoucherType"),e.context.voucherType==null||e.context.voucherType=="")return;if(e.context.IsUnattendedPOS)u=e.context.voucher_amount;else if(u=await i.numpad({title:n.IssueReturnVoucherTitle,caption:n.Amount,value:e.context.voucher_amount,notBlank:!0}),u===0||u===null)return;let c=await e.respond("validateAmount",{amountInput:u});if(c==0)return;let t=await e.respond("select_send_method");t.SendMethodEmail&&(t.SendToEmail=await i.input({title:n.SendViaEmail,caption:n.Email,value:t.SendToEmail,notBlank:!0})),t.SendMethodSMS&&(t.SendToPhoneNo=await i.input({title:n.SendViaSMS,caption:n.Phone,value:t.SendToPhoneNo,notBlank:!0})),e.context=Object.assign(e.context,t);const{paymentNo:o}=await e.respond("issueReturnVoucher",{ReturnVoucherAmount:c});a.ContactInfo&&await e.respond("contactInfo"),a.ScanReferenceNos&&await e.respond("scanReference"),a.EndSale&&(d?await e.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:o}}):await e.respond("endSale"))};'
         );
     end;
 
@@ -130,7 +130,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         end;
         Setup.GetPOSUnit(POSUnit);
         Context.SetContext('IsUnattendedPOS', POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED);
-        Response.Add('endSaleWorkflowEnabled', FeatureFlagsManagement.IsEnabled('endSaleWorkflowEnabled'));
+        Response.Add('posLifeCycleEventsWorkflowsEnabled', FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled'));
     end;
 
     local procedure ValidateAmount(Context: Codeunit "NPR POS JSON Helper"): Decimal
