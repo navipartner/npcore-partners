@@ -10,11 +10,15 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', false, false)]
     local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
     begin
-        if (Method = 'BalancingGetState') then
-            BalancingGetState(Context, FrontEnd, Handled);
-
-        if (Method = 'BalancingSetState') then
-            BalancingSetState(Context, Handled);
+        case Method of
+            'BalancingGetState':
+                BalancingGetState(Context, FrontEnd);
+            'BalancingSetState':
+                BalancingSetState(Context);
+            else
+                exit;
+        end;
+        Handled := true;
     end;
 
     local procedure GetEndOfDayContext(Context: JsonObject) EODContext: JsonObject
@@ -206,6 +210,7 @@
                     CountingType.Add('requireBankDepositAmtDenominations', EndOfDayProfile."Require Denomin.(Bank Deposit)");
                     CountingType.Add('requireMoveToBinAmtDenominations', EndOfDayProfile."Require Denomin. (Move to Bin)");
 
+                    Clear(CoinTypes);
                     PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
                     PaymentMethodDenom.SetRange(Blocked, false);
                     if (PaymentMethodDenom.FindSet()) then begin
@@ -268,7 +273,7 @@
         CashCount.Add('closingAndTransfer', GetClosingAndTransfer());
     end;
 
-    local procedure GetBins(BinType: Option) BinList: JsonArray
+    local procedure GetBins(BinType: Option; PosUnitNo: Code[10]) BinList: JsonArray
     var
         Bin: JsonObject;
         Bins: Record "NPR POS Payment Bin";
@@ -278,7 +283,7 @@
         if (BinType = 2) then
             Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::SAFE);
 
-        Bins.SetFilter("Attached to POS Unit No.", '=%1|=%2', '', _POSWorkShiftCheckpoint."POS Unit No.");
+        Bins.SetFilter("Attached to POS Unit No.", '=%1|=%2', '', PosUnitNo);
         if (Bins.FindSet()) then begin
             repeat
                 Bin.ReadFrom('{}');
@@ -289,14 +294,14 @@
         end;
     end;
 
-    local procedure GetAvailableBins() Bins: JsonObject
+    procedure GetAvailableBins(PosUnitNo: Code[10]) Bins: JsonObject
     begin
         Bins.ReadFrom('{}');
-        Bins.Add('bankBins', GetBins(1));
-        Bins.Add('otherBins', GetBins(2));
+        Bins.Add('bankBins', GetBins(1, PosUnitNo));
+        Bins.Add('otherBins', GetBins(2, PosUnitNo));
     end;
 
-    local procedure BalancingGetState(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean);
+    local procedure BalancingGetState(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EndOfDayProfile: Record "NPR POS End of Day Profile";
         Response: JsonObject;
@@ -304,21 +309,18 @@
         ResponseLbl: Label '%1 - %2', Locked = true;
         CheckpointEntryNo: Integer;
     begin
-
-        Handled := true;
         Context.WriteTo(JsonText);
 
         CheckpointEntryNo := GetValueAsInteger(Context, 'checkPointId');
 
         _POSWorkShiftCheckpoint.get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");
-        if (not EndOfDayProfile.Get(_POSUnit."POS End of Day Profile")) then
-            EndOfDayProfile.Init();
+        _POSUnit.GetProfile(EndOfDayProfile);
 
         Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkShiftCheckpoint.TableCaption(), _POSWorkShiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
         Response.Add('cashCount', GetCashCount(EndOfDayProfile));
-        Response.Add('bins', GetAvailableBins());
+        Response.Add('bins', GetAvailableBins(_POSWorkShiftCheckpoint."POS Unit No."));
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
         Response.Add('hideTurnover', EndOfDayProfile."Hide Turnover Section");
         Response.Add('backendContext', GetEndOfDayContext(Context));
@@ -326,18 +328,15 @@
 
         Response.WriteTo(JsonText);
 
-        Handled := true;
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
-    local procedure BalancingSetState(Context: JsonObject; var Handled: Boolean);
+    local procedure BalancingSetState(Context: JsonObject)
     var
         POSSession: Codeunit "NPR POS Session";
         JsonText: Text;
         CheckpointEntryNo: Integer;
     begin
-        Handled := true;
-
         Context.WriteTo(JsonText);
 
         CheckpointEntryNo := GetValueAsInteger(Context, 'state.backendContext.checkPointId');
@@ -357,7 +356,6 @@
 
         if (_POSWorkShiftCheckpoint.type = _POSWorkShiftCheckpoint.Type::XREPORT) then
             FinalizeXReport();
-
     end;
 
     local procedure TransferCashCountToBinCheckpointRec(ClosingAndTransfer: JsonArray; var TempBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
@@ -378,8 +376,8 @@
             TempBinCheckpoint."Bank Deposit Reference" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'bankDepositReference'), 1, MaxStrLen(TempBinCheckpoint."Bank Deposit Reference"));
 
             TempBinCheckpoint."Move To Bin Amount" := GetValueAsDecimal(CountedPayment.AsObject(), 'moveToBinAmount');
-            TempBinCheckpoint."Move To Bin Code" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinNo'), 1, MaxStrLen(TempBinCheckpoint."Bank Deposit Bin Code"));
-            TempBinCheckpoint."Move To Bin Reference" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinTransId'), 1, MaxStrLen(TempBinCheckpoint."Bank Deposit Reference"));
+            TempBinCheckpoint."Move To Bin Code" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinNo'), 1, MaxStrLen(TempBinCheckpoint."Move To Bin Code"));
+            TempBinCheckpoint."Move To Bin Reference" := CopyStr(GetValueAsText(CountedPayment.AsObject(), 'moveToBinTransId'), 1, MaxStrLen(TempBinCheckpoint."Move To Bin Reference"));
             TempBinCheckpoint.Insert();
 
             TransferDenominations(CountedPayment, 'bankDepositAmountCoinTypes', Enum::"NPR Denomination Target"::BankDeposit, TempBinCheckpoint);
@@ -404,7 +402,7 @@
         end;
     end;
 
-    local procedure TransferDenominations(CountedPayment: JsonToken; JsonPath: Text; DenominationTarget: Enum "NPR Denomination Target"; PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    procedure TransferDenominations(CountedPayment: JsonToken; JsonPath: Text; DenominationTarget: Enum "NPR Denomination Target"; PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
     var
         POSPmtBinCheckpDenom: Record "NPR POS Pmt. Bin Checkp. Denom";
         Denomination: JsonToken;
@@ -659,5 +657,4 @@
         SMSImplementation.PopulateSendList(SendToList, SMSTemplateHeader."Recipient Type", SMSTemplateHeader."Recipient Group", SendTo);
         SMSImplementation.QueueMessages(SendToList, Sender, SMSBodyText, CurrentDateTime + 1000 * 60); //Delay 1 minute;
     end;
-
 }

@@ -56,7 +56,7 @@ codeunit 6059994 "NPR Json Helper"
         exit('');
     end;
 
-    procedure GetJDT(Token: JsonToken; Path: Text; Required: Boolean) Result: DateTime
+    procedure GetJDT(Token: JsonToken; Path: Text; Required: Boolean): DateTime
     begin
         exit(GetJDT(Token, Path, Required, 0DT));
     end;
@@ -181,7 +181,7 @@ codeunit 6059994 "NPR Json Helper"
     end;
 
     [TryFunction]
-    local procedure JValueToBoolean(JValue: JsonValue; ValueOut: Boolean)
+    local procedure JValueToBoolean(JValue: JsonValue; var ValueOut: Boolean)
     begin
         ValueOut := JValue.AsBoolean();
     end;

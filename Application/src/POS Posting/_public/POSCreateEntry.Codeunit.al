@@ -879,9 +879,8 @@
             POSBalancingLine."Move-To Bin Amount" := PaymentBinCheckpoint."Move to Bin Amount";
             POSBalancingLine."Move-To Reference" := PaymentBinCheckpoint."Move to Bin Reference";
             InsertBinTransfer(POSBinEntry,
-              PaymentBinCheckpoint."Move to Bin Code",
-              PaymentBinCheckpoint."Move to Bin Amount",
-              PaymentBinCheckpoint."Move to Bin Reference");
+                PaymentBinCheckpoint."Move to Bin Code", PaymentBinCheckpoint."Move to Bin Amount", PaymentBinCheckpoint."Move to Bin Reference",
+                PaymentBinCheckpoint."Transfer IN", false);
         end;
 
         // Move to a different bin instruction (The "BANK")
@@ -894,10 +893,9 @@
             POSBalancingLine."Deposit-To Bin Code" := PaymentBinCheckpoint."Bank Deposit Bin Code";
             POSBalancingLine."Deposit-To Bin Amount" := PaymentBinCheckpoint."Bank Deposit Amount";
             POSBalancingLine."Deposit-To Reference" := PaymentBinCheckpoint."Bank Deposit Reference";
-            InsertBankTransfer(POSBinEntry,
-              PaymentBinCheckpoint."Bank Deposit Bin Code",
-              PaymentBinCheckpoint."Bank Deposit Amount",
-              PaymentBinCheckpoint."Bank Deposit Reference");
+            InsertBinTransfer(POSBinEntry,
+                PaymentBinCheckpoint."Bank Deposit Bin Code", PaymentBinCheckpoint."Bank Deposit Amount", PaymentBinCheckpoint."Bank Deposit Reference",
+                PaymentBinCheckpoint."Transfer IN", true);
         end;
 
         // When doing bin transfer we dont want to recalculate the float as it upset the EOD counting
@@ -916,64 +914,53 @@
         POSBalancingLine.Insert();
     end;
 
-    local procedure InsertBinTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
+    internal procedure InsertBinTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; BalancingBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50]; TransferIn: Boolean; BankTransfer: Boolean)
     var
         POSBinEntry: Record "NPR POS Bin Entry";
         POSPaymentBin: Record "NPR POS Payment Bin";
     begin
-
-        // Withdrawl from source bin
+        // Primary bin (POS unit)
         POSBinEntry.Init();
         POSBinEntry.TransferFields(CheckpointEntry);
         POSBinEntry."Entry No." := 0;
-        POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_OUT;
-
+        if TransferIn then begin
+            if BankTransfer then
+                POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_IN
+            else
+                POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_IN;
+        end else begin
+            if BankTransfer then
+                POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_OUT
+            else
+                POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_OUT;
+        end;
         POSBinEntry."External Transaction No." := Reference;
-        POSBinEntry.Comment := 'Transfer';
-        POSBinEntry."Transaction Amount" := -1 * TransactionAmount;
+        POSBinEntry.Comment := CopyStr(Format(POSBinEntry.Type), 1, MaxStrLen(POSBinEntry.Comment));
+        POSBinEntry."Transaction Amount" := -TransactionAmount;
         CalculateTransactionAmountLCY(POSBinEntry);
-
         POSBinEntry.Insert();
 
-        // Deposit to target bin
+        // Balancing bin (safe or bank or other POS)
         POSBinEntry."Entry No." := 0;
-        POSBinEntry."Payment Bin No." := TargetBinNo;
-        POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_IN;
-        POSPaymentBin.Get(POSBinEntry."Payment Bin No.");
-        POSBinEntry."POS Unit No." := POSPaymentBin."Attached to POS Unit No.";
-        POSBinEntry."Register No." := POSPaymentBin."Attached to POS Unit No.";
-        POSBinEntry."Transaction Amount" *= -1;
-        POSBinEntry."Transaction Amount (LCY)" *= -1;
-
-        POSBinEntry.Insert();
-    end;
-
-    internal procedure InsertBankTransfer(CheckpointEntry: Record "NPR POS Bin Entry"; TargetBinNo: Code[10]; TransactionAmount: Decimal; Reference: Text[50])
-    var
-        POSBinEntry: Record "NPR POS Bin Entry";
-    begin
-
-        // Withdrawl from source bin
-        POSBinEntry.Init();
-        POSBinEntry.TransferFields(CheckpointEntry);
-        POSBinEntry."Entry No." := 0;
-        POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_OUT;
-
-        POSBinEntry."External Transaction No." := Reference;
-        POSBinEntry.Comment := 'Bank Transfer';
-        POSBinEntry."Transaction Amount" := -1 * TransactionAmount;
-        CalculateTransactionAmountLCY(POSBinEntry);
-
-        POSBinEntry.Insert();
-
-        // Deposit to target bin
-        POSBinEntry."Entry No." := 0;
-        POSBinEntry."Payment Bin No." := TargetBinNo;
-        POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_IN;
-
-        POSBinEntry."Transaction Amount" *= -1;
-        POSBinEntry."Transaction Amount (LCY)" *= -1;
-
+        POSBinEntry."Payment Bin No." := BalancingBinNo;
+        if TransferIn then begin
+            if BankTransfer then
+                POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_OUT
+            else
+                POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_OUT;
+        end else begin
+            if BankTransfer then
+                POSBinEntry.Type := POSBinEntry.Type::BANK_TRANSFER_IN
+            else
+                POSBinEntry.Type := POSBinEntry.Type::BIN_TRANSFER_IN;
+        end;
+        if not BankTransfer then begin
+            POSPaymentBin.Get(POSBinEntry."Payment Bin No.");
+            POSBinEntry."POS Unit No." := POSPaymentBin."Attached to POS Unit No.";
+            POSBinEntry."Register No." := POSPaymentBin."Attached to POS Unit No.";
+        end;
+        POSBinEntry."Transaction Amount" := -POSBinEntry."Transaction Amount";
+        POSBinEntry."Transaction Amount (LCY)" := -POSBinEntry."Transaction Amount (LCY)";
         POSBinEntry.Insert();
     end;
 
@@ -1276,6 +1263,8 @@
 
     internal procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR POS Sale"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
     var
+        BinTransferJnl: Record "NPR BinTransferJournal";
+        PostedTransferEntries: Record "NPR PostedBinTransferEntry";
         POSPeriodRegister: Record "NPR POS Period Register";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSEntry: Record "NPR POS Entry";
@@ -1364,6 +1353,16 @@
             PaymentBinCheckpointUpdate.Get(PaymentBinCheckpointQuery.EntryNo);
             PaymentBinCheckpointUpdate.Status := PaymentBinCheckpointUpdate.Status::TRANSFERED;
             PaymentBinCheckpointUpdate.Modify();
+
+            if PaymentBinCheckpointUpdate."Bin Transfer Journal Entry No." <> 0 then begin
+                BinTransferJnl.Get(PaymentBinCheckpointUpdate."Bin Transfer Journal Entry No.");
+                PostedTransferEntries.TransferFields(BinTransferJnl, true);
+                PostedTransferEntries.DocumentNo := POSEntry."Document No.";
+                PostedTransferEntries.TransferredBy := CopyStr(UserId, 1, MaxStrLen(PostedTransferEntries.TransferredBy));
+                PostedTransferEntries.TransferredAt := CurrentDateTime();
+                PostedTransferEntries.Insert();
+                BinTransferJnl.Delete();
+            end;
         until (not PaymentBinCheckpointQuery.Read());
 
         exit(POSEntry."Entry No.");

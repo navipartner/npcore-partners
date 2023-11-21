@@ -14,11 +14,11 @@
 
         POSPaymentMethod.FindSet();
         repeat
-            AddBinCountingCheckpoint_PE(BinNo, UnitNo, POSPaymentMethod.Code, WorkshiftCheckpointEntryNo, PaymentBinCheckpointType);
+            AddBinCountingCheckpoint_PE(BinNo, UnitNo, POSPaymentMethod.Code, WorkshiftCheckpointEntryNo, PaymentBinCheckpointType, false);
         until (POSPaymentMethod.Next() = 0);
     end;
 
-    local procedure AddBinCountingCheckpoint_PE(BinNo: Code[10]; UnitNo: Code[10]; PaymentMethodCode: Code[10]; WorkshiftCheckpointEntryNo: Integer; PaymentBinCheckpointType: Option)
+    procedure AddBinCountingCheckpoint_PE(BinNo: Code[10]; UnitNo: Code[10]; PaymentMethodCode: Code[10]; WorkshiftCheckpointEntryNo: Integer; PaymentBinCheckpointType: Option; DoNotDeleteZeroAmountLines: Boolean): Integer
     var
         BinEntry: Record "NPR POS Bin Entry";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -43,7 +43,7 @@
         PaymentBinCheckpointQuery.SetFilter(PaymentBinNo, '=%1', BinNo);
         PaymentBinCheckpointQuery.Open();
         if (PaymentBinCheckpointQuery.Read()) then
-            exit; // no need to create it again
+            exit(PaymentBinCheckpointQuery.EntryNo); // no need to create it again
 
         if (not POSPaymentMethod.Get(PaymentMethodCode)) then
             Clear(POSPaymentMethod);
@@ -175,7 +175,7 @@
         BinEntry."Bin Checkpoint Entry No." := PaymentBinCheckpoint."Entry No.";
         BinEntry.Modify();
 
-        if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0)) then begin
+        if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0) and (not DoNotDeleteZeroAmountLines)) then begin
             POSEndofDayProfile.Init();
             if (POSUnit."POS End of Day Profile" <> '') then begin
                 if (not POSEndofDayProfile.Get(POSUnit."POS End of Day Profile")) then
@@ -185,8 +185,10 @@
             if (not POSEndofDayProfile."Show Zero Amount Lines") then begin
                 BinEntry.Delete();
                 PaymentBinCheckpoint.Delete();
+                exit(0);
             end;
         end;
+        exit(PaymentBinCheckpoint."Entry No.");
     end;
 
     local procedure FindFromEntryNo(POSUnitNo: Code[10]): Integer
@@ -227,11 +229,11 @@
 
         POSEntry.SetLoadFields("Entry No.");
         POSEntry.FindSet();
-            repeat
-                POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSEntryPaymentLine.SetRange("POS Payment Method Code", PaymentMethodCode);
-                PaymentBinCheckpoint."Payments Count" += POSEntryPaymentLine.Count();
-            until POSEntry.Next() = 0;
+        repeat
+            POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            POSEntryPaymentLine.SetRange("POS Payment Method Code", PaymentMethodCode);
+            PaymentBinCheckpoint."Payments Count" += POSEntryPaymentLine.Count();
+        until POSEntry.Next() = 0;
     end;
 
     procedure TransferToPaymentBin(FromWorkshiftCheckpointEntryNo: Integer; FromUnitNo: Code[10]; ToUnitNo: Code[10])

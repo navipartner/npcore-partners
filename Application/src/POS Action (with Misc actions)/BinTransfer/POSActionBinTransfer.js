@@ -1,9 +1,9 @@
-let main = async ({workflow, parameters}) => {
-    debugger;   
-    if (parameters.TransferDirection == parameters.TransferDirection["TransferIn"]) {
-        return await workflow.respond("TransferIn");
+let main = async ({ workflow }) => {
+    let { legacyAction, binTransferContextData } = (await workflow.respond("PrepareWorkflow"));
+    if (legacyAction) {
+        await workflow.respond("RunLegacyAction");
     } else {
-        let sourceBin = await workflow.respond("SelectBin");
-        return await workflow.respond("TransferOut", sourceBin);
-    }
+        let returnedData = await popup.binTransfer(binTransferContextData);
+        await workflow.respond("ProcessBinTranser", returnedData);
+    };
 };
