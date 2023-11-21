@@ -539,7 +539,7 @@
             Codeunit::"NPR Feature Flags Upgrade":
                 case UpgradeStep of
                     'PrepareFeatureFlags':
-                        exit('Upgrade_PrepareFeatureFlags-20230830');
+                        exit('Upgrade_PrepareFeatureFlags-20231117');
                 end;
             Codeunit::"NPR Feature Management Install":
                 case UpgradeStep of
