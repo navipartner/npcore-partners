@@ -58,7 +58,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('paymentDescription', POSPaymentMethod.Description);
         Response.Add('remainingAmount', RemainingAmount);
         Response.Add('amountPrompt', TextAmountLabel);
-        Response.Add('endSaleWorkflowEnabled', FeatureFlagsManagement.IsEnabled('endSaleWorkflowEnabled'));
+        Response.Add('posLifeCycleEventsWorkflowsEnabled', FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled'));
         exit(Response);
     end;
 
@@ -160,7 +160,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'let main=async({workflow:e,popup:l,scope:E,parameters:n,context:m})=>{const{HideAmountDialog:s,HideZeroAmountDialog:d}=n,{preWorkflows:o}=await e.respond("preparePreWorkflows");if(o)for(const W of Object.entries(o)){let[p,A]=W;p&&await e.run(p,{parameters:A})}const{dispatchToWorkflow:u,paymentType:y,remainingAmount:a,paymentDescription:c,amountPrompt:f,endSaleWorkflowEnabled:r}=await e.respond("preparePaymentWorkflow");let t=a;if(!s&&(!d||a>0)&&(t=await l.numpad({title:c,caption:f,value:a}),t===null))return;if(a==0){r?await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}):await e.respond("tryEndSale");return}let i=await e.run(u,{context:{paymentType:y,suggestedAmount:t}});i.legacy?(m.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):i.tryEndSale&&(r?await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}):await e.respond("tryEndSale"))};'
+'let main=async({workflow:e,popup:l,scope:A,parameters:n,context:s})=>{const{HideAmountDialog:m,HideZeroAmountDialog:u}=n,{preWorkflows:o}=await e.respond("preparePreWorkflows");if(o)for(const E of Object.entries(o)){let[p,W]=E;p&&await e.run(p,{parameters:W})}const{dispatchToWorkflow:y,paymentType:d,remainingAmount:a,paymentDescription:c,amountPrompt:f,posLifeCycleEventsWorkflowsEnabled:r}=await e.respond("preparePaymentWorkflow");let t=a;if(!m&&(!u||a>0)&&(t=await l.numpad({title:c,caption:f,value:a}),t===null))return;if(a==0){r?await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}):await e.respond("tryEndSale");return}let i=await e.run(y,{context:{paymentType:d,suggestedAmount:t}});i.legacy?(s.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):i.tryEndSale&&(r?await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}):await e.respond("tryEndSale"))};'
         );
     end;
 }
