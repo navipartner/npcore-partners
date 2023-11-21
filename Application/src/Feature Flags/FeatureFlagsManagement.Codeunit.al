@@ -148,6 +148,7 @@ codeunit 6151495 "NPR Feature Flags Management"
         ClearCompanyBuffer(TempCompany);
 
         Company.Reset();
+        Company.SetRange("Evaluation Company", false);
         if Company.Count = 1 then begin
             Company.FindFirst();
             TempCompany := Company;
