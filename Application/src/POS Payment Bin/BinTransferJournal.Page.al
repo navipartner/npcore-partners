@@ -230,12 +230,14 @@ page 6151240 "NPR BinTransferJournal"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
+                Enabled = not NewBinTransfer or (Rec.ReceiveAtPosUnitCode = '');
 
                 trigger OnAction();
                 var
                     BinTransferAnPost: Codeunit "NPR BinTransferPost";
                     BinTransferJournal: Record "NPR BinTransferJournal";
                 begin
+                    CheckNewBintTransferNotEnabled();
                     CurrPage.SetSelectionFilter(BinTransferJournal);
                     BinTransferJournal.FindSet(true);
                     repeat
@@ -257,12 +259,14 @@ page 6151240 "NPR BinTransferJournal"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Scope = Repeater;
+                Enabled = not NewBinTransfer or (Rec.ReceiveAtPosUnitCode = '');
 
                 trigger OnAction();
                 var
                     BinTransferAnPost: Codeunit "NPR BinTransferPost";
                     BinTransferJournal: Record "NPR BinTransferJournal";
                 begin
+                    CheckNewBintTransferNotEnabled();
                     CurrPage.SetSelectionFilter(BinTransferJournal);
                     BinTransferJournal.FindSet(true);
                     repeat
@@ -348,4 +352,22 @@ page 6151240 "NPR BinTransferJournal"
         _EditAmount := (Rec.DenominationSum = 0);
     end;
 
+    trigger OnOpenPage()
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
+    begin
+        NewBinTransfer := FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
+    end;
+
+    local procedure CheckNewBintTransferNotEnabled()
+    var
+        MustBePostedThroughPOSErr: Label 'This Bin Transfer IN transaction must be finished through POS.';
+    begin
+        if NewBinTransfer and (Rec.ReceiveAtPosUnitCode <> '') then
+            Error(MustBePostedThroughPOSErr);
+    end;
+
+    var
+        NewBinTransfer: Boolean;
 }

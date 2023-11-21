@@ -32,7 +32,7 @@ codeunit 85054 "NPR POS Act. Bin Trans. Tests"
         // [Given] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
-        FromBinNo := POSActionBinTransferB.GetDefaultUnitBin(POSSession);
+        FromBinNo := POSActionBinTransferB.GetDefaultUnitBin(POSUnit);
         POSActionBinTransferB.GetPosUnitFromBin(FromBinNo, PosUnit);
         CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(POSUnit."POS Store Code", POSUnit."No.", POSUnit.Status);
 

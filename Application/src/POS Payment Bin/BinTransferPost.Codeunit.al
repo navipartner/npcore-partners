@@ -345,9 +345,12 @@ codeunit 6150633 "NPR BinTransferPost"
 
         TempGenJournalLine.Description := CopyStr(PostingDescription, 1, MaxStrLen(TempGenJournalLine.Description));
 
-        TempGenJournalLine."Currency Code" := CurrencyCode;
-        if (not UseStandardExchangeRate) then
+        if UseStandardExchangeRate then
+            TempGenJournalLine.Validate("Currency Code", CurrencyCode)
+        else begin
+            TempGenJournalLine."Currency Code" := CurrencyCode;
             TempGenJournalLine.Validate("Currency Factor", ExchangeRate);
+        end;
 
         TempGenJournalLine.Validate(Amount, Amount);
 

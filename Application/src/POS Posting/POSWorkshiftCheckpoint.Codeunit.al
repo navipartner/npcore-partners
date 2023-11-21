@@ -885,10 +885,17 @@
                     POSBinEntry.SetFilter("Payment Bin No.", '=%1', POSBalancingLine."Move-To Bin Code");
 
                     if (POSBinEntry.FindFirst()) then begin
-                        if (POSUnittoBinRelation.Get(POSWorkshiftCheckpointOut."POS Unit No.", POSBalancingLine."Move-To Bin Code")) then
-                            POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)"
-                        else
-                            POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)";
+                        if (POSUnittoBinRelation.Get(POSWorkshiftCheckpointOut."POS Unit No.", POSBalancingLine."Move-To Bin Code")) then begin
+                            if POSBinEntry.Type = POSBinEntry.Type::BIN_TRANSFER_IN then
+                                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)"
+                            else
+                                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)";
+                        end else begin
+                            if POSBinEntry.Type = POSBinEntry.Type::BIN_TRANSFER_IN then
+                                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)"
+                            else
+                                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)";
+                        end;
                     end;
 
                 until (POSBalancingLine.Next() = 0);
