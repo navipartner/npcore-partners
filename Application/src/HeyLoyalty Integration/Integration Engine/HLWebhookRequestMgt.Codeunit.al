@@ -61,7 +61,16 @@ codeunit 6150948 "NPR HL Webhook Request Mgt."
     begin
         Commit();
         ClearLastError();
-        Success := Codeunit.Run(Codeunit::"NPR HL Member Webhook Handler", HLWebhookRequest);
+
+        case true of
+            IsConnectionTest(HLWebhookRequest):
+                begin
+                    HLWebhookRequest.SetStatusFinished();  //has a commit
+                    Success := true;
+                end;
+            else
+                Success := Codeunit.Run(Codeunit::"NPR HL Member Webhook Handler", HLWebhookRequest);
+        end;
 
         if not Success then
             if HLWebhookRequest.Find() then
@@ -73,9 +82,17 @@ codeunit 6150948 "NPR HL Webhook Request Mgt."
     begin
         if Rec.IsTemporary() or (Rec."Processing Status" <> Rec."Processing Status"::New) then
             exit;
-        if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
-            exit;
+        if not IsConnectionTest(Rec) then
+            if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
+                exit;
 
         ProcessWebhookRequest(Rec);
+    end;
+
+    local procedure IsConnectionTest(HLWebhookRequest: Record "NPR HL Webhook Request"): Boolean
+    var
+        ConnectionTestTok: Label 'CONNECTION TEST', Locked = true;
+    begin
+        exit(UpperCase(HLWebhookRequest."HL Request Type") = ConnectionTestTok);
     end;
 }
