@@ -47,7 +47,7 @@ let main = async ({ workflow, parameters, popup, context, captions }) => {
     let result = await workflow.respond("prepareRequest", { VoucherRefNo: voucher_input, selectedAmount: selectedAmount });
     if (result.tryEndSale) {
         if (parameters.EndSale) {
-            if (result.endSaleWorkflowEnabled) {
+            if (result.posLifeCycleEventsWorkflowsEnabled) {
                 await workflow.run('END_SALE', { parameters: { calledFromWorkflow: 'SCAN_VOUCHER_2', paymentNo: result.paymentNo } });
             } else {
                 if (!result.endSaleWithoutPosting) {
