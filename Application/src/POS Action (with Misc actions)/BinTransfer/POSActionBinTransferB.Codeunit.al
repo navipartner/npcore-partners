@@ -399,7 +399,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         until POSPmtBinCheckpDenom.Next() = 0;
     end;
 
-    internal procedure ProcessBinTransfer(BinTransferFrontReturnedData: JsonToken; SalePOS: Record "NPR POS Sale"; PosUnitNo: Code[10]; BinNo: Code[10]; PrintTransfer: Boolean): Boolean
+    internal procedure ProcessBinTransfer(BinTransferFrontReturnedData: JsonToken; SalePOS: Record "NPR POS Sale"; PosUnitNo: Code[10]; BinNo: Code[10]; PrintTransfer: Boolean; var CheckpointEntryNo: Integer): Boolean
     var
         BinTransferSetup: Record "NPR Bin Transfer Profile";
         PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -412,7 +412,8 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         if not JsonHelper.GetJBoolean(BinTransferFrontReturnedData, 'confirmed', false) then  // User clicked cancel, transaction will be aborted
             exit(false);
 
-        WorkShiftCheckpoint.Get(JsonHelper.GetJInteger(BinTransferFrontReturnedData, 'checkPointId', true));
+        CheckpointEntryNo := JsonHelper.GetJInteger(BinTransferFrontReturnedData, 'checkPointId', true);
+        WorkShiftCheckpoint.Get(CheckpointEntryNo);
         WorkShiftCheckpoint.TestField("POS Unit No.", PosUnitNo);
         POSUnit.Get(WorkShiftCheckpoint."POS Unit No.");
 

@@ -26,4 +26,11 @@ codeunit 6151068 "NPR POS Action Publishers"
         POSActionCustDepositB.SetNewDesc(NewDesciption, SaleLine, CopyNewDesc);
     end;
     #endregion
+
+    #region BIN_TRANSFER
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; SalePOS: Record "NPR POS Sale"; var PostWorkflows: JsonObject)
+    begin
+    end;
+    #endregion
 }
