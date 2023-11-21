@@ -595,6 +595,8 @@
         WizardModalChoosePresetDescriptionLbl: Label 'Choose from existing presets or create your own';
         WizardModalFinalizeDescriptionLbl: Label 'Confirm your selection';
         GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
+        GlobalSettingsModalEditorTabButtonLbl: Label 'Editor';
+        GlobalSettingsModalRestaurantTabButtonLbl: Label 'Restaurant';
         GlobalSettingsAuthorizationLbl: Label 'Authorization';
         GlobalSettingsDecimalNumberDigitsLbl: Label 'Decimal Number Digits';
         GlobalSettingsDecimalNumberDigitsInfoLbl: Label 'Specifies number of decimal places. Leaving this field blank disables this feature';
@@ -644,6 +646,10 @@
         ScheduleDialogTimeSlotsTableRemainingCapacityLbl: Label 'Remaining Capacity';
         ScheduleDialogTimeSlotsTablePriceLbl: Label 'Price';
         ScheduleDialogDialogScheduleRequestErrorLbl: Label 'Something went wrong when creating your ticket, please check the selected times and try again.';
+        RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
+        RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
+        RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
+        RestaurantMenusEditorTablesMenuLbl: Label 'Tables Menu';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -971,6 +977,8 @@
         Captions.Add('Wizard_Modal_FinalizeDescription', WizardModalFinalizeDescriptionLbl);
         Captions.Add('Global_Settings_PasswordRequirementForEditMode', GlobalSettingsModalLbl);
         Captions.Add('Global_Settings_Authorization', GlobalSettingsAuthorizationLbl);
+        Captions.Add('Global_Settings_Modal_RestaurantTabButton', GlobalSettingsModalRestaurantTabButtonLbl);
+        Captions.Add('Global_Settings_Modal_EditorTabButton', GlobalSettingsModalEditorTabButtonLbl);
         Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
         Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
         Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
@@ -1020,6 +1028,10 @@
         Captions.Add('ScheduleDialog_TimeSlots_Table_RemainingCapacity', ScheduleDialogTimeSlotsTableRemainingCapacityLbl);
         Captions.Add('ScheduleDialog_TimeSlots_Table_Price', ScheduleDialogTimeSlotsTablePriceLbl);
         Captions.Add('ScheduleDialog_Dialog_Schedule_RequestError', ScheduleDialogDialogScheduleRequestErrorLbl);
+        Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
+        Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
+        Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
+        Captions.Add('Restaurant_Menus_Editor_TablesMenu', RestaurantMenusEditorTablesMenuLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
