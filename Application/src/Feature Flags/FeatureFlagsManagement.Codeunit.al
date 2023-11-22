@@ -149,8 +149,7 @@ codeunit 6151495 "NPR Feature Flags Management"
 
         Company.Reset();
         Company.SetRange("Evaluation Company", false);
-        if Company.Count = 1 then begin
-            Company.FindFirst();
+        if Company.Find('-') and (Company.Next() = 0) then begin
             TempCompany := Company;
             TempCompany.Insert();
             exit;
@@ -162,7 +161,7 @@ codeunit 6151495 "NPR Feature Flags Management"
         repeat
             GLEntry.Reset();
             GLEntry.ChangeCompany(Company.Name);
-            if BestGLEntriesCount < GLEntry.Count then begin
+            if (BestGLEntriesCount < GLEntry.Count) or (TempCompany.IsEmpty) then begin
                 ClearCompanyBuffer(TempCompany);
                 TempCompany := Company;
                 TempCompany.Insert();
