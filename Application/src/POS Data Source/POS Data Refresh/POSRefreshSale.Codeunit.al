@@ -66,6 +66,14 @@ codeunit 6150749 "NPR POS Refresh Sale"
 
         if not POSSession.IsInitialized() then
             exit;
+
+        POSSession.GetSetup(POSSetup);
+        POSSaleRec."Register No." := POSSetup.GetxPOSUnitNo();
+        if (POSSaleRec."Register No." <> POSSetup.GetPOSUnitNo()) and (POSSaleRec."Register No." <> '') then begin
+            POSSaleRec.SystemId := CreateGuid();
+            Delete(POSSaleRec);
+        end;
+
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(POSSaleRec);
 
@@ -74,7 +82,6 @@ codeunit 6150749 "NPR POS Refresh Sale"
         end else begin
             //For backwards compatibility reasons we support refreshing the POS sale record even if no sale is currently active.
             //This is because values like LastSaleTotals are implemented via data extensions on BUILTIN_SALE and are shown on the login screen even when no new sale is started yet.
-            POSSession.GetSetup(POSSetup);
             TempSale."Register No." := POSSetup.GetPOSUnitNo();
             TempSale.Insert();
             Insert(TempSale);

@@ -41,10 +41,13 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
 
     internal procedure SwitchToNewRegister(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
+        POSSession: Codeunit "NPR POS Session";
         NewRegisterNo: Code[10];
     begin
         NewRegisterNo := CopyStr(Context.GetString('RegisterNo'), 1, MaxStrLen(NewRegisterNo));
         POSActSwitchRegB.SwitchRegister(NewRegisterNo, Setup);
+        POSSession.InitializeSession(true);
+        POSSession.RequestFullRefresh();
     end;
 
     local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper")

@@ -193,6 +193,7 @@
             _Setup.GetSalespersonRecord(Salesperson);
 
             UI.Initialize(_FrontEnd);
+            UI.SetOptions(_Setup);
 
             UsesLegacyPOSMenus := not _Setup.UsesNewPOSFrontEnd();
             if (PreviousRegisterNo <> _POSUnit."No.") then

@@ -58,7 +58,6 @@ codeunit 6151376 "NPR POS Action: Switch RegistB"
     var
         UserSetup: Record "User Setup";
         POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
     begin
         TestAllowUnitSwitch(RegisterNo);
 
@@ -68,7 +67,6 @@ codeunit 6151376 "NPR POS Action: Switch RegistB"
 
         POSUnit.Get(RegisterNo);
         Setup.SetPOSUnit(POSUnit);
-        POSSession.InitializeSession(true);
     end;
 
     internal procedure FilterByPOSUnitGr(FilterByPosUnitGroupValue: Boolean; var POSUnit: Record "NPR POS Unit"; Setup: Codeunit "NPR POS Setup")
