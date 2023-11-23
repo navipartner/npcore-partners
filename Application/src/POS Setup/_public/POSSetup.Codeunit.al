@@ -12,6 +12,7 @@
         Setup: Record "NPR POS Setup";
         UserSetup: Record "User Setup";
         SalespersonRec: Record "Salesperson/Purchaser";
+        xPOSUnitRec: Record "NPR POS Unit";
         POSUnitRec: Record "NPR POS Unit";
         POSStoreRec: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -76,6 +77,11 @@
     begin
         Initialize();
         exit(POSUnitRec."No.");
+    end;
+
+    procedure GetxPOSUnitNo(): Code[10]
+    begin
+        exit(xPOSUnitRec."No.");
     end;
 
     internal procedure Salesperson(): Code[20]
@@ -212,6 +218,7 @@
 
     procedure SetPOSUnit(POSUnit: Record "NPR POS Unit")
     begin
+        xPOSUnitRec := POSUnitRec;
         POSStoreRec.Get(POSUnit."POS Store Code");
         POSUnitRec := POSUnit;
         InitializeSetupPosUnit(POSUnitRec);
