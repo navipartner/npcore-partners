@@ -2,10 +2,9 @@
 codeunit 6184530 "NPR EFT Adyen Bgd. Lookup Req."
 {
     Access = Internal;
-    // NPR5.53/MMV /20191120 CASE 377533 Created object
-    // NPR5.53/MMV /20200126 CASE 377533 Added timeout param on lookup invoke
-    // NPR5.54/MMV /20200218 CASE 387990 Added response status code buffer.
-    // NPR5.54/MMV /20200226 CASE 364340 Added check for outdated request.
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'Replaced with version without .NET variables';
 
     TableNo = "NPR EFT Trx Async Req.";
 

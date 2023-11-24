@@ -2,6 +2,10 @@
 codeunit 6184517 "NPR EFT Adyen Cloud Integ."
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'Replaced with version without .NET variables';
+
 #if not CLOUD
     trigger OnRun()
     begin
@@ -41,6 +45,9 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         IsUnattended: Boolean;
         UserSetup: Record "User Setup";
     begin
+        if not IsEnabled() then
+            exit;
+
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
@@ -72,6 +79,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
+        if not IsEnabled() then
+            exit;
         //Any non standard EFT operations are registered here:
 
         tmpEFTAuxOperation.Init();
@@ -114,6 +123,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
     local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
     begin
+        if not IsEnabled() then
+            exit;
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
@@ -127,6 +138,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
     begin
+        if not IsEnabled() then
+            exit;
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
@@ -138,6 +151,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -159,6 +174,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -183,6 +200,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -212,6 +231,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -236,6 +257,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -249,6 +272,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -264,6 +289,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
         Handled := true;
@@ -277,6 +304,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
 
@@ -289,6 +318,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     var
         EFTAdyenCloudSignDialog: Codeunit "NPR EFT Adyen Cloud Sign Dia.";
     begin
+        if not IsEnabled() then
+            exit;
         if not EftTransactionRequest.IsType(IntegrationType()) then
             exit;
 
@@ -312,6 +343,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnBeforePauseFrontEnd', '', false, false)]
     local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
+        if not IsEnabled() then
+            exit;
         if not EFTTransactionRequest.IsType(IntegrationType()) then
             exit;
 
@@ -327,6 +360,8 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSSession: Codeunit "NPR POS Session";
     begin
+        if not IsEnabled() then
+            exit;
         if not POSSession.IsActiveSession(POSFrontEnd) then
             exit;
         if not EFTTransactionRequest.IsType(IntegrationType()) then
@@ -958,5 +993,12 @@ codeunit 6184517 "NPR EFT Adyen Cloud Integ."
         HandleProtocolResponse(OriginalEFTTransactionRequest);
     end;
     #endregion
+
+    local procedure IsEnabled(): Boolean
+    var
+        EFTAdyenFeatureFlag: Codeunit "NPR EFT Adyen Feature Flag";
+    begin
+        exit(not EFTAdyenFeatureFlag.IsEnabled());
+    end;
 #endif
 }

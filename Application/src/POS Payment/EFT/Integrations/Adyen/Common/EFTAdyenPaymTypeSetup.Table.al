@@ -1,14 +1,6 @@
-﻿#if not CLOUD
-table 6184508 "NPR EFT Adyen Paym. Type Setup"
+﻿table 6184508 "NPR EFT Adyen Paym. Type Setup"
 {
     Access = Internal;
-    // NPR5.49/MMV /20190401 CASE 345188 Created object
-    // NPR5.49/MMV /20190410 CASE 347476 Added field 7
-    // NPR5.50/MMV /20190430 CASE 352465 Added field 8
-    // NPR5.51/MMV /20190520 CASE 355433 Added field 9, 10
-    // NPR5.53/MMV /20191211 CASE 377533 Added fields 11, 12
-    // NPR5.55/MMV /20200421 CASE 386254 Added field 13
-
     Caption = 'EFT Adyen Payment Type Setup';
     DataClassification = CustomerContent;
 
@@ -30,7 +22,7 @@ table 6184508 "NPR EFT Adyen Paym. Type Setup"
         {
             Caption = 'Environment';
             DataClassification = CustomerContent;
-            OptionCaption = 'Production,Test';
+            OptionCaption = 'Live,Test';
             OptionMembers = PRODUCTION,TEST;
         }
         field(4; "Transaction Condition"; Option)
@@ -89,6 +81,25 @@ table 6184508 "NPR EFT Adyen Paym. Type Setup"
         {
             Caption = 'Unattended';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR28.0';
+            ObsoleteReason = 'The EFT module now correctly set "Self Service" field';
+        }
+        field(14; "Local Key Identifier"; Text[250])
+        {
+            Caption = 'Local Key Identifier';
+            DataClassification = CustomerContent;
+        }
+        field(15; "Local Key Passphrase"; Text[250])
+        {
+            Caption = 'Local Key Passphrase';
+            DataClassification = CustomerContent;
+        }
+        field(16; "Local Key Version"; Integer)
+        {
+            BlankZero = true;
+            Caption = 'Local Key Version';
+            DataClassification = CustomerContent;
         }
     }
 
@@ -103,4 +114,3 @@ table 6184508 "NPR EFT Adyen Paym. Type Setup"
     {
     }
 }
-#endif
