@@ -35,27 +35,34 @@ codeunit 6059980 "NPR POS Action: Switch Regist." implements "NPR IPOS Workflow"
             'EnterRegister':
                 SwitchToNewRegister(Context, Setup);
             else
-                OnActionList(Setup, Sale, Context);
+                if not OnActionList(Setup, Sale, Context) then
+                    exit;
         end;
+        InitAndRefreshFrontendSession();
     end;
 
     internal procedure SwitchToNewRegister(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
-        POSSession: Codeunit "NPR POS Session";
         NewRegisterNo: Code[10];
     begin
         NewRegisterNo := CopyStr(Context.GetString('RegisterNo'), 1, MaxStrLen(NewRegisterNo));
         POSActSwitchRegB.SwitchRegister(NewRegisterNo, Setup);
-        POSSession.InitializeSession(true);
-        POSSession.RequestFullRefresh();
     end;
 
-    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper")
+    local procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"): Boolean
     var
         FilterByPosUnitGroupValue: Boolean;
     begin
         Context.GetBooleanParameter('FilterByPosUnitGroup', FilterByPosUnitGroupValue);
-        POSActSwitchRegB.OnActionList(Setup, POSSale, FilterByPosUnitGroupValue);
+        exit(POSActSwitchRegB.OnActionList(Setup, POSSale, FilterByPosUnitGroupValue));
+    end;
+
+    local procedure InitAndRefreshFrontendSession()
+    var
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        POSSession.InitializeSession(true);
+        POSSession.RequestFullRefresh();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"User Setup", 'OnAfterValidateEvent', 'NPR Register Switch Filter', true, true)]
