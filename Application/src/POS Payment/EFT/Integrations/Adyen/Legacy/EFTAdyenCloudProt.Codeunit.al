@@ -2,32 +2,9 @@
 codeunit 6184518 "NPR EFT Adyen Cloud Prot."
 {
     Access = Internal;
-    // NPR5.48/MMV /20190124 CASE 341237 Created object
-    // 
-    // https://docs.adyen.com/developers/point-of-sale/build-your-integration/terminal-api-integration-overview
-    // 
-    // NPR5.49/MMV /20190219 CASE 345188 Handle void of recovered transactions correctly.
-    //                                   Don't throw exceptions when checking response document optional elements.
-    // NPR5.49/MMV /20190409 CASE 351678 Check response via codeunit.run instead of tryfunction
-    // NPR5.49/MMV /20190410 CASE 347476 Added request/response logging support
-    // NPR5.50/MMV /20190429 CASE 353340 Removed modify within TryFunction when logging.
-    // NPR5.50/MMV /20190516 CASE 355433 Increased abort request timeout
-    // NPR5.51/MMV /20190702 CASE 355433 Added amount to AcquireCard
-    //                                   Added capture delay parameter support.
-    // NPR5.53/MMV /20191120 CASE 378608 Set invariantculture when parsing from newtonsoft to prevent thread culture impact.
-    //                                   Removed single instance.
-    // NPR5.53/MMV /20191211 CASE 377533 Rewrote parsing to be in sync with undocumented API behaviour (all reject notifications -> no conclusive result)
-    //                                   Rewrote log handling to supporting table to prevent cross session locks.
-    //                                   Rewrote background session management.
-    //                                   Added disable recurring contract API request
-    // NPR5.53/MMV /20200128 CASE 377533 Added auto abort if API returns InProgress and we find a matching candidate on most recently logged trx.
-    //                                   Added variable lookup timeout.
-    // NPR5.54/MMV /20200218 CASE 387990 Added response status code buffer.
-    //                                   Parse web exception on error to fill buffer.
-    //                                   Handle acquire card hard error.
-    // NPR5.54/MMV /20200227 CASE 364340 Changed background session method.
-    // NPR5.55/MMV /20200421 CASE 386254 Parameter controlled model GUI
-
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'Replaced with version without .NET variables';
 
     trigger OnRun()
     begin

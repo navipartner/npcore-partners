@@ -979,4 +979,14 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_PEPPER_INSTALL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Pepper Install";
     }
+    value(6184486; EFT_ADYEN_CLOUD)
+    {
+        Caption = 'EFT_ADYEN_CLOUD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT Adyen Cloud";
+    }
+    value(6184487; EFT_ADYEN_LOCAL)
+    {
+        Caption = 'EFT_ADYEN_LOCAL', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT Adyen Local";
+    }
 }
