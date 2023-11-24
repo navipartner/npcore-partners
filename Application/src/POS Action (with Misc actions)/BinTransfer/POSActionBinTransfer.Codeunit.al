@@ -194,7 +194,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionBinTransfer.js###
-'let main=async({workflow:e})=>{let{legacyAction:n,binTransferContextData:s,postWorkflows:a}=await e.respond("PrepareWorkflow");if(n)return await e.respond("RunLegacyAction");{let t=await popup.binTransfer(s);var o=await e.respond("ProcessBinTranser",t)}if(a)for(const t of Object.entries(a)){let[r,i]=t;r&&await e.run(r,{context:{transferResult:o},parameters:i})}};'
+'let main=async({workflow:t})=>{let{legacyAction:a,binTransferContextData:n,postWorkflows:e}=await t.respond("PrepareWorkflow");if(a)return await t.respond("RunLegacyAction");let o=await popup.binTransfer(n),{success:s,checkpointEntryNo:i}=await t.respond("ProcessBinTranser",o);if(!!s&&e)for(const c of Object.entries(e)){let[r,p]=c;r&&await t.run(r,{context:{transferResult:{checkpointEntryNo:i}},parameters:p})}};'
         );
     end;
 }

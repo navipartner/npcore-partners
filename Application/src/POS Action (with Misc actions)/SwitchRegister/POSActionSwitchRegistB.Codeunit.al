@@ -1,15 +1,16 @@
 codeunit 6151376 "NPR POS Action: Switch RegistB"
 {
     Access = Internal;
-    procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; FilterByPosUnitGroupValue: Boolean)
+    procedure OnActionList(Setup: Codeunit "NPR POS Setup"; POSSale: Codeunit "NPR POS Sale"; FilterByPosUnitGroupValue: Boolean): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         NewRegisterNo: Code[10];
     begin
         POSSale.GetCurrentSale(SalePOS);
         if not SelectRegister(SalePOS."Register No.", NewRegisterNo, Setup, FilterByPosUnitGroupValue) then
-            exit;
+            exit(false);
         SwitchRegister(NewRegisterNo, Setup);
+        exit(true);
     end;
 
     local procedure TestAllowUnitSwitch(UnitNo: Code[10])
