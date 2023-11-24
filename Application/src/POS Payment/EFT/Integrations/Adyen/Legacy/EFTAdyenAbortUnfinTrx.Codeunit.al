@@ -2,8 +2,9 @@
 codeunit 6184531 "NPR EFT Adyen Abort Unfin. Trx"
 {
     Access = Internal;
-    // NPR5.53/MMV /20200126 CASE 377533 Created object
-    // NPR5.54/MMV /20200415 CASE 364340 Set sales ticket number correctly.
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'Replaced with version without .NET variables';
 
     TableNo = "NPR EFT Transaction Request";
 

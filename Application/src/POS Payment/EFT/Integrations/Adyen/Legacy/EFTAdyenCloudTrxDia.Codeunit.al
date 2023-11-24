@@ -6,6 +6,9 @@ codeunit 6184519 "NPR EFT Adyen Cloud Trx Dia."
 {
     Access = Internal;
     SingleInstance = true;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'Replaced with version without .NET variables';
 
     var
         Model: DotNet NPRNetModel;

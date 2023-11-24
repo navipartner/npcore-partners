@@ -31,6 +31,8 @@ codeunit 6184544 "NPR POS Action - SS Adyen" implements "NPR IPOS Workflow"
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
         EFTSetup: Record "NPR EFT Setup";
     begin
+        if not IsEnabled() then
+            exit;
         if EFTTransactionRequest."Integration Type" <> EFTAdyenCloudIntegration.IntegrationType() then
             exit;
         if EFTTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::PAYMENT then
@@ -87,6 +89,13 @@ codeunit 6184544 "NPR POS Action - SS Adyen" implements "NPR IPOS Workflow"
         EFTTransactionRequest.Find('=');
         Response.Add('trxDone', true);
         Response.Add('BCSuccess', EFTTransactionRequest.Successful);
+    end;
+
+    local procedure IsEnabled(): Boolean
+    var
+        EFTAdyenFeatureFlag: Codeunit "NPR EFT Adyen Feature Flag";
+    begin
+        exit(not EFTAdyenFeatureFlag.IsEnabled());
     end;
 
     local procedure GetActionScript(): Text
