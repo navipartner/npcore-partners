@@ -557,7 +557,7 @@
         POSEditorSaleLinesLbl: Label 'Sale Lines';
         POSEditorTotalsLbl: Label 'Totals';
         POSEditorLogoLbl: Label 'Logo';
-        POSEditorPanelBottomLineLbl: Label 'Logo';
+        POSEditorPanelBottomLineLbl: Label 'Panel Bottom Line';
         ColumnsPickerMaxColumnsNumberExceededErrorLbl: label 'Amount of columns is too high.Maximum number allowed is ';
         ColumnsPickerMinColumnsNumberExceededErrorLbl: label 'Minimum number of columns is too low.Please select more than';
         ColumnsPickerSpreadLbl: label 'Spread:';
