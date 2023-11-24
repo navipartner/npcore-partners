@@ -375,7 +375,6 @@
         SalesHeader."Document Type" := DocumentType;
         SalesHeader."No." := '';
         SalesHeader."Posting Date" := Today();
-        SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
         SalesHeader.SetRange("Sell-to Customer No.", SalePOS."Customer No.");
         SalesHeader.Insert(true);
 
