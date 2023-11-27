@@ -184,11 +184,6 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                         textattribute(xResponseMessageOut)
                         {
                             XmlName = 'message';
-
-                            trigger OnBeforePassVariable()
-                            begin
-                                SetResponseMessageText();
-                            end;
                         }
 
                         fieldattribute(xEventArrivalFromTime; TmpAdmScheduleEntryResponse."Event Arrival From Time")
@@ -288,8 +283,8 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                                 _CapacityStatusCode := -5;
 
                             if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse,
-                                        xAdmCapacityPriceBufferResponse.ItemNumber,
-                                        xAdmCapacityPriceBufferResponse.VariantCode,
+                                        xAdmCapacityPriceBufferResponse.RequestItemNumber,
+                                        xAdmCapacityPriceBufferResponse.RequestVariantCode,
                                         Today, Time,
                                         ReasonCode, _RemainingCapacity)) then begin
                                 _CapacityStatusCode := -1;
@@ -298,8 +293,8 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             end;
 
                             TicketManagement.CheckTicketBaseCalendar(TmpAdmScheduleEntryResponse."Admission Code",
-                                xAdmCapacityPriceBufferResponse.ItemNumber,
-                                xAdmCapacityPriceBufferResponse.VariantCode,
+                                xAdmCapacityPriceBufferResponse.RequestItemNumber,
+                                xAdmCapacityPriceBufferResponse.RequestVariantCode,
                                 TmpAdmScheduleEntryResponse."Admission Start Date",
                                 NonWorking,
                                 _CalendarExceptionText);
@@ -347,14 +342,13 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             if (NonWorking) then
                                 _CapacityStatusCode := -6;
 
-                            if (_CapacityStatusCode <> 1) then
-                                exit;
+                            if (_RemainingCapacity < 1) then begin
+                                _RemainingCapacity := 0;
+                                _CapacityStatusCode := -1;
+                                ReasonCode := ReasonCode::RemainingCapacityZeroOrLess;
+                            end;
 
-                            SetCapacityStatusCode();
-
-                            if ((_CalendarExceptionText <> '') and (_CapacityStatusCode > 0)) then
-                                _CapacityStatusCode := 6;
-
+                            xResponseMessageOut := SetResponseMessageText(ReasonCode);
                         end;
 
                     }
@@ -415,11 +409,11 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
     begin
 
         AdmCapacityPriceBuffer.TestField(ItemReference);
-        if (not TicketRequestManager.TranslateBarcodeToItemVariant(AdmCapacityPriceBuffer.ItemReference, AdmCapacityPriceBuffer.ItemNumber, AdmCapacityPriceBuffer.VariantCode, ItemResolver)) then
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(AdmCapacityPriceBuffer.ItemReference, AdmCapacityPriceBuffer.RequestItemNumber, AdmCapacityPriceBuffer.RequestVariantCode, ItemResolver)) then
             Error('Invalid ItemReference.');
 
-        TicketBom.SetFilter("Item No.", '=%1', AdmCapacityPriceBuffer.ItemNumber);
-        TicketBom.SetFilter("Variant Code", '=%1', AdmCapacityPriceBuffer.VariantCode);
+        TicketBom.SetFilter("Item No.", '=%1', AdmCapacityPriceBuffer.RequestItemNumber);
+        TicketBom.SetFilter("Variant Code", '=%1', AdmCapacityPriceBuffer.RequestVariantCode);
         if (xAdmCapacityPriceBufferRequest.AdmissionCode <> '') then
             TicketBom.SetFilter("Admission Code", '=%1', AdmCapacityPriceBuffer.AdmissionCode);
 
@@ -433,6 +427,8 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
             xAdmCapacityPriceBufferResponse.AdmissionCode := TicketBom."Admission Code";
             xAdmCapacityPriceBufferResponse.DefaultAdmission := TicketBom.Default;
             xAdmCapacityPriceBufferResponse.AdmissionInclusion := TicketBom."Admission Inclusion";
+            xAdmCapacityPriceBufferResponse.ItemNumber := xAdmCapacityPriceBufferResponse.RequestItemNumber;
+            xAdmCapacityPriceBufferResponse.VariantCode := xAdmCapacityPriceBufferResponse.RequestVariantCode;
 
             if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                 if (TicketBom.Default) then
@@ -463,37 +459,31 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
 
     end;
 
-    local procedure SetCapacityStatusCode()
+    local procedure SetResponseMessageText(ReasonCode: Enum "NPR TM Sch. Block Sales Reason"): Text
     begin
-        _CapacityStatusCode := 1;
-        if (_RemainingCapacity < 1) then begin
-            _RemainingCapacity := 0;
-            _CapacityStatusCode := -1;
-        end;
-    end;
+        if ((_CalendarExceptionText <> '') and (_CapacityStatusCode > 0)) then
+            _CapacityStatusCode := 6;
 
-    local procedure SetResponseMessageText()
-    begin
         case _CapacityStatusCode of
             6:
-                xResponseMessageOut := _CalendarExceptionText;
+                exit(_CalendarExceptionText);
             1:
-                xResponseMessageOut := 'Ok.';
+                exit('Ok.');
             -1:
-                xResponseMessageOut := 'Capacity exceeded.';
+                exit(StrSubstNo('Capacity exceeded (code: %1).', ReasonCode.AsInteger()));
             -2:
-                xResponseMessageOut := 'The schedule does not allow admissions at this time.';
+                exit('The schedule does not allow admissions at this time.');
             -3:
-                xResponseMessageOut := 'Unexpected problem with capacity calculation, invalid parameters?';
+                exit('Unexpected problem with capacity calculation, invalid parameters?');
             -4:
-                xResponseMessageOut := 'The external schedule id is invalid or all schedules have been cancelled.';
+                exit('The external schedule id is invalid or all schedules have been cancelled.');
             -5:
-                xResponseMessageOut := 'The admission schedule indicated that admission is closed.';
+                exit('The admission schedule indicated that admission is closed.');
             -6:
-                xResponseMessageOut := _CalendarExceptionText;
+                exit(_CalendarExceptionText);
 
             else
-                xResponseMessageOut := StrSubstNo(_ResponseLbl, _CapacityStatusCode);
+                exit(StrSubstNo(_ResponseLbl, _CapacityStatusCode));
         end;
     end;
 
