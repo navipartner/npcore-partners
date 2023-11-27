@@ -673,11 +673,14 @@ codeunit 6151543 "NPR TM Client API BL"
         AdmCapacityPriceBuffer.Quantity := Quantity;
 
         AdmCapacityPriceBuffer.ItemReference := CopyStr(ItemReference, 1, MaxStrLen(AdmCapacityPriceBuffer.ItemReference));
-        if (not TicketRequestManager.TranslateBarcodeToItemVariant(AdmCapacityPriceBuffer.ItemReference, AdmCapacityPriceBuffer.ItemNumber, AdmCapacityPriceBuffer.VariantCode, ItemResolver)) then
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(AdmCapacityPriceBuffer.ItemReference, AdmCapacityPriceBuffer.RequestItemNumber, AdmCapacityPriceBuffer.RequestVariantCode, ItemResolver)) then
             Error('Invalid ItemReference.');
 
-        TicketBom.SetFilter("Item No.", '=%1', AdmCapacityPriceBuffer.ItemNumber);
-        TicketBom.SetFilter("Variant Code", '=%1', AdmCapacityPriceBuffer.VariantCode);
+        AdmCapacityPriceBuffer.ItemNumber := AdmCapacityPriceBuffer.RequestItemNumber;
+        AdmCapacityPriceBuffer.VariantCode := AdmCapacityPriceBuffer.RequestVariantCode;
+
+        TicketBom.SetFilter("Item No.", '=%1', AdmCapacityPriceBuffer.RequestItemNumber);
+        TicketBom.SetFilter("Variant Code", '=%1', AdmCapacityPriceBuffer.RequestVariantCode);
         if (AdmissionCode <> '') then
             TicketBom.SetFilter("Admission Code", '=%1', CopyStr(AdmissionCode, 1, MaxStrLen(TicketBom."Admission Code")));
 
@@ -749,6 +752,7 @@ codeunit 6151543 "NPR TM Client API BL"
         DynamicPriceOptionText: Text;
         DynamicPriceOptionId: Integer;
         DynamicCustomerPrice: Decimal;
+        CustomerPriceOut: Decimal;
     begin
 
         AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
@@ -766,8 +770,8 @@ codeunit 6151543 "NPR TM Client API BL"
             CapacityStatusCode := _CapacityStatusCodeOption::OK;
 
             if (not TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry,
-                        AdmCapacityPriceBufferResponse.ItemNumber,
-                        AdmCapacityPriceBufferResponse.VariantCode,
+                        AdmCapacityPriceBufferResponse.RequestItemNumber,
+                        AdmCapacityPriceBufferResponse.RequestVariantCode,
                         Today(), Time(),
                         BlockSaleReason, RemainingCapacity)) then begin
                 CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
@@ -775,13 +779,18 @@ codeunit 6151543 "NPR TM Client API BL"
                     exit;
             end;
 
+            if (RemainingCapacity < 1) then begin
+                CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
+                BlockSaleReason := BlockSaleReason::RemainingCapacityZeroOrLess;
+            end;
+
             HavePriceRule := TicketPrice.SelectPriceRule(AdmissionScheduleEntry, Today(), Time(), PriceRule);
             if (HavePriceRule) then
                 TicketPrice.EvaluatePriceRule(PriceRule, AdmCapacityPriceBufferResponse.UnitPrice, AdmCapacityPriceBufferResponse.UnitPriceIncludesVat, AdmCapacityPriceBufferResponse.UnitPriceVatPercentage, false, BasePrice, AddonPrice);
 
             TicketManagement.CheckTicketBaseCalendar(AdmCapacityPriceBufferResponse.AdmissionCode,
-                AdmCapacityPriceBufferResponse.ItemNumber,
-                AdmCapacityPriceBufferResponse.VariantCode,
+                AdmCapacityPriceBufferResponse.RequestItemNumber,
+                AdmCapacityPriceBufferResponse.RequestVariantCode,
                 AdmCapacityPriceBufferResponse.ReferenceDate,
                 IsNonWorking,
                 CalendarExceptionText);
@@ -825,6 +834,8 @@ codeunit 6151543 "NPR TM Client API BL"
             if (DynamicCustomerPrice < 0) then
                 DynamicCustomerPrice := 0;
 
+            CustomerPriceOut := (AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice - AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice * AdmCapacityPriceBufferResponse.DiscountPct / 100);
+
             JBuilder.WriteStartObject('');
             JBuilder.WriteRawProperty('id', AdmissionScheduleEntry."External Schedule Entry No.");
             JBuilder.WriteStringProperty('scheduleCode', AdmissionScheduleEntry."Schedule Code");
@@ -837,7 +848,7 @@ codeunit 6151543 "NPR TM Client API BL"
 
             JBuilder.WriteStartObject('message');
             JBuilder.WriteRawProperty('option', CapacityStatusCode);
-            JBuilder.WriteStringProperty('description', GetMessageText(CapacityStatusCode, CalendarExceptionText));
+            JBuilder.WriteStringProperty('description', GetMessageText(CapacityStatusCode, CalendarExceptionText, BlockSaleReason.AsInteger()));
             JBuilder.WriteEndObject();
 
             JBuilder.WriteStartObject('allocationBy');
@@ -860,7 +871,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteNumberProperty('unitPrice', DynamicCustomerPrice);
             JBuilder.WriteEndObject();
 
-            JBuilder.WriteNumberProperty('customerPriceInclDiscount', (AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice - AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice * AdmCapacityPriceBufferResponse.DiscountPct / 100));
+            JBuilder.WriteNumberProperty('customerPriceInclDiscount', Format(TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection), 0, 9));
             JBuilder.WriteEndObject();
 
         until (AdmissionScheduleEntry.Next() = 0);
@@ -961,11 +972,11 @@ codeunit 6151543 "NPR TM Client API BL"
         JBuilder.WriteEndObject();
     end;
 
-    local procedure GetMessageText(CapacityStatusCode: Option; ReasonText: Text): Text
+    local procedure GetMessageText(CapacityStatusCode: Option; ReasonText: Text; BlockSalesReason: Integer): Text
     var
         ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message.';
         OK: Label 'Ok.';
-        CAPACITY_EXCEEDED: Label 'Capacity Exceeded.';
+        CAPACITY_EXCEEDED: Label 'Capacity Exceeded (code %1).';
     begin
         case CapacityStatusCode of
             _CapacityStatusCodeOption::OK:
@@ -973,7 +984,7 @@ codeunit 6151543 "NPR TM Client API BL"
             _CapacityStatusCodeOption::NON_WORKING:
                 exit(ReasonText);
             _CapacityStatusCodeOption::CAPACITY_EXCEEDED:
-                exit(CAPACITY_EXCEEDED);
+                exit(StrSubstNo(CAPACITY_EXCEEDED, BlockSalesReason));
             _CapacityStatusCodeOption::CALENDAR_WARNING:
                 exit(ReasonText);
             else

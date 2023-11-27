@@ -77,6 +77,14 @@ table 6060016 "NPR TM AdmCapacityPriceBuffer"
             OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
             OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
         }
+        field(240; RequestItemNumber; Code[20])
+        {
+            DataClassification = CustomerContent;
+        }
+        field(241; RequestVariantCode; Code[10])
+        {
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
