@@ -1,0 +1,372 @@
+codeunit 6151610 "NPR BG SIS Audit Mgt."
+{
+    Access = Internal;
+
+    var
+        Enabled: Boolean;
+        Initialized: Boolean;
+
+    #region BG SIS Fiscal - POS Handling Subscribers
+    [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
+    local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
+    begin
+        if not IsBGSISAuditEnabled(POSAuditProfile.Code) then
+            exit;
+
+        OnActionShowSetup();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
+    local procedure OnLookupAuditHandler(var tmpRetailList: Record "NPR Retail List")
+    begin
+        AddBGSISAuditHandler(tmpRetailList);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
+    local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+        HandleOnHandleAuditLogBeforeInsert(POSAuditLog);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSStore(var Rec: Record "NPR POS Store"; var xRec: Record "NPR POS Store"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSStoreIfAlreadyUsed(xRec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSUnit(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
+    end;
+    #endregion
+
+    #region BG SIS Fiscal - Audit Profile Mgt
+    local procedure AddBGSISAuditHandler(var tmpRetailList: Record "NPR Retail List")
+    begin
+        tmpRetailList.Number += 1;
+        tmpRetailList.Choice := CopyStr(HandlerCode(), 1, MaxStrLen(tmpRetailList.Choice));
+        tmpRetailList.Insert();
+    end;
+
+    local procedure HandleOnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if POSAuditLog."Active POS Unit No." = '' then
+            POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No.";
+
+        if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if not POSStore.Get(POSUnit."POS Store Code") then
+            exit;
+
+        if not (POSAuditLog."Action Type" in [POSAuditLog."Action Type"::DIRECT_SALE_END]) then
+            exit;
+
+        POSEntry.Get(POSAuditLog."Record ID");
+        if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
+            InsertBGSISPOSAuditLogAux(POSEntry, POSStore, POSUnit);
+    end;
+
+    local procedure InsertBGSISPOSAuditLogAux(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    var
+        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+    begin
+        BGSISPOSAuditLogAux.Init();
+        BGSISPOSAuditLogAux."Audit Entry Type" := BGSISPOSAuditLogAux."Audit Entry Type"::"POS Entry";
+        BGSISPOSAuditLogAux."POS Entry No." := POSEntry."Entry No.";
+        BGSISPOSAuditLogAux."Entry Date" := POSEntry."Entry Date";
+        BGSISPOSAuditLogAux."POS Store Code" := POSStore.Code;
+        BGSISPOSAuditLogAux."POS Unit No." := POSUnit."No.";
+        BGSISPOSAuditLogAux."Source Document No." := POSEntry."Document No.";
+
+        case true of
+            POSEntry."Amount Incl. Tax" > 0:
+                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale;
+            POSEntry."Amount Incl. Tax" < 0:
+                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
+        end;
+
+        BGSISPOSAuditLogAux.Insert();
+    end;
+    #endregion
+
+    #region Subscribers - POS Management
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
+    local procedure HandleOnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        POSUnit: Record "NPR POS Unit";
+        Salesperson: Record "Salesperson/Purchaser";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
+    begin
+        FrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSetup.GetSalespersonRecord(Salesperson);
+
+        TestPOSUnitMapping(POSUnit);
+        CheckSalesperson(Salesperson);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
+    local procedure HandleOnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]);
+    var
+        POSUnit: Record "NPR POS Unit";
+        NewSalesTicketNo: Code[20];
+    begin
+        Setup.GetPOSUnit(POSUnit);
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        NewSalesTicketNo := GetSourceDocumentNoForGrandReceiptNo(SalesTicketNo);
+        if NewSalesTicketNo <> '' then
+            SalesTicketNo := NewSalesTicketNo;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', false, false)]
+    local procedure HandleOnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale");
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not POSUnit.Get(SaleHeader."Register No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        CheckAreMandatoryMappingsPopulated(SaleHeader);
+    end;
+    #endregion
+
+    #region Subscribers - POS Workflows
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Login Events", 'OnAddPreWorkflowsToRun', '', false, false)]
+    local procedure HandleOnAddPreWorkflowsToRunOnPOSLoginEvents(Context: Codeunit "NPR POS JSON Helper"; SalePOS: Record "NPR POS Sale"; var PreWorkflows: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+    begin
+        if not IsBGSISFiscalEnabled() then
+            exit;
+
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        MainParameters.Add('Method', 'isCashierSet');
+        ActionParameters.Add('mainParameters', MainParameters);
+        PreWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_CASHIER"), ActionParameters);
+
+        AddPreWorkflowForRefreshFiscalPrinterInfoIfNecessary(PreWorkflows, POSUnit."No.");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Sale Events", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnEndSaleinternal(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; EndSaleSuccess: Boolean; var PostWorkflows: JsonObject)
+    var
+        POSSale: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+        ActionParameters: JsonObject;
+        CustomParameters: JsonObject;
+        MainParameters: JsonObject;
+    begin
+        if not EndSaleSuccess then
+            exit;
+
+        if not IsBGSISFiscalEnabled() then
+            exit;
+
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        MainParameters.Add('Method', 'printReceipt');
+        CustomParameters.Add('salesTicketNo', POSSale."Sales Ticket No.");
+
+        ActionParameters.Add('mainParameters', MainParameters);
+        ActionParameters.Add('customParameters', CustomParameters);
+
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_MGT"), ActionParameters);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnPOSActionPublishersEventsForBinTransfer(Context: Codeunit "NPR POS JSON Helper"; SalePOS: Record "NPR POS Sale"; var PostWorkflows: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        ActionParameters: JsonObject;
+        PostWorkflowParameters: JsonObject;
+    begin
+        if not IsBGSISFiscalEnabled() then
+            exit;
+
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        PostWorkflowParameters.Add('Method', 'cashHandling');
+        ActionParameters.Add('postWorkflowParameters', PostWorkflowParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_MGT"), ActionParameters);
+    end;
+    #endregion
+
+    #region BG SIS Fiscal - Procedures/Helper Functions
+    local procedure IsBGSISFiscalEnabled(): Boolean
+    var
+        BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
+    begin
+        if BGFiscalizationSetup.Get() then
+            exit(BGFiscalizationSetup."BG SIS Fiscal Enabled");
+    end;
+
+    local procedure IsBGSISAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
+
+        if POSAuditProfile."Audit Handler" <> HandlerCode() then
+            exit(false);
+
+        if Initialized then
+            exit(Enabled);
+
+        Initialized := true;
+        Enabled := true;
+        exit(true);
+    end;
+
+    local procedure AddPreWorkflowForRefreshFiscalPrinterInfoIfNecessary(var PreWorkflows: JsonObject; POSUnitNo: Code[10])
+    var
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+    begin
+        BGSISPOSUnitMapping.Get(POSUnitNo);
+        if BGSISPOSUnitMapping.ShouldRefreshFiscalPrinterInfo() then begin
+            MainParameters.Add('Method', 'getMfcInfo');
+            ActionParameters.Add('mainParameters', MainParameters);
+            PreWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_MGT"), ActionParameters);
+        end;
+    end;
+
+    local procedure HandlerCode(): Text
+    var
+        HandlerCodeTxt: Label 'BG_SIS', Locked = true, MaxLength = 20;
+    begin
+        exit(HandlerCodeTxt);
+    end;
+
+    local procedure OnActionShowSetup()
+    var
+        BGFiscalisationSetup: Page "NPR BG Fiscalization Setup";
+    begin
+        BGFiscalisationSetup.RunModal();
+    end;
+
+    local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")
+    var
+        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for calculating the seal.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - BG POS SIS Audit Log Aux. table caption';
+    begin
+        BGSISPOSAuditLogAux.SetRange("POS Store Code", OldPOSStore.Code);
+        if not BGSISPOSAuditLogAux.IsEmpty() then
+            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, BGSISPOSAuditLogAux.TableCaption());
+    end;
+
+    local procedure ErrorOnRenameOfPOSUnitIfAlreadyUsed(OldPOSUnit: Record "NPR POS Unit")
+    var
+        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for calculating the seal.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - BG POS SIS Audit Log Aux. table caption';
+    begin
+        if not IsBGSISAuditEnabled(OldPOSUnit."POS Audit Profile") then
+            exit;
+
+        BGSISPOSAuditLogAux.SetRange("POS Unit No.", OldPOSUnit."No.");
+        if not BGSISPOSAuditLogAux.IsEmpty() then
+            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", BGSISPOSAuditLogAux.TableCaption());
+    end;
+    #endregion
+
+    #region Procedures - Validations
+    local procedure TestPOSUnitMapping(POSUnit: Record "NPR POS Unit")
+    var
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+    begin
+        BGSISPOSUnitMapping.Get(POSUnit."No.");
+        BGSISPOSUnitMapping.TestField("Fiscal Printer IP Address");
+        BGSISPOSUnitMapping.TestField("Fiscal Printer Device No.");
+        BGSISPOSUnitMapping.TestField("Fiscal Printer Memory No.");
+    end;
+
+    local procedure CheckSalesperson(Salesperson: Record "Salesperson/Purchaser")
+    var
+        SalespersonCodeAsInteger: Integer;
+        CannotBeConvertedtoIntegerErr: Label '%1 %2 %3 cannot be converted to integer.', Comment = '%1 - Salesperson table caption, %2 - Salesperson Code field caption, %3 - Salesperson Code value';
+    begin
+        if not Evaluate(SalespersonCodeAsInteger, Salesperson.Code) then
+            Error(CannotBeConvertedtoIntegerErr, Salesperson.TableCaption(), Salesperson.FieldCaption(Code), Salesperson.Code);
+    end;
+
+    local procedure CheckAreMandatoryMappingsPopulated(SaleHeader: Record "NPR POS Sale")
+    var
+        BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
+        BGSISReturnReasonMap: Record "NPR BG SIS Return Reason Map";
+        BGSISVATPostSetupMap: Record "NPR BG SIS VAT Post. Setup Map";
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        if POSSaleLine.FindSet() then
+            repeat
+                case POSSaleLine."Line Type" of
+                    POSSaleLine."Line Type"::Item:
+                        begin
+                            BGSISVATPostSetupMap.Get(POSSaleLine."VAT Bus. Posting Group", POSSaleLine."VAT Prod. Posting Group");
+                            BGSISVATPostSetupMap.CheckIsBGSISVATCategoryPopulated();
+
+                            if POSSaleLine."Return Reason Code" <> '' then begin
+                                BGSISReturnReasonMap.Get(POSSaleLine."Return Reason Code");
+                                BGSISReturnReasonMap.CheckIsBGSISReturnReasonPopulated();
+                            end;
+                        end;
+                    POSSaleLine."Line Type"::"POS Payment":
+                        begin
+                            BGSISPOSPaymMethMap.Get(POSSaleLine."No.");
+                            BGSISPOSPaymMethMap.CheckIsBGSISPaymentMethodPopulated();
+                        end;
+                end;
+            until POSSaleLine.Next() = 0;
+    end;
+    #endregion
+
+    #region Procedures - Misc
+    local procedure GetSourceDocumentNoForGrandReceiptNo(GrandReceiptNo: Code[20]): Code[20]
+    var
+        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+    begin
+        GrandReceiptNo := DelChr(GrandReceiptNo, '<', '0');
+        BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", GrandReceiptNo);
+        if BGSISPOSAuditLogAux.FindFirst() then
+            exit(BGSISPOSAuditLogAux."Source Document No.");
+    end;
+    #endregion
+}

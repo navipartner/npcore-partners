@@ -68,7 +68,7 @@ stages:
                                 "NPRSIFiscal",
                                 "NPRNOFiscal",
                                 "NPRCROFiscal",
-                                "NPRBGFiscal")
+                                "NPRBGSISFiscal")
       exceptions: (@{Type = "Page"; Id = 6151094; Name = "NPR Feature Management" })
     generatePermissions:
       enabled: true
