@@ -5,6 +5,7 @@ codeunit 6151517 "NPR Feature Flags Upgrade"
 
     trigger OnUpgradePerCompany()
     begin
+        CleanAndRecreateGetFeatureFlagJobQueueEntry();
         PrepareFeatureFlags();
     end;
 
@@ -38,5 +39,35 @@ codeunit 6151517 "NPR Feature Flags Upgrade"
             JobQueueEntry.Delete();
             JobQueueEntry.CancelTask();
         end;
+    end;
+
+    local procedure CleanAndRecreateGetFeatureFlagJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        TempCompany: Record Company temporary;
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'CleanAndRecreateGetFeatureFlagJobQueueEntry')) then
+            exit;
+
+        FeatureFlagsManagement.GetMostUsedCompany(TempCompany);
+
+        if (TempCompany.Name <> CompanyName) then begin
+            if FeatureFlagsManagement.GetFeatureFlagsJobQueueEntry(JobQueueEntry, '') then begin
+                JobQueueEntry.Delete();
+                JobQueueEntry.CancelTask();
+            end;
+            exit;
+        end;
+
+        if not FeatureFlagsManagement.CreateGetFeatureFlagsJobQueueEntry(JobQueueEntry) then
+            exit;
+
+        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'CleanAndRecreateGetFeatureFlagJobQueueEntry'));
     end;
 }
