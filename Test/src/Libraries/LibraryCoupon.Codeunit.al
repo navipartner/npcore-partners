@@ -220,5 +220,95 @@ codeunit 85051 "NPR Library Coupon"
         CouponSetup.Insert();
     end;
 
+    procedure SetItemListActivityCoupon(var CouponType: Record "NPR NpDc Coupon Type";
+                                      DiscountedItem: Record Item;
+                                      ValidationQty: Decimal)
+    var
+        NPRNpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+    begin
+        SetApplyActivityDiscountModule(CouponType);
 
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := 10000;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", DiscountedItem."No.");
+        NPRNpDcCouponListItem.Insert(true);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := -1;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("Max. Quantity", ValidationQty);
+        NPRNpDcCouponListItem.Insert(true);
+
+    end;
+
+    procedure SetItemListActivityCouponTwice(var CouponType: Record "NPR NpDc Coupon Type";
+                                  DiscountedItem1: Record Item;
+                                  DiscountedItem2: Record Item)
+    var
+        NPRNpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+    begin
+        SetApplyActivityDiscountModule(CouponType);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := 10000;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", DiscountedItem1."No.");
+        NPRNpDcCouponListItem.Insert(true);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := 20000;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", DiscountedItem2."No.");
+        NPRNpDcCouponListItem.Insert(true);
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := -1;
+        NPRNpDcCouponListItem.Insert(true);
+    end;
+
+    internal procedure SetApplyActivityDiscountModule(var CouponType: Record "NPR NpDc Coupon Type")
+    var
+        NPRNpDcModuleApplyActivity: Codeunit "NPR Np Dc Module ApplyActivity";
+    begin
+        CouponType."Validate Coupon Module" := 'DEFAULT';
+        CouponType."Apply Discount Module" := NPRNpDcModuleApplyActivity.ModuleCode();
+        CouponType."Max Use per Sale" := 1000000;
+        CouponType."Multi-Use Qty." := 1000000;
+        CouponType."Multi-Use Coupon" := true;
+        CouponType.Modify();
+    end;
+
+    internal procedure CreateItemTrackingAndAssignToItem(var Item: Record Item; var ItemTrackingCode: Record "Item Tracking Code")
+    begin
+        if ItemTrackingCode.Get('ACTIVITY') then
+            ItemTrackingCode.Delete();
+        ItemTrackingCode.Init();
+        ItemTrackingCode.Code := 'ACTIVITY';
+        ItemTrackingCode."SN Sales Inbound Tracking" := true;
+        ItemTrackingCode."SN Sales Outbound Tracking" := true;
+        ItemTrackingCode.Insert();
+        Item."Item Tracking Code" := ItemTrackingCode.Code;
+        Item.Modify();
+    end;
+
+    internal procedure CreateTwoItemTrackingAndAssignToItem(var Item: Record Item; var Item1: Record Item; var ItemTrackingCode: Record "Item Tracking Code")
+    begin
+        if ItemTrackingCode.Get('ACTIVITY') then
+            ItemTrackingCode.Delete();
+        ItemTrackingCode.Init();
+        ItemTrackingCode.Code := 'ACTIVITY';
+        ItemTrackingCode."SN Sales Inbound Tracking" := true;
+        ItemTrackingCode."SN Sales Outbound Tracking" := true;
+        ItemTrackingCode.Insert();
+        Item."Item Tracking Code" := ItemTrackingCode.Code;
+        Item.Modify();
+        Item1."Item Tracking Code" := ItemTrackingCode.Code;
+        Item1.Modify();
+    end;
 }

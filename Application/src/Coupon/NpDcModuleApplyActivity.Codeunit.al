@@ -471,7 +471,7 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
         exit(IsSubscriber(CouponType));
     end;
 
-    local procedure ModuleCode(): Code[20]
+    internal procedure ModuleCode(): Code[20]
     begin
         exit('Activity');
     end;

@@ -104,6 +104,21 @@ codeunit 85003 "NPR Library - POS Mock"
         POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
     end;
 
+    procedure CreateItemLineWithSerialNo(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal; SerialNo: Text)
+    var
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryRandom: Codeunit "Library - Random";
+    begin
+        POSSession.GetFrontEnd(FrontEnd, true);
+        POSSession.GetSale(POSSale);
+        Item.Get(ItemNo);
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', SerialNo, POSSession, FrontEnd); // Insert step of item action
+    end;
+
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; Quantity: Decimal)
     var
         POSActionInsertItem: Codeunit "NPR POS Action: Insert Item B";
