@@ -16,7 +16,7 @@
             begin
                 if "No." <> xRec."No." then begin
                     GetTicketType();
-                    NoSeriesMgt.TestManual(TicketType."No. Series");
+                    _NoSeriesMgt.TestManual(_TicketType."No. Series");
                     "No. Series" := '';
                 end;
             end;
@@ -188,20 +188,35 @@
     }
 
     trigger OnInsert()
+    var
+        NotUnique: Label 'External Ticket No. must be unique [%1 - %2].';
+        GenerateNumberCount: Integer;
     begin
-        if "No." = '' then begin
-            GetTicketType();
-            NoSeriesMgt.InitSeries(TicketType."No. Series", xRec."No. Series", Today, "No.", "No. Series");
-        end;
+        GetTicketType();
 
-        "Last Date Modified" := Today();
+        if ("No." = '') then
+            _NoSeriesMgt.InitSeries(_TicketType."No. Series", xRec."No. Series", Today, Rec."No.", Rec."No. Series");
 
-        if "Ticket Type Code" <> '' then begin
-            if ("External Ticket No." = '') then begin
-                GetTicketType();
-                "External Ticket No." := TicketMgt.GenerateNumberPattern(TicketType."External Ticket Pattern", "No.");
+        Rec."Last Date Modified" := Today();
+
+        GenerateNumberCount := 0;
+        if (Rec."External Ticket No." = '') then begin
+
+            Rec."External Ticket No." := _TicketMgt.GenerateNumberPattern(_TicketType."External Ticket Pattern", Rec."No.");
+            if (not CheckIsUnique(Rec."External Ticket No.")) then begin
+                repeat
+                    Rec."External Ticket No." := _TicketMgt.GenerateNumberPattern(_TicketType."External Ticket Pattern", Rec."No.");
+                    GenerateNumberCount += 1;
+                until ((CheckIsUnique(Rec."External Ticket No.")) or (GenerateNumberCount >= 10));
+
+                ReportTicketNumberPattern(Rec."No.", _TicketType."External Ticket Pattern", Rec."Ticket Type Code", GenerateNumberCount, GenerateNumberCount < 10);
             end;
+
+        end else begin
+            if (not CheckIsUnique(Rec."External Ticket No.")) then
+                Error(NotUnique, Rec."No.", Rec."External Ticket No.");
         end;
+
     end;
 
     trigger OnModify()
@@ -210,16 +225,51 @@
     end;
 
     var
-        TicketType: Record "NPR TM Ticket Type";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        TicketMgt: Codeunit "NPR TM Ticket Management";
+        _TicketType: Record "NPR TM Ticket Type";
+        _NoSeriesMgt: Codeunit NoSeriesManagement;
+        _TicketMgt: Codeunit "NPR TM Ticket Management";
 
     internal procedure GetTicketType()
     begin
-        if TicketType.Code = "Ticket Type Code" then
+        if (_TicketType.Code = Rec."Ticket Type Code") and (_TicketType.Code <> '') then
             exit;
 
-        TicketType.Get("Ticket Type Code");
+        _TicketType.Get(Rec."Ticket Type Code");
     end;
+
+    local procedure CheckIsUnique(ExternalTicketNumber: Code[30]): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        //with RT11 -> Ticket.ReadIsolation(ReadIsolation::ReadUncommitted);
+        Ticket.SetCurrentKey("External Ticket No.");
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNumber);
+        exit(Ticket.IsEmpty());
+    end;
+
+    local procedure ReportTicketNumberPattern(TicketNumber: Code[20]; Pattern: Code[30]; TicketTypeCode: Code[10]; NumberOfAttempts: Integer; Warning: Boolean)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+
+        CustomDimensions.Add('NPR_TicketNumber', TicketNumber);
+        CustomDimensions.Add('NPR_TicketPattern', Pattern);
+        CustomDimensions.Add('NPR_TicketTypeCode', TicketTypeCode);
+        CustomDimensions.Add('NPR_Attempts', Format(NumberOfAttempts, 0, 9));
+
+        if (Warning) then
+            Session.LogMessage('NPR_ExternalTicketPatternNotUnique', 'Ticket External Number Generation Failure.', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+
+        if (not Warning) then
+            Session.LogMessage('NPR_ExternalTicketPatternNotUnique', 'Ticket External Number Generation Failure.', Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+
 }
+
 
