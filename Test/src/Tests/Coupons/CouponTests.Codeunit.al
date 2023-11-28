@@ -1491,6 +1491,1384 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(SaleLinePOS.Description = CopyStr(StrSubstNo(NewDiscCouponCpt, CouponType.Description), 1, MaxStrLen(SaleLinePOS.Description)), 'New description inserted');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountPercentOnItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount percentage activity coupon on one item without a serial no that is applicable for an activity coupon discount
+        // - Add one item without a serial no that is applicable for an activity coupon discount
+        // - Apply one activity coupon with a percentage discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the discount % on coupon should be the same as on item
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountAmountOnItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount amount activity coupon on one item without a serial no that is applicable for an activity coupon discount
+        // - Add one item without a serial no that is applicable for an activity coupon discount
+        // - Apply one activity coupon with an amount discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the discount amount on coupon should be the same as on item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountPercentOnItemWithoutSerialNoNotApplicable()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount percentage activity coupon on one item without a serial no that is NOT applicable for an activity coupon discount
+        // - Add one item without a serial no that is NOT applicable for an activity coupon discount
+        // - Apply one activity coupon with a percentage discount
+        // - Check if the discount is not applied.
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the different which means that the discount % should not be applied on item
+        Assert.AreEqual(SaleLinePOS."Discount %", 0, 'Discount % is applied which is not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountAmountOnItemWithoutSerialNoNotApplicable()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount amount activity coupon on one item without a serial no that is NOT applicable for an activity coupon discount
+        // - Add one item without a serial no that is NOT applicable for an activity coupon discount
+        // - Apply one activity coupon with an amount discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the different which means that the discount % should not be applied on item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount amount is applied which is not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountPercentOnTwoItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply one discount percentage activity coupon on two items without a serial no that are applicable for an activity coupon discount
+        // - Add two items without a serial no that are applicable for an activity coupon discount
+        // - Apply one activity coupon with a percentage discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be the same as first item's discount % and should not be applied on the second item
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.01, 'Discount % not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyDiscountAmountOnTwoItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply one discount amount activity coupon on two items without a serial no that are applicable for an activity coupon discount
+        // - Add two items without a serial no that are applicable for an activity coupon discount
+        // - Apply one activity coupon with an amount discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount on coupon should be the same as first item's discount amount and should not be applied on the second item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountPercentOnTwoItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount percentage activity coupon on two items without a serial no that are applicable for an activity coupon discount
+        // - Add two items without a serial no that are applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be the same as on both items on POS sale lines
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+        Assert.AreNearlyEqual(SaleLinePOSSecondItem."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountAmountOnTwoItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount amount activity coupon on two items without a serial no that are applicable for an activity coupon discount
+        // - Add two items without a serial no that are applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount on coupon should be the same as on both items on POS sale lines
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountPercentOnTwoItemOneApplicableOneNot()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount percentage activity coupon on two items without a serial no one of which is applicable for an activity coupon discount, and one is not
+        // - Add an item without a serial no that is applicable for an activity coupon discount
+        // - Add an item without a serial no that is NOT applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be applied on one item and shold not be applied on other one
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountAmountOnTwoItemOneApplicableOneNot()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount amount activity coupon on two items without a serial no one of which is applicable for an activity coupon discount, and one is not
+        // - Add an item without a serial no that is applicable for an activity coupon discount
+        // - Add an item without a serial no that is NOT applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item1."No.", 1);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be applied on one item and shold not be applied on other one
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwiceDiscountPercentOnItemWithSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice discount percentage activity coupon on one item with a serial no that is applicable for an activity coupon discount
+        // - Add an item with a serial no that is applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] Only one discount percentage should be applied on item
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwiceDiscountAmountOnItemWithSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice discount amount activity coupon on one item with a serial no that is applicable for an activity coupon discount
+        // - Add an item with a serial no that is applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] Only one discount amount should be applied on item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyOneDiscountPercentOnItemWithSerialNoNotApplicable()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount percentage activity coupon on one item with a serial no that is NOT applicable for an activity coupon discount
+        // - Add one item with  a serial no that is NOT applicable for an activity coupon discount
+        // - Apply one activity coupon with a discount percentage
+        // - Check if the discount is not applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
+
+        LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] Discount % should not be applied on item
+        Assert.AreEqual(SaleLinePOS."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyOneDiscountAmountOnItemWithSerialNoNotApplicable()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply a discount amount activity coupon on one item with a serial no that is NOT applicable for an activity coupon discount
+        // - Add one item with  a serial no that is NOT applicable for an activity coupon discount
+        // - Apply one activity coupon with a discount amount
+        // - Check if the discount is not applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
+
+        LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] Discount amount should not be applied on item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyOneDiscountPercentOnTwoItemWithSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply one discount percentage activity coupon on two items with a serial no that are applicable for an activity coupon discount
+        // - Add two items with a serial no that are applicable for an activity coupon discount
+        // - Apply one activity coupon with a percentage discount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be the same as first item's discount % and should not be applied on the second item
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyOneDiscountAmountOnTwoItemWithSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply one discount amount activity coupon on two items with a serial no that are applicable for an activity coupon discount
+        // - Add two items with a serial no that are applicable for an activity coupon discount
+        // - Apply one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 1;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount on coupon should be the same as first item's discount amount and should not be applied on the second item
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountPercentOnTwoItemWithSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount percentage activity coupon on two items with a serial no that are applicable for an activity coupon discount
+        // - Add two items with a serial no that are applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be the same on both POS sale lines
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+        Assert.AreNearlyEqual(SaleLinePOSSecondItem."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountAmountOnTwoItemWithSerialNo()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount amount activity coupon on two items with a serial no that are applicable for an activity coupon discount
+        // - Add two items with a serial no that are applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount on coupon should be the same on both POS sale lines
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountPercentOnTwoItemsWithSerialNoOneApplicableOneNot()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount percentage activity coupon on two items with a serial no one of which is applicable for an activity coupon discount, and one is not
+        // - Add an item with a serial no that is applicable for an activity coupon discount
+        // - Add an item with a serial no that is NOT applicable for an activity coupon discount.
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % on coupon should be applied on first item, but not on second one
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.01, 'Discount % not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwoDiscountAmountOnTwoItemsWithSerialNoOneApplicableOneNot()
+    var
+        Item: Record Item;
+        Item1: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ItemTrackingCode: Record "Item Tracking Code";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSSecondItem: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount amount activity coupon on two items with a serial no one of which is applicable for an activity coupon discount, and one is not
+        // - Add an item with a serial no that is applicable for an activity coupon discount
+        // - Add an item with a serial no that is NOT applicable for an activity coupon discount.
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Two Item with tracking in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item."No.", 1, LibraryUtility.GenerateRandomCode20(Item.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LibraryPOSMock.CreateItemLineWithSerialNo(_POSSession, Item1."No.", 1, LibraryUtility.GenerateRandomCode20(Item1.FieldNo("Serial Nos."), Database::Item));
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSSecondItem);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount on coupon should be applied on first item, but not on second one
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwiceDiscountPercentOnItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount percentage activity coupon on one item without a serial no that is applicable for an activity coupon discount
+        // - Add one item without a serial no that is applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount percentage
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount % should only be applied once
+        Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ActivityCouponApplyTwiceDiscountAmountOnItemWithoutSerialNo()
+    var
+        Item: Record Item;
+        CouponType: Record "NPR NpDc Coupon Type";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+    begin
+        // [SCENARIO] Apply twice a discount amount activity coupon on one item without a serial no that is applicable for an activity coupon discount
+        // - Add one item without a serial no that is applicable for an activity coupon discount
+        // - Apply twice one activity coupon with a discount amount
+        // - Check if the discount is correctly applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 1, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
+
+        CouponQty := 2;
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount should only be applied once
+        Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
