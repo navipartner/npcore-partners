@@ -6,7 +6,7 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
         {
             field("NPR Retail Location"; Rec."NPR Retail Location")
             {
-                ToolTip = 'Specifies whether location is Retail or Warehouse. If checked, location is Retail';
+                ToolTip = 'Specifies whether location is Retail or Warehouse. This field is affecting logic for POS Compilance.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Store Group Code"; Rec."NPR Store Group Code")

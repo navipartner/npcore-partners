@@ -21,8 +21,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ParamEditDescription2_DescLbl: Label 'Enable/Disable Edit Description 2';
         ParamEditDescription_CaptionLbl: Label 'Edit Description';
         ParamEditDescription_DescLbl: Label 'Enable/Disable Edit Description';
-        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference';
-        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', Locked = true;
+        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin';
+        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin', Locked = true;
         ParamItemIdentifierType_CaptionLbl: Label 'Item Identifier Type';
         ParamItemIdentifierType_DescLbl: Label 'Specifies the Item Identifier Type';
         ParamItemNo_CaptionLbl: Label 'Item No.';

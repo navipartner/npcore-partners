@@ -76,6 +76,24 @@ table 6059828 "NPR RS Aux Sales Header"
                 TestStatusOpen();
             end;
         }
+        field(60; "NPR RS Referent No."; Code[100])
+        {
+            Caption = 'RS Referent No.';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                TestStatusOpen();
+            end;
+        }
+        field(65; "NPR RS Referent Date/Time"; DateTime)
+        {
+            Caption = 'RS Referent Date/Time';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                TestStatusOpen();
+            end;
+        }
     }
 
     keys

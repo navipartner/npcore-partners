@@ -61,7 +61,7 @@ report 6014445 "NPR RS Fiscal Bill A4 V2"
                 NewLine := PrintNewLine();
                 if ("Discount Amount" <> 0) then
                     DiscountAmount := DiscountLineLbl + NewLine + DiscountLblCaption + NewLine + DiscountAmountLblCaption +
-                    Format("Discount Amount", 0, '<Precision,2><sign><Integer Thousand><Decimals,3>') + NewLine + DiscountLineLbl;
+                    Format("Discount Amount", 0, '<Precision,2><sign><Integer Thousand><Decimals,3><Comma,,>') + NewLine + DiscountLineLbl;
             end;
         }
     }

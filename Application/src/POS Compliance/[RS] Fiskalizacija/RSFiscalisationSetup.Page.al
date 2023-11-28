@@ -53,9 +53,9 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ToolTip = 'Specifies the value of the E-Mail Subject field.';
                 }
             }
-            group(LPRFAccess)
+            group(LPFRAccess)
             {
-                Caption = 'L-PRF Access Parameters';
+                Caption = 'L-PFR Access Parameters';
                 field("Sandbox URL"; Rec."Sandbox URL")
                 {
                     ApplicationArea = NPRRetail;

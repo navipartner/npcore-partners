@@ -125,7 +125,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'RS POS Unit';
                 ApplicationArea = NPRRSFiscal;
                 ToolTip = 'Specifies the value of the RS POS Unit field.';
-                ShowMandatory = true;
                 TableRelation = "NPR POS Unit";
                 trigger OnValidate()
                 begin
@@ -174,6 +173,28 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 trigger OnValidate()
                 begin
                     RSAuxSalesHeader.Validate("NPR RS Add. Cust. Ident.");
+                    RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+                end;
+            }
+            field("NPR RS Referent No."; RSAuxSalesHeader."NPR RS Referent No.")
+            {
+                Caption = 'RS Referent No.';
+                ApplicationArea = NPRRSFiscal;
+                ToolTip = 'Specifies the value of the RS Referent No. field.';
+                trigger OnValidate()
+                begin
+                    RSAuxSalesHeader.Validate("NPR RS Referent No.");
+                    RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+                end;
+            }
+            field("NPR RS Referent Date/Time"; RSAuxSalesHeader."NPR RS Referent Date/Time")
+            {
+                Caption = 'RS Referent Date/Time';
+                ApplicationArea = NPRRSFiscal;
+                ToolTip = 'Specifies the value of the RS Referent Date/Time field.';
+                trigger OnValidate()
+                begin
+                    RSAuxSalesHeader.Validate("NPR RS Referent Date/Time");
                     RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
                 end;
             }

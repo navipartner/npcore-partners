@@ -7,8 +7,8 @@
         ActionDescription: Label 'This is a built-in action for self-service, inserting an item line into the current transaction';
         ParamItemIdentifierType_CaptionLbl: Label 'Item Identifier Type';
         ParamItemIdentifierType_DescLbl: Label 'Specifies the Item Identifier Type';
-        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference', Locked = true;
-        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference';
+        ParamItemIdentifierOptionsLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin', Locked = true;
+        ParamItemIdentifierOptions_CaptionLbl: Label 'ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin';
         ParamItemNo_CaptionLbl: Label 'Item No.';
         ParamItemNo_DescLbl: Label 'Specifies the Item No.';
         ParamItemQty_CaptionLbl: Label 'Item Quantity';
