@@ -100,7 +100,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         //[Then] Retrieve voucher
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         Assert.IsTrue(SaleLinePOS."No." = AccountNo, 'GL account is inserted');
-        Assert.IsTrue(SaleLinePOS.Description = ('Commision ' + Format(CommisionPercentage) + '%'), 'Commision Description relatable');
+        Assert.IsTrue(SaleLinePOS.Description = ('Fee ' + Format(CommisionPercentage) + '%'), 'Commision Description relatable');
         Assert.IsTrue(SaleLinePOS."Amount Including VAT" = CommisionAmount, 'Commision Amount is correct');
         //[Then] 
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, VoucherAmount - CommisionAmount, '');
@@ -149,7 +149,7 @@ codeunit 85076 "NPR POS Cash Voucher Tests"
         //[Then] Retrieve voucher
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         Assert.IsTrue(SaleLinePOS."No." = AccountNo, 'GL account is inserted');
-        Assert.IsTrue(SaleLinePOS.Description = ('Commision ' + Format(CommisionAmount) + GLSetup."LCY Code"), 'Commision Description relatable');
+        Assert.IsTrue(SaleLinePOS.Description = ('Fee ' + Format(CommisionAmount) + GLSetup."LCY Code"), 'Commision Description relatable');
         Assert.IsTrue(SaleLinePOS."Amount Including VAT" = CommisionAmount, 'Commision Amount is correct');
         //[Then] 
         TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethodCash.Code, VoucherAmount - CommisionAmount, '');

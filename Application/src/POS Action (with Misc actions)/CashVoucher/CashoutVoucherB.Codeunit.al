@@ -34,7 +34,7 @@ codeunit 6184634 "NPR Cashout Voucher B"
         PayInPayOutMgr: Codeunit "NPR Pay-in Payout Mgr";
         CommisionAmount: Decimal;
         Description: Text;
-        CommisionLbl: Label 'Commision %1%2', Comment = '%1 - specifies the Commision percentage or amount based on Commision Type, %2 - specifies % sign or LCY based on Commision Type';
+        CommisionLbl: Label 'Fee %1%2', Comment = '%1 - specifies the Fee percentage or amount based on Fee Type, %2 - specifies % sign or LCY based on Fee Type';
     begin
         GLSetup.Get();
         PaymentLine.GetCurrentPaymentLine(POSLine);
