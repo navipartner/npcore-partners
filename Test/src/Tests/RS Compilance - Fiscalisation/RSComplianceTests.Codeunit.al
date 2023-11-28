@@ -108,6 +108,8 @@ codeunit 85063 "NPR RS Compliance Tests"
         Customer."VAT Bus. Posting Group" := _POSPostingProfile."VAT Bus. Posting Group";
         Customer.Modify();
         LibraryWarehouse.CreateLocation(Location);
+        Location."NPR Retail Location" := true;
+        Location.Modify();
         LibrarySales.CreateSalesDocumentWithItem(SalesHeader, SalesLine, Enum::"Sales Document Type"::Order, Customer."No.", _Item."No.", LibraryRandom.RandIntInRange(1, 9), Location.Code, Today());
         SalesHeader."Salesperson Code" := _Salesperson.Code;
         SalesHeader.Modify();
@@ -119,7 +121,9 @@ codeunit 85063 "NPR RS Compliance Tests"
         UnbindSubscription(LibraryRSFiscal);
         // [Then] For normal cash sale RS Audit Log is created and filled from Tax Authority
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
-        RSPOSAuditLogAuxInfo.Get(RSPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Header", RSAuxSalesHeader."NPR RS Audit Entry No.");
+        RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Header");
+        RSPOSAuditLogAuxInfo.SetRange("Audit Entry No.", RSAuxSalesHeader."NPR RS Audit Entry No.");
+        RSPOSAuditLogAuxInfo.FindFirst();
         _Assert.IsTrue(RSPOSAuditLogAuxInfo."RS Transaction Type" = RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE, 'RS Audit Transaction type must be by type SALE.');
         _Assert.IsTrue(RSPOSAuditLogAuxInfo."RS Invoice Type" = RSPOSAuditLogAuxInfo."RS Invoice Type"::PROFORMA, 'RS Audit Invoice type must be by type PROFORMA.');
         _Assert.IsTrue(RSPOSAuditLogAuxInfo.Signature <> '', 'Fiscal Bill must be signed from Tax Authority.');
@@ -160,6 +164,8 @@ codeunit 85063 "NPR RS Compliance Tests"
         Customer."VAT Bus. Posting Group" := _POSPostingProfile."VAT Bus. Posting Group";
         Customer.Modify();
         LibraryWarehouse.CreateLocation(Location);
+        Location."NPR Retail Location" := true;
+        Location.Modify();
         LibrarySales.CreateSalesDocumentWithItem(SalesHeader, SalesLine, Enum::"Sales Document Type"::Order, Customer."No.", _Item."No.", LibraryRandom.RandIntInRange(1, 9), Location.Code, Today());
         SalesHeader."Salesperson Code" := _Salesperson.Code;
         SalesHeader.Modify();

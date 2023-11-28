@@ -154,6 +154,11 @@
                                 if Rec."RS Transaction Type" in [Rec."RS Transaction Type"::REFUND] then
                                     RSTaxCommunicationMgt.CreateNormalRefund(Rec);
                             end;
+                        Rec."RS Invoice Type"::ADVANCE:
+                            begin
+                                if Rec."RS Transaction Type" in [Rec."RS Transaction Type"::SALE] then
+                                    RSTaxCommunicationMgt.CreatePrepaymentSale(Rec);
+                            end;
                     end;
                 end;
             }
