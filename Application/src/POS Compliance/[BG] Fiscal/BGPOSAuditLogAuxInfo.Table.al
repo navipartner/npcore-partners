@@ -3,8 +3,9 @@ table 6060079 "NPR BG POS Audit Log Aux. Info"
     Access = Internal;
     Caption = 'BG POS Audit Log Aux. Info';
     DataClassification = CustomerContent;
-    DrillDownPageId = "NPR BG POS Audit Log Aux. Info";
-    LookupPageId = "NPR BG POS Audit Log Aux. Info";
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR28.0';
+    ObsoleteReason = 'SIS Integration specific object is introduced.';
 
     fields
     {
