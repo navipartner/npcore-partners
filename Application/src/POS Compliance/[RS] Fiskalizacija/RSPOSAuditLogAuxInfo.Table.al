@@ -130,7 +130,7 @@
             Caption = 'Tax Group Revision';
             DataClassification = CustomerContent;
         }
-        field(24; "Business Name"; Text[300])
+        field(24; "Business Name"; Text[50])
         {
             Caption = 'Business Name';
             DataClassification = CustomerContent;
@@ -140,12 +140,12 @@
             Caption = 'Tin';
             DataClassification = CustomerContent;
         }
-        field(26; "Location Name"; Text[100])
+        field(26; "Location Name"; Text[50])
         {
             Caption = 'Location Name';
             DataClassification = CustomerContent;
         }
-        field(27; Address; Text[300])
+        field(27; Address; Text[100])
         {
             Caption = 'Address';
             DataClassification = CustomerContent;
@@ -202,6 +202,11 @@
         field(70; "Email-To"; Text[250])
         {
             Caption = 'Email-To';
+            DataClassification = CustomerContent;
+        }
+        field(80; "Prepayment Order No."; Code[20])
+        {
+            Caption = 'Prepayment Order No.';
             DataClassification = CustomerContent;
         }
         field(100; "Fiscal Bill Copies"; Boolean)

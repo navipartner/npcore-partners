@@ -19,7 +19,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
         Printer: Codeunit "NPR RP Line Print Mgt.";
-        i: Integer;
+        i, j : Integer;
         PrintTextList: List of [Text];
         PrintRawInputText: Text;
         PrintText: Text;
@@ -37,7 +37,15 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
             PrintTextList.Get(i, PrintText);
             if i = (PrintTextList.Count() - 1) then
                 PrintThermalLine(Printer, RSPOSAuditLogAuxInfo."Verification URL", 'QR', false, 'CENTER', true, false);
-            if ShouldSkipPrintLine(PrintText, RSPOSAuditLogAuxInfo."Customer Identification") then
+            if PrintText.Contains('========================================') then
+                j += 1;
+            if j = 2 then begin
+                if (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header"]) and (RSPOSAuditLogAuxInfo."RS Invoice Type" in [RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL]) and (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE]) then
+                    AddAdvancePaymentSection(Printer, RSPOSAuditLogAuxInfo);
+                AddRefundSection(Printer, RSPOSAuditLogAuxInfo);
+                j += 1;
+            end;
+            if not ShouldSkipPrintLine(PrintText, RSPOSAuditLogAuxInfo) then
                 PrintThermalLine(Printer, PrintText, 'A11', true, 'CENTER', true, false);
         end;
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
@@ -53,12 +61,63 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         PrintNonFiscalCopyForNormalRefund(RSPOSAuditLogAuxInfo);
     end;
 
+    local procedure AddRefundSection(Printer: Codeunit "NPR RP Line Print Mgt."; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        RefundAmountLbl: Label 'Повраћај: ', Locked = true;
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+        if POSEntryPaymentLine.FindFirst() and not (RSPOSAuditLogAuxInfo."RS Invoice Type" in [RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL]) and not (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND]) then
+            PrintThermalLine(Printer, Create40LengthText(RefundAmountLbl, Format(-POSEntryPaymentLine.Amount, 12, '<Precision,2:2><Integer Thousand><Decimals><Comma,,>')), 'A11', true, 'CENTER', true, false)
+        else
+            PrintThermalLine(Printer, Create40LengthText(RefundAmountLbl, '0,00'), 'A11', true, 'CENTER', true, false)
+    end;
+
+    local procedure AddAdvancePaymentSection(Printer: Codeunit "NPR RP Line Print Mgt."; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        RSPOSAuditLogAuxInfoReference: Record "NPR RS POS Audit Log Aux. Info";
+        PaidWithPrepaymentLbl: Label 'Плаћено авансом:', Locked = true;
+        VATonPrepaymentLbl: Label 'ПДВ на аванс:', Locked = true;
+        LeftToPayForPrepaymentLbl: Label 'Преостало за плаћање:', Locked = true;
+    begin
+        SalesInvoiceHeader.Get(RSPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        RSPOSAuditLogAuxInfoReference.SetRange("RS Invoice Type", RSPOSAuditLogAuxInfoReference."RS Invoice Type"::ADVANCE);
+        RSPOSAuditLogAuxInfoReference.SetRange("RS Transaction Type", RSPOSAuditLogAuxInfoReference."RS Transaction Type"::SALE);
+        RSPOSAuditLogAuxInfoReference.SetRange("Prepayment Order No.", SalesInvoiceHeader."Order No.");
+        if not RSPOSAuditLogAuxInfoReference.FindLast() then
+            exit;
+        SalesCrMemoHeader.SetRange("Prepayment Order No.", SalesInvoiceHeader."Order No.");
+        SalesCrMemoHeader.FindLast();
+        SalesCrMemoHeader.CalcFields("Amount Including VAT", Amount);
+        PrintThermalLine(Printer, Create40LengthText(PaidWithPrepaymentLbl, Format(SalesCrMemoHeader."Amount Including VAT", 12, '<Precision,2:2><Integer Thousand><Decimals><Comma,,>')), 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, Create40LengthText(VATonPrepaymentLbl, Format(SalesCrMemoHeader."Amount Including VAT" - SalesCrMemoHeader.Amount, 12, '<Precision,2:2><Integer Thousand><Decimals><Comma,,>')), 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, Create40LengthText(LeftToPayForPrepaymentLbl, '0,00'), 'A11', true, 'CENTER', true, false);
+    end;
+
+    local procedure Create40LengthText(CaptionText: Text; AmountText: Text) ResultText: Text[40]
+    var
+        i: Integer;
+        SpacesToAdd: Integer;
+    begin
+        SpacesToAdd := 40 - StrLen(CaptionText) - StrLen(AmountText);
+        ResultText := CopyStr(CaptionText, 1, MaxStrLen(ResultText));
+        for i := 1 to SpacesToAdd do begin
+            ResultText += ' ';
+        end;
+        ResultText += AmountText;
+    end;
+
     local procedure PrintThermalReceipt(RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy")
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
-        i: Integer;
+        i, j : Integer;
         CustomerSignaturePrintLbl: Label '              Потпис купца              ', Locked = true;
         PrintTextList: List of [Text];
         PrintRawInputText: Text;
@@ -86,7 +145,16 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
                         PrintThermalLine(Printer, CustomerSignaturePrintLbl, 'A11', true, 'CENTER', true, false);
                     end;
             end;
-            if ShouldSkipPrintLine(PrintText, RSPOSAuditLogAuxCopy."Customer Identification") then
+            if PrintText.Contains('========================================') then
+                j += 1;
+            if j = 2 then begin
+                RSPOSAuditLogAuxInfo.SetCurrentKey("Audit Entry Type", "Audit Entry No.");
+                if RSPOSAuditLogAuxInfo.Get(RSPOSAuditLogAuxCopy."Audit Entry Type", RSPOSAuditLogAuxCopy."Audit Entry No.") then
+                    if (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header"]) and (RSPOSAuditLogAuxInfo."RS Invoice Type" in [RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL]) and (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE]) then
+                        AddAdvancePaymentSection(Printer, RSPOSAuditLogAuxInfo);
+                AddRefundSection(Printer, RSPOSAuditLogAuxInfo);
+            end;
+            if not ShouldSkipPrintLine(PrintText, RSPOSAuditLogAuxCopy) then
                 PrintThermalLine(Printer, PrintText, 'A11', true, 'CENTER', true, false);
         end;
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
@@ -146,15 +214,42 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     #endregion
 
     #region Helper Procedures
-    local procedure ShouldSkipPrintLine(PrintText: Text; CustomerIdentification: Code[30]): Boolean
+    local procedure ShouldSkipPrintLine(PrintText: Text; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Boolean
     begin
         case true of
             PrintText.Contains('ИД купца'):
-                exit(CustomerIdentification <> '0');
+                exit(RSPOSAuditLogAuxInfo."Customer Identification" = '0');
             PrintText.Contains('ЕСИР време'):
-                exit(false);
+                begin
+                    if RSPOSAuditLogAuxInfo."Prepayment Order No." <> '' then
+                        exit(false)
+                    else
+                        exit(true);
+                end;
             else
-                exit(true);
+                exit(false);
+        end;
+    end;
+
+    local procedure ShouldSkipPrintLine(PrintText: Text; RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy"): Boolean
+    var
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+    begin
+        case true of
+            PrintText.Contains('ИД купца'):
+                exit(RSPOSAuditLogAuxCopy."Customer Identification" = '0');
+            PrintText.Contains('ЕСИР време'):
+                begin
+                    RSPOSAuditLogAuxInfo.SetRange("Audit Entry Type", RSPOSAuditLogAuxCopy."Audit Entry Type");
+                    RSPOSAuditLogAuxInfo.SetRange("Audit Entry No.", RSPOSAuditLogAuxCopy."Audit Entry No.");
+                    RSPOSAuditLogAuxInfo.FindFirst();
+                    if RSPOSAuditLogAuxInfo."Prepayment Order No." <> '' then
+                        exit(false)
+                    else
+                        exit(true);
+                end;
+            else
+                exit(false);
         end;
     end;
     #endregion

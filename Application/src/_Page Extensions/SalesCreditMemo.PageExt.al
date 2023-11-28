@@ -103,6 +103,28 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                     RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
                 end;
             }
+            field("NPR RS Referent No."; RSAuxSalesHeader."NPR RS Referent No.")
+            {
+                Caption = 'RS Referent No.';
+                ApplicationArea = NPRRSFiscal;
+                ToolTip = 'Specifies the value of the RS Referent No. field.';
+                trigger OnValidate()
+                begin
+                    RSAuxSalesHeader.Validate("NPR RS Referent No.");
+                    RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+                end;
+            }
+            field("NPR RS Referent Date/Time"; RSAuxSalesHeader."NPR RS Referent Date/Time")
+            {
+                Caption = 'RS Referent Date/Time';
+                ApplicationArea = NPRRSFiscal;
+                ToolTip = 'Specifies the value of the RS Referent Date/Time field.';
+                trigger OnValidate()
+                begin
+                    RSAuxSalesHeader.Validate("NPR RS Referent Date/Time");
+                    RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
+                end;
+            }
             field("NPR RS Audit Entry"; RSAuxSalesHeader."NPR RS Audit Entry")
             {
                 Caption = 'RS Audit Entry';
