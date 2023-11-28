@@ -81,6 +81,14 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
         {
             Caption = 'NaviPartner BG Fiscalisation';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR28.0';
+            ObsoleteReason = 'SIS Integration specific field is introduced.';
+        }
+        field(6060116; "NPR BG SIS Fiscal"; Boolean)
+        {
+            Caption = 'NaviPartner BG SIS Fiscalisation';
+            DataClassification = CustomerContent;
         }
     }
 }

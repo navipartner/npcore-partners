@@ -1,7 +1,7 @@
 page 6151269 "NPR BG Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'BG Tax Fiscalisation Setup';
+    Caption = 'BG Fiscalisation Setup';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;
@@ -13,19 +13,38 @@ page 6151269 "NPR BG Fiscalization Setup"
     {
         area(Content)
         {
-            group(General)
+            group(FiscalIntegrations)
             {
-                Caption = 'General Settings';
+                Caption = 'Fiscal Integrations';
 
-                field("Enable BG Fiscal"; Rec."Enable BG Fiscal")
+                field("BG SIS Fiscal Enabled"; Rec."BG SIS Fiscal Enabled")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable BG Fiscalisation field.';
+                    ToolTip = 'Specifies whether SIS fiscal integration is enabled.';
                     trigger OnValidate()
                     begin
-                        if xRec."Enable BG Fiscal" <> Rec."Enable BG Fiscal" then
+                        if xRec."BG SIS Fiscal Enabled" <> Rec."BG SIS Fiscal Enabled" then
                             EnabledValueChanged := true;
                     end;
+                }
+            }
+            group(FiscalSettings)
+            {
+                Caption = 'Fiscal Settings';
+                Visible = Rec."BG SIS Fiscal Enabled";
+
+                group(SISFiscalSettings)
+                {
+                    Caption = 'SIS Fiscal Settings';
+                    ShowCaption = false;
+                    Visible = Rec."BG SIS Fiscal Enabled";
+
+                    field("BG SIS on PDF"; Rec."BG SIS on PDF")
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'On PDF';
+                        ToolTip = 'Specifies whether the fiscal receipt at the end of sale should be printed as PDF or as regular fiscal receipt.';
+                    }
                 }
             }
         }

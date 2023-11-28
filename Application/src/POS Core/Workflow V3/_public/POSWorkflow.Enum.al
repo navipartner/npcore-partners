@@ -826,41 +826,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'ASSIGN_SERIAL_NO', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Serial No";
     }
-    value(179; END_SALE)
-    {
-        Caption = 'END_SALE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action End Sale";
-    }
-    value(180; "RS_INSERT_CUST_IDENT")
-    {
-        Caption = 'INSERT_CUST_IDENT', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert CustId";
-    }
-    value(181; "RS_INSERT_ADD_CUST_F")
-    {
-        Caption = 'INSERT_ADD_CUST_F', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Ins. AddCustF";
-    }
-    value(182; "RS_AUDIT_LOOKUP")
-    {
-        Caption = 'RS_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: RSAudit Lookup";
-    }
-    value(183; "CALCULATE_DISCOUNTS")
-    {
-        Caption = 'CALCULATE_DISCOUNTS', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Calc Discounts";
-    }
-    value(184; CRO_AUDIT_LOOKUP)
-    {
-        Caption = 'CRO_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROAudit Lkp";
-    }
-    value(185; CRO_INSERT_PARAGON)
-    {
-        Caption = 'CRO_INSERT_PARAGON', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROParagon Ins";
-    }
     value(169; DISCOUNT)
     {
         Caption = 'DISCOUNT', Locked = true, MaxLength = 20;
@@ -908,6 +873,71 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'READ_BEID', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: BelgianEid";
     }
+    value(179; END_SALE)
+    {
+        Caption = 'END_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action End Sale";
+    }
+    value(180; "RS_INSERT_CUST_IDENT")
+    {
+        Caption = 'INSERT_CUST_IDENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Insert CustId";
+    }
+    value(181; "RS_INSERT_ADD_CUST_F")
+    {
+        Caption = 'INSERT_ADD_CUST_F', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action - Ins. AddCustF";
+    }
+    value(182; "RS_AUDIT_LOOKUP")
+    {
+        Caption = 'RS_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: RSAudit Lookup";
+    }
+    value(183; "CALCULATE_DISCOUNTS")
+    {
+        Caption = 'CALCULATE_DISCOUNTS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Calc Discounts";
+    }
+    value(184; CRO_AUDIT_LOOKUP)
+    {
+        Caption = 'CRO_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROAudit Lkp";
+    }
+    value(185; CRO_INSERT_PARAGON)
+    {
+        Caption = 'CRO_INSERT_PARAGON', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: CROParagon Ins";
+    }
+    value(190; "BG_SIS_FP_MGT")
+    {
+        Caption = 'BG_SIS_FP_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS FP Mgt.";
+    }
+    value(191; BG_SIS_PRINT_FM_REP)
+    {
+        Caption = 'BG_SIS_PRINT_FM_REP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS Pr FM";
+    }
+    value(192; "BG_SIS_EJ_EXP_DATA")
+    {
+        Caption = 'BG_SIS_EJ_EXP_DATA', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS EJ Exp";
+    }
+    value(193; "BG_SIS_EJ_REPRINT")
+    {
+        Caption = 'BG_SIS_EJ_REPRINT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS EJ Repr";
+    }
+    value(194; "BG_SIS_AUDIT_LOOKUP")
+    {
+        Caption = 'BG_SIS_AUDIT_LOOKUP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS Audit";
+    }
+    value(195; "BG_SIS_FP_CASHIER")
+    {
+        Caption = 'BG_SIS_FP_CASHIER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS Cashier";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;
@@ -923,7 +953,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SS_PRINT_RECEIPT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction SS PrintReceipt";
     }
-
     value(6014600; BALANCE_V4)
     {
         Caption = 'BALANCE_V4', Locked = true, MaxLength = 20;
