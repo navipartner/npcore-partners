@@ -530,22 +530,19 @@
 
     internal procedure ScheduleFeatureFlagReport()
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         JobQueueEntry: Record "Job Queue Entry";
-        JobQueueDescrLbl: Label 'Get Feature Flag Report', MaxLength = 250;
+        CompanyNameText: Text;
     begin
-        SetJobTimeout(4, 0);  //4 hours
-
-        if InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::codeunit,
-            Codeunit::"NPR Get Feature Flags JQ",
-            '',
-            JobQueueDescrLbl,
-            NowWithDelayInSeconds(360),
-            1,
-            '',
-            JobQueueEntry)
-        then
+        if FeatureFlagsManagement.GetFeatureFlagsJobQueueEntry(JobQueueEntry, '') then begin
             StartJobQueueEntry(JobQueueEntry);
+            exit;
+        end;
+
+        if FeatureFlagsManagement.CheckIfGetFeatureFlagsExistsInACompany(JobQueueEntry, CompanyNameText) then
+            exit;
+
+        FeatureFlagsManagement.ScheduleGetFeatureFlagsIntegration();
     end;
 
     internal procedure RefreshNPRJobQueueList()

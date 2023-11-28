@@ -150,6 +150,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuditRoll'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile", 'MoveAsyncPostingSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Flags Install", 'PrepareFeatureFlags'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'PrepareFeatureFlags'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'CleanAndRecreateGetFeatureFlagJobQueueEntry'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -539,7 +542,9 @@
             Codeunit::"NPR Feature Flags Upgrade":
                 case UpgradeStep of
                     'PrepareFeatureFlags':
-                        exit('Upgrade_PrepareFeatureFlags-20231117');
+                        exit('Upgrade_PrepareFeatureFlags-20231122');
+                    'CleanAndRecreateGetFeatureFlagJobQueueEntry':
+                        exit('Upgrade_CleanAndRecreateGetFeatureFlagJobQueueEntry-20231122');
                 end;
             Codeunit::"NPR Feature Management Install":
                 case UpgradeStep of

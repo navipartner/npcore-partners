@@ -139,7 +139,7 @@ codeunit 6151495 "NPR Feature Flags Management"
         GetFeatureFlagsScheduled := not JobQueueEntry.IsEmpty;
     end;
 
-    local procedure GetMostUsedCompany(var TempCompany: Record Company temporary)
+    internal procedure GetMostUsedCompany(var TempCompany: Record Company temporary)
     var
         Company: Record Company;
         GLEntry: Record "G/L Entry";
@@ -277,4 +277,31 @@ codeunit 6151495 "NPR Feature Flags Management"
 
         GetFeatureFlagsJQ.Run();
     end;
+
+    internal procedure GetFeatureFlagsJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; CompanyNameText: Text) Found: Boolean
+    begin
+        JobQueueEntry.Reset();
+        if (CompanyNameText <> '') and (CompanyNameText <> CompanyName) then
+            JobQueueEntry.ChangeCompany(CompanyNameText);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR Get Feature Flags JQ");
+        Found := JobQueueEntry.FindFirst();
+    end;
+
+    internal procedure CheckIfGetFeatureFlagsExistsInACompany(var JobQueueEntry: Record "Job Queue Entry"; var CompanyNameText: Text) GetFeatureFlagJobExists: Boolean;
+    var
+        Companies: Record Company;
+    begin
+        Companies.Reset();
+        Companies.SetLoadFields(Name);
+        if not Companies.FindSet(false) then
+            exit;
+
+        repeat
+            GetFeatureFlagJobExists := GetFeatureFlagsJobQueueEntry(JobQueueEntry, Companies.Name);
+            if GetFeatureFlagJobExists then
+                CompanyNameText := Companies.Name;
+        until (Companies.Next() = 0) or GetFeatureFlagJobExists;
+    end;
+
 }
