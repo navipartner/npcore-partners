@@ -6,19 +6,19 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
     var
         ActionDescription: Label 'This action handles Cashout Retail Vouchers';
         VoucherType_CptLbl: Label 'Voucher Type';
-        DeductCommision_CptLbl: Label 'Deduct Commision';
-        DeductCommision_DescLbl: Label 'Specifies if Commision should be deducted from Voucher value';
-        CommisionPercentage_CptLbl: Label 'Commision %';
-        CommisionAmount_CptLbl: Label 'Commision Amount';
-        CommisionType_CptLbl: Label 'Commision Type';
-        CommisionType_DescLbl: Label 'Specifies the Commision Type';
+        DeductCommision_CptLbl: Label 'Deduct Fee';
+        DeductCommision_DescLbl: Label 'Specifies if Fee should be deducted from Voucher value';
+        CommisionPercentage_CptLbl: Label 'Fee %';
+        CommisionAmount_CptLbl: Label 'Fee Amount';
+        CommisionType_CptLbl: Label 'Fee Type';
+        CommisionType_DescLbl: Label 'Specifies the Fee Type';
         CommisionTypeOpt_CptLbl: Label 'Percentage,Amount';
         CommisionTypeOptLbl: Label 'Percentage,Amount';
-        CommisionAccount_CptLbl: Label 'Commision G/L Account';
-        CommisionAccount_DescLbl: Label 'Specifies G/L Account for posting Commision';
+        CommisionAccount_CptLbl: Label 'Fee G/L Account';
+        CommisionAccount_DescLbl: Label 'Specifies G/L Account for posting Fee';
         ScanRetailVoucherTitleLbl: Label 'Retail Voucher';
         ScanRetailVoucher_CptLbl: Label 'Enter Reference No.';
-        InvalidParametersLbl: Label 'Parameters for commission is incomplete';
+        InvalidParametersLbl: Label 'Parameters for fee are incompleted';
         EnableVoucherList_CptLbl: Label 'Open Voucher List';
         EnableVoucherList_DescLbl: Label 'Open Voucher List if Reference No. is blank';
     begin
