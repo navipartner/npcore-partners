@@ -80,6 +80,18 @@
         UpdatePosUnitsInTenantDiagnostic(Rec);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterModifyEvent', '', true, false)]
+    local procedure PosUnitOnAfterModify(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit")
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if xRec.Status = Rec.Status then
+            exit;
+
+        UpdatePosUnitsInTenantDiagnostic(Rec);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', true, false)]
     local procedure PosUnitOnAfterDelete(var Rec: Record "NPR POS Unit")
     begin
@@ -123,12 +135,30 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterInsertEvent', '', true, false)]
     local procedure PosStoreOnAFterInsert(var Rec: Record "NPR POS Store")
     begin
+        if Rec.IsTemporary() then
+            exit;
+
+        UpdatePosStoresInTenantDiagnostic(Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterModifyEvent', '', true, false)]
+    local procedure PosStoreOnAFterModify(var Rec: Record "NPR POS Store"; var xRec: Record "NPR POS Store")
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if xRec.Inactive = Rec.Inactive then
+            exit;
+
         UpdatePosStoresInTenantDiagnostic(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterDeleteEvent', '', true, false)]
     local procedure PosStoreOnAFterDelete(var Rec: Record "NPR POS Store")
     begin
+        if Rec.IsTemporary() then
+            exit;
+
         UpdatePosStoresInTenantDiagnostic(Rec);
     end;
 
@@ -431,29 +461,36 @@
             Commit();
     end;
 
-    procedure SendPosUnitQty()
+    procedure SendPosStoreAndUnitQty()
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
         PosUnit: Record "NPR POS Unit";
         ResponseMessage: Text;
         ShouldSendRequest: Boolean;
+        POSUnitsLastSent, POSStoresLastSent : DateTime;
     begin
         InitTenantDiagnostic(TenantDiagnostic);
 
         //In order to reduce number of calls to externall services (case system), send the request on login only:
         //  if it wasn't sent at least once in the past (because of initial sync after new App version is installed or new company is created) 
-        //  and when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
-        if (TenantDiagnostic."POS Units Last Sent" = 0DT) or (TenantDiagnostic."POS Stores Last Sent" = 0DT) then begin
+        //  if when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
+        //  and if more than 24 hours have passed after the last sync
+        POSUnitsLastSent := TenantDiagnostic."POS Units Last Sent";
+        POSStoresLastSent := TenantDiagnostic."POS Stores Last Sent";
+        if not PosStoresAndUnitsSyncedInTheLast24Hours(POSUnitsLastSent, POSStoresLastSent) then
             ShouldSendRequest := true;
-            TenantDiagnostic."POS Stores" := PosStore.Count();
-            TenantDiagnostic."POS Units" := PosUnit.Count();
-            TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
-            TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
-        end;
 
-        if (TenantDiagnostic."POS Stores" <> TenantDiagnostic."POS Stores Sent on Last Upd.") or (TenantDiagnostic."POS Units" <> TenantDiagnostic."POS Units Sent on Last Upd.") then
-            ShouldSendRequest := true;
+        PosStore.SetRange(Inactive, false);
+        PosUnit.SetFilter(Status, '<>%1', PosUnit.Status::INACTIVE);
+        TenantDiagnostic."POS Stores" := PosStore.Count();
+        TenantDiagnostic."POS Units" := PosUnit.Count();
+        TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+        TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+
+        if not ShouldSendRequest then
+            if (TenantDiagnostic."POS Stores" <> TenantDiagnostic."POS Stores Sent on Last Upd.") or (TenantDiagnostic."POS Units" <> TenantDiagnostic."POS Units Sent on Last Upd.") then
+                ShouldSendRequest := true;
 
         if not ShouldSendRequest then
             exit;
@@ -470,29 +507,36 @@
         end;
     end;
 
-    procedure SendPosUnitQtyFromSaasEnvironment(AzureAdTenantId: Text)
+    procedure SendPosStoreAndUnitQtyFromSaasEnvironment(AzureAdTenantId: Text)
     var
         SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
         PosUnit: Record "NPR POS Unit";
         ResponseMessage: Text;
         ShouldSendRequest: Boolean;
+        POSUnitsLastSent, POSStoresLastSent : DateTime;
     begin
         InitSaasTenantDiagnostic(AzureAdTenantId, SaasTenantDiagnostic);
 
         //In order to reduce number of calls to externall services (case system), send the request on login only:
         //  if it wasn't sent at least once in the past (because of initial sync after new App version is installed or new company is created) 
-        //  and when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
-        if (SaasTenantDiagnostic."POS Units Last Sent" = 0DT) or (SaasTenantDiagnostic."POS Stores Last Sent" = 0DT) then begin
+        //  if when there is a difference between current POS Store qty and POS Store qty previously sent through API. (same condition for POS Unit)
+        //  and more than 24 hours have passed after the last sync
+        POSUnitsLastSent := SaasTenantDiagnostic."POS Units Last Sent";
+        POSStoresLastSent := SaasTenantDiagnostic."POS Stores Last Sent";
+        if not PosStoresAndUnitsSyncedInTheLast24Hours(POSUnitsLastSent, POSStoresLastSent) then
             ShouldSendRequest := true;
-            SaasTenantDiagnostic."POS Stores" := PosStore.Count();
-            SaasTenantDiagnostic."POS Units" := PosUnit.Count();
-            SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
-            SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
-        end;
 
-        if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
-            ShouldSendRequest := true;
+        PosStore.SetRange(Inactive, false);
+        PosUnit.SetFilter(Status, '<>%1', PosUnit.Status::INACTIVE);
+        SaasTenantDiagnostic."POS Stores" := PosStore.Count();
+        SaasTenantDiagnostic."POS Units" := PosUnit.Count();
+        SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+        SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+
+        if not ShouldSendRequest then
+            if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
+                ShouldSendRequest := true;
 
         if not ShouldSendRequest then
             exit;
@@ -507,6 +551,25 @@
             SaasTenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
             SaasTenantDiagnostic.Modify();
         end;
+    end;
+
+    local procedure PosStoresAndUnitsSyncedInTheLast24Hours(POSUnitsLastSent: DateTime; POSStoresLastSent: DateTime): Boolean
+    var
+        DurationFromLastPosUnitCheck, DurationFromLastPosStoreCheck : Duration;
+        DurationCondition: Integer;
+    begin
+        if POSUnitsLastSent = 0DT then
+            Evaluate(POSUnitsLastSent, '1970-01-01T00:00:00Z', 9);
+
+        if POSStoresLastSent = 0DT then
+            Evaluate(POSStoresLastSent, '1970-01-01T00:00:00Z', 9);
+
+        DurationFromLastPosUnitCheck := CurrentDateTime() - POSUnitsLastSent;
+        DurationFromLastPosStoreCheck := CurrentDateTime() - POSStoresLastSent;
+        DurationCondition := 1000 * 60 * 60 * 24; //miliseconds * seconds * minutes * hours = one day
+
+        if (DurationFromLastPosUnitCheck <= DurationCondition) and (DurationFromLastPosStoreCheck <= DurationCondition) then
+            exit(true);
     end;
 
     local procedure InitTenantDiagnostic(var TenantDiagnostic: Record "NPR Tenant Diagnostic")
