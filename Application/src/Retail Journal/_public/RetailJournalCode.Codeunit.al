@@ -544,6 +544,46 @@
         RetailJnlLine.CloseGUI();
     end;
 
+    procedure PostedPurchaseReceipt2RetailJnl(PurchaseReceiptNo: Code[20]; RetailJnlCode: Code[40])
+    var
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+    begin
+        if PurchaseReceiptNo = '' then begin
+            if Page.RunModal(0, PurchRcptHeader) <> Action::LookupOK then
+                exit;
+        end else
+            PurchRcptHeader.Get(PurchaseReceiptNo);
+
+        PurchRcptLine.SetRange("Document No.", PurchRcptHeader."No.");
+        CopyPostedPurchaseRcpt2RetailJnlLines(PurchRcptLine, RetailJnlCode);
+    end;
+
+    procedure CopyPostedPurchaseRcpt2RetailJnlLines(var PurchRcptLine: Record "Purch. Rcpt. Line"; RetailJnlCode: Code[40])
+    var
+        RetailJnlLine: Record "NPR Retail Journal Line";
+    begin
+        if not SetRetailJnl(RetailJnlCode) then
+            exit;
+
+        PurchRcptLine.SetRange(Type, PurchRcptLine.Type::Item);
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(PurchRcptLine.Count());
+        if PurchRcptLine.FindSet() then
+            repeat
+                RetailJnlLine.InitLine();
+                if PurchRcptLine."Item Reference Type" = PurchRcptLine."Item Reference Type"::"Bar Code" then
+                    RetailJnlLine.SetItem(PurchRcptLine."No.", PurchRcptLine."Variant Code", PurchRcptLine."Item Reference No.")
+                else
+                    RetailJnlLine.SetItem(PurchRcptLine."No.", PurchRcptLine."Variant Code", '');
+                RetailJnlLine.Validate("Quantity to Print", PurchRcptLine.Quantity);
+                RetailJnlLine."Last Direct Cost" := PurchRcptLine."Direct Unit Cost";
+                OnBeforeRetJnlLineInsertFromPurchRcptLine(PurchRcptLine, RetailJnlLine);
+                RetailJnlLine.Insert();
+            until PurchRcptLine.Next() = 0;
+        RetailJnlLine.CloseGUI();
+    end;
+
     procedure InventoryPutAway2RetailJnl(DocumentType: Integer; DocumentNo: Code[20]; RetailJnlCode: Code[40])
     var
         WarehouseActivityHeader: Record "Warehouse Activity Header";
@@ -686,5 +726,9 @@
     local procedure OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine: Record "Purch. Inv. Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRetJnlLineInsertFromPurchRcptLine(PurchRcptLine: Record "Purch. Rcpt. Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
+    begin
+    end;
+}
