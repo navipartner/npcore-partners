@@ -19,6 +19,7 @@ codeunit 85162 "NPR Library CRO Fiscal"
         POSAuditProfile."Sale Fiscal No. Series" := CreateNumberSeries();
         POSAuditProfile."Sales Ticket No. Series" := CreateNumberSeries();
         POSAuditProfile."Credit Sale Fiscal No. Series" := CreateNumberSeries();
+        POSAuditProfile."Do Not Print Receipt on Sale" := true;
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sales Ticket No. Series");
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();

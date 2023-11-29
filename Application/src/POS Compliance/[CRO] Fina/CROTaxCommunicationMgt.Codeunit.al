@@ -8,36 +8,175 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
     internal procedure CreateNormalSale(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
     begin
-        CreateXMLFiscalMessage(CROPOSAuditLogAuxInfo, Subsequent);
+        case CROPOSAuditLogAuxInfo."Audit Entry Type" of
+            "NPR CRO Audit Entry Type"::"POS Entry":
+                CreateAndFiscalizePOSSale(CROPOSAuditLogAuxInfo, Subsequent);
+            "NPR CRO Audit Entry Type"::"Sales Invoice":
+                CreateAndFiscalizeSalesInvSale(CROPOSAuditLogAuxInfo, Subsequent);
+            "NPR CRO Audit Entry Type"::"Sales Credit Memo":
+                CreateAndFiscalizeSalesCrMemoRefund(CROPOSAuditLogAuxInfo, Subsequent);
+        end;
     end;
 
     #region CRO Tax Communication - XML Document Creation
 
-    local procedure CreateXMLFiscalMessage(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
+    local procedure CreateAndFiscalizePOSSale(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
     var
-        CompanyInformation: Record "Company Information";
-        CROAuxSalespersonPurch: Record "NPR CRO Aux Salesperson/Purch.";
         POSEntry: Record "NPR POS Entry";
         POSEntryTaxLine: Record "NPR POS Entry Tax Line";
-        SalespersonPurch: Record "Salesperson/Purchaser";
-        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
-        NamespaceLbl: Label 'http://www.apis-it.hr/fin/2012/types/f73', Locked = true;
-        TimeStampLbl: Label '%1T%2', Locked = true;
-        IdPoruke: Text;
         Document: XmlDocument;
-        BillNoSection: XmlElement;
         Body: XmlElement;
         Content: XmlElement;
-        Header1: XmlElement;
         VATElements: XmlElement;
         VATSection: XmlElement;
         XmlWriteOpts: XmlWriteOptions;
-        HasArchVoucherEntry: Boolean;
+    begin
+        Document := XmlDocument.Create('', '');
+        AddHeaderSection(CROPOSAuditLogAuxInfo, Body, Content);
+
+        VATSection := XmlElement.Create('Pdv');
+
+        if POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.") then begin
+            POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            if POSEntryTaxLine.FindSet() then
+                repeat
+                    VATElements := XmlElement.Create('Porez');
+                    VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax %")));
+                    VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax Base Amount")));
+                    VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax Amount")));
+                    VATSection.Add(VATElements);
+                until POSEntryTaxLine.Next() = 0;
+
+            AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
+
+            Content.Add(VATSection);
+
+            Content.Add(CreateXmlElement('IznosUkupno', CROAuditMgt.FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount")));
+
+            AddPaymentMethodSection(CROPOSAuditLogAuxInfo, Content);
+
+            AddFooterSection(CROPOSAuditLogAuxInfo, Subsequent, Content);
+
+            if CROPOSAuditLogAuxInfo."Paragon Number" <> '' then
+                Content.Add(CreateXmlElement('ParagonBrRac', CROPOSAuditLogAuxInfo."Paragon Number"));
+        end;
+
+        Body.Add(Content);
+
+        XmlWriteOpts.PreserveWhitespace(true);
+
+        Document.Add(Body, XmlWriteOpts);
+
+        SignBillAndSendToTA(CROPOSAuditLogAuxInfo, Document);
+    end;
+
+    local procedure CreateAndFiscalizeSalesInvSale(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
+    var
+        SalesInvLines: Record "Sales Invoice Line";
+        Document: XmlDocument;
+        Body: XmlElement;
+        Content: XmlElement;
+        VATElements: XmlElement;
+        VATSection: XmlElement;
+        XmlWriteOpts: XmlWriteOptions;
+    begin
+        SalesInvLines.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        if not SalesInvLines.FindSet() then
+            exit;
+
+        Document := XmlDocument.Create('', '');
+
+        AddHeaderSection(CROPOSAuditLogAuxInfo, Body, Content);
+
+        VATSection := XmlElement.Create('Pdv');
+        repeat
+            if CheckForRetailLocation(SalesInvLines) then begin
+                VATElements := XmlElement.Create('Porez');
+                VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesInvLines."VAT %")));
+                VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(SalesInvLines."VAT Base Amount")));
+                VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(SalesInvLines."Amount Including VAT" - SalesInvLines."VAT Base Amount")));
+                VATSection.Add(VATElements);
+            end
+        until SalesInvLines.Next() = 0;
+
+        AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
+
+        Content.Add(VATSection);
+
+        Content.Add(CreateXmlElement('IznosUkupno', CROAuditMgt.FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount")));
+
+        AddPaymentMethodSection(CROPOSAuditLogAuxInfo, Content);
+
+        AddFooterSection(CROPOSAuditLogAuxInfo, Subsequent, Content);
+
+        Body.Add(Content);
+
+        XmlWriteOpts.PreserveWhitespace(true);
+
+        Document.Add(Body, XmlWriteOpts);
+
+        SignBillAndSendToTA(CROPOSAuditLogAuxInfo, Document);
+    end;
+
+    internal procedure CreateAndFiscalizeSalesCrMemoRefund(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
+    var
+        SalesCrMemoLines: Record "Sales Cr.Memo Line";
+        Document: XmlDocument;
+        Body: XmlElement;
+        Content: XmlElement;
+        VATElements: XmlElement;
+        VATSection: XmlElement;
+        XmlWriteOpts: XmlWriteOptions;
+    begin
+        SalesCrMemoLines.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        if not SalesCrMemoLines.FindSet() then
+            exit;
+
+        Document := XmlDocument.Create('', '');
+
+        AddHeaderSection(CROPOSAuditLogAuxInfo, Body, Content);
+
+        VATSection := XmlElement.Create('Pdv');
+        repeat
+            if CheckForRetailLocation(SalesCrMemoLines) then begin
+                VATElements := XmlElement.Create('Porez');
+                VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT %")));
+                VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT Base Amount")));
+                VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(-(SalesCrMemoLines."Amount Including VAT" - SalesCrMemoLines."VAT Base Amount"))));
+                VATSection.Add(VATElements);
+            end
+        until SalesCrMemoLines.Next() = 0;
+
+        AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
+
+        Content.Add(VATSection);
+
+        Content.Add(CreateXmlElement('IznosUkupno', CROAuditMgt.FormatDecimal(-CROPOSAuditLogAuxInfo."Total Amount")));
+
+        AddPaymentMethodSection(CROPOSAuditLogAuxInfo, Content);
+
+        AddFooterSection(CROPOSAuditLogAuxInfo, Subsequent, Content);
+
+        Body.Add(Content);
+
+        XmlWriteOpts.PreserveWhitespace(true);
+
+        Document.Add(Body, XmlWriteOpts);
+
+        SignBillAndSendToTA(CROPOSAuditLogAuxInfo, Document);
+    end;
+
+    local procedure AddHeaderSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var Body: XmlElement; var Content: XmlElement)
+    var
+        CompanyInformation: Record "Company Information";
+        NamespaceLbl: Label 'http://www.apis-it.hr/fin/2012/types/f73', Locked = true;
+        TimeStampLbl: Label '%1T%2', Locked = true;
+        IdPoruke: Text;
+        BillNoSection: XmlElement;
+        Header1: XmlElement;
     begin
         CompanyInformation.Get();
         CROFiscalizationSetup.Get();
-
-        Document := XmlDocument.Create('', '');
 
         Body := XmlElement.Create('RacunZahtjev', NamespaceLbl);
         Body.Add(XmlAttribute.Create('Id', 'RacunZahtjev'));
@@ -67,74 +206,44 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BillNoSection.Add(CreateXmlElement('OznNapUr', CROPOSAuditLogAuxInfo."POS Unit No."));
 
         Content.Add(BillNoSection);
-
-        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
-        NpRvArchVoucherEntry.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
-
-        VATSection := XmlElement.Create('Pdv');
-
-        if POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.") then begin
-            POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-            if POSEntryTaxLine.FindSet() then
-                repeat
-                    VATElements := XmlElement.Create('Porez');
-                    VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax %")));
-                    VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax Base Amount")));
-                    VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax Amount")));
-                    VATSection.Add(VATElements);
-                until POSEntryTaxLine.Next() = 0;
-
-            if HasArchVoucherEntry then
-                AddVoucherVATSection(NpRvArchVoucherEntry, VATElements, VATSection);
-
-            Content.Add(VATSection);
-
-            Content.Add(CreateXmlElement('IznosUkupno', CROAuditMgt.FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount")));
-
-            case CROPOSAuditLogAuxInfo."CRO Payment Method" of
-                "NPR CRO POS Payment Method"::Card:
-                    Content.Add(CreateXmlElement('NacinPlac', 'K'));
-                "NPR CRO POS Payment Method"::Cash:
-                    Content.Add(CreateXmlElement('NacinPlac', 'G'));
-                "NPR CRO POS Payment Method"::Check:
-                    Content.Add(CreateXmlElement('NacinPlac', 'C'));
-                "NPR CRO POS Payment Method"::Other:
-                    Content.Add(CreateXmlElement('NacinPlac', 'O'));
-            end;
-
-            SalespersonPurch.Get(POSEntry."Salesperson Code");
-            CROAuxSalespersonPurch.Get(SalespersonPurch.SystemId);
-
-            Content.Add(CreateXmlElement('OibOper', Format(CROAuxSalespersonPurch."NPR CRO Salesperson OIB")));
-            Content.Add(CreateXmlElement('ZastKod', CROPOSAuditLogAuxInfo."ZKI Code"));
-
-            if Subsequent then
-                Content.Add(CreateXmlElement('NakDost', 'true'))
-            else
-                Content.Add(CreateXmlElement('NakDost', 'false'));
-
-            if CROPOSAuditLogAuxInfo."Paragon Number" <> '' then
-                Content.Add(CreateXmlElement('ParagonBrRac', CROPOSAuditLogAuxInfo."Paragon Number"));
-        end;
-
-        Body.Add(Content);
-
-        XmlWriteOpts.PreserveWhitespace(true);
-
-        Document.Add(Body, XmlWriteOpts);
-
-        SignBillAndSendToTA(CROPOSAuditLogAuxInfo, Document);
     end;
 
-    #endregion
+    local procedure AddPaymentMethodSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var Content: XmlElement)
+    begin
+        case CROPOSAuditLogAuxInfo."CRO Payment Method" of
+            "NPR CRO Payment Method"::Card:
+                Content.Add(CreateXmlElement('NacinPlac', 'K'));
+            "NPR CRO Payment Method"::Cash:
+                Content.Add(CreateXmlElement('NacinPlac', 'G'));
+            "NPR CRO Payment Method"::Check:
+                Content.Add(CreateXmlElement('NacinPlac', 'C'));
+            "NPR CRO Payment Method"::Other:
+                Content.Add(CreateXmlElement('NacinPlac', 'O'));
+        end;
+    end;
 
-    local procedure AddVoucherVATSection(NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry"; var VATElements: XmlElement; var VATSection: XmlElement)
+    local procedure AddFooterSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean; var Content: XmlElement)
+    begin
+        Content.Add(CreateXmlElement('OibOper', Format(CROPOSAuditLogAuxInfo."Cashier ID")));
+        Content.Add(CreateXmlElement('ZastKod', CROPOSAuditLogAuxInfo."ZKI Code"));
+
+        if Subsequent then
+            Content.Add(CreateXmlElement('NakDost', 'true'))
+        else
+            Content.Add(CreateXmlElement('NakDost', 'false'));
+    end;
+
+    local procedure AddVoucherVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var VATElements: XmlElement; var VATSection: XmlElement)
     var
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         NpRvArchVoucherEntry2: Record "NPR NpRv Arch. Voucher Entry";
         POSEntrySalesLines: Record "NPR POS Entry Sales Line";
         SalesLinesType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
     begin
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
+        NpRvArchVoucherEntry.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        if not NpRvArchVoucherEntry.FindFirst() then
+            exit;
         NpRvArchVoucherEntry2.SetCurrentKey("Arch. Voucher No.");
         NpRvArchVoucherEntry2.SetRange("Arch. Voucher No.", NpRvArchVoucherEntry."Arch. Voucher No.");
         NpRvArchVoucherEntry2.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::"Issue Voucher");
@@ -155,11 +264,14 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         until POSEntrySalesLines.Next() = 0;
     end;
 
+    #endregion
+
     #region CRO Tax Communication - HTTP Request
     local procedure SignBillAndSendToTA(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var ReceiptDocument: XmlDocument)
     var
         TempBlob: Codeunit "Temp Blob";
         IStream: InStream;
+        DocumentFiscalizedSuccesfullyMsg: Label 'Sales Document %1 has been fiscalized successfully.';
         VerificationURLFormatLbl: Label 'https://porezna.gov.hr/rn?jir=%1&datv=%2_%3&izn=%4', Locked = true;
         OStream: OutStream;
         BaseValue: Text;
@@ -181,15 +293,52 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         CROPOSAuditLogAuxInfo."JIR Code" := CopyStr(GetJIRCodeFromResponse(ResponseText), 1, MaxStrLen(CROPOSAuditLogAuxInfo."JIR Code"));
         CROPOSAuditLogAuxInfo."Verification URL" := StrSubstNo(VerificationURLFormatLbl, CROPOSAuditLogAuxInfo."JIR Code", Format(CROPOSAuditLogAuxInfo."Entry Date", 8, '<Year4><Month,2><Day,2>'), Format(CROPOSAuditLogAuxInfo."Log Timestamp", 4, '<Hours24,2><Minutes,2>'), DelChr(CROAuditMgt.FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"), '=', '.'));
         CROPOSAuditLogAuxInfo.Modify();
+
+        case CROPOSAuditLogAuxInfo."Audit Entry Type" of
+            "NPR CRO Audit Entry Type"::"Sales Invoice":
+                begin
+                    SetReceiptFiscalizedOnSalesInvoiceHeader(CROPOSAuditLogAuxInfo);
+                    Message(StrSubstNo(DocumentFiscalizedSuccesfullyMsg, CROPOSAuditLogAuxInfo."Source Document No."));
+                end;
+            "NPR CRO Audit Entry Type"::"Sales Credit Memo":
+                begin
+                    SetReceiptFiscalizedOnSalesCrMemoHeader(CROPOSAuditLogAuxInfo);
+                    Message(StrSubstNo(DocumentFiscalizedSuccesfullyMsg, CROPOSAuditLogAuxInfo."Source Document No."));
+                end;
+        end;
+    end;
+
+    local procedure SetReceiptFiscalizedOnSalesInvoiceHeader(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        if not SalesInvoiceHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+            exit;
+        CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        CROAuxSalesInvHeader."NPR CRO Document Fiscalized" := true;
+        CROAuxSalesInvHeader.SaveCROAuxSalesInvHeaderFields();
+    end;
+
+    local procedure SetReceiptFiscalizedOnSalesCrMemoHeader(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        CROAuxSalesCrMemoHeader: Record "NPR CRO Aux Sales Cr. Memo Hdr";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        if not SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+            exit;
+        CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+        CROAuxSalesCrMemoHeader."NPR CRO Document Fiscalized" := true;
+        CROAuxSalesCrMemoHeader.SaveCROAuxSalesCrMemoHeaderFields();
     end;
 
     local procedure SendToTA(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; XMLMessageText: Text; var ResponseText: Text): Boolean
     var
+        IsHandled: Boolean;
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         Url: Text;
-        IsHandled: Boolean;
     begin
         CROFiscalizationSetup.Get();
         Content.WriteFrom(XMLMessageText);
@@ -250,6 +399,25 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BaseValue := BaseValue.Replace('xmlns=""', '');
         BaseValue := BaseValue.Replace('"', '\"');
     end;
+
+    local procedure CheckForRetailLocation(SalesInvoiceLines: Record "Sales Invoice Line"): Boolean
+    var
+        Location: Record Location;
+    begin
+        if not Location.Get(SalesInvoiceLines."Location Code") then
+            exit(false);
+        exit(Location."NPR Retail Location");
+    end;
+
+    local procedure CheckForRetailLocation(SalesCrMemoLines: Record "Sales Cr.Memo Line"): Boolean
+    var
+        Location: Record Location;
+    begin
+        if not Location.Get(SalesCrMemoLines."Location Code") then
+            exit(false);
+        exit(Location."NPR Retail Location");
+    end;
+
     #endregion
 
     #region CRO Tax Communication - Test Procedures

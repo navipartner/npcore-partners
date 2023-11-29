@@ -132,16 +132,30 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 ToolTip = 'Specifies the value of the RS Audit Entry field.';
                 Editable = false;
             }
+            field("NPR CRO POS Unit"; CROAuxSalesHeader."NPR CRO POS Unit")
+            {
+                Caption = 'POS Unit No.';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the POS Unit No. field.';
+                TableRelation = "NPR POS Unit";
+                trigger OnValidate()
+                begin
+                    CROAuxSalesHeader.Validate("NPR CRO POS Unit");
+                    CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
+                end;
+            }
         }
     }
 
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
         AsyncEnabled: Boolean;
 
     trigger OnAfterGetCurrRecord()
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
     end;
 
     trigger OnOpenPage()

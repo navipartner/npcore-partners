@@ -43,6 +43,13 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 ToolTip = 'Specifies the value of the RS Audit Entry field.';
                 Editable = false;
             }
+            field("NPR CRO Document Fiscalized"; CROAuxSalesInvHeader."NPR CRO Document Fiscalized")
+            {
+                Caption = 'Document Fiscalized';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the CRO Document Fiscalized field.';
+                Editable = false;
+            }
         }
         addafter(Closed)
         {
@@ -129,6 +136,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     }
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+        CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
         OIOUBLInstalled: Boolean;
 
     trigger OnOpenPage()
@@ -141,5 +149,6 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     trigger OnAfterGetCurrRecord()
     begin
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(Rec);
+        CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
     end;
 }
