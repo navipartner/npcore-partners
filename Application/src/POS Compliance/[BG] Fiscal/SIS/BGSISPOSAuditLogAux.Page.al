@@ -1,4 +1,4 @@
-page 6151268 "NPR BG SIS POS Audit Log Aux."
+page 6151316 "NPR BG SIS POS Audit Log Aux."
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG POS SIS Audit Log Aux. Info';

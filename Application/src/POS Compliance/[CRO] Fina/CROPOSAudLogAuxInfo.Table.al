@@ -94,18 +94,16 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
-                case "Audit Entry Type" of
-                    "NPR CRO Audit Entry Type"::"POS Entry":
-                        FindPOSPaymentMethodMapping();
-                    else
-                        FindPaymentMethodMapping();
-                end;
+                FindPaymentMethodMapping();
             end;
         }
-        field(15; "CRO Payment Method"; Enum "NPR CRO Payment Method")
+        field(15; "CRO Payment Method"; Enum "NPR CRO POS Payment Method")
         {
             Caption = 'Payment Method';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR28.0';
+            ObsoleteReason = 'Replaced by Payment Method field.';
         }
         field(16; "Receipt Content"; Media)
         {
@@ -136,6 +134,11 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         field(21; "Paragon Number"; Text[40])
         {
             Caption = 'Paragon Number';
+            DataClassification = CustomerContent;
+        }
+        field(22; "Payment Method"; Enum "NPR CRO Payment Method")
+        {
+            Caption = 'Payment Method';
             DataClassification = CustomerContent;
         }
     }
@@ -181,24 +184,14 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         exit(Rec.FindFirst());
     end;
 
-    local procedure FindPOSPaymentMethodMapping()
-    var
-        CROPOSPaymMethMapp: Record "NPR CRO POS Paym. Method Mapp.";
-    begin
-        if CROPOSPaymMethMapp.Get("Payment Method Code") then
-            "CRO Payment Method" := CROPOSPaymMethMapp."CRO Payment Method"
-        else
-            "CRO Payment Method" := "NPR CRO Payment Method"::Other;
-    end;
-
     local procedure FindPaymentMethodMapping()
     var
         CROPaymentMethodMapping: Record "NPR CRO Payment Method Mapping";
     begin
         if CROPaymentMethodMapping.Get("Payment Method Code") then
-            "CRO Payment Method" := CROPaymentMethodMapping."CRO Payment Method"
+            "Payment Method" := CROPaymentMethodMapping."CRO Payment Method"
         else
-            "CRO Payment Method" := "NPR CRO Payment Method"::Other;
+            "Payment Method" := "NPR CRO Payment Method"::Other;
     end;
 
     var

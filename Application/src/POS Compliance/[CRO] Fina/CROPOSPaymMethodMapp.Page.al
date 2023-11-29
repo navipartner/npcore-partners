@@ -22,6 +22,14 @@ page 6151183 "NPR CRO POS Paym. Method Mapp."
                 {
                     ApplicationArea = NPRCROFiscal;
                     ToolTip = 'Specifies the value of the CRO Payment Method field.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR28.0';
+                    ObsoleteReason = 'Replaced by Payment Method field.';
+                }
+                field("Payment Method"; Rec."Payment Method")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the value of the Payment Method field.';
                 }
             }
         }
