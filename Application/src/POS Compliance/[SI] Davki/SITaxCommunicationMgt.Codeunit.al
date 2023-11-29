@@ -329,10 +329,14 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         TempBlob: Codeunit "Temp Blob";
         IStream: InStream;
         OStream: OutStream;
+        IsHandled: Boolean;
         BaseValue: Text;
         ResponseText: Text;
     begin
         FillRequestBaseValue(ReceiptDocument, BaseValue);
+        OnBeforeSendHttpRequest(SIPOSAuditLogAuxInfo, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if not SIAuditMgt.SignAndSendXML('INVOICE', BaseValue, ResponseText) then
             exit;
         GetEORCodeFromResponse(SIPOSAuditLogAuxInfo, ResponseText);
@@ -377,7 +381,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         BaseValue := BaseValue.Replace('"', '\"');
     end;
 
-    local procedure GetEORCodeFromResponse(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; ResponseText: Text)
+    internal procedure GetEORCodeFromResponse(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; ResponseText: Text)
     var
         XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true;
         Document: XmlDocument;
@@ -390,6 +394,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
             exit;
 
         SIPOSAuditLogAuxInfo."Receipt Fiscalized" := true;
+        SIPOSAuditLogAuxInfo."EOR Code" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(SIPOSAuditLogAuxInfo."EOR Code"));
         SIPOSAuditLogAuxInfo."EOR Code" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(SIPOSAuditLogAuxInfo."EOR Code"));
         SIPOSAuditLogAuxInfo."Validation Code" := CalculateValidationCode(SIPOSAuditLogAuxInfo);
         SIPOSAuditLogAuxInfo.Modify();
@@ -454,6 +459,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     internal procedure RegisterPOSStore(var SIPOSStoreMapping: Record "NPR SI POS Store Mapping")
     var
+        IsHandled: Boolean;
         POSStoreRegisteredSuccessfulyMsg: Label 'POS Store %1 registered successfully.', Comment = '%1 = POS Store Code';
         BaseValue: Text;
         ResponseText: Text;
@@ -461,16 +467,34 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     begin
         if SIPOSStoreMapping.Registered then
             exit;
-
         CreatePOSStoreRegistrationDocument(SIPOSStoreMapping, Document);
         FillRequestBaseValue(Document, BaseValue);
+        OnBeforeRegisterPOSStore(SIPOSStoreMapping, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if not SIAuditMgt.SignAndSendXML('PP', BaseValue, ResponseText) then
             exit;
-
         Message(StrSubstNo(POSStoreRegisteredSuccessfulyMsg, SIPOSStoreMapping."POS Store Code"));
         SIPOSStoreMapping.Registered := true;
         SIPOSStoreMapping.Modify();
     end;
 
     #endregion
+
+    #region SI Tax Communication - Test Procedures
+    internal procedure TestGetEORCodeFromResponse(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; ResponseText: Text)
+    begin
+        GetEORCodeFromResponse(SIPOSAuditLogAuxInfo, ResponseText);
+    end;
+    #endregion
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeRegisterPOSStore(var SIPOSStoreMapping: Record "NPR SI POS Store Mapping"; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequest(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
 }
