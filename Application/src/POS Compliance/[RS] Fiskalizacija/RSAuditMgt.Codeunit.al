@@ -175,6 +175,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
     begin
+        if not IsRSFiscalActive() then
+            exit;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesHeader."NPR RS POS Unit" := SalePOS."Register No.";
         RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
@@ -903,6 +905,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RSPOSSale: Record "NPR RS POS Sale";
     begin
+        if not IsRSFiscalActive() then
+            exit;
         if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
             exit;
         if not RSPOSSale.Get(SalePOS.SystemId) then
