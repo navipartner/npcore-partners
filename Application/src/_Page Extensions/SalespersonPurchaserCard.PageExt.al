@@ -50,14 +50,27 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                     CROAuxSalespersonPurchaser.SaveCROAuxSalespersonFields();
                 end;
             }
+            field("NPR SI Tax Number"; SIAuxSalespersonPurchaser."NPR SI Salesperson Tax Number")
+            {
+                ToolTip = 'Specifies the value of the Salesperson Tax Number field.';
+                Caption = 'Salesperson Tax Number';
+                ApplicationArea = NPRSIFiscal;
+                trigger OnValidate()
+                begin
+                    SIAuxSalespersonPurchaser.Validate("NPR SI Salesperson Tax Number");
+                    SIAuxSalespersonPurchaser.SaveSIAuxSalespersonFields();
+                end;
+            }
         }
     }
 
     var
         CROAuxSalespersonPurchaser: Record "NPR CRO Aux Salesperson/Purch.";
+        SIAuxSalespersonPurchaser: Record "NPR SI Aux Salesperson/Purch.";
 
     trigger OnAfterGetCurrRecord()
     begin
         CROAuxSalespersonPurchaser.ReadCROAuxSalespersonFields(Rec);
+        SIAuxSalespersonPurchaser.ReadSIAuxSalespersonFields(Rec);
     end;
 }

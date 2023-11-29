@@ -28,6 +28,71 @@ page 6150767 "NPR SI Fiscalization Setup"
                     end;
                 }
             }
+            group(Certificates)
+            {
+                Caption = 'Signing Certificate Setup';
+
+                field("Signing Certificate Password"; Rec."Signing Certificate Password")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Signing Certificate Password field.';
+                }
+                field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field.';
+                }
+                field("Certificate Subject Ident."; Rec."Certificate Subject Ident.")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Certificate Issuer field.';
+                }
+            }
+            group(FiscEnvironmentInfo)
+            {
+                Caption = 'Fiscalization Environment Setup';
+
+                field("Environment URL"; Rec."Environment URL")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Environment URL field.';
+                }
+            }
+            group(NoSeries)
+            {
+                Caption = 'No. Series Setup';
+
+                field("Receipt No. Series"; Rec."Receipt No. Series")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Receipt No. Series field.';
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action("Upload Certificate")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Upload Certificate';
+                Image = Import;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Upload Certificate action.';
+                trigger OnAction()
+                var
+                    SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
+                begin
+                    SIAuditMgt.ImportCertificate();
+                end;
+            }
         }
     }
 
