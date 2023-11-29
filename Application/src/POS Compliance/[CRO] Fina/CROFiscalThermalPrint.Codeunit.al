@@ -165,7 +165,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintFullLine();
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(POSEntry."Amount Incl. Tax"), true);
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(POSEntry."Amount Incl. Tax"), true);
 
         PrintTextLine('', false);
     end;
@@ -210,7 +210,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintFullLine();
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(SalesInvoiceHdr."Amount Including VAT"), true);
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(SalesInvoiceHdr."Amount Including VAT"), true);
 
         PrintTextLine('', false);
     end;
@@ -254,7 +254,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintFullLine();
 
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(-SalesCrMemoHdr."Amount Including VAT"), true);
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."Payment Method"), '', FormatDecimal(-SalesCrMemoHdr."Amount Including VAT"), true);
 
         PrintTextLine('', false);
     end;

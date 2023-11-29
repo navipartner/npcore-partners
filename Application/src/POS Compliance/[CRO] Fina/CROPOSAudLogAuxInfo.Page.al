@@ -80,6 +80,14 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                 {
                     ApplicationArea = NPRCROFiscal;
                     ToolTip = 'Specifies the value of the Payment Method field.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteReason = 'Replaced by Payment Method field.';
+                }
+                field("Payment Method"; Rec."Payment Method")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the value of the Payment Method field.';
                 }
                 field("Receipt Fiscalized"; Rec."Receipt Fiscalized")
                 {

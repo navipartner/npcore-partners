@@ -463,8 +463,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
                 repeat
                     if not CROPOSPaymMethMapping2.Get(POSEntryPaymentLine2."POS Payment Method Code") then
                         Error(PaymentMappingNonExistentErr);
-                    if CROPOSPaymMethMapping."CRO Payment Method" <> CROPOSPaymMethMapping2."CRO Payment Method" then begin
-                        CROPOSPaymMethMapping.SetRange("CRO Payment Method", "NPR CRO Payment Method"::Other);
+                    if CROPOSPaymMethMapping."Payment Method" <> CROPOSPaymMethMapping2."Payment Method" then begin
+                        CROPOSPaymMethMapping.SetRange("Payment Method", "NPR CRO Payment Method"::Other);
                         if CROPOSPaymMethMapping.FindFirst() then
                             CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPOSPaymMethMapping."Payment Method Code")
                         else
