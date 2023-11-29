@@ -1,8 +1,8 @@
 enum 6014533 "NPR SI Audit Entry Type"
 {
-#IF NOT BC17
+#if not BC17
     Access = Internal;
-#ENDIF
+#endif
     Extensible = false;
 
     value(0; "POS Entry")

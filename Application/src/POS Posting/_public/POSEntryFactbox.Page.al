@@ -213,7 +213,6 @@
                     end;
                 }
             }
-
             group(CROPOSAuditLog)
             {
                 ShowCaption = false;
@@ -235,9 +234,29 @@
                     end;
                 }
             }
+            group(SIPosAuditLog)
+            {
+                ShowCaption = false;
+                Visible = ShowSIAudit;
+                field("SI POS Audit Log"; Rec."SI POS Audit Log")
+                {
+                    Caption = 'SI POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of SI POS Audit Log information';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+                    begin
+                        SIPOSAuditLogAuxInfo.FilterGroup(10);
+                        SIPOSAuditLogAuxInfo.SetRange("Audit Entry Type", SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
+                        SIPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        SIPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(Page::"NPR RS POS Audit Log Aux. Info", SIPOSAuditLogAuxInfo);
+                    end;
+                }
+            }
         }
     }
-
 
     trigger OnAfterGetRecord()
     begin
@@ -292,11 +311,13 @@
         CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
     begin
         Clear(ShowCleanCash);
         Clear(ShowDEAudit);
         Clear(ShowRSAudit);
         Clear(ShowCroAudit);
+        Clear(ShowSIAudit);
         if not POSUnit.Get(Rec."POS Unit No.") then
             exit;
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
@@ -310,6 +331,8 @@
                 ShowRSAudit := true;
             CROAuditMgt.HandlerCode():
                 ShowCroAudit := true;
+            SIAuditMgt.HandlerCode():
+                ShowSIAudit := true;
         end;
     end;
 
@@ -318,5 +341,6 @@
         ShowCroAudit: Boolean;
         ShowDEAudit: Boolean;
         ShowRSAudit: Boolean;
+        ShowSIAudit: Boolean;
 }
 
