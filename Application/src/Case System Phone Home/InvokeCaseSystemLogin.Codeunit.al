@@ -19,12 +19,12 @@ codeunit 6059944 "NPR Invoke CaseSystem Login"
             ServiceTierUserMgt.ValidateSaasTenant(AzureAdTenantId);
             ServiceTierUserMgt.TestUserOnLogin(IsSaas, AzureAdTenantId, Rec."User Login Type");
             ClientDiagnNpCaseMgt.CollectAndSendClientDiagnostics(IsSaas, AzureAdTenantId, Rec."User Login Type");
-            ServiceTierUserMgt.SendPosUnitQtyFromSaasEnvironment(AzureAdTenantId);
+            ServiceTierUserMgt.SendPosStoreAndUnitQtyFromSaasEnvironment(AzureAdTenantId);
         end else begin
             ServiceTierUserMgt.ValidateTenant();
             ServiceTierUserMgt.TestUserOnLogin(IsSaas, '', Rec."User Login Type");
             ClientDiagnNpCaseMgt.CollectAndSendClientDiagnostics(IsSaas, '', Rec."User Login Type");
-            ServiceTierUserMgt.SendPosUnitQty();
+            ServiceTierUserMgt.SendPosStoreAndUnitQty();
         end;
     end;
 }
