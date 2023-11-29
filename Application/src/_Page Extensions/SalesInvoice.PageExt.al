@@ -102,6 +102,18 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 ToolTip = 'Specifies the value of the RS Audit Entry field.';
                 Editable = false;
             }
+            field("NPR CRO POS Unit"; CROAuxSalesHeader."NPR CRO POS Unit")
+            {
+                Caption = 'CRO POS Unit';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the CRO POS Unit field.';
+                TableRelation = "NPR POS Unit";
+                trigger OnValidate()
+                begin
+                    CROAuxSalesHeader.Validate("NPR CRO POS Unit");
+                    CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
+                end;
+            }
         }
     }
     actions
@@ -213,9 +225,11 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
 
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
 
     trigger OnAfterGetCurrRecord()
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
+        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
     end;
 }

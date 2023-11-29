@@ -1,8 +1,8 @@
-enum 6014583 "NPR CRO POS Payment Method"
+enum 6014583 "NPR CRO Payment Method"
 {
-#IF NOT BC17
+#if not BC17
     Access = Internal;
-#ENDIF
+#endif
     Extensible = false;
 
     value(0; Other)

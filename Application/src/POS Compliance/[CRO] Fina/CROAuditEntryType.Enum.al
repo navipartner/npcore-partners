@@ -1,12 +1,20 @@
 enum 6014586 "NPR CRO Audit Entry Type"
 {
-#IF NOT BC17
+#if not BC17
     Access = Internal;
-#ENDIF
+#endif
     Extensible = false;
 
     value(0; "POS Entry")
     {
         Caption = 'POS Entry';
+    }
+    value(1; "Sales Invoice")
+    {
+        Caption = 'Sales Invoice';
+    }
+    value(2; "Sales Credit Memo")
+    {
+        Caption = 'Sales Credit Memo';
     }
 }

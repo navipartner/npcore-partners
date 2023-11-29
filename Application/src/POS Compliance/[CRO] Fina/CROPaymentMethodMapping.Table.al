@@ -1,10 +1,10 @@
-table 6060039 "NPR CRO POS Paym. Method Mapp."
+table 6150724 "NPR CRO Payment Method Mapping"
 {
     Access = Internal;
-    Caption = 'CRO POS Payment Method Mapping';
+    Caption = 'CRO Payment Method Mapping';
     DataClassification = CustomerContent;
-    DrillDownPageId = "NPR CRO POS Paym. Method Mapp.";
-    LookupPageId = "NPR CRO POS Paym. Method Mapp.";
+    DrillDownPageId = "NPR CRO Payment Method Mapping";
+    LookupPageId = "NPR CRO Payment Method Mapping";
 
     fields
     {
@@ -12,7 +12,7 @@ table 6060039 "NPR CRO POS Paym. Method Mapp."
         {
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Payment Method";
+            TableRelation = "Payment Method";
         }
         field(2; "CRO Payment Method"; Enum "NPR CRO Payment Method")
         {

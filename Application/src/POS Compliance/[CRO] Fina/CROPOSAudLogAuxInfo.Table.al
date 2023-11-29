@@ -92,18 +92,17 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         {
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Payment Method";
             trigger OnValidate()
-            var
-                CROPOSPaymMethMapp: Record "NPR CRO POS Paym. Method Mapp.";
             begin
-                if CROPOSPaymMethMapp.Get("Payment Method Code") then
-                    "CRO Payment Method" := CROPOSPaymMethMapp."CRO Payment Method"
-                else
-                    "CRO Payment Method" := "NPR CRO POS Payment Method"::Other;
+                case "Audit Entry Type" of
+                    "NPR CRO Audit Entry Type"::"POS Entry":
+                        FindPOSPaymentMethodMapping();
+                    else
+                        FindPaymentMethodMapping();
+                end;
             end;
         }
-        field(15; "CRO Payment Method"; Enum "NPR CRO POS Payment Method")
+        field(15; "CRO Payment Method"; Enum "NPR CRO Payment Method")
         {
             Caption = 'Payment Method';
             DataClassification = CustomerContent;
@@ -164,6 +163,42 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         Rec.SetRange("Audit Entry Type", Rec."Audit Entry Type"::"POS Entry");
         Rec.SetRange("POS Entry No.", POSEntryNo);
         exit(Rec.FindFirst());
+    end;
+
+    procedure GetAuditFromSalesInvoice(SalesInvoiceNo: Code[20]): Boolean
+    begin
+        Rec.Reset();
+        Rec.SetRange("Audit Entry Type", Rec."Audit Entry Type"::"Sales Invoice");
+        Rec.SetRange("Source Document No.", SalesInvoiceNo);
+        exit(Rec.FindFirst());
+    end;
+
+    procedure GetAuditFromSalesCrMemo(SalesCrMemoNo: Code[20]): Boolean
+    begin
+        Rec.Reset();
+        Rec.SetRange("Audit Entry Type", Rec."Audit Entry Type"::"Sales Credit Memo");
+        Rec.SetRange("Source Document No.", SalesCrMemoNo);
+        exit(Rec.FindFirst());
+    end;
+
+    local procedure FindPOSPaymentMethodMapping()
+    var
+        CROPOSPaymMethMapp: Record "NPR CRO POS Paym. Method Mapp.";
+    begin
+        if CROPOSPaymMethMapp.Get("Payment Method Code") then
+            "CRO Payment Method" := CROPOSPaymMethMapp."CRO Payment Method"
+        else
+            "CRO Payment Method" := "NPR CRO Payment Method"::Other;
+    end;
+
+    local procedure FindPaymentMethodMapping()
+    var
+        CROPaymentMethodMapping: Record "NPR CRO Payment Method Mapping";
+    begin
+        if CROPaymentMethodMapping.Get("Payment Method Code") then
+            "CRO Payment Method" := CROPaymentMethodMapping."CRO Payment Method"
+        else
+            "CRO Payment Method" := "NPR CRO Payment Method"::Other;
     end;
 
     var
