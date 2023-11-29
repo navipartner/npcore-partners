@@ -208,6 +208,7 @@
         PeriodDiscountLine: Record "NPR Period Discount Line";
         TransferReceiptLine: Record "Transfer Receipt Line";
         PurchInvLine: Record "Purch. Inv. Line";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
         WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
@@ -312,6 +313,17 @@
                         if PurchInvLine.FindSet() then
                             PrintPostedPurchaseInvoice(PurchInvLine, ReportType);
                     end;
+                DATABASE::"Purch. Rcpt. Line":
+                    begin
+                        repeat
+                            if PurchRcptLine.Get(_TmpSelectionBuffer.RecordId()) then begin
+                                PurchRcptLine.Mark(true);
+                            end;
+                        until _TmpSelectionBuffer.Next() = 0;
+                        PurchRcptLine.MarkedOnly(true);
+                        if PurchRcptLine.FindSet() then
+                            PrintPostedPurchaseReceipt(PurchRcptLine, ReportType);
+                    end;
                 DATABASE::"NPR Item Worksheet Line":
                     begin
                         repeat
@@ -332,6 +344,8 @@
                         if WarehouseActivityLine.FindSet() then
                             PrintWarehouseActivityLine(WarehouseActivityLine, ReportType);
                     end;
+                else
+                    OnPrintSelection(_TmpSelectionBuffer, ReportType);
             end;
         end;
     end;
@@ -346,7 +360,10 @@
         RetailJournalMgt: Codeunit "NPR Retail Journal Code";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         PurchInvLine: Record "Purch. Inv. Line";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
         WarehouseActivityLine: Record "Warehouse Activity Line";
+        IsHandled: Boolean;
+        TableNotSupportedErr: Label 'Table %1 %2 is not supported for selected Printing.', Comment = '%1 - table number, %2 - table caption';
     begin
         _TmpRetailJnlCode := Format(CreateGuid());
         RetailJournalMgt.SetRetailJnlTemp(_TmpRetailJnlCode);
@@ -390,6 +407,12 @@
                     if PurchInvLine.FindFirst() then;
                     RetailJournalMgt.PostedPurchaseInvoice2RetailJnl(PurchInvLine."Document No.", _TmpRetailJnlCode);
                 end;
+            DATABASE::"Purch. Rcpt. Line":
+                begin
+                    RecRef.SetTable(PurchRcptLine);
+                    if PurchRcptLine.FindFirst() then;
+                    RetailJournalMgt.PostedPurchaseReceipt2RetailJnl(PurchRcptLine."Document No.", _TmpRetailJnlCode);
+                end;
             DATABASE::"Warehouse Activity Line":
                 begin
                     RecRef.SetTable(WarehouseActivityLine);
@@ -400,13 +423,16 @@
                     RetailJournalMgt.InventoryPutAway2RetailJnl(WarehouseActivityLine."Activity Type".AsInteger(), WarehouseActivityLine."No.", _TmpRetailJnlCode);
 #endif
                 end;
-            else
-                Error('table %1 is not supported for selected Printing', RecRef.Number);
+            else begin
+                OnRunPrintPage(RecRef, RetailJournalMgt, _TmpRetailJnlCode, IsHandled);
+                if not IsHandled then
+                    Error(TableNotSupportedErr, RecRef.Number, RecRef.Caption);
+            end;
         end;
 
         Commit();
 
-        if RetailJnlLine.IsEmpty then
+        if RetailJnlLine.IsEmpty() then
             exit;
 
         PAGE.RunModal(PAGE::"NPR Retail Journal Print", RetailJnlLine);
@@ -616,7 +642,7 @@
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
     end;
 
-    local procedure FlushJournalToPrinter(RetailJournalCode: Code[40]; ReportType: Integer)
+    procedure FlushJournalToPrinter(RetailJournalCode: Code[40]; ReportType: Integer)
     var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
@@ -639,6 +665,17 @@
         Evaluate(TempRetailJnlNo, CreateGuid());
         RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
         RetailJournalCode.CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine, TempRetailJnlNo);
+        FlushJournalToPrinter(TempRetailJnlNo, ReportType);
+    end;
+
+    local procedure PrintPostedPurchaseReceipt(var PurchRcptLine: Record "Purch. Rcpt. Line"; ReportType: Integer)
+    var
+        RetailJournalCode: Codeunit "NPR Retail Journal Code";
+        TempRetailJnlNo: Code[40];
+    begin
+        Evaluate(TempRetailJnlNo, CreateGuid());
+        RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
+        RetailJournalCode.CopyPostedPurchaseRcpt2RetailJnlLines(PurchRcptLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
     end;
 
@@ -743,6 +780,8 @@
         TransferReceiptLine: Record "Transfer Receipt Line";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
         WarehouseActivityHeader: Record "Warehouse Activity Header";
         WarehouseActivityLine: Record "Warehouse Activity Line";
         IsHandled: Boolean;
@@ -755,7 +794,6 @@
                     PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
                     PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
                     FilteredLineRecRef.GetTable(PurchaseLine);
-
                 end;
             DATABASE::"Transfer Header":
                 begin
@@ -782,12 +820,17 @@
                     PeriodDiscountLine.SetRange(Code, PeriodDiscount.Code);
                     FilteredLineRecRef.GetTable(PeriodDiscountLine);
                 end;
-
             DATABASE::"Purch. Inv. Header":
                 begin
                     RecRef2.SetTable(PurchInvHeader);
                     PurchInvLine.SetRange("Document No.", PurchInvHeader."No.");
                     FilteredLineRecRef.GetTable(PurchInvLine);
+                end;
+            DATABASE::"Purch. Rcpt. Header":
+                begin
+                    RecRef2.SetTable(PurchRcptHeader);
+                    PurchRcptLine.SetRange("Document No.", PurchRcptHeader."No.");
+                    FilteredLineRecRef.GetTable(PurchRcptLine);
                 end;
             DATABASE::"Warehouse Activity Header":
                 begin
@@ -820,6 +863,14 @@
     local procedure OnAfterPrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRunPrintPage(var RecRef: RecordRef; RetailJournalMgt: Codeunit "NPR Retail Journal Code"; RetailJnlCode: Code[40]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPrintSelection(var SelectionBuffer: RecordRef; ReportType: Integer)
+    begin
+    end;
 }
-
-
