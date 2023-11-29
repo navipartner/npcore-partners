@@ -14,9 +14,17 @@ table 6060039 "NPR CRO POS Paym. Method Mapp."
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Method";
         }
-        field(2; "CRO Payment Method"; Enum "NPR CRO Payment Method")
+        field(2; "CRO Payment Method"; Enum "NPR CRO POS Payment Method")
         {
             Caption = 'CRO Payment Method';
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR28.0';
+            ObsoleteReason = 'Replaced by Payment Method field.';
+        }
+        field(3; "Payment Method"; Enum "NPR CRO Payment Method")
+        {
+            Caption = 'Payment Method';
             DataClassification = CustomerContent;
         }
     }

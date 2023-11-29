@@ -210,7 +210,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
     local procedure AddPaymentMethodSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var Content: XmlElement)
     begin
-        case CROPOSAuditLogAuxInfo."CRO Payment Method" of
+        case CROPOSAuditLogAuxInfo."Payment Method" of
             "NPR CRO Payment Method"::Card:
                 Content.Add(CreateXmlElement('NacinPlac', 'K'));
             "NPR CRO Payment Method"::Cash:
