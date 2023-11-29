@@ -19,6 +19,16 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
+        addafter(Cancelled)
+        {
+            field("NPR Document Fiscalized"; CROAuxSalesCrMemoHdr."NPR CRO Document Fiscalized")
+            {
+                Caption = 'Document Fiscalized';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the Document Fiscalized field.';
+                Editable = false;
+            }
+        }
     }
     actions
     {
@@ -63,6 +73,7 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
     }
 
     var
+        CROAuxSalesCrMemoHdr: Record "NPR CRO Aux Sales Cr. Memo Hdr";
         OIOUBLInstalled: Boolean;
 
     trigger OnOpenPage()
@@ -70,5 +81,10 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
         OIOUBLSetup: Record "NPR OIOUBL Setup";
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        CROAuxSalesCrMemoHdr.ReadCROAuxSalesCrMemoHeaderFields(Rec);
     end;
 }

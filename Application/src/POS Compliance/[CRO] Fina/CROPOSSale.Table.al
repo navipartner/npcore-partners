@@ -26,5 +26,4 @@ table 6060100 "NPR CRO POS Sale"
             Clustered = true;
         }
     }
-
 }

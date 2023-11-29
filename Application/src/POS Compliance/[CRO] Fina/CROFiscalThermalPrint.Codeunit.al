@@ -4,16 +4,33 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
     var
         Printer: Codeunit "NPR RP Line Print";
+        AmountPaidLbl: Label 'PLAĆENO:', Locked = true;
+        FinalBillLbl: Label 'ZA PLATITI €', Locked = true;
+        ItemDescLbl: Label 'Artikal', Locked = true;
+        LineAmountLbl: Label 'Iznos €', Locked = true;
+        PriceLbl: Label 'Cijena', Locked = true;
+        QtyLbl: Label 'Kol', Locked = true;
         TwoValueFormatLbl: Label '%1 %2', Locked = true;
+        VATAmountLbl: Label 'PDV', Locked = true;
+        VATBaseLbl: Label 'Osnovica', Locked = true;
+        VATPercLbl: Label 'Porez', Locked = true;
+        VATTotalLbl: Label 'Ukupno', Locked = true;
 
     #region CRO Fiscal Thermal Print - Receipt Print
 
     internal procedure PrintReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     begin
-        PrintThermalReceipt(CROPOSAuditLogAuxInfo);
+        case CROPOSAuditLogAuxInfo."Audit Entry Type" of
+            "NPR CRO Audit Entry Type"::"POS Entry":
+                PrintPOSThermalReceipt(CROPOSAuditLogAuxInfo);
+            "NPR CRO Audit Entry Type"::"Sales Invoice":
+                PrintSalesInvThermalReceipt(CROPOSAuditLogAuxInfo);
+            "NPR CRO Audit Entry Type"::"Sales Credit Memo":
+                PrintSalesCrMemoThermalReceipt(CROPOSAuditLogAuxInfo);
+        end;
     end;
 
-    local procedure PrintThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure PrintPOSThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
         POSEntry: Record "NPR POS Entry";
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
@@ -25,9 +42,73 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintHeaderSection(CROPOSAuditLogAuxInfo);
 
-        PrintContentSection(CROPOSAuditLogAuxInfo, POSEntry);
+        PrintPOSContentSection(CROPOSAuditLogAuxInfo, POSEntry);
 
-        PrintVATSection(CROPOSAuditLogAuxInfo, POSEntry);
+        PrintPOSVATSection(CROPOSAuditLogAuxInfo, POSEntry);
+
+        PrintFooter(CROPOSAuditLogAuxInfo);
+
+        PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
+
+        PrinterDeviceSettings.Init();
+        PrinterDeviceSettings.Name := 'ENCODING';
+        PrinterDeviceSettings.Value := 'Windows-1251';
+        PrinterDeviceSettings.Insert();
+
+        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+
+        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
+        CROPOSAuditLogAuxInfo.Modify();
+    end;
+
+    local procedure PrintSalesInvThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        SalesInvoiceHdr: Record "Sales Invoice Header";
+    begin
+        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
+        Printer.SetAutoLineBreak(false);
+
+        SalesInvoiceHdr.Get(CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceHdr.CalcFields("Amount Including VAT");
+
+        PrintHeaderSection(CROPOSAuditLogAuxInfo);
+
+        PrintSalesInvContentSection(CROPOSAuditLogAuxInfo, SalesInvoiceHdr);
+
+        PrintSalesInvVATSection(CROPOSAuditLogAuxInfo, SalesInvoiceHdr);
+
+        PrintFooter(CROPOSAuditLogAuxInfo);
+
+        PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
+
+        PrinterDeviceSettings.Init();
+        PrinterDeviceSettings.Name := 'ENCODING';
+        PrinterDeviceSettings.Value := 'Windows-1251';
+        PrinterDeviceSettings.Insert();
+
+        Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+
+        CROPOSAuditLogAuxInfo."Receipt Printed" := true;
+        CROPOSAuditLogAuxInfo.Modify();
+    end;
+
+    local procedure PrintSalesCrMemoThermalReceipt(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    var
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        SalesCrMemoHdr: Record "Sales Cr.Memo Header";
+    begin
+        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
+        Printer.SetAutoLineBreak(false);
+
+        SalesCrMemoHdr.Get(CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoHdr.CalcFields("Amount Including VAT");
+
+        PrintHeaderSection(CROPOSAuditLogAuxInfo);
+
+        PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo, SalesCrMemoHdr);
+
+        PrintSalesCrMemoVATSection(CROPOSAuditLogAuxInfo, SalesCrMemoHdr);
 
         PrintFooter(CROPOSAuditLogAuxInfo);
 
@@ -46,7 +127,141 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
     #endregion
 
-    #region CRO Fiscal Thermal Print - Printing Sections
+    #region CRO Fiscal Thermal Print - POS Sections Printing
+    local procedure PrintPOSContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SalesLineType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
+    begin
+        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
+        PrintDottedLine();
+
+        POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
+        POSEntrySalesLine.SetRange(Type, SalesLineType::Item);
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                PrintTextLine(POSEntrySalesLine.Description, false);
+                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(Round(POSEntrySalesLine."Amount Incl. VAT")), false);
+            until POSEntrySalesLine.Next() = 0;
+        PrintFullLine();
+
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(POSEntry."Amount Incl. Tax"), true);
+        PrintTextLine('', false);
+    end;
+
+    local procedure PrintPOSVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+    begin
+        PrintDottedLine();
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
+        PrintDottedLine();
+
+        POSEntryTaxLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
+        if POSEntryTaxLine.FindSet() then
+            repeat
+                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(POSEntryTaxLine."Tax Base Amount"), FormatDecimal(POSEntryTaxLine."Tax Amount"), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), false);
+            until POSEntryTaxLine.Next() = 0;
+
+        PrintFullLine();
+
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(POSEntry."Amount Incl. Tax"), true);
+
+        PrintTextLine('', false);
+    end;
+
+    #endregion
+
+    #region CRO Fiscal Thermal Print - Sales Invoice Sections Printing
+    local procedure PrintSalesInvContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesInvoiceHdr: Record "Sales Invoice Header")
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
+        PrintDottedLine();
+
+        SalesInvoiceLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceLine.SetRange(Type, "Sales Line Type"::Item);
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                PrintTextLine(SalesInvoiceLine.Description, false);
+                PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesInvoiceLine."Unit Price"), FormatDecimal(Round(SalesInvoiceLine."Amount Including VAT")), false);
+            until SalesInvoiceLine.Next() = 0;
+        PrintFullLine();
+
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesInvoiceHdr."Amount Including VAT"), true);
+        PrintTextLine('', false);
+    end;
+
+    local procedure PrintSalesInvVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesInvoiceHdr: Record "Sales Invoice Header")
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+    begin
+        PrintDottedLine();
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
+        PrintDottedLine();
+
+        SalesInvoiceLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceLine.SetRange(Type, "Sales Line Type"::Item);
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(SalesInvoiceLine."VAT %", 0.1)), '%'), FormatDecimal(SalesInvoiceLine."VAT Base Amount"), FormatDecimal(SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount"), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+            until SalesInvoiceLine.Next() = 0;
+
+        PrintFullLine();
+
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(SalesInvoiceHdr."Amount Including VAT"), true);
+
+        PrintTextLine('', false);
+    end;
+    #endregion
+
+    #region CRO Fiscal Thermal Print - Sales Credit Memo Sections Printing
+    local procedure PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesCrMemoHdr: Record "Sales Cr.Memo Header")
+    var
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+    begin
+        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
+        PrintDottedLine();
+
+        SalesCrMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoLine.SetRange(Type, "Sales Line Type"::Item);
+        if SalesCrMemoLine.FindSet() then
+            repeat
+                PrintTextLine(SalesCrMemoLine.Description, false);
+                PrintFourColumnText(Format(-SalesCrMemoLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(-Round(SalesCrMemoLine."Unit Price")), FormatDecimal(-Round(SalesCrMemoLine."Amount Including VAT")), false);
+            until SalesCrMemoLine.Next() = 0;
+        PrintFullLine();
+
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesCrMemoHdr."Amount Including VAT"), true);
+        PrintTextLine('', false);
+    end;
+
+    local procedure PrintSalesCrMemoVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesCrMemoHdr: Record "Sales Cr.Memo Header")
+    var
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+    begin
+        PrintDottedLine();
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
+        PrintDottedLine();
+
+        SalesCrMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoLine.SetRange(Type, "Sales Line Type"::Item);
+        if SalesCrMemoLine.FindSet() then
+            repeat
+                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(-Round(SalesCrMemoLine."VAT %", 0.1)), '%'), FormatDecimal(-SalesCrMemoLine."VAT Base Amount"), FormatDecimal(-(SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount")), FormatDecimal(-SalesCrMemoLine."Amount Including VAT"), false);
+            until SalesCrMemoLine.Next() = 0;
+
+        PrintFullLine();
+
+        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(-SalesCrMemoHdr."Amount Including VAT"), true);
+
+        PrintTextLine('', false);
+    end;
+    #endregion
+
+    #region CRO Fiscal Thermal Print - Base Section Printing
+
     local procedure PrintHeaderSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
     var
         CompanyInfo: Record "Company Information";
@@ -82,58 +297,6 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintTextLine(StrSubstNo(TwoValueFormatLbl, POSUnitLbl, CROPOSAuditLogAuxInfo."POS Unit No."), false);
         PrintDottedLine();
-    end;
-
-    local procedure PrintContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntry: Record "NPR POS Entry")
-    var
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        FinalBillLbl: Label 'ZA PLATITI €', Locked = true;
-        ItemDescLbl: Label 'Artikal', Locked = true;
-        LineAmountLbl: Label 'Iznos €', Locked = true;
-        QtyLbl: Label 'Kol', Locked = true;
-        PriceLbl: Label 'Cijena', Locked = true;
-        SalesLineType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
-    begin
-        PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
-        PrintDottedLine();
-
-        POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetRange(Type, SalesLineType::Item);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                PrintTextLine(POSEntrySalesLine.Description, false);
-                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(Round(POSEntrySalesLine."Amount Incl. VAT")), false);
-            until POSEntrySalesLine.Next() = 0;
-        PrintFullLine();
-
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(POSEntry."Amount Incl. Tax"), true);
-        PrintTextLine('', false);
-    end;
-
-    local procedure PrintVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntry: Record "NPR POS Entry")
-    var
-        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
-        AmountPaidLbl: Label 'PLAĆENO:', Locked = true;
-        VATAmountLbl: Label 'PDV', Locked = true;
-        VATBaseLbl: Label 'Osnovica', Locked = true;
-        VATPercLbl: Label 'Porez', Locked = true;
-        VATTotalLbl: Label 'Ukupno', Locked = true;
-    begin
-        PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
-        PrintDottedLine();
-
-        POSEntryTaxLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        if POSEntryTaxLine.FindSet() then
-            repeat
-                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(POSEntryTaxLine."Tax Base Amount"), FormatDecimal(POSEntryTaxLine."Tax Amount"), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), false);
-            until POSEntryTaxLine.Next() = 0;
-
-        PrintFullLine();
-
-        PrintFourColumnText(AmountPaidLbl, Format(CROPOSAuditLogAuxInfo."CRO Payment Method"), '', FormatDecimal(POSEntry."Amount Incl. Tax"), true);
-
-        PrintTextLine('', false);
     end;
 
     local procedure PrintFooter(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
