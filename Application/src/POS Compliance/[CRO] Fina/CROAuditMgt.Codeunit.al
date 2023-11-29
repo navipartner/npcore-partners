@@ -247,6 +247,10 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     var
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
     begin
+        if not IsCROFiscalActive() then
+            exit;
+        if not RetailLocationExists then
+            exit;
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesHeader."NPR CRO POS Unit" := SalePOS."Register No.";
         CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
