@@ -188,7 +188,7 @@
         TransactionId: Text;
         PaymentAmount: Decimal;
     begin
-        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), true));
+        TransactionId := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), true);
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
