@@ -342,7 +342,7 @@
         PaymentAmount: Decimal;
         ShopperReference: Text;
     begin
-        TransactionId := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), false));
+        TransactionId := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), false);
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
