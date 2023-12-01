@@ -167,7 +167,7 @@ report 6014466 "NPR NpRv Voucher Cloud"
                 Language: Codeunit Language;
             begin
                 BarCodeText := "NpRv Voucher"."Reference No.";
-                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, Enum::"Barcode Symbology"::Code39, BarcodeFontProviderMgt.SetBarcodeSettings(0, true, false, false));
+                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, Enum::"Barcode Symbology"::Code128);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));

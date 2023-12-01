@@ -1,12 +1,12 @@
 #if CLOUD
-report 6014492 "NPR NpRv Voucher Cloud 2"
+report 6014517 "NPR NpRv Voucher Cloud 2 QR"
 {
     Extensible = False;
-    WordLayout = './src/_Reports/layouts/NpRvVoucherCloud2.docx';
+    WordLayout = './src/_Reports/layouts/NpRvVoucherCloud2QR.docx';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
     DefaultLayout = Word;
-    Caption = 'Voucher Cloud 2';
+    Caption = 'Voucher Cloud 2 QR';
     DataAccessIntent = ReadOnly;
 
     dataset
@@ -167,7 +167,7 @@ report 6014492 "NPR NpRv Voucher Cloud 2"
                 Language: Codeunit Language;
             begin
                 BarCodeText := "NpRv Voucher"."Reference No.";
-                BarCodeEncodedText := BarcodeFontProviderMgt.EncodeText(BarCodeText, Enum::"Barcode Symbology"::Code128);
+                BarCodeEncodedText := BarcodeFontProviderMgt.GenerateQRCodeAZ(BarCodeText, 'M', 'UTF8', true, true, 2);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 Evaluate(StartingDate, Format(DT2Date("NpRv Voucher"."Starting Date")));
                 Evaluate(EndingDate, Format(DT2Date("NpRv Voucher"."Ending Date")));
