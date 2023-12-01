@@ -11,9 +11,9 @@ codeunit 6184561 "NPR UPG POS Posting Profile"
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Posting Profile', 'MoveAsyncPostingSetup');
 
-        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile")) then begin
+        if not UpgradeTagMgt.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile", 'MoveAsyncPostingSetup')) then begin
             MoveAsyncPostingSetup();
-            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile"));
+            UpgradeTagMgt.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Posting Profile", 'MoveAsyncPostingSetup'));
         end;
 
         LogMessageStopwatch.LogFinish();
