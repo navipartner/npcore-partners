@@ -7,7 +7,7 @@ page 6150772 "NPR POS HTML Disp. Prof. List"
     CardPageId = "NPR POS HTML Disp. Prof. Card";
     Extensible = false;
     Editable = false;
-    Caption = 'HTML Display Profiles List';
+    Caption = 'HTML Display Profiles';
 
     layout
     {

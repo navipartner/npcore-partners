@@ -296,11 +296,21 @@
     end;
 
     procedure CreateRequestJSON(EftTrxRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        HtmlProfile: Record "NPR POS HTML Disp. Prof.";
     begin
         Request.Add('EntryNo', EftTrxRequest."Entry No.");
         Request.Add('qr', GetQRBeaconId(EftTrxRequest));
         Request.Add('formattedAmount', Format(EftTrxRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
         Request.Add('transactionCaption', Format(EftTrxRequest."Processing Type"));
+        if (POSUnit.Get(EftTrxRequest."Register No.")) then begin
+            if (POSUnit."POS HTML Display Profile" <> '') then begin
+                if (HtmlProfile.Get(POSUnit."POS HTML Display Profile")) then begin
+                    Request.Add('QrOnCustomerDisplay', HtmlProfile."MobilePay QR");
+                end
+            end
+        end
     end;
 
     internal procedure PollTrxStatus(var eftTrxRequest: Record "NPR EFT Transaction Request"; eftSetup: Record "NPR EFT Setup"): Boolean
