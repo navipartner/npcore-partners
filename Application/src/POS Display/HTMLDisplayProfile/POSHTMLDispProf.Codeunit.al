@@ -3,6 +3,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     Access = Internal;
 
     var
+        State: Codeunit "NPR POS HTML Disp. Session";
         MsgRememberInputLabel: Label 'REMEMBER TO ASK FOR SIGNATURE ON THE CUSTOMER DISPLAY.', Comment = 'Input reminder', MaxLength = 100;
         MsgRememberInputTitleLabel: Label 'CUSTOMER DISPLAY', Comment = 'Input reminder', MaxLength = 100;
         MsgInputCancelledLabel: Label 'Signature capture was canceled', Comment = 'User canceled signature', MaxLength = 100;
@@ -10,224 +11,139 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitializeAtLogin', '', true, true)]
     local procedure OnAfterInitializeAtLogin(POSUnit: Record "NPR POS Unit")
     var
-        Context: JsonObject;
+        Request: JsonObject;
         DisplayRequest: Codeunit "NPR POS Html Disp. Req";
     begin
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
-        Context.Add('DisplayAction', 'Open');
-        DisplayRequest.AppendMediaObject(Context, POSUnit);
-        SendRequest(POSUnit."No.", Context, False);
+        DisplayRequest.OpenRequest(Request, (not State.MediaIsDownloaded()));
+        State.SetDidDownload(true);
+        SendRequest(Request);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitSale', '', true, true)]
     local procedure OnAfterInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        POSUnit: Record "NPR POS Unit";
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
-        ReceiptContent: JsonObject;
-        Context: JsonObject;
-        JsParam: JsonObject;
     begin
-        POSUnit.Get(SaleHeader."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleHeader."Sales Ticket No.", SaleHeader.Date);
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('DisplayAction', 'SendJS');
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
     end;
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterResumeSale', '', true, true)]
     local procedure OnAfterResumeSale(SalePOS: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SalePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SalePOS."Sales Ticket No.", SalePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
-    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
-    begin
-        SendInputSignalToHWC(SalePOS."Sales Ticket No.");
-    end;
-
-    procedure UpdateHTMLDisplay(SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
-    begin
-        POSUnit.Get(SaleLinePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterDeletePOSSaleLine', '', true, true)]
     local procedure OnAfterDeletePOSSaleLine(var Sender: Codeunit "NPR POS Sale Line"; SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SaleLinePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnUpdateLine', '', true, true)]
     local procedure OnUpdateLine(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SaleLinePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]
     local procedure OnAfterSetQuantity(var Sender: Codeunit "NPR POS Sale Line"; var SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SaleLinePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterDeleteLine', '', true, true)]
     local procedure OnAfterDeleteLine(SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SaleLinePOS."Register No.");
-        if (POSUnit."POS HTML Display Profile" = '') then
-            exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        UpdateReceipt();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertPOSSaleLine', '', true, true)]
+    local procedure OnAfterInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        UpdateReceipt();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnAfterInsertPaymentLine', '', true, true)]
     local procedure OnAfterInsertPaymentLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        UpdateReceipt();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
+    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
-        Context: JsonObject;
-        JsParam: JsonObject;
-        ReceiptContent: JsonObject;
-        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
     begin
-        POSUnit.Get(SaleLinePOS."Register No.");
+        POSUnit.Get(SalePOS."Register No.");
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
-        ReceiptContent := HtmlDisplayReq.GetReceiptContent(POSUnit."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date);
-        JsParam.Add('JSAction', 'UpdateReceipt');
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('ReceiptContent', ReceiptContent);
-        JsParam.Add('Labels', HtmlDisplayReq.GetLabels());
-        Context.Add('JSParameter', JsParam);
-        SendRequest(POSUnit."No.", Context, False);
+        SendInputSignalToHWC(SalePOS."Sales Ticket No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR HWC Response Method", 'OnHardwareConnectorResponse', '', false, false)]
     local procedure OnHardwareConnectorResponse(RequestId: Guid; Response: JsonToken; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSUnit: Record "NPR POS Unit";
-        POSEntry: Record "NPR POS Entry";
-        ValidatePage: Page "NPR POS HTML Validate Input";
-        HtmlProfSession: Codeunit "NPR POS HTML Disp. Session";
         Setup: Codeunit "NPR POS Setup";
-        ResponseObj: JsonToken;
-        InputObj: JsonToken;
-        validateResult: Text;
+        ReqType: Text;
     begin
-        if (not HtmlProfSession.PopGuid(RequestId)) then
-            exit;
         POSSession.GetSetup(Setup);
         POSUnit.Get(Setup.GetPOSUnitNo());
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
-        if (
-        Response.AsObject().Get('JSON', ResponseObj) and
-        ResponseObj.AsObject().Get('Input', InputObj)
-        ) then begin
-            validateResult := ValidatePage.ValidateInput(InputObj.AsObject());
-            case validateResult of
+        if (not State.PopGuid(RequestId, ReqType)) then
+            exit;
+        case ReqType of
+            'GetInput':
+                HandleGetInputResponse(Response);
+        end;
+    end;
+
+    procedure UpdateHTMLDisplay()
+    begin
+        UpdateReceipt();
+    end;
+
+    local procedure UpdateReceipt()
+    var
+        POSSession: Codeunit "NPR POS Session";
+        PosSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
+        Request: JsonObject;
+        HtmlDisplayReq: Codeunit "NPR POS Html Disp. Req";
+    begin
+        POSSession.GetSetup(PosSetup);
+        if (not POSUnit.Get(PosSetup.GetPOSUnitNo())) then
+            exit;
+        if (POSUnit."POS HTML Display Profile" = '') then
+            exit;
+        HtmlDisplayReq.UpdateReceiptRequest(Request);
+        SendRequest(Request);
+    end;
+
+    local procedure HandleGetInputResponse(Response: JsonToken)
+    var
+        HtmlResponseParser: Codeunit "NPR POS Html Disp. Resp";
+        POSEntry: Record "NPR POS Entry";
+        ValidatePage: Page "NPR POS HTML Validate Input";
+        InputObj: JsonObject;
+        ValidateResult: Text;
+    begin
+        if (not HtmlResponseParser.ParseGetInputResponse(Response.AsObject(), InputObj)) then begin
+            Message('An error occoured while gathering input: ' + GetLastErrorText());
+        end else begin
+            ValidateResult := ValidatePage.ValidateInput(InputObj);
+            case ValidateResult of
                 'OK':
                     begin
-                        POSEntry.SetFilter("Document No.", HtmlProfSession.GetLastTicketNo());
+                        POSEntry.SetFilter("Document No.", State.GetLastTicketNo());
                         POSEntry.FindLast();
-                        EnterCustomerInput(InputObj.AsObject(), POSEntry);
+                        EnterCustomerInput(InputObj, POSEntry);
                     end;
                 'REDO':
                     begin
-                        SendInputSignalToHWC(HtmlProfSession.GetLastTicketNo());
+                        SendInputSignalToHWC(State.GetLastTicketNo());
                         exit;
                     end;
                 'CANCEL':
@@ -236,7 +152,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
                     end;
             end
         end;
-        HtmlProfSession.ClearLastTicketNo();
+        State.ClearLastTicketNo();
     end;
 
     /// <summary>
@@ -254,7 +170,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         Setup: Codeunit "NPR POS Setup";
         PhoneObj: JsonToken;
         SignObj: JsonToken;
-        signStream: OutStream;
+        SignStream: OutStream;
     begin
         POSSession.GetSetup(Setup);
         POSUnit.Get(Setup.GetPOSUnitNo());
@@ -269,9 +185,9 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         CostumerInput.Init();
         CostumerInput.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
         CostumerInput."Phone Number" := CopyStr(PhoneObj.AsValue().AsText(), 1, 50);
-        CostumerInput.Signature.CreateOutStream(signStream);
+        CostumerInput.Signature.CreateOutStream(SignStream);
         CostumerInput."Date & Time" := CurrentDateTime();
-        signStream.WriteText(SignObj.AsValue().AsText());
+        SignStream.WriteText(SignObj.AsValue().AsText());
         CostumerInput."POS Entry No." := POSEntry."Entry No.";
         CostumerInput.Insert();
     end;
@@ -279,14 +195,14 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     local procedure SendInputSignalToHWC(TicketNo: Code[20])
     var
         POSSession: Codeunit "NPR POS Session";
+        HtmlProfSession: Codeunit "NPR POS HTML Disp. Session";
+        HtmlProfRequest: Codeunit "NPR POS Html Disp. Req";
+        Setup: Codeunit "NPR POS Setup";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         HtmlProf: Record "NPR POS HTML Disp. Prof.";
-        Setup: Codeunit "NPR POS Setup";
         POSSaleLines: Record "NPR POS Entry Sales Line";
-        HtmlProfSession: Codeunit "NPR POS HTML Disp. Session";
-        Context: JsonObject;
-        JsParam: JsonObject;
+        Request: JsonObject;
         Sum: Decimal;
         cPage: Page "NPR Custom Message Page";
     begin
@@ -312,43 +228,30 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         if (Sum >= 0.00) then
             exit;
         HtmlProfSession.SetLastTicketNo(TicketNo);
-        Context.Add('DisplayAction', 'SendJS');
-        JsParam.Add('JSAction', 'GetInput');
-        JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
-        Context.Add('JSParameter', JsParam);
+        HtmlProfRequest.InputRequest(Request, HtmlProf);
         cPage.ShowMessage(MsgRememberInputTitleLabel, MsgRememberInputLabel);
-        SendRequest(POSUnit."No.", Context, True);
+        AwaitSendRequest(Request, 'GetInput');
     end;
 
-    local procedure SendRequest(POSUnitCode: Code[10]; Context: JsonObject; AwaitResponse: Boolean)
+    local procedure SendRequest(Request: JsonObject)
     var
-        Request: Codeunit "NPR Front-End: HWC";
-        POSUnitDisplay: Record "NPR POS Unit Display";
-        POSUnit: Record "NPR POS Unit";
+        Hwc: Codeunit "NPR Front-End: HWC";
         FrontEnd: Codeunit "NPR POS Front End Management";
-        HtmlDisplay: Record "NPR POS HTML Disp. Prof.";
-        HwcGUID: Codeunit "NPR POS HTML Disp. Session";
-        JSParamTxt: Text;
-        JsToken: JsonToken;
     begin
-        POSUnit.Get(POSUnitCode);
-        HtmlDisplay.Get(POSUnit."POS HTML Display Profile");
-        Request.SetHandler('HTMLDisplay');
-        if (Context.Get('JSParameter', JsToken)) then begin
-            JsToken.AsObject().Add('ExVAT', HtmlDisplay."Ex. VAT");
-            JsToken.WriteTo(JSParamTxt);
-            Context.Replace('JSParameter', JSParamTxt);
-        end;
-        Request.SetRequest(Context);
-        if (not POSUnitDisplay.Get(POSUnitCode)) then begin
-            POSUnitDisplay.Init();
-            POSUnitDisplay.POSUnit := POSUnitCode;
-            POSUnitDisplay.Insert();
-        end;
-        if (AwaitResponse) then begin
-            HwcGUID.AddGuid(Request.AwaitResponse());
-        end;
-        FrontEnd.InvokeFrontEndMethod2(Request);
+        Hwc.SetHandler('HTMLDisplay');
+        Hwc.SetRequest(Request);
+        FrontEnd.InvokeFrontEndMethod2(Hwc);
+    end;
 
+    local procedure AwaitSendRequest(Request: JsonObject; ReqType: Text)
+    var
+        Hwc: Codeunit "NPR Front-End: HWC";
+        FrontEnd: Codeunit "NPR POS Front End Management";
+        HwcGUID: Codeunit "NPR POS HTML Disp. Session";
+    begin
+        Hwc.SetHandler('HTMLDisplay');
+        Hwc.SetRequest(Request);
+        HwcGUID.AddGuid(Hwc.AwaitResponse(), ReqType);
+        FrontEnd.InvokeFrontEndMethod2(Hwc);
     end;
 }

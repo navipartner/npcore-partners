@@ -604,7 +604,7 @@
         if (not (Rec.GetSkipCalcDiscount())) then
             POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
         POSIssueOnSale.AddNewSaleCoupons(Rec);
-        HTMLDisplay.UpdateHTMLDisplay(Rec);
+        HTMLDisplay.UpdateHTMLDisplay();
         POSProxyDisplay.UpdateDisplay(Rec);
         POSActTicketMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
