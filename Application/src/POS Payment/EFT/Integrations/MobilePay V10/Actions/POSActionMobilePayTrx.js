@@ -43,15 +43,32 @@ let main = async ({ workflow, context, popup }) => {
 
     try {
         await workflow.respond("startTransaction");
-        await workflow.run("HTML_DISPLAY", {context: { JSAction: "QRPaymentScan", Command: "Open", QrContent: context.request.qr, Amount: context.request.formattedAmount, Provider: "MobilePay"}});
+        if (context.request.QrOnCustomerDisplay)
+        {
+            await workflow.run("HTML_DISPLAY_QR", {context: 
+                { 
+                    IsNestedWorkflow: true,
+                    QrShow: true,
+                    QrTitle: "MobilePay",
+                    QrMessage: context.request.formattedAmount,
+                    QrContent: context.request.qr
+                }});
+        }
         await trxPromise;
     }
     finally {
         if (_dialogRef) {
             _dialogRef.close();
         }
-        await workflow.run("HTML_DISPLAY", {context: {JSAction: "QRPaymentScan", Command: "Close"}});
-            
+        if (context.request.QrOnCustomerDisplay)
+        {
+            await workflow.run("HTML_DISPLAY_QR", {context: 
+            {
+                IsNestedWorkflow: true,
+                QrShow: false,
+                QrTitle: "MobilePay",
+            }});    
+        }    
     }
 
     return ({ "success": context.success, "tryEndSale": context.success });

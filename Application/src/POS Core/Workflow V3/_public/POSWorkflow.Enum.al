@@ -948,6 +948,21 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'BG_SIS_FP_CASHIER', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS Cashier";
     }
+    value(196; HTML_DISPLAY_QR)
+    {
+        Caption = 'HTML_DISPLAY_QR', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HD Qr";
+    }
+    value(197; HTML_DISPLAY_LOAD)
+    {
+        Caption = 'HTML_DISPLAY_LOAD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HD Load";
+    }
+    value(198; HTML_DISPLAY_INPUT)
+    {
+        Caption = 'HTML_DISPLAY_QR', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HD Input";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;

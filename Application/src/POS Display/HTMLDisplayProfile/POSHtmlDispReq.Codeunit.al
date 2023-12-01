@@ -2,12 +2,138 @@ codeunit 6060083 "NPR POS Html Disp. Req"
 {
     Access = Internal;
 
-    procedure AppendMediaObject(var Context: JsonObject; POSUnit: Record "NPR POS Unit")
+    local procedure GetPOSNo(): Code[10]
+    var
+        Session: Codeunit "NPR POS Session";
+        Setup: Codeunit "NPR POS Setup";
+    begin
+        Session.GetSetup(Setup);
+        exit(Setup.GetPOSUnitNo());
+    end;
+
+    procedure HtmlDisplayVersion(): Integer
+    begin
+        exit(1);
+    end;
+
+    local procedure GetScreenNo(): Integer
     var
         UnitDisplay: Record "NPR POS Unit Display";
+    begin
+        if (not UnitDisplay.Get(GetPOSNo())) then begin
+            UnitDisplay.Init();
+            UnitDisplay."Screen No." := 0;
+            UnitDisplay.POSUnit := GetPOSNo();
+            UnitDisplay.Insert();
+        end;
+        exit(UnitDisplay."Screen No.");
+    end;
+
+    procedure OpenRequest(var Request: JsonObject; DownloadMedia: Boolean)
+    var
+        PosUnit: Record "NPR POS Unit";
+    begin
+        Request.Add('DisplayAction', 'Open');
+        Request.Add('Version', HtmlDisplayVersion());
+        if (DownloadMedia) then begin
+            PosUnit.Get(GetPOSNo());
+            Request.Add('LocalMediaInfo', LocalMediaObject());
+        end;
+        Request.Add('WindowScreenNo', GetScreenNo());
+    end;
+
+    procedure CloseRequest(var Request: JsonObject)
+    begin
+        Request.Add('DisplayAction', 'Close');
+        Request.Add('Version', HtmlDisplayVersion());
+    end;
+
+    procedure InputRequest(var Request: JsonObject; HtmlProf: Record "NPR POS HTML Disp. Prof.")
+    var
+        JsParam: JsonObject;
+        JsParamTxt: Text;
+    begin
+        if (HtmlProf."CIO: Money Back"::None = HtmlProf."CIO: Money Back") then
+            Error('Programming error: Cannot Get input with option ''None''');
+        Request.Add('DisplayAction', 'SendJs');
+        Request.Add('Version', HtmlDisplayVersion());
+        JsParam.Add('JSAction', 'GetInput');
+        JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
+        JsParam.WriteTo(JsParamTxt);
+        Request.Add('JsParameter', JsParamTxt);
+    end;
+
+    procedure UpdateReceiptRequest(var Request: JsonObject)
+    var
+        JsParam: JsonObject;
+        PosUnit: Record "NPR POS Unit";
+        HtmlProfile: Record "NPR POS HTML Disp. Prof.";
+        JsParamTxt: Text;
+    begin
+        PosUnit.Get(GetPOSNo());
+        HtmlProfile.Get(PosUnit."POS HTML Display Profile");
+        Request.Add('DisplayAction', 'SendJs');
+        Request.Add('Version', HtmlDisplayVersion());
+        JsParam.Add('JSAction', 'UpdateReceipt');
+        JsParam.Add('ReceiptContent', GetReceiptContent());
+        JsParam.Add('Labels', GetLabels());
+        JsParam.Add('ExVAT', HtmlProfile."Ex. VAT");
+        JsParam.WriteTo(JsParamTxt);
+        Request.Add('JsParameter', JsParamTxt);
+
+    end;
+
+    /// <summary>
+    /// The use case for the current version of the HTML File is only Mobilepay, hence the naming conventions.
+    /// In the future the following changes will be made:
+    /// Provider --> Title
+    /// Amount --> Message
+    /// QrContent (Will remain the same)
+    /// Command will be removed.JSAction should dictate the action made.
+    /// </summary>
+
+    procedure ToggleQRRequest(var Request: JsonObject; Open: Boolean; QrTitle: Text; QrMessage: Text; QrContent: Text)
+    var
+        JsParam: JsonObject;
+        Command: Text;
+        JsParamTxt: Text;
+    begin
+        Request.Add('DisplayAction', 'SendJs');
+        Request.Add('Version', HtmlDisplayVersion());
+        JsParam.Add('Provider', QrTitle);
+        JsParam.Add('PaymentAmount', QrMessage);
+        JsParam.Add('QrContent', QrContent);
+        if (Open) then
+            Command := 'Open'
+        else
+            Command := 'Close';
+        JsParam.Add('Command', Command);
+        JsParam.Add('JSAction', 'QRPaymentScan');
+        JsParam.WriteTo(JsParamTxt);
+        Request.Add('JsParameter', JsParamTxt);
+    end;
+
+    procedure LoadWebsiteRequest(var Request: JsonObject; Website: Text; JsExe: Text)
+    begin
+        Request.Add('DisplayAction', 'LoadWebsite');
+        Request.Add('Version', HtmlDisplayVersion());
+        Request.Add('Website', Website);
+        Request.Add('JsScript', JsExe);
+    end;
+
+    procedure LoadProfileRequest(var Request: JsonObject)
+    begin
+        Request.Add('DisplayAction', 'LoadWebsite');
+        Request.Add('Version', HtmlDisplayVersion());
+        Request.Add('Website', '');
+    end;
+
+    procedure LocalMediaObject(): JsonObject
+    var
         DisplayContent: Record "NPR Display Content";
         HtmlDisplay: Record "NPR POS HTML Disp. Prof.";
         DisplayContentLines: Record "NPR Display Content Lines";
+        PosUnit: Record "NPR POS Unit";
 
         LocalMediaInfo: JsonObject;
         Images: JsonArray;
@@ -22,16 +148,10 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         base64Convert: Codeunit "Base64 Convert";
 
     begin
-        if (not UnitDisplay.Get(POSUnit."No.")) then begin
-            UnitDisplay.Init();
-            UnitDisplay."Screen No." := 0;
-            UnitDisplay.POSUnit := POSUnit."No.";
-            UnitDisplay.Insert();
-        end;
+        PosUnit.Get(GetPOSNo());
         HtmlDisplay.Get(POSUnit."POS HTML Display Profile");
         DisplayContent.Get(HtmlDisplay."Display Content Code");
 
-        Context.Add('WindowScreenNo', UnitDisplay."Screen No.");
         if (HtmlDisplay."Display Content Code" <> '') then begin
             DisplayContentLines.SetRange("Content Code", HtmlDisplay."Display Content Code");
             case DisplayContent.Type of
@@ -71,7 +191,6 @@ codeunit 6060083 "NPR POS Html Disp. Req"
                             LocalMediaInfo.Add('Videos', Videos);
                         end;
                     end;
-
             end;
         end;
 
@@ -80,7 +199,7 @@ codeunit 6060083 "NPR POS Html Disp. Req"
             Base64Html := base64Convert.ToBase64(InS);
         end;
         LocalMediaInfo.Add('Base64Html', Base64Html);
-        Context.Add('LocalMediaInfo', LocalMediaInfo);
+        exit(LocalMediaInfo);
     end;
 
     procedure GetLabels(): JsonObject;
@@ -110,12 +229,16 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         exit(Lbls);
     end;
 
-    procedure GetReceiptContent(POSUnitCode: Code[10]; SalesTicket: Code[20]; Date: Date): JsonObject
+    procedure GetReceiptContent(): JsonObject
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         GLSetup: Record "General Ledger Setup";
         POSunit: Record "NPR POS Unit";
         HtmlProfile: Record "NPR POS HTML Disp. Prof.";
+
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleRec: Record "NPR POS Sale";
 
         ReceiptContent: JsonObject;
         SaleLines: JsonArray;
@@ -133,12 +256,14 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         RemainingTotalIncTax: Decimal;
         RemainingTotalExTax: Decimal;
     begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(POSSaleRec);
         GLSetup.Get();
         SaleLinePOS.Reset();
-        SaleLinePOS.SetRange("Register No.", POSUnitCode);
-        SaleLinePOS.SetRange("Sales Ticket No.", SalesTicket);
-        SaleLinePOS.SetRange(Date, Date);
-        POSunit.Get(POSUnitCode);
+        SaleLinePOS.SetRange("Register No.", GetPOSNo());
+        SaleLinePOS.SetRange("Sales Ticket No.", POSSaleRec."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, POSSaleRec.Date);
+        POSunit.Get(GetPOSNo());
         HtmlProfile.Get(POSunit."POS HTML Display Profile");
         if (SaleLinePOS.FindSet()) then begin
             repeat

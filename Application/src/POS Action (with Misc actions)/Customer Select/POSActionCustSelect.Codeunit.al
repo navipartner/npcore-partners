@@ -53,6 +53,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     var
         SalePOS: Record "NPR POS Sale";
         PosActionBusinessLogic: Codeunit "NPR POS Action: Cust. Select-B";
+        HtmlDisplay: Codeunit "NPR POS HTML Disp. Prof.";
         Operation: Option Attach,Remove;
         CustomerLookupPage: Integer;
         CustomerTableView: Text;
@@ -79,6 +80,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
             Operation::Remove:
                 PosActionBusinessLogic.RemoveCustomer(SalePOS);
         end;
+        HtmlDisplay.UpdateHTMLDisplay();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

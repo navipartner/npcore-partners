@@ -4,37 +4,47 @@ codeunit 6060084 "NPR POS HTML Disp. Session"
     SingleInstance = true;
 
     var
-        hwcGUIDs: JsonObject;
-        lastTicketNo: Code[20];
+        MediaDownloaded: Boolean;
+        HwcGUIDs: JsonObject;
+        LastTicketNo: Code[20];
 
-
-    procedure PeekGuid(Guid: Guid): Boolean
+    procedure SetDidDownload(didDownload: Boolean)
     begin
-        exit(hwcGUIDs.Contains(Guid));
+        MediaDownloaded := didDownload;
     end;
 
-    procedure AddGuid(Guid: Guid): Boolean
+    procedure MediaIsDownloaded(): Boolean
     begin
-        exit(hwcGUIDs.Add(Guid, ''))
+        exit(MediaDownloaded);
     end;
 
-    procedure PopGuid(Guid: Guid): Boolean
+    procedure AddGuid(Guid: Guid; ReqType: Text): Boolean
     begin
-        exit(hwcGUIDs.Remove(Guid));
+        exit(HwcGUIDs.Add(Guid, ReqType));
+    end;
+
+    [TryFunction]
+    procedure PopGuid(Guid: Guid; var ReqType: Text)
+    var
+        JToken: JsonToken;
+    begin
+        HwcGUIDs.Get(Guid, JToken);
+        HwcGUIDs.Remove(Guid);
+        ReqType := JToken.AsValue().AsText();
     end;
 
     procedure SetLastTicketNo(TicketNo: Code[20])
     begin
-        lastTicketNo := TicketNo;
+        LastTicketNo := TicketNo;
     end;
 
     procedure GetLastTicketNo(): Code[20]
     begin
-        exit(lastTicketNo);
+        exit(LastTicketNo);
     end;
 
     procedure ClearLastTicketNo()
     begin
-        Clear(lastTicketNo);
+        Clear(LastTicketNo);
     end;
 }
