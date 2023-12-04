@@ -124,6 +124,10 @@ page 6151166 "NPR APIV2 PBIItem"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(itemStatus; Rec."NPR Item Status")
+                {
+                    Caption = 'Item Status', Locked = true;
+                }
             }
         }
     }
