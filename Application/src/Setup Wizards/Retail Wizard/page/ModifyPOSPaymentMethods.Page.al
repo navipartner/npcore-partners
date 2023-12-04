@@ -1,7 +1,7 @@
 page 6150817 "NPR Modify POS Payment Methods"
 {
-    Extensible = False;
     Caption = 'Modify POS Payment Methods';
+    Extensible = false;
     PageType = NavigatePage;
 
     layout
@@ -16,11 +16,10 @@ page 6150817 "NPR Modify POS Payment Methods"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
-
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
             group(FinishedBanner)
@@ -30,11 +29,10 @@ page 6150817 "NPR Modify POS Payment Methods"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
-
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -74,7 +72,6 @@ page 6150817 "NPR Modify POS Payment Methods"
                     part(POSPaymentMethodsPG; "NPR POS Pmt. Method List Step")
                     {
                         ApplicationArea = NPRRetail;
-
                     }
                 }
             }
@@ -88,7 +85,6 @@ page 6150817 "NPR Modify POS Payment Methods"
                     Caption = 'Finish';
                     InstructionalText = 'That was the last step of this wizard.';
                 }
-
                 group(MissingData)
                 {
                     Caption = 'The following data won''t be created: ';
@@ -100,12 +96,11 @@ page 6150817 "NPR Modify POS Payment Methods"
                         {
                             Caption = '';
                             Visible = not POSPaymentMethodDataToCreate;
-                            label(POSPaymentMethodLabel)
+                            Label(POSPaymentMethodLabel)
                             {
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Method';
                                 ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
-
                             }
                         }
                     }
@@ -127,12 +122,39 @@ page 6150817 "NPR Modify POS Payment Methods"
                         {
                             Caption = '';
                             Visible = POSPaymentMethodDataToCreate;
-                            label(POSPaymentMethodLabel1)
+                            Label(POSPaymentMethodLabel1)
                             {
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Payment Method';
                                 ToolTip = 'Specifies the value of the POSPaymentMethodLabel field';
                             }
+                        }
+                    }
+                }
+                group(SetupsNotVisitedWarning)
+                {
+                    Caption = 'Warning - following setups were not reviewed or edited';
+                    Visible = ShowDenominationSetupOpenedWarning or ShowEFTSetupOpenedWarning;
+
+                    group(EFTSetupWarning)
+                    {
+                        Caption = '';
+                        Visible = ShowEFTSetupOpenedWarning;
+
+                        Label(EFTSetupWarningLabel)
+                        {
+                            ApplicationArea = NPRRetail;
+                            Caption = '- EFT Setup';
+                        }
+                    }
+                    group(DenominationSetupWarning)
+                    {
+                        Caption = '';
+                        Visible = ShowDenominationSetupOpenedWarning;
+                        Label(DenominationSetupWarningLabel)
+                        {
+                            ApplicationArea = NPRRetail;
+                            Caption = '- Denomination Setup';
                         }
                     }
                 }
@@ -149,43 +171,40 @@ page 6150817 "NPR Modify POS Payment Methods"
     {
         area(processing)
         {
-            action(ActionBack)
+            Action(ActionBack)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(true);
                 end;
             }
-            action(ActionNext)
+            Action(ActionNext)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(false);
                 end;
             }
-            action(ActionFinish)
+            Action(ActionFinish)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     FinishAction();
@@ -211,17 +230,19 @@ page 6150817 "NPR Modify POS Payment Methods"
         MediaRepositoryStandard: Record "Media Repository";
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
-        Step: Option Start,POSPaymentMethodStep,Finish;
-        BackActionEnabled: Boolean;
-        FinishActionEnabled: Boolean;
-        NextActionEnabled: Boolean;
-        IntroStepVisible: Boolean;
-        POSPaymentMethodStepVisible: Boolean;
-        FinishStepVisible: Boolean;
-        TopBannerVisible: Boolean;
         AllDataFilledIn: Boolean;
-        POSPaymentMethodDataToCreate: Boolean;
         AnyDataToCreate: Boolean;
+        BackActionEnabled: Boolean;
+        ShowDenominationSetupOpenedWarning: Boolean;
+        ShowEFTSetupOpenedWarning: Boolean;
+        FinishActionEnabled: Boolean;
+        FinishStepVisible: Boolean;
+        IntroStepVisible: Boolean;
+        NextActionEnabled: Boolean;
+        POSPaymentMethodDataToCreate: Boolean;
+        POSPaymentMethodStepVisible: Boolean;
+        TopBannerVisible: Boolean;
+        Step: Option Start,POSPaymentMethodStep,Finish;
 
     local procedure EnableControls();
     begin
@@ -239,9 +260,13 @@ page 6150817 "NPR Modify POS Payment Methods"
 
     local procedure NextStep(Backwards: Boolean)
     begin
+        if (Step = Step::POSPaymentMethodStep) and (not Backwards) then
+            if not ShouldContinueWithoutOtherSetupsVisited() then
+                exit;
+
         if Backwards then
             Step := Step - 1
-        ELSE
+        else
             Step := Step + 1;
 
         EnableControls();
@@ -270,6 +295,8 @@ page 6150817 "NPR Modify POS Payment Methods"
     local procedure CheckIfDataFilledIn()
     begin
         POSPaymentMethodDataToCreate := CurrPage.POSPaymentMethodsPG.Page.POSPaymentMethodsToModify();
+        ShowEFTSetupOpenedWarning := not CurrPage.POSPaymentMethodsPG.Page.EFTSetupVisited();
+        ShowDenominationSetupOpenedWarning := not CurrPage.POSPaymentMethodsPG.Page.DenominationSetupVisited();
         AllDataFilledIn := POSPaymentMethodDataToCreate;
         AnyDataToCreate := POSPaymentMethodDataToCreate;
     end;
@@ -292,13 +319,42 @@ page 6150817 "NPR Modify POS Payment Methods"
         FinishStepVisible := false;
     end;
 
+    local procedure ShouldContinueWithoutOtherSetupsVisited(): Boolean
+    var
+        WarningMsgTxt: Text;
+        ContinueQstLbl: Label '\Do you still want to continue?';
+        DenominationSetupNotOpenedLbl: Label 'Denomination Setup was not edited or reviewed.\';
+        EFTSetupNotOpenedLbl: Label 'EFT Setup was not edited or reviewed.\';
+        EFTSetupVisited, DenominationSetupVisited : Boolean;
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        EFTSetupVisited := CurrPage.POSPaymentMethodsPG.Page.EFTSetupVisited();
+        DenominationSetupVisited := CurrPage.POSPaymentMethodsPG.Page.DenominationSetupVisited();
+
+        if EFTSetupVisited and DenominationSetupVisited then
+            exit(true);
+
+        if not EFTSetupVisited then
+            WarningMsgTxt += EFTSetupNotOpenedLbl;
+
+        if not DenominationSetupVisited then
+            WarningMsgTxt += DenominationSetupNotOpenedLbl;
+
+        WarningMsgTxt += ContinueQstLbl;
+
+        if not ConfirmManagement.GetResponseOrDefault(WarningMsgTxt, true) then
+            exit(false);
+
+        exit(true);
+    end;
+
     local procedure LoadTopBanners()
     begin
-        if MediaRepositoryStandard.GET('AssistedSetup-NoText-400px.png', FORMAT(CurrentClientType())) AND
-           MediaRepositoryDone.GET('AssistedSetupDone-NoText-400px.png', FORMAT(CurrentClientType()))
+        if MediaRepositoryStandard.Get('AssistedSetup-NoText-400px.png', Format(CurrentClientType())) and
+           MediaRepositoryDone.Get('AssistedSetupDone-NoText-400px.png', Format(CurrentClientType()))
         then
-            if MediaResourcesStandard.GET(MediaRepositoryStandard."Media Resources Ref") AND
-               MediaResourcesDone.GET(MediaRepositoryDone."Media Resources Ref")
+            if MediaResourcesStandard.Get(MediaRepositoryStandard."Media Resources Ref") and
+               MediaResourcesDone.Get(MediaRepositoryDone."Media Resources Ref")
             then
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
     end;

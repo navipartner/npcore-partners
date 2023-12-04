@@ -1,7 +1,7 @@
 page 6150818 "NPR Modify POS Posting Setup"
 {
-    Extensible = False;
     Caption = 'Modify POS Posting Setup';
+    Extensible = false;
     PageType = NavigatePage;
 
     layout
@@ -16,11 +16,10 @@ page 6150818 "NPR Modify POS Posting Setup"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
-
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
             group(FinishedBanner)
@@ -30,11 +29,10 @@ page 6150818 "NPR Modify POS Posting Setup"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
-
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -74,7 +72,6 @@ page 6150818 "NPR Modify POS Posting Setup"
                     part(PrePOSPostingSetupPG; "NPR Pre POS Posting Setup Step")
                     {
                         ApplicationArea = NPRRetail;
-
                     }
                 }
             }
@@ -90,7 +87,6 @@ page 6150818 "NPR Modify POS Posting Setup"
                     part(POSPostingSetupPG; "NPR POS Posting Setup Step")
                     {
                         ApplicationArea = NPRRetail;
-
                     }
                 }
             }
@@ -104,7 +100,6 @@ page 6150818 "NPR Modify POS Posting Setup"
                     Caption = 'Finish';
                     InstructionalText = 'That was the last step of this wizard.';
                 }
-
                 group(MissingData)
                 {
                     Caption = 'The following data won''t be modified: ';
@@ -116,12 +111,11 @@ page 6150818 "NPR Modify POS Posting Setup"
                         {
                             Caption = '';
                             Visible = not POSPostingSetupDataToCreate;
-                            label(POSPostingSetupLabel)
+                            Label(POSPostingSetupLabel)
                             {
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Posting Setup';
                                 ToolTip = 'Specifies the value of the POSPostingSetupLabel field';
-
                             }
                         }
                     }
@@ -143,7 +137,7 @@ page 6150818 "NPR Modify POS Posting Setup"
                         {
                             Caption = '';
                             Visible = POSPostingSetupDataToCreate;
-                            label(POSPostingSetupLabel1)
+                            Label(POSPostingSetupLabel1)
                             {
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Posting Setup';
@@ -151,6 +145,12 @@ page 6150818 "NPR Modify POS Posting Setup"
                             }
                         }
                     }
+                }
+                group(SameAccountNosWarning)
+                {
+                    Caption = 'Warning - Same Posting accounts';
+                    InstructionalText = 'Setting all Account Numbers to the same code may impact your ability to maintain a clear overview of postings for different payment methods. Distinguishing accounts based on unique codes helps ensure accurate tracking and reporting. It''s recommended to review and adjust the Account Numbers to maintain proper visibility into your financial transactions.';
+                    Visible = ShowWarningSameAccountNos;
                 }
                 group(AnyDataFilledInMsg)
                 {
@@ -165,43 +165,40 @@ page 6150818 "NPR Modify POS Posting Setup"
     {
         area(processing)
         {
-            action(ActionBack)
+            Action(ActionBack)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(true);
                 end;
             }
-            action(ActionNext)
+            Action(ActionNext)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(false);
                 end;
             }
-            action(ActionFinish)
+            Action(ActionFinish)
             {
-
+                ApplicationArea = NPRRetail;
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     FinishAction();
@@ -227,24 +224,27 @@ page 6150818 "NPR Modify POS Posting Setup"
         MediaRepositoryStandard: Record "Media Repository";
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
-        Step: Option Start,PrePOSPostingSetupStep,POSPostingSetupStep,Finish;
+        AllDataFilledIn: Boolean;
+        AnyDataToCreate: Boolean;
         BackActionEnabled: Boolean;
         FinishActionEnabled: Boolean;
-        NextActionEnabled: Boolean;
-        IntroStepVisible: Boolean;
-        PrePOSPostingSetupStepVisible: Boolean;
-        POSPostingSetupStepVisible: Boolean;
         FinishStepVisible: Boolean;
-        TopBannerVisible: Boolean;
-        AllDataFilledIn: Boolean;
+        IntroStepVisible: Boolean;
+        NextActionEnabled: Boolean;
         POSPostingSetupDataToCreate: Boolean;
-        AnyDataToCreate: Boolean;
+        POSPostingSetupStepVisible: Boolean;
+        PrePOSPostingSetupStepVisible: Boolean;
+        ShowWarningSameAccountNos: Boolean;
+        TopBannerVisible: Boolean;
         _DoNotCopy: Boolean;
-        _AccountType: Option " ","G/L Account","Bank Account",Customer;
         _AccountNo: Code[20];
-        _DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer;
         _DifferenceAccountNo: Code[20];
         _DifferenceAccountNoNeg: Code[20];
+        Step: Option Start,PrePOSPostingSetupStep,POSPostingSetupStep,Finish;
+        _AccountType: Option " ","G/L Account","Bank Account",Customer;
+        _DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer;
+        ContinueWithSameAccountNosQstLbl: Label 'Setting all Account Numbers to the same code may impact your ability to maintain a clear overview of postings for different payment methods. Distinguishing accounts based on unique codes helps ensure accurate tracking and reporting. It''s recommended to review and adjust the Account Numbers to maintain proper visibility into your financial transactions.\Do you still want to continue?';
+        MandatoryFieldsNotPopulatedErrLbl: Label 'Fields marked with a red star (*) are mandatory. Ensure all required fields are populated in order to continue.';
 
     local procedure EnableControls();
     begin
@@ -264,9 +264,18 @@ page 6150818 "NPR Modify POS Posting Setup"
 
     local procedure NextStep(Backwards: Boolean)
     begin
+        if (Step = Step::POSPostingSetupStep) and (not Backwards) then
+            if not CurrPage.POSPostingSetupPG.Page.MandatoryFieldsPopulated() then
+                Error(MandatoryFieldsNotPopulatedErrLbl);
+
+        if (Step = Step::POSPostingSetupStep) and (not Backwards) then
+            if CurrPage.POSPostingSetupPG.Page.AllAccountNosAreEqual() then
+                if not ShowWarningAboutSameAccountNos() then
+                    exit;
+
         if Backwards then
             Step := Step - 1
-        ELSE
+        else
             Step := Step + 1;
 
         EnableControls();
@@ -305,6 +314,7 @@ page 6150818 "NPR Modify POS Posting Setup"
     local procedure CheckIfDataFilledIn()
     begin
         POSPostingSetupDataToCreate := CurrPage.POSPostingSetupPG.Page.POSPostingSetupToCreate();
+        ShowWarningSameAccountNos := CurrPage.POSPostingSetupPG.Page.AllAccountNosAreEqual();
         AllDataFilledIn := POSPostingSetupDataToCreate;
         AnyDataToCreate := POSPostingSetupDataToCreate;
     end;
@@ -327,13 +337,23 @@ page 6150818 "NPR Modify POS Posting Setup"
         FinishStepVisible := false;
     end;
 
+    local procedure ShowWarningAboutSameAccountNos(): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(ContinueWithSameAccountNosQstLbl, true) then
+            exit(false);
+
+        exit(true);
+    end;
+
     local procedure LoadTopBanners()
     begin
-        if MediaRepositoryStandard.GET('AssistedSetup-NoText-400px.png', FORMAT(CurrentClientType())) AND
-           MediaRepositoryDone.GET('AssistedSetupDone-NoText-400px.png', FORMAT(CurrentClientType()))
+        if MediaRepositoryStandard.Get('AssistedSetup-NoText-400px.png', Format(CurrentClientType())) and
+           MediaRepositoryDone.Get('AssistedSetupDone-NoText-400px.png', Format(CurrentClientType()))
         then
-            if MediaResourcesStandard.GET(MediaRepositoryStandard."Media Resources Ref") AND
-               MediaResourcesDone.GET(MediaRepositoryDone."Media Resources Ref")
+            if MediaResourcesStandard.Get(MediaRepositoryStandard."Media Resources Ref") and
+               MediaResourcesDone.Get(MediaRepositoryDone."Media Resources Ref")
             then
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
     end;
