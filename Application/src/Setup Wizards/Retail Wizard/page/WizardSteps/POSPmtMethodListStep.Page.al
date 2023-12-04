@@ -1,10 +1,10 @@
 ﻿page 6014687 "NPR POS Pmt. Method List Step"
 {
-    Extensible = False;
     Caption = 'POS Payment Methods';
+    DelayedInsert = true;
+    Extensible = False;
     PageType = ListPart;
     SourceTable = "NPR POS Payment Method";
-    DelayedInsert = true;
     UsageCategory = None;
     layout
     {
@@ -14,79 +14,118 @@
             {
                 field("Code"; Rec.Code)
                 {
-
-                    ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Code field';
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Processing Type field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Processing Type field';
                 }
                 field("Currency Code2"; Rec."Currency Code")
                 {
-
-                    ToolTip = 'Specifies the value of the Currency Code field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Currency Code field';
+                }
+                field("Fixed Rate"; Rec."Fixed Rate")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'You can specify the Fixed Rate which will be used to convert 100 units of foreign currency into local currency. For example 1 FCY = 6.15 LCY , hence the value to be inserted = 100 x 6.15 = 615 instead of 6.15.';
                 }
                 field("Vouched By"; Rec."Vouched By")
                 {
-
-                    ToolTip = 'Specifies the value of the Vouched By field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Vouched By field';
                 }
                 field("Include In Counting"; Rec."Include In Counting")
                 {
-
-                    ToolTip = 'Specifies the value of the Include In Counting field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Include In Counting field';
                 }
                 field("Bin for Virtual-Count"; Rec."Bin for Virtual-Count")
                 {
-
-                    ToolTip = 'Specifies the value of the Bin for Virtual-Count field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Bin for Virtual-Count field';
                 }
                 field("Post Condensed"; Rec."Post Condensed")
                 {
-
-                    ToolTip = 'Specifies the value of the Post Condensed field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Post Condensed field';
                 }
                 field("Condensed Posting Description"; Rec."Condensed Posting Description")
                 {
-
-                    ToolTip = 'Specifies the value of the Condensed Posting Description field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Condensed Posting Description field';
                 }
                 field("Rounding Precision"; Rec."Rounding Precision")
                 {
-
-                    ToolTip = 'Specifies the value of the Rounding Precision field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Rounding Precision field';
                 }
                 field("Rounding Type"; Rec."Rounding Type")
                 {
-
-                    ToolTip = 'Specifies the value of the Rounding Type field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Rounding Type field';
                 }
                 field("Rounding Gains Account"; Rec."Rounding Gains Account")
                 {
-
-                    ToolTip = 'Specifies the value of the Rounding Gains Account field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Rounding Gains Account field';
                 }
                 field("Rounding Losses Account"; Rec."Rounding Losses Account")
                 {
-
-                    ToolTip = 'Specifies the value of the Rounding Losses Account field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Rounding Losses Account field';
                 }
             }
         }
     }
+    actions
+    {
+        area(Processing)
+        {
+            action(Denominations)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Denominations';
+                Image = Currency;
+                RunObject = Page "NPR Payment Method Denom";
+                RunPageLink = "POS Payment Method Code" = field(Code);
+                ShortCutKey = 'Ctrl+F5';
+                ToolTip = 'Executes the Denominations action';
+
+                trigger OnAction()
+                begin
+                    DenominationSetupOpened := true;
+                end;
+            }
+            action(EFTSetup)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'EFT Setup';
+                Image = SetupLines;
+                ToolTip = 'Executes the EFT Setup action.';
+
+                trigger OnAction()
+                var
+                    EFTSetup: Record "NPR EFT Setup";
+                    EFTSetupPage: Page "NPR EFT Setup";
+                begin
+                    EFTSetupOpened := true;
+                    EFTSetup.SetRange("Payment Type POS", Rec.Code);
+
+                    EFTSetupPage.SetRecord(EFTSetup);
+                    EFTSetupPage.SetTableView(EFTSetup);
+
+                    EFTSetupPage.RunModal();
+                end;
+            }
+        }
+    }
+
+    var
+        EFTSetupOpened: Boolean;
+        DenominationSetupOpened: Boolean;
 
     internal procedure CopyRealAndTemp(var TempPOSPaymentMethod: Record "NPR POS Payment Method")
     var
@@ -140,5 +179,15 @@
                 if not POSPaymentMethod.Insert() then
                     POSPaymentMethod.Modify();
             until Rec.Next() = 0;
+    end;
+
+    internal procedure EFTSetupVisited(): Boolean
+    begin
+        exit(EFTSetupOpened);
+    end;
+
+    internal procedure DenominationSetupVisited(): Boolean
+    begin
+        exit(DenominationSetupOpened);
     end;
 }

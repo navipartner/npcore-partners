@@ -1,10 +1,10 @@
 page 6150850 "NPR Pre POS Posting Setup Step"
 {
-    Extensible = False;
     Caption = 'Pre POS Posting Setup';
+    DelayedInsert = true;
+    Extensible = False;
     PageType = ListPart;
     SourceTable = "NPR POS Posting Setup";
-    DelayedInsert = true;
     UsageCategory = None;
     layout
     {
@@ -21,10 +21,10 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                 Caption = '';
                 field(AccountTypeField; _AccountType)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Account Type';
                     OptionCaption = ' ,G/L Account,Bank Account,Customer';
                     ToolTip = 'Specifies the value of the Account Type field';
-                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -33,17 +33,17 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                 Caption = '';
                 field(AccountNoField; _AccountNo)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Account No.';
                     ToolTip = 'Specifies the value of the Account No. field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
-                        Customer: Record Customer;
                         BankAcc: Record "Bank Account";
+                        Customer: Record Customer;
                         GLAcc: Record "G/L Account";
-                        CustomerList: Page "Customer List";
                         BankAccList: Page "Bank Account List";
+                        CustomerList: Page "Customer List";
                         GLAccList: Page "G/L Account List";
                     begin
                         if _AccountType = _AccountType::"G/L Account" then begin
@@ -92,10 +92,10 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                 Caption = '';
                 field(DifferenceAccountTypeField; _DifferenceAccountType)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Difference Account Type';
                     OptionCaption = ' ,G/L Account,Bank Account,Customer';
                     ToolTip = 'Specifies the value of the Difference Account Type field';
-                    ApplicationArea = NPRRetail;
                 }
             }
             group(DifferenceAccountNoGroup)
@@ -103,17 +103,17 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                 Caption = '';
                 field(DifferenceAccountNoField; _DifferenceAccountNo)
                 {
-                    Caption = 'Difference Account No.';
-                    ToolTip = 'Specifies the value of the Difference Account No. field';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Difference Account No. (Pos)';
+                    ToolTip = 'Specifies the value of the Difference Account No. field';
 
                     trigger OnAssistEdit()
                     var
-                        Customer: Record Customer;
                         BankAcc: Record "Bank Account";
+                        Customer: Record Customer;
                         GLAcc: Record "G/L Account";
-                        CustomerList: Page "Customer List";
                         BankAccList: Page "Bank Account List";
+                        CustomerList: Page "Customer List";
                         GLAccList: Page "G/L Account List";
                     begin
                         if _DifferenceAccountType = _DifferenceAccountType::"G/L Account" then begin
@@ -162,17 +162,17 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                 Caption = '';
                 field(DifferenceAccountNoNegField; _DifferenceAccountNoNeg)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Difference Account No. (Neg)';
                     ToolTip = 'Specifies the value of the Difference Account No. (Neg) field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnAssistEdit()
                     var
-                        Customer: Record Customer;
                         BankAcc: Record "Bank Account";
+                        Customer: Record Customer;
                         GLAcc: Record "G/L Account";
-                        CustomerList: Page "Customer List";
                         BankAccList: Page "Bank Account List";
+                        CustomerList: Page "Customer List";
                         GLAccList: Page "G/L Account List";
                     begin
                         if _DifferenceAccountType = _DifferenceAccountType::"G/L Account" then begin
@@ -220,11 +220,11 @@ page 6150850 "NPR Pre POS Posting Setup Step"
     }
 
     var
-        _AccountType: Option " ","G/L Account","Bank Account",Customer;
         _AccountNo: Code[20];
-        _DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer;
         _DifferenceAccountNo: Code[20];
         _DifferenceAccountNoNeg: Code[20];
+        _AccountType: Option " ","G/L Account","Bank Account",Customer;
+        _DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer;
 
     internal procedure POSPostingSetupToCreate(): Boolean
     begin
@@ -242,8 +242,6 @@ page 6150850 "NPR Pre POS Posting Setup Step"
                     POSPostingSetup.Modify();
             until Rec.Next() = 0;
     end;
-
-
 
     internal procedure GetGlobals(var AccountType: Option " ","G/L Account","Bank Account",Customer; var AccountNo: Code[20]; var DiffAccountType: Option " ","G/L Account","Bank Account",Customer; var DiffAccountNo: Code[20]; var DiffAccountNoNeg: Code[20])
     begin

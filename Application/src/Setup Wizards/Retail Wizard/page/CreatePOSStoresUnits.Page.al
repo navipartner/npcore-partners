@@ -16,7 +16,6 @@ page 6150813 "NPR Create POS Stores & Units"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
-
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
@@ -30,7 +29,6 @@ page 6150813 "NPR Create POS Stores & Units"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
-
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
@@ -80,7 +78,6 @@ page 6150813 "NPR Create POS Stores & Units"
                         Caption = '';
                         field(EmptyVar2; EmptyVar)
                         {
-
                             Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
                             Visible = false;
@@ -90,7 +87,6 @@ page 6150813 "NPR Create POS Stores & Units"
                     part(POSStoresAndUnitsPG; "NPR POS Stores & Units Step")
                     {
                         ApplicationArea = NPRRetail;
-
                     }
                 }
             }
@@ -107,7 +103,6 @@ page 6150813 "NPR Create POS Stores & Units"
                         Caption = '';
                         field(EmptyVar3; EmptyVar)
                         {
-
                             Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
                             Visible = false;
@@ -117,7 +112,6 @@ page 6150813 "NPR Create POS Stores & Units"
                     part(POSStoresModifyPG; "NPR POS Stores Modify Step")
                     {
                         ApplicationArea = NPRRetail;
-
                     }
                 }
             }
@@ -134,7 +128,6 @@ page 6150813 "NPR Create POS Stores & Units"
                         Caption = '';
                         field(EmptyVar4; EmptyVar)
                         {
-
                             Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
                             Visible = false;
@@ -144,7 +137,30 @@ page 6150813 "NPR Create POS Stores & Units"
                     part(POSUnitsModifyPG; "NPR POS Units Modify Step")
                     {
                         ApplicationArea = NPRRetail;
+                    }
+                }
+            }
 
+            group(RetailLogoModifyStep)
+            {
+                Visible = RetailLogoModifyStepVisible;
+                group(RetailLogoSetup)
+                {
+                    Caption = 'Modify Retail Logo Setup';
+                    group(Empty5)
+                    {
+                        Caption = '';
+                        field(EmptyVar5; EmptyVar)
+                        {
+                            Caption = ' ';
+                            ToolTip = 'Specifies the value of the EmptyVar field';
+                            Visible = false;
+                            ApplicationArea = NPRRetail;
+                        }
+                    }
+                    part(RetailLogoModifyPG; "NPR Retail Logo Modify Step")
+                    {
+                        ApplicationArea = NPRRetail;
                     }
                 }
             }
@@ -158,13 +174,13 @@ page 6150813 "NPR Create POS Stores & Units"
                     Caption = 'Finish';
                     InstructionalText = 'That was the last step of this wizard.';
                 }
-
                 group(MissingData)
                 {
                     Caption = 'The following data won''t be created: ';
                     Visible = not AllDataFilledIn;
                     group(MandatoryDataMissing)
                     {
+                        Caption = '';
                         group(POSStoresDataMissing)
                         {
                             Caption = '';
@@ -175,7 +191,17 @@ page 6150813 "NPR Create POS Stores & Units"
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Stores';
                                 ToolTip = 'Specifies the value of the POSStoresLabel field';
-
+                            }
+                        }
+                        group(POSStoresDimensionDataMissing)
+                        {
+                            Caption = '';
+                            Visible = not POSStoreDimensionsToCreate;
+                            label(POSStoresDimensionLabel)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- POS Stores Dimensions';
+                                ToolTip = 'Specifies the value of the POSStoresDimensionLabel field';
                             }
                         }
                         group(POSUnitsDataMissing)
@@ -188,7 +214,30 @@ page 6150813 "NPR Create POS Stores & Units"
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Units';
                                 ToolTip = 'Specifies the value of the POSUnitsLabel field';
+                            }
+                        }
+                        group(POSUnitsDimensionsDataMissing)
+                        {
+                            Caption = '';
+                            Visible = not POSUnitsDimemensionsToCreate;
 
+                            label(POSUnitsDimensionLabel)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- POS Units Dimensions';
+                                ToolTip = 'Specifies the value of the POSUnitsLabel field';
+                            }
+                        }
+                        group(REtailLogoDataMissing)
+                        {
+                            Caption = '';
+                            Visible = not RetailLogoDataToCreate;
+
+                            label(RetailLogoLabel)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- Retail Logos';
+                                ToolTip = 'Specifies the value of the RetailLogoLabel field';
                             }
                         }
                     }
@@ -205,6 +254,7 @@ page 6150813 "NPR Create POS Stores & Units"
                     Visible = AnyDataToCreate;
                     group(MandatoryDataFilledIn)
                     {
+                        Caption = '';
                         group(POSStoresDataExists)
                         {
                             Caption = '';
@@ -216,6 +266,17 @@ page 6150813 "NPR Create POS Stores & Units"
                                 ToolTip = 'Specifies the value of the POSStoresLabel field';
                             }
                         }
+                        group(POSStoresDimensionDataExists)
+                        {
+                            Caption = '';
+                            Visible = POSStoreDimensionsToCreate;
+                            label(POSStoresLabel2)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- POS Stores Dimensions';
+                                ToolTip = 'Specifies the value of the POSStoresDimensionLabel field';
+                            }
+                        }
                         group(POSUnitsDataExists)
                         {
                             Caption = '';
@@ -225,6 +286,28 @@ page 6150813 "NPR Create POS Stores & Units"
                                 ApplicationArea = NPRRetail;
                                 Caption = '- POS Units';
                                 ToolTip = 'Specifies the value of the POSUnitsLabel field';
+                            }
+                        }
+                        group(POSUnitsDimensionsDataExists)
+                        {
+                            Caption = '';
+                            Visible = POSUnitsDimemensionsToCreate;
+                            label(POSUnitsLabel2)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- POS Units Dimensions';
+                                ToolTip = 'Specifies the value of the POSUnitsLabel2 field';
+                            }
+                        }
+                        group(RetailLogoDataExists)
+                        {
+                            Caption = '';
+                            Visible = RetailLogoDataToCreate;
+                            label(RetailLogoLabel1)
+                            {
+                                ApplicationArea = NPRRetail;
+                                Caption = '- Retail Logos';
+                                ToolTip = 'Specifies the value of the RetailLogoLabel field';
                             }
                         }
                     }
@@ -244,7 +327,6 @@ page 6150813 "NPR Create POS Stores & Units"
         {
             action(ActionBack)
             {
-
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
@@ -258,7 +340,6 @@ page 6150813 "NPR Create POS Stores & Units"
             }
             action(ActionNext)
             {
-
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
@@ -272,7 +353,6 @@ page 6150813 "NPR Create POS Stores & Units"
             }
             action(ActionFinish)
             {
-
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
@@ -299,6 +379,14 @@ page 6150813 "NPR Create POS Stores & Units"
         EnableControls();
     end;
 
+    trigger OnClosePage()
+    begin
+        if FinishActionClicked then
+            exit;
+
+        CurrPage.RetailLogoModifyPG.Page.DeleteRetailLogoData();
+    end;
+
     var
         MediaRepositoryDone: Record "Media Repository";
         MediaRepositoryStandard: Record "Media Repository";
@@ -308,7 +396,7 @@ page 6150813 "NPR Create POS Stores & Units"
         TempAllPOSStore: Record "NPR POS Store" temporary;
         TempPOSUnit: Record "NPR POS Unit" temporary;
         TempPOSPaymentBin: Record "NPR POS Payment Bin" temporary;
-        Step: Option Start,CreatePOSStoresUnitsStep,POSStoresModifyStep,POSUnitsModifyStep,Finish;
+        Step: Option Start,CreatePOSStoresUnitsStep,POSStoresModifyStep,POSUnitsModifyStep,RetailLogoModifyStep,Finish;
         BackActionEnabled: Boolean;
         FinishActionEnabled: Boolean;
         NextActionEnabled: Boolean;
@@ -316,13 +404,22 @@ page 6150813 "NPR Create POS Stores & Units"
         CreatePOSStoresUnitsStepVisible: Boolean;
         POSStoresModifyStepVisible: Boolean;
         POSUnitsModifyStepVisible: Boolean;
+        RetailLogoModifyStepVisible: Boolean;
         FinishStepVisible: Boolean;
         TopBannerVisible: Boolean;
+        FinishActionClicked: Boolean;
         EmptyVar: Integer;
         AllDataFilledIn: Boolean;
         POSStoresDataToCreate: Boolean;
+        POSStoreDimensionsToCreate: Boolean;
+        POSUnitsDimemensionsToCreate: Boolean;
         POSUnitsDataToCreate: Boolean;
+        RetailLogoDataToCreate: Boolean;
         AnyDataToCreate: Boolean;
+        POSUnitDimension1Code: Code[20];
+        POSUnitDimension2Code: Code[20];
+        POSStoreDimension1Code: Code[20];
+        POSStoreDimension2Code: Code[20];
         POSUnitsMandatoryErrorLbl: Label 'You have created POS Store(s), creation of POS Unit(s) is Mandatory!';
 
     local procedure EnableControls();
@@ -338,6 +435,8 @@ page 6150813 "NPR Create POS Stores & Units"
                 ShowPOSStoresModifyStep();
             Step::POSUnitsModifyStep:
                 ShowPOSUnitsModifyStep();
+            Step::RetailLogoModifyStep:
+                ShowRetailLogoModifyStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -376,6 +475,7 @@ page 6150813 "NPR Create POS Stores & Units"
         CreatePOSStoresUnitsStepVisible := true;
         POSStoresModifyStepVisible := false;
         POSUnitsModifyStepVisible := false;
+        RetailLogoModifyStepVisible := false;
     end;
 
     local procedure ShowPOSStoresModifyStep()
@@ -383,7 +483,9 @@ page 6150813 "NPR Create POS Stores & Units"
         CreatePOSStoresUnitsStepVisible := false;
         POSStoresModifyStepVisible := true;
         POSUnitsModifyStepVisible := false;
+        RetailLogoModifyStepVisible := false;
         CurrPage.POSStoresAndUnitsPG.Page.CopyTempStores(TempPOSStore);
+        CurrPage.POSStoresAndUnitsPG.Page.GetPOSStoreDimensionCodes(POSStoreDimension1Code, POSStoreDimension2Code);
         CurrPage.POSStoresModifyPG.Page.CopyTemp(TempPOSStore);
     end;
 
@@ -391,13 +493,26 @@ page 6150813 "NPR Create POS Stores & Units"
     begin
         CreatePOSStoresUnitsStepVisible := false;
         POSStoresModifyStepVisible := false;
+        RetailLogoModifyStepVisible := false;
         POSUnitsModifyStepVisible := true;
         CurrPage.POSStoresAndUnitsPG.Page.CopyTempUnits(TempPOSUnit);
         CurrPage.POSStoresAndUnitsPG.Page.CreateTempPOSPaymentBin(TempPOSPaymentBin, TempPOSUnit);
+        CurrPage.POSStoresAndUnitsPG.Page.GetPOSUnitDimensionCodes(POSUnitDimension1Code, POSUnitDimension2Code);
         CurrPage.POSUnitsModifyPG.Page.CopyTempPOSPaymentBin(TempPOSPaymentBin);
         CurrPage.POSStoresModifyPG.Page.CopyAllPOSStores(TempAllPOSStore);
         CurrPage.POSUnitsModifyPG.Page.CopyAllPOSStores(TempAllPOSStore);
         CurrPage.POSUnitsModifyPG.Page.CopyTemp(TempPOSUnit);
+    end;
+
+    local procedure ShowRetailLogoModifyStep()
+    begin
+        CreatePOSStoresUnitsStepVisible := false;
+        POSStoresModifyStepVisible := false;
+        POSUnitsModifyStepVisible := false;
+        RetailLogoModifyStepVisible := true;
+
+        CurrPage.POSStoresAndUnitsPG.Page.CopyTempUnits(TempPOSUnit);
+        CurrPage.RetailLogoModifyPG.Page.CreateRetailLogoBuffer(TempPOSUnit);
     end;
 
     local procedure ShowFinishStep()
@@ -407,21 +522,30 @@ page 6150813 "NPR Create POS Stores & Units"
         CreatePOSStoresUnitsStepVisible := false;
         POSStoresModifyStepVisible := false;
         NextActionEnabled := false;
+        RetailLogoModifyStepVisible := false;
         FinishActionEnabled := true;
     end;
 
     local procedure CheckIfDataFilledIn()
     begin
         POSStoresDataToCreate := CurrPage.POSStoresAndUnitsPG.Page.POSStoresToCreate();
+        POSStoreDimensionsToCreate := CurrPage.POSStoresModifyPG.Page.DimensionsToCreate();
         POSUnitsDataToCreate := CurrPage.POSStoresAndUnitsPG.Page.POSUnitsToCreate();
+        POSUnitsDimemensionsToCreate := CurrPage.POSUnitsModifyPG.Page.DimensionsToCreate();
+        RetailLogoDataToCreate := CurrPage.RetailLogoModifyPG.Page.RetailLogosToCreate();
+
         AllDataFilledIn := POSStoresDataToCreate and
-                           POSUnitsDataToCreate;
+                           POSUnitsDataToCreate and
+                           RetailLogoDataToCreate;
+
         AnyDataToCreate := POSStoresDataToCreate or
-                           POSUnitsDataToCreate;
+                           POSUnitsDataToCreate or
+                           RetailLogoDataToCreate;
     end;
 
     local procedure FinishAction();
     begin
+        FinishActionClicked := true;
         CurrPage.POSStoresModifyPG.Page.CreatePOSStoreData();
         CurrPage.POSUnitsModifyPG.Page.CreatePOSUnitData();
         OnAfterFinishStep(AnyDataToCreate);

@@ -1,11 +1,11 @@
 ﻿page 6014688 "NPR POS Posting Setup Step"
 {
-    Extensible = False;
     Caption = 'POS Posting Setup';
+    DelayedInsert = true;
+    Extensible = False;
     PageType = ListPart;
     SourceTable = "NPR POS Posting Setup";
     SourceTableTemporary = true;
-    DelayedInsert = true;
     UsageCategory = None;
     layout
     {
@@ -16,10 +16,10 @@
                 field("POS Store Code"; Rec."POS Store Code")
                 {
 
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS Store Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSStoreCode field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -35,10 +35,10 @@
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
 
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS Payment Method Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentMethodCode field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -54,10 +54,10 @@
                 field("POS Payment Bin Code"; Rec."POS Payment Bin Code")
                 {
 
+                    ApplicationArea = NPRRetail;
                     Caption = 'POS Payment Bin Code';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the POSPaymentBinNo field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -73,10 +73,10 @@
                 field("Close to POS Bin No."; Rec."Close to POS Bin No.")
                 {
 
+                    ApplicationArea = NPRRetail;
                     Caption = 'Close to POS Bin No.';
                     Lookup = true;
                     ToolTip = 'Specifies the value of the CloseToPOSPaymentBinNo field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
@@ -92,8 +92,8 @@
                 field("Account Type"; Rec."Account Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Account Type field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Account Type field';
 
                     trigger OnValidate()
                     begin
@@ -102,9 +102,9 @@
                 }
                 field("Account No."; Rec."Account No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Account No. field';
                     ApplicationArea = NPRRetail;
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the value of the Account No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -158,8 +158,8 @@
                 field("Difference Account Type"; Rec."Difference Account Type")
                 {
 
-                    ToolTip = 'Specifies the value of the Difference Account Type field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Difference Account Type field';
 
                     trigger OnValidate()
                     begin
@@ -170,9 +170,9 @@
                 }
                 field("Difference Acc. No."; Rec."Difference Acc. No.")
                 {
-
-                    ToolTip = 'Specifies the value of the Difference Acc. No. field';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Difference Acc. No. (Pos)';
+                    ToolTip = 'Specifies the value of the Difference Acc. No. field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -226,8 +226,8 @@
                 field("Difference Acc. No. (Neg)"; Rec."Difference Acc. No. (Neg)")
                 {
 
-                    ToolTip = 'Specifies the value of the Difference Acc. No. (Neg) field';
                     ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Difference Acc. No. (Neg) field';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -353,6 +353,21 @@
             until Rec.Next() = 0;
     end;
 
+    internal procedure AllAccountNosAreEqual(): Boolean
+    var
+        TempPOSPostingSetup: Record "NPR POS Posting Setup" temporary;
+    begin
+        if Rec.IsEmpty() then
+            exit(false);
+        if Rec.Count() = 1 then
+            exit(false);
+
+        TempPOSPostingSetup.Copy(Rec, true);
+        TempPOSPostingSetup.FindFirst();
+        TempPOSPostingSetup.SetFilter("Account No.", '<>%1', TempPOSPostingSetup."Account No.");
+        exit(TempPOSPostingSetup.IsEmpty());
+    end;
+
     internal procedure ApplyValues(AccountType: Option " ","G/L Account","Bank Account",Customer; AccountNo: Code[20]; DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer; DifferenceAccountNo: Code[20]; DifferenceAccountNoNeg: Code[20])
     begin
         if Rec.FindSet() then
@@ -392,5 +407,19 @@
             until Rec.Next() = 0;
 
         Clear(Rec);
+    end;
+
+    internal procedure MandatoryFieldsPopulated(): Boolean
+    begin
+        if Rec.IsEmpty() then
+            exit;
+
+        Rec.FindSet();
+        repeat
+            if Rec."Account No." = '' then
+                exit(false);
+        until Rec.Next() = 0;
+
+        exit(true);
     end;
 }

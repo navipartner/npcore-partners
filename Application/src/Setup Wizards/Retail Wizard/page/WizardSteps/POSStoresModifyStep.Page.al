@@ -25,6 +25,70 @@ page 6150842 "NPR POS Stores Modify Step"
                     ToolTip = 'Specifies the POS store name which will be displayed on sales documents, receipts etc.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
+                {
+                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        DimValue: Record "Dimension Value";
+                        DimValueList: Page "Dimension Value List";
+                    begin
+                        GLSetup.Get();
+
+                        DimValueList.LookupMode := true;
+
+                        DimValue.SetRange("Global Dimension No.", 1);
+                        DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 1 Code");
+
+                        if DimValue.FindFirst() then;
+                        DimValueList.SetTableView(DimValue);
+
+                        if Rec."Global Dimension 1 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 1 Code");
+                            if DimValue.FindFirst() then
+                                DimValueList.SetRecord(DimValue);
+                        end;
+
+                        if DimValueList.RunModal() = Action::LookupOK then begin
+                            DimValueList.GetRecord(DimValue);
+                            Rec."Global Dimension 1 Code" := DimValue.Code;
+                        end;
+                    end;
+                }
+                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
+                {
+                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        DimValue: Record "Dimension Value";
+                        DimValueList: Page "Dimension Value List";
+                    begin
+                        GLSetup.Get();
+
+                        DimValueList.LookupMode := true;
+
+                        DimValue.SetRange("Global Dimension No.", 2);
+                        DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 2 Code");
+
+                        if DimValue.FindFirst() then;
+                        DimValueList.SetTableView(DimValue);
+
+                        if Rec."Global Dimension 2 Code" <> '' then begin
+                            DimValue.SetRange(Code, Rec."Global Dimension 2 Code");
+                            if DimValue.FindFirst() then
+                                DimValueList.SetRecord(DimValue);
+                        end;
+
+                        if DimValueList.RunModal() = Action::LookupOK then begin
+                            DimValueList.GetRecord(DimValue);
+                            Rec."Global Dimension 2 Code" := DimValue.Code;
+                        end;
+                    end;
+                }
                 field("Name 2"; Rec."Name 2")
                 {
                     ToolTip = 'Specifies a longer legal name of the store, if necessary. This name is not displayed on sales documents by default.';
@@ -95,38 +159,7 @@ page 6150842 "NPR POS Stores Modify Step"
                     ToolTip = 'Specifies the code that creates EAN Label on this store';
                     ApplicationArea = NPRRetail;
                 }
-                field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
-                {
-                    ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
-                    ApplicationArea = NPRRetail;
 
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        DimValue: Record "Dimension Value";
-                        DimValueList: Page "Dimension Value List";
-                    begin
-                        GLSetup.Get();
-
-                        DimValueList.LookupMode := true;
-
-                        DimValue.SetRange("Global Dimension No.", 1);
-                        DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 1 Code");
-
-                        if DimValue.FindFirst() then;
-                        DimValueList.SetTableView(DimValue);
-
-                        if Rec."Global Dimension 1 Code" <> '' then begin
-                            DimValue.SetRange(Code, Rec."Global Dimension 1 Code");
-                            if DimValue.FindFirst() then
-                                DimValueList.SetRecord(DimValue);
-                        end;
-
-                        if DimValueList.RunModal() = Action::LookupOK then begin
-                            DimValueList.GetRecord(DimValue);
-                            Rec."Global Dimension 1 Code" := DimValue.Code;
-                        end;
-                    end;
-                }
                 field("Phone No."; Rec."Phone No.")
                 {
                     ToolTip = 'Specifies the POS store''s phone number, which will be displayed on sales documents, receipts etc.';
@@ -152,38 +185,6 @@ page 6150842 "NPR POS Stores Modify Step"
                     ShowMandatory = true;
                     ToolTip = 'Specifies which General and VAT Posting group this store is using as well as journal definitions etc.';
                     ApplicationArea = NPRRetail;
-                }
-                field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
-                {
-                    ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        DimValue: Record "Dimension Value";
-                        DimValueList: Page "Dimension Value List";
-                    begin
-                        GLSetup.Get();
-
-                        DimValueList.LookupMode := true;
-
-                        DimValue.SetRange("Global Dimension No.", 2);
-                        DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 2 Code");
-
-                        if DimValue.FindFirst() then;
-                        DimValueList.SetTableView(DimValue);
-
-                        if Rec."Global Dimension 2 Code" <> '' then begin
-                            DimValue.SetRange(Code, Rec."Global Dimension 2 Code");
-                            if DimValue.FindFirst() then
-                                DimValueList.SetRecord(DimValue);
-                        end;
-
-                        if DimValueList.RunModal() = Action::LookupOK then begin
-                            DimValueList.GetRecord(DimValue);
-                            Rec."Global Dimension 2 Code" := DimValue.Code;
-                        end;
-                    end;
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
@@ -229,6 +230,7 @@ page 6150842 "NPR POS Stores Modify Step"
             }
         }
     }
+
     var
         GLSetup: Record "General Ledger Setup";
 
@@ -269,15 +271,37 @@ page 6150842 "NPR POS Stores Modify Step"
                 POSStore := Rec;
                 if not POSStore.Insert() then
                     POSStore.Modify();
-                CreatePOSPostingSetup(POSStore.Code)
+                CreatePOSPostingSetup(POSStore.Code);
+                CreateDefaulDimensions(POSStore);
             until Rec.Next() = 0;
+    end;
+
+    internal procedure DimensionsToCreate(): Boolean
+    var
+        TempPOSStore: Record "NPR POS Store" temporary;
+        GlobalDimension1Populated: Boolean;
+        GlobalDimension2Populated: Boolean;
+    begin
+        if Rec.IsEmpty() then
+            exit(false);
+
+        TempPOSStore.Copy(Rec, true);
+        TempPOSStore.SetFilter("Global Dimension 1 Code", '<>%1', '');
+
+        GlobalDimension1Populated := not TempPOSStore.IsEmpty();
+
+        TempPOSStore.Reset();
+        TempPOSStore.SetFilter("Global Dimension 2 Code", '<>%1', '');
+        GlobalDimension2Populated := not TempPOSStore.IsEmpty();
+
+        exit(GlobalDimension1Populated or GlobalDimension2Populated);
     end;
 
     local procedure CreatePOSPostingSetup(POSStoreCode: Code[10])
     var
-        POSPostingSetup: Record "NPR POS Posting Setup";
-        POSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentBin: Record "NPR POS Payment Bin";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPostingSetup: Record "NPR POS Posting Setup";
     begin
         POSPaymentMethod.SetRange("Include In Counting", POSPaymentMethod."Include In Counting"::YES);
         if POSPaymentMethod.FindSet() then
@@ -293,5 +317,34 @@ page 6150842 "NPR POS Stores Modify Step"
                             POSPostingSetup.Modify();
                     until POSPaymentBin.Next() = 0
             until POSPaymentMethod.Next() = 0;
+    end;
+
+    local procedure CreateDefaulDimensions(POSStore: Record "NPR POS Store")
+    begin
+        GLSetup.Get();
+
+        CreateDefaultDimension(POSStore, POSStore."Global Dimension 1 Code", GLSetup."Global Dimension 1 Code");
+        CreateDefaultDimension(POSStore, POSStore."Global Dimension 2 Code", GLSetup."Global Dimension 2 Code");
+    end;
+
+    local procedure CreateDefaultDimension(POSStore: Record "NPR POS Store" temporary; DimensionValueCode: Code[20]; DimensionCode: Code[20])
+    var
+        DefaultDimension: Record "Default Dimension";
+    begin
+        if DimensionValueCode = '' then
+            exit;
+
+        if DimensionCode = '' then
+            exit;
+
+        if DefaultDimension.Get(Database::"NPR POS Store", POSStore."Code", DimensionCode) then
+            exit;
+
+        DefaultDimension.Init();
+        DefaultDimension."Table ID" := Database::"NPR POS Store";
+        DefaultDimension."No." := POSStore."Code";
+        DefaultDimension."Dimension Code" := DimensionCode;
+        DefaultDimension."Dimension Value Code" := DimensionValueCode;
+        DefaultDimension.Insert();
     end;
 }
