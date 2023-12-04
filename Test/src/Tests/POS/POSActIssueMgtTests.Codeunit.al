@@ -60,7 +60,7 @@ codeunit 85099 "NPR POS Act. Issue Mgt. Tests"
         POSSession.GetSaleLine(POSSaleLine);
 
         // [When] Create
-        POSIssueMgt.IssueVoucherCreate(POSSaleLine, TempVoucher, _VoucherTypeDefault, '0', 1, VoucherAmount, DiscountPerc);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, TempVoucher, _VoucherTypeDefault, '0', 1, VoucherAmount, DiscountPerc, '');
         POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, TempVoucher, _VoucherTypeDefault, POSSaleLine);
 
         //[When] Open pages

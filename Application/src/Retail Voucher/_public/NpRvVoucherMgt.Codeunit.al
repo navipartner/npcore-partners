@@ -1053,7 +1053,13 @@
     end;
 
     procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    begin
+        GenerateTempVoucher(VoucherType, TempVoucher, '');
+    end;
+
+    internal procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary; CustomRefereceNo: Text[50])
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         ReferenceNo: Text;
         ReferenceErr: Label 'Generated reference no. %1 is too long. Max length is %2.';
@@ -1065,7 +1071,14 @@
         TempVoucher.Validate("Voucher Type", VoucherType.Code);
         if VoucherType."No. Series" <> '' then
             NoSeriesMgt.InitSeries(TempVoucher."No. Series", '', 0D, TempVoucher."No.", TempVoucher."No. Series");
-        ReferenceNo := GenerateReferenceNo(TempVoucher);
+
+        if FeatureFlagsManagement.IsEnabled('newVoucherCustomReferenceNoExperienceEnabled') then begin
+            if CustomRefereceNo <> '' then
+                ReferenceNo := CustomRefereceNo
+            else
+                ReferenceNo := GenerateReferenceNo(TempVoucher);
+        end else
+            ReferenceNo := GenerateReferenceNo(TempVoucher);
         if StrLen(ReferenceNo) > MaxStrLen(TempVoucher."Reference No.") then
             Error(ReferenceErr, ReferenceNo, MaxStrLen(TempVoucher."Reference No."))
         else
@@ -1147,7 +1160,7 @@
         ReferenceNo := UpperCase(CopyStr(ReferenceNo, 1, MaxLenght));
     end;
 
-    local procedure CheckReferenceNoHasNotBeenUsedBefore(ExcludeVoucherNo: Code[20]; ReferenceNoToCheck: Text): Boolean
+    internal procedure CheckReferenceNoHasNotBeenUsedBefore(ExcludeVoucherNo: Code[20]; ReferenceNoToCheck: Text): Boolean
     var
         ArchVoucher: Record "NPR NpRv Arch. Voucher";
         Voucher: Record "NPR NpRv Voucher";
@@ -1159,6 +1172,27 @@
 
         ArchVoucher.SetRange("Reference No.", ReferenceNoToCheck);
         exit(ArchVoucher.IsEmpty());
+    end;
+
+    internal procedure CheckReferenceNoAlreadyUsed(VocuherNo: Code[20]; RefereceNo: Text) ReferenceNoAlreadyUsed: Boolean
+    begin
+        ReferenceNoAlreadyUsed := not CheckReferenceNoHasNotBeenUsedBefore(VocuherNo, RefereceNo);
+        if ReferenceNoAlreadyUsed then
+            exit;
+        ReferenceNoAlreadyUsed := CheckReferenceNoUsedInSale(RefereceNo);
+    end;
+
+    local procedure CheckReferenceNoUsedInSale(ReferenceNoFilterText: Text) ReferenceNoUsed: Boolean;
+    var
+        NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
+    begin
+        if ReferenceNoFilterText = '' then
+            exit;
+
+        NpRvSalesLineRef.Reset();
+        NpRvSalesLineRef.SetCurrentKey("Reference No.");
+        NpRvSalesLineRef.SetFilter("Reference No.", ReferenceNoFilterText);
+        ReferenceNoUsed := not NpRvSalesLineRef.IsEmpty;
     end;
 
     [TryFunction]
