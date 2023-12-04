@@ -59,13 +59,13 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         end;
     end;
 
-    procedure IssueVoucherCreate(var POSSaleLine: Codeunit "NPR POS Sale Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; VoucherType: Record "NPR NpRv Voucher Type"; DiscountType: Text; Quantity: Integer; Amount: Decimal; Discount: Decimal)
+    procedure IssueVoucherCreate(var POSSaleLine: Codeunit "NPR POS Sale Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; VoucherType: Record "NPR NpRv Voucher Type"; DiscountType: Text; Quantity: Integer; Amount: Decimal; Discount: Decimal; CustomRefereceNo: Text[50])
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         QtyNotPositiveErr: Label 'You must specify a positive quantity.';
     begin
-        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher);
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher, CustomRefereceNo);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"Issue Voucher");
         SaleLinePOS.Validate("No.", VoucherType."Account No.");
@@ -166,6 +166,13 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         NpRvSalesLineRef.SetRange("Sales Line Id", NpRvSalesLine.Id);
         if NpRvSalesLineRef.FindFirst() then
             UpdateSaleLinePOS(NpRvSalesLineRef."Reference No.", NpRvSalesLine, SaleLinePOS);
+    end;
+
+    internal procedure CheckReferenceNoAlreadyUsed(VocuherNo: Code[20]; RefereceNo: Text) ReferenceNoAlreadyUsed: Boolean
+    var
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        ReferenceNoAlreadyUsed := VoucherMgt.CheckReferenceNoAlreadyUsed(VocuherNo, RefereceNo);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
