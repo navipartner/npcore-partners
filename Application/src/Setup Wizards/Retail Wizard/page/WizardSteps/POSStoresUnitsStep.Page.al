@@ -1,9 +1,9 @@
 ﻿page 6150859 "NPR POS Stores & Units Step"
 {
-    Extensible = False;
     Caption = 'POS Stores and Units';
-    PageType = ListPart;
+    Extensible = False;
     InsertAllowed = false;
+    PageType = ListPart;
     UsageCategory = None;
 
     layout
@@ -15,16 +15,15 @@
                 Caption = '';
                 InstructionalText = 'In case that the selected Starting No. is taken, the first available No. will be used.';
             }
-
             group(NoOfPOSStoresToCreateGroup)
             {
                 Caption = 'POS Stores';
                 field(NoOfPOSStoresToCreate; NoOfPOSStoresToCreate)
                 {
-                    Caption = 'No. of POS Stores to create:';
-                    ToolTip = 'Specifies the value of the Number of stores to create:  field';
                     ApplicationArea = NPRRetail;
                     BlankZero = true;
+                    Caption = 'No. of POS Stores to create:';
+                    ToolTip = 'Specifies the value of the Number of stores to create:  field';
 
                     trigger OnValidate()
                     begin
@@ -38,9 +37,9 @@
                 Caption = '';
                 field(StartingNoStore; StartingNoStore)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Starting No.:';
                     ToolTip = 'Specifies the value of the Starting No.:  field';
-                    ApplicationArea = NPRRetail;
 
                     trigger OnValidate()
                     begin
@@ -49,17 +48,41 @@
                     end;
                 }
             }
+            group(POSStoreDimension1)
+            {
+                Caption = '';
+                field(POSStoreDimension1CodeFld; POSStoreDimension1Code)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Global Dimension 1';
+                    CaptionClass = '1,1,1';
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+                    ToolTip = 'Specifies the code of the first Global Dimension to be assigned to the POS Store.';
+                }
+            }
+            group(POSStoreDimension2)
+            {
+                Caption = '';
+                field(POSStoreDimension2CodeFld; POSStoreDimension2Code)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Global Dimension 2';
+                    CaptionClass = '1,1,2';
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+                    ToolTip = 'Specifies the code of the second Global Dimension to be assigned to the POS Store.';
+                }
+            }
             group(NoOfPOSUnitsToCreateGroup)
             {
                 Caption = 'POS Units';
                 field(NoOfPOSUnitsToCreate; NoOfPOSUnitsToCreate)
                 {
+                    ApplicationArea = NPRRetail;
+                    BlankZero = true;
                     Caption = 'Number of POS units to create';
+                    ShowMandatory = POSUnitsMandatory;
 
                     ToolTip = 'Specifies the value of the Number of POS units to create.';
-                    ApplicationArea = NPRRetail;
-                    ShowMandatory = POSUnitsMandatory;
-                    BlankZero = true;
 
                     trigger OnValidate()
                     var
@@ -76,11 +99,38 @@
                 Caption = '';
                 field(StartingNoUnitField; StartingNoUnit)
                 {
+                    ApplicationArea = NPRRetail;
                     Caption = 'Starting No.';
+                    ShowMandatory = POSUnitsMandatory;
 
                     ToolTip = 'Specifies the value of the Starting No. field';
+                }
+            }
+
+            group(POSUnitDimension1)
+            {
+                Caption = '';
+                field(POSUnitDimension1CodeFld; POSUnitDimension1Code)
+                {
                     ApplicationArea = NPRRetail;
+                    Caption = 'Global Dimension 1';
+                    CaptionClass = '1,1,1';
                     ShowMandatory = POSUnitsMandatory;
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+                    ToolTip = 'Specifies the code of the first Global Dimension to be assigned to the POS Unit.';
+                }
+            }
+            group(POSUnitDimension2)
+            {
+                Caption = '';
+                field(POSUnitDimension2CodeFld; POSUnitDimension2Code)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Global Dimension 2';
+                    CaptionClass = '1,1,2';
+                    ShowMandatory = POSUnitsMandatory;
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
+                    ToolTip = 'Specifies the code of the second Global Dimension to be assigned to the POS Unit.';
                 }
             }
         }
@@ -100,6 +150,10 @@
         StartingNoStore: Code[10];
         StartingNoUnit: Code[10];
         POSUnitsMandatory: Boolean;
+        POSUnitDimension1Code: Code[20];
+        POSUnitDimension2Code: Code[20];
+        POSStoreDimension1Code: Code[20];
+        POSStoreDimension2Code: Code[20];
 
     internal procedure CreateTempPOSStores()
     var
@@ -120,6 +174,8 @@
             LastNoUsed := CheckIfNoAvailableInPOSStore(POSStore, LastNoUsed);
             LastNoUsed := CheckIfNoAvailableInPOSStore(TempPOSStore_, LastNoUsed);
             TempPOSStore_.Code := LastNoUsed;
+            TempPOSStore_."Global Dimension 1 Code" := POSStoreDimension1Code;
+            TempPOSStore_."Global Dimension 2 Code" := POSStoreDimension2Code;
 
             FillAddressFromCompInfo(TempPOSStore_);
 
@@ -194,6 +250,8 @@
             TempPOSUnit_."POS Store Code" := POSStoreCode;
             TempPOSUnit_."Default POS Payment Bin" := LastNoUsed;
             TempPOSUnit_."POS Layout Code" := 'DEFAULT';
+            TempPOSUnit_."Global Dimension 1 Code" := POSUnitDimension1Code;
+            TempPOSUnit_."Global Dimension 2 Code" := POSUnitDimension2Code;
 
             if POSAuditProfile.Get('DEFAULT') then
                 TempPOSUnit_."POS Audit Profile" := POSAuditProfile.Code;
@@ -293,5 +351,17 @@
     internal procedure POSUnitsToCreate(): Boolean
     begin
         exit(TempPOSUnit_.FindSet());
+    end;
+
+    internal procedure GetPOSUnitDimensionCodes(var Dimension1Code: Code[20]; var Dimension2Code: Code[20])
+    begin
+        Dimension1Code := POSUnitDimension1Code;
+        Dimension2Code := POSUnitDimension2Code;
+    end;
+
+    internal procedure GetPOSStoreDimensionCodes(var Dimension1Code: Code[20]; var Dimension2Code: Code[20])
+    begin
+        Dimension1Code := POSStoreDimension1Code;
+        Dimension2Code := POSStoreDimension2Code;
     end;
 }
