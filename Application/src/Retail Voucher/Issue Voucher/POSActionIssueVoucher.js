@@ -1,4 +1,5 @@
 let main = async ({ workflow, parameters, popup, captions }) => {
+    debugger
     let VoucherTypeCode,qty_input,amt_input,discount_input;
 
     if (parameters.VoucherTypeCode) {
@@ -41,7 +42,7 @@ let main = async ({ workflow, parameters, popup, captions }) => {
         default:
             break;
     }
-    let {SendToEmail, SendToPhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS} = await workflow.respond("select_send_method",{VoucherTypeCode:VoucherTypeCode});
+    let {SendToEmail, SendToPhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, NewVoucherCustomReferenceNoExperienceEnabled} = await workflow.respond("select_send_method",{VoucherTypeCode:VoucherTypeCode});
     if(SendMethodEmail){
         SendToEmail = await popup.input({title: captions.SendViaEmail, caption: captions.Email, value: SendToEmail, notBlank: true});
         if (SendToEmail == null) return;
@@ -51,12 +52,52 @@ let main = async ({ workflow, parameters, popup, captions }) => {
         if (SendToPhoneNo == null) return;
     }
    
-    await workflow.respond("issue_voucher", {VoucherTypeCode:VoucherTypeCode,qty_input:qty_input,amt_input:amt_input,DiscountType:parameters.DiscountType, discount_input:discount_input, SendMethodPrint:SendMethodPrint, SendToEmail:SendToEmail, SendToPhoneNo:SendToPhoneNo,SendMethodEmail:SendMethodEmail,SendMethodSMS:SendMethodSMS});
+    if (NewVoucherCustomReferenceNoExperienceEnabled) {
+        let CustomReferenceNo;
+        let CustomReferenceNoScanned = false;
+        let i = 0;
+        if ((parameters.ScanReferenceNos)) {
+            let GetCustomReferences = true;
+            while (GetCustomReferences) {
+                let ScanCustomReferenceNo = true;
+                while (ScanCustomReferenceNo) {
 
-    if (parameters.ContactInfo){
-        await workflow.respond("contact_info");
-    }
-    if (parameters.ScanReferenceNos){
-        await workflow.respond("scan_reference_nos");
+                    CustomReferenceNo = await popup.input({ title: captions.CustomReferenceNoTitle, caption: captions.CustomReferenceNoCaption })
+                    ScanCustomReferenceNo = (CustomReferenceNo == "");
+                    if (CustomReferenceNo !== null) {
+                        if (ScanCustomReferenceNo)
+                            ScanCustomReferenceNo = await (popup.confirm({ title: captions.CustomReferenceNoTitle, caption: captions.ScanReferenceNoError }));
+
+                        CustomReferenceNoScanned = ((!ScanCustomReferenceNo) || (CustomReferenceNoScanned));
+                    }
+                    const {ReferenceNoAlreadyUsed, ReferenceNoAlreadyUsedMessage} = await workflow.respond('check_reference_no_already_used', {CustomReferenceNo: CustomReferenceNo });
+                    if (ReferenceNoAlreadyUsed){
+                        CustomReferenceNo = ''; 
+                        ScanCustomReferenceNo = await (popup.confirm({ title: captions.CustomReferenceNoCaption, caption: ReferenceNoAlreadyUsedMessage }));
+                    }
+                }
+
+                if (CustomReferenceNo)
+                    await workflow.respond("issue_voucher", { VoucherTypeCode: VoucherTypeCode, qty_input: 1, amt_input: amt_input, DiscountType: parameters.DiscountType, discount_input: discount_input, SendMethodPrint: SendMethodPrint, SendToEmail: SendToEmail, SendToPhoneNo: SendToPhoneNo, SendMethodEmail: SendMethodEmail, SendMethodSMS: SendMethodSMS, CustomReferenceNo: CustomReferenceNo });
+                
+                i += 1;
+                GetCustomReferences = ((CustomReferenceNo !== null) && (i < qty_input));
+            }
+        } else {
+            await workflow.respond("issue_voucher", { VoucherTypeCode: VoucherTypeCode, qty_input: qty_input, amt_input: amt_input, DiscountType: parameters.DiscountType, discount_input: discount_input, SendMethodPrint: SendMethodPrint, SendToEmail: SendToEmail, SendToPhoneNo: SendToPhoneNo, SendMethodEmail: SendMethodEmail, SendMethodSMS: SendMethodSMS });
+        }
+        if (((CustomReferenceNoScanned) || (!parameters.ScanReferenceNos)) && (parameters.ContactInfo))
+            await workflow.respond("contact_info");
+
+    } else {
+        await workflow.respond("issue_voucher", { VoucherTypeCode: VoucherTypeCode, qty_input: qty_input, amt_input: amt_input, DiscountType: parameters.DiscountType, discount_input: discount_input, SendMethodPrint: SendMethodPrint, SendToEmail: SendToEmail, SendToPhoneNo: SendToPhoneNo, SendMethodEmail: SendMethodEmail, SendMethodSMS: SendMethodSMS });
+
+        if (parameters.ContactInfo) {
+            await workflow.respond("contact_info");
+        }
+
+        if (parameters.ScanReferenceNos) {
+            await workflow.respond("scan_reference_nos");
+        }
     }
 }
