@@ -15,15 +15,17 @@
             {
                 Caption = 'Outstanding';
                 CuegroupLayout = Wide;
-                field("Waiter Pads - Open"; Rec."Waiter Pads - Open")
+                field("Waiter Pads - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Waiter Pads - Open"))))
                 {
                     ToolTip = 'Specifies the number of currently opened waiter pads.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Waiter Pads - Open';
                 }
-                field("Kitchen Requests - Open"; Rec."Kitchen Requests - Open")
+                field("Kitchen Requests - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitchen Requests - Open"))))
                 {
                     ToolTip = 'Specifies the number of currently active kitchen requests (the requests that hasn’t been finished or cancelled so far).';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Kitchen Requests - Open';
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
                 {
@@ -36,39 +38,45 @@
             cuegroup(TableStatus)
             {
                 Caption = 'Current Table Status';
-                field("Seatings: Ready"; Rec."Seatings: Ready")
+                field("Seatings: Ready"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Ready"))))
                 {
                     ToolTip = 'Specifies the number of tables that are currently ready for next guests.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Seatings: Ready';
                 }
-                field("Seatings: Occupied"; Rec."Seatings: Occupied")
+                field("Seatings: Occupied"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Occupied"))))
                 {
                     ToolTip = 'Specifies the number of occupied tables.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Seatings: Occupied';
                 }
-                field("Seatings: Reserved"; Rec."Seatings: Reserved")
+                field("Seatings: Reserved"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Reserved"))))
                 {
                     ToolTip = 'Specifies the number of reserved tables.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Seatings: Reserved';
                 }
-                field("Seatings: Cleaning Required"; Rec."Seatings: Cleaning Required")
+                field("Seatings: Cleaning Required"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Cleaning Required"))))
                 {
                     ToolTip = 'Specifies the number of tables requiring cleaning.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Seatings: Cleaning Required';
                 }
             }
             cuegroup(SeatStatus)
             {
                 Caption = 'Seats';
-                field("Available seats"; Rec."Available seats")
+                field("Available seats"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Available Seats"))))
                 {
                     ToolTip = 'Specifies the number of currently available seats.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Available Seats';
                 }
-                field("Inhouse Guests"; Rec."Inhouse Guests")
+                field("Inhouse Guests"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Inhouse Guests"))))
                 {
                     ToolTip = 'Specifies current number of inhouse guests.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Inhouse Guests';
                 }
             }
             cuegroup("My User Tasks")
@@ -93,40 +101,43 @@
             cuegroup(TodaySummary)
             {
                 Caption = 'Today’s Summary';
-                field("Turnover (LCY)"; Rec."Turnover (LCY)")
+                field("Turnover (LCY)"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Turnover (LCY)"))))
                 {
                     ToolTip = 'Specifies today’s turnover amount posted so far.';
                     ApplicationArea = NPRRetail;
-
+                    Caption = 'Turnover (LCY)';
                     trigger OnDrillDown()
                     begin
                         DrillDownTurnover();
                     end;
                 }
-                field("No. of Sales"; Rec."No. of Sales")
+                field("No. of Sales"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("No. of Sales"))))
                 {
                     ToolTip = 'Specifies today’s number of POS sales posted so far.';
                     ApplicationArea = NPRRetail;
-
+                    Caption = 'No. of Sales';
                     trigger OnDrillDown()
                     begin
                         DrillDownTurnover();
                     end;
                 }
-                field("Total No. of Guests"; Rec."Total No. of Guests")
+                field("Total No. of Guests"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Total No. of Guests"))))
                 {
                     ToolTip = 'Specifies today’s total of number of guests registered on posted POS sales so far.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Total No. of Guests';
                 }
-                field("Average per Sale (LCY)"; Rec."Average per Sale (LCY)")
+                field("Average per Sale (LCY)"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Average per Sale (LCY)"))))
                 {
                     ToolTip = 'Specifies today’s average amount per sale.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Average per Sale (LCY)';
                 }
-                field("Average per Guest (LCY)"; Rec."Average per Guest (LCY)")
+                field("Average per Guest (LCY)"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Average per Guest (LCY)"))))
                 {
                     ToolTip = 'Specifies today’s average amount per guest.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Average per Guest (LCY)';
                 }
             }
             cuegroup(Reservations)
@@ -137,16 +148,19 @@
                 {
                     ToolTip = 'Specifies today’s number of completed reservations.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Completed';
                 }
                 field("No-Shows"; Rec."No-Shows")
                 {
                     ToolTip = 'Specifies today’s number of reservation no-shows.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'No-Shows';
                 }
                 field("Cancelled Reservations"; Rec."Cancelled Reservations")
                 {
                     ToolTip = 'Specifies today’s number of cancelled reservations.';
                     ApplicationArea = NPRRetail;
+                    Caption = 'Cancelled';
                 }
             }
         }
@@ -200,16 +214,29 @@
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
 #endif        
     begin
-#if BC17 or BC18 or BC19 or BC20        
+#if BC17 or BC18 or BC19 or BC20
         RoleCenterNotificationMgt.HideEvaluationNotificationAfterStartingTrial();
-#endif        
-        RecalculateCues();
+#endif
+        CalculateFieldValues();
+    end;
+
+    local procedure CalculateFieldValues()
+    var
+        Parameters: Dictionary of [Text, Text];
+    begin
+        if (BackgroundTaskId <> 0) then
+            CurrPage.CancelBackgroundTask(BackgroundTaskId);
+
+        Parameters.Add(Rec.FieldCaption("Restaurant Filter"), Rec.GetFilter("Restaurant Filter"));
+        Parameters.Add(Rec.FieldCaption("Seating Location Filter"), Rec.GetFilter("Seating Location Filter"));
+        Parameters.Add(Rec.FieldCaption("POS Unit Filter"), Rec.GetFilter("POS Unit Filter"));
+
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR RE Activity Backgrd Task", Parameters);
     end;
 
     trigger OnOpenPage()
     var
         Restaurant: Record "NPR NPRE Restaurant";
-        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         UserSetup: Record "User Setup";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
@@ -220,20 +247,10 @@
             Rec.Insert();
         end;
 
-        Rec.SetRange("Date Filter", WorkDate());
-        Rec.SetRange("User ID Filter", UserId);
-
         if UserSetup.get(UserId) then
             if UserSetup."NPR Backoffice Restaurant Code" <> '' then
                 Restaurant.SetRange(Code, UserSetup."NPR Backoffice Restaurant Code");
         SetRestaurantFilter(Restaurant);
-
-        if not RestaurantSetup.get() then
-            clear(RestaurantSetup);
-        Rec.SetRange("Ready Seating Status Filter", RestaurantSetup."Seat.Status: Ready");
-        Rec.SetRange("Occupied Seating Status Filter", RestaurantSetup."Seat.Status: Occupied");
-        Rec.SetRange("Cleaning R. Seat.Status Filter", RestaurantSetup."Seat.Status: Cleaning Required");
-        Rec.SetRange("Reserved Seating Status Filter", RestaurantSetup."Seat.Status: Reserved");
 
         RoleCenterNotificationMgt.ShowNotifications();
         ConfPersonalizationMgt.RaiseOnOpenRoleCenterEvent();
@@ -302,57 +319,6 @@
         Rec.SetFilter("POS Unit Filter", SelectionFilterMgt.GetSelectionFilter(RecRef, POSUnit.FieldNo("No.")));
     end;
 
-    local procedure RecalculateCues()
-    var
-        POSEntry: Record "NPR POS Entry";
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        POSEntryQry: Query "NPR POS Entry with Sales Lines";
-        SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link";
-    begin
-        Rec."Turnover (LCY)" := 0;
-        Rec."No. of Sales" := 0;
-        Rec."Total No. of Guests" := 0;
-
-        if Rec.GetFilter("Date Filter") <> '' then
-            POSEntryQry.SetFilter(Posting_Date, Rec.GetFilter("Date Filter"));
-        if Rec.GetFilter("POS Unit Filter") <> '' then
-            POSEntryQry.SetFilter(POS_Unit_No, Rec.GetFilter("POS Unit Filter"));
-        POSEntryQry.SetRange(Type, POSSalesLine.Type::Item);
-        POSEntryQry.Open();
-        while POSEntryQry.Read() do
-            if POSSalesLine.Get(POSEntryQry.POS_Entry_No, POSEntryQry.Line_No) then begin
-                Rec."Turnover (LCY)" += POSSalesLine."Amount Excl. VAT (LCY)";
-                if POSEntry.Get(POSSalesLine."POS Entry No.") then
-                    if not POSEntry.Mark() then begin
-                        POSEntry.Mark(true);
-                        Rec."No. of Sales" += 1;
-                        Rec."Total No. of Guests" += POSEntry."NPRE Number of Guests";
-                    end;
-            end;
-        POSEntryQry.Close();
-
-        if Rec."Total No. of Guests" <> 0 then
-            Rec."Average per Guest (LCY)" := Round(Rec."Turnover (LCY)" / Rec."Total No. of Guests")
-        else
-            Rec."Average per Guest (LCY)" := 0;
-        if Rec."No. of Sales" <> 0 then
-            Rec."Average per Sale (LCY)" := Round(Rec."Turnover (LCY)" / Rec."No. of Sales")
-        else
-            Rec."Average per Sale (LCY)" := 0;
-
-        //Calc inhouse number of guests
-        Rec."Inhouse Guests" := 0;
-        if Rec.GetFilter("Seating Location Filter") <> '' then
-            SeatingWPLinkQry.setfilter(SeatingLocation, Rec.GetFilter("Seating Location Filter"));
-        SeatingWPLinkQry.SetRange(SeatingClosed, false);
-        SeatingWPLinkQry.Open();
-        while SeatingWPLinkQry.Read() do
-            Rec."Inhouse Guests" += SeatingWPLinkQry.NumberOfGuests;
-        SeatingWPLinkQry.Close();
-
-        Rec.Modify();
-    end;
-
     local procedure DrillDownTurnover()
     var
         POSEntry: Record "NPR POS Entry";
@@ -363,7 +329,32 @@
         Page.run(Page::"NPR POS Entries", POSEntry);
     end;
 
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        BackgrndTaskMgt.CopyTaskResults(Results, BackgroundTaskResults);
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if (TaskId = BackgroundTaskId) then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
+    end;
+
+    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    begin
+        if not BackgroundTaskResults.ContainsKey(FieldNo) then
+            exit(0);
+        if not Evaluate(Result, BackgroundTaskResults.Get(FieldNo), 9) then
+            Result := 0;
+    end;
+
     var
         CuesAndKpis: Codeunit "Cues And KPIs";
         UserTaskManagement: Codeunit "User Task Management";
+        BackgroundTaskResults: Dictionary of [Text, Text];
+        BackgroundTaskId: Integer;
 }

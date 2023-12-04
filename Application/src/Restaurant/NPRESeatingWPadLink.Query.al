@@ -34,6 +34,9 @@
                     {
                         Method = Sum;
                     }
+                    column(WaiterNo; "No.")
+                    {
+                    }
                 }
             }
         }

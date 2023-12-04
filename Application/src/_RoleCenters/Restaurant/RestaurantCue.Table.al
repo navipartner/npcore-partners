@@ -14,9 +14,7 @@
         field(10; "Waiter Pads - Open"; Integer)
         {
             Caption = 'Waiter Pads - Open';
-            Editable = false;
-            FieldClass = FlowField;
-            CalcFormula = count("NPR NPRE Waiter Pad" where(Closed = const(false)));
+            DataClassification = CustomerContent;
         }
         field(11; "Kitchen Requests - Open"; Integer)
         {
