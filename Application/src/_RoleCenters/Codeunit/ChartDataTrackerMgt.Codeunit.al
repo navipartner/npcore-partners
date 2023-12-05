@@ -84,7 +84,7 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
             exit;
 
         repeat
-            Results.Add(ChartData."Key", Format(ChartData.Val));
+            Results.Add(ChartData."Key", ChartData.Val);
         until ChartData.Next() = 0;
     end;
 
@@ -98,10 +98,25 @@ codeunit 6060006 "NPR Chart Data Tracker Mgt."
             ChartData."Tracker Entry No." := TrackerEntryNo;
 #pragma warning disable AA0139
             ChartData."Key" := "Key";
-            ChartData.Val := Results.Get("Key");
+            ChartData.Val := ProcessValueByKey("Key", Results.Get("Key"));
 #pragma warning restore
             ChartData.Insert();
         end;
+    end;
+
+    local procedure ProcessValueByKey("Key": Text; Input: Text): Text
+    var
+        ConvertVar: Decimal;
+        MarginKeyTxtLbl: Label 'Margin', Locked = true;
+        TurnoverKeyTxtLbl: Label 'Turnover', Locked = true;
+    begin
+        if not "Key".Contains(MarginKeyTxtLbl) or "Key".Contains(TurnoverKeyTxtLbl) then
+            exit(Input);
+
+        if Evaluate(ConvertVar, Input) then
+            exit(Format(ConvertVar, 0, 9));
+
+        exit(Input);
     end;
 
     local procedure CheckLastUpdateTimestamp(ChartDataUpdateTracker: Record "NPR Chart Data Update Tracker"): Boolean
