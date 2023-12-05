@@ -3,8 +3,8 @@
     Access = Internal;
 
     var
-        _AFClient: Codeunit "NPR AF HTTP Client";
-        _SftpApp: Codeunit "NPR SFTP App";
+        _FunctionAppName: Label 'SftpProxy', Locked = true;
+        _AzureKeyVaultNameForSubKey: Label 'AFSftpProxySub', Locked = true;
         _HttpHeaderName: Label 'NP-FileTransfer-Request', Locked = true;
         _JsonUrl: Label 'FileServerUrl', Locked = true;
         _JsonPort: Label 'FileServerPort', Locked = true;
@@ -15,6 +15,11 @@
         _JsonNewPath: Label 'NewPath', Locked = true;
         _JsonForce: Label 'Force', Locked = true;
         _lblRequestError: Label 'Http request error(%1): %2';
+
+    local procedure FunctionAppVersion(): Integer;
+    begin
+        exit(1);
+    end;
 
     /// <summary>
     /// Creates a JSON Object based on the Sftp Connection Record. This JsonObject is used by the other functions in this codeunit.
@@ -97,7 +102,7 @@
     begin
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'DownloadFile', http);
+        GetAFHttpClient(_FunctionAppName, 'DownloadFile', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -139,7 +144,7 @@
         headerJson.Add(_JsonPath, RemotePath);
         FileStream.CreateInStream(InS);
         content.WriteFrom(InS);
-        _AFClient.GetAFHttpClient(_SftpApp, 'UploadFile', http);
+        GetAFHttpClient(_FunctionAppName, 'UploadFile', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -172,7 +177,7 @@
     begin
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'DeleteFile', http);
+        GetAFHttpClient(_FunctionAppName, 'DeleteFile', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -213,7 +218,7 @@
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
         headerJson.Add(_JsonNewPath, RemoteNewPath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'MoveFile', http);
+        GetAFHttpClient(_FunctionAppName, 'MoveFile', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -253,7 +258,7 @@
     begin
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'ListDirectory', http);
+        GetAFHttpClient(_FunctionAppName, 'ListDirectory', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -291,7 +296,7 @@
     begin
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'CreateDirectory', http);
+        GetAFHttpClient(_FunctionAppName, 'CreateDirectory', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -327,7 +332,7 @@
     begin
         headerJson := FileServerRequest.Clone().AsObject();
         headerJson.Add(_JsonPath, RemotePath);
-        _AFClient.GetAFHttpClient(_SftpApp, 'DeleteDirectory', http);
+        GetAFHttpClient(_FunctionAppName, 'DeleteDirectory', FunctionAppVersion(), _AzureKeyVaultNameForSubKey, http);
         SendRequest(http, content, headerJson, response);
         if (not response.IsSuccessStatusCode()) then
             Error(_lblRequestError, Format(response.HttpStatusCode()), GetErrorMessage(response));
@@ -352,6 +357,23 @@
         json.ReadFrom(txt);
         json.Get('ErrorMessage', tok);
         exit(tok.AsValue().AsText());
+    end;
+
+    [NonDebuggable]
+    local procedure GetAFHttpClient(
+        FunctionAppName: Text;
+        AFAppAction: Text;
+        AppVersion: Integer;
+        AzureVaultKeyNameForSubscription: Text;
+        var http: HttpClient)
+    var
+        AFVault: Codeunit "NPR Azure Key Vault Mgt.";
+        AzureApiUrl: Label 'https://navipartner.azure-api.net', Locked = true;
+        Url: Text;
+    begin
+        Url := AzureApiUrl + '/' + FunctionAppName + '/v' + Format(AppVersion) + '/' + AFAppAction + '/';
+        http.SetBaseAddress(Url);
+        http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', AFVault.GetAzureKeyVaultSecret(AzureVaultKeyNameForSubscription));
     end;
 }
 

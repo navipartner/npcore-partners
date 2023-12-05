@@ -56,4 +56,14 @@ enum 6014505 "NPR POS Background Task" implements "NPR POS Background Task"
         Caption = 'EFT_ADYEN_SETUP_CHECK', Locked = true;
         Implementation = "NPR POS Background Task" = "NPR EFT Adyen Setup Check Task";
     }
+    value(10; EFT_PLANET_PAX_TRX)
+    {
+        Caption = 'EFT_PLANET_PAX_TRX', Locked = true;
+        Implementation = "NPR POS Background Task" = "NPR EFT Planet PAX Trx";
+    }
+    value(11; EFT_PLANET_PAX_ABORT)
+    {
+        Caption = 'EFT_PLANET_PAX_ABORT', Locked = true;
+        Implementation = "NPR POS Background Task" = "NPR EFT Planet PAX Abort";
+    }
 }

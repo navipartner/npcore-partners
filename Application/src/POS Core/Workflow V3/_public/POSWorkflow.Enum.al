@@ -873,6 +873,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'READ_BEID', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: BelgianEid";
     }
+    value(178; SET_VOUCHER_REF_NO)
+    {
+        Caption = 'SET_VOUCHER_REF_NO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Vch Ref No";
+    }
     value(179; END_SALE)
     {
         Caption = 'END_SALE', Locked = true, MaxLength = 20;
@@ -963,10 +968,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'HTML_DISPLAY_QR', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: HD Input";
     }
-    value(178; SET_VOUCHER_REF_NO)
+    value(199; "PLANET_PAX")
     {
-        Caption = 'SET_VOUCHER_REF_NO', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Vch Ref No";
+        Caption = 'PLANET_PAX', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Planet PAX";
     }
     value(6184573; SS_EFT_RECONCILE)
     {
