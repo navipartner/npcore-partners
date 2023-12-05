@@ -183,7 +183,7 @@
             RaptorDataBuffer."Item No." := CopyStr(RaptorItemNo, 1, MaxStrLen(RaptorDataBuffer."Item No."));
             RaptorDataBuffer."Variant Code" := '';
         end;
-        if not Item.Get(RaptorDataBuffer."Item No.") then
+        if not Item.Get(CopyStr(RaptorDataBuffer."Item No.", 1, MaxStrLen(Item."No."))) then
             Item.Init();
         RaptorDataBuffer."Item Description" := Item.Description;
     end;
