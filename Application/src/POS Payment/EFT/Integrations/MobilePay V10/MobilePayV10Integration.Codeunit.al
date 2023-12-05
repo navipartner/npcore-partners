@@ -270,21 +270,14 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     internal procedure HandleProtocolResponse(var eftTrxRequest: Record "NPR EFT Transaction Request")
     var
         eftInterface: Codeunit "NPR EFT Interface";
-        SystemAppVersionCheck: Codeunit "NPR System App. Version Check";
-        PosSession: Codeunit "NPR POS Session";
     begin
         if not eftTrxRequest.Successful then begin
-            if (GuiAllowed) then begin
-                If (SystemAppVersionCheck.GetSystemAppVersion() >= SystemAppVersionCheck.GetVersionFromVersionSegments(17, 7)) then begin
-                    Message(eftTrxRequest."Result Display Text");
-                end else begin
-                    if (not PosSession.IsInitialized()) then begin
-                        Message(eftTrxRequest."Result Display Text");
-                    end else begin
-                        // Problems with MESSAGE (BC17 RTM and some following versions issue) - we shouldn't use MESSAGE in EFT.
-                        // We probably can't do anything here.
-                    end;
-                end;
+            if GuiAllowed then begin
+#if BC17
+                //Message() in BC17 crashes control addin in certain timings.
+#else
+                Message(eftTrxRequest."Result Display Text");
+#endif
             end else begin
                 Error(eftTrxRequest."Result Display Text");
             end;
