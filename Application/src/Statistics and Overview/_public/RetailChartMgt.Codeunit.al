@@ -12,7 +12,6 @@
         StoreLbl: Label 'Store';
         TurnoverLbl: Label 'Turnover';
 
-
     internal procedure TurnOver_Revenue(var BusChartBuf: Record "Business Chart Buffer"; Period: Option " ",Next,Previous; var PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period; Results: Dictionary of [Text, Text])
     var
         Enddate: Date;
@@ -49,9 +48,12 @@
 
             BusChartBuf.GetPeriodFromMapColumn(I - 1, StartDate, Enddate);
             if Results.ContainsKey('Margin ' + Format(I - 1)) then
-                Evaluate(Margin, Results.Get('Margin ' + Format(I - 1)));
+                if not Evaluate(Margin, Results.Get('Margin ' + Format(I - 1)), 9) then
+                    Margin := 0;
+
             if Results.ContainsKey('Turnover ' + Format(I - 1)) then
-                Evaluate(Turnover, Results.Get('Turnover ' + Format(I - 1)));
+                if not Evaluate(Turnover, Results.Get('Turnover ' + Format(I - 1)), 9) then
+                    Turnover := 0;
 
             BusChartBuf.SetValue(MarginLbl, I - 1, Margin);
             BusChartBuf.SetValue(TurnoverLbl, I - 1, Turnover);
@@ -88,9 +90,12 @@
             Turnover := 0;
 
             if Results.ContainsKey('Margin ' + Format(I - 1)) then
-                Evaluate(Margin, Results.Get('Margin ' + Format(I - 1)));
+                if not Evaluate(Margin, Results.Get('Margin ' + Format(I - 1)), 9) then
+                    Margin := 0;
+
             if Results.ContainsKey('Turnover ' + Format(I - 1)) then
-                Evaluate(Turnover, Results.Get('Turnover ' + Format(I - 1)));
+                if not Evaluate(Turnover, Results.Get('Turnover ' + Format(I - 1)), 9) then
+                    Turnover := 0;
 
             BusChartBuf.AddColumn(Results.Get('DimCode ' + Format(I - 1)));
             BusChartBuf.SetValue(MarginLbl, I - 1, Margin);
