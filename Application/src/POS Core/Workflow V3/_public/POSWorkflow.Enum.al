@@ -965,7 +965,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     }
     value(198; HTML_DISPLAY_INPUT)
     {
-        Caption = 'HTML_DISPLAY_QR', Locked = true, MaxLength = 20;
+        Caption = 'HTML_DISPLAY_INPUT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: HD Input";
     }
     value(199; "PLANET_PAX")
