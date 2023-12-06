@@ -151,6 +151,13 @@
 
                     ApplicationArea = NPRRetail;
                 }
+                action("Azure Member Registration Setup")
+                {
+                    Caption = 'Azure Member Reg. Setup';
+                    RunObject = Page "NPR MM AzureMemberRegSetup";
+                    ToolTip = 'View or edit detailed information about Azure Member Registration setup.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Loyalty)
             {
