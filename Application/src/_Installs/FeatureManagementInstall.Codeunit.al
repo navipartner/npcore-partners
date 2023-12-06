@@ -12,6 +12,7 @@ codeunit 6151434 "NPR Feature Management Install"
     local procedure HandleOnCompanyInitialize()
     begin
         InitFeatures();
+        RefreshExperienceTierCurrentCompany();
     end;
 
     // NOTE: use procedure RefreshExperienceTierCurrentCompany every time new feature is added if you want to update related application area accordingly
