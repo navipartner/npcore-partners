@@ -57,16 +57,17 @@
         NpRvPartner.Get(NpRvVoucherType."Partner Code");
         NpRvGlobalVoucherSetup.TestField("Service Url");
 
-        RequestXmlText :=
+        RequestXmlText
+         :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
              '<soapenv:Body>' +
                '<UpsertPartners xmlns="urn:microsoft-dynamics-schemas/codeunit/' + GetServiceName(NpRvGlobalVoucherSetup) + '">' +
                  '<retail_voucher_partners>' +
                    '<retail_voucher_partner partner_code="' + NpRvPartner.Code + '">' +
-                     '<name>' + NpRvPartner.Name + '</name>' +
-                     '<service_url>' + NpRvPartner."Service Url" + '</service_url>' +
-                     '<service_username>' + NpRvPartner."Service Username" + '</service_username>' +
-                     '<service_password>' + WebServiceAuthHelper.GetApiPassword(NpRvPartner."API Password Key") + '</service_password>' +
+                     '<name>' + '<![CDATA[' + NpRvPartner.Name + ']]>' + '</name>' +
+                     '<service_url>' + '<![CDATA[' + NpRvPartner."Service Url" + ']]>' + '</service_url>' +
+                     '<service_username>' + '<![CDATA[' + NpRvPartner."Service Username" + ']]>' + '</service_username>' +
+                     '<service_password>' + '<![CDATA[' + WebServiceAuthHelper.GetApiPassword(NpRvPartner."API Password Key") + ']]>' + '</service_password>' +
                      '<relations>' +
                        '<relation voucher_type="' + NpRvGlobalVoucherSetup."Voucher Type" + '" />' +
                      '</relations>' +
@@ -382,9 +383,9 @@
                     '<issue_register_no>' + Voucher."Issue Register No." + '</issue_register_no>' +
                     '<issue_sales_ticket_no>' + Voucher."Issue Document No." + '</issue_sales_ticket_no>' +
                     '<issue_user_id>' + Voucher."Issue User ID" + '</issue_user_id>' +
-                    '<issue_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</issue_partner_code>' +
+                    '<issue_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</issue_partner_code>' +
                     '<issue_posstore_code>' + StoreCode + '</issue_posstore_code>' +
-                    '<company>' + CompanyName() + '</company>' +
+                    '<company>' + '<![CDATA[' + CompanyName() + ']]>' + '</company>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</CreateVouchers>' +
@@ -582,9 +583,9 @@
                     '<redeem_register_no>' + TempNpRvVoucherBuffer."Redeem Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + TempNpRvVoucherBuffer."Redeem Sales Ticket No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + TempNpRvVoucherBuffer."Redeem User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</redeem_partner_code>' +
                     '<issue_posstore_code>' + TempNpRvVoucherBuffer."POS Store Code" + '</issue_posstore_code>' +
-                    '<company>' + TempNpRvVoucherBuffer.Company + '</company>' +
+                    '<company>' + '<![CDATA[' + TempNpRvVoucherBuffer.Company + ']]>' + '</company>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</ReserveVouchers>' +
@@ -704,9 +705,9 @@
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</redeem_partner_code>' +
                     '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
-                    '<company>' + VoucherEntry.Company + '</company>' +
+                    '<company>' + '<![CDATA[' + VoucherEntry.Company + ']]>' + '</company>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemVouchers>' +
@@ -791,9 +792,9 @@
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</redeem_partner_code>' +
                     '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
-                    '<company>' + VoucherEntry.Company + '</company>' +
+                    '<company>' + '<![CDATA[' + VoucherEntry.Company + ']]>' + '</company>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemPartnerVouchers>' +
@@ -853,9 +854,9 @@
                     '<redeem_register_no>' + VoucherEntry."Register No." + '</redeem_register_no>' +
                     '<redeem_sales_ticket_no>' + VoucherEntry."Document No." + '</redeem_sales_ticket_no>' +
                     '<redeem_user_id>' + VoucherEntry."User ID" + '</redeem_user_id>' +
-                    '<redeem_partner_code>' + CopyStr(CompanyName(), 1, 20) + '</redeem_partner_code>' +
+                    '<redeem_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</redeem_partner_code>' +
                     '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
-                    '<company>' + VoucherEntry.Company + '</company>' +
+                    '<company>' + '<![CDATA[' + VoucherEntry.Company + ']]>' + '</company>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</TopUpVouchers>' +
