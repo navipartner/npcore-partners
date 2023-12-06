@@ -1527,8 +1527,8 @@
 
     local procedure PostOnImport(SalesHeader: Record "Sales Header")
     var
-        ReleaseSalesDoc: Codeunit "Release Sales Document";
-    begin
+        ReleaseSalesDoc: Codeunit "Release Sales Document";        
+    begin        
         if MagentoSetup."Prevent posting if commented" and OrderHasComments then
             exit;
 
@@ -1544,6 +1544,7 @@
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
         SalesPost.Run(SalesHeader);
+        OnAfterPostOnImport(SalesHeader);
     end;
 
     local procedure HasLinesToPostOnImport(SalesHeader: Record "Sales Header"): Boolean
@@ -1958,4 +1959,10 @@
     local procedure OnBeforeInsertSalesLineItem(XmlElement: XmlElement; SalesHeader: Record "Sales Header"; var LineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostOnImport(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
 }
