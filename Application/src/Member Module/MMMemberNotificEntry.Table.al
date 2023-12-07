@@ -4,6 +4,8 @@
 
     Caption = 'Member Notification Entry';
     DataClassification = CustomerContent;
+    DrillDownPageId = "NPR MM Member Notific. Entry";
+    LookupPageId = "NPR MM Member Notific. Entry";
 
     fields
     {
