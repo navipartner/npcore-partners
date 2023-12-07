@@ -37,65 +37,24 @@ page 6151240 "NPR BinTransferJournal"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Receive From Pos Unit Code field.';
-
-                    trigger OnValidate()
-                    var
-                        PosUnit: Record "NPR POS Unit";
-                    begin
-                        if (not (PosUnit.Get(Rec.ReceiveFromPosUnitCode))) then
-                            exit;
-                        Rec.TransferFromBinCode := PosUnit."Default POS Payment Bin";
-                    end;
+                    Visible = false;
                 }
                 field(TransferFromBinCode; Rec.TransferFromBinCode)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Transfer From Bin Code field.';
                     ShowMandatory = true;
-
-                    trigger OnValidate()
-                    var
-                        Bin: Record "NPR POS Payment Bin";
-                    begin
-                        Bin.Get(Rec.TransferFromBinCode);
-                        if (Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER) then
-                            Rec.TestField(ReceiveFromPosUnitCode);
-
-                        if (Bin."Bin Type" <> Bin."Bin Type"::CASH_DRAWER) then
-                            Clear(Rec.ReceiveFromPosUnitCode);
-                    end;
                 }
                 field(ReceiveAtPosUnitCode; Rec.ReceiveAtPosUnitCode)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Receive From Pos Unit Code field.';
-
-                    trigger OnValidate()
-                    var
-                        PosUnit: Record "NPR POS Unit";
-                    begin
-                        if (not (PosUnit.Get(Rec.ReceiveFromPosUnitCode))) then
-                            exit;
-                        Rec.ReceiveAtPosUnitCode := PosUnit."Default POS Payment Bin";
-                    end;
                 }
                 field(TransferToBinCode; Rec.TransferToBinCode)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Transfer To Bin Code field.';
                     ShowMandatory = true;
-
-                    trigger OnValidate()
-                    var
-                        Bin: Record "NPR POS Payment Bin";
-                    begin
-                        Bin.Get(Rec.TransferToBinCode);
-                        if (Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER) then
-                            Rec.TestField(ReceiveAtPosUnitCode);
-
-                        if (Bin."Bin Type" <> Bin."Bin Type"::CASH_DRAWER) then
-                            Clear(Rec.ReceiveAtPosUnitCode);
-                    end;
                 }
                 field(PaymentMethod; Rec.PaymentMethod)
                 {
@@ -145,7 +104,6 @@ page 6151240 "NPR BinTransferJournal"
                     BinTransferAnPost: Codeunit "NPR BinTransferPost";
                     TransferDenomination: Record "NPR BinTransferDenomination";
                     TransferDenominationPage: Page "NPR BinTransferDenomination";
-                    PageAction: Action;
                 begin
                     Rec.TestField(PaymentMethod);
 
@@ -160,7 +118,9 @@ page 6151240 "NPR BinTransferJournal"
                     TransferDenomination.FilterGroup(0);
 
                     TransferDenominationPage.SetTableView(TransferDenomination);
-                    PageAction := TransferDenominationPage.RunModal();
+                    TransferDenominationPage.RunModal();
+                    if Rec.Status <> Rec.Status::OPEN then
+                        exit;
 
                     Rec.CalcFields(DenominationSum);
                     Rec.Amount := Rec.DenominationSum;

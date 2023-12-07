@@ -61,6 +61,18 @@ page 6151237 "NPR BinTransferDenomination"
 
     }
 
+    trigger OnClosePage()
+    var
+        BinTransferDenomination: Record "NPR BinTransferDenomination";
+    begin
+        if Rec.EntryNo = 0 then
+            exit;
+        BinTransferDenomination.SetRange(EntryNo, Rec.EntryNo);
+        BinTransferDenomination.SetRange(Quantity, 0);
+        if not BinTransferDenomination.IsEmpty() then
+            BinTransferDenomination.DeleteAll();
+    end;
+
     internal procedure SetEditable()
     begin
         _IsEditable := true;

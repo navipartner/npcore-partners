@@ -3,9 +3,9 @@ let main = async ({ workflow }) => {
     if (legacyAction) {
         return await workflow.respond("RunLegacyAction");
     };
-    
-    let returnedData = await popup.binTransfer(binTransferContextData);
-    let { success, checkpointEntryNo } = await workflow.respond("ProcessBinTranser", returnedData);
+
+    let result = await popup.binTransfer(binTransferContextData);
+    let { success, checkpointEntryNo } = await workflow.respond("ProcessBinTranser", { returnedData: result });
     if (!success) { return };
 
     if (postWorkflows) {
