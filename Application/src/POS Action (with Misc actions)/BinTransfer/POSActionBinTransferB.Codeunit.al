@@ -84,10 +84,16 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         PmtBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
         PmtBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpoint."Entry No.");
         PmtBinCheckpoint.SetRange(Status, PmtBinCheckpoint.Status::READY);
+        PmtBinCheckpoint.FilterGroup(-1);
         PmtBinCheckpoint.SetFilter("Bin Transfer Journal Entry No.", '<>%1', 0);
+        PmtBinCheckpoint.SetFilter("Bin Transf. Jnl. Entry (Bank)", '<>%1', 0);
+        PmtBinCheckpoint.FilterGroup(0);
         if PmtBinCheckpoint.FindSet() then
             repeat
-                BinTransferPost.ReceivePrint(PmtBinCheckpoint."Bin Transfer Journal Entry No.");
+                if PmtBinCheckpoint."Bin Transfer Journal Entry No." <> 0 then
+                    BinTransferPost.ReceivePrint(PmtBinCheckpoint."Bin Transfer Journal Entry No.");
+                if PmtBinCheckpoint."Bin Transf. Jnl. Entry (Bank)" <> 0 then
+                    BinTransferPost.ReceivePrint(PmtBinCheckpoint."Bin Transf. Jnl. Entry (Bank)");
             until PmtBinCheckpoint.Next() = 0;
     end;
 
@@ -244,7 +250,8 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             Line.Add('binNo', PmtBinCheckPoint."Move to Bin Code");
             Line.Add('binTransId', PmtBinCheckPoint."Move to Bin Reference");
             Line.Add('binAmountCoinTypes', AddDenominations(PmtBinCheckpoint, Enum::"NPR Denomination Target"::MoveToBin));
-            Line.Add('prestagedTransferId', PmtBinCheckPoint."Bin Transfer Journal Entry No.");
+            Line.Add('prestagedTransferIdBin', PmtBinCheckPoint."Bin Transfer Journal Entry No.");
+            Line.Add('prestagedTransferIdBank', PmtBinCheckPoint."Bin Transf. Jnl. Entry (Bank)");
             Transfer.Add(Line);
         until PmtBinCheckPoint.Next() = 0;
     end;
@@ -313,6 +320,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             until PaymentMethodDenom.Next() = 0;
 
         TransferDenomination.SetRange(EntryNo, BinTransferJnlLine.EntryNo);
+        TransferDenomination.SetFilter(Quantity, '<>%1', 0);
         if TransferDenomination.FindSet() then
             repeat
                 if not TransferDenomination.Mark() then begin
@@ -432,6 +440,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         PmtBinCheckpoint.SetRange(Status, PmtBinCheckpoint.Status::READY);
         if PmtBinCheckpoint.IsEmpty() then
             exit(false);
+        UpdateNotfinalizedPmtBinCheckpoints(PmtBinCheckpoint);
 
         PostWorkshiftCheckpoint(WorkshiftCheckpoint."Entry No.", SalePOS);  //Has a commit
 
@@ -444,16 +453,26 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         exit(true);
     end;
 
+    local procedure UpdateNotfinalizedPmtBinCheckpoints(var PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    var
+        PmtBinCheckpoint2: Record "NPR POS Payment Bin Checkp.";
+    begin
+        PmtBinCheckpoint.SetFilter(Status, '<>%1', PmtBinCheckpoint.Status::READY);
+        if PmtBinCheckpoint.FindSet(true) then
+            repeat
+                PmtBinCheckpoint2 := PmtBinCheckpoint;
+                PmtBinCheckPoint2.Validate("Counted Amount Incl. Float", PmtBinCheckpoint2."Calculated Amount Incl. Float");
+                UpdateNewFloatAmount(PmtBinCheckpoint2);
+                PmtBinCheckpoint2.Status := PmtBinCheckpoint2.Status::READY;
+                PmtBinCheckpoint2.Modify();
+            until PmtBinCheckpoint.Next() = 0;
+    end;
+
     local procedure TransferCashCountToBinCheckpoint(Transfers: JsonArray; CheckpointEntryNo: Integer; TransferIn: Boolean; var TempPmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
     var
-        BinTransferJnlLine: Record "NPR BinTransferJournal";
-        PmtBinCheckpoint2: Record "NPR POS Payment Bin Checkp.";
         EndOfDayUIHandler: Codeunit "NPR End Of Day UI Handler";
-        PaymentBinCheckpointHdlr: Codeunit "NPR POS Payment Bin Checkpoint";
         CountedPayment: JsonToken;
         AmtFactor: Integer;
-        PmtBinCheckpointEntryID: Integer;
-        PrestagedTransferEntryNo: Integer;
     begin
         if TransferIn then
             AmtFactor := -1
@@ -461,22 +480,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             AmtFactor := 1;
 
         foreach CountedPayment in Transfers do begin
-            PmtBinCheckpointEntryID := JsonHelper.GetJInteger(CountedPayment, 'id', false);
-            PrestagedTransferEntryNo := JsonHelper.GetJInteger(CountedPayment, 'prestagedTransferId', PmtBinCheckpointEntryID = 0);
-            if (PmtBinCheckpointEntryID = 0) or (PrestagedTransferEntryNo <> 0) then begin
-                BinTransferJnlLine.Get(PrestagedTransferEntryNo);
-                BinTransferJnlLine.TestField(Status, BinTransferJnlLine.Status::RELEASED);
-                if PmtBinCheckpointEntryID = 0 then
-                    PmtBinCheckpointEntryID :=
-                        PaymentBinCheckpointHdlr.AddBinCountingCheckpoint_PE(
-                            BinTransferJnlLine.TransferToBinCode, BinTransferJnlLine.ReceiveAtPosUnitCode, BinTransferJnlLine.PaymentMethod,
-                            CheckpointEntryNo, PmtBinCheckpoint2.Type::TRANSFER, true);
-            end;
-            PmtBinCheckpoint2.Get(PmtBinCheckpointEntryID);
-
-            TempPmtBinCheckpoint.TransferFields(PmtBinCheckpoint2, true);
-            TempPmtBinCheckPoint.Validate("Counted Amount Incl. Float", TempPmtBinCheckpoint."Calculated Amount Incl. Float");
-            TempPmtBinCheckpoint."Bin Transfer Journal Entry No." := PrestagedTransferEntryNo;
+            InitTempPmtBinCheckpoint(CountedPayment, CheckpointEntryNo, TempPmtBinCheckpoint);
 #pragma warning disable AA0139
             TempPmtBinCheckpoint."Payment Type No." := JsonHelper.GetJText(CountedPayment, 'paymentTypeNo', MaxStrLen(TempPmtBinCheckpoint."Payment Type No."), false, TempPmtBinCheckpoint."Payment Type No.");
             TempPmtBinCheckpoint."Bank Deposit Bin Code" := JsonHelper.GetJText(CountedPayment, 'bankDepositBinCode', MaxStrLen(TempPmtBinCheckpoint."Bank Deposit Bin Code"), false);
@@ -488,24 +492,75 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             TempPmtBinCheckpoint."Move To Bin Amount" := JsonHelper.GetJDecimal(CountedPayment, 'binAmount', false) * AmtFactor;
             TempPmtBinCheckpoint."Transfer In" := TransferIn;
 
-            TempPmtBinCheckpoint."New Float Amount" := TempPmtBinCheckpoint."Counted Amount Incl. Float" - TempPmtBinCheckpoint."Bank Deposit Amount" - TempPmtBinCheckpoint."Move to Bin Amount";
-            if TempPmtBinCheckpoint."New Float Amount" < 0 then
-                TempPmtBinCheckpoint."New Float Amount" := 0;
-            if (TempPmtBinCheckpoint."Move to Bin Amount" <> 0) and (TempPmtBinCheckpoint."Include In Counting" = TempPmtBinCheckpoint."Include In Counting"::NO) then
-                TempPmtBinCheckpoint."Include In Counting" := TempPmtBinCheckpoint."Include In Counting"::YES;
+            UpdateNewFloatAmount(TempPmtBinCheckpoint);
             TempPmtBinCheckpoint.Status := TempPmtBinCheckpoint.Status::READY;
             TempPmtBinCheckpoint.Insert();
 
             EndOfDayUIHandler.TransferDenominations(CountedPayment, 'bankDepositAmountCoinTypes', Enum::"NPR Denomination Target"::BankDeposit, TempPmtBinCheckpoint);
             EndOfDayUIHandler.TransferDenominations(CountedPayment, 'binAmountCoinTypes', Enum::"NPR Denomination Target"::MoveToBin, TempPmtBinCheckpoint);
 
-            if PrestagedTransferEntryNo <> 0 then
-                UpdateBinTransferJnlLine(BinTransferJnlLine, TempPmtBinCheckpoint);
+            UpdateBinTransferJnlLines(TempPmtBinCheckpoint);
         end;
     end;
 
-    local procedure UpdateBinTransferJnlLine(var BinTransferJnlLine: Record "NPR BinTransferJournal"; PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    local procedure InitTempPmtBinCheckpoint(CountedPayment: JsonToken; CheckpointEntryNo: Integer; var TempPmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    var
+        BinTransferJnlLine: Record "NPR BinTransferJournal";
+        PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        PaymentBinCheckpointHdlr: Codeunit "NPR POS Payment Bin Checkpoint";
+        PmtBinCheckpointEntryID: Integer;
+        PrestagedTransferEntryNo_Bank: Integer;
+        PrestagedTransferEntryNo_Bin: Integer;
     begin
+        PmtBinCheckpointEntryID := JsonHelper.GetJInteger(CountedPayment, 'id', false);
+        PrestagedTransferEntryNo_Bank := JsonHelper.GetJInteger(CountedPayment, 'prestagedTransferIdBank', false);
+        PrestagedTransferEntryNo_Bin := JsonHelper.GetJInteger(CountedPayment, 'prestagedTransferIdBin', (PmtBinCheckpointEntryID = 0) and (PrestagedTransferEntryNo_Bank = 0));
+        if (PmtBinCheckpointEntryID = 0) or (PrestagedTransferEntryNo_Bank <> 0) or (PrestagedTransferEntryNo_Bin <> 0) then begin
+            if PrestagedTransferEntryNo_Bank <> 0 then
+                BinTransferJnlLine.Get(PrestagedTransferEntryNo_Bank)
+            else
+                if PrestagedTransferEntryNo_Bin <> 0 then
+                    BinTransferJnlLine.Get(PrestagedTransferEntryNo_Bin);
+            if PmtBinCheckpointEntryID = 0 then
+                PmtBinCheckpointEntryID :=
+                    PaymentBinCheckpointHdlr.AddBinCountingCheckpoint_PE(
+                        BinTransferJnlLine.TransferToBinCode, BinTransferJnlLine.ReceiveAtPosUnitCode, BinTransferJnlLine.PaymentMethod,
+                        CheckpointEntryNo, PmtBinCheckpoint.Type::TRANSFER, true);
+        end;
+        PmtBinCheckpoint.Get(PmtBinCheckpointEntryID);
+
+        TempPmtBinCheckpoint.TransferFields(PmtBinCheckpoint, true);
+        TempPmtBinCheckPoint.Validate("Counted Amount Incl. Float", TempPmtBinCheckpoint."Calculated Amount Incl. Float");
+        TempPmtBinCheckpoint."Bin Transfer Journal Entry No." := PrestagedTransferEntryNo_Bin;
+        TempPmtBinCheckpoint."Bin Transf. Jnl. Entry (Bank)" := PrestagedTransferEntryNo_Bank;
+    end;
+
+    local procedure UpdateNewFloatAmount(var PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    begin
+        PmtBinCheckpoint."New Float Amount" := PmtBinCheckpoint."Counted Amount Incl. Float" - PmtBinCheckpoint."Bank Deposit Amount" - PmtBinCheckpoint."Move to Bin Amount";
+        if PmtBinCheckpoint."New Float Amount" < 0 then
+            PmtBinCheckpoint."New Float Amount" := 0;
+        if (PmtBinCheckpoint."Move to Bin Amount" <> 0) and (PmtBinCheckpoint."Include In Counting" = PmtBinCheckpoint."Include In Counting"::NO) then
+            PmtBinCheckpoint."Include In Counting" := PmtBinCheckpoint."Include In Counting"::YES;
+    end;
+
+    local procedure UpdateBinTransferJnlLines(PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    begin
+        UpdateBinTransferJnlLine(PmtBinCheckpoint."Bin Transf. Jnl. Entry (Bank)", PmtBinCheckpoint);
+        UpdateBinTransferJnlLine(PmtBinCheckpoint."Bin Transfer Journal Entry No.", PmtBinCheckpoint);
+    end;
+
+    local procedure UpdateBinTransferJnlLine(BinTransferJnlEntryNo: Integer; PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    var
+        BinTransferJnlLine: Record "NPR BinTransferJournal";
+    begin
+        if BinTransferJnlEntryNo = 0 then
+            exit;
+        BinTransferJnlLine.Get(BinTransferJnlEntryNo);
+        BinTransferJnlLine.TestField(Status, BinTransferJnlLine.Status::RELEASED);
+        BinTransferJnlLine.TestField(TransferToBinCode, PmtBinCheckpoint."Payment Bin No.");
+        BinTransferJnlLine.TestField(PaymentMethod, PmtBinCheckpoint."Payment Method No.");
+
         if BalancingBinTypeIsBank(BinTransferJnlLine) then begin
             BinTransferJnlLine.TransferFromBinCode := PmtBinCheckpoint."Bank Deposit Bin Code";
             BinTransferJnlLine.Amount := -PmtBinCheckpoint."Bank Deposit Amount";
@@ -519,17 +574,31 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         BinTransferJnlLine.Modify();
     end;
 
-    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOS: Record "NPR POS Sale")
+    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOSIn: Record "NPR POS Sale")
     var
         POSEntryToPost: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         POSEntryNo: Integer;
+        Now: DateTime;
         NotReadyForPostingErr: Label 'Counting has not been completed for workshift checkpoint entry No. %1.';
     begin
+        // A Sale POS record is needed when creating POS Entry
+        Now := CurrentDateTime();
+        Clear(SalePOS);
+        SalePOS.SystemId := CreateGuid();
+        SalePOS."Register No." := SalePOSIn."Register No.";
+        SalePOS."POS Store Code" := SalePOSIn."POS Store Code";
+        SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(Now, 0, 9), '=', DelChr(Format(Now, 0, 9), '=', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
+        SalePOS.Date := DT2Date(Now);
+        SalePOS."Start Time" := DT2Time(Now);
+        SalePOS."Salesperson Code" := SalePOSIn."Salesperson Code";
+        SalePOS.CreateDimFromDefaultDim(SalePOS.FieldNo("Salesperson Code"));
+
         POSEntryNo := POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, false, CheckpointEntryNo);
         if POSEntryNo = 0 then
-            Error(NotReadyForPostingErr);
+            Error(NotReadyForPostingErr, CheckpointEntryNo);
 
         POSEntryToPost.Get(POSEntryNo);
         POSEntryToPost.SetRecFilter();

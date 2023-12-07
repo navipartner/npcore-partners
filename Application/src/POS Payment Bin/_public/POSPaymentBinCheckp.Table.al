@@ -212,7 +212,13 @@
         }
         field(270; "Bin Transfer Journal Entry No."; Integer)
         {
-            Caption = 'Bin Transfer Journal Entry No.';
+            Caption = 'Bin Transf. Jnl. Entry (Bin)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR BinTransferJournal".EntryNo;
+        }
+        field(275; "Bin Transf. Jnl. Entry (Bank)"; Integer)
+        {
+            Caption = 'Bin Transf. Jnl. Entry (Bank)';
             DataClassification = CustomerContent;
             TableRelation = "NPR BinTransferJournal".EntryNo;
         }

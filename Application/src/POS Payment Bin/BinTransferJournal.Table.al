@@ -23,35 +23,75 @@ table 6151584 "NPR BinTransferJournal"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
         }
-
         field(12; ReceiveFromPosUnitCode; Code[10])
         {
-            Caption = 'Receive From Pos Unit Code';
+            Caption = 'Receive from POS Unit Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Pos Unit"."No.";
-        }
 
+            trigger OnValidate()
+            var
+                PosUnit: Record "NPR POS Unit";
+            begin
+                if not PosUnit.Get(Rec.ReceiveFromPosUnitCode) then
+                    exit;
+                TransferFromBinCode := PosUnit."Default POS Payment Bin";
+            end;
+        }
         Field(15; TransferFromBinCode; Code[10])
         {
-            Caption = 'Transfer From Bin Code';
+            Caption = 'Transfer from Bin Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Payment Bin"."No.";
+            TableRelation = "NPR POS Payment Bin"."No." where("Attached to POS Unit No." = field(ReceiveFromPosUnitCode));
             ValidateTableRelation = true;
-        }
 
+            trigger OnValidate()
+            var
+                Bin: Record "NPR POS Payment Bin";
+            begin
+                if TransferFromBinCode = '' then
+                    exit;
+                Bin.Get(TransferFromBinCode);
+                if Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER then
+                    TestField(ReceiveFromPosUnitCode)
+                else
+                    ReceiveFromPosUnitCode := '';
+            end;
+        }
         field(20; ReceiveAtPosUnitCode; Code[10])
         {
-            Caption = 'Receive At Pos Unit Code';
+            Caption = 'Receive at POS Unit Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Pos Unit"."No.";
-        }
+            TableRelation = "NPR Pos Unit"."No." where("POS Store Code" = field(StoreCode));
 
+            trigger OnValidate()
+            var
+                PosUnit: Record "NPR POS Unit";
+            begin
+                if not PosUnit.Get(ReceiveFromPosUnitCode) then
+                    exit;
+                ReceiveAtPosUnitCode := PosUnit."Default POS Payment Bin";
+            end;
+        }
         Field(25; TransferToBinCode; Code[10])
         {
-            Caption = 'Transfer To Bin Code';
+            Caption = 'Transfer to Bin Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Payment Bin"."No.";
+            TableRelation = "NPR POS Payment Bin"."No." where("Attached to POS Unit No." = field(ReceiveAtPosUnitCode));
             ValidateTableRelation = true;
+
+            trigger OnValidate()
+            var
+                Bin: Record "NPR POS Payment Bin";
+            begin
+                if TransferToBinCode = '' then
+                    exit;
+                Bin.Get(TransferToBinCode);
+                if Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER then
+                    TestField(ReceiveAtPosUnitCode)
+                else
+                    ReceiveAtPosUnitCode := '';
+            end;
         }
         Field(30; Description; Text[80])
         {
@@ -65,14 +105,12 @@ table 6151584 "NPR BinTransferJournal"
             TableRelation = "NPR POS Payment Method"."Code";
             ValidateTableRelation = true;
         }
-
         Field(60; Amount; Decimal)
         {
             Caption = 'Amount';
             DataClassification = CustomerContent;
             MinValue = 0;
         }
-
         Field(90; Status; Option)
         {
             Caption = 'Status';
@@ -85,27 +123,23 @@ table 6151584 "NPR BinTransferJournal"
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
         }
-
         field(100; CreatedBy; Code[100])
         {
             Caption = 'Created By';
             DataClassification = CustomerContent;
         }
-
         field(200; HasDenomination; Boolean)
         {
             Caption = 'Has Denomination';
             FieldClass = FlowField;
             CalcFormula = exist("NPR BinTransferDenomination" where(EntryNo = Field(EntryNo)));
         }
-
         field(201; DenominationSum; Decimal)
         {
             Caption = 'Has Denomination';
             FieldClass = FlowField;
             CalcFormula = sum("NPR BinTransferDenomination".Amount where(EntryNo = Field(EntryNo)));
         }
-
     }
 
     keys

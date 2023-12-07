@@ -26,28 +26,28 @@ table 6151585 "NPR PostedBinTransferEntry"
 
         field(12; ReceiveFromPosUnitCode; Code[10])
         {
-            Caption = 'Receive From Pos Unit Code';
+            Caption = 'Receive from POS Unit Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Pos Unit"."No.";
         }
 
         Field(15; TransferFromBinCode; Code[10])
         {
-            Caption = 'Transfer From Bin Code';
+            Caption = 'Transfer from Bin Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin"."No.";
         }
 
         field(20; ReceiveAtPosUnitCode; Code[10])
         {
-            Caption = 'Receive From Pos Unit Code';
+            Caption = 'Receive at POS Unit Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Pos Unit"."No.";
         }
 
         Field(25; TransferToBinCode; Code[10])
         {
-            Caption = 'Transfer To Bin Code';
+            Caption = 'Transfer to Bin Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin"."No.";
         }

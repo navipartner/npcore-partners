@@ -1263,8 +1263,6 @@
 
     internal procedure CreateBalancingEntryAndLines(var SalePOS: Record "NPR POS Sale"; IntermediateEndOfDay: Boolean; WorkshiftEntryNo: Integer) EntryNo: Integer
     var
-        BinTransferJnl: Record "NPR BinTransferJournal";
-        PostedTransferEntries: Record "NPR PostedBinTransferEntry";
         POSPeriodRegister: Record "NPR POS Period Register";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSEntry: Record "NPR POS Entry";
@@ -1272,6 +1270,7 @@
         PaymentBinCheckpointUpdate: Record "NPR POS Payment Bin Checkp.";
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        BinTransferPost: Codeunit "NPR BinTransferPost";
         SalespersonPurchaserLbl: Label '%1: %2', Locked = true;
         PaymentBinCheckpointQuery: Query "NPR WorkshiftPaymentCheckpoint";
     begin
@@ -1354,15 +1353,8 @@
             PaymentBinCheckpointUpdate.Status := PaymentBinCheckpointUpdate.Status::TRANSFERED;
             PaymentBinCheckpointUpdate.Modify();
 
-            if PaymentBinCheckpointUpdate."Bin Transfer Journal Entry No." <> 0 then begin
-                BinTransferJnl.Get(PaymentBinCheckpointUpdate."Bin Transfer Journal Entry No.");
-                PostedTransferEntries.TransferFields(BinTransferJnl, true);
-                PostedTransferEntries.DocumentNo := POSEntry."Document No.";
-                PostedTransferEntries.TransferredBy := CopyStr(UserId, 1, MaxStrLen(PostedTransferEntries.TransferredBy));
-                PostedTransferEntries.TransferredAt := CurrentDateTime();
-                PostedTransferEntries.Insert();
-                BinTransferJnl.Delete();
-            end;
+            BinTransferPost.MoveBinTransferJnlToPostedEntries(PaymentBinCheckpointUpdate."Bin Transfer Journal Entry No.", POSEntry."Document No.");
+            BinTransferPost.MoveBinTransferJnlToPostedEntries(PaymentBinCheckpointUpdate."Bin Transf. Jnl. Entry (Bank)", POSEntry."Document No.");
         until (not PaymentBinCheckpointQuery.Read());
 
         exit(POSEntry."Entry No.");

@@ -112,15 +112,16 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
-            }
-            group(BinTransfer)
-            {
-                Visible = BinTransferVisible;
-                field("Bin Transfer: Require Journal"; Rec."Bin Transfer: Require Journal")
+                group(BinTransfer)
                 {
-                    Caption = 'Require Journal for Trans. INs';
-                    ToolTip = 'Specifies if system will require a prestaged bin transfer journal line for a POS user to select from when performing a Bin TransferIN transaction.';
-                    ApplicationArea = NPRRetail;
+                    Caption = 'Bin Transfer';
+                    Visible = BinTransferVisible;
+                    field("Bin Transfer: Require Journal"; Rec."Bin Transfer: Require Journal")
+                    {
+                        Caption = 'Require Journal for Trans. INs';
+                        ToolTip = 'Specifies if system will require a prestaged bin transfer journal line for a POS user to select from when performing a Bin TransferIN transaction.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
         }

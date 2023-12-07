@@ -273,7 +273,6 @@ codeunit 6150633 "NPR BinTransferPost"
         PostedTransferEntries.Insert();
     end;
 
-
     local procedure PadOnLeft(NumberToPad: Integer; IntendedLength: Integer) NumberString: Text
     begin
         if (IntendedLength <= 0) then
@@ -449,4 +448,19 @@ codeunit 6150633 "NPR BinTransferPost"
         end;
     end;
 
+    internal procedure MoveBinTransferJnlToPostedEntries(BinTransferJnlLineNo: Integer; PostedDocumentNo: Code[20])
+    var
+        BinTransferJnl: Record "NPR BinTransferJournal";
+        PostedTransferEntries: Record "NPR PostedBinTransferEntry";
+    begin
+        if BinTransferJnlLineNo = 0 then
+            exit;
+        BinTransferJnl.Get(BinTransferJnlLineNo);
+        PostedTransferEntries.TransferFields(BinTransferJnl, true);
+        PostedTransferEntries.DocumentNo := PostedDocumentNo;
+        PostedTransferEntries.TransferredBy := CopyStr(UserId, 1, MaxStrLen(PostedTransferEntries.TransferredBy));
+        PostedTransferEntries.TransferredAt := CurrentDateTime();
+        PostedTransferEntries.Insert();
+        BinTransferJnl.Delete();
+    end;
 }
