@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "80f03226-bfef-467f-805d-7e2df65f7c50",
+		"name": "ConfigCat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14139975"
+	},
+	"item": [
+		{
+			"name": "ConfigCat-Eval-All",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Gopi9961",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "NP579610",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"user\": {\r\n    \"Identifier\": \"Telerik\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://npconfigcatproxy.azurewebsites.net/api/npcore_staging_npcoreconfig/eval-all",
+					"protocol": "https",
+					"host": [
+						"npconfigcatproxy",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"npcore_staging_npcoreconfig",
+						"eval-all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigCat-Eval-All-Local",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8050/api/npcore_staging_npcoreconfig/eval-all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8050",
+					"path": [
+						"api",
+						"npcore_staging_npcoreconfig",
+						"eval-all"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
