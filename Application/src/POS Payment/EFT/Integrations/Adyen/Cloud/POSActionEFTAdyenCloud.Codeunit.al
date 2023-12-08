@@ -110,7 +110,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 end;
             EftTransactionRequest."Processing Type"::AUXILIARY:
                 case EftTransactionRequest."Auxiliary Operation ID" of
-                    2, 4, 5, 6:
+                    2, 4, 5:
                         begin
                             _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::AcquireCardInitiated.AsInteger());
                             POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ACQ_CARD, Parameters, 1000 * 60 * 5);
@@ -297,22 +297,24 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         TaskId: Integer;
         AbortTaskActive: Boolean;
         EFTAdyenAbortMgmt: Codeunit "NPR EFT Adyen Abort Mgmt";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         if _trxAbortStatus.Get(EntryNo, AbortTaskActive) then begin
             if AbortTaskActive then begin
                 exit; //Only start at most 1 task for attempting to abort trx. When task is done it will reset this boolean.
             end;
         end;
+        _trxAbortStatus.Set(EntryNo, true);
 
         EFTTransactionRequest.Get(EntryNo);
         EftSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
+
+        EFTAdyenIntegration.WriteLogEntry(EFTTransactionRequest, false, 'Requesting abort of transaction', '');
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         AbortReqEntryNo := EFTAdyenAbortMgmt.CreateAbortTransactionRequest(EFTTransactionRequest);
-
         Parameters.Add('EntryNo', Format(AbortReqEntryNo));
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 10);
-        _trxAbortStatus.Set(EFTTransactionRequest."Entry No.", true);
     end;
 
     local procedure CancelAcquisition(EntryNo: Integer)

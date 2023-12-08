@@ -3,11 +3,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     Access = Internal;
 
     var
-        CONTRACT_DUPLICATE: Label 'Card already has contract for %1 %2';
         NO_SHOPPER_ON_CARD: Label 'No shopper associated with card';
-        CLEAR_SHOPPER_PROMPT_MATCH: Label 'Disable contract with shopper?\Reference ID: %1\%2 No.: %3';
-        CLEAR_SHOPPER_PROMPT: Label 'Disable contract with shopper?\Reference ID: %1';
-        UNKNOWN_SHOPPER: Label 'Unknown shopper reference ID associated with card: %1';
 
     procedure CloudIntegrationType(): Code[20]
     var
@@ -180,7 +176,11 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end else begin
             Request.Add('formattedAmount', ' ');
         end;
-        Request.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
+        if EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::AUXILIARY then begin
+            Request.Add('TypeCaption', Format(EftTransactionRequest."Auxiliary Operation Desc."));
+        end else begin
+            Request.Add('TypeCaption', Format(EftTransactionRequest."Processing Type"));
+        end;
         Request.Add('unattended', EftTransactionRequest."Self Service");
 
         case EftTransactionRequest."Integration Type" of
@@ -449,6 +449,9 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         DisableEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
         ShopperFound: Boolean;
+        DISABLE_SHOPPER_SUCCESS: Label 'Shopper Reference Disabled: %1';
+        CLEAR_SHOPPER_PROMPT_MATCH: Label 'Disable contract with shopper?\Reference ID: %1\%2 No.: %3';
+        CLEAR_SHOPPER_PROMPT: Label 'Disable contract with shopper?\Reference ID: %1';
     begin
         if not (EFTTransactionRequest.Successful) then
             exit;
@@ -477,6 +480,12 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         DisableEFTTransactionRequest.Modify();
         Commit();
         EFTFrameworkMgt.SendSynchronousRequest(DisableEFTTransactionRequest);
+
+        DisableEFTTransactionRequest.Find('=');
+        if DisableEFTTransactionRequest.Successful then begin
+            Message(StrSubstNo(DISABLE_SHOPPER_SUCCESS, DisableEFTTransactionRequest."External Customer ID"));
+        end;
+
     end;
 
     local procedure ContinueAfterShopperRecognition(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
@@ -502,6 +511,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     local procedure DetectShopper(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
+        UNKNOWN_SHOPPER: Label 'Unknown shopper reference ID associated with card: %1';
     begin
         if not (EFTTransactionRequest.Successful) then
             exit;
@@ -586,6 +596,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         CurrentShopperRef: Text;
         CurrentShopperRefLbl: Label ', %1 %2', Locked = true;
+        CONTRACT_DUPLICATE: Label 'Card already has contract for %1 %2';
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
@@ -643,6 +654,26 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     begin
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup."Log Level");
+    end;
+
+    internal procedure RewriteAmountFromStringToNumberWithoutRounding(Json: Text; Element: Text): Text
+    var
+        ElementStartIndex: Integer;
+        ValueStartIndex: Integer;
+        ValueEndIndex: Integer;
+    begin
+        // Adyen built an API that depends on amounts being sent as decimals, but they also have strong opinions on the number of decimals. 3 or 2 depending on the currency.
+        // The problem is that if you use the built-in JSON types in AL, a decimal is rounded to remove trailing zeroes. And since formatted decimals in AL are strings which adyen doesn't accept in the JSON,
+        // we are removing the string quotes manually around numbers formatted to adyens spec....
+        // This situation is why other PSPs use integers to transfers amount :)
+
+        ElementStartIndex := Json.IndexOf('"' + Element + '":');
+        if ElementStartIndex = 0 then
+            exit(Json);
+        ValueStartIndex := Json.IndexOf('"', ElementStartIndex + StrLen(Element) + 3);
+        ValueEndIndex := Json.IndexOf('"', ValueStartIndex + 1);
+
+        exit(Json.Remove(ValueStartIndex, 1).Remove(ValueEndIndex - 1, 1));
     end;
 
     local procedure IsEnabled(): Boolean
