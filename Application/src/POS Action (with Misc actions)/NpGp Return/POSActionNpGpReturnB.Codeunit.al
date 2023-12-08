@@ -292,7 +292,7 @@ codeunit 6059943 "NPR POS Action: NpGp Return B"
             else
                 Item.Get(NpGpCrossCompanySetup."Generic Item No.");
 
-            SaleLinePOS."No." := Item."No.";
+            SaleLinePOS.Validate("No.", Item."No.");
             SaleLinePOS.Description := TempNpGpPOSSalesLine.Description;
             SaleLinePOS."Description 2" := TempNpGpPOSSalesLine."Description 2";
             if FullSale then
