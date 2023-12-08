@@ -15,13 +15,13 @@ codeunit 6184616 "NPR EFT Adyen Abort Acq. Task" implements "NPR POS Background 
         Completed: Boolean;
         Logs: Text;
         StatusCode: Integer;
-        EFTAdyenAbortTrxReq: Codeunit "NPR EFT Adyen AbortTrx Req";
+        EFTAdyenAbortAcquireReq: Codeunit "NPR EFT Adyen AbortAcquire Req";
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         EFTTransactionRequest.Get(EntryNo);
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        Request := EFTAdyenAbortTrxReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
+        Request := EFTAdyenAbortAcquireReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
         Completed := EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);

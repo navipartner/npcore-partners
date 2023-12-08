@@ -281,19 +281,6 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
 
             EftTransactionRequest."Processing Type"::VOID:
                 HandleVoidResponse(EftTransactionRequest);
-
-            //            EftTransactionRequest."Processing Type"::SETUP:
-            //              HandleSetupResponse(EftTransactionRequest);
-
-            EftTransactionRequest."Processing Type"::AUXILIARY:
-                case EftTransactionRequest."Auxiliary Operation ID" of
-                    1, 2, 3:
-                        ;
-                //4, 5:
-                //    HandleDetectShopperResponse(EftTransactionRequest);
-                //6:
-                //    HandleClearShopperContractResponse(EftTransactionRequest);
-                end;
         end;
 
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
@@ -310,7 +297,6 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
     var
         TRX_ERROR: Label '%1 failed\%2\%3\%4';
         VOID_SUCCESS: Label 'Transaction %1 voided successfully';
-        DISABLE_SHOPPER_SUCCESS: Label 'Shopper Reference Disabled: %1';
     begin
         if EFTTransactionRequest.Successful then begin
             case EFTTransactionRequest."Processing Type" of
@@ -318,11 +304,6 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                     Message := StrSubstNo(VOID_SUCCESS, EftTransactionRequest."Entry No.");
                 EFTTransactionRequest."Processing Type"::SETUP:
                     Message := StrSubstNo(EftTransactionRequest."Result Display Text");
-                EFTTransactionRequest."Processing Type"::AUXILIARY:
-                    case EFTTransactionRequest."Auxiliary Operation ID" of
-                        6:
-                            Message := StrSubstNo(DISABLE_SHOPPER_SUCCESS, EftTransactionRequest."External Customer ID");
-                    end;
             end;
         end else begin
             case EFTTransactionRequest."Processing Type" of

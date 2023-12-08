@@ -7,6 +7,8 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
         Json: Codeunit "Json Text Reader/Writer";
         TransactionConditions: Text;
         AcquireCardRequest: Record "NPR EFT Transaction Request";
+        JsonText: Text;
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         Json.WriteStartObject('');
 
@@ -34,9 +36,9 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
         Json.WriteStartObject('PaymentTransaction');
         Json.WriteStartObject('AmountsReq');
         Json.WriteStringProperty('Currency', EFTTransactionRequest."Currency Code");
-        Json.WriteNumberProperty('RequestedAmount', Format(EFTTransactionRequest."Amount Input", 0, 9));
+        Json.WriteStringProperty('RequestedAmount', Format(EFTTransactionRequest."Amount Input", 0, '<Precision,2:3><Standard Format,9>'));
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT then
-            Json.WriteNumberProperty('CashBackAmount', Format(EFTTransactionRequest."Cashback Amount", 0, 9));
+            Json.WriteStringProperty('CashBackAmount', Format(EFTTransactionRequest."Cashback Amount", 0, '<Precision,2:3><Standard Format,9>'));
         Json.WriteEndObject(); // AmountsReq
         TransactionConditions := GetTransactionConditions(EFTSetup);
         if TransactionConditions <> '' then begin
@@ -61,8 +63,12 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
         Json.WriteEndObject(); // SaleToPOIRequest
         Json.WriteEndObject(); // Root
 
-        exit(Json.GetJSonAsText());
+        JsonText := EFTAdyenIntegration.RewriteAmountFromStringToNumberWithoutRounding(Json.GetJSonAsText(), 'RequestedAmount');
+        JsonText := EFTAdyenIntegration.RewriteAmountFromStringToNumberWithoutRounding(JsonText, 'CashBackAmount');
+
+        exit(JsonText);
     end;
+
 
     local procedure GetSaleToAcquirerData(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
     var

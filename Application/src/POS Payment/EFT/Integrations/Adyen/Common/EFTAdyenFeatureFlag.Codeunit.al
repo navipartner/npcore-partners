@@ -11,7 +11,7 @@ codeunit 6184644 "NPR EFT Adyen Feature Flag"
     var
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        exit(FeatureFlagsManagement.IsEnabled('adyencloudwithoutdotnet'));
+        exit(FeatureFlagsManagement.IsEnabled('adyencloudwithoutdotnet_v2'));
     end;
 
 
