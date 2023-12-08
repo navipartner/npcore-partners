@@ -22,11 +22,12 @@ codeunit 6184612 "NPR EFT Adyen Contract Mgmt."
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
         Request := EFTAdyenDisableCtrctReq.GetRequestJson(EftTransactionRequest, EFTAdyenIntegration.GetMerchantAccount(EFTSetup));
-        URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
+        URL := EFTAdyenCloudProtocol.GetDisableRecurringURL(EftTransactionRequest, EFTSetup);
         ClearLastError();
         Completed := EFTAdyenCloudProtocol.InvokeAPI(Request, EFTAdyenCloudIntegrat.GetAPIKey(EFTSetup), URL, 1000 * 60 * 5, Response, StatusCode);
 
         EFTAdyenIntegration.WriteLogEntry(EftTransactionRequest, not Completed, 'Invoke', EFTAdyenCloudProtocol.GetLogBuffer());
+        Commit();
         EFTAdyenResponseHandler.ProcessResponse(EftTransactionRequest."Entry No.", Response, Completed, false, GetLastErrorText());
     end;
 }

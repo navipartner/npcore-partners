@@ -32,10 +32,13 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
     end;
 
     local procedure GetMessageCategory(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    var
+        ProcessedEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        case EFTTransactionRequest."Processing Type" of
-            EFTTransactionRequest."Processing Type"::PAYMENT,
-            EFTTransactionRequest."Processing Type"::REFUND:
+        ProcessedEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+        case ProcessedEFTTransactionRequest."Processing Type" of
+            ProcessedEFTTransactionRequest."Processing Type"::PAYMENT,
+            ProcessedEFTTransactionRequest."Processing Type"::REFUND:
                 exit('Payment');
             else
                 exit('CardAcquisition');
