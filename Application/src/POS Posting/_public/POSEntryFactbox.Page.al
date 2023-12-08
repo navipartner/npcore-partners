@@ -251,7 +251,7 @@
                         SIPOSAuditLogAuxInfo.SetRange("Audit Entry Type", SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
                         SIPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
                         SIPOSAuditLogAuxInfo.FilterGroup(0);
-                        Page.RunModal(Page::"NPR RS POS Audit Log Aux. Info", SIPOSAuditLogAuxInfo);
+                        Page.RunModal(Page::"NPR SI POS Audit Log Aux. Info", SIPOSAuditLogAuxInfo);
                     end;
                 }
             }
