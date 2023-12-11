@@ -47,7 +47,7 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
     var
         AuxGLEntry: Record "NPR Aux. G/L Entry";
     begin
-        if not AuxGLEntry.WritePermission() then
+        if not (AuxGLEntry.ReadPermission() and AuxGLEntry.WritePermission()) then
             exit(false);
         AuxGLEntry.DeleteAll(false);
         exit(true);
@@ -64,7 +64,7 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
     var
         AuditRoll: Record "NPR Audit Roll";
     begin
-        if not AuditRoll.WritePermission() then
+        if not (AuditRoll.ReadPermission() and AuditRoll.WritePermission()) then
             exit(false);
         AuditRoll.DeleteAll(false);
         exit(true);
