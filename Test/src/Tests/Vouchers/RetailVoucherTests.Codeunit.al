@@ -1335,4 +1335,135 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Assert.AreNearlyEqual(0, NewEndingDT - NpRvVoucher."Ending Date", 2000, 'Voucher Ending Date not according to test scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure SetReferenceNoOnSaleLineThatIsNotVoucher()
+    var
+        Item: Record Item;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSale: Codeunit "NPR POS Sale";
+        POSActionSetVoucherRefNo: Codeunit "NPR POS Action Set Vch Ref NoB";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        Assert: Codeunit Assert;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        ReferenceNo: Text[50];
+        LineTypeErrorLbl: Label 'The line is not a voucher. Please select a voucher.';
+    begin
+        // [SCENARIO] Set reference number on sale line that is not of type voucher
+        // - Add sale line that is not a voucher(item i.e.)
+        // - Try setting reference no on that sale line
+        // - Check if reference no is not applied and error is thrown
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        //[GIVEN] Random reference number
+        ReferenceNo := GetRandomVoucherReferenceNo();
+
+        // [GIVEN] Item in the POS Sale
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        //[WHEN]
+        asserterror POSActionSetVoucherRefNo.AssignReferenceNo(SaleLinePOS, '', ReferenceNo);
+        // [THEN] Reference number cannot be applied on sale line which is not voucher
+        Assert.ExpectedError(LineTypeErrorLbl);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure SetEmptyReferenceNoOnVoucher()
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSActionSetVoucherRefNo: Codeunit "NPR POS Action Set Vch Ref NoB";
+        Assert: Codeunit Assert;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        EmptyReferenceNoErrorLbl: Label 'Reference No. cannot be empty.';
+    begin
+        // [SCENARIO] Set empty reference number on voucher 
+        // - Add sale line of type voucher
+        // - Try setting empty reference no on voucher
+        // - Check if reference no is not applied and error is thrown
+
+        Initialize();
+
+        // [GIVEN] POS Transaction and default voucher created
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        LibraryPOSMock.CreateVoucherLine(_POSSession, _VoucherTypeDefault.Code, 1, VoucherAmount, '', 0);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        //[WHEN] Apply empty reference number
+        asserterror POSActionSetVoucherRefNo.AssignReferenceNo(SaleLinePOS, '', '');
+        // [THEN] Reference number cannot be empty
+        Assert.ExpectedError(EmptyReferenceNoErrorLbl);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    internal procedure ChangeVoucherReferenceNoWhichIsAlreadySet()
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvSalesLineRef: Record "NPR NpRv Sales Line Ref.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSActionSetVoucherRefNo: Codeunit "NPR POS Action Set Vch Ref NoB";
+        Assert: Codeunit Assert;
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        ReferenceNo: Text[50];
+    begin
+        // [SCENARIO] Change reference no of voucher with different one
+        // - Add sale line of type voucher
+        // - Try setting reference no on voucher that already has one
+        // - Check if reference no is applied
+
+        Initialize();
+
+        // [GIVEN] POS Transaction and default voucher created
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        LibraryPOSMock.CreateVoucherLine(_POSSession, _VoucherTypeDefault.Code, 1, VoucherAmount, '', 0);
+
+        //[GIVEN] Random reference number
+        ReferenceNo := GetRandomVoucherReferenceNo();
+
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        //[WHEN]
+        POSActionSetVoucherRefNo.AssignReferenceNo(SaleLinePOS, '', ReferenceNo);
+
+        NpRvSalesLine.Reset();
+        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
+        if not NpRvSalesLine.FindFirst() then
+            Error(GetLastErrorText());
+
+        NpRvSalesLineRef.Reset();
+        NpRvSalesLineRef.SetCurrentKey("Sales Line Id");
+        NpRvSalesLineRef.Setrange("Sales Line Id", NpRvSalesLine.Id);
+        if not NpRvSalesLineRef.FindFirst() then
+            Error(GetLastErrorText());
+
+        // [THEN] Reference is applied on voucher
+        Assert.AreEqual(NpRvSalesLineRef."Reference No.", ReferenceNo, 'Reference No. not applied according to scenario.');
+    end;
 }
