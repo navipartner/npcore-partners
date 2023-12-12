@@ -472,28 +472,16 @@
         EFTNETSCloudProtocol.GetToken(EFTSetup); // Trigger token refresh if missing
     end;
 
-    procedure SignaturePrompt(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    procedure SignaturePrompt(var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
     var
-        EFTSetup: Record "NPR EFT Setup";
-        VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
-        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        POSSession: Codeunit "NPR POS Session";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleRecord: Record "NPR POS Sale";
-        Request: JsonObject;
-        Mechanism: Enum "NPR EFT Request Mechanism";
-        Workflow: Text;
-        EntryNo: Integer;
-        SIGNATURE_APPROVAL: Label 'Customer must sign the receipt. Please confirm that signature is valid';
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
 
         if not EFTTransactionRequest.Successful then
-            exit;
+            exit(false);
         if not (EftTransactionRequest."Signature Type" = EftTransactionRequest."Signature Type"::"On Receipt") then
-            exit;
+            exit(false);
 
         case true of
             EftTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]:
@@ -502,31 +490,13 @@
                 begin
                     OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
                     if not (OriginalEFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
-                        exit;
+                        exit(false);
                 end;
             else
-                exit;
+                exit(false);
         end;
 
-        if Confirm(SIGNATURE_APPROVAL) then
-            exit;
-
-
-        Sleep(5 * 1000);
-        //Gap in integration - we need to void if signature was declined, however we have no way of knowing if terminal is ready to accept a void request yet,
-        //because we are not receiving events from it. We have observed "terminal busy" errors for this scenario.
-        //Sleeping 5 seconds is a pragmatic workaround to reduce impact of this problem.
-        //A manual "void last" is the solution if this fails but it will confuse sales person.
-        //The real fix requires a better API from NETS
-
-        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-        POSSession.GetSale(POSSale);
-        POSSale.GetCurrentSale(POSSaleRecord);
-
-        EntryNo := EFTTransactionMgt.PrepareVoid(EFTSetup, POSSaleRecord, EFTTransactionRequest."Entry No.", false, Request, Mechanism, Workflow);
-        VoidEFTTransactionRequest.Get(EntryNo);
-        Commit();
-        EFTFrameworkMgt.SendSynchronousRequest(VoidEFTTransactionRequest);
+        exit(true);
     end;
 
     procedure GetPOSDescription(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
