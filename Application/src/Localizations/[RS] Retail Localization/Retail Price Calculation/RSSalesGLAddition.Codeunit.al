@@ -1,6 +1,8 @@
 codeunit 6151094 "NPR RS Sales GL Addition"
 {
     Access = Internal;
+    Permissions = tabledata "G/L Entry" = rimd;
+
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Sales Posting Behaviour
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', false, false)]

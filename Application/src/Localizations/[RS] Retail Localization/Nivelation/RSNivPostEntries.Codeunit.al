@@ -1,6 +1,12 @@
 codeunit 6151372 "NPR RS Niv. Post Entries"
 {
     Access = Internal;
+    Permissions = tabledata "G/L Entry" = rimd,
+                  tabledata "VAT Entry" = rimd,
+                  tabledata "Item Ledger Entry" = rimd,
+                  tabledata "Value Entry" = rimd,
+                  tabledata "Item Journal Line" = rimd;
+
 #if not (BC17 or BC18 or BC19)
     internal procedure PostNivelationEntries(var PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr")
     var
@@ -695,7 +701,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
             PostedNivelationHeader.Type::"Price Change":
                 begin
                     ItemLedgEntry."Entry Type" := "Item Ledger Entry Type"::Purchase;
-                    ItemLedgEntry."Purchase Amount (Actual)" := ItemJnlLine.Amount;
+                    ItemLedgEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
                 end;
             PostedNivelationHeader.Type::"Promotions & Discounts":
                 begin
@@ -727,7 +733,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
         case PostedNivelationHeader.Type of
             PostedNivelationHeader.Type::"Price Change":
-                ValueEntry."Purchase Amount (Actual)" := ItemJnlLine.Amount;
+                ValueEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
             PostedNivelationHeader.Type::"Promotions & Discounts":
                 ValueEntry."Sales Amount (Actual)" := ItemJnlLine.Amount;
         end;
