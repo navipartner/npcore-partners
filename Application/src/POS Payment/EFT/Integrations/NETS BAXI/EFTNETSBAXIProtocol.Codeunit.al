@@ -480,14 +480,6 @@
         EFTNETSBAXIRespPars: Codeunit "NPR EFT NETS BAXI Resp. Pars.";
         EntryNo: Integer;
         EFTNETSBAXIIntegration: Codeunit "NPR EFT NETS BAXI Integration";
-        SignatureApprovalLbl: Label 'Approve signature?';
-        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
-        EFTSetup: Record "NPR EFT Setup";
-        POSSale: Record "NPR POS Sale";
-        VoidRequest: JsonObject;
-        VoidMechanism: Enum "NPR EFT Request Mechanism";
-        VoidWorkflow: Text;
-        Rejected: Boolean;
     begin
         ClearLastError();
 
@@ -504,20 +496,7 @@
         ResponseObject.Add('BCSuccess', EFTTransactionRequest.Successful);
 
         if (EFTTransactionRequest.Successful) and (EFTTransactionRequest."Signature Type" <> EFTTransactionRequest."Signature Type"::" ") then begin
-            Rejected := EFTTransactionRequest."Self Service";
-            if not Rejected then
-                Rejected := not Confirm(SignatureApprovalLbl, false);
-
-            if Rejected then begin
-                ResponseObject.Add('voidTransaction', true);
-                //prepare void workflow, json so the payment can be voided right away
-                EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
-                POSSale.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
-                EFTTransactionMgt.PrepareVoid(EFTSetup, POSSale, EFTTransactionRequest."Entry No.", false, VoidRequest, VoidMechanism, VoidWorkflow);
-                Commit();
-                ResponseObject.Add('voidWorkflow', VoidWorkflow);
-                ResponseObject.Add('voidWorkflowRequest', VoidRequest);
-            end
+            ResponseObject.Add('confirmSignature', true);
         end;
 
         exit(ResponseObject);
@@ -540,5 +519,29 @@
         EFTTransactionRequest."Result Display Text" := CopyStr(PhoneAuthCancelledLbl, 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
         EFTTransactionRequest.Modify();
         EFTNETSBAXIIntegration.HandleProtocolResponse(EFTTransactionRequest);
+    end;
+
+    procedure SignatureDeclined(Context: Codeunit "NPR POS JSON Helper") ResponseObject: JsonObject
+    var
+        EFTSetup: Record "NPR EFT Setup";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        POSSale: Record "NPR POS Sale";
+        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        VoidRequest: JsonObject;
+        VoidMechanism: Enum "NPR EFT Request Mechanism";
+        VoidWorkflow: Text;
+        RequestObject: JsonObject;
+        EntryNoToken: JsonToken;
+    begin
+        Context.GetJsonObject('request', RequestObject);
+        RequestObject.Get('EntryNo', EntryNoToken);
+        EFTTransactionRequest.Get(EntryNoToken.AsValue().AsInteger());
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+        POSSale.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+
+        EFTTransactionMgt.PrepareVoid(EFTSetup, POSSale, EFTTransactionRequest."Entry No.", false, VoidRequest, VoidMechanism, VoidWorkflow);
+        Commit();
+        ResponseObject.Add('voidWorkflow', VoidWorkflow);
+        ResponseObject.Add('voidWorkflowRequest', VoidRequest);
     end;
 }
