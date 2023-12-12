@@ -137,6 +137,11 @@
             Caption = 'Require Item Return Reason';
             DataClassification = CustomerContent;
         }
+        field(130; AllowSalesAndReturnInSameTrans; Boolean)
+        {
+            Caption = 'Allow Sales and Returns in Same Transaction';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
