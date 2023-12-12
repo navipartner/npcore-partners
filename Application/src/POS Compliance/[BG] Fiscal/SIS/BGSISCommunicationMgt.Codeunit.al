@@ -121,8 +121,10 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     var
         POSEntry: Record "NPR POS Entry";
         JsonTextReaderWriter: Codeunit "Json Text Reader/Writer";
+        Refund: Boolean;
     begin
         POSEntry.Get(BGSISPOSAuditLogAux."POS Entry No.");
+        Refund := BGSISPOSAuditLogAux."Transaction Type" = BGSISPOSAuditLogAux."Transaction Type"::Refund;
 
         InitJSONBody(JsonTextReaderWriter);
         JsonTextReaderWriter.WriteStringProperty('method', 'printReceipt');
@@ -132,10 +134,10 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         if ExtendedReceipt then
             AddInvoiceDataJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry);
 
-        AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.");
-        AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.");
-        if BGSISPOSAuditLogAux."Transaction Type" = BGSISPOSAuditLogAux."Transaction Type"::Refund then
-            AddStornoInputJSONObjectForSaleAndRefund(JsonTextReaderWriter, ExtendedReceipt, POSEntry."Entry No.");
+        AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
+        AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
+        if Refund then
+            AddStornoInputJSONObjectForRefund(JsonTextReaderWriter, ExtendedReceipt, POSEntry."Entry No.");
 
         JsonTextReaderWriter.WriteEndObject(); // params
         JsonTextReaderWriter.WriteEndObject();
@@ -227,7 +229,6 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
             if CustomerNo <> '' then
                 InputDialog.InputText(7, CustomerVATNumber);
 
-
             Clear(AllInvoiceDataCorrect);
             AllInvoiceDataEntered := (InvoiceNumber <> '') and (CustomerCity <> '') and (CustomerID <> '') and (CustomerAddress <> '') and (CustomerName <> '');
             if not AllInvoiceDataEntered then
@@ -283,31 +284,92 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         end;
     end;
 
-    local procedure AddReceiptItemsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    local procedure AddReceiptItemsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer; Refund: Boolean)
     var
         BGSISVATPostSetupMap: Record "NPR BG SIS VAT Post. Setup Map";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        TotalsRoundingDifference: Decimal;
+        UnitPrice: Decimal;
     begin
         JsonTextReaderWriter.WriteStartArray('receiptItems');
 
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
-        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
+        POSEntrySalesLine.SetFilter(Quantity, '<>0');
         if POSEntrySalesLine.FindSet() then
             repeat
+                Clear(TotalsRoundingDifference);
                 JsonTextReaderWriter.WriteStartObject('');
                 JsonTextReaderWriter.WriteStringProperty('description', CopyStr(POSEntrySalesLine.Description, 1, 64));
                 BGSISVATPostSetupMap.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                 BGSISVATPostSetupMap.CheckIsBGSISVATCategoryPopulated();
                 JsonTextReaderWriter.WriteRawProperty('enumVatCategory', BGSISVATPostSetupMap."BG SIS VAT Category".AsInteger());
-                JsonTextReaderWriter.WriteStringProperty('price', Format(Abs(Round(POSEntrySalesLine."Unit Price", 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
-                JsonTextReaderWriter.WriteStringProperty('quantity', Format(Abs(Round(POSEntrySalesLine.Quantity, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                if Refund then begin
+                    if POSEntrySalesLine."Line Discount Amount Incl. VAT" = 0 then
+                        JsonTextReaderWriter.WriteStringProperty('price', Format(Abs(Round(POSEntrySalesLine."Unit Price", 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'))
+                    else begin
+                        CalculateUnitPriceAndTotalsRoundingDifference(POSEntrySalesLine, UnitPrice, TotalsRoundingDifference);
+                        JsonTextReaderWriter.WriteStringProperty('price', Format(UnitPrice, 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                    end;
+                    JsonTextReaderWriter.WriteStringProperty('quantity', Format(Abs(Round(POSEntrySalesLine.Quantity, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                end else begin
+                    JsonTextReaderWriter.WriteStringProperty('price', Format(Abs(Round(POSEntrySalesLine."Unit Price", 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                    JsonTextReaderWriter.WriteStringProperty('quantity', Format(Abs(Round(POSEntrySalesLine.Quantity, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                    if POSEntrySalesLine."Line Discount Amount Incl. VAT" <> 0 then
+                        JsonTextReaderWriter.WriteStringProperty('surchargeAmount', Format(-Round(POSEntrySalesLine."Line Discount Amount Incl. VAT", 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                end;
                 JsonTextReaderWriter.WriteEndObject();
+
+                if TotalsRoundingDifference <> 0 then
+                    AddRoundingCorrectionToReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, BGSISVATPostSetupMap, TotalsRoundingDifference);
             until POSEntrySalesLine.Next() = 0;
 
         JsonTextReaderWriter.WriteEndArray();
     end;
 
-    local procedure AddReceiptPaymentsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    local procedure CalculateUnitPriceAndTotalsRoundingDifference(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var UnitPrice: Decimal; var TotalsRoundingDifference: Decimal)
+    var
+        AmountInclVATCalculated: Decimal;
+    begin
+        UnitPrice := Abs(Round(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0.01));
+        AmountInclVATCalculated := POSEntrySalesLine.Quantity * UnitPrice;
+        TotalsRoundingDifference := Abs(Round(POSEntrySalesLine."Amount Incl. VAT", 0.01)) - Abs(Round(AmountInclVATCalculated, 0.01));
+        if TotalsRoundingDifference >= 0 then
+            exit;
+
+        UnitPrice := Abs(Round(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0.01, '<'));
+        AmountInclVATCalculated := POSEntrySalesLine.Quantity * UnitPrice;
+        TotalsRoundingDifference := Abs(Round(POSEntrySalesLine."Amount Incl. VAT", 0.01)) - Abs(Round(AmountInclVATCalculated, 0.01));
+
+        if TotalsRoundingDifference > 0 then
+            exit;
+
+        UnitPrice := UnitPrice - 0.01;
+        AmountInclVATCalculated := POSEntrySalesLine.Quantity * UnitPrice;
+        TotalsRoundingDifference := Abs(Round(POSEntrySalesLine."Amount Incl. VAT", 0.01)) - Abs(Round(AmountInclVATCalculated, 0.01));
+    end;
+
+    local procedure AddRoundingCorrectionToReceiptItemsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; BGSISVATPostSetupMap: Record "NPR BG SIS VAT Post. Setup Map"; TotalsRoundingDifference: Decimal)
+    var
+        RoundingCorrectionLbl: Label 'Rounding Correction';
+    begin
+        JsonTextReaderWriter.WriteStartObject('');
+        JsonTextReaderWriter.WriteStringProperty('description', CopyStr(RoundingCorrectionLbl, 1, 64));
+        JsonTextReaderWriter.WriteRawProperty('enumVatCategory', BGSISVATPostSetupMap."BG SIS VAT Category".AsInteger());
+        JsonTextReaderWriter.WriteStringProperty('price', Format(TotalsRoundingDifference, 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+        JsonTextReaderWriter.WriteStringProperty('quantity', Format(Abs(Round(1, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+        JsonTextReaderWriter.WriteEndObject();
+    end;
+
+    local procedure AddReceiptPaymentsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer; Refund: Boolean)
+    begin
+        if not Refund then
+            AddReceiptPaymentsJSONArrayForSale(JsonTextReaderWriter, POSEntryNo)
+        else
+            AddReceiptPaymentsJSONArrayForRefund(JsonTextReaderWriter, POSEntryNo);
+    end;
+
+    local procedure AddReceiptPaymentsJSONArrayForSale(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
     var
         BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
@@ -328,7 +390,39 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndArray();
     end;
 
-    local procedure AddStornoInputJSONObjectForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; ExtendedReceipt: Boolean; POSEntryNo: Integer)
+    local procedure AddReceiptPaymentsJSONArrayForRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    var
+        BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        ReceiptPayments: Dictionary of [Integer, Decimal];
+        PaymentAmount: Decimal;
+        PaymentMedium: Integer;
+    begin
+        JsonTextReaderWriter.WriteStartArray('receiptPayments');
+
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                BGSISPOSPaymMethMap.Get(POSEntryPaymentLine."POS Payment Method Code");
+                BGSISPOSPaymMethMap.CheckIsBGSISPaymentMethodPopulated();
+                if ReceiptPayments.Get(BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger(), PaymentAmount) then
+                    ReceiptPayments.Set(BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger(), PaymentAmount + Round(POSEntryPaymentLine.Amount, 0.01))
+                else
+                    ReceiptPayments.Add(BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger(), Round(POSEntryPaymentLine.Amount, 0.01));
+            until POSEntryPaymentLine.Next() = 0;
+
+        foreach PaymentMedium in ReceiptPayments.Keys() do begin
+            PaymentAmount := ReceiptPayments.Get(PaymentMedium);
+            JsonTextReaderWriter.WriteStartObject('');
+            JsonTextReaderWriter.WriteStringProperty('amount', Format(Abs(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+            JsonTextReaderWriter.WriteRawProperty('medium', PaymentMedium);
+            JsonTextReaderWriter.WriteEndObject();
+        end;
+
+        JsonTextReaderWriter.WriteEndArray();
+    end;
+
+    local procedure AddStornoInputJSONObjectForRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; ExtendedReceipt: Boolean; POSEntryNo: Integer)
     var
         BGSISPOSAuditLogAuxToRefund: Record "NPR BG SIS POS Audit Log Aux.";
         BGSISReturnReasonMap: Record "NPR BG SIS Return Reason Map";

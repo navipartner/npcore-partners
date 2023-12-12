@@ -115,6 +115,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
 
         POSSetup.GetSalespersonRecord(Salesperson);
 
+        TestIsProfileSetAccordingToCompliance(POSUnit."POS Audit Profile");
         TestPOSUnitMapping(POSUnit);
         CheckSalesperson(Salesperson);
     end;
@@ -145,7 +146,9 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
+        CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
         CheckAreMandatoryMappingsPopulated(SaleHeader);
+        DoNotAllowUsingOtherPaymentMethodThanCashForReturn(SaleHeader);
     end;
     #endregion
 
@@ -209,7 +212,6 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     var
         POSUnit: Record "NPR POS Unit";
         ActionParameters: JsonObject;
-        PostWorkflowParameters: JsonObject;
     begin
         if not IsBGSISFiscalEnabled() then
             exit;
@@ -220,8 +222,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        PostWorkflowParameters.Add('Method', 'cashHandling');
-        ActionParameters.Add('postWorkflowParameters', PostWorkflowParameters);
+        ActionParameters.Add('Method', 'cashHandling');
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_MGT"), ActionParameters);
     end;
     #endregion
@@ -267,7 +268,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         end;
     end;
 
-    local procedure HandlerCode(): Text
+    internal procedure HandlerCode(): Text
     var
         HandlerCodeTxt: Label 'BG_SIS', Locked = true, MaxLength = 20;
     begin
@@ -306,6 +307,19 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     #endregion
 
     #region Procedures - Validations
+    local procedure TestIsProfileSetAccordingToCompliance(POSAuditProfileCode: Code[20])
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        POSAuditProfile.Get(POSAuditProfileCode);
+        POSAuditProfile.TestField("Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Credit Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Balancing Fiscal No. Series");
+        POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
+        POSAuditProfile.TestField("Require Item Return Reason", true);
+        POSAuditProfile.TestField(AllowSalesAndReturnInSameTrans, false);
+    end;
+
     local procedure TestPOSUnitMapping(POSUnit: Record "NPR POS Unit")
     var
         BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
@@ -325,6 +339,31 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
             Error(CannotBeConvertedtoIntegerErr, Salesperson.TableCaption(), Salesperson.FieldCaption(Code), Salesperson.Code);
     end;
 
+    local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSSaleLine: Record "NPR POS Sale Line";
+        SalesAndReturnsNotAllowedInSameTransactionErr: Label 'It is not allowed to sale and return item(s) in same transaction.';
+    begin
+        POSAuditProfile.Get(POSAuditProfileCode);
+        if POSAuditProfile.AllowSalesAndReturnInSameTrans then
+            exit;
+
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetFilter(Quantity, '>0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        POSSaleLine.SetFilter(Quantity, '<0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        Error(SalesAndReturnsNotAllowedInSameTransactionErr);
+    end;
+
     local procedure CheckAreMandatoryMappingsPopulated(SaleHeader: Record "NPR POS Sale")
     var
         BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
@@ -335,6 +374,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
         POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"POS Payment");
         if POSSaleLine.FindSet() then
             repeat
                 case POSSaleLine."Line Type" of
@@ -354,6 +394,28 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
                             BGSISPOSPaymMethMap.CheckIsBGSISPaymentMethodPopulated();
                         end;
                 end;
+            until POSSaleLine.Next() = 0;
+    end;
+
+    local procedure DoNotAllowUsingOtherPaymentMethodThanCashForReturn(SaleHeader: Record "NPR POS Sale")
+    var
+        BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetFilter("Return Sale Sales Ticket No.", '<>%1', '');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        POSSaleLine.SetRange("Return Sale Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::"POS Payment");
+
+        if POSSaleLine.FindSet() then
+            repeat
+                BGSISPOSPaymMethMap.Get(POSSaleLine."No.");
+                BGSISPOSPaymMethMap.TestField("BG SIS Payment Method", BGSISPOSPaymMethMap."BG SIS Payment Method"::Cash);
             until POSSaleLine.Next() = 0;
     end;
     #endregion

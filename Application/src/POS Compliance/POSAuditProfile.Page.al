@@ -96,6 +96,11 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Prompts for return reason when returning items in POS';
                 }
+                field(AllowSalesAndReturnInSameTrans; Rec.AllowSalesAndReturnInSameTrans)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
+                }
             }
         }
     }
