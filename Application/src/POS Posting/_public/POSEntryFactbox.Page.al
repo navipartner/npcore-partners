@@ -255,6 +255,28 @@
                     end;
                 }
             }
+            group(BGSISPOSAuditLogGroup)
+            {
+                ShowCaption = false;
+                Visible = ShowBGSISAudit;
+                field("BG SIS POS Audit Log"; Rec."BG SIS POS Audit Log")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'BG SIS POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of BG SIS POS Audit Log information.';
+
+                    trigger OnDrillDown()
+                    var
+                        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+                    begin
+                        BGSISPOSAuditLogAux.FilterGroup(10);
+                        BGSISPOSAuditLogAux.SetRange("Audit Entry Type", BGSISPOSAuditLogAux."Audit Entry Type"::"POS Entry");
+                        BGSISPOSAuditLogAux.SetRange("POS Entry No.", Rec."Entry No.");
+                        BGSISPOSAuditLogAux.FilterGroup(0);
+                        Page.RunModal(Page::"NPR BG SIS POS Audit Log Aux.", BGSISPOSAuditLogAux);
+                    end;
+                }
+            }
         }
     }
 
@@ -307,21 +329,34 @@
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
-        CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
-        CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
-        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
-        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
-        SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
+    begin
+        ClearShowVariables();
+        if not POSUnit.Get(Rec."POS Unit No.") then
+            exit;
+        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+            exit;
+        SetShowVariables(POSAuditProfile);
+    end;
+
+    local procedure ClearShowVariables()
     begin
         Clear(ShowCleanCash);
         Clear(ShowDEAudit);
         Clear(ShowRSAudit);
         Clear(ShowCroAudit);
         Clear(ShowSIAudit);
-        if not POSUnit.Get(Rec."POS Unit No.") then
-            exit;
-        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-            exit;
+        Clear(ShowBGSISAudit);
+    end;
+
+    local procedure SetShowVariables(POSAuditProfile: Record "NPR POS Audit Profile")
+    var
+        CleanCashXCCSPProtocol: Codeunit "NPR CleanCash XCCSP Protocol";
+        CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
+        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
+        BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
+    begin
         case POSAuditProfile."Audit Handler" of
             CleanCashXCCSPProtocol.HandlerCode():
                 ShowCleanCash := true;
@@ -333,6 +368,8 @@
                 ShowCroAudit := true;
             SIAuditMgt.HandlerCode():
                 ShowSIAudit := true;
+            BGSISAuditMgt.HandlerCode():
+                ShowBGSISAudit := true;
         end;
     end;
 
@@ -342,5 +379,6 @@
         ShowDEAudit: Boolean;
         ShowRSAudit: Boolean;
         ShowSIAudit: Boolean;
+        ShowBGSISAudit: Boolean;
 }
 
