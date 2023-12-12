@@ -15,6 +15,11 @@ let main = async ({ workflow, context, popup, captions }) => {
             try {
                 let pollResponse = await workflow.respond("poll");
                 if (pollResponse.done) {
+                    if (pollResponse.signatureRequired) {
+                        if (!await popup.confirm(captions.approveSignature)) {
+                            await workflow.respond("signatureDecline");
+                        }
+                    }
                     debugger;
                     context.success = pollResponse.success;
                     resolve();
