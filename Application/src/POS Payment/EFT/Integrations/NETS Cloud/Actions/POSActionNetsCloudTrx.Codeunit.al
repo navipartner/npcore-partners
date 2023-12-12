@@ -13,12 +13,14 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
         InitialStatusLbl: Label 'Initializing';
         ActiveStatusLbl: Label 'Waiting For Response';
         TitleLbl: Label 'Transaction';
+        ApproveSignatureLbl: Label 'Approve signature on receipt?';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddLabel('initialStatus', InitialStatusLbl);
         WorkflowConfig.AddLabel('title', TitleLbl);
         WorkflowConfig.AddLabel('activeStatus', ActiveStatusLbl);
+        WorkflowCOnfig.AddLabel('approveSignature', ApproveSignatureLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -30,6 +32,8 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(PollResponse(Context));
             'requestAbort':
                 RequestAbort(Context);
+            'signatureDecline':
+                SignatureDecline(Context.GetInteger('EntryNo'));
         end;
     end;
 
@@ -67,8 +71,9 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
                     if not Codeunit.Run(Codeunit::"NPR EFT Try Print Receipt", EftTransactionRequest) then
                         Message(GetLastErrorText);
                     Commit();
-                    EFTNETSCloudIntegrat.SignaturePrompt(EFTTransactionRequest);
-
+                    if EFTNETSCloudIntegrat.SignaturePrompt(EFTTransactionRequest) then begin
+                        Response.Add('signatureRequired', true);
+                    end;
                     Response.Add('done', true);
                     Response.Add('success', EFTTransactionRequest.Successful);
                     exit(Response);
@@ -159,6 +164,40 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
         _trxAbortStatus.Set(EFTTransactionRequest."Entry No.", true);
     end;
 
+    local procedure SignatureDecline(EntryNo: Integer)
+    var
+        VoidEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        EFTSetup: Record "NPR EFT Setup";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleRecord: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        Request: JsonObject;
+        Mechanism: Enum "NPR EFT Request Mechanism";
+        Workflow: Text;
+        VoidEntryNo: Integer;
+    begin
+        Sleep(5 * 1000);
+        //Gap in integration - we need to void if signature was declined, however we have no way of knowing if terminal is ready to accept a void request yet,
+        //because we are not receiving events from it. We have observed "terminal busy" errors for this scenario.
+        //Sleeping 5 seconds is a pragmatic workaround to reduce impact of this problem.
+        //A manual "void last" is the solution if this fails but it will confuse sales person.
+        //The real fix requires a better API from NETS
+
+        EFTTransactionRequest.Get(EntryNo);
+
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(POSSaleRecord);
+
+        VoidEntryNo := EFTTransactionMgt.PrepareVoid(EFTSetup, POSSaleRecord, EFTTransactionRequest."Entry No.", false, Request, Mechanism, Workflow);
+        VoidEFTTransactionRequest.Get(VoidEntryNo);
+        Commit();
+        EFTFrameworkMgt.SendSynchronousRequest(VoidEFTTransactionRequest);
+    end;
+
     local procedure ClearGlobalState()
     begin
         clear(_trxStatus);
@@ -179,7 +218,7 @@ codeunit 6059906 "NPR POS Action: NetsCloud Trx" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionNetsCloudTrx.Codeunit.js###
-'let main=async({workflow:e,context:t,popup:u,captions:r})=>{t.EntryNo=t.request.EntryNo;let s=await u.simplePayment({title:r.title,initialStatus:r.initialStatus,showStatus:!0,amount:t.request.formattedAmount,onAbort:async()=>{await e.respond("requestAbort")}}),n=new Promise((l,o)=>{let i=async()=>{try{let a=await e.respond("poll");if(a.done){debugger;t.success=a.success,l();return}}catch(a){try{await e.respond("requestAbort")}catch{}o(a);return}setTimeout(i,1e3)};setTimeout(i,1e3)});try{await e.respond("startTransaction"),s.updateStatus(r.activeStatus),s.enableAbort(!0),await n}finally{s&&s.close()}return{success:t.success,tryEndSale:t.success}};'
+'let main=async({workflow:t,context:e,popup:i,captions:s})=>{e.EntryNo=e.request.EntryNo;let r=await i.simplePayment({title:s.title,initialStatus:s.initialStatus,showStatus:!0,amount:e.request.formattedAmount,onAbort:async()=>{await t.respond("requestAbort")}}),n=new Promise((l,c)=>{let u=async()=>{try{let a=await t.respond("poll");if(a.done){a.signatureRequired&&(await i.confirm(s.approveSignature)||await t.respond("signatureDecline"));debugger;e.success=a.success,l();return}}catch(a){try{await t.respond("requestAbort")}catch{}c(a);return}setTimeout(u,1e3)};setTimeout(u,1e3)});try{await t.respond("startTransaction"),r.updateStatus(s.activeStatus),r.enableAbort(!0),await n}finally{r&&r.close()}return{success:e.success,tryEndSale:e.success}};'
         );
     end;
 
