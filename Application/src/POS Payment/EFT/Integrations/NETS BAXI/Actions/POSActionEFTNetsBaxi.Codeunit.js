@@ -46,8 +46,11 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
                 switch (hwcResponse.Type) {
                     case "Transaction":
                         bcResponse = await workflow.respond("TransactionCompleted", hwcResponse);
-                        if (bcResponse.voidTransaction) {
-                            await workflow.run(bcResponse.voidWorkflow, { context: { request: bcResponse.voidWorkflowRequest } });
+                        if (bcResponse.confirmSignature) {
+                            if (context.request.Unattended || !await popup.confirm(captions.approveSignature)) {
+                                voidResponse = await workflow.respond("signatureDeclined");
+                                await workflow.run(voidResponse.voidWorkflow, { context: { request: voidResponse.voidWorkflowRequest } });
+                            }
                         }
                         context.success = bcResponse.BCSuccess;
                         hwc.unregisterResponseHandler(_contextId); //done
