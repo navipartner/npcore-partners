@@ -1,10 +1,12 @@
 codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
 {
     Access = Internal;
+    Permissions = tabledata "G/L Entry" = rimd;
+    
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Transfer Recieve Posting Behaviour
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Receipt", 'OnRunOnAfterInsertTransRcptLines', '', false, false)]
-    local procedure AddTransferGLEntries(TransRcptHeader: Record "Transfer Receipt Header")
+    local procedure AddTransferGLEntries(TransRcptHeader: Record "Transfer Receipt Header"; TransferHeader: Record "Transfer Header")
     var
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
@@ -16,7 +18,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not CheckRetailLocation(TransRcptHeader) then
             exit;
 
-        FillRetailTransferLines(TransRcptHeader);
+        FillRetailTransferLines(TransferHeader);
 
         if not TempTransferLine.FindSet() then
             exit;
@@ -358,25 +360,25 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         LocationCheck: Boolean;
     begin
         LocationCheck := false;
-        if Location.Get(TransRcptHeader."Transfer-to Code") then
+        if Location.Get(TransRcptHeader."Transfer-from Code") then
             if not Location."NPR Retail Location" then
                 LocationCheck := true;
-        if Location.Get(TransRcptHeader."Transfer-from Code") then
+        if Location.Get(TransRcptHeader."Transfer-to Code") then
             if Location."NPR Retail Location" then
                 LocationCheck := true;
         exit(LocationCheck);
     end;
 
-    local procedure FillRetailTransferLines(TransRcptHeader: Record "Transfer Receipt Header")
+    local procedure FillRetailTransferLines(TransferHeader: Record "Transfer Header")
     var
         Location: Record Location;
         TransferLine: Record "Transfer Line";
     begin
-        TransferLine.SetRange("Document No.", TransRcptHeader."No.");
+        TransferLine.SetRange("Document No.", TransferHeader."No.");
         if not TransferLine.FindSet() then
             exit;
         repeat
-            if Location.Get(TransRcptHeader."Transfer-to Code") then
+            if Location.Get(TransferHeader."Transfer-to Code") then
                 if Location."NPR Retail Location" then begin
                     TempTransferLine.Init();
                     TempTransferLine.Copy(TransferLine);

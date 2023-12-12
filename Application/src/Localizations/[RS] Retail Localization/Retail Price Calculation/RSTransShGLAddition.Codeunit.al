@@ -1,6 +1,8 @@
 codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 {
     Access = Internal;
+    Permissions = tabledata "G/L Entry" = rimd;
+
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Transfer Shipment Posting Behaviour
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Shipment", 'OnBeforeCopyTransLines', '', false, false)]
