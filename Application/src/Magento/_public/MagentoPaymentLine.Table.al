@@ -139,11 +139,9 @@
     {
         key(Key1; "Document Table No.", "Document Type", "Document No.", "Line No.")
         {
-            SumIndexFields = Amount;
         }
         key(Key2; "Payment Type", "No.", Amount)
         {
-            SumIndexFields = Amount;
         }
     }
 
