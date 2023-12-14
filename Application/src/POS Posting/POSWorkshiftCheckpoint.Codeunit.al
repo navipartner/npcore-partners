@@ -749,7 +749,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         SetGeneralStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
-        GetTransferStatistics(POSWorkshiftCheckpoint, FromPosEntryNo);
+        GetTransferStatistics(POSWorkshiftCheckpoint, POSUnitNo, FromPosEntryNo);
         AggregateVat_PE(POSWorkshiftCheckpoint."Entry No.", POSStoreCode, POSUnitNo, FromPosEntryNo);
         SetRegisterStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
 
@@ -856,17 +856,16 @@
 
     end;
 
-    local procedure GetTransferStatistics(var POSWorkshiftCheckpointOut: Record "NPR POS Workshift Checkpoint"; FromPosEntryNo: Integer)
+    local procedure GetTransferStatistics(var POSWorkshiftCheckpointOut: Record "NPR POS Workshift Checkpoint"; POSUnitNo: Code[10]; FromPosEntryNo: Integer)
     var
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSBinEntry: Record "NPR POS Bin Entry";
-        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
     begin
-
         // Get intermediate end-of-day
         POSWorkshiftCheckpoint.SetCurrentKey("POS Entry No.");
         POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '%1..', FromPosEntryNo);
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSUnitNo);
         POSWorkshiftCheckpoint.SetFilter(Open, '=%1', true);
         if (POSWorkshiftCheckpoint.IsEmpty()) then
             exit;
@@ -875,33 +874,43 @@
         repeat
             // Find the balancing lines that specify bin transfer
             POSBalancingLine.SetFilter("POS Entry No.", '=%1', POSWorkshiftCheckpoint."POS Entry No.");
+            POSBalancingLine.FilterGroup(-1);
             POSBalancingLine.SetFilter("Move-To Bin Code", '<>%1', '');
-            if (POSBalancingLine.FindSet()) then begin
+            POSBalancingLine.SetFilter("Deposit-To Bin Code", '<>%1', '');
+            POSBalancingLine.FilterGroup(0);
+            if POSBalancingLine.FindSet() then
                 repeat
                     // Find the binentry to get LCY
                     POSBinEntry.SetCurrentKey("Bin Checkpoint Entry No.");
                     POSBinEntry.SetFilter("Bin Checkpoint Entry No.", '=%1', POSBalancingLine."POS Bin Checkpoint Entry No.");
-                    POSBinEntry.SetFilter(Type, '%1|%2|%3', POSBinEntry.Type::BIN_TRANSFER, POSBinEntry.Type::BIN_TRANSFER_IN, POSBinEntry.Type::BIN_TRANSFER_OUT);
-                    POSBinEntry.SetFilter("Payment Bin No.", '=%1', POSBalancingLine."Move-To Bin Code");
+                    POSBinEntry.SetFilter(Type, '%1|%2|%3..%4', POSBinEntry.Type::BANK_TRANSFER, POSBinEntry.Type::BIN_TRANSFER, POSBinEntry.Type::BANK_TRANSFER_OUT, POSBinEntry.Type::BIN_TRANSFER_IN);
+                    if POSBalancingLine."Move-To Bin Code" <> '' then
+                        AddToTransferStatistics(POSWorkshiftCheckpointOut, POSBinEntry, POSBalancingLine."Move-To Bin Code");
+                    if POSBalancingLine."Deposit-To Bin Code" <> '' then
+                        AddToTransferStatistics(POSWorkshiftCheckpointOut, POSBinEntry, POSBalancingLine."Deposit-To Bin Code");
+                until POSBalancingLine.Next() = 0;
+        until POSWorkshiftCheckpoint.Next() = 0;
+    end;
 
-                    if (POSBinEntry.FindFirst()) then begin
-                        if (POSUnittoBinRelation.Get(POSWorkshiftCheckpointOut."POS Unit No.", POSBalancingLine."Move-To Bin Code")) then begin
-                            if POSBinEntry.Type = POSBinEntry.Type::BIN_TRANSFER_IN then
-                                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)"
-                            else
-                                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)";
-                        end else begin
-                            if POSBinEntry.Type = POSBinEntry.Type::BIN_TRANSFER_IN then
-                                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)"
-                            else
-                                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)";
-                        end;
-                    end;
+    local procedure AddToTransferStatistics(var POSWorkshiftCheckpointOut: Record "NPR POS Workshift Checkpoint"; var POSBinEntry: Record "NPR POS Bin Entry"; BinCode: Code[10])
+    var
+        POSUnittoBinRelation: Record "NPR POS Unit to Bin Relation";
+    begin
+        POSBinEntry.SetRange("Payment Bin No.", BinCode);
+        if not POSBinEntry.FindFirst() then
+            exit;
 
-                until (POSBalancingLine.Next() = 0);
-            end;
-
-        until (POSWorkshiftCheckpoint.Next() = 0);
+        if POSUnittoBinRelation.Get(POSWorkshiftCheckpointOut."POS Unit No.", POSBinEntry."Payment Bin No.") then begin
+            if POSBinEntry.Type in [POSBinEntry.Type::BANK_TRANSFER_IN, POSBinEntry.Type::BIN_TRANSFER_IN] then
+                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)"
+            else
+                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)";
+        end else begin
+            if POSBinEntry.Type in [POSBinEntry.Type::BANK_TRANSFER_IN, POSBinEntry.Type::BIN_TRANSFER_IN] then
+                POSWorkshiftCheckpointOut."Bin Transfer Out Amount (LCY)" += POSBinEntry."Transaction Amount (LCY)"
+            else
+                POSWorkshiftCheckpointOut."Bin Transfer In Amount (LCY)" -= POSBinEntry."Transaction Amount (LCY)";
+        end;
     end;
 
     procedure SetTurnoverAndProfit(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSSalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
