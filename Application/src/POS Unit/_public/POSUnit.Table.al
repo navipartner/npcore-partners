@@ -193,7 +193,7 @@
         }
         field(510; "POS End of Day Profile"; Code[20])
         {
-            Caption = 'POS End of Day Profile';
+            Caption = 'POS End of Day/Bin Tr. Profile';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS End of Day Profile";
         }
