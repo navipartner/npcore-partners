@@ -64,9 +64,10 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var
+        DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
         POSUnitAux: Record "NPR DE POS Unit Aux. Info";
         POSUnit: Record "NPR POS Unit";
-        DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
+        DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
     begin
         if (POSAuditLog."Active POS Unit No." = '') then
             POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No.";
@@ -83,22 +84,24 @@
                     InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::RECEIPT);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
                     DeAuditAux.Insert(true, true);
+                    DEFiskalyCommunication.SendDocument(DeAuditAux);
                 end;
             POSAuditLog."Action Type"::CANCEL_SALE_END:
                 begin
                     InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::CANCELLATION);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
                     DeAuditAux.Insert(true, true);
+                    DEFiskalyCommunication.SendDocument(DeAuditAux);
                 end;
         end;
     end;
 
     procedure CreateDeFiskalyOnSale(SalePOS: Record "NPR POS Sale")
     var
-        PosUnit: Record "NPR POS Unit";
+        DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
         PosAuditProfile: Record "NPR POS Audit Profile";
         PosEntry: Record "NPR POS Entry";
-        DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
+        PosUnit: Record "NPR POS Unit";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
     begin
         if not PosUnit.Get(SalePOS."Register No.") then
@@ -115,7 +118,7 @@
             exit;
         if not (PosEntry."Entry Type" in [PosEntry."Entry Type"::"Direct Sale", PosEntry."Entry Type"::"Cancelled Sale"]) then
             exit;
-        if not DeAuditAux.GET(PosEntry."Entry No.") then
+        if not DeAuditAux.Get(PosEntry."Entry No.") then
             exit;
 
         DEFiskalyCommunication.SendDocument(DeAuditAux);
@@ -123,9 +126,9 @@
 
     procedure CreateDocumentJson(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; NewTransactionState: Enum "NPR DE Fiskaly Trx. State"; var DocumentJson: JsonObject)
     var
-        StandardJson: JsonObject;
-        ReceiptJson: JsonObject;
         ReceiptDataJson: JsonObject;
+        ReceiptJson: JsonObject;
+        StandardJson: JsonObject;
     begin
         if DeAuditAux."Fiskaly Transaction Type" = DeAuditAux."Fiskaly Transaction Type"::Unknown then
             DeAuditAux."Fiskaly Transaction Type" := DeAuditAux."Fiskaly Transaction Type"::RECEIPT;
@@ -161,8 +164,8 @@
 
     local procedure GetPaymentTypes(EntryNo: Integer) PaymentArray: JsonArray
     var
-        PaymentLine: Record "NPR POS Entry Payment Line";
         PaymentMapper: Record "NPR Payment Method Mapper";
+        PaymentLine: Record "NPR POS Entry Payment Line";
         PaymentJsonObject: JsonObject;
     begin
         PaymentLine.Reset();
@@ -203,9 +206,9 @@
         DETSS: Record "NPR DE TSS";
         TypeHelper: Codeunit "Type Helper";
         Token: JsonToken;
+        UnexpectedResponseJsonErr: Label 'Unexpected response json.\%1';
         OutStr: OutStream;
         State: Text;
-        UnexpectedResponseJsonErr: Label 'Unexpected response json.\%1';
     begin
         if not ResponseJson.IsObject() then
             Error(UnexpectedResponseJsonErr, ResponseJson);
@@ -276,16 +279,16 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
     local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSUnit: Record "NPR POS Unit";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSStore: Record "NPR POS Store";
-        DETSS: Record "NPR DE TSS";
-        POSEndofDayProfile: Record "NPR POS End of Day Profile";
-        POSAuditProfile: Record "NPR POS Audit Profile";
         CompanyInformation: Record "Company Information";
         POSUnitAudit: Record "NPR DE POS Unit Aux. Info";
+        DETSS: Record "NPR DE TSS";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSEndofDayProfile: Record "NPR POS End of Day Profile";
+        POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
         MissingConnectionParameterErr: Label 'Please specify %1 in %2 %3=%4 and then try again.', Comment = '%1 - missing parameter name, %2 - "NPR DE Audit Setup" table caption, %3 - "NPR DE Audit Setup" table primary key field caption, %4 - "NPR DE Audit Setup" table primary key field value';
         ParameterFieldCaptionsLbl: Label 'Api Key,Api Secret';
     begin
@@ -401,14 +404,14 @@
     local procedure DoEndWorkshiftDeFiscaly(UnitNo: Code[10]; Successful: Boolean; PosEntryNo: Integer)
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
-        POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
-        POSUnit: Record "NPR POS Unit";
         DSFINVKClosing: Record "NPR DSFINVK Closing";
-        DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
+        POSUnit: Record "NPR POS Unit";
+        POSWorkshifCheckpoint: Record "NPR POS Workshift Checkpoint";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
+        DSFINVKMng: Codeunit "NPR DE Fiskaly DSFINVK";
+        NextClosingId: Integer;
         DSFINVKJson: JsonObject;
         DSFINVKResponseJson: JsonToken;
-        NextClosingId: Integer;
     begin
         if not Successful then
             exit;
@@ -459,7 +462,7 @@
             exit;
         end;
 
-        DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
+        DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
         if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
