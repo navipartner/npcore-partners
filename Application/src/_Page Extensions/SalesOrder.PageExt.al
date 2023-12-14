@@ -486,13 +486,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 trigger OnAction()
                 var
                     SalesHeader: Record "Sales Header";
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                     RecRef: RecordRef;
                 begin
                     SalesHeader := Rec;
                     SalesHeader.SetRecFilter();
                     RecRef.GetTable(SalesHeader);
-                    LabelLibrary.PrintCustomShippingLabel(RecRef, '');
+                    LabelManagement.PrintCustomShippingLabel(RecRef, '');
                 end;
             }
             group("NPR SMS")

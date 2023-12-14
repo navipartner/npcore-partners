@@ -71,9 +71,9 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
 
                     trigger OnAction()
                     var
-                        LabelLibrary: Codeunit "NPR Label Library";
+                        LabelManagement: Codeunit "NPR Label Management";
                     begin
-                        LabelLibrary.ChooseLabel(Rec);
+                        LabelManagement.ChooseLabel(Rec);
                     end;
                 }
             }

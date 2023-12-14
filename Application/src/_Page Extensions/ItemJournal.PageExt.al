@@ -33,9 +33,9 @@ pageextension 6014438 "NPR Item Journal" extends "Item Journal"
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.PrintLabel(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
+                    LabelManagement.PrintLabel(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
                 end;
             }
         }

@@ -19,7 +19,7 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
         RetailJnlLine: Record "NPR Retail Journal Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
         GUID: Guid;
     begin
         POSSession.GetSaleLine(POSSaleLine);
@@ -32,7 +32,7 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
 
         if SaleLinePOS2.FindSet() then
             repeat
-                LabelLibrary.ItemToRetailJnlLine(SaleLinePOS2."No.", SaleLinePOS2."Variant Code", Round(Abs(SaleLinePOS2.Quantity), 1, '>'), GUID, RetailJnlLine);
+                LabelManagement.ItemToRetailJnlLine(SaleLinePOS2."No.", SaleLinePOS2."Variant Code", Round(Abs(SaleLinePOS2.Quantity), 1, '>'), GUID, RetailJnlLine);
             until SaleLinePOS2.Next() = 0;
 
         RetailJnlLine.SetRange("No.", GUID);
@@ -50,7 +50,7 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
         RetailJnlLine: Record "NPR Retail Journal Line";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
         GUID: Guid;
     begin
         POSSession.GetSaleLine(POSSaleLine);
@@ -58,7 +58,7 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
 
         GUID := CreateGuid();
 
-        LabelLibrary.ItemToRetailJnlLine(SaleLinePOS."No.", SaleLinePOS."Variant Code", QuantityInput, GUID, RetailJnlLine);
+        LabelManagement.ItemToRetailJnlLine(SaleLinePOS."No.", SaleLinePOS."Variant Code", QuantityInput, GUID, RetailJnlLine);
 
         RetailJnlLine.SetRange("No.", GUID);
         if not RetailJnlLine.FindFirst() then
@@ -72,7 +72,7 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
     local procedure PrintRJL(var RetailJnlLine: Record "NPR Retail Journal Line"; PrintType: Option Price,Shelf,Sign)
     var
         ReportSelectionRetail: Record "NPR Report Selection Retail";
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
     begin
         case PrintType of
             PrintType::Price:
@@ -85,6 +85,6 @@ codeunit 6060090 "NPR POS Action: Print Item-B"
 
         Commit();
 
-        LabelLibrary.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type".AsInteger());
+        LabelManagement.PrintRetailJournal(RetailJnlLine, ReportSelectionRetail."Report Type".AsInteger());
     end;
 }

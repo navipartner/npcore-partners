@@ -18,9 +18,9 @@ pageextension 6014465 "NPR Posted Transfer Shipment" extends "Posted Transfer Sh
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.ChooseLabel(Rec);
+                    LabelManagement.ChooseLabel(Rec);
                 end;
             }
         }

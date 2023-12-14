@@ -22,9 +22,9 @@ pageextension 6014462 "NPR Transfer Order" extends "Transfer Order"
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.ChooseLabel(Rec);
+                    LabelManagement.ChooseLabel(Rec);
                 end;
 
             }

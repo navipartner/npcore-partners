@@ -135,13 +135,13 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     trigger OnAction()
                     var
                         Customer: Record Customer;
-                        LabelLibrary: Codeunit "NPR Label Library";
+                        LabelManagement: Codeunit "NPR Label Management";
                         RecRef: RecordRef;
                     begin
                         Customer := Rec;
                         Customer.SetRecFilter();
                         RecRef.GetTable(Customer);
-                        LabelLibrary.PrintCustomShippingLabel(RecRef, '');
+                        LabelManagement.PrintCustomShippingLabel(RecRef, '');
                     end;
                 }
             }

@@ -17,9 +17,9 @@ pageextension 6014409 "NPR Posted Purchase Receipt" extends "Posted Purchase Rec
                 ApplicationArea = NPRRetail;
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.ChooseLabel(Rec);
+                    LabelManagement.ChooseLabel(Rec);
                 end;
             }
         }

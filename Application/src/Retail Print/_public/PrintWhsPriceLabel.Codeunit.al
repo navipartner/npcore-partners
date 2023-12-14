@@ -4,12 +4,12 @@ codeunit 6150655 "NPR Print Whs. Price Label"
 
     trigger OnRun()
     var
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
         RecordVar: Variant;
         ReportSelectionRetail: Record "NPR Report Selection Retail";
     begin
         RecordVar := Rec;
-        LabelLibrary.PrintLabel(RecordVar, ReportSelectionRetail."Report Type"::"Price Label".AsInteger());
+        LabelManagement.PrintLabel(RecordVar, ReportSelectionRetail."Report Type"::"Price Label".AsInteger());
     end;
 
 }
