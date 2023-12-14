@@ -92,7 +92,7 @@
                 field("POS End of Day Profile"; Rec."POS End of Day Profile")
                 {
                     ShowMandatory = true;
-                    ToolTip = 'Set up components of the end-of-day process, and intervals in which it is performed.';
+                    ToolTip = 'Set up components of the end-of-day process, and intervals in which it is performed. Also, establish parameters for the bin transfer process.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Ean Box Sales Setup"; Rec."Ean Box Sales Setup")

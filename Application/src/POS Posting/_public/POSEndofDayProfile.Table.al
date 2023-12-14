@@ -1,6 +1,6 @@
 ﻿table 6150652 "NPR POS End of Day Profile"
 {
-    Caption = 'POS End of Day Profile';
+    Caption = 'POS End of Day/Bin Tr. Profile';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR POS End of Day Profiles";
     LookupPageID = "NPR POS End of Day Profiles";
@@ -164,6 +164,102 @@
             Caption = 'Bin Transfer: Require Journal';
             DataClassification = CustomerContent;
         }
+        field(110; "Bank Deposit Ref. Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'Bank Deposit Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(111; "Move to Bin Ref. Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'Move to Bin Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(120; "BT OUT: Bank Dep. Ref. Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'BT: Bank Deposit Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(121; "BT OUT: Move to Bin Ref.Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'BT: Move to Bin Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(130; "BT IN: Tr.from Bank Ref.Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'BT: Tr.from Bank Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(131; "BT IN: Move fr. Bin Ref.Asgmt."; Enum "NPR Ref.No. Assignment Method")
+        {
+            Caption = 'BT: Move fr. Bin Ref. Asgmt. Method';
+            DataClassification = CustomerContent;
+        }
+        field(140; "Bank Deposit Ref. Nos."; Code[20])
+        {
+            Caption = 'Bank Deposit Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("Bank Deposit Ref. Nos.");
+            end;
+        }
+        field(141; "Move to Bin Ref. Nos."; Code[20])
+        {
+            Caption = 'Move to Bin Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("Move to Bin Ref. Nos.");
+            end;
+        }
+        field(150; "BT OUT: Bank Deposit Ref. Nos."; Code[20])
+        {
+            Caption = 'BT: Bank Deposit Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("BT OUT: Bank Deposit Ref. Nos.");
+            end;
+        }
+        field(151; "BT OUT: Move to Bin Ref. Nos."; Code[20])
+        {
+            Caption = 'BT: Move to Bin Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("BT OUT: Move to Bin Ref. Nos.");
+            end;
+        }
+        field(160; "BT IN: Tr.from Bank Ref. Nos."; Code[20])
+        {
+            Caption = 'BT Tr. from Bank Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("BT IN: Tr.from Bank Ref. Nos.");
+            end;
+        }
+        field(161; "BT IN: Move fr. Bin Ref. Nos."; Code[20])
+        {
+            Caption = 'BT: Move fr. Bin Ref. Nos.';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            begin
+                ValidateNoSeries("BT IN: Move fr. Bin Ref. Nos.");
+            end;
+        }
     }
 
     keys
@@ -175,4 +271,18 @@
 
     var
         PROFILE_MISSMATCH: Label 'The master POS Unit must have the same profile as this unit.';
+
+    internal procedure ValidateNoSeries(NoSeriesCode: Code[20])
+    var
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+    begin
+        if NoSeriesCode = '' then
+            exit;
+        NoSeries.Get(NoSeriesCode);
+        NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, NoSeriesCode, 0D);
+        NoSeriesLine.FindFirst();
+        NoSeriesLine.TestField("Allow Gaps in Nos.", true);
+    end;
 }

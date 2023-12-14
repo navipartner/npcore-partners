@@ -165,7 +165,7 @@
         Statistics.Add('taxSummary', GetSectionTaxSummary());
     end;
 
-    local procedure GetCashCountingTypes(EndOfDayProfile: Record "NPR POS End of Day Profile") CashCounting: JsonArray
+    local procedure GetCashCountingTypes(EndOfDayProfile: Record "NPR POS End of Day Profile"; POSUnitNo: Code[10]) CashCounting: JsonArray
     var
         PaymentMethod: Record "NPR POS Payment Method";
         CountingType: JsonObject;
@@ -209,6 +209,8 @@
                     CountingType.Add('requireCountedAmtDenominations', EndOfDayProfile."Require Denomin.(Counted Amt.)");
                     CountingType.Add('requireBankDepositAmtDenominations', EndOfDayProfile."Require Denomin.(Bank Deposit)");
                     CountingType.Add('requireMoveToBinAmtDenominations', EndOfDayProfile."Require Denomin. (Move to Bin)");
+                    CountingType.Add('bankDepositRef', GetReferenceNo(Enum::"NPR Reference No. Target"::EOD_BankDeposit, EndOfDayProfile, POSUnitNo, PaymentMethod.Code, _POSWorkShiftCheckpoint."Entry No."));
+                    CountingType.Add('moveToBinRef', GetReferenceNo(Enum::"NPR Reference No. Target"::EOD_MoveToBin, EndOfDayProfile, POSUnitNo, PaymentMethod.Code, _POSWorkShiftCheckpoint."Entry No."));
 
                     Clear(CoinTypes);
                     PaymentMethodDenom.SetFilter("POS Payment Method Code", '=%1', POSPaymentBinCheckPoint."Payment Method No.");
@@ -236,6 +238,35 @@
             end;
 
         until (POSPaymentBinCheckPoint.Next() = 0);
+    end;
+
+    internal procedure GetReferenceNo(RefNoTarget: Enum "NPR Reference No. Target"; EndOfDayProfile: Record "NPR POS End of Day Profile"; POSUnitNo: Code[10]; POSPmtMethodCode: Code[10]; CheckpointEntryNo: Integer): Text
+    var
+        RefNoAssignment: Interface "NPR Reference No. Assignment";
+        RefNoAssignmentHelper: Codeunit "NPR Ref.No. Assignment Helper";
+        AssignmentMethod: Enum "NPR Ref.No. Assignment Method";
+        Parameters: Dictionary of [Text, Text];
+    begin
+        case RefNoTarget of
+            RefNoTarget::EOD_BankDeposit:
+                AssignmentMethod := EndofDayProfile."Bank Deposit Ref. Asgmt.";
+            RefNoTarget::EOD_MoveToBin:
+                AssignmentMethod := EndofDayProfile."Move to Bin Ref. Asgmt.";
+            RefNoTarget::BT_OUT_BankDeposit:
+                AssignmentMethod := EndofDayProfile."BT OUT: Bank Dep. Ref. Asgmt.";
+            RefNoTarget::BT_OUT_MoveToBin:
+                AssignmentMethod := EndofDayProfile."BT OUT: Move to Bin Ref.Asgmt.";
+            RefNoTarget::BT_IN_FromBank:
+                AssignmentMethod := EndofDayProfile."BT IN: Tr.from Bank Ref.Asgmt.";
+            RefNoTarget::BT_IN_FromBin:
+                AssignmentMethod := EndofDayProfile."BT IN: Move fr. Bin Ref.Asgmt.";
+        end;
+        Parameters.Add(RefNoAssignmentHelper.PosUnitNoParam(), POSUnitNo);
+        Parameters.Add(RefNoAssignmentHelper.PosPmtMethodCodeParam(), POSPmtMethodCode);
+        Parameters.Add(RefNoAssignmentHelper.CheckpointEntryNoParam(), Format(CheckpointEntryNo, 0, 9));
+        RefNoAssignmentHelper.OnGenerateParameterDictionary(RefNoTarget, EndOfDayProfile, AssignmentMethod, Parameters);
+        RefNoAssignment := AssignmentMethod;
+        exit(RefNoAssignment.GetReferenceNo(EndOfDayProfile, RefNoTarget, Parameters));
     end;
 
     local procedure GetClosingAndTransfer() ClosingAndTransfer: JsonArray
@@ -267,9 +298,9 @@
 
     end;
 
-    local procedure GetCashCount(EndOfDayProfile: Record "NPR POS End of Day Profile") CashCount: JsonObject
+    local procedure GetCashCount(EndOfDayProfile: Record "NPR POS End of Day Profile"; POSUnitNo: Code[10]) CashCount: JsonObject
     begin
-        CashCount.Add('counting', GetCashCountingTypes(EndOfDayProfile));
+        CashCount.Add('counting', GetCashCountingTypes(EndOfDayProfile, POSUnitNo));
         CashCount.Add('closingAndTransfer', GetClosingAndTransfer());
     end;
 
@@ -305,12 +336,9 @@
     var
         EndOfDayProfile: Record "NPR POS End of Day Profile";
         Response: JsonObject;
-        JsonText: Text;
         ResponseLbl: Label '%1 - %2', Locked = true;
         CheckpointEntryNo: Integer;
     begin
-        Context.WriteTo(JsonText);
-
         CheckpointEntryNo := GetValueAsInteger(Context, 'checkPointId');
 
         _POSWorkShiftCheckpoint.get(CheckpointEntryNo);
@@ -319,14 +347,12 @@
 
         Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkShiftCheckpoint.TableCaption(), _POSWorkShiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
-        Response.Add('cashCount', GetCashCount(EndOfDayProfile));
+        Response.Add('cashCount', GetCashCount(EndOfDayProfile, _POSWorkShiftCheckpoint."POS Unit No."));
         Response.Add('bins', GetAvailableBins(_POSWorkShiftCheckpoint."POS Unit No."));
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
         Response.Add('hideTurnover', EndOfDayProfile."Hide Turnover Section");
         Response.Add('backendContext', GetEndOfDayContext(Context));
         Response.Add('reportType', _POSWorkShiftCheckpoint.Type);
-
-        Response.WriteTo(JsonText);
 
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
@@ -334,11 +360,8 @@
     local procedure BalancingSetState(Context: JsonObject)
     var
         POSSession: Codeunit "NPR POS Session";
-        JsonText: Text;
         CheckpointEntryNo: Integer;
     begin
-        Context.WriteTo(JsonText);
-
         CheckpointEntryNo := GetValueAsInteger(Context, 'state.backendContext.checkPointId');
         _POSWorkShiftCheckpoint.Get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");

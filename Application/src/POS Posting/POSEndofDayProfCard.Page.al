@@ -1,7 +1,7 @@
 ﻿page 6150752 "NPR POS End of Day Prof. Card"
 {
     Extensible = False;
-    Caption = 'NPR POS End of Day Profile Card';
+    Caption = 'POS End of Day/Bin Tr. Profile Card';
     ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/eod/balance_config/';
     PageType = Card;
     SourceTable = "NPR POS End of Day Profile";
@@ -90,6 +90,38 @@
                     ToolTip = 'Specifies whether editing of the Difference field is allowed on the counting page.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Bank Deposit Ref. Asgmt."; Rec."Bank Deposit Ref. Asgmt.")
+                {
+                    ToolTip = 'Specifies the method used for reference number assignment for "Bank Deposit" amounts posted in end-of-day transactions.';
+                    ApplicationArea = NPRRetail;
+                    Visible = BackendGeneratedBinReferences;
+                }
+                group(BankDep_Subgroup)
+                {
+                    ShowCaption = false;
+                    Visible = Rec."Bank Deposit Ref. Asgmt." = Rec."Bank Deposit Ref. Asgmt."::NoSeries;
+                    field("Bank Deposit Ref. Nos."; Rec."Bank Deposit Ref. Nos.")
+                    {
+                        ToolTip = 'Specifies the number series used for reference number assignment for "Bank Deposit" amounts posted in end-of-day transactions.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
+                field("Move to Bin Ref. Asgmt."; Rec."Move to Bin Ref. Asgmt.")
+                {
+                    ToolTip = 'Specifies the method used for reference number assignment for "Move to Bin" amounts posted in end-of-day transactions.';
+                    ApplicationArea = NPRRetail;
+                    Visible = BackendGeneratedBinReferences;
+                }
+                group(MoveToBin_Subgroup)
+                {
+                    ShowCaption = false;
+                    Visible = Rec."Move to Bin Ref. Asgmt." = Rec."Move to Bin Ref. Asgmt."::NoSeries;
+                    field("Move to Bin Ref. Nos."; Rec."Move to Bin Ref. Nos.")
+                    {
+                        ToolTip = 'Specifies the number series used for reference number assignment for "Move to Bin" amounts posted in end-of-day transactions.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
                 group(RequireDenominations)
                 {
                     Caption = 'Require Denominations';
@@ -112,15 +144,95 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
-                group(BinTransfer)
+            }
+            group(BinTransfer)
+            {
+                Caption = 'Bin Transfer';
+                Visible = BinTransferVisible;
+                group(BinTransferOUT)
                 {
-                    Caption = 'Bin Transfer';
-                    Visible = BinTransferVisible;
+                    Caption = 'Transfer OUT';
+                    field("BT OUT: Bank Dep. Ref. Asgmt."; Rec."BT OUT: Bank Dep. Ref. Asgmt.")
+                    {
+                        Caption = 'Bank Deposit Ref. Asgmt. Method';
+                        ToolTip = 'Specifies the method used for reference number assignment for "Bank Deposit" amounts posted in Bin TransferOUT transactions.';
+                        ApplicationArea = NPRRetail;
+                        Visible = BackendGeneratedBinReferences;
+                    }
+                    group(BTOUT_BankDep_Subgroup)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."BT OUT: Bank Dep. Ref. Asgmt." = Rec."BT OUT: Bank Dep. Ref. Asgmt."::NoSeries;
+                        field("BT OUT: Bank Deposit Ref. Nos."; Rec."BT OUT: Bank Deposit Ref. Nos.")
+                        {
+                            Caption = 'Bank Deposit Ref. Nos.';
+                            ToolTip = 'Specifies the number series used for reference number assignment for "Bank Deposit" amounts posted in Bin TransferOUT transactions.';
+                            ApplicationArea = NPRRetail;
+                        }
+                    }
+                    field("BT OUT: Move to Bin Ref.Asgmt."; Rec."BT OUT: Move to Bin Ref.Asgmt.")
+                    {
+                        Caption = 'Move to Bin Ref. Asgmt. Method';
+                        ToolTip = 'Specifies the method used for reference number assignment for "Move to Bin" amounts posted in Bin TransferOUT transactions.';
+                        ApplicationArea = NPRRetail;
+                        Visible = BackendGeneratedBinReferences;
+                    }
+                    group(BTOUT_MoveToBin_Subgroup)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."BT OUT: Move to Bin Ref.Asgmt." = Rec."BT OUT: Move to Bin Ref.Asgmt."::NoSeries;
+                        field("BT OUT: Move to Bin Ref. Nos."; Rec."BT OUT: Move to Bin Ref. Nos.")
+                        {
+                            Caption = 'Move to Bin Ref. Nos.';
+                            ToolTip = 'Specifies the number series used for reference number assignment for "Move to Bin" amounts posted in Bin TransferOUT transactions.';
+                            ApplicationArea = NPRRetail;
+                        }
+                    }
+                }
+                group(BinTransferIN)
+                {
+                    Caption = 'Transfer IN';
                     field("Bin Transfer: Require Journal"; Rec."Bin Transfer: Require Journal")
                     {
                         Caption = 'Require Journal for Trans. INs';
                         ToolTip = 'Specifies if system will require a prestaged bin transfer journal line for a POS user to select from when performing a Bin TransferIN transaction.';
                         ApplicationArea = NPRRetail;
+                    }
+                    field("BT IN: Tr.from Bank Ref.Asgmt."; Rec."BT IN: Tr.from Bank Ref.Asgmt.")
+                    {
+                        Caption = 'Tr. from Bank Ref. Asgmt. Method';
+                        ToolTip = 'Specifies the method used for reference number assignment for "Transfer from Bank" amounts posted in Bin TransferIN transactions.';
+                        ApplicationArea = NPRRetail;
+                        Visible = BackendGeneratedBinReferences;
+                    }
+                    group(BTIN_TrFromBank_Subgroup)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."BT IN: Tr.from Bank Ref.Asgmt." = Rec."BT IN: Tr.from Bank Ref.Asgmt."::NoSeries;
+                        field("BT IN: Tr.from Bank Ref. Nos."; Rec."BT IN: Tr.from Bank Ref. Nos.")
+                        {
+                            Caption = 'Transf. from Bank Ref. Nos.';
+                            ToolTip = 'Specifies the number series used for reference number assignment for "Transfer from Bank" amounts posted in Bin TransferIN transactions.';
+                            ApplicationArea = NPRRetail;
+                        }
+                    }
+                    field("BT IN: Move fr. Bin Ref.Asgmt."; Rec."BT IN: Move fr. Bin Ref.Asgmt.")
+                    {
+                        Caption = 'Move from Bin Ref. Asgmt. Method';
+                        ToolTip = 'Specifies the method used for reference number assignment for "Move from Bin" amounts posted in Bin TransferIN transactions.';
+                        ApplicationArea = NPRRetail;
+                        Visible = BackendGeneratedBinReferences;
+                    }
+                    group(BTIN_MoveFromBin_Subgroup)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."BT IN: Move fr. Bin Ref.Asgmt." = Rec."BT IN: Move fr. Bin Ref.Asgmt."::NoSeries;
+                        field("BT IN: Move fr. Bin Ref. Nos."; Rec."BT IN: Move fr. Bin Ref. Nos.")
+                        {
+                            Caption = 'Move from Bin Ref. Nos.';
+                            ToolTip = 'Specifies the number series used for reference number assignment for "Move from Bin" amounts posted in Bin TransferIN transactions.';
+                            ApplicationArea = NPRRetail;
+                        }
                     }
                 }
             }
@@ -133,8 +245,10 @@
         POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
     begin
         BinTransferVisible := FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
+        BackendGeneratedBinReferences := FeatureFlagsManagement.IsEnabled('backendGeneratedBinReferences');
     end;
 
     var
         BinTransferVisible: Boolean;
+        BackendGeneratedBinReferences: Boolean;
 }

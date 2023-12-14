@@ -1,7 +1,7 @@
 ﻿page 6150637 "NPR POS End of Day Profiles"
 {
     Extensible = False;
-    Caption = 'POS End of Day Profile';
+    Caption = 'POS End of Day/Bin Tr. Profile';
     ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/eod/balance_config/';
     PageType = List;
     UsageCategory = Administration;
