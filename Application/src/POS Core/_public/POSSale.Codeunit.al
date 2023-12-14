@@ -819,15 +819,10 @@
 
     local procedure RunAfterEndSale(xRec: Record "NPR POS Sale")
     var
-        CreateDeFiskalyonSale: Codeunit "NPR Create De Fiskaly on Sale";
         Success: Boolean;
         AfterEndSaleErr: Label 'An error occurred after the sale ended: %1';
-        FiskalyError: Label 'The error occurred during the fiskaly process: %1';
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
-        if not CreateDeFiskalyOnSale.Run(xRec) then
-            Message(FiskalyError, GetLastErrorText);
-
         ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
