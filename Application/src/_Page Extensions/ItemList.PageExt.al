@@ -319,11 +319,11 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        LabelLibrary: Codeunit "NPR Label Library";
+                        LabelManagement: Codeunit "NPR Label Management";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
-                        LabelLibrary.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Price Label".AsInteger());
+                        LabelManagement.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
                 action("NPR Shelf Label")
@@ -341,11 +341,11 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     trigger OnAction()
                     var
                         Item: Record Item;
-                        LabelLibrary: Codeunit "NPR Label Library";
+                        LabelManagement: Codeunit "NPR Label Management";
                     begin
                         Item := Rec;
                         Item.SetRecFilter();
-                        LabelLibrary.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Shelf Label".AsInteger());
+                        LabelManagement.ResolveVariantAndPrintItem(Item, "NPR Report Selection Type"::"Shelf Label".AsInteger());
                     end;
                 }
             }

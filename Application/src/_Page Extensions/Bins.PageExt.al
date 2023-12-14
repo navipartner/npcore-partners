@@ -14,9 +14,9 @@ pageextension 6014478 "NPR Bins" extends Bins
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.PrintLabel(Rec, "NPR Report Selection Type"::"Bin Label".AsInteger());
+                    LabelManagement.PrintLabel(Rec, "NPR Report Selection Type"::"Bin Label".AsInteger());
                 end;
             }
 
@@ -29,16 +29,16 @@ pageextension 6014478 "NPR Bins" extends Bins
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                     RecRef: RecordRef;
                 begin
                     SetSelectionFilter(Rec);
                     RecRef.GetTable(Rec);
                     if RecRef.FindSet() then
                         repeat
-                            LabelLibrary.ToggleLine(RecRef);
+                            LabelManagement.ToggleLine(RecRef);
                         until RecRef.Next() = 0;
-                    LabelLibrary.PrintSelection("NPR Report Selection Type"::"Bin Label".AsInteger());
+                    LabelManagement.PrintSelection("NPR Report Selection Type"::"Bin Label".AsInteger());
                     Rec.MarkedOnly(false);
                 end;
             }

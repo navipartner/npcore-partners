@@ -18,16 +18,16 @@ codeunit 6059844 "NPR Retail Print"
 
     procedure ItemToRetailJnlLine(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; PK: Code[40]; var RetailJournalLineOut: Record "NPR Retail Journal Line")
     var
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
     begin
-        LabelLibrary.ItemToRetailJnlLine(ItemNo, VariantCode, Quantity, PK, RetailJournalLineOut);
+        LabelManagement.ItemToRetailJnlLine(ItemNo, VariantCode, Quantity, PK, RetailJournalLineOut);
     end;
 
     procedure PrintRetailJournal(var JournalLine: Record "NPR Retail Journal Line"; ReportType: Integer)
     var
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
     begin
-        LabelLibrary.PrintRetailJournal(JournalLine, ReportType);
+        LabelManagement.PrintRetailJournal(JournalLine, ReportType);
     end;
 
     procedure GetDataItemTableId(Code: Code[10]; Level: Integer): Integer

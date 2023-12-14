@@ -57,7 +57,7 @@
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
-                        LabelLibrary.ToggleLine(RecRef);
+                        LabelManagement.ToggleLine(RecRef);
                     end;
                 }
                 field(Barcode; Rec.Barcode)
@@ -185,7 +185,7 @@
                         if Rec.FindSet() then
                             repeat
                                 RecRef.GetTable(Rec);
-                                LabelLibrary.ToggleLine(RecRef);
+                                LabelManagement.ToggleLine(RecRef);
                             until Rec.Next() = 0;
                     end;
                 }
@@ -198,7 +198,7 @@
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        Print := LabelLibrary.SelectionContains(RecRef);
+        Print := LabelManagement.SelectionContains(RecRef);
 
     end;
 
@@ -207,8 +207,8 @@
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        if LabelLibrary.SelectionContains(RecRef) then
-            LabelLibrary.ToggleLine(RecRef);
+        if LabelManagement.SelectionContains(RecRef) then
+            LabelManagement.ToggleLine(RecRef);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -218,20 +218,20 @@
 
     var
         Print: Boolean;
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
 
     internal procedure InvertSelection()
     var
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        LabelLibrary.InvertAllLines(RecRef);
+        LabelManagement.InvertAllLines(RecRef);
         CurrPage.Update(false);
     end;
 
     procedure PrintSelection(ReportType: Integer)
     begin
-        LabelLibrary.PrintSelection(ReportType);
+        LabelManagement.PrintSelection(ReportType);
     end;
 }
 
