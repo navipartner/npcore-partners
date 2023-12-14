@@ -942,8 +942,8 @@
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
-                        LabelLibrary.ToggleLine(RecRef);
-                        LabelLibrary.PrintSelection("NPR Report Selection Type"::"Shelf Label".AsInteger());
+                        LabelManagement.ToggleLine(RecRef);
+                        LabelManagement.PrintSelection("NPR Report Selection Type"::"Shelf Label".AsInteger());
                     end;
                 }
                 action("Price Label")
@@ -963,8 +963,8 @@
                         RecRef: RecordRef;
                     begin
                         RecRef.GetTable(Rec);
-                        LabelLibrary.ToggleLine(RecRef);
-                        LabelLibrary.PrintSelection("NPR Report Selection Type"::"Price Label".AsInteger());
+                        LabelManagement.ToggleLine(RecRef);
+                        LabelManagement.PrintSelection("NPR Report Selection Type"::"Price Label".AsInteger());
                     end;
                 }
             }
@@ -1287,7 +1287,7 @@
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         ItemWorksheetMgt: Codeunit "NPR Item Worksheet Mgt.";
         ItemWshtImpExpMgt: Codeunit "NPR Item Wsht. Imp. Exp.";
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
         SuggestItemWorksheetLines: Report "NPR Suggest Item Worksh. Lines";
         FieldsEditable: Boolean;
         NPRAttrEditable: Boolean;

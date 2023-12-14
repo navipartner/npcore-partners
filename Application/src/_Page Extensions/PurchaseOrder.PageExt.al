@@ -95,7 +95,7 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
                 begin
                     if not InventorySetup.Get() then
                         exit;
-                    
+
                     RecRef.GetTable(Rec);
                     ScannerImportMgt.ImportFromScanner(InventorySetup."NPR Scanner Provider", Enum::"NPR Scanner Import"::PURCHASE, RecRef);
                 end;
@@ -118,9 +118,9 @@ pageextension 6014451 "NPR Purchase Order" extends "Purchase Order"
 
                 trigger OnAction()
                 var
-                    LabelLibrary: Codeunit "NPR Label Library";
+                    LabelManagement: Codeunit "NPR Label Management";
                 begin
-                    LabelLibrary.ChooseLabel(Rec);
+                    LabelManagement.ChooseLabel(Rec);
                 end;
             }
         }

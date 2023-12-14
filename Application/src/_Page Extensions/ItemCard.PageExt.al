@@ -902,7 +902,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                     trigger OnAction()
                     var
-                        PrintLabelAndDisplay: Codeunit "NPR Label Library";
+                        PrintLabelAndDisplay: Codeunit "NPR Label Management";
                     begin
                         PrintLabelAndDisplay.ResolveVariantAndPrintItem(Rec, "NPR Report Selection Type"::"Price Label".AsInteger());
                     end;

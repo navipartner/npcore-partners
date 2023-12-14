@@ -273,7 +273,7 @@
             exit;
 
         RecRef.GetTable(Rec);
-        Print := LabelLibrary.SelectionContains(RecRef);
+        Print := LabelManagement.SelectionContains(RecRef);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -281,8 +281,8 @@
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        if LabelLibrary.SelectionContains(RecRef) then
-            LabelLibrary.ToggleLine(RecRef);
+        if LabelManagement.SelectionContains(RecRef) then
+            LabelManagement.ToggleLine(RecRef);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -298,7 +298,7 @@
     end;
 
     var
-        LabelLibrary: Codeunit "NPR Label Library";
+        LabelManagement: Codeunit "NPR Label Management";
         Print: Boolean;
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
         SkipConfirm: Boolean;
@@ -335,7 +335,7 @@
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        LabelLibrary.InvertAllLines(RecRef);
+        LabelManagement.InvertAllLines(RecRef);
         CurrPage.Update(false);
     end;
 
@@ -344,7 +344,7 @@
         RetailJnlLine: Record "NPR Retail Journal Line";
         RecRef: RecordRef;
     begin
-        LabelLibrary.PrintSelection(ReportType);
+        LabelManagement.PrintSelection(ReportType);
 
         If SkipConfirm then
             exit;
@@ -354,9 +354,9 @@
             if RetailJnlLine.FindSet() then
                 repeat
                     RecRef.GetTable(RetailJnlLine);
-                    if LabelLibrary.SelectionContains(RecRef) then begin
+                    if LabelManagement.SelectionContains(RecRef) then begin
                         RetailJnlLine.Delete(true);
-                        LabelLibrary.ToggleLine(RecRef);
+                        LabelManagement.ToggleLine(RecRef);
                     end;
                 until RetailJnlLine.Next() = 0;
         end;
@@ -427,7 +427,7 @@
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        LabelLibrary.ToggleLine(RecRef);
+        LabelManagement.ToggleLine(RecRef);
     end;
 
     [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
