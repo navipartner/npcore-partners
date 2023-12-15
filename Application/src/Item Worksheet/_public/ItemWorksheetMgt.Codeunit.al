@@ -592,12 +592,18 @@
             exit(false);
     end;
 
-    internal procedure IsDoNotMapField(TableNumber: Integer; FieldNumber: Integer): Boolean
+    internal procedure IsDoNotMapField(TableNumber: Integer; FieldNumber: Integer) Result: Boolean
     var
         Item: Record Item;
         ItemWorksheetVariantLine: Record "NPR Item Worksh. Variant Line";
         ItemWorksheetLine: Record "NPR Item Worksheet Line";
+        IsHandled: Boolean;
     begin
+        OnBeforeIsDoNotMapField(TableNumber, FieldNumber, Result, IsHandled);
+
+        if IsHandled then
+            exit;
+
         case TableNumber of
             DATABASE::Item:
                 if FieldNumber in [
@@ -758,5 +764,9 @@
                 end;
             until ItemWorksheetFieldSetup.Next() = 0;
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsDoNotMapField(TableNumber: Integer; FieldNumber: Integer; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+}
