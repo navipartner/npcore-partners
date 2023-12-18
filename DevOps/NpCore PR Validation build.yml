@@ -29,7 +29,7 @@ stages:
         - name: BC1906
 
         - name: BC2103_CLOUD
-          alwaysRun: true        
+          alwaysRun: true
 
         - name: vPrevious_CLOUD
           compareAppWithSpecificCompareAppVersion: true
