@@ -194,10 +194,11 @@
             ConfigTemplateMgt.ApplyTemplateLinesWithoutValidation(ConfigTemplateHeader, RecRef);
             RecRef.SetTable(Item);
         end;
+        Item.Modify();
 
         //onInsert default dimensions there is Item.Modify
         if ApplyItemCategoryDimensionsToItem(ItemCategory, Item, true) then
-            Item.Modify();
+            Item.Find();
     end;
 
     internal procedure GetVATPostingSetupFromItemCategory(ItemCategory: Record "Item Category"; var VATPostingSetup: Record "VAT Posting Setup"): Boolean
@@ -454,7 +455,6 @@
     var
         DefaultDimension: Record "Default Dimension";
         DefaultDimension2: Record "Default Dimension";
-        DimensionManagement: Codeunit DimensionManagement;
         ConfirmQst: Label 'Apply Dimensions from Item Category to Item?';
     begin
         if ItemCategory.IsTemporary() or Item.IsTemporary() then
@@ -484,10 +484,6 @@
                 DefaultDimension2.Insert(true);
             until DefaultDimension.Next() = 0;
 
-        DimensionManagement.UpdateDefaultDim(
-            Database::Item, Item."No.",
-            Item."Global Dimension 1 Code",
-            Item."Global Dimension 2 Code");
         exit(true);
     end;
 
