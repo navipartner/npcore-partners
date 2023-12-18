@@ -633,7 +633,9 @@
         GlobalSettingsSystemWorkflowsLbl: Label 'System workflows';
         GlobalSettingsSystemWorkflowsDefineWorkflowLbl: Label 'Define which workflow should run in certain situation';
         GlobalSettingsSystemWorkFlowLoginLbl: Label 'Login :';
-        GlobalSettingsSystemWorkFlowItemLbl: Label 'Item :';
+        GlobalSettingsSystemWorkFlowItemLbl: Label 'Add Item to Order :';
+        GlobalSettingsSystemWorkFlowCustomerSelectLbl: Label 'Customer Select :';
+        GlobalSettingsSystemWorkFlowMakePaymentLbl: Label 'Make Payment :';
         GlobalSettingsSystemWorkFlowSelectWorkflowLbl: Label 'Select Workflow';
         GlobalSettingsSystemWorkNoEditableVariablesLbl: Label 'No Editable Variables';
         ColorPickerDeleteColorLbl: Label 'Delete Color';
@@ -1048,6 +1050,8 @@
         Captions.Add('Global_Settings_SystemWorkflowsDefineWorkflow', GlobalSettingsSystemWorkflowsDefineWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkFlowLogin', GlobalSettingsSystemWorkFlowLoginLbl);
         Captions.Add('Global_Settings_SystemWorkFlowItem', GlobalSettingsSystemWorkFlowItemLbl);
+        Captions.Add('Global_Settings_SystemWorkFlowMake_Payment', GlobalSettingsSystemWorkFlowMakePaymentLbl);
+        Captions.Add('Global_Settings_SystemWorkFlowCustomer_Select', GlobalSettingsSystemWorkFlowCustomerSelectLbl);
         Captions.Add('Global_Settings_SystemWorkFlowSelectWorkflow', GlobalSettingsSystemWorkFlowSelectWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkNoEditableVariables', GlobalSettingsSystemWorkNoEditableVariablesLbl);
         Captions.Add('Global_Settings_SystemWorkFlowEditVariables', GlobalSettingsEditVariablesLbl);
@@ -1141,7 +1145,7 @@
         Captions.Add('BinTransfer_PaymentTypeNo', BinTransferPaymentTypeNoLbl);
         Captions.Add('BinTransfer_Description', BinTransferDescriptionLbl);
         Captions.Add('BinTransfer_CashCountNothingToCount', BinTransferCashCountNothingToCountLbl);
-        Captions.Add('BinTransfer_CashCountNothingToCountMessage', BinTransferCashCountNothingToCountMessageLbl);        
+        Captions.Add('BinTransfer_CashCountNothingToCountMessage', BinTransferCashCountNothingToCountMessageLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
