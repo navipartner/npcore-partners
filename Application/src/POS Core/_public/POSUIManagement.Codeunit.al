@@ -353,8 +353,8 @@
         BalancingIssuedVouchersLCYLbl: Label 'Issued Vouchers (LCY)';
         BalancingOtherLbl: Label 'Other';
         BalancingRoundingLCYLbl: Label 'Rounding (LCY)';
-        BalancingBinTransferOutAmountLCYLbl: Label 'Bin Transfer Out Amount (LCY)';
-        BalancingBinTransferInAmountLCYLbl: Label 'Bin Transfer In Amount (LCY)';
+        BalancingBinTransferOutAmountLCYLbl: Label 'Transfer OUT Amount (LCY)';
+        BalancingBinTransferInAmountLCYLbl: Label 'Transfer IN Amount (LCY)';
         BalancingCreditSalesLbl: Label 'Credit Sales';
         BalancingCreditSalesCountLbl: Label 'Credit Sales Count (LCY)';
         BalancingCreditSalesAmountLCYLbl: Label 'Credit Sales Amount (LCY)';
