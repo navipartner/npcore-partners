@@ -14,6 +14,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Error(RSFiscalGTINErr);
             end;
         }
+        modify("Item Category Code")
+        {
+            trigger OnAfterValidate()
+            begin
+                CurrPage.Update(true);
+            end;
+        }
 
         addafter(Description)
         {
