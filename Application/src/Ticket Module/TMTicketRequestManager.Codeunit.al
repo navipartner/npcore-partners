@@ -559,7 +559,7 @@
 
     end;
 
-    procedure FinalizePayment(Token: Text[100])
+    procedure FinalizePayment(Token: Text[100]; TokenLineNumber: Integer)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -569,11 +569,15 @@
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
+        
         TicketReservationRequest.FindSet();
         repeat
-            if TicketReservationRequest.Default then
+            if (TicketReservationRequest.Default) then
                 SwitchTicketReservationEntryNo(TicketReservationRequest);
+
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
                 repeat
@@ -586,8 +590,13 @@
         until (TicketReservationRequest.Next() = 0);
     end;
 
-    [CommitBehavior(CommitBehavior::Error)]
     procedure ConfirmReservationRequest(Token: Text[100]; var ResponseMessage: Text) ReservationConfirmed: Boolean
+    begin
+        exit(ConfirmReservationRequest(Token, 0, ResponseMessage));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure ConfirmReservationRequest(Token: Text[100]; TokenLineNumber: Integer; var ResponseMessage: Text) ReservationConfirmed: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
@@ -599,6 +608,8 @@
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
         if (not TicketReservationRequest.IsEmpty()) then begin
             ResponseMessage := StrSubstNo(TOKEN_EXPIRED, Token);
@@ -618,6 +629,8 @@
 
         // Update the response object
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationResponse.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationResponse.ModifyAll(Status, ReservationConfirmed);
         TicketReservationResponse.ModifyAll(Confirmed, ReservationConfirmed);
         TicketReservationResponse.ModifyAll("Response Message", ResponseMessage);
@@ -633,6 +646,8 @@
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
 
         // Filter only on Required and Selected
@@ -647,7 +662,7 @@
         TicketReservationRequest.ModifyAll("Request Status Date Time", CurrentDateTime);
         TicketReservationRequest.ModifyAll("Expires Date Time", CreateDateTime(0D, 0T));
 
-        FinalizePayment(Token);
+        FinalizePayment(Token, TokenLineNumber);
 
         exit(true);
     end;
@@ -676,6 +691,14 @@
         ResponseMessage: Text;
     begin
         if (not ConfirmReservationRequest(Token, ResponseMessage)) then
+            Error(ResponseMessage);
+    end;
+
+    procedure ConfirmReservationRequestWithValidate(Token: Text[100]; TokenLineNumber: Integer)
+    var
+        ResponseMessage: Text;
+    begin
+        if (not ConfirmReservationRequest(Token, TokenLineNumber, ResponseMessage)) then
             Error(ResponseMessage);
     end;
 
