@@ -426,7 +426,6 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         JobQueueCategoryTok: Label 'MMAZUREUPD', Locked = true, MaxLength = 10;
         JobQueueDescLbl: Label 'Dequeue and update member information from Azure user input', Locked = true;
     begin
-        Evaluate(NextRunDateFormula, '<1D>');
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
 
         if (JobQueueMgt.InitRecurringJobQueueEntry(
@@ -441,6 +440,11 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
             JobQueueCategoryTok,
             JobQueueEntry))
         then begin
+            JobQueueEntry."No. of Minutes between Runs" := 1;
+            JobQueueEntry."Recurring Job" := true;
+            JobQueueEntry.Validate("Starting Time", 070001T);
+            JobQueueEntry."Ending Time" := 220000T;
+            JobQueueEntry.Modify();
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
             exit(true);
         end;
