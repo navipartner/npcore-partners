@@ -27,7 +27,20 @@ stages:
 
       containerDefinitions:
         - name: Auto
-        
+
+        - name: BC1700
+
+        - name: BC1704
+
+        - name: BC1711
+
+        - name: BC1804
+       
+        - name: BC1906
+
+        - name: BC2103_CLOUD
+          alwaysRun: true
+
         - name: vPrevious_CLOUD
           alwaysRun: true
 
@@ -59,6 +72,7 @@ stages:
         objectCaption: 'NP Retail'
         xmlRoleId: 'NP RETAIL'
         xmlRoleName: 'NP Retail'        
+      runTests: true
       testApps:
       - 'Performance Toolkit'
       - 'Test'
