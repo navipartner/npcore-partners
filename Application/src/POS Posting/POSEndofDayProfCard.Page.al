@@ -94,7 +94,6 @@
                 {
                     ToolTip = 'Specifies the method used for reference number assignment for "Bank Deposit" amounts posted in end-of-day transactions.';
                     ApplicationArea = NPRRetail;
-                    Visible = BackendGeneratedBinReferences;
                 }
                 group(BankDep_Subgroup)
                 {
@@ -110,7 +109,6 @@
                 {
                     ToolTip = 'Specifies the method used for reference number assignment for "Move to Bin" amounts posted in end-of-day transactions.';
                     ApplicationArea = NPRRetail;
-                    Visible = BackendGeneratedBinReferences;
                 }
                 group(MoveToBin_Subgroup)
                 {
@@ -157,7 +155,6 @@
                         Caption = 'Bank Deposit Ref. Asgmt. Method';
                         ToolTip = 'Specifies the method used for reference number assignment for "Bank Deposit" amounts posted in Bin TransferOUT transactions.';
                         ApplicationArea = NPRRetail;
-                        Visible = BackendGeneratedBinReferences;
                     }
                     group(BTOUT_BankDep_Subgroup)
                     {
@@ -175,7 +172,6 @@
                         Caption = 'Move to Bin Ref. Asgmt. Method';
                         ToolTip = 'Specifies the method used for reference number assignment for "Move to Bin" amounts posted in Bin TransferOUT transactions.';
                         ApplicationArea = NPRRetail;
-                        Visible = BackendGeneratedBinReferences;
                     }
                     group(BTOUT_MoveToBin_Subgroup)
                     {
@@ -203,7 +199,6 @@
                         Caption = 'Tr. from Bank Ref. Asgmt. Method';
                         ToolTip = 'Specifies the method used for reference number assignment for "Transfer from Bank" amounts posted in Bin TransferIN transactions.';
                         ApplicationArea = NPRRetail;
-                        Visible = BackendGeneratedBinReferences;
                     }
                     group(BTIN_TrFromBank_Subgroup)
                     {
@@ -221,7 +216,6 @@
                         Caption = 'Move from Bin Ref. Asgmt. Method';
                         ToolTip = 'Specifies the method used for reference number assignment for "Move from Bin" amounts posted in Bin TransferIN transactions.';
                         ApplicationArea = NPRRetail;
-                        Visible = BackendGeneratedBinReferences;
                     }
                     group(BTIN_MoveFromBin_Subgroup)
                     {
@@ -245,10 +239,8 @@
         POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
     begin
         BinTransferVisible := FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag());
-        BackendGeneratedBinReferences := FeatureFlagsManagement.IsEnabled('backendGeneratedBinReferences');
     end;
 
     var
         BinTransferVisible: Boolean;
-        BackendGeneratedBinReferences: Boolean;
 }
