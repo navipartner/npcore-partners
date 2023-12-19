@@ -171,12 +171,12 @@
         _LastSalePOSEntry := POSEntryIn;
     end;
 
-    internal procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
+    procedure GetLastSalePOSEntry(var POSEntryOut: Record "NPR POS Entry")
     begin
         POSEntryOut := _LastSalePOSEntry;
     end;
 
-    internal procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
+    procedure GetLastSaleInfo(var LastSaleTotalOut: Decimal; var LastSalePaymentOut: Decimal; var LastSaleDateTextOut: Text; var LastSaleReturnAmountOut: Decimal; var LastReceiptNoOut: Text)
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
