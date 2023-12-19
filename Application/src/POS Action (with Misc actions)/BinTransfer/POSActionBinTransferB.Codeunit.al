@@ -637,6 +637,6 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
 
     procedure NewBinTransferFeatureFlag(): Text[50]
     begin
-        exit('binTransferDragonglassDialog');
+        exit('binTransferDragonglassDialog_v2');
     end;
 }
