@@ -162,7 +162,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         EndOfDayUIHandler: Codeunit "NPR End Of Day UI Handler";
         PaymentBinCheckpointHdlr: Codeunit "NPR POS Payment Bin Checkpoint";
         WorkshiftCheckpointHdlr: Codeunit "NPR POS Workshift Checkpoint";
-        DirectionLbl: Label 'OUT,IN';
+        DirectionLbl: Label 'OUT,IN', Locked = true;
         TransferDirectionNotSetErr: Label 'Please select a transfer direction (in our out) for the POS button before using it.';
     begin
         If TransferDirection = 0 then
