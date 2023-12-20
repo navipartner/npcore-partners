@@ -45,6 +45,10 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
                 begin
                     CollectInStoreOrders(Context);
                 end;
+            'is_workflow_disabled':
+                begin
+                    FrontEnd.WorkflowResponse(SetWorkflowState(Context));
+                end;
         end;
     end;
 
@@ -57,7 +61,7 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionProcessCnCOrder.js###
-'let main=async({})=>await workflow.respond("run_collect_in_store_orders");'
+'let main=async({})=>await workflow.respond("run_collect_in_store_orders"),isWorkflowDisabled=async({workflow:e,context:r,popup:o,runtime:s,hwc:t,data:a,parameters:n,captions:i,scope:l})=>e.respond("is_workflow_disabled");'
         );
     end;
 
@@ -136,5 +140,14 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
         LocationFilter := GetLocationFilter(Context);
         SortingInt := Context.GetIntegerParameter('Sorting');
         NpCsPOSActionProcOrderB.RunCollectInStoreOrders(LocationFilter, SortingInt);
+    end;
+
+    local procedure SetWorkflowState(var Context: Codeunit "NPR POS JSON Helper"): JsonObject
+    var
+        NpCsPOSActionProcOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
+        LocationFilter: Text;
+    begin
+        LocationFilter := GetLocationFilter(Context);
+        Context.SetContext('disabled', not NpCsPOSActionProcOrderB.HasUnprocessedOrders(LocationFilter));
     end;
 }

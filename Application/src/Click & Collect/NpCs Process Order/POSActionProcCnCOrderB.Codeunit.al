@@ -30,4 +30,13 @@ codeunit 6151325 "NPR POSAction Proc. CnC OrderB"
         end;
         Page.Run(PAGE::"NPR NpCs Coll. Store Orders", NpCsDocument);
     end;
+
+    procedure HasUnprocessedOrders(LocationFilter: Text): Boolean
+    var
+        ClickCollectDataSourceExt: Codeunit "NPR NpCs Data Source Extension";
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        ClickCollectDataSourceExt.SetUnprocessedFilter(LocationFilter, NpCsDocument);
+        exit(not NpCsDocument.IsEmpty());
+    end;
 }
