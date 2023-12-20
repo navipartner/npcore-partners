@@ -162,7 +162,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         EndOfDayUIHandler: Codeunit "NPR End Of Day UI Handler";
         PaymentBinCheckpointHdlr: Codeunit "NPR POS Payment Bin Checkpoint";
         WorkshiftCheckpointHdlr: Codeunit "NPR POS Workshift Checkpoint";
-        DirectionLbl: Label 'OUT,IN', Locked = true;
+        TransferDirectionLbl: Label 'OUT,IN', Locked = true;
         TransferDirectionNotSetErr: Label 'Please select a transfer direction (in our out) for the POS button before using it.';
     begin
         If TransferDirection = 0 then
@@ -177,7 +177,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         Response.Add('cashCount', GetCashCount(EndOfDayProfile, POSUnit."No.", WorkshiftCheckpoint."Entry No.", TransferDirection));
         Response.Add('bins', EndOfDayUIHandler.GetAvailableBins(PosUnit."No."));
         Response.Add('checkPointId', WorkshiftCheckpoint."Entry No.");
-        Response.Add('direction', SelectStr(TransferDirection, DirectionLbl));
+        Response.Add('direction', SelectStr(TransferDirection, TransferDirectionLbl));
         if TransferDirection = TransferDirection::TransferIn then begin
             Response.Add('allowPrestagedTransfersOnly', EndOfDayProfile."Bin Transfer: Require Journal");
             Response.Add('prestagedTransfers', GetBinTransferJnlLines(EndOfDayProfile, PosUnit."No.", BinNo, WorkshiftCheckpoint."Entry No."));
