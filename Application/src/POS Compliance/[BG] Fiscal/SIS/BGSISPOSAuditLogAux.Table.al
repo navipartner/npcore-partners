@@ -48,6 +48,11 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
             Caption = 'Source Document No.';
             DataClassification = CustomerContent;
         }
+        field(8; "Amount Incl. Tax"; Decimal)
+        {
+            Caption = 'Amount Incl. Tax';
+            DataClassification = CustomerContent;
+        }
         field(10; "Grand Receipt No."; Text[10])
         {
             Caption = 'Grand Receipt No.';
