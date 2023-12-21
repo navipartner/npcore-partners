@@ -142,6 +142,24 @@ page 6059888 "NPR TM Ticket Item List"
                     TicketBomPage.MakeTourTicket(Rec."Item No.", Rec.Code);
                 end;
             }
+            Action(ImportExternalTickets)
+            {
+                ToolTip = 'Import tickets created by external party.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Import External Tickets';
+                Image = ExternalDocument;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    ImportTicket: Codeunit "NPR TM ImportTicketControl";
+                begin
+                    ImportTicket.ImportTicketsFromFile(true);
+                end;
+            }
             Action(ResynchronizeMagento)
             {
                 ToolTip = 'This action will emit data related to this ticket item to synchronize external systems.';

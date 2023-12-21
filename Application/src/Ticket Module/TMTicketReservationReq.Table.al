@@ -101,6 +101,12 @@
             Caption = 'External Ticket Number';
             DataClassification = CustomerContent;
         }
+        field(45; PreAssignedTicketNumber; Text[30])
+        {
+            Caption = 'Pre-Assigned Ticket Number';
+            DataClassification = CustomerContent;
+        }
+
         field(50; "Item No."; Code[20])
         {
             Caption = 'Item No.';

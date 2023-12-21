@@ -239,7 +239,6 @@
 
                         Page.Run(Page::"NPR TM Ticket List", TempTickets);
                     end;
-
                 }
                 action("Navi&gate")
                 {
@@ -294,6 +293,30 @@
                     PromotedCategory = Category4;
                     RunObject = Page "NPR TM RequestResponse";
                     RunPageLink = "Session Token ID" = field("Session Token ID");
+                }
+                action(TicketImportLog)
+                {
+                    ToolTip = 'Open the import ticket log list overview.';
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Imported Tickets Overview';
+                    Image = ImportLog;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "NPR TM ImportTicketLog";
+                }
+                action(TicketImportOrder)
+                {
+                    ToolTip = 'Open the import ticket order.';
+                    ApplicationArea = NPRTicketAdvanced;
+                    Caption = 'Imported Tickets Order';
+                    Scope = Repeater;
+                    Image = OrderTracking;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "NPR TM ImportTicketsArchive";
+                    RunPageLink = TicketRequestToken = field("Session Token ID");
                 }
                 group(ProcessGroup)
                 {

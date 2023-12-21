@@ -554,21 +554,21 @@ codeunit 85012 "NPR Library - Ticket XML API"
     end;
 
 
-    procedure ValidateTicketArrival(ExternalTicketNo: Code[20]; AdmissionCode: Code[20]; ScannerStation: Code[20]; var ResponseMessage: Text): Boolean
+    procedure ValidateTicketArrival(ExternalTicketNo: Code[30]; AdmissionCode: Code[20]; ScannerStation: Code[20]; var ResponseMessage: Text): Boolean
     var
         TicketWebService: Codeunit "NPR TM Ticket WebService";
     begin
         exit(TicketWebService.ValidateTicketArrival(AdmissionCode, ExternalTicketNo, ScannerStation, ResponseMessage));
     end;
 
-    procedure ValidateTicketDeparture(ExternalTicketNo: Code[20]; AdmissionCode: Code[20]; ScannerStation: Code[20]; var ResponseMessage: Text): Boolean
+    procedure ValidateTicketDeparture(ExternalTicketNo: Code[30]; AdmissionCode: Code[20]; ScannerStation: Code[20]; var ResponseMessage: Text): Boolean
     var
         TicketWebService: Codeunit "NPR TM Ticket WebService";
     begin
         exit(TicketWebService.ValidateTicketDeparture(AdmissionCode, ExternalTicketNo, ScannerStation, ResponseMessage));
     end;
 
-    procedure ListDetails_Ticket(ExternalTicketNo: Code[20]; var TmpTicketsOut: Record "NPR TM Ticket" temporary): Boolean
+    procedure ListDetails_Ticket(ExternalTicketNo: Code[30]; var TmpTicketsOut: Record "NPR TM Ticket" temporary): Boolean
     begin
         exit(ListDetails('TICKET', ExternalTicketNo, TmpTicketsOut));
     end;

@@ -160,6 +160,7 @@
         // The link to ticket is only on the first request
         TicketReservationRequest.FindFirst();
         TicketReservationRequest2.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+        TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
         TicketReservationRequest2.FindFirst();
 
         TicketReservationRequest.Reset();
