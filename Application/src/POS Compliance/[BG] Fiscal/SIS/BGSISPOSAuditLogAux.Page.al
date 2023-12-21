@@ -29,6 +29,21 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 {
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+
+                    trigger OnDrillDown()
+                    var
+                        POSEntry: Record "NPR POS Entry";
+                        POSEntryList: Page "NPR POS Entry List";
+                    begin
+                        if not (Rec."Audit Entry Type" in [Rec."Audit Entry Type"::"POS Entry"]) then
+                            exit;
+
+                        POSEntry.FilterGroup(2);
+                        POSEntry.SetRange("Entry No.", Rec."POS Entry No.");
+                        POSEntry.FilterGroup(0);
+                        POSEntryList.SetTableView(POSEntry);
+                        POSEntryList.Run();
+                    end;
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
@@ -49,6 +64,11 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 {
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies the value of the Source Document No. field.';
+                }
+                field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the total amount including taxes for the transaction.';
                 }
                 field("Grand Receipt No."; Rec."Grand Receipt No.")
                 {

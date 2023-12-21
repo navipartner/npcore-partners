@@ -15,10 +15,10 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
         ParamMethodCaptionLbl: Label 'Method';
         ParamMethodDescrLbl: Label 'Specifies the Method used.';
         // TO-DO this will be finished in one of the future tasks
-        // ParamMethodOptionsCaptionLbl: Label 'Get Mfc Info,Print Receipt,Print X Report,Print Z Report,Print Duplicate,Cash Handling,Print Last Not Fiscalized,Print Selected Not Fiscalized,Get Receipt';
-        // ParamMethodOptionsLbl: Label 'getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getReceipt', Locked = true;
-        ParamMethodOptionsCaptionLbl: Label 'Get Mfc Info,Print Receipt,Print X Report,Print Z Report,Print Duplicate,Cash Handling,Print Last Not Fiscalized,Print Selected Not Fiscalized';
-        ParamMethodOptionsLbl: Label 'getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized', Locked = true;
+        // ParamMethodOptionsCaptionLbl: Label 'Get Mfc Info,Print Receipt,Print X Report,Print Z Report,Print Duplicate,Cash Handling,Print Last Not Fiscalized,Print Selected Not Fiscalized,Get Cash Balance,Get Receipt';
+        // ParamMethodOptionsLbl: Label 'getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance,getReceipt', Locked = true;
+        ParamMethodOptionsCaptionLbl: Label 'Get Mfc Info,Print Receipt,Print X Report,Print Z Report,Print Duplicate,Cash Handling,Print Last Not Fiscalized,Print Selected Not Fiscalized,Get Cash Balance';
+        ParamMethodOptionsLbl: Label 'getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance', Locked = true;
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
@@ -40,8 +40,8 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
         BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
         BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
         // TO-DO this will be finished in one of the future tasks
-        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getReceipt;
-        Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized;
+        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance,getReceipt;
+        Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance;
     begin
         ClearGlobalVariables();
         BGSISPOSUnitMapping.Get(GetPOSUnitNo(Sale));
@@ -78,6 +78,8 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
                     GetRequestText(true);
                     Response.Add('requestBody', RequestText);
                 end;
+            Method::getCashBalance:
+                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForGetCashBalance());
         // TO-DO this will be finished in one of the future tasks
         // Method::getReceipt:
         //     if SelectFiscalizedAuditLog(GetPOSUnitNo(Sale)) then
@@ -90,8 +92,8 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
         BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
         Response: JsonObject;
         // TO-DO this will be finished in one of the future tasks
-        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getReceipt;
-        Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized;
+        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance,getReceipt;
+        Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance;
         ResponseText: Text;
     begin
         Response := Context.GetJsonObject('result');
@@ -126,6 +128,8 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
                     GetRequestText(false);
                     BGSISCommunicationMgt.ProcessPrintSaleAndRefundResponse(BGSISPOSAuditLogAux, GetPOSUnitNo(Sale), ResponseText, RequestText, ExtendedReceipt);
                 end;
+            Method::getCashBalance:
+                BGSISCommunicationMgt.ProcessGetCashBalanceResponse(ResponseText);
         // TO-DO this will be finished in one of the future tasks
         // Method::getReceipt:
         //     if AuditLogFound then

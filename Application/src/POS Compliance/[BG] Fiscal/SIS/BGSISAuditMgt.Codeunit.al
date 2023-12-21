@@ -86,11 +86,12 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux."POS Store Code" := POSStore.Code;
         BGSISPOSAuditLogAux."POS Unit No." := POSUnit."No.";
         BGSISPOSAuditLogAux."Source Document No." := POSEntry."Document No.";
+        BGSISPOSAuditLogAux."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
 
         case true of
-            POSEntry."Amount Incl. Tax" > 0:
+            BGSISPOSAuditLogAux."Amount Incl. Tax" > 0:
                 BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale;
-            POSEntry."Amount Incl. Tax" < 0:
+            BGSISPOSAuditLogAux."Amount Incl. Tax" < 0:
                 BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
         end;
 
@@ -426,9 +427,27 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
     begin
         GrandReceiptNo := DelChr(GrandReceiptNo, '<', '0');
+        BGSISPOSAuditLogAux.FilterGroup(10);
         BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", GrandReceiptNo);
-        if BGSISPOSAuditLogAux.FindFirst() then
-            exit(BGSISPOSAuditLogAux."Source Document No.");
+        BGSISPOSAuditLogAux.FilterGroup(0);
+
+        case BGSISPOSAuditLogAux.Count() of
+            0:
+                exit('');
+            1:
+                begin
+                    if BGSISPOSAuditLogAux.FindFirst() then
+                        exit(BGSISPOSAuditLogAux."Source Document No.");
+
+                    exit('');
+                end;
+            else begin
+                if Page.RunModal(0, BGSISPOSAuditLogAux) <> Action::LookupOK then
+                    exit('');
+
+                exit(BGSISPOSAuditLogAux."Source Document No.");
+            end;
+        end;
     end;
     #endregion
 }

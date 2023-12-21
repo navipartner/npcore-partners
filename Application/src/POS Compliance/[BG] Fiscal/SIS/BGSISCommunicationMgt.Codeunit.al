@@ -66,6 +66,18 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         ThrowErrorIfResponseNotSuccessful(ResponseText);
     end;
 
+    internal procedure ProcessGetCashBalanceResponse(ResponseText: Text)
+    var
+        TempJsonBuffer: Record "JSON Buffer" temporary;
+        CashBalanceMsg: Label 'Cash balance is %1.', Comment = '%1 - cash balance value';
+        CashBalance: Text;
+    begin
+        if IsResponseSuccessfulAndThrowErrorIfNot(TempJsonBuffer, ResponseText) then begin
+            CashBalance := GetPropertyValueWithCheck(TempJsonBuffer, 'cashBalance');
+            Message(CashBalanceMsg, CashBalance);
+        end;
+    end;
+
     internal procedure ProcessGetCashierDataResponse(ResponseText: Text)
     begin
         ThrowErrorIfResponseNotSuccessful(ResponseText);
@@ -179,7 +191,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         end else
             CustomerIDNumberType := 1;
 
-        EnterInvoiceDataForSaleAndRefund(POSEntry."Customer No.", CustomerIDNumberType, CustomerAddress, CustomerCity, CustomerID, CustomerName, CustomerVATNumber, InvoiceNumber);
+        EnterInvoiceDataForSaleAndRefund(CustomerIDNumberType, CustomerAddress, CustomerCity, CustomerID, CustomerName, CustomerVATNumber, InvoiceNumber);
 
         JsonTextReaderWriter.WriteStartObject('invoiceData');
         JsonTextReaderWriter.WriteStringProperty('invNumber', InvoiceNumber);
@@ -193,17 +205,19 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndObject();
     end;
 
-    local procedure EnterInvoiceDataForSaleAndRefund(CustomerNo: Code[20]; var CustomerIDNumberType: Integer; var CustomerAddress: Text; var CustomerCity: Text; var CustomerID: Text; var CustomerName: Text; var CustomerVATNumber: Text; var InvoiceNumber: Text)
+    local procedure EnterInvoiceDataForSaleAndRefund(var CustomerIDNumberType: Integer; var CustomerAddress: Text; var CustomerCity: Text; var CustomerID: Text; var CustomerName: Text; var CustomerVATNumber: Text; var InvoiceNumber: Text)
     var
         InputDialog: Page "NPR Input Dialog";
         AllInvoiceDataCorrect, AllInvoiceDataEntered, AllInvoiceDataEnteredSuccessfully : Boolean;
         CustomerAddressLbl: Label 'Customer Address';
         CustomerCityLbl: Label 'Customer City';
         CustomerIDLbl: Label 'Customer ID';
+        CustomerIDMsg: Label 'Customer ID does not have allowed value.';
         CustomerIDNumberTypeLbl: Label 'Customer ID Number Type (0 - BG Company; 1 - BG Physical Person; 2 - Foreign Company or Physical Person)';
-        CustomerIDValuesMsg: Label 'Customer ID / Customer ID Number Type does not have allowed value.';
+        CustomerIDNumberTypeMsg: Label 'Customer ID Number Type does not have allowed value.';
         CustomerNameLbl: Label 'Customer Name';
         CustomerVATNumberLbl: Label 'Customer VAT Number';
+        CustomerVATNumberMsg: Label 'Customer VAT Number does not have allowed value.';
         InvoiceNumberLbl: Label 'Invoice Number';
         MustEnterNecessaryExtendedReceiptDataMsg: Label 'You must enter all the necessary data for extended receipt.';
     begin
@@ -215,10 +229,10 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
             InputDialog.SetInput(4, CustomerIDNumberType, CustomerIDNumberTypeLbl);
             InputDialog.SetInput(5, CustomerAddress, CustomerAddressLbl);
             InputDialog.SetInput(6, CustomerName, CustomerNameLbl);
-            if CustomerNo <> '' then
-                InputDialog.SetInput(7, CustomerVATNumber, CustomerVATNumberLbl);
+            InputDialog.SetInput(7, CustomerVATNumber, CustomerVATNumberLbl);
 
-            InputDialog.RunModal();
+            if InputDialog.RunModal() <> Action::OK then
+                Error('');
 
             InputDialog.InputText(1, InvoiceNumber);
             InputDialog.InputText(2, CustomerCity);
@@ -226,32 +240,41 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
             InputDialog.InputInteger(4, CustomerIDNumberType);
             InputDialog.InputText(5, CustomerAddress);
             InputDialog.InputText(6, CustomerName);
-            if CustomerNo <> '' then
-                InputDialog.InputText(7, CustomerVATNumber);
+            InputDialog.InputText(7, CustomerVATNumber);
 
             Clear(AllInvoiceDataCorrect);
             AllInvoiceDataEntered := (InvoiceNumber <> '') and (CustomerCity <> '') and (CustomerID <> '') and (CustomerAddress <> '') and (CustomerName <> '');
             if not AllInvoiceDataEntered then
                 Message(MustEnterNecessaryExtendedReceiptDataMsg)
             else begin
-                AllInvoiceDataCorrect := AreCustomerIDValuesAllowed(CustomerIDNumberType, CustomerID);
+                AllInvoiceDataCorrect := IsCustomerIDNumberTypealueAllowed(CustomerIDNumberType);
                 if not AllInvoiceDataCorrect then
-                    Message(CustomerIDValuesMsg);
-            end;
+                    Message(CustomerIDNumberTypeMsg)
+                else begin
+                    AllInvoiceDataCorrect := IsCustomerIDNumberAllowed(CustomerIDNumberType, CustomerID);
+                    if not AllInvoiceDataCorrect then
+                        Message(CustomerIDMsg)
+                    else begin
+                        AllInvoiceDataCorrect := IsCustomerVATNumberValueAllowed(CustomerIDNumberType, CustomerVATNumber);
+                        if not AllInvoiceDataCorrect then
+                            Message(CustomerVATNumberMsg);
+                    end;
+                end;
 
-            AllInvoiceDataEnteredSuccessfully := AllInvoiceDataEntered and AllInvoiceDataCorrect;
+                AllInvoiceDataEnteredSuccessfully := AllInvoiceDataEntered and AllInvoiceDataCorrect;
+            end;
         end;
     end;
 
-    local procedure AreCustomerIDValuesAllowed(CustomerIDNumberType: Integer; CustomerID: Text): Boolean
+    local procedure IsCustomerIDNumberTypealueAllowed(CustomerIDNumberType: Integer): Boolean
     begin
         if not (CustomerIDNumberType in [0, 1, 2]) then
             exit(false);
 
-        exit(IsCustomerIDValueAllowed(CustomerIDNumberType, CustomerID));
+        exit(true);
     end;
 
-    local procedure IsCustomerIDValueAllowed(CustomerIDNumberType: Integer; CustomerID: Text): Boolean
+    local procedure IsCustomerIDNumberAllowed(CustomerIDNumberType: Integer; CustomerID: Text): Boolean
     var
         CharPos: Integer;
         CustomerIDLenght: Integer;
@@ -282,6 +305,29 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
                     exit(true);
                 end;
         end;
+    end;
+
+    local procedure IsCustomerVATNumberValueAllowed(CustomerIDNumberType: Integer; CustomerVATNumber: Text): Boolean
+    var
+        CharPos: Integer;
+        CustomerVATNumberLenght: Integer;
+    begin
+        if CustomerIDNumberType <> 0 then
+            exit(true);
+
+        CustomerVATNumberLenght := StrLen(CustomerVATNumber);
+
+        if CustomerVATNumberLenght = 0 then
+            exit(true);
+
+        if not (CustomerVATNumberLenght in [1 .. 15]) then
+            exit(false);
+
+        for CharPos := 1 to CustomerVATNumberLenght do
+            if not IsAlphanumeric(CopyStr(CustomerVATNumber, CharPos, 1)) then
+                exit(false);
+
+        exit(true);
     end;
 
     local procedure AddReceiptItemsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer; Refund: Boolean)
@@ -377,10 +423,11 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteStartArray('receiptPayments');
 
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntryPaymentLine.SetFilter(Amount, '<>0');
         if POSEntryPaymentLine.FindSet() then
             repeat
                 JsonTextReaderWriter.WriteStartObject('');
-                JsonTextReaderWriter.WriteStringProperty('amount', Format(Abs(Round(POSEntryPaymentLine.Amount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(POSEntryPaymentLine.Amount, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
                 BGSISPOSPaymMethMap.Get(POSEntryPaymentLine."POS Payment Method Code");
                 BGSISPOSPaymMethMap.CheckIsBGSISPaymentMethodPopulated();
                 JsonTextReaderWriter.WriteRawProperty('medium', BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger());
@@ -394,8 +441,8 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     var
         BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-        ReceiptPayments: Dictionary of [Integer, Decimal];
         PaymentAmount: Decimal;
+        ReceiptPayments: Dictionary of [Integer, Decimal];
         PaymentMedium: Integer;
     begin
         JsonTextReaderWriter.WriteStartArray('receiptPayments');
@@ -414,7 +461,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         foreach PaymentMedium in ReceiptPayments.Keys() do begin
             PaymentAmount := ReceiptPayments.Get(PaymentMedium);
             JsonTextReaderWriter.WriteStartObject('');
-            JsonTextReaderWriter.WriteStringProperty('amount', Format(Abs(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+            JsonTextReaderWriter.WriteStringProperty('amount', Format(-(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
             JsonTextReaderWriter.WriteRawProperty('medium', PaymentMedium);
             JsonTextReaderWriter.WriteEndObject();
         end;
@@ -563,6 +610,39 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteStringProperty('amount', Format(-Round(POSPaymentBinCheckp."Move to Bin Amount", 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
 
         JsonTextReaderWriter.WriteEndObject(); // params
+        JsonTextReaderWriter.WriteEndObject();
+        JsonBody := JsonTextReaderWriter.GetJSonAsText();
+    end;
+
+    internal procedure CreateJSONBodyForCashHandling(POSUnitNo: Code[10]; SalespersonCode: Code[20]; AmountToHandle: Decimal) JsonBody: Text
+    var
+        JsonTextReaderWriter: Codeunit "Json Text Reader/Writer";
+        OperatorNumber: Integer;
+    begin
+        InitJSONBody(JsonTextReaderWriter);
+        JsonTextReaderWriter.WriteStringProperty('method', 'cashHandling');
+
+        JsonTextReaderWriter.WriteStartObject('params');
+
+        JsonTextReaderWriter.WriteStartObject('beginFiscalReceiptInput');
+        Evaluate(OperatorNumber, SalespersonCode);
+        JsonTextReaderWriter.WriteStringProperty('terminalNumber', POSUnitNo);
+        JsonTextReaderWriter.WriteRawProperty('operatorNumber', OperatorNumber);
+        JsonTextReaderWriter.WriteEndObject(); // beginFiscalReceiptInput
+
+        JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(AmountToHandle, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+
+        JsonTextReaderWriter.WriteEndObject(); // params
+        JsonTextReaderWriter.WriteEndObject();
+        JsonBody := JsonTextReaderWriter.GetJSonAsText();
+    end;
+
+    internal procedure CreateJSONBodyForGetCashBalance() JsonBody: Text
+    var
+        JsonTextReaderWriter: Codeunit "Json Text Reader/Writer";
+    begin
+        InitJSONBody(JsonTextReaderWriter);
+        JsonTextReaderWriter.WriteStringProperty('method', 'getCashBalance');
         JsonTextReaderWriter.WriteEndObject();
         JsonBody := JsonTextReaderWriter.GetJSonAsText();
     end;
