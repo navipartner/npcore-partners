@@ -68,7 +68,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Bin Transfer".AsInteger());
     end;
 
-    local procedure PrintBinTransfer(WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintBinTransfer(var WorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -466,8 +466,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         if not PrintTransfer and TransferIn then
             PrintTransfer := BinTransferSetup.Get() and BinTransferSetup.PrintOnReceive;
 
-        if PrintTransfer then
+        if PrintTransfer then begin
+            WorkshiftCheckpoint.Find();
+            WorkshiftCheckpoint.SetRecFilter();
             PrintBinTransfer(WorkshiftCheckpoint);
+        end;
 
         exit(true);
     end;
