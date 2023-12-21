@@ -572,7 +572,7 @@
         if (TokenLineNumber <> 0) then
             TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
-        
+
         TicketReservationRequest.FindSet();
         repeat
             if (TicketReservationRequest.Default) then
@@ -2664,6 +2664,7 @@
         Ticket."External Member Card No." := ReservationRequest."External Member No.";
         Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
         Ticket."Line No." := ReservationRequest."Line No.";
+        Ticket."External Ticket No." := ReservationRequest.PreAssignedTicketNumber;
 
         if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
             Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
@@ -2672,6 +2673,7 @@
             Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
 
         TicketManagement.SetTicketProperties(Ticket, Today);
+
         Ticket.Insert(true);
     end;
 

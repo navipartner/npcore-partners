@@ -1,0 +1,230 @@
+#pragma warning disable AA0073
+codeunit 6184696 "NPR TM ImportTicketWorker"
+{
+    Access = Internal;
+
+    trigger OnRun()
+    begin
+        Import();
+    end;
+
+    var
+        _TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        _TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+
+    internal procedure SetImportBuffer(var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)
+    begin
+        if (not TempTicketImport.IsTemporary) then
+            Error('Record must be a temporary record. This is a programming bug and not a user error.');
+
+        if (not TempTicketImportLine.IsTemporary) then
+            Error('Record must be a temporary record. This is a programming bug and not a user error.');
+
+        _TempTicketImport.Copy(TempTicketImport, true);
+        _TempTicketImportLine.Copy(TempTicketImportLine, true);
+    end;
+
+
+    internal procedure Import();
+    var
+        Token: Text[100];
+        TokenLine: Integer;
+        ResponseMessage: Text;
+        RequestSuccess: Boolean;
+    begin
+        _TempTicketImport.Reset();
+        if (not _TempTicketImport.FindSet()) then
+            Error('Import buffer is empty.');
+
+        repeat
+            _TempTicketImportLine.SetFilter(OrderId, '=%1', _TempTicketImport.OrderId);
+            if (not _TempTicketImportLine.FindSet()) then
+                Error('Order %1 has no lines.', _TempTicketImport.OrderId);
+
+            Token := CreateDocumentId();
+            TokenLine := 1;
+
+            Archive(Token, _TempTicketImport);
+            repeat
+                Archive(Token, TokenLine, _TempTicketImportLine);
+                RequestSuccess := CreateTicketRequest(_TempTicketImportLine, ResponseMessage);
+                TokenLine += 1;
+            until (_TempTicketImportLine.Next() = 0) or (not RequestSuccess);
+
+        until (_TempTicketImport.Next() = 0) or (not RequestSuccess);
+
+        if (RequestSuccess) then begin
+            _TempTicketImport.FindSet();
+            repeat
+                RequestSuccess := ConfirmTicketRequest(_TempTicketImport.TicketRequestToken, _TempTicketImport, ResponseMessage);
+            until (_TempTicketImport.Next() = 0) or (not RequestSuccess);
+        end;
+
+        // CreateTicketRequest performs a codeunit.run when attempting ticket create. Batch needs to be cleaned-up
+        if (not RequestSuccess) then
+            Error(ResponseMessage);
+
+    end;
+
+    internal procedure CleanUpFailedImport(JobId: Code[40])
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketImport: Record "NPR TM ImportTicketHeader";
+        TicketImportLine: Record "NPR TM ImportTicketLine";
+    begin
+        _TempTicketImport.Reset();
+        if (not _TempTicketImport.FindSet()) then
+            Error('Import buffer is empty.');
+
+        repeat
+            if (TicketImport.Get(_TempTicketImport.OrderId, JobId)) then begin
+                TicketRequestManager.DeleteReservationRequest(TicketImport.TicketRequestToken, true);
+                TicketImportLine.SetFilter(OrderId, '=%1', TicketImport.OrderId);
+                TicketImportLine.SetFilter(JobId, '=%1', TicketImport.JobId);
+                TicketImportLine.DeleteAll();
+                TicketImport.Delete();
+            end;
+        until (_TempTicketImport.Next() = 0);
+    end;
+
+
+#pragma warning disable AA0139
+    local procedure CreateDocumentId(): Text[50]
+    begin
+        exit('IMP' + UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+#pragma warning restore
+
+    [CommitBehavior(CommitBehavior::Error)]
+    local procedure ConfirmTicketRequest(Token: Text[100]; TempTicketImport: Record "NPR TM ImportTicketHeader" temporary; var ErrorMessage: Text) Success: Boolean
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        TicketRequestManager.SetReservationRequestExtraInfo(TempTicketImport.TicketRequestToken, TempTicketImport.TicketHolderEMail, TempTicketImport.PaymentReference);
+        Success := TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage);
+    end;
+
+    local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; var ResponseMessage: Text) Success: Boolean
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketWebRequestManager: Codeunit "NPR TM Ticket WebService Mgr";
+        ExternalId: List of [Integer];
+        ResolvingTable: Integer;
+        INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
+    begin
+        TicketRequest.Init();
+
+        TicketRequest."Session Token ID" := TempTicketImportLine.TicketRequestToken;
+        TicketRequest."Request Status" := TicketRequest."Request Status"::WIP;
+        TicketRequest."Request Status Date Time" := CurrentDateTime;
+        TicketRequest."Created Date Time" := CurrentDateTime();
+        TicketRequest."Ext. Line Reference No." := TempTicketImportLine.TicketRequestTokenLine;
+
+        TicketRequest."External Item Code" := TempTicketImportLine.ItemReferenceNumber;
+        TicketRequest."External Order No." := TempTicketImportLine.OrderId;
+        TicketRequest.PreAssignedTicketNumber := TempTicketImportLine.PreAssignedTicketNumber;
+        TicketRequest.Quantity := 1;
+        TicketRequest."External Member No." := TempTicketImportLine.MemberNumber;
+        TicketRequest."Notification Address" := TempTicketImportLine.TicketHolderEMail;
+
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
+            Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");
+
+        TicketBOM.SetFilter("Item No.", '=%1', TicketRequest."Item No.");
+        TicketBOM.SetFilter("Variant Code", '=%1', TicketRequest."Variant Code");
+        TicketBOM.SetFilter(Default, '=%1', true);
+        TicketBOM.FindFirst(); // Must fail when no admission is marked default.
+
+        TicketRequest."Admission Code" := TicketBOM."Admission Code";
+        Admission.Get(TicketBOM."Admission Code");
+
+        TicketRequest.Default := TicketBOM.Default;
+        TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion";
+        if (TicketBOM."Admission Inclusion" <> TicketBOM."Admission Inclusion"::REQUIRED) then
+            TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::SELECTED;
+
+        if ((TicketRequest."Admission Inclusion" = TicketBOM."Admission Inclusion"::SELECTED) and (TicketRequest.Quantity = 0)) then
+            TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::NOT_SELECTED;
+
+        TicketRequest."Admission Description" := Admission.Description;
+        TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
+        TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
+        TicketRequest.Insert();
+
+        ExternalId.Add(TicketRequest."Ext. Line Reference No.");
+        TicketWebRequestManager.FinalizeTicketReservation(TicketRequest."Session Token ID", ExternalId);
+
+        TicketResponse.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
+        TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
+        if (TicketResponse.FindFirst()) then begin
+            ResponseMessage := TicketResponse."Response Message";
+            Success := TicketResponse.Status;
+        end;
+    end;
+
+    local procedure Archive(Token: Text[100]; TokenLine: Integer; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)
+    var
+        TicketImportLine: Record "NPR TM ImportTicketLine";
+    begin
+        TempTicketImportLine.TicketRequestToken := Token;
+        TempTicketImportLine.TicketRequestTokenLine := TokenLine;
+        TempTicketImportLine.Modify();
+
+        TicketImportLine.TransferFields(TempTicketImportLine, true);
+        TicketImportLine.Insert();
+    end;
+
+    local procedure Archive(Token: Text[100]; var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary)
+    var
+        TicketImport: Record "NPR TM ImportTicketHeader";
+    begin
+        TempTicketImport.TicketRequestToken := Token;
+        TempTicketImport.Modify();
+
+        TicketImport.TransferFields(TempTicketImport, true);
+        TicketImport.Insert();
+    end;
+
+    local procedure GetAdmissionTimeSlot(AdmissionCode: Code[20]; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        NoTimeSlot: Label 'Admission Code %1 has no available time slots for expected visit date %2.';
+        TimeDifference, MinTimeDifference : Integer;
+        EntryNo: Integer;
+    begin
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
+        ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ScheduleEntry.SetFilter("Admission Start Date", '=%1', ExpectedVisitDate);
+        ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (ScheduleEntry.FindSet()) then begin
+            repeat
+                case true of
+                    ExpectedVisitTime <= ScheduleEntry."Admission Start Time":
+                        TimeDifference := ScheduleEntry."Admission Start Time" - ExpectedVisitTime;
+                    ExpectedVisitTime <= ScheduleEntry."Admission End Time":
+                        TimeDifference := 0;
+                    else
+                        TimeDifference := ExpectedVisitTime - ScheduleEntry."Admission Start Time";
+                end;
+
+                if ((EntryNo = 0) or (TimeDifference < MinTimeDifference)) then begin
+                    EntryNo := ScheduleEntry."Entry No.";
+                    MinTimeDifference := TimeDifference;
+                end;
+
+            until (ScheduleEntry.Next() = 0);
+        end;
+
+        if (EntryNo = 0) then
+            Error(NoTimeSlot, AdmissionCode, ExpectedVisitDate); // blow up if expected visit date does not have a valid time slot for that entire date
+
+        ScheduleEntry.Get(EntryNo);
+        exit(ScheduleEntry."External Schedule Entry No.");
+    end;
+
+}
