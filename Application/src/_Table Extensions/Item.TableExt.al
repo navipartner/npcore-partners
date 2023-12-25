@@ -625,13 +625,29 @@ tableextension 6014427 "NPR Item" extends Item
         SalesSetup: Record "Sales & Receivables Setup";
 
     local procedure UpdateVendorItemRef(var Item: Record Item; xItem: Record Item)
-    var
-        ItemReference: Record "Item Reference";
     begin
         if Item.IsTemporary() then
             exit;
 
         if (Item."Vendor No." = xItem."Vendor No.") and (Item."Vendor Item No." = xItem."Vendor Item No.") then
+            exit;
+
+        DeleteItemReference(Item, xItem);
+
+        if (Item."Vendor No." = '') or (Item."Vendor Item No." = '') then
+            exit;
+
+        CreateItemRef(Item);
+    end;
+
+    local procedure DeleteItemReference(Item: Record Item; xItem: Record Item)
+    var
+        IsHandled: Boolean;
+        ItemReference: Record "Item Reference";
+    begin
+        IsHandled := false;
+        OnBeforeDeleteItemRef(ItemReference, IsHandled);
+        if IsHandled then
             exit;
 
         ItemReference.SetRange("Item No.", Item."No.");
@@ -641,8 +657,16 @@ tableextension 6014427 "NPR Item" extends Item
         ItemReference.SetRange("Reference Type No.", xItem."Vendor No.");
         ItemReference.SetRange("Reference No.", xItem."Vendor Item No.");
         ItemReference.DeleteAll(true);
+    end;
 
-        if (Item."Vendor No." = '') or (Item."Vendor Item No." = '') then
+    local procedure CreateItemRef(var Item: Record Item)
+    var
+        ItemReference: Record "Item Reference";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateItemRef(ItemReference, IsHandled);
+        If IsHandled then
             exit;
 
         if not ItemReference.Get(Item."No.", '', Item."Base Unit of Measure", ItemReference."Reference Type"::Vendor, Item."Vendor No.", Item."Vendor Item No.") then begin
@@ -654,8 +678,24 @@ tableextension 6014427 "NPR Item" extends Item
             ItemReference."Reference Type No." := Item."Vendor No.";
             ItemReference."Reference No." := Item."Vendor Item No.";
             ItemReference.Description := '';
+            OnBeforeInsertItemRef(ItemReference);
             ItemReference.Insert(true);
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertItemRef(var ItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeleteItemRef(var ItemReference: Record "Item Reference"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateItemRef(var ItemReference: Record "Item Reference"; var IsHandled: Boolean)
+    begin
     end;
 
 #pragma warning disable AL0432
