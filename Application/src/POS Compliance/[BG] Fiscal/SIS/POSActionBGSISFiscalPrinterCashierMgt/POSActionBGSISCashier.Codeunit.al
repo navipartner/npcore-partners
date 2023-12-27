@@ -9,8 +9,8 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
         ActionDescriptionLbl: Label 'This is a built-in action to manage fiscal printer cashier methods.';
         ParamMethodCaptionLbl: Label 'Method';
         ParamMethodDescrLbl: Label 'Specifies the Method used.';
-        ParamMethodOptionsCaptionLbl: Label 'Get Cashier Data,Is Cashier Set,Set Cashier,Delete Cashier';
-        ParamMethodOptionsLbl: Label 'getCashierData,isCashierSet,setCashier,deleteCashier', Locked = true;
+        ParamMethodOptionsCaptionLbl: Label 'Get Cashier Data,Is Cashier Set,Set Cashier,Delete Cashier,Try Set Cashier';
+        ParamMethodOptionsLbl: Label 'getCashierData,isCashierSet,setCashier,deleteCashier,trySetCashier', Locked = true;
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
@@ -33,7 +33,7 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
         POSSale: Record "NPR POS Sale";
         Salesperson: Record "Salesperson/Purchaser";
         BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
-        Method: Option getCashierData,isCashierSet,setCashier,deleteCashier;
+        Method: Option getCashierData,isCashierSet,setCashier,deleteCashier,trySetCashier;
     begin
         Sale.GetCurrentSale(POSSale);
         BGSISPOSUnitMapping.Get(POSSale."Register No.");
@@ -58,6 +58,11 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
                     SelectSalesperson(Salesperson);
                     Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForDeleteCashier(Salesperson));
                 end;
+            Method::trySetCashier:
+                begin
+                    Salesperson.Get(POSSale."Salesperson Code");
+                    Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForSetCashier(Salesperson));
+                end;
         end;
     end;
 
@@ -66,7 +71,7 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
         POSSale: Record "NPR POS Sale";
         BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
         Response: JsonObject;
-        Method: Option getCashierData,isCashierSet,setCashier,deleteCashier;
+        Method: Option getCashierData,isCashierSet,setCashier,deleteCashier,trySetCashier;
         ResponseText: Text;
     begin
         Sale.GetCurrentSale(POSSale);
@@ -84,6 +89,8 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
                 BGSISCommunicationMgt.ProcessSetCashierResponse(ResponseText);
             Method::deleteCashier:
                 BGSISCommunicationMgt.ProcessDeleteCashierResponse(ResponseText);
+            Method::trySetCashier:
+                if BGSISCommunicationMgt.TryProcessSetCashierResponse(ResponseText) then;
         end;
     end;
 

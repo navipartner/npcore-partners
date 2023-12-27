@@ -157,6 +157,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Login Events", 'OnAddPreWorkflowsToRun', '', false, false)]
     local procedure HandleOnAddPreWorkflowsToRunOnPOSLoginEvents(Context: Codeunit "NPR POS JSON Helper"; SalePOS: Record "NPR POS Sale"; var PreWorkflows: JsonObject)
     var
+        BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
         POSUnit: Record "NPR POS Unit";
         ActionParameters: JsonObject;
         MainParameters: JsonObject;
@@ -170,7 +171,12 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        MainParameters.Add('Method', 'isCashierSet');
+        BGFiscalizationSetup.Get();
+        if BGFiscalizationSetup."BG SIS Auto Set Cashier" then
+            MainParameters.Add('Method', 'trySetCashier')
+        else
+            MainParameters.Add('Method', 'isCashierSet');
+
         ActionParameters.Add('mainParameters', MainParameters);
         PreWorkflows.Add(Format(Enum::"NPR POS Workflow"::"BG_SIS_FP_CASHIER"), ActionParameters);
 
