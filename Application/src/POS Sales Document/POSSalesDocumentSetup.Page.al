@@ -22,6 +22,15 @@ page 6151289 "NPR POS Sales Document Setup"
                     ToolTip = 'Specifies if you use job queues to post sales documents from POS in the background.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Generate Posting No. for Scheduled Documents"; Rec."Generate Posting No.")
+                {
+                    ToolTip = 'Generate a Posting No. for Final Invoices and Credit memos for reporting purposes';
+                    ApplicationArea = NPRRetail;
+#if not BC17
+                    AboutTitle = 'Generate Posting No. for Reporting purposes';
+                    AboutText = 'Enable if POS Final invoices or credit memos should be sent or printed immediately after the POS sale ends. System will reserve and assign Posting No. before execution of Job Queue.';
+#endif
+                }
             }
         }
     }

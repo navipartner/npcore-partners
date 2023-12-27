@@ -27,6 +27,13 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
                 Visible = false;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            field("NPR Posting No."; Rec."Posting No.")
+            {
+                ApplicationArea = NPRRetail;
+                Importance = Additional;
+                Visible = false;
+                ToolTip = 'Specifies the value of the Posting No. field.';
+            }
         }
 
         addlast("Invoice Details")

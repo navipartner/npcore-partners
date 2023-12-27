@@ -34,6 +34,13 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Visible = false;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            field("NPR Posting No."; Rec."Posting No.")
+            {
+                ApplicationArea = NPRRetail;
+                Importance = Additional;
+                Visible = false;
+                ToolTip = 'Specifies the value of the Posting No. field.';
+            }
         }
 
         addlast("Credit Memo Details")
