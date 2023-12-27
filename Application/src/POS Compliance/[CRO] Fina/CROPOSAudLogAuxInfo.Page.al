@@ -19,67 +19,67 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Audit Entry Type.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry No. field.';
+                    ToolTip = 'Specifies the Audit Entry No.';
                 }
                 field("Bill No."; Rec."Bill No.")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Bill No. field.';
+                    ToolTip = 'Specifies the Fiscal Bill No.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document No.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+                    ToolTip = 'Specifies the POS Entry No. related to this record.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the POS store code value.';
+                    ToolTip = 'Specifies the POS Store Code related to this record.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS Unit No. related to this record.';
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the entry date value.';
+                    ToolTip = 'Specifies the entry date.';
                 }
                 field("Log Timestamp"; Rec."Log Timestamp")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Log Timestamp field.';
+                    ToolTip = 'Specifies the time of the record creation.';
                 }
                 field("Paragon Number"; Rec."Paragon Number")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Paragon Number field.';
+                    ToolTip = 'Specifies the Paragon Number related to this record.';
                 }
                 field("ZKI Code"; Rec."ZKI Code")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the ZKI field.';
+                    ToolTip = 'Specifies the ZKI - security code of the receipt issuer.';
                 }
                 field("JIR Code"; Rec."JIR Code")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the JIR field.';
+                    ToolTip = 'Specifies the JIR - unique receipt identifier.';
                 }
                 field("CRO Payment Method"; Rec."CRO Payment Method")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method field.';
+                    ToolTip = 'Specifies the Payment Method related to this transaction.';
                     ObsoleteState = Pending;
                     ObsoleteTag = 'NPR23.0';
                     ObsoleteReason = 'Replaced by Payment Method field.';
@@ -87,12 +87,12 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                 field("Payment Method"; Rec."Payment Method")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method field.';
+                    ToolTip = 'Specifies the Payment Method related to this transaction.';
                 }
                 field("Receipt Fiscalized"; Rec."Receipt Fiscalized")
                 {
                     ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the value of the Receipt Fiscalized field.';
+                    ToolTip = 'Specifies if the receipt is fiscalized or not.';
                 }
             }
         }
@@ -111,7 +111,7 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 Scope = Repeater;
-                ToolTip = 'Executes the Open Related Document action.';
+                ToolTip = 'Openes the Document related to the selected transaction.';
 
                 trigger OnAction()
                 var
@@ -197,7 +197,7 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     PromotedCategory = Category5;
                     PromotedIsBig = true;
                     PromotedOnly = true;
-                    ToolTip = 'Executes the Download Request Message action.';
+                    ToolTip = 'The message sent to TA will be downloaded in the XML form.';
                     trigger OnAction()
                     var
                         FileMgt: Codeunit "File Management";
@@ -227,7 +227,7 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     PromotedCategory = Category6;
                     PromotedIsBig = true;
                     PromotedOnly = true;
-                    ToolTip = 'Executes the Show Related Sale Lines action.';
+                    ToolTip = 'Opens the sale lines related to the selected transaction record.';
                     trigger OnAction()
                     var
                         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
