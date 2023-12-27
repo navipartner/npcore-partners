@@ -1533,7 +1533,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             EanBoxEvent.Code := EventCodeExternalTicketNo();
             EanBoxEvent."Module Name" := 'Ticket Management';
             EanBoxEvent.Description := CopyStr(TMTicket.FieldCaption("External Ticket No."), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := ActionCode('');
+            EanBoxEvent."Action Code" := ActionCode('3');
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);
