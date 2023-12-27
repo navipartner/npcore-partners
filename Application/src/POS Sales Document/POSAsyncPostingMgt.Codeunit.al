@@ -53,11 +53,17 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     end;
 
     local procedure AsyncPostDocumentBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         SalesHeader.Ship := SaleLinePOS."Sales Document Ship";
         SalesHeader.Invoice := SaleLinePOS."Sales Document Invoice";
         SalesHeader.Receive := SaleLinePOS."Sales Document Receive";
+        if GeneratePostingNoEnabled() then
+            If SalesDocImpMgt.DocumentIsSetToFullPosting(SalesHeader) then
+                SalesHeader."Posting No." := GeneratePostingNo(SalesHeader);
         SalesHeader.Modify(true);
+        Commit();
     end;
 
     internal procedure CreateNotificationOnOpenPage(SalesHeader: Record "Sales Header")
@@ -215,6 +221,15 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
         exit(POSSalesDocumentSetup."Post with Job Queue");
     end;
 
+    internal procedure GeneratePostingNoEnabled(): Boolean
+    var
+        POSSalesDocumentSetup: Record "NPR POS Sales Document Setup";
+    begin
+        if not POSSalesDocumentSetup.Get() then
+            exit(false);
+        exit(POSSalesDocumentSetup."Generate Posting No.");
+    end;
+
     internal procedure GetPOSSalePostingMandatoryFlow(): Enum "NPR POS Sales Document Post"
     begin
         if AsyncPostingEnabled() then
@@ -298,6 +313,65 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
             exit(POSEntrySLineRelation."Line No." + 10000)
         else
             exit(10000)
+    end;
+
+    internal procedure GeneratePostingNo(var SalesHeader: Record "Sales Header") PostingNo: Code[20]
+    var
+        SalesSetup: Record "Sales & Receivables Setup";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        NoSeriesMgt: Codeunit NoSeriesManagement; //trebace direkctiva sigurno
+    begin
+        SalesSetup.Get();
+        if SalesHeader.Invoice and (SalesHeader."Posting No." = '') then begin
+            if (SalesHeader."No. Series" <> '') or
+               (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"])
+            then begin
+                if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order"] then
+                    ResetPostingNoSeriesFromSetup(SalesHeader."Posting No. Series", SalesSetup."Posted Credit Memo Nos.")
+                else
+                    if (SalesHeader."Document Type" <> SalesHeader."Document Type"::"Credit Memo") then
+                        ResetPostingNoSeriesFromSetup(SalesHeader."Posting No. Series", SalesSetup."Posted Invoice Nos.");
+                if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
+                    if (SalesSetup."Posted Credit Memo Nos." <> '') and (SalesHeader."Posting No. Series" = '') then
+                        CheckDefaultNoSeries(SalesSetup."Posted Credit Memo Nos.");
+                if SalesHeader."Posting No. Series" = '' then
+                    exit;
+            end;
+
+            if (SalesHeader."No. Series" <> SalesHeader."Posting No. Series") or
+               (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"])
+            then
+                PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+
+            // Check for posting conflicts and generate
+            if SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice] then begin
+                if SalesInvoiceHeader.Get(PostingNo) then begin
+                    Clear(SalesInvoiceHeader);
+                    while (not SalesInvoiceHeader.Get(PostingNo)) do
+                        PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+                end;
+            end else
+                if SalesCrMemoHeader.Get(PostingNo) then begin
+                    Clear(SalesCrMemoHeader);
+                    while (not SalesCrMemoHeader.Get(PostingNo)) do
+                        PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+                end;
+        end
+    end;
+
+    local procedure ResetPostingNoSeriesFromSetup(var PostingNoSeries: Code[20]; SetupNoSeries: Code[20])
+    begin
+        if (PostingNoSeries = '') and (SetupNoSeries <> '') then
+            PostingNoSeries := SetupNoSeries;
+    end;
+
+    local procedure CheckDefaultNoSeries(NoSeriesCode: Code[20])
+    var
+        NoSeries: Record "No. Series";
+    begin
+        if NoSeries.Get(NoSeriesCode) then
+            NoSeries.TestField("Default Nos.", true);
     end;
     //Subscribers region
     //ORDER
@@ -474,8 +548,51 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post (Yes/No)", 'OnBeforeConfirmSalesPost', '', false, false)]
     local procedure OnBeforeConfirmSalesPost(var SalesHeader: Record "Sales Header"; var HideDialog: Boolean; var IsHandled: Boolean; var DefaultOption: Integer; var PostAndSend: Boolean);
     begin
-         if not CheckIsModificationAllowed(SalesHeader) then    //raise message if status is unposted
+        if not CheckIsModificationAllowed(SalesHeader) then    //raise message if status is unposted
             FromPOSRelatedPOSTransExist(SalesHeader);
     end;
 #ENDIF
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeCopySalesDocument', '', false, false)]
+    local procedure OnBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20]; var ToSalesHeader: Record "Sales Header"; var IsHandled: Boolean);
+    begin
+        //Prevent unposted document from being copied
+        if not AsyncPostingEnabled() then
+            exit;
+        CheckBeforeCopySalesDocument(FromDocumentType, FromDocumentNo);
+    end;
+#ELSE
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeCopySalesDocument', '', false, false)]
+    local procedure OnBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20]; var ToSalesHeader: Record "Sales Header");
+    begin
+        //Prevent unposted document from being copied
+        if not AsyncPostingEnabled() then
+            exit;
+        CheckBeforeCopySalesDocument(FromDocumentType, FromDocumentNo);
+    end;
+#ENDIF
+    internal procedure CheckBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20])
+    var
+        SalesHeader: Record "Sales Header";
+        Sender: Codeunit "Copy Document Mgt.";
+        FromDocType2: Enum "Sales Document Type From";
+        PreventCopyErr: Label '%1 %2 is created from POS and it is scheduled for posting. It can''t be copied before Posting POS Entry.', Comment = '%1=SalesHeader."Document Type;%2=SalesHeader."No."';
+    begin
+        FromDocType2 := "Sales Document Type From".FromInteger(FromDocumentType);
+        case FromDocType2 of
+            "Sales Document Type From"::Order,
+            "Sales Document Type From"::Invoice,
+            "Sales Document Type From"::"Return Order",
+            "Sales Document Type From"::"Credit Memo":
+                begin
+                    if SalesHeader.Get(Sender.GetSalesDocumentType(FromDocType2), FromDocumentNo) then begin
+                        SalesHeader.CalcFields("NPR POS Trans. Sch. For Post");
+                        if SalesHeader."NPR POS Trans. Sch. For Post" then
+                            Error(PreventCopyErr, SalesHeader."Document Type", SalesHeader."No.");
+                    end;
+                end;
+            else
+                exit;
+        end;
+    end;
 }

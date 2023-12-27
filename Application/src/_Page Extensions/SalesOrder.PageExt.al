@@ -54,6 +54,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Visible = false;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            field("NPR Posting No."; Rec."Posting No.")
+            {
+                ApplicationArea = NPRRetail;
+                Importance = Additional;
+                Visible = false;
+                ToolTip = 'Specifies the value of the Posting No. field.';
+            }
         }
 
         addafter(Control85)
