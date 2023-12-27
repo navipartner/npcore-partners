@@ -109,12 +109,26 @@
     end;
 
     internal procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
+    var
+        Filename: Text;
     begin
         ErrorMessage := SetupEmailTemplate(RecRef, CopyStr(RecipientEmail, 1, 250), Silent, EmailTemplateHeader);
         if EmailTemplateHeader."Default Recipient Address" = '' then
             exit;
         if ErrorMessage = '' then
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, 0);
+
+        AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader);
+
+        if ErrorMessage = '' then begin
+            Filename := GetFilename(EmailTemplateHeader, RecRef);
+            RecRef.SetRecFilter();
+            if not PrintPDF(EmailTemplateHeader."Report ID", RecRef, Filename) then
+                ErrorMessage := StrSubstNo(Text006, EmailTemplateHeader."Report ID", GetLastErrorText);
+        end;
+
+        if ErrorMessage = '' then
+            ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader, RecRef);
 
         if ErrorMessage = '' then
             ErrorMessage := SendSmtpMessage(RecRef, Silent, EmailTemplateHeader."Email Scenario");
