@@ -31,6 +31,11 @@ table 6060085 "NPR BG Fiscalization Setup"
             Caption = 'BG SIS on PDF';
             DataClassification = CustomerContent;
         }
+        field(30; "BG SIS Auto Set Cashier"; Boolean)
+        {
+            Caption = 'BG SIS Auto Set Cashier';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
