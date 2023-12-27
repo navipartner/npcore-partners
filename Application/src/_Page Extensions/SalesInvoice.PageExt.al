@@ -15,6 +15,13 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 Visible = false;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            field("NPR Posting No."; Rec."Posting No.")
+            {
+                ApplicationArea = NPRRetail;
+                Importance = Additional;
+                Visible = false;
+                ToolTip = 'Specifies the value of the Posting No. field.';
+            }
         }
 
         addafter("Posting Date")

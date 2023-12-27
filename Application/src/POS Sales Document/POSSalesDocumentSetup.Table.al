@@ -15,6 +15,23 @@ table 6150632 "NPR POS Sales Document Setup"
         {
             Caption = 'Post with Job Queue';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+            begin
+                if not Rec."Post with Job Queue" then
+                    Rec."Generate Posting No." := false;
+            end;
+        }
+        field(20; "Generate Posting No."; Boolean)
+        {
+            Caption = 'Generate Posting No. for Scheduled Documents';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+            begin
+                if Rec."Generate Posting No." then
+                    Rec.TestField("Post with Job Queue", true);
+            end;
         }
     }
 
