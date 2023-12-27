@@ -45,6 +45,12 @@ page 6151269 "NPR BG Fiscalization Setup"
                         Caption = 'On PDF';
                         ToolTip = 'Specifies whether the fiscal receipt at the end of sale should be printed as PDF or as regular fiscal receipt.';
                     }
+                    field("BG SIS Auto Set Cashier"; Rec."BG SIS Auto Set Cashier")
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Auto Set Cashier';
+                        ToolTip = 'Specifies whether should try to automatically set cashier in fiscal printer on login.';
+                    }
                 }
             }
         }
