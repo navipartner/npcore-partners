@@ -19,12 +19,12 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Audit Entry Type.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry No. field.';
+                    ToolTip = 'Specifies the Audit Entry No.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
@@ -34,27 +34,27 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the entry date value.';
+                    ToolTip = 'Specifies the date of the entry creation.';
                 }
                 field("Log Timestamp"; Rec."Log Timestamp")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Log Timestamp field.';
+                    ToolTip = 'Specifies the time of the entry creation.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the POS store code value.';
+                    ToolTip = 'Specifies the POS Store Code related to this record.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS Unit No. related to this record.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document No.';
                 }
                 field("Receipt No."; Rec."Receipt No.")
                 {
@@ -64,32 +64,32 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 field("Sales Book Invoice No."; Rec."Sales Book Invoice No.")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Sales Book Invoice Number field.';
+                    ToolTip = 'Specifies the of the Sales Book Invoice Number of the related record. Sales Book Invoice is used when POS is out of order.';
                 }
                 field("Sales Book Serial No."; Rec."Sales Book Serial No.")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Sales Book Serial Number field.';
+                    ToolTip = 'Specifies the Sales Book Serial Number of the related document.';
                 }
                 field("Total Amount"; Rec."Total Amount")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Total Amount field.';
+                    ToolTip = 'Specifies the value of the Total Amount of the related transaction.';
                 }
                 field("ZOI Code"; Rec."ZOI Code")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the ZOI Code field.';
+                    ToolTip = 'Specifies the value of the ZOI Code - protective mark of the issuer, assigned by the POS system.';
                 }
                 field("EOR Code"; Rec."EOR Code")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the EOR Code field.';
+                    ToolTip = 'Specifies the value of the EOR Code -  unique receipt identifier, provided in the response message from TA.';
                 }
                 field("Validation Code"; Rec."Validation Code")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Validation Code field.';
+                    ToolTip = 'Specifies the value of the Validation Code.';
                 }
             }
         }
@@ -150,7 +150,7 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Download Request Message action.';
+                ToolTip = 'The message sent to TA will be downloaded in the XML form.';
                 trigger OnAction()
                 var
                     FileMgt: Codeunit "File Management";
@@ -173,7 +173,7 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 Promoted = true;
                 PromotedCategory = Category5;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Download Response Message action.';
+                ToolTip = 'The message recived from TA will be downloaded in the XML form.';
                 trigger OnAction()
                 var
                     FileMgt: Codeunit "File Management";
@@ -197,7 +197,7 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 Promoted = true;
                 PromotedCategory = Category6;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Show Related POS Sale Lines action.';
+                ToolTip = 'Opens the sale lines related to the selected transaction record.';
                 trigger OnAction()
                 var
                     POSEntrySalesLine: Record "NPR POS Entry Sales Line";

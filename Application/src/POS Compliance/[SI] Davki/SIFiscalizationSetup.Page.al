@@ -20,7 +20,7 @@ page 6150767 "NPR SI Fiscalization Setup"
                 field("Enable SI Fiscal"; Rec."Enable SI Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable SI Fiscalisation field.';
+                    ToolTip = 'Specifies if the SI Fiscalization is enabled.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable SI Fiscal" <> Rec."Enable SI Fiscal" then
@@ -35,19 +35,19 @@ page 6150767 "NPR SI Fiscalization Setup"
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Signing Certificate Password field.';
+                    ToolTip = 'Specifies the password of the Signing Certificate.';
                 }
                 field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field.';
+                    ToolTip = 'Specifies the Thumbprint of the Signing Certificate.';
                 }
                 field("Certificate Subject Ident."; Rec."Certificate Subject Ident.")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certificate Issuer field.';
+                    ToolTip = 'Specifies the identification of the Certificate Issuer.';
                 }
             }
             group(FiscEnvironmentInfo)
@@ -57,7 +57,7 @@ page 6150767 "NPR SI Fiscalization Setup"
                 field("Environment URL"; Rec."Environment URL")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Environment URL field.';
+                    ToolTip = 'Specifies the URL of the Fiscalization Environment.';
                 }
             }
             group(NoSeries)
@@ -67,7 +67,7 @@ page 6150767 "NPR SI Fiscalization Setup"
                 field("Receipt No. Series"; Rec."Receipt No. Series")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Receipt No. Series field.';
+                    ToolTip = 'Specifies the Fiscal Bill No. Series.';
                 }
             }
         }
@@ -85,7 +85,7 @@ page 6150767 "NPR SI Fiscalization Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Upload Certificate action.';
+                ToolTip = 'Opens the page for Certificate upload.';
                 trigger OnAction()
                 var
                     SIAuditMgt: Codeunit "NPR SI Audit Mgt.";

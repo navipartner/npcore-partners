@@ -16,32 +16,32 @@ page 6151297 "NPR SI POS Store Mapping"
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the POS Unit Code field.';
+                    ToolTip = 'Specifies the POS Unit Code.';
                 }
                 field(Registered; Rec.Registered)
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Registered field.';
+                    ToolTip = 'Specifies if the related POS Unit is Registered.';
                 }
                 field("Cadastral Number"; Rec."Cadastral Number")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Cadastral Number field.';
+                    ToolTip = 'Specifies the Cadastral Number of the related registered POS Unit.';
                 }
                 field("Building Number"; Rec."Building Number")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Building Number field.';
+                    ToolTip = 'Specifies the Building Number of the related registered POS Unit.';
                 }
                 field("Building Section Number"; Rec."Building Section Number")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Building Section Number field.';
+                    ToolTip = 'Specifies the Building Section Number of the related registered POS Unit.';
                 }
                 field("Validity Date"; Rec."Validity Date")
                 {
                     ApplicationArea = NPRSIFiscal;
-                    ToolTip = 'Specifies the value of the Validity Date field.';
+                    ToolTip = 'Specifies the Validity Date of the registration.';
                 }
             }
         }
