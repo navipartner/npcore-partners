@@ -18,17 +18,17 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Audit Entry Type.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry No. field.';
+                    ToolTip = 'Specifies the Audit Entry No.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+                    ToolTip = 'Specifies the POS Entry No. related to this record.';
 
                     trigger OnDrillDown()
                     var
@@ -48,22 +48,22 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the entry date value.';
+                    ToolTip = 'Specifies the Entry Date.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the POS store code value.';
+                    ToolTip = 'Specifies the POS store code from which the related record was created.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS unit number from which the related record was created.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document No.';
                 }
                 field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                 {
@@ -73,22 +73,22 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Grand Receipt No."; Rec."Grand Receipt No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Grand Receipt No. field.';
+                    ToolTip = 'Specifies the Grand Receipt No. - receipt number.';
                 }
                 field("Receipt Timestamp"; Rec."Receipt Timestamp")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the timestamp of the receipt in the format “ss,mm,hh;DD,MM,YY"';
+                    ToolTip = 'Specifies the time and date of the receipt creation in the format “ss,mm,hh;DD,MM,YY".';
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Transaction Type field.';
+                    ToolTip = 'Specifies the Transaction Type.';
                 }
                 field("Extended Receipt"; Rec."Extended Receipt")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Extended Receipt field.';
+                    ToolTip = 'Specifies whether the receipt from the related record is extended or not.';
                 }
             }
         }
@@ -107,7 +107,7 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
-                ToolTip = 'Shows the content of related request.';
+                ToolTip = 'Shows the request content related to the selected entry.';
 
                 trigger OnAction()
                 begin
