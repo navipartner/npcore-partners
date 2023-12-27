@@ -16,12 +16,12 @@ page 6151288 "NPR BG SIS Return Reason Map"
                 field("Return Reason Code"; Rec."Return Reason Code")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method Code field.';
+                    ToolTip = 'Specifies the Return Reason Code.';
                 }
                 field("BG SIS Return Reason"; Rec."BG SIS Return Reason")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the BG Payment Method field.';
+                    ToolTip = 'Specifies the Return Reason that is possible to use in Bulgaria.';
                 }
             }
         }

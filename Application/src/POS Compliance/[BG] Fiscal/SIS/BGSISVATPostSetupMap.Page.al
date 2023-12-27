@@ -16,17 +16,17 @@ page 6151273 "NPR BG SIS VAT Post. Setup Map"
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field.';
+                    ToolTip = 'Specifies the VAT Bus. Posting Group.';
                 }
                 field("VAT Prod. Posting Group"; Rec."VAT Prod. Posting Group")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field.';
+                    ToolTip = 'Specifies the VAT Prod. Posting Group.';
                 }
                 field("BG SIS VAT Category"; Rec."BG SIS VAT Category")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the BG SIS VAT Category field.';
+                    ToolTip = 'Specifies the VAT Category related to the combination of VAT Business and VAT Product Posting Groups which is possible to use in Bulgaria.';
                 }
             }
         }

@@ -16,12 +16,12 @@ page 6151272 "NPR BG SIS POS Paym. Meth. Map"
                 field("POS Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method Code field.';
+                    ToolTip = 'Specifies the POS Payment Method.';
                 }
                 field("BG Payment Method"; Rec."BG SIS Payment Method")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    ToolTip = 'Specifies the value of the BG Payment Method field.';
+                    ToolTip = 'Specifies the Payment Method that is possible to use in Bulgaria.';
                 }
             }
         }
