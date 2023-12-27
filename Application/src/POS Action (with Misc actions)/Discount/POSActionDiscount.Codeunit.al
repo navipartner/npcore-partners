@@ -323,6 +323,7 @@
                     GetDimensionCodeParameter(POSParameterValue, DimCode);
                     DimensionValue."Dimension Code" := DimCode;
                     DimensionValue.Code := CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimensionValue.Code));
+                    DimensionValue.SetRange(Code, DimensionValue.Code);
                     if not DimensionValue.FindFirst() then begin
                         DimensionValue.SetRange("Dimension Code", Dimension.Code);
                         DimensionValue.SetFilter(Code, '%1', POSParameterValue.Value + '*');
