@@ -61,7 +61,7 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionProcessCnCOrder.js###
-'let main=async({})=>await workflow.respond("run_collect_in_store_orders"),isWorkflowDisabled=async({workflow:e,context:r,popup:o,runtime:s,hwc:t,data:a,parameters:n,captions:i,scope:l})=>e.respond("is_workflow_disabled");'
+'let main=async({workflow:r})=>await r.respond("run_collect_in_store_orders"),isWorkflowDisabled=async({workflow:r})=>await r.respond("is_workflow_disabled");'
         );
     end;
 
