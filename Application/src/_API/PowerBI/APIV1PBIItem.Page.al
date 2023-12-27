@@ -123,6 +123,10 @@ page 6059926 "NPR APIV1 PBIItem"
                 {
                     Caption = 'Ticket Type';
                 }
+                field(description2; Rec."Description 2")
+                {
+                    Caption = 'Description 2', Locked = true;
+                }
             }
         }
     }
