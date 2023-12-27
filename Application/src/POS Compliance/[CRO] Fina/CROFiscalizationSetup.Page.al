@@ -20,7 +20,7 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 field("Enable CRO Fiscal"; Rec."Enable CRO Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable CRO Fiscalisation field.';
+                    ToolTip = 'Specifies if the CRO Fiscalization is enabled.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable CRO Fiscal" <> Rec."Enable CRO Fiscal" then
@@ -36,19 +36,19 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Signing Certificate Password field.';
+                    ToolTip = 'Specifies the password of the Signing Certificate.';
                 }
                 field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field.';
+                    ToolTip = 'Specifies the Thumbprint of the Signing Certificate.';
                 }
                 field("Certificate Subject OIB"; Rec."Certificate Subject OIB")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certificate Subject OIB field.';
+                    ToolTip = 'Specifies the Certificate Subject OIB of the uploaded Certificate.';
                 }
             }
 
@@ -59,7 +59,7 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 field("Environment URL"; Rec."Environment URL")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Environment URL field.';
+                    ToolTip = 'Specifies the URL of the Fiscalization Environment.';
                 }
             }
 
@@ -70,7 +70,7 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 field("Bill No. Series"; Rec."Bill No. Series")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Bill No. Series field.';
+                    ToolTip = 'Specifies the Fiscal Bill No. Series.';
                 }
             }
         }
@@ -88,7 +88,7 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Upload Certificate action.';
+                ToolTip = 'Opens the page for Certificate upload.';
                 trigger OnAction()
                 var
                     CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
