@@ -287,7 +287,7 @@ codeunit 6184672 "NPR DK SAF-T Cash Export Mgt."
         Commit();
 
         ClearLastError();
-        if not Codeunit.Run(Codeunit::"NPR Generate SAF-T Cash File", SAFTExportLine) then
+        if not Codeunit.Run(Codeunit::"NPR DK Gen. SAF-T Cash File", SAFTExportLine) then
             Codeunit.Run(Codeunit::"NPR DK SAF-T Exp. Err. Handler", SAFTExportLine);
         Commit();
     end;
