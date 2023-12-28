@@ -43,6 +43,16 @@ page 6151281 "NPR BG SIS POS Unit Mapping"
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies the memory number of the fiscal printer related to this POS unit.';
                 }
+                field("Extended Receipt Invoice No."; Rec."Extended Receipt Invoice No.")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the No Serie of the Extended Receipt Invoice No. field.';
+                }
+                field("Extended Receipt Cr. Memo No."; Rec."Extended Receipt Cr. Memo No.")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the No Serie of the Extended Receipt Cr. Memo No. field.';
+                }
             }
         }
     }

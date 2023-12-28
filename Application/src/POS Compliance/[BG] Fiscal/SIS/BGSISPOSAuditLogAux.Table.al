@@ -73,6 +73,11 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
             Caption = 'Extended Receipt';
             DataClassification = CustomerContent;
         }
+        field(26; "Extended Receipt Counter"; Code[20])
+        {
+            Caption = 'Extended Receipt Counter';
+            DataClassification = CustomerContent;
+        }
         field(30; "Fiscal Printer Device No."; Text[8])
         {
             Caption = 'Fiscal Printer Device No.';
