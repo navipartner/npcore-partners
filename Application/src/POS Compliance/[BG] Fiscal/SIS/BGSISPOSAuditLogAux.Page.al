@@ -90,6 +90,11 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies whether the receipt from the related record is extended or not.';
                 }
+                field("Extended Receipt Counter"; Rec."Extended Receipt Counter")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the value of the Extended Receipt Counter field.';
+                }
             }
         }
     }
