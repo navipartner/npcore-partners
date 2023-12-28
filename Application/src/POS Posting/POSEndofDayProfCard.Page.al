@@ -90,6 +90,11 @@
                     ToolTip = 'Specifies whether editing of the Difference field is allowed on the counting page.';
                     ApplicationArea = NPRRetail;
                 }
+                field("General Info Output Type"; Rec."NO General Info Output Type")
+                {
+                    ApplicationArea = NPRNOFiscal;
+                    ToolTip = 'Specifies the value of the General Info Output Type field.';
+                }
                 field("Bank Deposit Ref. Asgmt."; Rec."Bank Deposit Ref. Asgmt.")
                 {
                     ToolTip = 'Specifies the method used for reference number assignment for "Bank Deposit" amounts posted in end-of-day transactions.';
