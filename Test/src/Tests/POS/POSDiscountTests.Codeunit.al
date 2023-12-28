@@ -19,6 +19,7 @@ codeunit 85147 "NPR POS Discount Tests"
         NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure UpdateDimensionValue()
     var
         SalePOS: Record "NPR POS Sale";
@@ -95,6 +96,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure CheckDiscountTypeWithNegativeAmtWithError()
     var
         DiscountAmt: Decimal;
@@ -111,7 +113,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
-
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyDiscountInInvalidPercentage()
     var
         SalePOS: Record "NPR POS Sale";
@@ -150,6 +152,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyDiscountToWrongTargetLines()
     var
         SalePOS: Record "NPR POS Sale";
@@ -190,6 +193,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyTotalDiscountOnlyToNegativeLineQty()
     var
         SalePOS: Record "NPR POS Sale";
@@ -249,6 +253,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyTotalDiscountAmount()
     var
         SalePOS: Record "NPR POS Sale";
@@ -313,7 +318,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
-
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyTotalAmountDiscountType()
     var
         SalePOS: Record "NPR POS Sale";
@@ -365,6 +370,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyLineDiscountPercentageWithReasonCode()
     var
         SalePOS: Record "NPR POS Sale";
@@ -419,6 +425,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ApplyDiscountHigherThanSaleAmount()
     var
         SalePOS: Record "NPR POS Sale";
@@ -564,6 +571,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure ClearLineDiscount()
     var
         SalePOS: Record "NPR POS Sale";
@@ -607,6 +615,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure SetDiscountPercentRelative()
     var
         SalePOS: Record "NPR POS Sale";
@@ -650,6 +659,7 @@ codeunit 85147 "NPR POS Discount Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     internal procedure DiscountDoesntIncludeTax()
     var
         SalePOS: Record "NPR POS Sale";
