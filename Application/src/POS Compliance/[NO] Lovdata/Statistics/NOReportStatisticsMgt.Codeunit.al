@@ -181,7 +181,7 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSEntry.Next() = 0;
     end;
 
-    internal procedure CalcCancelledReceiptsAmount(SalespersonPurchaserCode: Code[20]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; var Amount: Decimal)
+    internal procedure CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode: Code[20]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; var Amount: Decimal; ActionType: Option)
     var
         POSAuditLog: Record "NPR POS Audit Log";
         ConvertVar: Decimal;
@@ -189,8 +189,9 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         Clear(Amount);
         POSAuditLog.Reset();
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
-        POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
-        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
+        if SalespersonPurchaserCode <> '' then
+            POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
+        POSAuditLog.SetRange("Action Type", ActionType);
 
         POSAuditLog.SetLoadFields("Additional Information");
         if POSAuditLog.FindSet() then
@@ -200,32 +201,6 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSAuditLog.Next() = 0;
     end;
 
-    internal procedure CalcTotalReturnAndSalesOnAllReceipts(var ReturnAmount: Decimal; var Amount: Decimal)
-    var
-        POSSalesLine: Record "NPR POS Entry Sales Line";
-        POSEntry: Record "NPR POS Entry";
-    begin
-        Clear(ReturnAmount);
-        Clear(Amount);
-
-        POSSalesLine.SetLoadFields(Type, "Exclude from Posting", "Amount Incl. VAT", Quantity);
-        POSEntry.SetLoadFields("Entry No.", "Entry Type");
-        POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale");
-        if POSEntry.FindSet() then
-            repeat
-                POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSSalesLine.SetRange("Type", POSSalesLine.Type::Item);
-                POSSalesLine.SetFilter("Exclude from Posting", '=%1', false);
-                if (POSSalesLine.FindSet()) then
-                    repeat
-                        if POSSalesLine.Quantity > 0 then
-                            Amount += POSSalesLine."Amount Incl. VAT"
-                        else
-                            ReturnAmount += POSSalesLine."Amount Incl. VAT";
-                    until POSSalesLine.Next() = 0;
-            until POSEntry.Next() = 0;
-    end;
-
     internal procedure GetPOSAuditLogCount(SalespersonPurchaserCode: Code[20]; POSUnitNo: Code[10]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; ActionType: Option): Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
@@ -233,7 +208,8 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         POSAuditLog.Reset();
         POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
-        POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
+        if SalespersonPurchaserCode <> '' then
+            POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
         POSAuditLog.SetRange("Active POS Unit No.", POSUnitNo);
         POSAuditLog.SetRange("Action Type", ActionType);
 
@@ -285,9 +261,10 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         PaymentBinCheckpoint.SetRange("Include In Counting", PaymentBinCheckpoint."Include In Counting"::YES);
 
         PaymentBinCheckpoint.SetLoadFields("Bank Deposit Amount");
-        if not PaymentBinCheckpoint.FindSet() then
+        if PaymentBinCheckpoint.IsEmpty() then
             exit;
 
+        PaymentBinCheckpoint.FindSet();
         repeat
             Result += PaymentBinCheckpoint."Bank Deposit Amount";
         until PaymentBinCheckpoint.Next() = 0;

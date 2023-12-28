@@ -90,7 +90,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDesc, '');
+        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDesc, Format(POSSaleLineRecord."Amount Including VAT"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Cancel Sale B", 'OnBeforeDeletePOSSaleLine', '', false, false)]
@@ -102,7 +102,6 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         AuditLogDesc: Label 'POS Sales Line canceled';
         POSSaleLineRecord: Record "NPR POS Sale Line";
-        Amount: Decimal;
     begin
         POSSaleLine.GetCurrentSaleLine(POSSaleLineRecord);
         if POSSaleLineRecord.IsEmpty() then
@@ -120,8 +119,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         until POSSaleLineRecord.Next() = 0;
 
         POSSaleLineRecord.CalcSums("Amount Including VAT");
-        Amount := POSSaleLineRecord."Amount Including VAT";
-        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDesc, Format(Amount));
+        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDesc, Format(POSSaleLineRecord."Amount Including VAT"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Discount B", 'OnBeforeSetDiscount', '', false, false)]

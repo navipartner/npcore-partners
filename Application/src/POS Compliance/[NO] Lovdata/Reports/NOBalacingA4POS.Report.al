@@ -817,7 +817,7 @@ report 6014468 "NPR NO Balacing A4 POS"
         Clear(PriceLookupQuantity);
         PriceLookupQuantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::PRICE_CHECK);
         TotalPriceLookupQuantity += PriceLookupQuantity;
-        NOReportStatisticsMgt.CalcCancelledReceiptsAmount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, CancelledReceiptsAmount);
+        NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaser.Code, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, CancelledReceiptsAmount, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
     end;
 
     var

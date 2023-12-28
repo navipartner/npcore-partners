@@ -260,6 +260,11 @@
                 ValidateNoSeries("BT IN: Move fr. Bin Ref. Nos.");
             end;
         }
+        field(170; "NO General Info Output Type"; Enum "NPR NO Gen. Info Output Type")
+        {
+            Caption = 'General Info Output Type';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
