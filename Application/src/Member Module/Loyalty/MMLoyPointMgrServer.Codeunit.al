@@ -32,6 +32,8 @@
         JNL_NOT_EMPTY: Label 'The %1 %2 is not empty. Confirm YES to delete lines and proceed.';
         SELECT_JNL_TYPE: Label 'Select journal template type:';
 
+        _MembershipEvents: Codeunit "NPR MM Membership Events";
+
     procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -91,6 +93,7 @@
         LoyaltyStoreLedger.Insert();
 
         LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", 0);
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
@@ -142,6 +145,7 @@
         LoyaltyStoreLedger.Insert();
 
         LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", 0);
 
         TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
@@ -535,6 +539,7 @@
         MembershipPointsEntry.Quantity := TmpBuffer.Quantity;
         MembershipPointsEntry.Description := TmpBuffer.Description;
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;
@@ -586,6 +591,7 @@
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := TmpBuffer.Description;
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
         // Payment points are negative
@@ -635,6 +641,8 @@
         MembershipPointsEntry."Awarded Amount (LCY)" := 0;
         MembershipPointsEntry.Description := TmpBuffer.Description;
         MembershipPointsEntry.Quantity := 1;
+
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
     end;
 
@@ -676,6 +684,7 @@
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := 'Amount not eligible for points';
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
         LoyaltyStoreLedger."Earned Points" += MembershipPointsEntry.Points;

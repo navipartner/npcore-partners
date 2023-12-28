@@ -18,6 +18,7 @@
         MISSING_VALUE: Label 'Missing value in field %1.';
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
         SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
+        _MembershipEvents: Codeunit "NPR MM Membership Events";
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterInsertValueEntry', '', true, true)]
     local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
@@ -318,12 +319,11 @@
         POSUnit: Record "NPR POS Unit";
         AwardPoints: Boolean;
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
-        MembershipEvents: Codeunit "NPR MM Membership Events";
         CreatePointEntry: Boolean;
     begin
 
         CreatePointEntry := true;
-        MembershipEvents.OnBeforeCreatePointEntry(ValueEntry, LoyaltyPostingSource, POSUnitNo, CreatePointEntry);
+        _MembershipEvents.OnBeforeCreatePointEntry(ValueEntry, LoyaltyPostingSource, POSUnitNo, CreatePointEntry);
         if (not CreatePointEntry) then
             exit(false);
 
@@ -430,9 +430,12 @@
 
         CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         if (MembershipPointsEntry.Insert()) then;
 
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
+
         exit(true);
     end;
 
@@ -941,7 +944,11 @@
 
         MembershipPointsEntry.Quantity := 1;
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
+
+        AfterMembershipPointsUpdate(MembershipPointsEntry."Membership Entry No.", MembershipPointsEntry."Entry No.");
+        _MembershipEvents.OnAfterMembershipPointsUpdate(MembershipPointsEntry."Membership Entry No.", MembershipPointsEntry."Entry No.");
     end;
 
     procedure UnRedeemPointsCoupon(MembershipEntryNo: Integer; DocumentNo: Code[20]; DocumentDate: Date; CouponNo: Code[20]): Boolean
@@ -973,7 +980,12 @@
         MembershipPointsEntry.Points *= -1;
         MembershipPointsEntry.Adjustment := true;
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
+
+        AfterMembershipPointsUpdate(MembershipPointsEntry."Membership Entry No.", MembershipPointsEntry."Entry No.");
+        _MembershipEvents.OnAfterMembershipPointsUpdate(MembershipPointsEntry."Membership Entry No.", MembershipPointsEntry."Entry No.");
+
         exit(true);
     end;
 
@@ -1261,9 +1273,11 @@
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Description := Description;
 
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
 
         AfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", MembershipPointsEntry."Entry No.");
 
         exit(MembershipPointsEntry."Entry No.");
     end;

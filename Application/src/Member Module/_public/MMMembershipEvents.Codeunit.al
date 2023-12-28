@@ -83,10 +83,26 @@
     begin
     end;
 
+    #region Loyalty
+
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeCreatePointEntry(var ValueEntry: Record "Value Entry"; LoyaltyPostingSource: Option VALUE_ENTRY,MEMBERSHIP_ENTRY,POS_ENDOFSALE; var POSUnitNo: Code[10]; var CreatePointEntry: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertPointEntry(var MembershipPointsEntry: Record "NPR MM Members. Points Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterMembershipPointsUpdate(MembershipEntryNo: Integer; MembershipPointsEntryNo: Integer)
+    begin
+    end;
+
+    #endregion
+
+    #region SmartSearch
 
     [IntegrationEvent(false, false)]
     internal procedure OnAfterSetMemberSmartSearchFilter(SearchTerm: Text; SearchContext: Integer; var Member: Record "NPR MM Member")
@@ -107,6 +123,8 @@
     internal procedure OnBeforeValidateSmartSearchTerm(SearchTerm: Text; SearchContext: Integer; var Handled: Boolean; var IsValidSearchTerm: Boolean)
     begin
     end;
+
+    #endregion
 
     [IntegrationEvent(false, false)]
     procedure OnAfterCreateMemberSoapRequest(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var XmlDoc: XmlDocument; SOAPAction: Text)
