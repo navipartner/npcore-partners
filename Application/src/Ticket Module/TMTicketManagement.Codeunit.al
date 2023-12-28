@@ -250,7 +250,11 @@
             if (PrintTicket) then begin
                 Ticket2.SetFilter("No.", '=%1', Ticket."No.");
                 Ticket2.Get(Ticket."No.");
-                if (PrintSingleTicket(Ticket2)) then;
+                if (PrintSingleTicket(Ticket2)) then begin
+                    Ticket2."Printed Date" := Today();
+                    Ticket2.Modify();
+                    Commit();
+                end
             end;
 
         until (Ticket.Next() = 0);
@@ -279,11 +283,14 @@
         exit(true);
     end;
 
+    /// <summary>
+    /// Some Print implementations uses RunModal, meaning it will block writing transactions on each subsequent call.
+    /// If this is called multiple times make sure to Commit(), before calling it again to ensure no that there no ongoing writing transaction. 
+    /// </summary>
     procedure PrintSingleTicket(var Ticket: Record "NPR TM Ticket") Printed: Boolean
     var
         TicketType: Record "NPR TM Ticket Type";
     begin
-
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
             exit(false);
 
@@ -291,10 +298,6 @@
             exit(false);
 
         Printed := PrintTicketUsingFormatter(Ticket, TicketType."Print Object Type", TicketType."Print Object ID", TicketType."RP Template Code");
-        if (Printed) then begin
-            Ticket."Printed Date" := Today();
-            Ticket.Modify();
-        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
@@ -1134,7 +1137,10 @@
         end;
 
         if (WithPrint) then
-            PrintSingleTicket(Ticket);
+            if (PrintSingleTicket(Ticket)) then begin
+                Ticket."Printed Date" := Today();
+                Ticket.Modify();
+            end;
     end;
 
     internal procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ScannerStationId: Code[10]; ProcessFlow: Option SALES,SCAN)

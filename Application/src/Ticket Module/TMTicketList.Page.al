@@ -392,7 +392,11 @@
                     repeat
                         Ticket2.Get(Ticket."No.");
                         Ticket2.SetRecFilter();
-                        TicketManagement.PrintSingleTicket(Ticket2);
+                        if (TicketManagement.PrintSingleTicket(Ticket2)) then begin
+                            Ticket2."Printed Date" := Today();
+                            Ticket2.Modify();
+                            Commit();
+                        end
                     until (Ticket.Next() = 0);
                 end;
             }
