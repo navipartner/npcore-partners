@@ -58,6 +58,16 @@ table 6060097 "NPR BG SIS POS Unit Mapping"
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(50; "Extended Receipt Invoice No."; Code[20])
+        {
+            TableRelation = "No. Series";
+            DataClassification = CustomerContent;
+        }
+        field(51; "Extended Receipt Cr. Memo No."; Code[20])
+        {
+            TableRelation = "No. Series";
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

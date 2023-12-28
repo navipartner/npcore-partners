@@ -150,7 +150,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         AddBeginFiscalReceiptInputJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry);
         if ExtendedReceipt then
-            AddInvoiceDataJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry, ExtendedReceipt);
+            AddInvoiceDataJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry, ExtendedReceipt, BGSISPOSAuditLogAux);
 
         AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
@@ -178,18 +178,18 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndObject();
     end;
 
-    local procedure AddInvoiceDataJSONObjectForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; var ExtendedReceipt: Boolean)
+    local procedure AddInvoiceDataJSONObjectForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; var ExtendedReceipt: Boolean; var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.")
     var
         Customer: Record Customer;
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+        NoSeriesManagement: Codeunit NoSeriesManagement;
         CustomerIDNumberType: Integer;
         CustomerAddress: Text;
         CustomerCity: Text;
         CustomerID: Text;
         CustomerName: Text;
         CustomerVATNumber: Text;
-        InvoiceNumber: Text;
     begin
-        InvoiceNumber := POSEntry."Document No.";
         if POSEntry."Customer No." <> '' then begin
             CustomerIDNumberType := 0;
             if Customer.Get(POSEntry."Customer No.") then
@@ -197,13 +197,21 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         end else
             CustomerIDNumberType := 1;
 
-        if not EnterInvoiceDataForSaleAndRefund(CustomerIDNumberType, CustomerAddress, CustomerCity, CustomerID, CustomerName, CustomerVATNumber, InvoiceNumber) then begin
+        if not EnterInvoiceDataForSaleAndRefund(CustomerIDNumberType, CustomerAddress, CustomerCity, CustomerID, CustomerName, CustomerVATNumber) then begin
             ExtendedReceipt := false;
             exit;
         end;
 
+        BGSISPOSUnitMapping.Get(POSEntry."POS Unit No.");
+        if BGSISPOSAuditLogAux."Transaction Type" in [BGSISPOSAuditLogAux."Transaction Type"::Refund] then
+            BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), true)
+        else
+            BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), true);
+        BGSISPOSAuditLogAux.Modify();
+        Commit();
+
         JsonTextReaderWriter.WriteStartObject('invoiceData');
-        JsonTextReaderWriter.WriteStringProperty('invNumber', InvoiceNumber);
+        JsonTextReaderWriter.WriteStringProperty('invNumber', BGSISPOSAuditLogAux."Extended Receipt Counter");
         JsonTextReaderWriter.WriteStringProperty('city', CopyStr(CustomerCity, 1, 30));
         JsonTextReaderWriter.WriteStringProperty('identNumber', CopyStr(CustomerID, 1, 30));
         JsonTextReaderWriter.WriteRawProperty('identNumberType', CustomerIDNumberType);
@@ -214,11 +222,11 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndObject();
     end;
 
-    local procedure EnterInvoiceDataForSaleAndRefund(var CustomerIDNumberType: Integer; var CustomerAddress: Text; var CustomerCity: Text; var CustomerID: Text; var CustomerName: Text; var CustomerVATNumber: Text; var InvoiceNumber: Text): Boolean
+    local procedure EnterInvoiceDataForSaleAndRefund(var CustomerIDNumberType: Integer; var CustomerAddress: Text; var CustomerCity: Text; var CustomerID: Text; var CustomerName: Text; var CustomerVATNumber: Text): Boolean
     var
         InputDialog: Page "NPR Input Dialog";
-        AllInvoiceDataCorrect, AllInvoiceDataEntered, AllInvoiceDataEnteredSuccessfully : Boolean;
         ActionOK: Boolean;
+        AllInvoiceDataCorrect, AllInvoiceDataEntered, AllInvoiceDataEnteredSuccessfully : Boolean;
         AbortCreationOfExtendedReceiptQst: Label 'Are you sure that you do not want to create extended fiscal receipt?';
         CustomerAddressLbl: Label 'Customer Address';
         CustomerCityLbl: Label 'Customer City';
@@ -229,18 +237,16 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         CustomerNameLbl: Label 'Customer Name';
         CustomerVATNumberLbl: Label 'Customer VAT Number';
         CustomerVATNumberMsg: Label 'Customer VAT Number does not have allowed value.';
-        InvoiceNumberLbl: Label 'Invoice Number';
         MustEnterNecessaryExtendedReceiptDataMsg: Label 'You must enter all the necessary data for extended receipt.';
     begin
         while not AllInvoiceDataEnteredSuccessfully do begin
             Clear(InputDialog);
-            InputDialog.SetInput(1, InvoiceNumber, InvoiceNumberLbl);
-            InputDialog.SetInput(2, CustomerCity, CustomerCityLbl);
-            InputDialog.SetInput(3, CustomerID, CustomerIDLbl);
-            InputDialog.SetInput(4, CustomerIDNumberType, CustomerIDNumberTypeLbl);
-            InputDialog.SetInput(5, CustomerAddress, CustomerAddressLbl);
-            InputDialog.SetInput(6, CustomerName, CustomerNameLbl);
-            InputDialog.SetInput(7, CustomerVATNumber, CustomerVATNumberLbl);
+            InputDialog.SetInput(1, CustomerCity, CustomerCityLbl);
+            InputDialog.SetInput(2, CustomerID, CustomerIDLbl);
+            InputDialog.SetInput(3, CustomerIDNumberType, CustomerIDNumberTypeLbl);
+            InputDialog.SetInput(4, CustomerAddress, CustomerAddressLbl);
+            InputDialog.SetInput(5, CustomerName, CustomerNameLbl);
+            InputDialog.SetInput(6, CustomerVATNumber, CustomerVATNumberLbl);
 
             if InputDialog.RunModal() = Action::OK then
                 ActionOK := true
@@ -253,16 +259,15 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
             end;
 
             if ActionOK then begin
-                InputDialog.InputText(1, InvoiceNumber);
-                InputDialog.InputText(2, CustomerCity);
-                InputDialog.InputText(3, CustomerID);
-                InputDialog.InputInteger(4, CustomerIDNumberType);
-                InputDialog.InputText(5, CustomerAddress);
-                InputDialog.InputText(6, CustomerName);
-                InputDialog.InputText(7, CustomerVATNumber);
+                InputDialog.InputText(1, CustomerCity);
+                InputDialog.InputText(2, CustomerID);
+                InputDialog.InputInteger(3, CustomerIDNumberType);
+                InputDialog.InputText(4, CustomerAddress);
+                InputDialog.InputText(5, CustomerName);
+                InputDialog.InputText(6, CustomerVATNumber);
 
                 Clear(AllInvoiceDataCorrect);
-                AllInvoiceDataEntered := (InvoiceNumber <> '') and (CustomerCity <> '') and (CustomerID <> '') and (CustomerAddress <> '') and (CustomerName <> '');
+                AllInvoiceDataEntered := (CustomerCity <> '') and (CustomerID <> '') and (CustomerAddress <> '') and (CustomerName <> '');
                 if not AllInvoiceDataEntered then
                     Message(MustEnterNecessaryExtendedReceiptDataMsg)
                 else begin
@@ -735,6 +740,8 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
     internal procedure UpdateBGSISAuditLogForSaleAndRefund(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping"; var TempJsonBuffer: Record "JSON Buffer" temporary; RequestText: Text; ExtendedReceipt: Boolean)
     begin
+        BGSISPOSAuditLogAux.Find();
+
         if ExtendedReceipt then
             RemoveCustomerIDWhenNotBGCompany(RequestText);
 
