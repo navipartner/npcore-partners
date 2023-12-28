@@ -103,6 +103,14 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         }
     }
 
+    fieldgroups
+    {
+        fieldgroup(Brick; "POS Entry No.", "Entry Date", "POS Store Code", "POS Unit No.", "Source Document No.", "Amount Incl. Tax", "Grand Receipt No.")
+        {
+
+        }
+    }
+
     internal procedure FindAuditLog(POSEntryNo: Integer): Boolean
     begin
         SetRange("Audit Entry Type", "Audit Entry Type"::"POS Entry");
