@@ -558,6 +558,11 @@
         if (not TmpOneTimePassword.FindFirst()) then
             Error('No account to validate.');
 
+        // Replace * to prevent wildcard search (cant use the = for exact match with @)
+        // Replace @ with ? (single wildcard character) since 2 @ in a filter f***s-up the case insensitivity filter
+        // Prefix filter with @ to make filter case insensitive
+        TmpOneTimePassword."E-Mail" := '@' + TmpOneTimePassword."E-Mail".Replace('@', '?').Replace('*', '');
+
         if (TmpOneTimePassword."E-Mail" = '') and (TmpOneTimePassword."Phone No." = '') then
             Error('E-Mail and Phone No. cannot both be blank.');
 
@@ -568,7 +573,7 @@
             Error('E-Mail must be specified when attempting to validate a password.');
 
         if (TmpOneTimePassword."E-Mail" <> '') then begin
-            OneTimePassword.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+            OneTimePassword.SetFilter("E-Mail", '%1', LowerCase(TmpOneTimePassword."E-Mail"));
             OneTimePassword.SetFilter("Password (Hash)", '=%1', TmpOneTimePassword."Password (Hash)");
             OTPAuthentication := OneTimePassword.FindFirst();
 
@@ -586,7 +591,7 @@
                 OneTimePassword.Modify();
             end;
 
-            Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+            Contact.SetFilter("E-Mail", '%1', LowerCase(TmpOneTimePassword."E-Mail"));
             Contact.SetFilter("NPR Magento Contact", '=%1', true);
 
             if (not OTPAuthentication) then
@@ -597,7 +602,7 @@
 
             if (Contact.IsEmpty()) then begin
                 Contact.Reset();
-                Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+                Contact.SetFilter("E-Mail", '%1', LowerCase(TmpOneTimePassword."E-Mail"));
                 Contact.SetFilter("NPR Magento Contact", '=%1', true);
                 Contact.SetFilter("NPR Magento Password (Md5)", '<>%1', '');
                 if (not Contact.IsEmpty()) then
@@ -623,7 +628,7 @@
         Contact.SetFilter("NPR Magento Contact", '=%1', true);
         Contact.FilterGroup := -1;
         if (TmpOneTimePassword."E-Mail" <> '') then
-            Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+            Contact.SetFilter("E-Mail", '%1', LowerCase(TmpOneTimePassword."E-Mail"));
         if (TmpOneTimePassword."Phone No." <> '') then begin
             Contact.SetFilter("Phone No.", '=%1', TmpOneTimePassword."Phone No.");
             Contact.SetFilter("Mobile Phone No.", '=%1', TmpOneTimePassword."Phone No.");
