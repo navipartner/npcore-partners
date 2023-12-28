@@ -52,6 +52,18 @@ page 6150777 "NPR APIV1 PBISalesCrMemo"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(shortcutDimension1Code; Rec."Shortcut Dimension 1 Code")
+                {
+                    Caption = 'Shortcut Dimension 1 Code', Locked = true;
+                }
+                field(shortcutDimension2Code; Rec."Shortcut Dimension 2 Code")
+                {
+                    Caption = 'Shortcut Dimension 2 Code', Locked = true;
+                }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }
