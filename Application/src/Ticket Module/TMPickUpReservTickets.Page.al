@@ -368,7 +368,10 @@
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', Rec."Entry No.");
         Ticket.FindFirst();
 
-        TicketManagement.PrintSingleTicket(Ticket);
+        if (TicketManagement.PrintSingleTicket(Ticket)) then begin
+            Ticket."Printed Date" := Today();
+            Ticket.Modify();
+        end;
     end;
 }
 
