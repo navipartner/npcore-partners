@@ -537,6 +537,9 @@
         GenJnlLine."Document No." := POSEntry."Document No.";
         GenJnlLine."System-Created Entry" := true;
         GenJnlLine."Source Currency Code" := POSEntry."Currency Code";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20)
+        GenJnlLine."VAT Reporting Date" := POSEntry."Posting Date";
+#ENDIF
 
         DataTypeMgt.GetRecordRef(GenJnlLine, RecRef);
         if DataTypeMgt.FindFieldByName(RecRef, FldRef, 'Tax Jurisdiction Code') then
