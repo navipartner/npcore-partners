@@ -518,7 +518,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         if ExtendedReceipt then begin
             JsonTextReaderWriter.WriteStringProperty('fiscDevNumber', BGSISPOSAuditLogAuxToRefund."Fiscal Printer Device No.");
-            JsonTextReaderWriter.WriteStringProperty('invoiceNumber', BGSISPOSAuditLogAuxToRefund."Source Document No.");
+            JsonTextReaderWriter.WriteStringProperty('invoiceNumber', BGSISPOSAuditLogAuxToRefund."Extended Receipt Counter");
         end;
 
         JsonTextReaderWriter.WriteStringProperty('receiptNumber', BGSISPOSAuditLogAuxToRefund."Grand Receipt No.".PadLeft(10, '0'));
