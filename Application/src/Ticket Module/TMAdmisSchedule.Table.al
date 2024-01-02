@@ -372,16 +372,34 @@
     local procedure UpdateRecurrencePattern()
     var
         TMAdmissionSchManagement: Codeunit "NPR TM Admission Sch. Mgt.";
+        ScheduleLine: Record "NPR TM Admis. Schedule Lines";
     begin
-        if "Recurrence Until Pattern" = "Recurrence Until Pattern"::AFTER_X_OCCURENCES then begin
-            if "End After Date" = 0D then begin
+        if (Rec."Recurrence Until Pattern" = "Recurrence Until Pattern"::AFTER_X_OCCURENCES) then begin
+            if ("End After Date" = 0D) then begin
                 Validate("Recurrence Until Pattern", "Recurrence Until Pattern"::NO_END_DATE);
             end else begin
-                if "End After Date" <> TMAdmissionSchManagement.GetRecurrenceEndDate("Start From", "End After Occurrence Count", "Recurrence Pattern") then begin
-                    Validate("Recurrence Until Pattern", "Recurrence Until Pattern"::END_DATE);
-                end;
+                if (Rec."End After Date" <> TMAdmissionSchManagement.GetRecurrenceEndDate(Rec."Start From", Rec."End After Occurrence Count", Rec."Recurrence Pattern")) then
+                    Validate(Rec."Recurrence Until Pattern", Rec."Recurrence Until Pattern"::END_DATE);
             end;
         end;
+
+        if (Rec."End After Date" <> 0D) then begin
+            if (Rec."Recurrence Until Pattern" = "Recurrence Until Pattern"::NO_END_DATE) then
+                Validate(Rec."Recurrence Until Pattern", Rec."Recurrence Until Pattern"::END_DATE);
+
+            ScheduleLine.SetFilter("Schedule Code", '=%1', Rec."Schedule Code");
+            if (ScheduleLine.FindSet()) then begin
+                if (ScheduleLine."Schedule Generated Until" > Rec."End After Date") then begin
+                    ScheduleLine."Schedule Generated Until" := Rec."End After Date";
+                    ScheduleLine.Modify();
+                end;
+            end
+        end;
+
+        if (Rec."End After Date" = 0D) then
+            if (Rec."Recurrence Until Pattern" = "Recurrence Until Pattern"::END_DATE) then
+                Validate(Rec."Recurrence Until Pattern", Rec."Recurrence Until Pattern"::NO_END_DATE);
+
     end;
 
     local procedure SetDayOfTheWeek()

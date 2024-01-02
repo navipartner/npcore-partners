@@ -28,6 +28,11 @@
         {
             Caption = 'Blocked';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if (Rec."Schedule Generated Until" > Today()) then
+                    Rec."Schedule Generated Until" := Today();
+            end;
         }
         field(40; "Prebook Is Required"; Boolean)
         {
