@@ -10,7 +10,7 @@
         if (Admission.FindSet()) then begin
             repeat
                 Commit();
-                CreateAdmissionSchedule(Admission."Admission Code", false, Today, 'NPRTMAdmissionSchMgt.OnRun()');
+                CreateAdmissionSchedule(Admission."Admission Code", false, Today(), 'NPRTMAdmissionSchMgt.OnRun()');
             until (Admission.Next() = 0);
         end;
     end;
@@ -18,12 +18,22 @@
     var
         APPEND_LIST_CONFIRM: Label 'There is already a list created for this schedule.\Do you want to append to it?';
         RECREATE_LIST_CONFIRM: Label 'Warning.\The list will be recreated and the current notification status will set to pending.';
+        _TodaysDate: Date;
 
     // This API is intended for the test framework to use - there is no spamming telemetry
     internal procedure CreateAdmissionScheduleTestFramework(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date)
     var
         CustomDimensions: Dictionary of [Text, Text];
     begin
+        _TodaysDate := Today();
+        CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
+    end;
+
+    internal procedure CreateAdmissionScheduleTestFramework(AdmissionCode: Code[20]; Regenerate: Boolean; ReferenceDate: Date; SimulationForDate: Date)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+    begin
+        _TodaysDate := SimulationForDate;
         CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
     end;
 
@@ -50,11 +60,13 @@
         CustomDimensions.Add('NPR_Regenerate', Format(Regenerate, 0, 9));
         CustomDimensions.Add('NPR_ReferenceDate', Format(ReferenceDate, 0, 9));
         CustomDimensions.Add('NPR_SourceTag', SourceTag);
+        CustomDimensions.Add('NPR_SchedularVersion', '2');
 
         VerbosityLevel := Verbosity::Normal;
         Session.LogMessage('NPR_CreateAdmissionSchedule', 'CreateAdmissionSchedule Started', VerbosityLevel, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
 
         StartTime := Time();
+        _TodaysDate := Today();
         CreateAdmissionScheduleWorker(AdmissionCode, Regenerate, ReferenceDate, CustomDimensions);
 
         CustomDimensions.Add('NPR_DurationMs', format((Time() - StartTime), 0, 9));
@@ -65,19 +77,27 @@
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
         DateRecord: Record Date;
-        TempAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+        TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
         ScheduleStartDate: Date;
         ScheduleEndDate: Date;
         GenerateFromDate: Date;
         GenerateUntilDate: Date;
-        AreEqual: Boolean;
         EntryCounter: Integer;
+
+        FullReplaceDict: Dictionary of [Integer, Integer];
+        PartialUpdateDict: Dictionary of [Integer, Integer];
+        InsertNewList: List of [Integer];
+        CancelExistingList: List of [Integer];
+
+        CountFullReplace, CountUpdated, CountNew, CountCanceled : Integer;
     begin
 
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (AdmissionScheduleLines.FindSet()) then begin
-            GenerateFromDate := Today();
+            GenerateFromDate := _TodaysDate;
+            if ((ReferenceDate > _TodaysDate) and (Regenerate)) then
+                GenerateFromDate := ReferenceDate;
             GenerateUntilDate := 0D;
 
             // find the low / high dates for all schedules for this admission
@@ -88,19 +108,20 @@
 
                 if (GenerateUntilDate < ScheduleEndDate) then
                     GenerateUntilDate := ScheduleEndDate;
+
             until (AdmissionScheduleLines.Next() = 0);
+
+            if (GenerateFromDate < _TodaysDate) then
+                GenerateFromDate := _TodaysDate;
+
+            if (GenerateUntilDate < GenerateFromDate) then
+                exit;
 
             if (Regenerate) then begin
                 AdmissionScheduleLines.FindSet();
                 repeat
                     CancelTimeEntry(AdmissionScheduleLines."Admission Code", AdmissionScheduleLines."Schedule Code", GenerateFromDate, GenerateUntilDate);
                 until (AdmissionScheduleLines.Next() = 0);
-            end;
-
-            if (not Regenerate) then begin
-                if ((GenerateUntilDate > AdmissionScheduleLines."Schedule Generated Until") and
-                    (AdmissionScheduleLines."Schedule Generated Until" > Today)) then
-                    GenerateFromDate := AdmissionScheduleLines."Schedule Generated Until";
             end;
 
             CustomDimensions.Add('NPR_GenerateFromDate', Format(GenerateFromDate, 0, 9));
@@ -112,26 +133,39 @@
             DateRecord.SetFilter("Period Start", '%1..%2', GenerateFromDate, GenerateUntilDate);
             if (DateRecord.FindSet()) then begin
                 repeat
+
+                    Clear(FullReplaceDict);
+                    Clear(PartialUpdateDict);
+                    Clear(InsertNewList);
+                    Clear(CancelExistingList);
+
+                    if (TempTargetAdmissionScheduleEntry.IsTemporary) then
+                        TempTargetAdmissionScheduleEntry.DeleteAll();
+
                     AdmissionScheduleLines.FindSet();
                     repeat
-                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TempAdmissionScheduleEntry);
+                        GenerateScheduleEntry(AdmissionScheduleLines, DateRecord."Period Start", TempTargetAdmissionScheduleEntry);
                     until (AdmissionScheduleLines.Next() = 0);
 
-                    if (not TempAdmissionScheduleEntry.IsEmpty) then begin
-                        AreEqual := CompareScheduleEntries(AdmissionCode, DateRecord."Period Start", TempAdmissionScheduleEntry);
-                        if (not AreEqual) then
-                            StoreScheduleEntries(TempAdmissionScheduleEntry);
-                    end;
+                    CompareScheduleEntriesV2(AdmissionCode,
+                        DateRecord."Period Start",
+                        TempTargetAdmissionScheduleEntry,
+                        FullReplaceDict, PartialUpdateDict, InsertNewList, CancelExistingList,
+                        Regenerate);
 
-                    TempAdmissionScheduleEntry.Reset();
-                    EntryCounter += TempAdmissionScheduleEntry.Count();
-                    if (TempAdmissionScheduleEntry.IsTemporary) then
-                        TempAdmissionScheduleEntry.DeleteAll();
+                    CountFullReplace += FullReplaceEntry(FullReplaceDict, TempTargetAdmissionScheduleEntry);
+                    CountUpdated += PartialUpdateEntry(PartialUpdateDict, TempTargetAdmissionScheduleEntry);
+                    CountNew += InsertNewEntry(InsertNewList, TempTargetAdmissionScheduleEntry);
+                    CountCanceled += CancelExistingEntry(CancelExistingList);
+
+                    TempTargetAdmissionScheduleEntry.Reset();
+                    EntryCounter += TempTargetAdmissionScheduleEntry.Count();
 
                 until (DateRecord.Next() = 0);
             end;
 
             CustomDimensions.Add('NPR_EntriesAffected', Format(EntryCounter, 0, 9));
+            CustomDimensions.Add('NPR_EntriesAffectedDetailed', StrSubstNo('%1/%2/%3/%4', CountNew, CountFullReplace, CountUpdated, CountCanceled));
         end;
     end;
 
@@ -140,7 +174,7 @@
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
         if (ReferenceDate = 0D) then
-            ReferenceDate := Today();
+            ReferenceDate := _TodaysDate;
 
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
         AdmissionScheduleLines.SetFilter(Blocked, '=%1', false);
@@ -185,8 +219,8 @@
 
         if (not CalculateScheduleDateRange(AdmissionScheduleLines, GenerateForDate, 0D, true, ScheduleStartDate, ScheduleEndDate)) then begin
             // This schedule has expired in some way
-            if (AdmissionScheduleLines."Schedule Generated At" <> Today) then begin
-                AdmissionScheduleLines."Schedule Generated At" := Today();
+            if (AdmissionScheduleLines."Schedule Generated At" <> _TodaysDate) then begin
+                AdmissionScheduleLines."Schedule Generated At" := _TodaysDate;
                 AdmissionScheduleLines.Modify();
             end;
             exit;
@@ -249,7 +283,7 @@
         end;
 
         AdmissionScheduleLines."Schedule Generated Until" := DateRecord."Period Start";
-        AdmissionScheduleLines."Schedule Generated At" := Today();
+        AdmissionScheduleLines."Schedule Generated At" := _TodaysDate;
         AdmissionScheduleLines.Modify();
     end;
 
@@ -269,7 +303,7 @@
 
         // nothing to do in soft mode
         if (not IgnoreGenerationDate) then
-            if (AdmissionScheduleLines."Schedule Generated At" = Today) then
+            if (AdmissionScheduleLines."Schedule Generated At" = _TodaysDate) then
                 exit(false);
 
         Admission.Get(AdmissionScheduleLines."Admission Code");
@@ -316,26 +350,35 @@
     local procedure AddTimeEntry(StartFromDate: Date; Admission: Record "NPR TM Admission"; Schedule: Record "NPR TM Admis. Schedule"; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        AdmissionScheduleLines2: Record "NPR TM Admis. Schedule Lines";
         TicketCalendarManagement: Codeunit "NPR TMBaseCalendarManager";
         EndDateTime: DateTime;
         EntryNo: Integer;
     begin
 
         // we are not creating historical entries
-        if (StartFromDate < WorkDate()) then
+        if (StartFromDate < _TodaysDate) then
             exit;
 
         AdmissionScheduleLines.Get(Admission."Admission Code", Schedule."Schedule Code");
 
+        // Prevent duplicate same time entries
         TmpAdmissionScheduleEntry.Reset();
-        EntryNo := 1;
+        TmpAdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
+        TmpAdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', StartFromDate);
+        TmpAdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', Schedule."Start Time");
+        if (TmpAdmissionScheduleEntry.FindFirst()) then begin
+            AdmissionScheduleLines2.Get(TmpAdmissionScheduleEntry."Admission Code", TmpAdmissionScheduleEntry."Schedule Code");
+            if (AdmissionScheduleLines2."Process Order" > AdmissionScheduleLines."Process Order") then
+                exit;
+            TmpAdmissionScheduleEntry.Delete();
+        end;
 
         // the new entry
         TmpAdmissionScheduleEntry.Reset();
-        if (TmpAdmissionScheduleEntry.FindLast()) then
-            EntryNo := TmpAdmissionScheduleEntry."Entry No.";
-
+        EntryNo := TmpAdmissionScheduleEntry.Count();
         EntryNo += 1;
+
         TmpAdmissionScheduleEntry.Init();
         TmpAdmissionScheduleEntry."Entry No." := EntryNo;
         TmpAdmissionScheduleEntry.Insert();
@@ -402,156 +445,179 @@
         TmpAdmissionScheduleEntry.Modify();
     end;
 
-    local procedure CompareScheduleEntries(AdmissionCode: Code[20]; ReferenceDate: Date; var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
+    local procedure CompareScheduleEntriesV2(AdmissionCode: Code[20];
+        ReferenceDate: Date;
+        var TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
+        var FullReplace: Dictionary of [Integer, Integer];
+        var PartialUpdate: Dictionary of [Integer, Integer];
+        var InsertNewList: List of [Integer];
+        var CancelExistingList: List of [Integer];
+        Regenerate: Boolean
+    )
     var
+        AdmissionScheduleLine: Record "NPR TM Admis. Schedule Lines";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        UniqKey: Text;
+        TempExistingAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary;
     begin
-
-        // is there a manual override?
-        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-        AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
-        AdmissionScheduleEntry.SetFilter("Regenerate With", '=%1', AdmissionScheduleEntry."Regenerate With"::MANUAL);
-        AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', TmpAdmissionScheduleEntry."Schedule Code");
-        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-
-        if (not AdmissionScheduleEntry.IsEmpty()) then
-            exit(true); // Ignore this line by saying a idenical line exist.
-
-        AdmissionScheduleEntry.Reset();
-
-        if (TmpAdmissionScheduleEntry.IsEmpty()) then begin
+        // Get the last existing time slots for each schedule on reference date
+        AdmissionScheduleLine.SetFilter("Admission Code", '=%1', AdmissionCode);
+        if (AdmissionScheduleLine.FindSet()) then begin
+            AdmissionScheduleEntry.SetCurrentKey("Entry No.");
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
-            if (AdmissionScheduleEntry.IsEmpty()) then
-                exit(true);
-
-            AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false); // Entries with cancelled FALSE must me cancelled
-            exit(not AdmissionScheduleEntry.IsEmpty());
+            repeat
+                AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', AdmissionScheduleLine."Schedule Code");
+                if (AdmissionScheduleEntry.FindLast()) then begin
+                    repeat
+                        TempExistingAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
+                        TempExistingAdmissionScheduleEntry.Insert();
+                        CancelExistingList.Add(TempExistingAdmissionScheduleEntry."Entry No.");
+                    until (AdmissionScheduleEntry.Next() = 0);
+                end;
+            until (AdmissionScheduleLine.Next() = 0);
         end;
 
-        if (TmpAdmissionScheduleEntry.Count() = 1) then begin
-            TmpAdmissionScheduleEntry.FindFirst();
+        // Verify target exists
+        TempTargetAdmissionScheduleEntry.Reset();
+        if (TempTargetAdmissionScheduleEntry.FindSet()) then begin
+            repeat
+                InsertNewList.Add(TempTargetAdmissionScheduleEntry."Entry No.");
 
-            AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-            AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
-            AdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', TmpAdmissionScheduleEntry."Admission Start Time");
-            AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-            if (AdmissionScheduleEntry.Count() <> 1) then
-                exit(false);
+                TempExistingAdmissionScheduleEntry.Reset();
+                TempExistingAdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TempTargetAdmissionScheduleEntry."Admission Code");
+                TempExistingAdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', TempTargetAdmissionScheduleEntry."Schedule Code");
+                TempExistingAdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
+                if (TempExistingAdmissionScheduleEntry.FindFirst()) then begin
 
-            AdmissionScheduleEntry.FindFirst();
-            exit(IsIdentical(TmpAdmissionScheduleEntry, AdmissionScheduleEntry));
+                    if (Regenerate) then begin
+                        if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                            FullReplace.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
+                    end else begin
+                        if (TempExistingAdmissionScheduleEntry."Regenerate With" = TempExistingAdmissionScheduleEntry."Regenerate With"::SCHEDULER) then
+                            if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                                FullReplace.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
+
+                        if (TempExistingAdmissionScheduleEntry."Regenerate With" = TempExistingAdmissionScheduleEntry."Regenerate With"::MANUAL) then
+                            if (not AreEqual(TempExistingAdmissionScheduleEntry, TempTargetAdmissionScheduleEntry)) then
+                                PartialUpdate.Add(TempExistingAdmissionScheduleEntry."Entry No.", TempTargetAdmissionScheduleEntry."Entry No.");
+                    end;
+                    InsertNewList.Remove(TempTargetAdmissionScheduleEntry."Entry No.");
+                    CancelExistingList.Remove(TempExistingAdmissionScheduleEntry."Entry No.");
+                end;
+            until (TempTargetAdmissionScheduleEntry.Next() = 0);
         end;
-
-        // multiple schedules group them per start time
-        // TODO add a horizontal group code
-        TmpAdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
-        TmpAdmissionScheduleEntry.FindSet();
-        UniqKey := '';
-        repeat
-
-            if (UniqKey = '') then
-                if (not CheckExists(TmpAdmissionScheduleEntry)) then
-                    exit(false);
-
-            if (UniqKey <> '') and (UniqKey <> GetIdentifyingString(TmpAdmissionScheduleEntry)) then
-                if (not CheckExists(TmpAdmissionScheduleEntry)) then
-                    exit(false);
-
-            UniqKey := GetIdentifyingString(TmpAdmissionScheduleEntry);
-
-        until (TmpAdmissionScheduleEntry.Next() = 0);
-
-        exit(CheckExists(TmpAdmissionScheduleEntry));
     end;
 
-    local procedure StoreScheduleEntries(var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
+    local procedure AreEqual(var TmpExistingAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary; var TmpTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
+    begin
+        if (TmpExistingAdmissionScheduleEntry."Regenerate With" = TmpExistingAdmissionScheduleEntry."Regenerate With"::SCHEDULER) then
+            exit(
+                (TmpExistingAdmissionScheduleEntry."Event Arrival From Time" = TmpTargetAdmissionScheduleEntry."Event Arrival From Time")
+                and (TmpExistingAdmissionScheduleEntry."Event Arrival Until Time" = TmpTargetAdmissionScheduleEntry."Event Arrival Until Time")
+                and (TmpExistingAdmissionScheduleEntry."Max Capacity Per Sch. Entry" = TmpTargetAdmissionScheduleEntry."Max Capacity Per Sch. Entry")
+                and (TmpExistingAdmissionScheduleEntry."Sales From Date" = TmpTargetAdmissionScheduleEntry."Sales From Date")
+                and (TmpExistingAdmissionScheduleEntry."Sales From Time" = TmpTargetAdmissionScheduleEntry."Sales From Time")
+                and (TmpExistingAdmissionScheduleEntry."Sales Until Date" = TmpTargetAdmissionScheduleEntry."Sales Until Date")
+                and (TmpExistingAdmissionScheduleEntry."Sales Until Time" = TmpTargetAdmissionScheduleEntry."Sales Until Time")
+                and (TmpExistingAdmissionScheduleEntry."Visibility On Web" = TmpTargetAdmissionScheduleEntry."Visibility On Web")
+                and (TmpExistingAdmissionScheduleEntry."Admission Start Time" = TmpTargetAdmissionScheduleEntry."Admission Start Time")
+                and (TmpExistingAdmissionScheduleEntry."Admission End Date" = TmpTargetAdmissionScheduleEntry."Admission End Date")
+                and (TmpExistingAdmissionScheduleEntry."Admission End Time" = TmpTargetAdmissionScheduleEntry."Admission End Time")
+                and (TmpExistingAdmissionScheduleEntry."Admission Is" = TmpTargetAdmissionScheduleEntry."Admission Is")
+                and (TmpExistingAdmissionScheduleEntry.Cancelled = TmpTargetAdmissionScheduleEntry.Cancelled)
+                and (TmpExistingAdmissionScheduleEntry."Dynamic Price Profile Code" = TmpTargetAdmissionScheduleEntry."Dynamic Price Profile Code")
+            );
+
+        if (TmpExistingAdmissionScheduleEntry."Regenerate With" = TmpExistingAdmissionScheduleEntry."Regenerate With"::MANUAL) then
+            exit(
+                (TmpExistingAdmissionScheduleEntry."Admission Start Time" = TmpTargetAdmissionScheduleEntry."Admission Start Time")
+                and (TmpExistingAdmissionScheduleEntry."Admission End Date" = TmpTargetAdmissionScheduleEntry."Admission End Date")
+                and (TmpExistingAdmissionScheduleEntry."Admission End Time" = TmpTargetAdmissionScheduleEntry."Admission End Time")
+                and (TmpExistingAdmissionScheduleEntry.Cancelled = TmpTargetAdmissionScheduleEntry.Cancelled)
+            );
+    end;
+
+    local procedure FullReplaceEntry(FullReplaceDict: Dictionary of [Integer, Integer]; var TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        PreviousAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        UniqKey: Text;
+        TargetEntryNo: Integer;
+        ExistingEntryNo: Integer;
+        OriginalEntryNo: Integer;
     begin
+        foreach ExistingEntryNo in FullReplaceDict.Keys() do begin
+            TargetEntryNo := FullReplaceDict.Get(ExistingEntryNo);
+            AdmissionScheduleEntry.Get(ExistingEntryNo);
+            OriginalEntryNo := AdmissionScheduleEntry."External Schedule Entry No.";
 
-        TmpAdmissionScheduleEntry.FindSet();
+            AdmissionScheduleEntry.Cancelled := true;
+            AdmissionScheduleEntry."Reason Code" := 'REPLACED';
+            AdmissionScheduleEntry.Modify();
 
-        UniqKey := '';
-        repeat
-            if (UniqKey <> '') and (UniqKey <> GetIdentifyingString(TmpAdmissionScheduleEntry)) then begin
-                PreviousAdmissionScheduleEntry."External Schedule Entry No." := CancelExisting(PreviousAdmissionScheduleEntry);
-                Clear(AdmissionScheduleEntry);
-                AdmissionScheduleEntry.TransferFields(PreviousAdmissionScheduleEntry, false);
-                AdmissionScheduleEntry."Entry No." := 0;
-                AdmissionScheduleEntry.Insert();
-                if (AdmissionScheduleEntry."External Schedule Entry No." = 0) then begin
-                    AdmissionScheduleEntry."External Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
-                    AdmissionScheduleEntry.Modify();
-                end;
-            end;
+            TempTargetAdmissionScheduleEntry.Get(TargetEntryNo);
+            AdmissionScheduleEntry.TransferFields(TempTargetAdmissionScheduleEntry, false);
+            AdmissionScheduleEntry."External Schedule Entry No." := OriginalEntryNo;
+            AdmissionScheduleEntry."Entry No." := 0;
+            AdmissionScheduleEntry.Insert();
+        end;
 
-            UniqKey := GetIdentifyingString(TmpAdmissionScheduleEntry);
-            PreviousAdmissionScheduleEntry.Copy(TmpAdmissionScheduleEntry);
+        exit(FullReplaceDict.Count());
+    end;
 
-        until (TmpAdmissionScheduleEntry.Next() = 0);
+    local procedure PartialUpdateEntry(PartialUpdateDict: Dictionary of [Integer, Integer]; var TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Integer
+    var
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TargetEntryNo: Integer;
+        ExistingEntryNo: Integer;
+    begin
+        foreach ExistingEntryNo in PartialUpdateDict.Keys() do begin
+            TargetEntryNo := PartialUpdateDict.Get(ExistingEntryNo);
+            AdmissionScheduleEntry.Get(ExistingEntryNo);
+            TempTargetAdmissionScheduleEntry.Get(TargetEntryNo);
 
-        TmpAdmissionScheduleEntry."External Schedule Entry No." := CancelExisting(TmpAdmissionScheduleEntry);
-        Clear(AdmissionScheduleEntry);
-        AdmissionScheduleEntry.TransferFields(TmpAdmissionScheduleEntry, false);
-        AdmissionScheduleEntry."Entry No." := 0;
-        AdmissionScheduleEntry.Insert();
+            AdmissionScheduleEntry."Admission Start Time" := TempTargetAdmissionScheduleEntry."Admission Start Time";
+            AdmissionScheduleEntry."Admission End Date" := TempTargetAdmissionScheduleEntry."Admission End Date";
+            AdmissionScheduleEntry."Admission End Time" := TempTargetAdmissionScheduleEntry."Admission End Time";
+            AdmissionScheduleEntry."Event Duration" := TempTargetAdmissionScheduleEntry."Event Duration";
+            AdmissionScheduleEntry."Reason Code" := 'UPDATED';
+            AdmissionScheduleEntry.Modify();
+        end;
 
-        if (AdmissionScheduleEntry."External Schedule Entry No." = 0) then begin
+        exit(PartialUpdateDict.Count());
+    end;
+
+    local procedure InsertNewEntry(InsertNewList: List of [Integer]; var TempTargetAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Integer
+    var
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TargetEntryNo: Integer;
+    begin
+        foreach TargetEntryNo in InsertNewList do begin
+            TempTargetAdmissionScheduleEntry.Get(TargetEntryNo);
+            AdmissionScheduleEntry.TransferFields(TempTargetAdmissionScheduleEntry, false);
+            AdmissionScheduleEntry."Entry No." := 0;
+            AdmissionScheduleEntry."Reason Code" := 'NEW';
+            AdmissionScheduleEntry.Cancelled := false;
+            AdmissionScheduleEntry.Insert();
+
             AdmissionScheduleEntry."External Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
             AdmissionScheduleEntry.Modify();
         end;
+
+        exit(InsertNewList.Count());
     end;
 
-    local procedure GetIdentifyingString(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Text
-    var
-        AdmissionScheduleEntryLbl: Label '%1;%2;%3', Locked = true;
-    begin
-        exit(
-          StrSubstNo(AdmissionScheduleEntryLbl,
-            AdmissionScheduleEntry."Admission Code",
-            AdmissionScheduleEntry."Admission Start Date",
-            AdmissionScheduleEntry."Admission Start Time")
-          );
-    end;
-
-    local procedure CheckExists(TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary): Boolean
+    local procedure CancelExistingEntry(CancelList: List of [Integer]): Integer
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        ExistingEntryNo: Integer;
     begin
-
-        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TmpAdmissionScheduleEntry."Admission Code");
-        AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', TmpAdmissionScheduleEntry."Admission Start Date");
-        AdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', TmpAdmissionScheduleEntry."Admission Start Time");
-        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-        if (not AdmissionScheduleEntry.FindSet()) then
-            exit(false);
-
-        if (AdmissionScheduleEntry.Next() <> 0) then
-            exit(false);
-
-        exit(AdmissionScheduleEntry."Admission Is" = TmpAdmissionScheduleEntry."Admission Is");
-    end;
-
-    local procedure CancelExisting(TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary) ExternalEntryNo: Integer
-    var
-        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-    begin
-
-        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TmpAdmissionScheduleEntry."Admission Code");
-        AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', TmpAdmissionScheduleEntry."Admission Start Date");
-        AdmissionScheduleEntry.SetFilter("Admission Start Time", '=%1', TmpAdmissionScheduleEntry."Admission Start Time");
-
-        if (AdmissionScheduleEntry.FindFirst()) then begin
-            ExternalEntryNo := AdmissionScheduleEntry."External Schedule Entry No.";
-
-            AdmissionScheduleEntry.ModifyAll(Cancelled, true);
-            AdmissionScheduleEntry.ModifyAll("Reason Code", 'CTE04');
-
+        foreach ExistingEntryNo in CancelList do begin
+            AdmissionScheduleEntry.Get(ExistingEntryNo);
+            AdmissionScheduleEntry."Reason Code" := 'CANCELED';
+            AdmissionScheduleEntry.Cancelled := true;
+            AdmissionScheduleEntry.Modify();
         end;
+
+        exit(CancelList.Count());
     end;
 
     local procedure CancelTimeEntry(AdmissionCode: Code[20]; ScheduleCode: Code[20]; FromDate: Date; ToDate: Date)
@@ -569,17 +635,6 @@
         AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', ToDate);
         AdmissionScheduleEntry.ModifyALL("Reason Code", 'CTE01B');
         AdmissionScheduleEntry.ModifyALL(Cancelled, TRUE);
-    end;
-
-    local procedure IsIdentical(AdmissionScheduleEntry1: Record "NPR TM Admis. Schedule Entry"; AdmissionScheduleEntry2: Record "NPR TM Admis. Schedule Entry"): Boolean
-    begin
-
-        if (AdmissionScheduleEntry1."Admission Start Date" <> AdmissionScheduleEntry2."Admission Start Date") then exit(false);
-        if (AdmissionScheduleEntry1."Admission Start Time" <> AdmissionScheduleEntry2."Admission Start Time") then exit(false);
-        if (AdmissionScheduleEntry1."Event Duration" <> AdmissionScheduleEntry2."Event Duration") then exit(false);
-        if (AdmissionScheduleEntry1.Cancelled <> AdmissionScheduleEntry2.Cancelled) then exit(false);
-
-        exit(true);
     end;
 
     procedure CreateNotificationList(ScheduleEntryNo: Integer)

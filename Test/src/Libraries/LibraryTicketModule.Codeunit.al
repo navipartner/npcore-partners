@@ -25,13 +25,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketTypeCode: Code[10];
     begin
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
+        CreateMinimalSetup();
 
         // Used for testing dynamic prices
-
-        CreateNumberSeries();
-
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
         ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
@@ -148,13 +144,10 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketTypeCode: Code[10];
     begin
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
+        CreateMinimalSetup();
 
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
-
-        CreateNumberSeries();
         TicketSetup.Init();
         if (not TicketSetup.Insert()) then
             TicketSetup.Get();
@@ -189,15 +182,11 @@ codeunit 85011 "NPR Library - Ticket Module"
         i, SlotSize : Integer;
     begin
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
+        CreateMinimalSetup();
 
         // This scenario creates a ticket setup that requires a reservation time entry that you provide.
 
-        SlotSize := Round((24 * 60 * 60 - 2) / NumberOfTimeSlots, 0.001); // -2 => 00:00:01 -> 23:59:59 intervall
-
-        CreateNumberSeries();
-
+        SlotSize := Round((24 * 60 * 60 - 2) / NumberOfTimeSlots, 0.001); // -2 => 00:00:01 -> 23:59:59 interval
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', ''));
         for i := 1 to NumberOfTimeSlots do begin
@@ -214,7 +203,7 @@ codeunit 85011 "NPR Library - Ticket Module"
     end;
 
 
-    procedure CreateScenario_TicketStatistics(RevisitPolicy: Option NA,NONINITIAL,DAILY_NONINITIAL,NEVER) SalesItemNo: Code[20]
+    procedure CreateScenario_TicketStatistics(RevisitPolicy: Option NA,NON_INITIAL,DAILY_NON_INITIAL,NEVER) SalesItemNo: Code[20]
     var
         TicketType: Record "NPR TM Ticket Type";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -230,14 +219,10 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketTypeCode: Code[10];
     begin
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
+        CreateMinimalSetup();
 
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
-
-        CreateNumberSeries();
-
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::MULTIPLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::LOCATION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::TODAY, '', ''));
         ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::LOCATION, AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, 000001T, 235959T, true, true, true, true, true, true, true, '');
@@ -274,13 +259,10 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionBaseCalendarCode, TicketBaseCalendarCode : Code[10];
     begin
 
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
+        CreateMinimalSetup();
 
         // Used for smoke testing
         // This scenario creates a ticket which is always available today.
-
-        CreateNumberSeries();
 
         AdmissionBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
         TicketBaseCalendarCode := CreateBaseCalendar(GenerateCode10());
@@ -361,7 +343,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(TicketItem."No.");
     end;
 
-    procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Option; DefaultSchedule: Option; AdmissionBaseCalendarCode: Code[10]; TicketBaseCalendarCode: Code[10]): code[20]
+    internal procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Enum "NPR TM CapacityLimit"; DefaultSchedule: Option; AdmissionBaseCalendarCode: Code[10]; TicketBaseCalendarCode: Code[10]): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin
@@ -438,22 +420,22 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(TicketTypeCode);
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[20]; StartNumber: Code[20])
+    local procedure CreateNoSerie(NoSeriesCode: Code[20]; StartNumber: Code[20])
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
-        if (not NoSeries.Get(NoSerieCode)) then begin
-            NoSeries.Code := NoSerieCode;
+        if (not NoSeries.Get(NoSeriesCode)) then begin
+            NoSeries.Code := NoSeriesCode;
             NoSeries.Insert();
         end;
 
-        NoSeries.Description := NoSerieCode;
+        NoSeries.Description := NoSeriesCode;
         NoSeries."Default Nos." := true;
         NoSeries.Modify();
 
-        if (not NoSeriesLine.Get(NoSerieCode, 10000)) then begin
-            NoSeriesLine."Series Code" := NoSerieCode;
+        if (not NoSeriesLine.Get(NoSeriesCode, 10000)) then begin
+            NoSeriesLine."Series Code" := NoSeriesCode;
             NoSeriesLine."Line No." := 10000;
             NoSeriesLine."Starting Date" := DMY2Date(1, 1, 2020);
             NoSeriesLine."Starting No." := StartNumber;
@@ -462,19 +444,19 @@ codeunit 85011 "NPR Library - Ticket Module"
         end;
     end;
 
-    procedure CreateSchedule(ScehduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean; AdmissionBaseCalendarCode: Code[10]): Code[20]
+    procedure CreateSchedule(ScheduleCode: Code[20]; ScheduleType: Option; AdmissionIs: Option; StartFrom: Date; RecurrencePattern: Option; StartTime: Time; EndTime: Time; Monday: Boolean; Tuesday: Boolean; Wednesday: Boolean; Thursday: Boolean; Friday: Boolean; Saturday: Boolean; Sunday: Boolean; AdmissionBaseCalendarCode: Code[10]): Code[20]
     var
         AdmissionSchedule: Record "NPR TM Admis. Schedule";
     begin
         AdmissionSchedule.INIT();
-        if (not AdmissionSchedule.Get(ScehduleCode)) then begin
-            AdmissionSchedule."Schedule Code" := ScehduleCode;
+        if (not AdmissionSchedule.Get(ScheduleCode)) then begin
+            AdmissionSchedule."Schedule Code" := ScheduleCode;
             AdmissionSchedule.Insert();
         end;
 
         AdmissionSchedule."Schedule Type" := ScheduleType;
         AdmissionSchedule."Admission Is" := AdmissionIs;
-        AdmissionSchedule.Description := ScehduleCode;
+        AdmissionSchedule.Description := ScheduleCode;
         AdmissionSchedule."Start From" := StartFrom;
         AdmissionSchedule."Recurrence Until Pattern" := RecurrencePattern;
         AdmissionSchedule.VALIDATE("Start Time", StartTime);
@@ -489,7 +471,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         AdmissionSchedule."Admission Base Calendar Code" := AdmissionBaseCalendarCode;
         AdmissionSchedule.Modify();
 
-        exit(ScehduleCode);
+        exit(ScheduleCode);
     end;
 
     procedure CreateScheduleLinePriceProfile(AdmissionCode: Code[20]; ScheduleCode: Code[20]; ProcessOrder: Integer; PreBookRequired: Boolean; MaxCapacity: Integer; CapacityControl: Option; PrebookFromFormula: Text[30]; AllowAdmissionBeforeStart_Minutes: Integer; AllowAdmissionPassedStart_Minutes: Integer)
@@ -519,15 +501,15 @@ codeunit 85011 "NPR Library - Ticket Module"
         Evaluate(ScheduleLines."Prebook From", PrebookFromFormula);
 
         if (ScheduleLines."Prebook Is Required") then begin
-            ScheduleLines.CALCFIELDS("Scheduled Start Time", "Scheduled Stop Time");
+            ScheduleLines.CalcFields("Scheduled Start Time", "Scheduled Stop Time");
 
             ScheduleLines."Event Arrival From Time" := ScheduleLines."Scheduled Start Time";
             if (AllowAdmissionBeforeStart_Minutes > 0) then
-                ScheduleLines."Event Arrival From Time" := ScheduleLines."Scheduled Start Time" + AllowAdmissionBeforeStart_Minutes * 60 * 1000; //millis
+                ScheduleLines."Event Arrival From Time" := ScheduleLines."Scheduled Start Time" + AllowAdmissionBeforeStart_Minutes * 60 * 1000; //milliseconds
 
             ScheduleLines."Event Arrival Until Time" := ScheduleLines."Scheduled Stop Time";
             if (AllowAdmissionPassedStart_Minutes >= 0) then
-                ScheduleLines."Event Arrival Until Time" := ScheduleLines."Scheduled Stop Time" + AllowAdmissionPassedStart_Minutes * 60 * 1000; // millis
+                ScheduleLines."Event Arrival Until Time" := ScheduleLines."Scheduled Stop Time" + AllowAdmissionPassedStart_Minutes * 60 * 1000; // milliseconds
 
         end;
         ScheduleLines."Max Capacity Per Sch. Entry" := MaxCapacity;
@@ -708,13 +690,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         Default: Boolean;
         AdmissionInclusion: Option;
     begin
-        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
-        WorkDate(Today());
-
-        // Used for smoke testing
-        // This scenario creates a ticket which is always available today.
-
-        CreateNumberSeries();
+        CreateMinimalSetup();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
@@ -733,6 +709,15 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(ItemNo)
     end;
 
+    procedure CreateMinimalSetup()
+    var
+        NprMasterData: Codeunit "NPR Library - POS Master Data";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+    begin
+        WorkDate(Today());
+        NprMasterData.CreateDefaultPostingSetup(POSPostingProfile);
+        CreateNumberSeries();
+    end;
 
     local procedure GetNextNo(): Code[20]
     begin
