@@ -43,11 +43,11 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
         case Step of
             'run_collect_in_store_orders':
                 begin
-                    CollectInStoreOrders(Context);
+                    CollectInStoreOrders(Context, SetupMgr);
                 end;
             'is_workflow_disabled':
                 begin
-                    FrontEnd.WorkflowResponse(SetWorkflowState(Context));
+                    FrontEnd.WorkflowResponse(SetWorkflowState(Context, SetupMgr));
                 end;
         end;
     end;
@@ -109,45 +109,45 @@ codeunit 6151202 "NPR POSAction Proc. CnC Order" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper") LocationFilter: Text
+    local procedure GetLocationFilter(Context: Codeunit "NPR POS JSON Helper"; POSSetup: Codeunit "NPR POS Setup"): Text
     var
         POSStore: Record "NPR POS Store";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSSession: Codeunit "NPR POS Session";
+        LocationFrom: Integer;
+        LocationFilter: Text;
     begin
-        case Context.GetIntegerParameter('Location From') of
+        if not Context.GetIntegerParameter('Location From', LocationFrom) then
+            LocationFrom := 0;
+
+        LocationFilter := '';
+        case LocationFrom of
             0:
                 begin
-                    POSSession.GetSetup(POSSetup);
                     POSSetup.GetPOSStore(POSStore);
                     LocationFilter := POSStore."Location Code";
                 end;
             1:
-                begin
-                    LocationFilter := UpperCase(Context.GetStringParameter('Location Filter'));
-                end;
+                if not Context.GetStringParameter('Location Filter', LocationFilter) then;
         end;
-
-        exit(LocationFilter);
+        exit(UpperCase(LocationFilter));
     end;
 
-    local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper")
+    local procedure CollectInStoreOrders(var Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
     var
         NpCsPOSActionProcOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
         LocationFilter: Text;
         SortingInt: Integer;
     begin
-        LocationFilter := GetLocationFilter(Context);
+        LocationFilter := GetLocationFilter(Context, Setup);
         SortingInt := Context.GetIntegerParameter('Sorting');
         NpCsPOSActionProcOrderB.RunCollectInStoreOrders(LocationFilter, SortingInt);
     end;
 
-    local procedure SetWorkflowState(var Context: Codeunit "NPR POS JSON Helper"): JsonObject
+    local procedure SetWorkflowState(var Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup"): JsonObject
     var
         NpCsPOSActionProcOrderB: Codeunit "NPR POSAction Proc. CnC OrderB";
         LocationFilter: Text;
     begin
-        LocationFilter := GetLocationFilter(Context);
+        LocationFilter := GetLocationFilter(Context, Setup);
         Context.SetContext('disabled', not NpCsPOSActionProcOrderB.HasUnprocessedOrders(LocationFilter));
     end;
 }
