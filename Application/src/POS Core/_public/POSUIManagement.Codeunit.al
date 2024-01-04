@@ -498,6 +498,7 @@
         ActionsEditorPromptForPasswordLbl: Label 'Prompt for password';
         ActionsEditorDataSourceLbl: Label 'Data Source';
         ActionsEditorOptionsLabelAddItemToOrderLbl: Label 'Add Item to Order';
+        ActionsEditorOptionsLabelCustomerSelectLbl: Label 'Select Customer';
         ActionsEditorOptionsLabelMakePaymentLbl: Label 'Make Payment';
         ActionsEditorOptionsLabelOpenPopupMenuLbl: Label 'Open Popup Menu';
         ActionsEditorOptionsLabelOpenNestedMenuLbl: Label 'Open Nested Menu';
@@ -520,6 +521,8 @@
         VariablesEditorPopupMenuAllreadyTakenLbl: Label 'already exists. Please pick a different Popup Menu name.';
         VariablesEditorEnterNewIdLbl: Label 'Enter new id';
         VariablesEditorLookupProductLbl: Label 'Lookup Product';
+        VariablesGlobalCustomerIDLbl: Label 'Customer ID';
+        VariablesEditorLookupCustomerLbl: Label 'Select Customer';
         VariablesEditorPopupMenuIdLbl: Label 'Popup Menu ID';
         VariablesEditorSelectAnIdLbl: Label 'Select an id ...';
         VariablesEditorOpenNestedMenuIDLbl: Label 'Open Nested Menu ID';
@@ -527,6 +530,8 @@
         VariablesEditorTargetSectionLbl: Label 'Target Section';
         VariablesEditorTargetSectionPopoverLbl: Label 'The target grid will be the grid where the nested menu is opened. If left unchanged the nested menu will always open in the same grid as the button. However, this option makes it possible to open a nested menu in a different grid than where the button is placed.';
         VariablesEditorPageTypeLbl: Label 'Page Type';
+        VariablesEditorPaymentMethodLbl: Label 'Payment Method';
+        VariablesEditorSelectMethodLbl: Label 'Select Method';
         VariablesEditorPleaseSelectActionLbl: Label 'Please select an action';
         VariablesEditorNoParametersLbl: Label 'There are no editable parameters for the action';
         EditModalEditButtonLbl: Label 'Edit Button';
@@ -936,6 +941,7 @@
         Captions.Add('Actions_Editor_PromptForPassword', ActionsEditorPromptForPasswordLbl);
         Captions.Add('Actions_Editor_DataSourceLabel', ActionsEditorDataSourceLbl);
         Captions.Add('Actions_Editor_OptionsLabelAddItemToOrder', ActionsEditorOptionsLabelAddItemToOrderLbl);
+        Captions.Add('Actions_Editor_OptionsLabelCustomerSelect', ActionsEditorOptionsLabelCustomerSelectLbl);
         Captions.Add('Actions_Editor_OptionsLabelMakePayment', ActionsEditorOptionsLabelMakePaymentLbl);
         Captions.Add('Actions_Editor_OptionsLabelOpenPopupMenu', ActionsEditorOptionsLabelOpenPopupMenuLbl);
         Captions.Add('Actions_Editor_OptionsLabelOpenNestedMenu', ActionsEditorOptionsLabelOpenNestedMenuLbl);
@@ -958,6 +964,8 @@
         Captions.Add('Variables_Editor_PopupMenuTakenError', VariablesEditorPopupMenuAllreadyTakenLbl);
         Captions.Add('Variables_Editor_EnterNewId', VariablesEditorEnterNewIdLbl);
         Captions.Add('Variables_Editor_LookupProduct', VariablesEditorLookupProductLbl);
+        Captions.Add('Global_Customer_ID', VariablesGlobalCustomerIDLbl);
+        Captions.Add('Variables_Editor_LookupCustomer', VariablesEditorLookupCustomerLbl);
         Captions.Add('Variables_Editor_PopupMenuID', VariablesEditorPopupMenuIdLbl);
         Captions.Add('Variables_Editor_SelectAnId', VariablesEditorSelectAnIdLbl);
         Captions.Add('Variables_Editor_OpenNestedMenuID', VariablesEditorOpenNestedMenuIDLbl);
@@ -965,6 +973,8 @@
         Captions.Add('Variables_Editor_TargetSection', VariablesEditorTargetSectionLbl);
         Captions.Add('Variables_Editor_TargetSectionPopover', VariablesEditorTargetSectionPopoverLbl);
         Captions.Add('Variables_Editor_PageType', VariablesEditorPageTypeLbl);
+        Captions.Add('VariablesEditor_PaymentMethod', VariablesEditorPaymentMethodLbl);
+        Captions.Add('VariablesEditor_SelectMethod', VariablesEditorSelectMethodLbl);
         Captions.Add('Variables_Editor_PleaseSelectAction', VariablesEditorPleaseSelectActionLbl);
         Captions.Add('Variables_Editor_NoParameters', VariablesEditorNoParametersLbl);
         Captions.Add('Edit_Modal_EditButton', EditModalEditButtonLbl);
