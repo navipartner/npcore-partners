@@ -118,17 +118,21 @@
         if ErrorMessage = '' then
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, 0);
 
-        AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader);
+        if EmailTemplateHeader."Report ID" <> 0 then begin
 
-        if ErrorMessage = '' then begin
-            Filename := GetFilename(EmailTemplateHeader, RecRef);
-            RecRef.SetRecFilter();
-            if not PrintPDF(EmailTemplateHeader."Report ID", RecRef, Filename) then
-                ErrorMessage := StrSubstNo(Text006, EmailTemplateHeader."Report ID", GetLastErrorText);
+            AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader);
+
+            if ErrorMessage = '' then begin
+                Filename := GetFilename(EmailTemplateHeader, RecRef);
+                RecRef.SetRecFilter();
+                if not PrintPDF(EmailTemplateHeader."Report ID", RecRef, Filename) then
+                    ErrorMessage := StrSubstNo(Text006, EmailTemplateHeader."Report ID", GetLastErrorText);
+            end;
+
+            if ErrorMessage = '' then
+                ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader, RecRef);
+
         end;
-
-        if ErrorMessage = '' then
-            ErrorMessage := AddAdditionalReportsToSmtpMessage(EmailTemplateHeader, RecRef);
 
         if ErrorMessage = '' then
             ErrorMessage := SendSmtpMessage(RecRef, Silent, EmailTemplateHeader."Email Scenario");
