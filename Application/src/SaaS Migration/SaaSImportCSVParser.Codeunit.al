@@ -58,7 +58,13 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Tenant Media Thumbnails" = rimd,
                   TableData "Tenant Media" = rimd,
                   TableData "Item Application Entry" = rimd,
-                  TableData "Item Register" = rimd;
+                  TableData "Item Register" = rimd,
+                  TableData "Batch Processing Parameter" = rimd,
+                  TableData "Approval Entry" = rimd,
+                  TableData "Posted Approval Entry" = rimd,
+                  TableData "Posted Approval Comment Line" = rimd,
+                  TableData "Workflow Step Instance Archive" = rimd,
+                  TableData "Workflow Step Argument Archive" = rimd;
 
 
     trigger OnRun()
