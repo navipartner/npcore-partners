@@ -150,7 +150,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         AddBeginFiscalReceiptInputJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry);
         if ExtendedReceipt then
-            AddInvoiceDataJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry, ExtendedReceipt, BGSISPOSAuditLogAux);
+            AddInvoiceDataJSONObjectForSaleAndRefund(JsonTextReaderWriter, POSEntry, ExtendedReceipt, Refund);
 
         AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
@@ -178,11 +178,12 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteEndObject();
     end;
 
-    local procedure AddInvoiceDataJSONObjectForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; var ExtendedReceipt: Boolean; var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.")
+    local procedure AddInvoiceDataJSONObjectForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; var ExtendedReceipt: Boolean; Refund: Boolean)
     var
         Customer: Record Customer;
         BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        ExtendedReceiptNo: Code[20];
         CustomerIDNumberType: Integer;
         CustomerAddress: Text;
         CustomerCity: Text;
@@ -203,15 +204,13 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         end;
 
         BGSISPOSUnitMapping.Get(POSEntry."POS Unit No.");
-        if BGSISPOSAuditLogAux."Transaction Type" in [BGSISPOSAuditLogAux."Transaction Type"::Refund] then
-            BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), true)
+        if Refund then
+            ExtendedReceiptNo := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), false)
         else
-            BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), true);
-        BGSISPOSAuditLogAux.Modify();
-        Commit();
+            ExtendedReceiptNo := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), false);
 
         JsonTextReaderWriter.WriteStartObject('invoiceData');
-        JsonTextReaderWriter.WriteStringProperty('invNumber', BGSISPOSAuditLogAux."Extended Receipt Counter");
+        JsonTextReaderWriter.WriteStringProperty('invNumber', ExtendedReceiptNo);
         JsonTextReaderWriter.WriteStringProperty('city', CopyStr(CustomerCity, 1, 30));
         JsonTextReaderWriter.WriteStringProperty('identNumber', CopyStr(CustomerID, 1, 30));
         JsonTextReaderWriter.WriteRawProperty('identNumberType', CustomerIDNumberType);
@@ -739,9 +738,9 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     end;
 
     internal procedure UpdateBGSISAuditLogForSaleAndRefund(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping"; var TempJsonBuffer: Record "JSON Buffer" temporary; RequestText: Text; ExtendedReceipt: Boolean)
+    var
+        NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
-        BGSISPOSAuditLogAux.Find();
-
         if ExtendedReceipt then
             RemoveCustomerIDWhenNotBGCompany(RequestText);
 
@@ -750,6 +749,12 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         BGSISPOSAuditLogAux."Grand Receipt No." := GetPropertyValueWithCheck(TempJsonBuffer, 'grandReceiptNum');
         BGSISPOSAuditLogAux."Receipt Timestamp" := GetPropertyValueWithCheck(TempJsonBuffer, 'receiptTimestamp');
         BGSISPOSAuditLogAux."Extended Receipt" := ExtendedReceipt;
+
+        if ExtendedReceipt then
+            if BGSISPOSAuditLogAux."Transaction Type" = BGSISPOSAuditLogAux."Transaction Type"::Refund then
+                BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), true)
+            else
+                BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), true);
 
         BGSISPOSAuditLogAux."Fiscal Printer Device No." := BGSISPOSUnitMapping."Fiscal Printer Device No.";
         BGSISPOSAuditLogAux."Fiscal Printer Memory No." := BGSISPOSUnitMapping."Fiscal Printer Memory No.";
