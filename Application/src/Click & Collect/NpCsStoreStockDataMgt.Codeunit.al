@@ -228,6 +228,8 @@
         Item.CalcFields(Inventory, "Qty. on Sales Order");
         StockQty := Item.Inventory - Item."Qty. on Sales Order";
 
+        OnAfterCalculateStockQty(Item, StockQty);
+
         NpCsStoreStockItem.LockTable();
         if not NpCsStoreStockItem.Get(NpCsStore.Code, TempStockkeepingUnit."Item No.", TempStockkeepingUnit."Variant Code") then begin
             NpCsStoreStockItem.Init();
@@ -326,5 +328,10 @@
     procedure GetStoreStockStatusUrl(ServiceCompany: Text): Text
     begin
         exit(GetUrl(CLIENTTYPE::ODataV4, ServiceCompany, OBJECTTYPE::Query, QUERY::"NPR NpCs Store Stock Status"));
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalculateStockQty(var Item: Record Item; var StockQty: Decimal)
+    begin
     end;
 }
