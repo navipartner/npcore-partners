@@ -80,8 +80,8 @@
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON;
+            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon,Achievement';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT;
         }
         field(51; "Template Filter Value"; Code[20])
         {
