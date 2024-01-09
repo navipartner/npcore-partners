@@ -695,6 +695,30 @@
                 ToolTip = 'Opens Coupons List';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            action(Achievements)
+            {
+                Caption = 'Achievements';
+                ToolTip = 'This action opens the achievements and progress list for the membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = History;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    MemberGoals: Page "NPR MM AchMemberGoalList";
+                    Goals: Record "NPR MM AchGoal";
+                begin
+                    Goals.FilterGroup(248);
+                    Goals.SetFilter(CommunityCode, '=%1', Rec."Community Code");
+                    Goals.SetFilter(MembershipCode, '=%1', Rec."Membership Code");
+                    Goals.SetFilter(Activated, '=%1', true);
+                    Goals.SetFilter(MembershipEntryNoFilter, '=%1', Rec."Entry No.");
+                    Goals.FilterGroup(0);
+                    MemberGoals.SetTableView(Goals);
+                    MemberGoals.Run();
+                end;
+            }
             group(History)
             {
                 Caption = 'History';

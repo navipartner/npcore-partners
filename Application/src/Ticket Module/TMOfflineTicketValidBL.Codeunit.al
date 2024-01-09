@@ -38,9 +38,11 @@
         Ticket: Record "NPR TM Ticket";
         AccessEntry: Record "NPR TM Ticket Access Entry";
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         InvalidEntry: Boolean;
         ScheduleEntryNo: Integer;
         ExternalEntryNo: Integer;
+        AdmissionEntryNo: Integer;
         RespLbl: Label '%1 %2', Locked = true;
     begin
         if (not OfflineTicketValidation.Get(EntryNo)) then
@@ -138,7 +140,8 @@
                 OfflineTicketValidation."Process Status" := OfflineTicketValidation."Process Status"::INVALID;
                 OfflineTicketValidation."Process Response Text" := StrSubstNo(NO_ADMISSION_FOR_TIME, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time", AccessEntry."Admission Code");
             end else begin
-                RegisterArrival_Worker(AccessEntry."Entry No.", ScheduleEntryNo, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
+                AdmissionEntryNo := RegisterArrival_Worker(AccessEntry."Entry No.", ScheduleEntryNo, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
+                TicketManagement.OnAfterRegisterArrival(Ticket, AccessEntry."Admission Code", AdmissionEntryNo);
             end;
 
         until (AccessEntry.Next() = 0);
@@ -246,7 +249,7 @@
         TicketOfflineValidation.Insert();
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; pDate: Date; pTime: Time)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; pDate: Date; pTime: Time): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -276,6 +279,7 @@
         AdmittedTicketAccessEntry.Insert();
 
         CloseReservationEntry(AdmittedTicketAccessEntry);
+        exit(AdmittedTicketAccessEntry."Entry No.");
     end;
 
     local procedure CloseReservationEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean

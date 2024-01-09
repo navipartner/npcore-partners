@@ -156,6 +156,12 @@
     begin
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterRegisterArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; DetAccessEntryNo: Integer)
+    begin
+    end;
+
     procedure PrintTicketFromSalesTicketNo(SalesTicketNo: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
@@ -341,6 +347,7 @@
         TicketAccessEntryNo: Integer;
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
+        AdmissionEntryNo: Integer;
     begin
 
         if (AdmissionCode = '') then
@@ -355,7 +362,7 @@
         ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, false);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
 
-        RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDate, EventTime);
+        AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDate, EventTime);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
@@ -368,8 +375,9 @@
 
         ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntryNo, _TicketExecutionContext::ADMISSION, AllowAdmissionOverAllocation);
 
-    end;
+        OnAfterRegisterArrival(Ticket, AdmissionCode, AdmissionEntryNo);
 
+    end;
 
     procedure ValidateTicketForDeparture(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20])
     var
@@ -2004,7 +2012,7 @@
         end;
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -2042,7 +2050,7 @@
         CloseReservationEntry(AdmittedTicketAccessEntry);
 
         NotifyParticipant.CreateOnAdmissionNotification(TicketAccessEntry, AdmittedTicketAccessEntry, FirstAdmission);
-
+        exit(AdmittedTicketAccessEntry."Entry No.");
     end;
 
     local procedure SetDuration(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time)

@@ -84,6 +84,27 @@ codeunit 85014 "NPR Library - Member Module"
 
     end;
 
+    procedure SetupAchievementScenarioSimple(CommunityCode: Code[20]; MembershipCode: Code[20]; Threshold: Integer) GoalCode: Code[20]
+    var
+        RewardCode: Code[20];
+        Constraints: Dictionary of [Text[30], Text[30]];
+    begin
+        RewardCode := CreateAchievementReward('T-REWARD-R1');
+        GoalCode := CreateAchievementGoal('T-GOAL-G1', CommunityCode, MembershipCode, RewardCode, '', Threshold);
+        CreateAchievementAddActivity(GoalCode, 'T-A1', Enum::"NPR MM AchActivity"::MANUAL, 1, Constraints);
+        CreateAchievementAddActivity(GoalCode, 'T-A2', Enum::"NPR MM AchActivity"::MEMBER_ARRIVAL, 3, Constraints);
+    end;
+
+    procedure SetupAchievementScenarioConstraints(CommunityCode: Code[20]; MembershipCode: Code[20]; Threshold: Integer; Constraints: Dictionary of [Text[30], Text[30]]) GoalCode: Code[20]
+    var
+        RewardCode: Code[20];
+    begin
+        RewardCode := CreateAchievementReward('T-REWARD-R1');
+        GoalCode := CreateAchievementGoal('T-GOAL-G1', CommunityCode, MembershipCode, RewardCode, '', Threshold);
+        CreateAchievementAddActivity(GoalCode, 'T-A1', Enum::"NPR MM AchActivity"::MANUAL, 1, Constraints);
+        CreateAchievementAddActivity(GoalCode, 'T-A2', Enum::"NPR MM AchActivity"::MEMBER_ARRIVAL, 3, Constraints);
+    end;
+
     procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
@@ -454,6 +475,110 @@ codeunit 85014 "NPR Library - Member Module"
         MemberNotificationSetup.Modify();
     end;
 
+    procedure CreateAchievementGoal(GoalCode: Code[20]; CommunityCode: Code[20]; MembershipCode: Code[20]; RewardCode: Code[20]; RequiresAchievement: Code[20]; Threshold: Integer): Code[20]
+    var
+        Goal: Record "NPR MM AchGoal";
+    begin
+
+        if (not Goal.Get(GoalCode)) then begin
+            Goal.Init();
+            Goal.Code := GoalCode;
+            Goal.Insert();
+        end;
+
+        Goal.Activated := true;
+        Goal.CommunityCode := CommunityCode;
+        Goal.MembershipCode := MembershipCode;
+        Goal.Description := 'Goal Description';
+        Goal.EnableFromDate := Today();
+        Goal.EnableUntilDate := Today();
+        Goal.RewardCode := CreateAchievementReward(RewardCode);
+        Goal.RequiresAchievement := RequiresAchievement;
+        Goal.RewardThreshold := Threshold;
+        Goal.Modify();
+
+        exit(Goal.Code);
+    end;
+
+    procedure CreateAchievementAddActivity(GoalCode: Code[20]; ActivityCode: Code[20]; ActivityType: Enum "NPR MM AchActivity"; Weight: Integer; Constraints: Dictionary of [Text[30], Text[30]]): Code[20]
+    var
+        Activity: Record "NPR MM AchActivity";
+        ActivityInterface: Interface "NPR MM AchActivity";
+    begin
+        if (not Activity.Get(ActivityCode)) then begin
+            Activity.Init();
+            Activity.Code := ActivityCode;
+            Activity.Insert();
+        end;
+
+        Activity.Activity := ActivityType;
+        Activity.GoalCode := GoalCode;
+        Activity.Description := 'Activity Description';
+        Activity.EnableFromDate := Today();
+        Activity.EnableUntilDate := Today();
+        Activity.Weight := Weight;
+        Activity.Modify();
+
+        ActivityInterface := Activity.Activity;
+        ActivityInterface.InitializeConditions(Activity.Code);
+
+        CreateAchievementActivityCondition(Activity.Code, 'Frequency', GetConditionValueOrBlank(Constraints, 'Frequency'));
+        CreateAchievementActivityCondition(Activity.Code, 'Weekday', GetConditionValueOrBlank(Constraints, 'Weekday'));
+        CreateAchievementActivityCondition(Activity.Code, 'Month', GetConditionValueOrBlank(Constraints, 'Month'));
+
+        case (Activity.Activity) of
+            "NPR MM AchActivity"::MEMBER_ARRIVAL:
+                CreateAchievementActivityCondition(Activity.Code, 'AdmissionCode', GetConditionValueOrBlank(Constraints, 'AdmissionCode'));
+            "NPR MM AchActivity"::NAMED_ACHIEVEMENT:
+                CreateAchievementActivityCondition(Activity.Code, 'GoalFilter', GetConditionValueOrBlank(Constraints, 'GoalFilter'));
+        end;
+        exit(Activity.Code);
+    end;
+
+    local procedure GetConditionValueOrBlank(Constraints: Dictionary of [Text[30], Text[30]]; ConditionName: Text[30]): Text[30]
+    begin
+        if (not Constraints.ContainsKey(ConditionName)) then
+            exit('');
+
+        exit(Constraints.Get(ConditionName));
+    end;
+
+    procedure CreateAchievementActivityCondition(ActivityCode: Code[20]; ConditionName: Text[30]; ConditionValue: Text[30])
+    var
+        Condition: Record "NPR MM AchActivityCondition";
+    begin
+        if (not Condition.Get(ActivityCode, ConditionName)) then begin
+            Condition.Init();
+            Condition.ActivityCode := ActivityCode;
+            Condition.ConditionName := ConditionName;
+            Condition.Insert();
+        end;
+
+        Condition.ConditionValue := ConditionValue;
+        Condition.Description := 'Condition Description';
+        Condition.Modify();
+    end;
+
+    procedure CreateAchievementReward(RewardCode: Code[20]): Code[20]
+    var
+        Reward: Record "NPR MM AchReward";
+    begin
+
+        if (not Reward.Get(RewardCode)) then begin
+            Reward.Code := RewardCode;
+            Reward.Insert();
+        end;
+
+        Reward.RewardType := Reward.RewardType::NO_REWARD;
+        Reward.CouponType := '';
+        Reward.NotificationCode := '';
+        Evaluate(Reward.CollectWithin, '<7D>');
+        Reward.Modify();
+
+        exit(Reward.Code);
+    end;
+
+
     local procedure AddConfigTemplateLine(TemplateCode: Code[10]; LineNo: Integer; FieldId: Integer; Value: Text[250]): Integer;
     var
         ConfigTemplateHeader: Record "Config. Template Header";
@@ -533,7 +658,13 @@ codeunit 85014 "NPR Library - Member Module"
     end;
 
 
-    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Enum "NPR MM Member Unique Identity"; UIViolation: Option; LogonCredentials: Option; CreateContacts: Boolean; CreateRenewNotification: Boolean; Description: Text; MembershipNoSeries: Code[20]; MemberNoSeries: Code[20]): Code[20];
+    local procedure CreateCommunitySetup(CommunityCode: Code[20]; SearchOrder: Option; UniqueIdentity: Enum "NPR MM Member Unique Identity"; UIViolation: Option;
+                                                                                                           LogonCredentials: Option;
+                                                                                                           CreateContacts: Boolean;
+                                                                                                           CreateRenewNotification: Boolean;
+                                                                                                           Description: Text;
+                                                                                                           MembershipNoSeries: Code[20];
+                                                                                                           MemberNoSeries: Code[20]): Code[20];
     var
         MemberCommunity: Record "NPR MM Member Community";
     begin
