@@ -143,7 +143,8 @@
 
                     exit(_NOTIFICATION_ACTION::IGNORE); // Wait for the membership to become active
                 end;
-            MembershipNotification."Notification Trigger"::COUPON:
+            MembershipNotification."Notification Trigger"::COUPON,
+            MembershipNotification."Notification Trigger"::ACHIEVEMENT:
                 begin
                     if (not Coupon.Get(MembershipNotification."Coupon No.")) then
                         exit(_NOTIFICATION_ACTION::IGNORE); // Coupon not created yet or not valid
@@ -332,7 +333,7 @@
         if (NotificationSetup."Generate Magento PW URL") then
             RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
 
-        if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::COUPON) then begin
+        if (MembershipNotification."Coupon No." <> '') then begin
             if (not Coupon.Get(MembershipNotification."Coupon No.")) then
                 Coupon.Init();
             MemberNotificationEntry."Coupon Reference No." := Coupon."Reference No.";
@@ -424,6 +425,8 @@
             MembershipNotification."Notification Trigger"::WALLET_UPDATE:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_MemberCard(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
             MembershipNotification."Notification Trigger"::COUPON:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_Coupon(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::ACHIEVEMENT:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_Coupon(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
         end;
 
