@@ -3968,8 +3968,8 @@
         if (Contact."Country/Region Code" = '') then
             Contact.Validate("Country/Region Code", Community.MemberDefaultCountryCode);
 
-        Contact.Validate("Post Code", CopyStr(Member."Post Code Code", 1, MaxStrLen(Contact."Post Code")));
         Contact.Validate(City, CopyStr(Member.City, 1, MaxStrLen(Contact.City)));
+        Contact.Validate("Post Code", CopyStr(Member."Post Code Code", 1, MaxStrLen(Contact."Post Code")));
 
         Contact.Validate("Phone No.", CopyStr(Member."Phone No.", 1, MaxStrLen(Contact."Phone No.")));
         Contact.Validate("E-Mail", CopyStr(Member."E-Mail Address", 1, MaxStrLen(Contact."E-Mail")));
