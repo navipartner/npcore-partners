@@ -434,36 +434,6 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     end;
 
     local procedure AddReceiptPaymentsJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer; Refund: Boolean)
-    begin
-        if not Refund then
-            AddReceiptPaymentsJSONArrayForSale(JsonTextReaderWriter, POSEntryNo)
-        else
-            AddReceiptPaymentsJSONArrayForRefund(JsonTextReaderWriter, POSEntryNo);
-    end;
-
-    local procedure AddReceiptPaymentsJSONArrayForSale(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
-    var
-        BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-    begin
-        JsonTextReaderWriter.WriteStartArray('receiptPayments');
-
-        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
-        POSEntryPaymentLine.SetFilter(Amount, '<>0');
-        if POSEntryPaymentLine.FindSet() then
-            repeat
-                JsonTextReaderWriter.WriteStartObject('');
-                JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(POSEntryPaymentLine.Amount, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
-                BGSISPOSPaymMethMap.Get(POSEntryPaymentLine."POS Payment Method Code");
-                BGSISPOSPaymMethMap.CheckIsBGSISPaymentMethodPopulated();
-                JsonTextReaderWriter.WriteRawProperty('medium', BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger());
-                JsonTextReaderWriter.WriteEndObject();
-            until POSEntryPaymentLine.Next() = 0;
-
-        JsonTextReaderWriter.WriteEndArray();
-    end;
-
-    local procedure AddReceiptPaymentsJSONArrayForRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
     var
         BGSISPOSPaymMethMap: Record "NPR BG SIS POS Paym. Meth. Map";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
@@ -487,7 +457,10 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         foreach PaymentMedium in ReceiptPayments.Keys() do begin
             PaymentAmount := ReceiptPayments.Get(PaymentMedium);
             JsonTextReaderWriter.WriteStartObject('');
-            JsonTextReaderWriter.WriteStringProperty('amount', Format(-(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+            if Refund then
+                JsonTextReaderWriter.WriteStringProperty('amount', Format(-(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'))
+            else
+                JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(PaymentAmount, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
             JsonTextReaderWriter.WriteRawProperty('medium', PaymentMedium);
             JsonTextReaderWriter.WriteEndObject();
         end;
