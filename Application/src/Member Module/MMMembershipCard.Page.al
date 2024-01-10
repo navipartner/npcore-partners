@@ -663,6 +663,17 @@
                 ToolTip = 'Executes the Show Sponsorship Tickets action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
+            action(CustomerCard)
+            {
+                Caption = 'Open Customer Card';
+                Ellipsis = true;
+                Image = Customer;
+                RunObject = Page "Customer Card";
+                RunPageLink = "No." = field("Customer No.");
+
+                ToolTip = 'Opens the Customer Card';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
             action("Arrival Log")
             {
                 Caption = 'Arrival Log';
