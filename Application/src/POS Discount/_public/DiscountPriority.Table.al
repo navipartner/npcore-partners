@@ -1,6 +1,6 @@
 ﻿table 6014417 "NPR Discount Priority"
 {
-    Access = Internal;
+
     Caption = 'Discount Priority';
     DataClassification = CustomerContent;
 

@@ -1,6 +1,5 @@
 ﻿page 6014407 "NPR Discount Priority List"
 {
-    Extensible = False;
     // NPR5.31/MHA /20170210  CASE 262904 Object created
     // NPR5.44/MMV /20180627  CASE 312154 Added field 30
 
