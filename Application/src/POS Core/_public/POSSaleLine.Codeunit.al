@@ -583,7 +583,7 @@
         POSIssueOnSale: Codeunit "NPR POSAction Issue DC OnSaleB";
         HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
         POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
-        POSActTicketMgt: Codeunit "NPR POSAction: Ticket Mgt.";
+        TicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         POSActMemberMgt: codeunit "NPR POS Action Member Mgt WF3";
     begin
         Rec := Line;
@@ -606,7 +606,7 @@
         POSIssueOnSale.AddNewSaleCoupons(Rec);
         HTMLDisplay.UpdateHTMLDisplay();
         POSProxyDisplay.UpdateDisplay(Rec);
-        POSActTicketMgt.UpdateTicketOnSaleLineInsert(Rec);
+        TicketRetailMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
         OnAfterInsertPOSSaleLine(Rec);

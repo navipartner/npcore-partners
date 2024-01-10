@@ -78,6 +78,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         SaleLinePOS2: Record "NPR POS Sale Line";
+        TicketManagement: Codeunit "NPR TM Ticket Retail Mgt.";
         SaleLinePOSLineNo: Integer;
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
@@ -108,6 +109,8 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 SaleLinePOS."Return Sale Sales Ticket No." := SalesTicketNo;
                 CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);
                 SaleLinePOS.Modify(true);
+
+                TicketManagement.UpdateTicketOnSaleLineInsert(SaleLinePOS);
             until POSSalesLine.Next() = 0;
     end;
 
