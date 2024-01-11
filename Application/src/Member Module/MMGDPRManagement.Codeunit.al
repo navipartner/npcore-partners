@@ -195,6 +195,8 @@
     begin
         Membership.Get(MembershipEntryNo);
         AnonymizeOnDate := GetMembershipValidUntil(MembershipEntryNo);
+        if (AnonymizeOnDate >= Today) then
+            exit(false); // Not time yet
 
         if (AgreementCheck) then begin
             if (not MembershipSetup.Get(Membership."Membership Code")) then
