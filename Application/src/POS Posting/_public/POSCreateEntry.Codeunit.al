@@ -418,7 +418,7 @@
             POSEntrySalesLine."VAT Difference" := -POSEntrySalesLine."VAT Difference";
         end;
         POSEntrySalesLine."POS Sale Line Created At" := POSSaleLine."Created At";
-
+        POSEntrySalesLine."Return Sale Sales Ticket No." := POSSaleLine."Return Sale Sales Ticket No.";
         OnBeforeInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
         POSEntrySalesLine.Insert(false, true);
         OnAfterInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);

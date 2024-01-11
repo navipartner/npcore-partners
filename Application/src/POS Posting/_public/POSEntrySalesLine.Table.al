@@ -639,6 +639,11 @@
             TableRelation = "NPR Item Benefit List Header".Code;
 
         }
+        field(9060; "Return Sale Sales Ticket No."; Code[20])
+        {
+            Caption = 'Return Sale Sales Ticket No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

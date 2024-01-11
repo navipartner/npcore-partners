@@ -208,6 +208,11 @@
                     ToolTip = 'Specifies the value of the Dimension Set ID field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Return Sale Sales Ticket No."; Rec."Return Sale Sales Ticket No.")
+                {
+                    ToolTip = 'Specifies the value of the Return Sales Sales Ticket No. field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
