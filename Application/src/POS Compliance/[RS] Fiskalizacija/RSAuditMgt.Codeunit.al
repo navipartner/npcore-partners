@@ -455,42 +455,52 @@ codeunit 6059942 "NPR RS Audit Mgt."
     #endregion
 
     #region Job Queue
-    procedure AddRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Silent: Boolean): Boolean
+    procedure AddRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Enable: Boolean; Silent: Boolean) Success: Boolean
     var
-        ConfirmJobCreationQst: Label 'This function will add a new periodic job (Job Queue Entry), responsible for obsolete ticket data cleanup, including unused schedule entries (if a similar job already exists, system will not add anything).\Are you sure you want to continue?';
+        OpenJobQueueQst: Label 'A job queue entry to automate fiscalisation tasks has been created.\\Do you want to open the Job Queue Entry Setup page now?';
     begin
-        if not Silent then
-            if not Confirm(ConfirmJobCreationQst, true) then
-                exit(false);
-        exit(InitRSAuditBackgroundJobQueue(JobQueueEntry));
+        Success := InitRSAuditBackgroundJobQueue(JobQueueEntry, Enable);
+        if Success and not Silent then begin
+            Commit();
+            if Confirm(OpenJobQueueQst, true) then
+                Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+        end;
     end;
 
-    local procedure InitRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    local procedure InitRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Enable: Boolean): Boolean
     var
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NextRunDateFormula: DateFormula;
         JobQueueDescrLbl: Label 'RS Fiscal background processor', MaxLength = 250;
     begin
-        Evaluate(NextRunDateFormula, '<1D>');
-        JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
-        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 2700, '');
-        if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR RS Fiscal BG Comm. Batch",
-            '',
-            JobQueueDescrLbl,
-            JobQueueMgt.NowWithDelayInSeconds(300),
-            0T,
-            0T,
-            NextRunDateFormula,
-            DefaultRSAuditCategoryCode(),
-            JobQueueEntry)
-        then begin
-            if not IsRSFiscalActive() then
-                exit;
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-            exit(true);
+        if Enable then begin
+            Evaluate(NextRunDateFormula, '<1D>');
+            JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
+            JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, 2700, '');
+            if JobQueueMgt.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR RS Fiscal BG Comm. Batch",
+                '',
+                JobQueueDescrLbl,
+                JobQueueMgt.NowWithDelayInSeconds(300),
+                0T,
+                0T,
+                NextRunDateFormula,
+                DefaultRSAuditCategoryCode(),
+                JobQueueEntry)
+            then begin
+                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+                exit(true);
+            end;
         end;
+
+        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR RS Fiscal BG Comm. Batch") then begin
+            JobQueueEntry.FindSet(true);
+            repeat
+                JobQueueEntry.Cancel();
+            until JobQueueEntry.Next() = 0;
+        end;
+        exit(false);
     end;
 
     local procedure DefaultRSAuditCategoryCode(): Code[10]
@@ -501,6 +511,27 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         JobQueueCategory.InsertRec(ImportListJQCategoryCode, ImportListJQCategoryDescrLbl);
         exit(JobQueueCategory.Code);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        AddRSAuditBackgroundJobQueue(JobQueueEntry, IsRSFiscalActive(), true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR RS Fiscal BG Comm. Batch")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
     #endregion
 

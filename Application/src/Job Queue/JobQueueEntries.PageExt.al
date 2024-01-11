@@ -34,6 +34,47 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
 
     actions
     {
+        modify(Suspend)
+        {
+            Visible = not NPRRetailAppAreaEnabled;
+            Enabled = not NPRRetailAppAreaEnabled;
+        }
+#if not (BC17 or BC18 or BC19 or BC20)
+        modify(Suspend_Promoted)
+        {
+            Visible = not NPRRetailAppAreaEnabled;
+        }
+#endif
+        addafter(Suspend)
+        {
+            action("NPR Suspend")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Set On Hold';
+                Image = Pause;
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedCategory = Process;
+#endif
+                ToolTip = 'Change the status of the selected entry.';
+                Visible = NPRRetailAppAreaEnabled;
+
+                trigger OnAction()
+                var
+                    UpdateJQOnHoldStatus: Codeunit "NPR Update JQ OnHold Status";
+                begin
+                    BindSubscription(UpdateJQOnHoldStatus);
+                    Rec.SetStatus(Rec.Status::"On Hold");
+                    UnbindSubscription(UpdateJQOnHoldStatus);
+                end;
+            }
+        }
+#if not (BC17 or BC18 or BC19 or BC20)
+        addafter(Suspend_Promoted)
+        {
+            actionref("NPR Suspend_Promoted"; "NPR Suspend") { }
+        }
+#endif
         addlast(Action15)
         {
             action("NPR AddLogCleanupJob")
@@ -75,4 +116,14 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        EnableApplicationAreas: Codeunit "NPR Enable Application Areas";
+    begin
+        NPRRetailAppAreaEnabled := EnableApplicationAreas.IsNPRRetailApplicationAreaEnabled();
+    end;
+
+    var
+        NPRRetailAppAreaEnabled: Boolean;
 }

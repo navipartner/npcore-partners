@@ -171,4 +171,13 @@ codeunit 6151349 "NPR Enable Application Areas"
 
         exit(ITFiscalizationSetup."Enable IT Fiscal");
     end;
+
+    internal procedure IsNPRRetailApplicationAreaEnabled(): Boolean
+    var
+        ApplicationAreaSetup: Record "Application Area Setup";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+    begin
+        if ApplicationAreaMgmtFacade.GetApplicationAreaSetupRecFromCompany(ApplicationAreaSetup, CompanyName()) then
+            exit(ApplicationAreaSetup."NPR Retail");
+    end;
 }
