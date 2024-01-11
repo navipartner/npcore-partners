@@ -31,7 +31,11 @@ codeunit 6060025 "NPR Environment Mgt."
     procedure IsProd(): Boolean
     var
         NPREnvironmentInfo: Record "NPR Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
+        if EnvironmentInformation.IsSaaS() then
+            exit(EnvironmentInformation.IsProduction());
+
         if NPREnvironmentInfo.Get() then
             exit((NPREnvironmentInfo."Environment Type" = "NPR Environment Type"::PROD) and NPREnvironmentInfo."Environment Verified");
     end;
@@ -39,7 +43,11 @@ codeunit 6060025 "NPR Environment Mgt."
     procedure IsDemo(): Boolean
     var
         EnvironmentInfo: Record "NPR Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
+        if EnvironmentInformation.IsSaaS() then
+            exit(false);
+
         if EnvironmentInfo.Get() then
             exit((EnvironmentInfo."Environment Type" = "NPR Environment Type"::DEMO) and EnvironmentInfo."Environment Verified");
     end;
@@ -47,7 +55,11 @@ codeunit 6060025 "NPR Environment Mgt."
     procedure IsTest(): Boolean
     var
         NPREnvironmentInfo: Record "NPR Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
+        if EnvironmentInformation.IsSaaS() then
+            exit(not EnvironmentInformation.IsProduction());
+
         if NPREnvironmentInfo.Get() then
             exit((NPREnvironmentInfo."Environment Type" = "NPR Environment Type"::SANDBOX) and NPREnvironmentInfo."Environment Verified");
     end;
@@ -73,6 +85,9 @@ codeunit 6060025 "NPR Environment Mgt."
         EnvironmentInformation: Codeunit "Environment Information";
         Iterations: Integer;
     begin
+        if EnvironmentInformation.IsSaaS() then
+            exit; //We use microsofts prod/sandbox terminology in saas instead of our own.
+
         if NavApp.IsInstalling() then
             exit;
 
