@@ -85,7 +85,6 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MEMBERSHIP_BLOCKED_NOT_FOUND: Label 'Membership %1 is either blocked or not found.', Comment = '%1= CardNo.';
-        MEMBERSHIP_NOT_SELECTED: Label 'No membership was selected.';
         FailReasonText: Text;
     begin
         if (InputMethod = InputMethod::CARD_SCAN) then
@@ -93,7 +92,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
         if ((ExternalMemberCardNo = '') and (InputMethod = InputMethod::NO_PROMPT)) then begin
             if (not ChooseMemberCard(ExternalMemberCardNo)) then
-                Error(MEMBERSHIP_NOT_SELECTED);
+                Error('');
         end;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, WithActivate, ExternalMemberCardNo);
