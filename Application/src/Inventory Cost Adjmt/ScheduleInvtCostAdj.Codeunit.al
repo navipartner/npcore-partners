@@ -34,9 +34,6 @@
         NextRunDateFormula: DateFormula;
     begin
         GetTimingParameters(NotBeforeDateTime, NextRunDateFormula);
-        if AdjCostJobQueueExists(NotBeforeDateTime) then
-            exit;
-
         JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntryGlobal."Object Type to Run"::Report,
@@ -50,8 +47,10 @@
             SalesSetup."Job Queue Category Code",
             JobQueueEntryGlobal)
         then begin
-            JobQueueEntryGlobal."Report Output Type" := JobQueueEntryGlobal."Report Output Type"::"None (Processing only)";
-            JobQueueEntryGlobal.Modify();
+            if JobQueueEntryGlobal."Report Output Type" <> JobQueueEntryGlobal."Report Output Type"::"None (Processing only)" then begin
+                JobQueueEntryGlobal."Report Output Type" := JobQueueEntryGlobal."Report Output Type"::"None (Processing only)";
+                JobQueueEntryGlobal.Modify();
+            end;
             JobQueueEntryGlobal.Mark(true);
             JobQueueMgt.StartJobQueueEntry(JobQueueEntryGlobal);
         end;
@@ -143,6 +142,8 @@
     begin
         if not ShouldBeScheduled(Rec, xRec) then
             exit;
+        if AdjCostJobQueueExists(CurrentDateTime()) then
+            exit;
 
         Commit();
         if not Confirm(ScheduleJobQueuesConfLbl, true) then
@@ -154,19 +155,10 @@
     end;
 
     local procedure ShouldBeScheduled(Rec: Record "Inventory Setup"; xRec: Record "Inventory Setup"): Boolean
-    var
-        AtDateTime: DateTime;
     begin
-        if (not xRec."Automatic Cost Posting" or Rec."Automatic Cost Posting") and
-           ((xRec."Automatic Cost Adjustment" = Rec."Automatic Cost Adjustment"::Never) or (Rec."Automatic Cost Adjustment" <> Rec."Automatic Cost Adjustment"::Never))
-        then
-            exit(false);
-
-        AtDateTime := CurrentDateTime();
-        if AdjCostJobQueueExists(AtDateTime) and PostInvCostToGLJobQueueExists(AtDateTime) then
-            exit(false);
-
-        exit(true);
+        exit(
+            not Rec."Automatic Cost Posting" and (Rec."Automatic Cost Adjustment" = Rec."Automatic Cost Adjustment"::Never) and
+            (xRec."Automatic Cost Posting" or (xRec."Automatic Cost Adjustment" <> xRec."Automatic Cost Adjustment"::Never)));
     end;
 
 #if not BC17
@@ -220,6 +212,27 @@
     local procedure RefreshJobQueueEntry()
     begin
         Schedule(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Report) and
+            (JobQueueEntry."Object ID to Run" in [Report::"Adjust Cost - Item Entries", Report::"Post Inventory Cost to G/L"]))
+           or
+           ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+            (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Post Inventory Cost to G/L"))
+#if not BC17
+           or
+           ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+            (JobQueueEntry."Object ID to Run" = Codeunit::"Post Inventory Cost to G/L"))
+#endif
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 
     var

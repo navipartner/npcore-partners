@@ -1,6 +1,7 @@
 ﻿codeunit 6014663 "NPR Job Queue Management"
 {
     Access = Public;
+
     Permissions =
         tabledata "Error Message" = rimd,
         tabledata "Error Message Register" = rimd,
@@ -70,7 +71,7 @@
             JobQueueCatagoryCode,
             JobQueueEntry)
         then
-            StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            StartJobQueueEntry(JobQueueEntry);
     end;
 
     internal procedure ScheduleNcTaskCountResetJob(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; JobQueueCatagoryCode: Code[10])
@@ -164,7 +165,7 @@
             JobQueueCatagoryCode,
             JobQueueEntry)
         then
-            StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            StartJobQueueEntry(JobQueueEntry);
     end;
 
     procedure InitRecurringJobQueueEntry(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; ParameterString: Text; JobDescription: Text; EarliestStartDateTime: DateTime; NoOfMinutesBetweenRuns: Integer; JobQueueCatagoryCode: Code[10]; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
@@ -261,50 +262,22 @@
         if Handled then
             exit(Success);
 
-        if JobQueueEntryExists(Parameters, JobQueueEntryOut) then
+        if JobQueueEntryExists(Parameters, JobQueueEntryOut) then begin
+            UpdateJobQueueEntry(Parameters, JobQueueEntryOut);
             exit(true);
+        end;
 
         JobQueueEntry.Init();
         JobQueueEntry.Validate("Object Type to Run", Parameters."Object Type to Run");
         JobQueueEntry.Validate("Object ID to Run", Parameters."Object ID to Run");
         JobQueueEntry."Record ID to Process" := Parameters."Record ID to Process";
         JobQueueEntry."Earliest Start Date/Time" := Parameters."Earliest Start Date/Time";
-        if Format(Parameters."Next Run Date Formula") <> '' then
-            JobQueueEntry.Validate("Next Run Date Formula", Parameters."Next Run Date Formula")
-        else
-            if Parameters."No. of Minutes between Runs" <> 0 then begin
-                JobQueueEntry."Run on Mondays" := Parameters."Run on Mondays";
-                JobQueueEntry."Run on Tuesdays" := Parameters."Run on Tuesdays";
-                JobQueueEntry."Run on Wednesdays" := Parameters."Run on Wednesdays";
-                JobQueueEntry."Run on Thursdays" := Parameters."Run on Thursdays";
-                JobQueueEntry."Run on Fridays" := Parameters."Run on Fridays";
-                JobQueueEntry."Run on Saturdays" := Parameters."Run on Saturdays";
-                JobQueueEntry."Run on Sundays" := Parameters."Run on Sundays";
-                JobQueueEntry.Validate("No. of Minutes between Runs", Parameters."No. of Minutes between Runs");
-            end;
-        if JobQueueEntry."Recurring Job" then begin
-            if Parameters."Starting Time" <> 0T then
-                JobQueueEntry.Validate("Starting Time", Parameters."Starting Time");
-            if Parameters."Ending Time" <> 0T then
-                JobQueueEntry."Ending Time" := Parameters."Ending Time";
-        end;
-        JobQueueEntry."Maximum No. of Attempts to Run" := Parameters."Maximum No. of Attempts to Run";
-        if JobQueueEntry."Maximum No. of Attempts to Run" <= 0 then
-            JobQueueEntry."Maximum No. of Attempts to Run" := 5;
-        JobQueueEntry."Rerun Delay (sec.)" := Parameters."Rerun Delay (sec.)";
-        if JobQueueEntry."Rerun Delay (sec.)" <= 0 then
-            JobQueueEntry."Rerun Delay (sec.)" := 180;
+        SetJobQueueEntryParams(Parameters, JobQueueEntry);
         JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
-        if Parameters."Parameter String" <> '' then
-            JobQueueEntry.Validate("Parameter String", Parameters."Parameter String");
         if Parameters.Description <> '' then
             JobQueueEntry.Description := Parameters.Description;
         JobQueueEntry."Job Queue Category Code" := Parameters."Job Queue Category Code";
-#IF NOT BC17
-        if Parameters."Job Timeout" <> 0 then
-            JobQueueEntry."Job Timeout" := Parameters."Job Timeout";
-#ENDIF
         JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
         JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
         JobQueueEntry."NPR Notif. Profile on Error" := Parameters."NPR Notif. Profile on Error";
@@ -314,6 +287,53 @@
 
         JobQueueEntryOut := JobQueueEntry;
         exit(true);
+    end;
+
+    local procedure UpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
+    var
+        xJobQueueEntry: Record "Job Queue Entry";
+    begin
+        xJobQueueEntry := JobQueueEntry;
+        SetJobQueueEntryParams(Parameters, JobQueueEntry);
+        OnBeforeModifyUpdatedJobQueueEntry(JobQueueEntry);
+        if Format(xJobQueueEntry) <> Format(JobQueueEntry) then begin
+            JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+            JobQueueEntry.Modify(true);
+        end;
+    end;
+
+    local procedure SetJobQueueEntryParams(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if Format(Parameters."Next Run Date Formula") <> '' then
+            JobQueueEntry.Validate("Next Run Date Formula", Parameters."Next Run Date Formula")
+        else begin
+            JobQueueEntry."Run on Mondays" := Parameters."Run on Mondays";
+            JobQueueEntry."Run on Tuesdays" := Parameters."Run on Tuesdays";
+            JobQueueEntry."Run on Wednesdays" := Parameters."Run on Wednesdays";
+            JobQueueEntry."Run on Thursdays" := Parameters."Run on Thursdays";
+            JobQueueEntry."Run on Fridays" := Parameters."Run on Fridays";
+            JobQueueEntry."Run on Saturdays" := Parameters."Run on Saturdays";
+            JobQueueEntry."Run on Sundays" := Parameters."Run on Sundays";
+            JobQueueEntry.Validate("No. of Minutes between Runs", Parameters."No. of Minutes between Runs");
+        end;
+        if JobQueueEntry."Recurring Job" then begin
+            if (Parameters."Starting Time" <> 0T) and (JobQueueEntry."Starting Time" <> Parameters."Starting Time") then
+                JobQueueEntry.Validate("Starting Time", Parameters."Starting Time");
+            if (Parameters."Ending Time" <> 0T) and (JobQueueEntry."Ending Time" <> Parameters."Ending Time") then
+                JobQueueEntry."Ending Time" := Parameters."Ending Time";
+        end;
+        JobQueueEntry."Maximum No. of Attempts to Run" := Parameters."Maximum No. of Attempts to Run";
+        if JobQueueEntry."Maximum No. of Attempts to Run" <= 0 then
+            JobQueueEntry."Maximum No. of Attempts to Run" := 5;
+        JobQueueEntry."Rerun Delay (sec.)" := Parameters."Rerun Delay (sec.)";
+        if JobQueueEntry."Rerun Delay (sec.)" <= 0 then
+            JobQueueEntry."Rerun Delay (sec.)" := 180;
+        if (Parameters."Parameter String" <> '') and (JobQueueEntry."Parameter String" <> Parameters."Parameter String") then
+            JobQueueEntry.Validate("Parameter String", Parameters."Parameter String");
+#IF NOT BC17
+        if Parameters."Job Timeout" <> 0 then
+            JobQueueEntry."Job Timeout" := Parameters."Job Timeout";
+#ENDIF
     end;
 
     procedure JobQueueEntryExists(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
@@ -345,24 +365,41 @@
 
     procedure StartJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
     begin
-        StartJobQueueEntry(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time");
+        ActivateJobQueueEntry(JobQueueEntry);
     end;
 
     procedure StartJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime)
-    var
-        HasStartDT: Boolean;
     begin
+        ActivateJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+    end;
+
+    internal procedure ActivateJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    begin
+        exit(ActivateJobQueueEntry(JobQueueEntry, NextDueRunDateTime(JobQueueEntry)));
+    end;
+
+    internal procedure ActivateJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime) Activated: Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        ValidStartDT: Boolean;
+    begin
+        Activated := false;
         if not TaskScheduler.CanCreateTask() then
             exit;
-
         if (JobQueueEntry.Status = JobQueueEntry.Status::"In Process") or JobQueueEntry."NPR Manually Set On Hold" then
             exit;
-        JobQueueEntry.CalcFields(Scheduled);
-        HasStartDT := (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and (JobQueueEntry."Earliest Start Date/Time" <= NotBeforeDateTime);
-        if (JobQueueEntry.Status = JobQueueEntry.Status::Ready) and HasStartDT and JobQueueEntry.Scheduled then
-            exit;
+        if EnvironmentInformation.IsSaaS() then
+            if GetCurrentModuleExecutionContext() <> ExecutionContext::Normal then
+                exit;
 
-        if not HasStartDT then begin
+        ValidStartDT := HasValidStartDT(JobQueueEntry, NotBeforeDateTime);
+        if ValidStartDT and (JobQueueEntry.Status = JobQueueEntry.Status::Ready) then begin
+            JobQueueEntry.CalcFields(Scheduled);
+            if JobQueueEntry.Scheduled then
+                exit;
+        end;
+
+        if not ValidStartDT then begin
             JobQueueEntry.LockTable();
             JobQueueEntry.Get(JobQueueEntry.ID);
             JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
@@ -370,6 +407,21 @@
             JobQueueEntry.Modify();
         end;
         JobQueueEntry.Restart();
+        Activated := true;
+    end;
+
+    local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
+    var
+        NextRunDateTimeIfFinishedNow: DateTime;
+    begin
+        NextRunDateTimeIfFinishedNow := RoundDateTime(CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, CurrentDateTime(), false), 60000, '>');
+        if NotBeforeDateTime > NextRunDateTimeIfFinishedNow then
+            NextRunDateTimeIfFinishedNow := RoundDateTime(NotBeforeDateTime, 60000, '>');
+
+        exit(
+            (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and
+            (JobQueueEntry."Earliest Start Date/Time" <= NextRunDateTimeIfFinishedNow) and
+            (JobQueueEntry."Earliest Start Date/Time" >= RoundDateTime(NotBeforeDateTime, 60000, '<')));
     end;
 
     local procedure CheckRequiredPermissions()
@@ -394,6 +446,16 @@
         exit(CurrentDateTime() + NoOfSeconds * 1000);
     end;
 
+    internal procedure DaysToDuration(NoOfDays: Integer): Duration
+    begin
+        exit(NoOfDays * 86400000);
+    end;
+
+    internal procedure MinutesToDuration(NoOfMinutes: Integer): Duration
+    begin
+        exit(NoOfMinutes * 60000);
+    end;
+
     internal procedure GetAutoRecreateNoteTxt(): Text
     var
         AutoRecreateNoteLbl: Label 'Auto-created for %1. Can be deleted if not used. Will be recreated when the feature is activated.', Comment = '%1 = initial description of Job Queue Entry';
@@ -414,7 +476,7 @@
         SetJobTimeout(4, 0);  //4 hours
 
         if InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::codeunit,
+            JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR POS Post Item Entries JQ",
             '',
             JobQueueDescrLbl,
@@ -459,7 +521,7 @@
         SetJobTimeout(4, 0);  //4 hours
 
         if InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::codeunit,
+            JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Post Sales Documents JQ",
             '',
             JobQueueDescrLbl,
@@ -476,31 +538,30 @@
         JobQueueEntry: Record "Job Queue Entry";
         RetentionPolicyLog: Codeunit "Retention Policy Log";
         RetentionPolicyLogCategory: Enum "Retention Policy Log Category";
-        RetentionPolicySetup: Record "Retention Policy Setup";
+        RetentionPolicySetup: Codeunit "Retention Policy Setup";
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
         NextRunDateFormula: DateFormula;
 #ENDIF
+        AlreadyExists: Boolean;
+        ReadyToStart: Boolean;
         JobQueueActivatedNotificationTxt: Label 'A Job Queue Entry to apply the retention policies has been scheduled to run.';
+        JobQueueDeactivatedNotificationTxt: Label 'A Job Queue Entry to apply the retention policies was set to On-Hold state.';
         JobQueueReadyNotificationTxt: Label 'A Job Queue Entry to apply the retention policies was set to Ready state.';
     begin
-        if RetentionPolicySetup.IsEmpty() then
-            exit;
-        if RetentionPolicySetup.WritePermission() and TaskScheduler.CanCreateTask() then begin
-            RetentionPolicySetup.FindFirst();
-            RetentionPolicySetup.Modify();  //will trigger scheduling of recurring retention policy job
+        AlreadyExists := JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, 3997);  //3997 = Codeunit::"Retention Policy JQ"
+
+        if not RetentionPolicySetup.IsRetentionPolicyEnabled() then begin
+            if AlreadyExists then
+                if JobQueueEntry.Status <> JobQueueEntry.Status::"On Hold" then begin
+                    JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+                    JobQueueEntry.Modify();
+                    RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueDeactivatedNotificationTxt);
+                end;
             exit;
         end;
 
-        //Manually create retention policy job queue, if current user does not have sufficient permissions to modify table "Retention Policy Setup" records, or the user cannot schedule tasks.
-        //Based on Codeunit 3998 "Retention Policy Scheduler", procedure ScheduleRecurringRetentionPolicy()
-        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, 3997) then begin  //3997 = Codeunit::"Retention Policy JQ"
-            if JobQueueEntry.IsReadyToStart() or not TaskScheduler.CanCreateTask() then
-                exit;
-
-            JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
-            RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueReadyNotificationTxt);
-            exit;
-        end;
+        if AlreadyExists then
+            ReadyToStart := JobQueueEntry.IsReadyToStart();
 
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
         Evaluate(NextRunDateFormula, '<1D>');
@@ -522,10 +583,12 @@
             CreateAndAssignRetentionPolicyJobQueueCategory(),
             JobQueueEntry)
         then
-            if TaskScheduler.CanCreateTask() then begin
-                StartJobQueueEntry(JobQueueEntry);
-                RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueActivatedNotificationTxt);
-            end;
+            if ActivateJobQueueEntry(JobQueueEntry) then
+                if AlreadyExists then begin
+                    if not ReadyToStart then
+                        RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueReadyNotificationTxt);
+                end else
+                    RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueActivatedNotificationTxt);
     end;
 
     internal procedure ScheduleFeatureFlagReport()
@@ -722,19 +785,165 @@
         Clear(NotifProfileCodeOnError);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
-    local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
+    local procedure NextDueRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
     var
         JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
+    begin
+        if not JobQueueEntry."Recurring Job" then begin
+            if JobQueueEntry."Earliest Start Date/Time" <> 0DT then
+                exit(JobQueueEntry."Earliest Start Date/Time");
+            exit(CurrentDateTime());
+        end;
+        exit(JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, LastSuccessfulRunDateTime(JobQueueEntry)));
+    end;
+
+    local procedure LastSuccessfulRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
+    var
+        JobQueueLogEntry: Record "Job Queue Log Entry";
+    begin
+        JobQueueLogEntry.SetCurrentKey(ID, Status);
+        JobQueueLogEntry.SetRange(ID, JobQueueEntry.ID);
+        JobQueueLogEntry.SetRange(Status, JobQueueLogEntry.Status::Success);
+        JobQueueLogEntry.SetLoadFields("Start Date/Time", "End Date/Time");
+        if JobQueueLogEntry.FindLast() then
+            if JobQueueLogEntry."End Date/Time" <> 0DT then
+                exit(JobQueueLogEntry."End Date/Time")
+            else
+                exit(JobQueueLogEntry."Start Date/Time");
+
+        exit(HasNeverBeenRunDT());
+    end;
+
+    local procedure CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; AdjustForRunWindowOnly: Boolean) NewRunDateTime: DateTime
+    var
+        RunWindowDate: Date;
+        RunWindowStartDT: DateTime;
+        RunWindowEndDT: DateTime;
+        TimeZoneAdjmt: Duration;
+    begin
+        if StartingDateTime in [0DT, HasNeverBeenRunDT()] then begin
+            if JobQueueEntry."Earliest Start Date/Time" <> 0DT then
+                StartingDateTime := JobQueueEntry."Earliest Start Date/Time"
+            else
+                StartingDateTime := CurrentDateTime();
+            AdjustForRunWindowOnly := true;
+        end;
+        NewRunDateTime := StartingDateTime;
+        if not JobQueueEntry."Recurring Job" then
+            exit;
+
+        if JobQueueEntry."Starting Time" <> 0T then begin
+            if JobQueueEntry."Reference Starting Time" = 0DT then
+                JobQueueEntry.Validate("Starting Time");
+            if JobQueueEntry."Reference Starting Time" <> 0DT then
+                TimeZoneAdjmt := CreateDateTime(DMY2Date(1, 1, 2000), JobQueueEntry."Starting Time") - JobQueueEntry."Reference Starting Time";
+        end;
+
+        if not AdjustForRunWindowOnly then
+            case true of
+                Format(JobQueueEntry."Next Run Date Formula") <> '':
+                    NewRunDateTime := CreateDateTime(CalcDate(JobQueueEntry."Next Run Date Formula", DT2Date(StartingDateTime)), DT2Time(JobQueueEntry."Reference Starting Time"));
+                JobQueueEntry."No. of Minutes between Runs" > 0:
+                    NewRunDateTime := StartingDateTime + MinutesToDuration(JobQueueEntry."No. of Minutes between Runs");
+                else
+                    NewRunDateTime := CreateDateTime(DT2Date(StartingDateTime) + 1, DT2Time(JobQueueEntry."Reference Starting Time"));
+            end;
+
+        if NewRunDateTime > CurrentDateTime() then
+            RunWindowDate := DT2Date(NewRunDateTime)
+        else
+            RunWindowDate := Today();
+
+        RunWindowStartDT := CreateDateTime(RunWindowDate, DT2Time(JobQueueEntry."Reference Starting Time"));
+        if (JobQueueEntry."Starting Time" <> 0T) and (JobQueueEntry."Ending Time" <> 0T) and (JobQueueEntry."Ending Time" < JobQueueEntry."Starting Time") then
+            RunWindowStartDT := RunWindowStartDT - DaysToDuration(1);
+
+        if JobQueueEntry."Ending Time" <> 0T then
+            RunWindowEndDT := CreateDateTime(RunWindowDate, JobQueueEntry."Ending Time") - TimeZoneAdjmt;
+        if (RunWindowEndDT <> 0DT) and (NewRunDateTime > RunWindowEndDT) then begin
+            RunWindowStartDT := RunWindowStartDT + DaysToDuration(1);
+            RunWindowEndDT := RunWindowEndDT + DaysToDuration(1);
+        end;
+
+        if NewRunDateTime < RunWindowStartDT then
+            NewRunDateTime := RunWindowStartDT;
+
+        if Format(JobQueueEntry."Next Run Date Formula") <> '' then
+            exit;
+        NewRunDateTime := CalcRunTimeForRecurringJob(JobQueueEntry, NewRunDateTime);
+    end;
+
+    local procedure CalcRunTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime) NewRunDateTime: DateTime
+    var
+        RunOnDate: array[7] of Boolean;
+        NoOfDays: Integer;
+        StartingWeekDay: Integer;
+        Found: Boolean;
+    begin
+        JobQueueEntry.TestField("Recurring Job");
+        RunOnDate[1] := JobQueueEntry."Run on Mondays";
+        RunOnDate[2] := JobQueueEntry."Run on Tuesdays";
+        RunOnDate[3] := JobQueueEntry."Run on Wednesdays";
+        RunOnDate[4] := JobQueueEntry."Run on Thursdays";
+        RunOnDate[5] := JobQueueEntry."Run on Fridays";
+        RunOnDate[6] := JobQueueEntry."Run on Saturdays";
+        RunOnDate[7] := JobQueueEntry."Run on Sundays";
+        NewRunDateTime := StartingDateTime;
+        NoOfDays := 0;
+
+        StartingWeekDay := Date2DWY(DT2Date(StartingDateTime), 1);
+        Found := RunOnDate[(StartingWeekDay - 1 + NoOfDays) mod 7 + 1];
+        while not Found and (NoOfDays < 7) do begin
+            NoOfDays := NoOfDays + 1;
+            Found := RunOnDate[(StartingWeekDay - 1 + NoOfDays) mod 7 + 1];
+        end;
+        if Found then
+            NewRunDateTime := NewRunDateTime + DaysToDuration(NoOfDays);
+    end;
+
+    internal procedure IsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        IsNpJob: Boolean;
+        Handled: Boolean;
+    begin
+        OnCheckIfIsNPRecurringJob(JobQueueEntry, IsNpJob, Handled);
+        exit(IsNpJob);
+    end;
+
+    local procedure HasNeverBeenRunDT(): DateTime
+    begin
+        exit(CreateDateTime(DMY2Date(1, 1, 2000), 0T));
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeCalcNextRunTimeForRecurringJob', '', true, false)]
+    local procedure NPCalcNextRunDateTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; var NewRunDateTime: DateTime; var IsHandled: Boolean)
+    begin
+        if IsHandled then
+            exit;
+        If not IsNPRecurringJob(JobQueueEntry) then
+            exit;
+        IsHandled := true;
+        NewRunDateTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, StartingDateTime, false);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime', '', true, false)]
+    local procedure NPCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime(var JobQueueEntry: Record "Job Queue Entry"; var EarliestPossibleRunTime: DateTime; var IsHandled: Boolean)
+    begin
+        if IsHandled then
+            exit;
+        If not IsNPRecurringJob(JobQueueEntry) then
+            exit;
+        IsHandled := true;
+        EarliestPossibleRunTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, EarliestPossibleRunTime, true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
+    local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin
         if JobQueueEntry."Maximum No. of Attempts to Run" = 3 then  //3 - default value in MS standard application
             JobQueueEntry."Maximum No. of Attempts to Run" := 5;
         if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
             JobQueueEntry."Rerun Delay (sec.)" := 180;
-        //Do not rescedule jobs to run after ending time
-        if JobQueueEntry."Recurring Job" and (JobQueueEntry."Ending Time" <> 0T) and (DT2Date(JobQueueEntry."Earliest Start Date/Time") <= Today()) then
-            if JobQueueEntry."Earliest Start Date/Time" > CreateDateTime(Today(), JobQueueEntry."Ending Time") then
-                JobQueueEntry."Earliest Start Date/Time" := JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time");
 
         AutoRestartRetentionPolicyJQ(JobQueueEntry);
         UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
@@ -759,7 +968,7 @@
             JobQueueSendNotif.SendNotifications(JobQueueEntry, JobQueueSendNotif);
 
         if JobQueueEntry."NPR Auto-Resched. after Error" then begin
-            JobQueueEntry."Earliest Start Date/Time" := NowWithDelayInSeconds(JobQueueEntry."NPR Auto-Resched. Delay (sec.)");
+            JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, NowWithDelayInSeconds(JobQueueEntry."NPR Auto-Resched. Delay (sec.)"), true);
             JobQueueEntry.Modify();
             JobQueueEntry.Restart();
         end;
@@ -787,6 +996,12 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunAddPosSaleDocumentPostingJobQueue()
+    begin
+        AddPosSaleDocumentPostingJobQueue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RunRefreshRetentionPolicyJQ()
     begin
         RefreshRetentionPolicyJQ();
@@ -796,6 +1011,25 @@
     local procedure RunScheduleFeatureFlagReport()
     begin
         ScheduleFeatureFlagReport();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" in
+               [Codeunit::"NPR POS Post Item Entries JQ",
+                Codeunit::"NPR POS Post GL Entries JQ",
+                Codeunit::"NPR Get Feature Flags JQ",
+                Codeunit::"NPR Post Sales Documents JQ",
+                3997  //3997 = Codeunit::"Retention Policy JQ"
+               ])
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
@@ -815,13 +1049,10 @@
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeSetStatusValue', '', false, false)]
-#if not (BC17 or BC18 or BC19 or BC20)
-    local procedure HandleOnBeforeSetStatusValue(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var NewStatus: Option; var IsHandled: Boolean)
-#else
     local procedure HandleOnBeforeSetStatusValue(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var NewStatus: Option)
-#endif
     begin
-        JobQueueEntry."NPR Manually Set On Hold" := NewStatus = JobQueueEntry.Status::"On Hold";
+        if NewStatus <> JobQueueEntry.Status::"On Hold" then
+            JobQueueEntry."NPR Manually Set On Hold" := false;
     end;
 
     [IntegrationEvent(false, false)]
@@ -854,12 +1085,22 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifyUpdatedJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+    end;
+
 #if (BC17 or BC18 or BC19)
     [IntegrationEvent(false, false)]
 #else
     [IntegrationEvent(false, false, true)]  //isolated event
 #endif
     local procedure OnRefreshNPRJobQueueList()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin
     end;
 }

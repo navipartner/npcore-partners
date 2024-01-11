@@ -22,6 +22,12 @@
 
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue install', 'AddJobQueues');
 
+        //Run this first in order to not affect job queues created by this codeunit further on
+        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold')) then begin
+            SetManuallySetOnHold();
+            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
+        end;
+
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues')) then begin
             UpdateNaviConnectJobQueueCategories();
             UpdateJobQueueEntries();
@@ -102,11 +108,6 @@
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForAllWithStartingTime'));
         end;
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold')) then begin
-            SetManuallySetOnHold();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
-        end;
-
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -158,7 +159,7 @@
         JobQueueEntry: Record "Job Queue Entry";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
     begin
-        RSAuditMgt.AddRSAuditBackgroundJobQueue(JobQueueEntry, true);
+        RSAuditMgt.AddRSAuditBackgroundJobQueue(JobQueueEntry, RSAuditMgt.IsRSFiscalActive(), true);
     end;
 
     local procedure AddInventoryAdjmtJobQueues()
@@ -391,9 +392,19 @@
     local procedure SetManuallySetOnHold()
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueEntry2: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"On Hold");
-        JobQueueEntry.ModifyAll("NPR Manually Set On Hold", true);
+        JobQueueEntry.SetRange("NPR Manually Set On Hold", false);
+        if JobQueueEntry.FindSet(true) then
+            repeat
+                if JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then begin
+                    JobQueueEntry2.Get(JobQueueEntry.ID);
+                    JobQueueEntry2."NPR Manually Set On Hold" := true;
+                    JobQueueEntry2.Modify();
+                end;
+            until JobQueueEntry.Next() = 0;
     end;
 
     local procedure AssignJoqCategoryToTMRetentionJQ()

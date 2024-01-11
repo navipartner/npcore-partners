@@ -27,4 +27,76 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
             }
         }
     }
+    actions
+    {
+        modify("Set On Hold")
+        {
+            Visible = not NPRRetailAppAreaEnabled;
+            Enabled = not NPRRetailAppAreaEnabled;
+        }
+#if not (BC17 or BC18 or BC19 or BC20)
+        modify("Set On Hold_Promoted")
+        {
+            Visible = not NPRRetailAppAreaEnabled;
+        }
+#endif
+        addafter("Set On Hold")
+        {
+            action("NPR Suspend")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Set On Hold';
+                Image = Pause;
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedCategory = Process;
+#endif
+                ToolTip = 'Change the status of the entry.';
+                Visible = NPRRetailAppAreaEnabled;
+
+                trigger OnAction()
+                var
+                    UpdateJQOnHoldStatus: Codeunit "NPR Update JQ OnHold Status";
+                begin
+                    BindSubscription(UpdateJQOnHoldStatus);
+                    Rec.SetStatus(Rec.Status::"On Hold");
+                    UnbindSubscription(UpdateJQOnHoldStatus);
+                    RecallModifyOnlyWhenReadOnlyNotification();
+                end;
+            }
+        }
+#if not (BC17 or BC18 or BC19 or BC20)
+        addafter("Set On Hold_Promoted")
+        {
+            actionref("NPR Suspend_Promoted"; "NPR Suspend") { }
+        }
+#endif
+    }
+
+    trigger OnOpenPage()
+    var
+        EnableApplicationAreas: Codeunit "NPR Enable Application Areas";
+    begin
+        NPRRetailAppAreaEnabled := EnableApplicationAreas.IsNPRRetailApplicationAreaEnabled();
+    end;
+
+    local procedure RecallModifyOnlyWhenReadOnlyNotification()
+    var
+        ModifyOnlyWhenReadOnlyNotification: Notification;
+    begin
+        ModifyOnlyWhenReadOnlyNotification.Id := GetModifyOnlyWhenReadOnlyNotificationId();
+        ModifyOnlyWhenReadOnlyNotification.Recall();
+    end;
+
+    local procedure GetModifyOnlyWhenReadOnlyNotificationId(): Guid
+    var
+        ModifyOnlyWhenReadOnlyNotificationId: Guid;
+        ModifyOnlyWhenReadOnlyNotificationIdTxt: Label '509FD112-31EC-4CDC-AEBF-19B8FEBA526F', Locked = true;
+    begin
+        Evaluate(ModifyOnlyWhenReadOnlyNotificationId, ModifyOnlyWhenReadOnlyNotificationIdTxt);
+        exit(ModifyOnlyWhenReadOnlyNotificationId);
+    end;
+
+    var
+        NPRRetailAppAreaEnabled: Boolean;
 }
