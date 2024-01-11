@@ -169,6 +169,19 @@ codeunit 6151548 "NPR NO Audit Mgt."
         UpdatePriceChangedLine(SaleLinePOS, Format(POSEntry."Entry Type"));
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Of Day Worker", 'OnAfterCleanupPOSSavedSalesBeforeBalancing', '', false, false)]
+    local procedure CheckOnAfterCleanupPOSSavedSalesBeforeBalancing(SalePOS: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        ErrorIfThereArePOSSavedSales(SalePOS);
+    end;
     #endregion
 
     #region NO Fiscal - Audit Profile Mgt
@@ -697,6 +710,16 @@ codeunit 6151548 "NPR NO Audit Mgt."
         NOPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
         if not NOPOSAuditLogAuxInfo.IsEmpty() then
             Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", NOPOSAuditLogAuxInfo.TableCaption());
+    end;
+
+    local procedure ErrorIfThereArePOSSavedSales(SalePOS: Record "NPR POS Sale")
+    var
+        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
+        POSSavedSalesErr: Label 'All POS Saved Sales related to %1 %2 must be canceled or finished.', Comment = '%1 - Register Number field caption, %2 - Register Number value';
+    begin
+        POSSavedSaleEntry.SetRange("Register No.", SalePOS."Register No.");
+        if not POSSavedSaleEntry.IsEmpty() then
+            Error(POSSavedSalesErr, SalePOS.FieldCaption("Register No."), SalePOS."Register No.");
     end;
     #endregion
 
