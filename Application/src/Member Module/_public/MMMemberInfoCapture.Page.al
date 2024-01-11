@@ -1151,7 +1151,7 @@
                     if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) then begin
                         SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("External Card No."), (MemberInfoCapture."External Card No." = ''));
 
-                        if (MembershipSetup."Card Expire Date Calculation" <> MembershipSetup."Card Expire Date Calculation"::NA) then
+                        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::DATEFORMULA) then
                             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Valid Until"), (MemberInfoCapture."Valid Until" = 0D));
 
                     end;
@@ -1239,7 +1239,7 @@
 
                 ExternalCardNoMandatory := (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL);
                 CardValidUntilMandatory := ((MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL) and
-                                            not (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA));
+                                            (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::DATEFORMULA));
 
                 case MembershipSalesSetup."Valid From Base" of
                     MembershipSalesSetup."Valid From Base"::FIRST_USE:

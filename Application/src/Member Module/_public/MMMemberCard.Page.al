@@ -511,14 +511,12 @@
                     MemberInfoCapture: Record "NPR MM Member Info Capture";
                 begin
 
-                    //MembershipEntryNo := MembershipManagement.GetMembershipFromExtMemberNo (Rec."External Member No.");
                     MembershipEntryNo := CurrPage.MembershipListPart.Page.GetSelectedMembershipEntryNo();
 
                     if (MembershipManagement.MembershipNeedsActivation(MembershipEntryNo)) then
                         if (Confirm(ACTIVATE_MEMBERSHIP, true)) then
                             MembershipManagement.ActivateMembershipLedgerEntry(MembershipEntryNo, Today);
 
-                    //MembershipManagement.IssueNewMemberCard (TRUE, "Entry No.", CardEntryNo, ResponseMessage);
                     MemberInfoCapture."Member Entry No" := Rec."Entry No.";
                     MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
                     MembershipManagement.IssueMemberCard(MemberInfoCapture, CardEntryNo, ResponseMessage);
@@ -538,7 +536,9 @@
                     end;
                     MemberCard.Modify();
 
-                    Page.Run(6060133, MemberCard);
+                    Commit();
+                    Page.RunModal(page::"NPR MM Member Card Card", MemberCard);
+                    CurrPage.Update(false);
                 end;
             }
             Action("Take Picture")

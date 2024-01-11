@@ -127,9 +127,23 @@
     }
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        ConfirmDeleteCard: Label 'Member card must have a card number to be valid. Do you want to remove this card?';
+
     begin
-        if (CloseAction = ACTION::OK) then
-            Rec.TestField("External Card No.");
+        if (CloseAction = ACTION::OK) then begin
+            if (Rec."External Card No." = '') then begin
+                if ((DT2Date(Rec.SystemCreatedAt) = Today()) and (Time() - DT2Time(Rec.SystemCreatedAt) < 1 * 60 * 1000)) then begin
+                    if (not Rec.Delete()) then;
+                end else begin
+                    if (Confirm(ConfirmDeleteCard, false)) then begin
+                        if (not Rec.Delete()) then;
+                    end else begin
+                        Rec.TestField("External Card No.");
+                    end;
+                end;
+            end;
+        end;
     end;
 
     var

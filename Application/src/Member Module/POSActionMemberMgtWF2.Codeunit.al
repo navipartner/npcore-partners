@@ -481,8 +481,6 @@
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM Membership Mgt.";
         MEMBERSHIP_BLOCKED_NOT_FOUND: Label 'Membership %1 is either blocked or not found.';
-        MEMBERSHIP_NOT_SELECTED: Label 'No membership was selected.';
-
         FailReasonText: Text;
     begin
 
@@ -491,7 +489,7 @@
 
         if ((ExternalMemberCardNo = '') and (InputMethod = MemberSelectionMethod::NO_PROMPT)) then begin
             if (not ChooseMemberCard(ExternalMemberCardNo)) then
-                Error(MEMBERSHIP_NOT_SELECTED);
+                Error('');
         end;
 
         MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, WithActivate, ExternalMemberCardNo);
@@ -500,7 +498,6 @@
             MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
             exit;
         end;
-
 
         if (FailReasonText <> '') then
             Error(FailReasonText) else
