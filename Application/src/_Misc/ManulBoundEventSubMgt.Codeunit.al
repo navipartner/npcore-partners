@@ -13,4 +13,11 @@ codeunit 6151428 "NPR Manul Bound Event Sub. Mgt"
         Result := true;
         IsHandled := true;
     end;
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    [EventSubscriber(ObjectType::Table, Database::"Assembly Header", 'OnBeforeShowDueDateBeforeWorkDateMsg', '', false, false)]
+    local procedure AssemblyHeaderOnBeforeShowDueDateBeforeWorkDateMsg(var IsHandled: Boolean)
+    begin
+        IsHandled := true;
+    end;
+#ENDIF
 }
