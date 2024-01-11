@@ -8,23 +8,23 @@
 
     procedure CleanupPOSQuotesBeforeBalancing(SalePOS: Record "NPR POS Sale") Confirmed: Boolean
     var
-        POSQuoteEntry: Record "NPR POS Saved Sale Entry";
-        POSQuotes: Page "NPR POS Saved Sales";
+        POSSavedSaleEntry: Record "NPR POS Saved Sale Entry";
+        POSSavedSales: Page "NPR POS Saved Sales";
         SelectedMenu: Integer;
     begin
         if not GuiAllowed then
             exit(true);
 
-        POSQuoteEntry.SetAutoCalcFields("Contains EFT Approval");
-        POSQuoteEntry.SetRange("Register No.", SalePOS."Register No.");
-        POSQuoteEntry.SetRange("Contains EFT Approval", true);
-        if not POSQuoteEntry.IsEmpty then
+        POSSavedSaleEntry.SetAutoCalcFields("Contains EFT Approval");
+        POSSavedSaleEntry.SetRange("Register No.", SalePOS."Register No.");
+        POSSavedSaleEntry.SetRange("Contains EFT Approval", true);
+        if not POSSavedSaleEntry.IsEmpty then
             if not Confirm(EFT_WARNING, false, SalePOS.FieldCaption("Register No."), SalePOS."Register No.") then
                 exit(false);
 
-        POSQuoteEntry.SetRange("Contains EFT Approval");
+        POSSavedSaleEntry.SetRange("Contains EFT Approval");
 
-        if not POSQuoteEntry.FindFirst() then
+        if not POSSavedSaleEntry.FindFirst() then
             exit(true);
 
         SelectedMenu := StrMenu(Text000, 2);
@@ -33,14 +33,14 @@
             1:
                 begin
                     Confirmed := true;
-                    POSQuoteEntry.DeleteAll(true);
+                    POSSavedSaleEntry.DeleteAll(true);
                 end;
             2:
                 begin
-                    Clear(POSQuotes);
-                    POSQuotes.SetIsInEndOfTheDayProcess(true);
-                    POSQuotes.LookupMode(true);
-                    Confirmed := POSQuotes.RunModal() = Action::LookupOK;
+                    Clear(POSSavedSales);
+                    POSSavedSales.SetIsInEndOfTheDayProcess(true);
+                    POSSavedSales.LookupMode(true);
+                    Confirmed := POSSavedSales.RunModal() = Action::LookupOK;
                 end;
         end;
 
