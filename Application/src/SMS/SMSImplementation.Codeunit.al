@@ -631,6 +631,19 @@ codeunit 6060035 "NPR SMS Implementation"
             SMSSetup.Validate("Job Queue Category Code", GetJobQueueCategoryCode());
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Send SMS Job Handler")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
+    end;
+
     #endregion Subscribers
     #region Job functions
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
@@ -668,7 +681,7 @@ codeunit 6060035 "NPR SMS Implementation"
             JobQueueEntry."Maximum No. of Attempts to Run" := 10000;  //Why so big number?
             JobQueueEntry.Modify();
 
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
         end;
     end;
 

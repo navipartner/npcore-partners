@@ -153,17 +153,24 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
 
     internal procedure CreateJobQueueEntry()
     var
+        MMMemberCommunity: Record "NPR MM Member Community";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueDescription: Label 'Membership Statistics - AutoCreated';
         NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
     begin
+        if MMMemberCommunity.IsEmpty() then begin
+            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID()) then
+                JobQueueEntry.Cancel();
+            exit;
+        end;
+
         NotBeforeDateTime := CurrentDateTime();
         Evaluate(NextRunDateFormula, '<1D>');
         if JobQueueManagement.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR MM Membership Stat. Mgmt.",
+            CurrCodeunitID(),
             '',
             JobQueueDescription,
             NotBeforeDateTime,
@@ -173,16 +180,42 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
             '',
             JobQueueEntry)
         then
-            JobQueueManagement.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure CurrCodeunitID(): Integer
+    begin
+        exit(Codeunit::"NPR MM Membership Stat. Mgmt.");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Community", 'OnAfterInsertEvent', '', false, false)]
+    local procedure EnsureJobQueueEntryExistsOnMemberCommunityInsert(var Rec: Record "NPR MM Member Community")
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        MMStatMgmt: Codeunit "NPR MM Membership Stat. Mgmt.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID()) then
+            MMStatMgmt.CreateJobQueueEntry();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
-    var
-        MMMemberCommunity: Record "NPR MM Member Community";
     begin
-        if MMMemberCommunity.IsEmpty() then
-            exit;
         CreateJobQueueEntry();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = CurrCodeunitID())
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 }

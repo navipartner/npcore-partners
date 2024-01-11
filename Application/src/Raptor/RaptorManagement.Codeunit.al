@@ -293,7 +293,7 @@
             JobQueueCategory.InsertRec('RAPTOR', CopyStr(SendDataToRaptrorLbl, 1, MaxStrLen(JobQueueCategory.Description)));
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,
-                CODEUNIT::"NPR Raptor Send Data",
+                Codeunit::"NPR Raptor Send Data",
                 '',
                 SendDataToRaptrorLbl,
                 JobQueueMgt.NowWithDelayInSeconds(60),
@@ -489,6 +489,19 @@
     local procedure RefreshJobQueueEntry()
     begin
         SetupJobQueue(RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Raptor Send Data")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 
     [IntegrationEvent(true, false)]

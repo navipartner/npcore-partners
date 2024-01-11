@@ -85,7 +85,7 @@
             JobCategory,
             JobQueueEntry)
         then begin
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, NotBeforeDateTime);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
         end;
     end;
 
@@ -700,5 +700,18 @@
         if not (PriceLogSetup.Get() and PriceLogSetup."Job Queue Activated") then
             exit;
         CreatePriceLogJobQueue('');
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Retail Price Log Mgt.")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 }
