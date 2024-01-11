@@ -9,10 +9,9 @@ codeunit 6059860 "NPR End Of Day Worker"
     var
         POSUnit: Record "NPR POS Unit";
         SalePOS: Record "NPR POS Sale";
-        POSQuoteMgt: Codeunit "NPR POS Saved Sale Mgt.";
+        POSSavedSaleMgt: Codeunit "NPR POS Saved Sale Mgt.";
         SaleMustBeEmpty: Label 'Delete all sales lines before balancing the register';
     begin
-
         if (SalesTicketNo = '') then
             exit(true);
 
@@ -21,8 +20,10 @@ codeunit 6059860 "NPR End Of Day Worker"
         if (LineExists(SalePOS)) then
             Error(SaleMustBeEmpty);
 
-        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
+        if not POSSavedSaleMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');
+
+        OnAfterCleanupPOSSavedSalesBeforeBalancing(SalePOS);
 
         exit(true);
     end;
@@ -257,5 +258,10 @@ codeunit 6059860 "NPR End Of Day Worker"
             WorkflowContext.Add('WorkflowName', WorkflowName);
             WorkflowsArray.Add(WorkflowContext);
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCleanupPOSSavedSalesBeforeBalancing(SalePOS: Record "NPR POS Sale")
+    begin
     end;
 }
