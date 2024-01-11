@@ -579,7 +579,7 @@
             Codeunit::"NPR UPG POS Input Box Events":
                 case UpgradeStep of
                     'UpgradeTicketArrivalActionCode':
-                        exit('NPR-UpgradeTicketArrivalActionCode-20231221');
+                        exit('NPR-UpgradeTicketArrivalActionCode-20240111');
                 end;
         end;
     end;
