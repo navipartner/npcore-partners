@@ -587,6 +587,66 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ExportBOMItemWithAssembleToOrderPolicy()
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalesHeader: Record "Sales Header";
+        AssemblyHeader: Record "Assembly Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        Item: Record Item;
+        AssembleToOrderLink: Record "Assemble-to-Order Link";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        Assert: Codeunit "Assert";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+    begin
+        // [Scenario] Check that a successful export of item with Assemble-To-Order Assembly Policy creates corresponding Assembly Order alongside with regular Sales Order.
+
+        // [Given] POS & Payment setup
+        InitializeData();
+
+        // [Given] Active POS session & sale
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+
+        // [Given] Item Line
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        AddBOMAndAssemblyPolicyToItem(Item);
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [Given] Customer applied to sale
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        // [When] Exporting to sales order without posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        ExportPOSSAlesToSalesOrder(POSSale, false, false, SalesHeader);
+
+        // [Then] POS entry created as credit sale, POS sale ended and sales document is created, open and linked to POS entry.
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        Assert.IsTrue(POSEntry.FindFirst(), 'Related POS Entry not found.');
+        Assert.IsTrue(POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale", 'POS Entry not created as Credit Sale.');
+
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        AssembleToOrderLink.SetRange("Document Type", Enum::"Assembly Document Type"::Order);
+        AssembleToOrderLink.SetRange("Document No.", POSEntry."Sales Document No.");
+        AssembleToOrderLink.SetRange("Document Line No.", SaleLinePOS."Line No.");
+        Assert.IsTrue(AssembleToOrderLink.FindFirst(), 'Assemble-To-Order not found.');
+
+        Assert.IsTrue(AssemblyHeader.Get(Enum::"Assembly Document Type"::Order, AssembleToOrderLink."Assembly Document No."), 'Assembly Order must be created.');
+    end;
+
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -694,4 +754,24 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         SalesDocumentExportMgt.GetCreatedSalesHeader(SalesHeader);
     end;
     #endregion ExportPOSSAlesToSalesOrder
+
+    #region ModifyItemWithBOMAndAssemblyPolicy
+    local procedure AddBOMAndAssemblyPolicyToItem(var BOMItem: Record Item)
+    var
+        LibraryInventory: Codeunit "Library - Inventory";
+        BOMComponentItem: Record Item;
+        BOMComponent: Record "BOM Component";
+    begin
+        LibraryInventory.CreateItem(BOMComponentItem);
+        BOMComponent.Init();
+        BOMComponent."Parent Item No." := BOMItem."No.";
+        BOMComponent."No." := BOMComponentItem."No.";
+        BOMComponent."Line No." := 10000;
+        BOMComponent.Insert();
+
+        BOMItem."Assembly Policy" := "Assembly Policy"::"Assemble-to-Order";
+        BOMItem."Replenishment System" := "Replenishment System"::Assembly;
+        BOMItem.Modify();
+    end;
+    #endregion ModifyItemWithBOMAndAssemblyPolicy
 }
