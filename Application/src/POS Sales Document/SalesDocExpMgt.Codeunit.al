@@ -467,8 +467,14 @@
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
+#ENDIF
         SalesPriceRecalculated: Boolean;
     begin
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        BindSubscription(ManulBoundEventSubMgt);
+#ENDIF
         if SaleLinePOS.FindSet() then
             repeat
                 SalesLine.Init();
@@ -496,6 +502,8 @@
                     else
                         if SalesLine.Quantity <> SaleLinePOS.Quantity then
                             SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
+
+                    SalesLine.VAlidate("Qty. to Assemble to Order");
 
                     if (SalesLine."Unit Price" <> SaleLinePOS."Unit Price") and not SalesPriceRecalculated then begin
                         SalesLine."Line Discount %" := SaleLinePOS."Discount %";
@@ -567,6 +575,9 @@
                         NpRvSalesLine.Modify(true);
                     until NpRvSalesLine.Next() = 0;
             until SaleLinePOS.Next() = 0;
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        UnbindSubscription(ManulBoundEventSubMgt);
+#ENDIF
     end;
 
     procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
