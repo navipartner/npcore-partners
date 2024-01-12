@@ -265,6 +265,12 @@
             Caption = 'General Info Output Type';
             DataClassification = CustomerContent;
         }
+        field(180; "In-Transit Bin Code"; Code[10])
+        {
+            Caption = 'In-Transit Bin Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Bin" where("Bin Type" = const(SAFE));
+        }
     }
 
     keys

@@ -79,9 +79,14 @@
             var
                 Bin: Record "NPR POS Payment Bin";
                 POSUnit: Record "NPR POS Unit";
+                FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+                POSActionBinTransferB: Codeunit "NPR POS Action: Bin Transfer B";
+                DirectTransferNoAllowedErr: Label 'Direct bin transfers between POS units are not allowed. Please use an in-transit bin of type "Safe"';
             begin
                 Bin.Get(Rec."Move to Bin Code");
                 if (Bin."Bin Type" = Bin."Bin Type"::CASH_DRAWER) then begin
+                    if FeatureFlagsManagement.IsEnabled(POSActionBinTransferB.NewBinTransferFeatureFlag()) then
+                        Error(DirectTransferNoAllowedErr);
                     if (Bin."Attached to POS Unit No." = '') then
                         Error('Bin %1 must be attached to a POS Unit.', Bin."No.");
                     POSUnit.Get(Bin."Attached to POS Unit No.");
@@ -226,6 +231,18 @@
         {
             Caption = 'Transfer In';
             DataClassification = CustomerContent;
+        }
+        field(290; "Direct Transfer Dest. Bin Code"; Code[10])
+        {
+            Caption = 'Direct Transfer Dest. Bin Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Bin" where("Bin Type" = const(CASH_DRAWER));
+        }
+        field(295; "Direct Transf. Bin Jnl. Entry"; Integer)
+        {
+            Caption = 'Direct Transf. Bin Jnl. Entry';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR BinTransferJournal".EntryNo;
         }
     }
     keys
