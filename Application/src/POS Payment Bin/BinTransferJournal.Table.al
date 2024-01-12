@@ -128,6 +128,12 @@ table 6151584 "NPR BinTransferJournal"
             Caption = 'Created By';
             DataClassification = CustomerContent;
         }
+        Field(110; "Original TransferFromBinCode"; Code[10])
+        {
+            Caption = 'Original Trans. from Bin Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Bin"."No." where("Bin Type" = const(CASH_DRAWER));
+        }
         field(200; HasDenomination; Boolean)
         {
             Caption = 'Has Denomination';
@@ -199,6 +205,8 @@ table 6151584 "NPR BinTransferJournal"
 
     internal procedure DefaultDescription() AutoDesc: Text[80]
     begin
+        if "Original TransferFromBinCode" <> '' then
+            exit(CopyStr(StrSubstNo('Transfer %2 %1 / %3 -> %4', PaymentMethod, Amount, "Original TransferFromBinCode", TransferToBinCode), 1, MaxStrLen(AutoDesc)));
         exit(CopyStr(StrSubstNo('Transfer %2 %1 / %3 -> %4', PaymentMethod, Amount, TransferFromBinCode, TransferToBinCode), 1, MaxStrLen(AutoDesc)));
     end;
 }

@@ -155,6 +155,11 @@
                 group(BinTransferOUT)
                 {
                     Caption = 'Transfer OUT';
+                    field("In-Transit Bin Code"; Rec."In-Transit Bin Code")
+                    {
+                        ToolTip = 'Specifies the In-Transit bin code used as an intermediate bin when posting direct transfers between POS unit bins.';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("BT OUT: Bank Dep. Ref. Asgmt."; Rec."BT OUT: Bank Dep. Ref. Asgmt.")
                     {
                         Caption = 'Bank Deposit Ref. Asgmt. Method';

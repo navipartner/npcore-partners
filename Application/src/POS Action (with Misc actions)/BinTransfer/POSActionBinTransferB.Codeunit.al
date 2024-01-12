@@ -175,7 +175,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
 
         POSUnit.GetProfile(EndOfDayProfile);
         Response.Add('cashCount', GetCashCount(EndOfDayProfile, POSUnit."No.", WorkshiftCheckpoint."Entry No.", TransferDirection));
-        Response.Add('bins', EndOfDayUIHandler.GetAvailableBins(PosUnit."No."));
+        Response.Add('bins', EndOfDayUIHandler.GetAvailableBins(PosUnit."No.", (TransferDirection = TransferDirection::TransferOut) and (EndOfDayProfile."In-Transit Bin Code" <> '')));
         Response.Add('checkPointId', WorkshiftCheckpoint."Entry No.");
         Response.Add('direction', SelectStr(TransferDirection, TransferDirectionLbl));
         if TransferDirection = TransferDirection::TransferIn then begin
@@ -429,6 +429,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
     internal procedure ProcessBinTransfer(BinTransferFrontReturnedData: JsonToken; SalePOS: Record "NPR POS Sale"; PosUnitNo: Code[10]; BinNo: Code[10]; PrintTransfer: Boolean; var CheckpointEntryNo: Integer): Boolean
     var
         BinTransferSetup: Record "NPR Bin Transfer Profile";
+        EndOfDayProfile: Record "NPR POS End of Day Profile";
         PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         TempPmtBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary;
         POSUnit: Record "NPR POS Unit";
@@ -443,10 +444,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         WorkShiftCheckpoint.Get(CheckpointEntryNo);
         WorkShiftCheckpoint.TestField("POS Unit No.", PosUnitNo);
         POSUnit.Get(WorkShiftCheckpoint."POS Unit No.");
+        POSUnit.GetProfile(EndOfDayProfile);
 
         Transfers := JsonHelper.GetJsonToken(BinTransferFrontReturnedData, 'cashCount.transfer');
         TransferIn := JsonHelper.GetJText(BinTransferFrontReturnedData, 'direction', true) = 'IN';
-        TransferCashCountToBinCheckpoint(Transfers.AsArray(), WorkshiftCheckpoint."Entry No.", TransferIn, TempPmtBinCheckpoint);
+        TransferCashCountToBinCheckpoint(Transfers.AsArray(), WorkshiftCheckpoint."Entry No.", TransferIn, BinNo, EndOfDayProfile, TempPmtBinCheckpoint);
 
         if TempPmtBinCheckpoint.FindSet() then
             repeat
@@ -490,11 +492,12 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             until PmtBinCheckpoint.Next() = 0;
     end;
 
-    local procedure TransferCashCountToBinCheckpoint(Transfers: JsonArray; CheckpointEntryNo: Integer; TransferIn: Boolean; var TempPmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
+    local procedure TransferCashCountToBinCheckpoint(Transfers: JsonArray; CheckpointEntryNo: Integer; TransferIn: Boolean; TransferBaseBinNo: Code[10]; EndOfDayProfile: Record "NPR POS End of Day Profile"; var TempPmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
     var
         EndOfDayUIHandler: Codeunit "NPR End Of Day UI Handler";
         CountedPayment: JsonToken;
         AmtFactor: Integer;
+        IsDirectTransfer: Boolean;
     begin
         if TransferIn then
             AmtFactor := -1
@@ -509,7 +512,8 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             TempPmtBinCheckpoint."Bank Deposit Reference" := JsonHelper.GetJText(CountedPayment, 'bankDepositReference', MaxStrLen(TempPmtBinCheckpoint."Bank Deposit Reference"), false);
             TempPmtBinCheckpoint."Move To Bin Code" := JsonHelper.GetJText(CountedPayment, 'binNo', MaxStrLen(TempPmtBinCheckpoint."Move To Bin Code"), false);
             TempPmtBinCheckpoint."Move To Bin Reference" := JsonHelper.GetJText(CountedPayment, 'binTransId', MaxStrLen(TempPmtBinCheckpoint."Move To Bin Reference"), false);
-#pragma warning restore AA0139            
+#pragma warning restore AA0139
+            IsDirectTransfer := CheckIfDirectTransfer(EndOfDayProfile, TempPmtBinCheckpoint);
             TempPmtBinCheckpoint."Bank Deposit Amount" := JsonHelper.GetJDecimal(CountedPayment, 'bankDepositAmount', false) * AmtFactor;
             TempPmtBinCheckpoint."Move To Bin Amount" := JsonHelper.GetJDecimal(CountedPayment, 'binAmount', false) * AmtFactor;
             TempPmtBinCheckpoint."Transfer In" := TransferIn;
@@ -521,7 +525,10 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             EndOfDayUIHandler.TransferDenominations(CountedPayment, 'bankDepositAmountCoinTypes', Enum::"NPR Denomination Target"::BankDeposit, TempPmtBinCheckpoint);
             EndOfDayUIHandler.TransferDenominations(CountedPayment, 'binAmountCoinTypes', Enum::"NPR Denomination Target"::MoveToBin, TempPmtBinCheckpoint);
 
-            UpdateBinTransferJnlLines(TempPmtBinCheckpoint);
+            if IsDirectTransfer then
+                CreateBinTransferJnlLine(TempPmtBinCheckpoint, TransferBaseBinNo)
+            else
+                UpdateBinTransferJnlLines(TempPmtBinCheckpoint);
         end;
     end;
 
@@ -564,6 +571,60 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             PmtBinCheckpoint."New Float Amount" := 0;
         if (PmtBinCheckpoint."Move to Bin Amount" <> 0) and (PmtBinCheckpoint."Include In Counting" = PmtBinCheckpoint."Include In Counting"::NO) then
             PmtBinCheckpoint."Include In Counting" := PmtBinCheckpoint."Include In Counting"::YES;
+    end;
+
+    local procedure CheckIfDirectTransfer(EndOfDayProfile: Record "NPR POS End of Day Profile"; var PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp."): Boolean
+    var
+        PmtBin: Record "NPR POS Payment Bin";
+    begin
+        if PmtBinCheckpoint."Move To Bin Code" = '' then
+            exit(false);
+        PmtBin.Get(PmtBinCheckpoint."Move To Bin Code");
+        if PmtBin."Bin Type" <> PmtBin."Bin Type"::CASH_DRAWER then
+            exit(false);
+
+        EndOfDayProfile.TestField("In-Transit Bin Code");
+        PmtBinCheckpoint."Direct Transfer Dest. Bin Code" := PmtBinCheckpoint."Move To Bin Code";
+        PmtBinCheckpoint."Move To Bin Code" := EndOfDayProfile."In-Transit Bin Code";
+        exit(true);
+    end;
+
+    internal procedure CreateBinTransferJnlLine(var PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp."; OriginalTransferFromBinCode: Code[10])
+    var
+        BinTransferJnlLine: Record "NPR BinTransferJournal";
+        BinTransferSetup: Record "NPR Bin Transfer Profile";
+        PmtBin: Record "NPR POS Payment Bin";
+        POSUnit: Record "NPR POS Unit";
+        BinTransferAnPost: Codeunit "NPR BinTransferPost";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+    begin
+        if PmtBinCheckpoint."Direct Transfer Dest. Bin Code" = '' then
+            exit;
+        PmtBinCheckpoint.TestField("Direct Transf. Bin Jnl. Entry", 0);
+        PmtBinCheckpoint.TestField("Move to Bin Code");
+        PmtBin.Get(PmtBinCheckpoint."Direct Transfer Dest. Bin Code");
+        PmtBin.TestField("Attached to POS Unit No.");
+        POSUnit.Get(PmtBin."Attached to POS Unit No.");
+        if not BinTransferSetup.Get() then
+            BinTransferSetup.Init();
+
+        BinTransferJnlLine.Init();
+        BinTransferJnlLine.StoreCode := POSUnit."POS Store Code";
+        BinTransferJnlLine.TransferFromBinCode := PmtBinCheckpoint."Move to Bin Code";
+        BinTransferJnlLine."Original TransferFromBinCode" := OriginalTransferFromBinCode;
+        BinTransferJnlLine.ReceiveAtPosUnitCode := POSUnit."No.";
+        BinTransferJnlLine.TransferToBinCode := PmtBinCheckpoint."Direct Transfer Dest. Bin Code";
+        BinTransferJnlLine.PaymentMethod := PmtBinCheckpoint."Payment Method No.";
+        BinTransferJnlLine.Amount := PmtBinCheckpoint."Move To Bin Amount";
+        BinTransferJnlLine.ExternalDocumentNo := CopyStr(PmtBinCheckpoint."Move To Bin Reference", 1, MaxStrLen(BinTransferJnlLine.ExternalDocumentNo));
+        BinTransferJnlLine.DocumentNo := NoSeriesMgt.GetNextNo(BinTransferSetup.DocumentNoSeries, Today(), true);
+        BinTransferJnlLine.EntryNo := 0;
+        BinTransferJnlLine.Insert(true);
+        TransferDenominations(PmtBinCheckpoint, Enum::"NPR Denomination Target"::MoveToBin, BinTransferJnlLine);
+        BinTransferAnPost.SetReleased(BinTransferJnlLine.EntryNo, true);
+
+        PmtBinCheckpoint."Direct Transf. Bin Jnl. Entry" := BinTransferJnlLine.EntryNo;
+        PmtBinCheckpoint.Modify();
     end;
 
     local procedure UpdateBinTransferJnlLines(PmtBinCheckpoint: Record "NPR POS Payment Bin Checkp.")
