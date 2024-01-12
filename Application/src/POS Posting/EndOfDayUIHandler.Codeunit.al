@@ -304,7 +304,7 @@
         CashCount.Add('closingAndTransfer', GetClosingAndTransfer());
     end;
 
-    local procedure GetBins(BinType: Option; PosUnitNo: Code[10]) BinList: JsonArray
+    local procedure GetBins(BinType: Option; PosUnitNo: Code[10]; IncludedCashDrawerBins: Boolean) BinList: JsonArray
     var
         Bin: JsonObject;
         Bins: Record "NPR POS Payment Bin";
@@ -312,24 +312,31 @@
         if (BinType = 1) then
             Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::BANK);
         if (BinType = 2) then
-            Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::SAFE);
+            if IncludedCashDrawerBins then
+                Bins.SetFilter("Bin Type", '=%1|=%2', Bins."Bin Type"::CASH_DRAWER, Bins."Bin Type"::SAFE)
+            else
+                Bins.SetFilter("Bin Type", '=%1', Bins."Bin Type"::SAFE);
 
-        Bins.SetFilter("Attached to POS Unit No.", '=%1|=%2', '', PosUnitNo);
         if (Bins.FindSet()) then begin
             repeat
-                Bin.ReadFrom('{}');
-                Bin.Add('binCode', Bins."No.");
-                Bin.Add('description', Bins.Description);
-                BinList.Add(Bin);
+                if ((Bins."Bin Type" in [Bins."Bin Type"::BANK, Bins."Bin Type"::SAFE]) and (Bins."Attached to POS Unit No." in ['', PosUnitNo]))
+                   or
+                   ((Bins."Bin Type" = Bins."Bin Type"::CASH_DRAWER) and (Bins."Attached to POS Unit No." <> PosUnitNo))  //only applicable for transfer outs
+                then begin
+                    Bin.ReadFrom('{}');
+                    Bin.Add('binCode', Bins."No.");
+                    Bin.Add('description', Bins.Description);
+                    BinList.Add(Bin);
+                end;
             until (Bins.Next() = 0);
         end;
     end;
 
-    procedure GetAvailableBins(PosUnitNo: Code[10]) Bins: JsonObject
+    procedure GetAvailableBins(PosUnitNo: Code[10]; IncludedCashDrawerBins: Boolean) Bins: JsonObject
     begin
         Bins.ReadFrom('{}');
-        Bins.Add('bankBins', GetBins(1, PosUnitNo));
-        Bins.Add('otherBins', GetBins(2, PosUnitNo));
+        Bins.Add('bankBins', GetBins(1, PosUnitNo, false));
+        Bins.Add('otherBins', GetBins(2, PosUnitNo, IncludedCashDrawerBins));
     end;
 
     local procedure BalancingGetState(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -348,7 +355,7 @@
         Response.Add('caption', StrSubstNo(ResponseLbl, _POSWorkShiftCheckpoint.TableCaption(), _POSWorkShiftCheckpoint."Entry No."));
         Response.Add('statistics', GetStatistics());
         Response.Add('cashCount', GetCashCount(EndOfDayProfile, _POSWorkShiftCheckpoint."POS Unit No."));
-        Response.Add('bins', GetAvailableBins(_POSWorkShiftCheckpoint."POS Unit No."));
+        Response.Add('bins', GetAvailableBins(_POSWorkShiftCheckpoint."POS Unit No.", false));
         Response.Add('isStatisticsEnabled', (EndOfDayProfile."Z-Report UI" = EndOfDayProfile."Z-Report UI"::SUMMARY_BALANCING));
         Response.Add('hideTurnover', EndOfDayProfile."Hide Turnover Section");
         Response.Add('backendContext', GetEndOfDayContext(Context));
