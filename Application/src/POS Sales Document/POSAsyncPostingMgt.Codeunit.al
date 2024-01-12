@@ -552,16 +552,7 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
             FromPOSRelatedPOSTransExist(SalesHeader);
     end;
 #ENDIF
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeCopySalesDocument', '', false, false)]
-    local procedure OnBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20]; var ToSalesHeader: Record "Sales Header"; var IsHandled: Boolean);
-    begin
-        //Prevent unposted document from being copied
-        if not AsyncPostingEnabled() then
-            exit;
-        CheckBeforeCopySalesDocument(FromDocumentType, FromDocumentNo);
-    end;
-#ELSE
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Copy Document Mgt.", 'OnBeforeCopySalesDocument', '', false, false)]
     local procedure OnBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20]; var ToSalesHeader: Record "Sales Header");
     begin
@@ -570,7 +561,7 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
             exit;
         CheckBeforeCopySalesDocument(FromDocumentType, FromDocumentNo);
     end;
-#ENDIF
+
     internal procedure CheckBeforeCopySalesDocument(FromDocumentType: Option; FromDocumentNo: Code[20])
     var
         SalesHeader: Record "Sales Header";
