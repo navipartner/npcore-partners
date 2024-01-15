@@ -138,6 +138,6 @@
     var
         MixedDiscount: Record "NPR Mixed Discount";
     begin
-        exit(MixedDiscount.Get(MixedDiscount.Code) and ((MixedDiscount."Starting date" <= _Date) and (MixedDiscount."Ending date" >= _Date)));
+        exit(MixedDiscount.Get(_Code) and ((MixedDiscount."Starting date" <= _Date) and (MixedDiscount."Ending date" >= _Date)));
     end;
 }
