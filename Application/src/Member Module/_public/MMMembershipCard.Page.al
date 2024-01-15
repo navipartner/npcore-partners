@@ -1,6 +1,6 @@
 ﻿page 6060137 "NPR MM Membership Card"
 {
-    Extensible = False;
+    Extensible = true;
     UsageCategory = None;
     Caption = 'Membership Card';
     ContextSensitiveHelpPage = 'docs/entertainment/loyalty/explanation/navigation_reports/';

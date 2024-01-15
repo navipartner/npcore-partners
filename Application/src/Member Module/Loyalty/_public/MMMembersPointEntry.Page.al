@@ -1,6 +1,6 @@
 ﻿page 6060104 "NPR MM Members. Point Entry"
 {
-    Extensible = False;
+    Extensible = true;
 
     Caption = 'Membership Point Entry';
     Editable = false;
