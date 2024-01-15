@@ -1,6 +1,6 @@
 ﻿page 6060127 "NPR MM Memberships"
 {
-    Extensible = False;
+    Extensible = true;
 
     Caption = 'Memberships';
     CardPageID = "NPR MM Membership Card";
