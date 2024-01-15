@@ -11,6 +11,7 @@
         AssistedSetup.Remove(Page::"NPR Magento Wizard");
         AddRetailSetupsWizard();
         AddRestaurantSetupsWizard();
+        AddAttractionSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -58,6 +59,25 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Create Kitchen Layout", KitchenLayoutSetupTxt, AssistedSetupGroup::NPRetail);
     end;
 
+    local procedure AddAttractionSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        WelcomeVideoTxt: Label 'Welcome to Attraction Module';
+        ImportTicketRapidPackagesTxt: Label 'Download and Import Ticketing Data';
+        ImportMembershipRapidPackagesTxt: Label 'Download and Import Membership Data';
+        CreateTickesAndTicketItemsTxt: Label 'Create Tickets & Ticket Items';
+        TicketSetupWizardTxt: Label 'Welcome to Ticket Setup Wizard';
+        MembershipSetupWizardTxt: Label 'Welcome to Membership Setup Wizard';
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+    begin
+        AssistedSetup.Add(GetAppId(), Codeunit::"NPR Attraction Welcome Video", WelcomeVideoTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR TM Ticket Rapid Packages", ImportTicketRapidPackagesTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR MM Membership Rapid Pckg.", ImportMembershipRapidPackagesTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Create Tickets&TicketItems", CreateTickesAndTicketItemsTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Ticket Setup Wizard", TicketSetupWizardTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup Membership Wizard", MembershipSetupWizardTxt, AssistedSetupGroup::NPRetail);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -82,6 +102,7 @@
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Magento Wizard");
         RetailSetups();
         RestaurantSetups();
+        AttractionSetups();
     end;
 
     #region Retail
@@ -783,9 +804,226 @@
 
     #endregion
 
+    #region Attraction
+
+    local procedure AttractionSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant,Attraction;
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Attraction)) then
+            exit;
+
+        RemoveAttractionGuidedExperience();
+
+        AddAttractionSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Attraction));
+    end;
+
+    local procedure RemoveAttractionGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR MM Membership Rapid Pckg.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR TM Ticket Rapid Packages");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Tickets&TicketItems");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup Membership Wizard");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Ticket Setup Wizard");
+    end;
+
+    local procedure AddAttractionSetupsWizard()
+    begin
+        CreateAttractionWelcomeVideo();
+        ImportTicketingDataWizard();
+        ImportMembershipDataWizard();
+        CreateTicketsAndTicketItemsWizard();
+        RunTicketWizard();
+        SetupMemberAndMemberships();
+    end;
+
+    local procedure CreateAttractionWelcomeVideo()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Welcome Video Attraction', Locked = true;
+        SetupDescriptionTxt: Label 'Welcome Video Attraction', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Attraction Welcome Video") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Codeunit,
+                                                Codeunit::"NPR Attraction Welcome Video",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+
+    end;
+
+    local procedure ImportTicketingDataWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Download and Import Ticketing Data', Locked = true;
+        SetupDescriptionTxt: Label 'Download & Import Data', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR TM Ticket Rapid Packages") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR TM Ticket Rapid Packages",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure ImportMembershipDataWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Download and Import Membership Data', Locked = true;
+        SetupDescriptionTxt: Label 'Download & Import Data', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR MM Membership Rapid Pckg.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR MM Membership Rapid Pckg.",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure CreateTicketsAndTicketItemsWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Create Tickets & Ticket Items', Locked = true;
+        SetupDescriptionTxt: Label 'Create Tickets and Ticket Items', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create Tickets&TicketItems") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Create Tickets&TicketItems",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Create Tickets&TicketItems", 'OnAfterFinishStep', '', false, false)]
+    local procedure CreateTicketsAndTicketItemsWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateCreateTicketsAndTicketItemsWizardStatus();
+    end;
+
+    local procedure UpdateCreateTicketsAndTicketItemsWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create Tickets&TicketItems");
+    end;
+
+    local procedure RunTicketWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Ticket Wizard', Locked = true;
+        SetupDescriptionTxt: Label 'Ticket Setup Wizard', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Ticket Setup Wizard") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Ticket Setup Wizard",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Ticket Setup Wizard", 'OnAfterFinishStep', '', false, false)]
+    local procedure TicketSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateTicketSetupWizardStatus();
+    end;
+
+    local procedure UpdateTicketSetupWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Ticket Setup Wizard");
+    end;
+
+    local procedure SetupMemberAndMemberships()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Memberships', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Memberships', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup Membership Wizard") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup Membership Wizard",
+                                                AssistedSetupGroup::NPRAttraction,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup Membership Wizard", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupMembershipWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupMembershipWizardStatus();
+    end;
+
+    local procedure UpdateSetupMembershipWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup Membership Wizard");
+    end;
+
+    #endregion
+
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -794,10 +1032,13 @@
             Modul::Restaurant:
                 //For Any change, increase version
                 exit('NPR-Checklist-Restaurant-v1.5');
+            Modul::Attraction:
+                //For Any change, increase version
+                exit('NPR-Checklist-Attraction-v1.0');
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -806,6 +1047,9 @@
             Modul::Restaurant:
                 //For Any change, increase version
                 exit('NPR-AssistedSetup-Restaurant-v1.5');
+            Modul::Attraction:
+                //For Any change, increase version
+                exit('NPR-AssistedSetup-Attraction-v1.0');
         end;
     end;
 
