@@ -154,6 +154,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'PrepareFeatureFlags'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Flags Upgrade", 'CleanAndRecreateGetFeatureFlagJobQueueEntry'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Input Box Events", 'UpgradeTicketArrivalActionCode'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'add-salesperson-to-bg-sis-audit-log'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -580,6 +581,11 @@
                 case UpgradeStep of
                     'UpgradeTicketArrivalActionCode':
                         exit('NPR-UpgradeTicketArrivalActionCode-20240111');
+                end;
+            Codeunit::"NPR BG SIS Upgrade":
+                case UpgradeStep of
+                    'add-salesperson-to-bg-sis-audit-log':
+                        exit('NPR-add-salesperson-to-bg-sis-audit-log-20240111');
                 end;
         end;
     end;

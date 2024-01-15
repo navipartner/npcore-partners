@@ -60,6 +60,11 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies the POS unit number from which the related record was created.';
                 }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the salesperson which created this record.';
+                }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;

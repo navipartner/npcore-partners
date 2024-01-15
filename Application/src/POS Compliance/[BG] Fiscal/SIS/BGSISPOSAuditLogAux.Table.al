@@ -23,7 +23,7 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         {
             Caption = 'POS Entry No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Entry"."Entry No.";
+            TableRelation = "NPR POS Entry";
         }
         field(4; "Entry Date"; Date)
         {
@@ -52,6 +52,12 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         {
             Caption = 'Amount Incl. Tax';
             DataClassification = CustomerContent;
+        }
+        field(9; "Salesperson Code"; Code[20])
+        {
+            Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser";
         }
         field(10; "Grand Receipt No."; Text[10])
         {
@@ -110,7 +116,7 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
 
     fieldgroups
     {
-        fieldgroup(Brick; "POS Entry No.", "Entry Date", "POS Store Code", "POS Unit No.", "Source Document No.", "Amount Incl. Tax", "Grand Receipt No.")
+        fieldgroup(Brick; "POS Entry No.", "Entry Date", "POS Unit No.", "Salesperson Code", "Source Document No.", "Amount Incl. Tax", "Grand Receipt No.")
         {
 
         }
