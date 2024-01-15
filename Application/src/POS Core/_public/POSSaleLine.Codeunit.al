@@ -256,8 +256,12 @@
             Rec.UpdateAmounts(Rec);
             Rec.Modify();
         end;
-        OnAfterDeletePOSSaleLine(LocalxRec);
 
+        OnAfterDeletePOSSaleLineBeforeCommit(Rec, LocalxRec);
+        OnAfterDeletePOSSaleLine(LocalxRec);
+        Commit();
+
+        OnAfterDeletePOSSaleLineAfterCommit(Rec, LocalxRec);
         POSSale.RefreshCurrent();
     end;
 
@@ -321,9 +325,14 @@
         xRec := Rec;
         Rec.Validate(Quantity, Quantity);
         Rec.Modify(true);
-        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
-        OnAfterSetQuantity(Rec);
 
+        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
+
+        OnAfterSetQuantityBeforeCommit(Rec, xRec);
+        OnAfterSetQuantity(Rec);
+        Commit();
+
+        OnAfterSetQuantityAfterCommit(Rec, xRec);
         POSSale.RefreshCurrent();
     end;
 
@@ -337,9 +346,14 @@
         xRec := Rec;
         Rec.Validate("Unit of Measure Code", UoMCode);
         Rec.Modify(true);
-        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
-        OnAfterSetUoM(Rec);
 
+        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
+
+        OnAfterSetUoMBeforeCommit(Rec, xRec);
+        OnAfterSetUoM(Rec);
+        Commit();
+
+        OnAfterSetUoMAfterCommit(Rec, xRec);
         POSSale.RefreshCurrent();
     end;
 
@@ -366,9 +380,14 @@
         xRec := Rec;
         Rec.Validate("Location Code", LocationCode);
         Rec.Modify(true);
-        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
-        OnAfterSetLocation(Rec);
 
+        POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(Rec, xRec);
+
+        OnAfterSetLocationBeforeCommit(Rec, xRec);
+        OnAfterSetLocation(Rec);
+        Commit();
+
+        OnAfterSetLocationAfterCommit(Rec, xRec);
         POSSale.RefreshCurrent();
     end;
 
@@ -603,22 +622,41 @@
         Rec.UpdateAmounts(Rec);
         if (not (Rec.GetSkipCalcDiscount())) then
             POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOS(Rec);
+
+        OnAfterInsertPOSSaleLineBeforeWorkflows(Rec);
+
         POSIssueOnSale.AddNewSaleCoupons(Rec);
         HTMLDisplay.UpdateHTMLDisplay();
         POSProxyDisplay.UpdateDisplay(Rec);
         TicketRetailMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
+
+        OnAfterInsertPOSSaleLineBeforeCommit(Rec);
         OnAfterInsertPOSSaleLine(Rec);
+        Commit();
+
+        OnAfterInsertPOSSaleLineAfterCommit(Rec);
         POSSale.RefreshCurrent();
 
         Line := Rec;
     end;
 
     //--- Publishers ---
-
+    [Obsolete('Not used. Use OnAfterDeletePOSSaleLineBeforeCommit or OnAfterDeletePOSSaleLineAfterCommit instead.', 'NPR30.0')]
     [IntegrationEvent(true, false)]
     internal procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterDeletePOSSaleLineBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterDeletePOSSaleLineAfterCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
@@ -632,18 +670,54 @@
     begin
     end;
 
+    [Obsolete('Not used. Use OnAfterSetQuantityBeforeCommit or OnAfterSetQuantityAfterCommit instead.', 'NPR30.0')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetQuantityBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetQuantityAfterCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [Obsolete('Not used. Use OnAfterSetUoMBeforeCommit or OnAfterSetUoMAfterCommit instead.', 'NPR30.0')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetUoM(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetUoMBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetUoMAfterCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [Obsolete('Not used. Use OnAfterSetLocationBeforeCommit or OnAfterSetLocationAfterCommit instead.', 'NPR30.0')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetLocation(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetLocationBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    procedure OnAfterSetLocationAfterCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
@@ -751,8 +825,26 @@
     begin
     end;
 
+    [Obsolete('Not used. Use OnAfterInsertPOSSaleLineBeforeCommit or OnAfterInsertPOSSaleLineAfterCommit instead.', 'NPR30.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInsertPOSSaleLineBeforeWorkflows(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInsertPOSSaleLineBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInsertPOSSaleLineAfterCommit(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
