@@ -87,6 +87,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux."POS Unit No." := POSUnit."No.";
         BGSISPOSAuditLogAux."Source Document No." := POSEntry."Document No.";
         BGSISPOSAuditLogAux."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
+        BGSISPOSAuditLogAux."Salesperson Code" := POSEntry."Salesperson Code";
 
         case true of
             BGSISPOSAuditLogAux."Amount Incl. Tax" > 0:
