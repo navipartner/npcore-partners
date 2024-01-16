@@ -37,6 +37,10 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
         DescPrintTaxFreeVoucher: Label 'Printing of the tax free voucher';
         CaptionPrintRetailVoucher: Label 'Print Retail Voucher';
         DescPrintRetailVoucher: Label 'Printing of the retail voucher';
+        CaptionIssueDigitalReceipt: Label 'Issue Digital Receipts';
+        DescIssueDigitalReceipts: Label 'Issuing of the digital receipts';
+        CaptionPrintPhysicalReceipts: Label 'Print Physical Receipts';
+        DescPrintPhysicalReceipts: Label 'Printing of the physical receipts';
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -49,6 +53,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
                                         CaptionSetting,
                                         DescSetting,
                                         OptionCptSetting);
+        WorkflowConfig.AddBooleanParameter('Print Physical Receipts', true, CaptionPrintPhysicalReceipts, DescPrintPhysicalReceipts);
         WorkflowConfig.AddBooleanParameter('Print Tickets', false, CaptionPrintTickets, DescPrintTickets);
         WorkflowConfig.AddBooleanParameter('Print Memberships', false, CaptionPrintMemberships, DescPrintMemberships);
         WorkflowConfig.AddBooleanParameter('Print Terminal Receipt', false, CaptionPrintTerminalReceipt, DescPrintTerminalReceipt);
@@ -79,6 +84,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
                                         OptionCptObfuscationMethod);
         WorkflowConfig.AddBooleanParameter('Print Tax Free Voucher', false, CaptionPrintTaxFreeVoucher, DescPrintTaxFreeVoucher);
         WorkflowConfig.AddBooleanParameter('Print Retail Voucher', false, CaptionPrintRetailVoucher, DescPrintRetailVoucher);
+        WorkflowConfig.AddBooleanParameter('Issue Digital Receipts', false, CaptionIssueDigitalReceipt, DescIssueDigitalReceipts);
         WorkflowConfig.AddLabel('EnterReceiptNoLbl', EnterReceiptNoLbl);
     end;
 
@@ -86,24 +92,28 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintRcpt.js###
-'let main=async({workflow:n,popup:l,parameters:i,captions:e})=>{if(i.SelectionDialogType==i.SelectionDialogType.TextField&&(i.Setting==i.Setting["Choose Receipt"]||i.Setting==i.Setting["Choose Receipt Large"])){var t=await l.input({title:e.Title,caption:e.EnterReceiptNoLbl,value:""});if(t==null)return" "}await n.respond("ManualReceiptNo",{ManualReceiptNo:t})};'
+'let main=async({workflow:e,popup:o,parameters:i,captions:t})=>{debugger;if(!(i["Issue Digital Receipts"]||i["Print Physical Receipts"]))return;if(i.SelectionDialogType==i.SelectionDialogType.TextField&&(i.Setting==i.Setting["Choose Receipt"]||i.Setting==i.Setting["Choose Receipt Large"])){var n=await o.input({title:t.Title,caption:t.EnterReceiptNoLbl,value:""});if(n==null)return" "}const{qrCodeLink:l}=await e.respond("ManualReceiptNo",{ManualReceiptNo:n});l&&await e.run("VIEW_DIG_RCPT_QRCODE",{parameters:{qrCodeLink:l}})};'
         );
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogicRun: Codeunit "NPR POS Action: Print Rcpt.-B";
+        POSUnit: Record "NPR POS Unit";
         SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large";
         ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
         SelectionDialogType: Option TextField,List;
         PresetTableView: Text;
+        SalesTicketNo: Code[20];
         ManualReceiptNo: Code[20];
         ObfuscationMethod: Option None,MI;
+        PrintPhysicalReceipts: Boolean;
         PrintTickets: Boolean;
         PrintMemberships: Boolean;
         PrintRetailVoucher: Boolean;
         PrintTerminalReceipt: Boolean;
         PrintTaxFreeVoucher: Boolean;
+        IssueDigitalReceipts: Boolean;
     begin
         SettingOption := Context.GetIntegerParameter('Setting');
         ReceiptListFilterOption := Context.GetIntegerParameter('ReceiptListFilter');
@@ -116,22 +126,47 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
             ManualReceiptNo := Context.GetString('ManualReceiptNo');
 #pragma warning restore
         ObfuscationMethod := Context.GetIntegerParameter('ObfuscationMethod');
+        PrintPhysicalReceipts := Context.GetBooleanParameter('Print Physical Receipts');
         PrintTickets := Context.GetBooleanParameter('Print Tickets');
         PrintMemberships := Context.GetBooleanParameter('Print Memberships');
         PrintRetailVoucher := Context.GetBooleanParameter('Print Retail Voucher');
         PrintTerminalReceipt := Context.GetBooleanParameter('Print Terminal Receipt');
         PrintTaxFreeVoucher := Context.GetBooleanParameter('Print Tax Free Voucher');
-        BusinessLogicRun.PrintReceipt(SettingOption,
-                                    ReceiptListFilterOption,
-                                    PresetTableView,
-                                    SelectionDialogType,
-                                    ManualReceiptNo,
-                                    ObfuscationMethod,
-                                    PrintTickets,
-                                    PrintMemberships,
-                                    PrintRetailVoucher,
-                                    PrintTerminalReceipt,
-                                    PrintTaxFreeVoucher);
+        IssueDigitalReceipts := Context.GetBooleanParameter('Issue Digital Receipts');
+
+        if not (PrintPhysicalReceipts or IssueDigitalReceipts) then
+            exit;
+
+        Setup.GetPOSUnit(POSUnit);
+        SalesTicketNo := BusinessLogicRun.GetSalesTicketNo(Setup,
+                                                           POSUnit,
+                                                           SettingOption,
+                                                           ReceiptListFilterOption,
+                                                           PresetTableView,
+                                                           SelectionDialogType,
+                                                           ManualReceiptNo,
+                                                           ObfuscationMethod);
+        if PrintPhysicalReceipts then
+            BusinessLogicRun.PrintReceipt(Setup,
+                                          POSUnit,
+                                          SalesTicketNo,
+                                          PrintTickets,
+                                          PrintMemberships,
+                                          PrintRetailVoucher,
+                                          PrintTerminalReceipt,
+                                          PrintTaxFreeVoucher);
+
+        FrontEnd.WorkflowResponse(PrepareDigitalReceiptWorkflow(IssueDigitalReceipts, SalesTicketNo));
+    end;
+
+    local procedure PrepareDigitalReceiptWorkflow(IssueDigitalReceipts: Boolean; SalesTicketNo: Code[20]) DigitalReceiptParameters: JsonObject
+    var
+        BusinessLogicRun: Codeunit "NPR POS Action: Print Rcpt.-B";
+        QrCodeLink: Text;
+    begin
+        if IssueDigitalReceipts then
+            QrCodeLink := BusinessLogicRun.GetDigitalReceiptQRCodeLink(SalesTicketNo);
+        DigitalReceiptParameters.Add('qrCodeLink', QrCodeLink);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

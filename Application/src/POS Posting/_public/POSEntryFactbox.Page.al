@@ -129,6 +129,11 @@
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies if there are any POS informations related to the POS Entry';
             }
+            field("POS Sales Digital Receipts"; Rec."POS Sales Digital Receipts")
+            {
+                ToolTip = 'Specifies the value of the POS Sales Digital Receipts field.';
+                ApplicationArea = NPRRetail;
+            }
             field("Images Exist"; Rec."Images Exist")
             {
                 ApplicationArea = NPRRetail;

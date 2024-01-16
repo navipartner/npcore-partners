@@ -91,7 +91,32 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     var
         EndSaleEvents: Codeunit "NPR End Sale Events";
     begin
+        if EndSaleSuccess then
+            AddDigitalReceiptWorkflow(Sale, PostWorkflows);
         EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
+    end;
+
+    local procedure AddDigitalReceiptWorkflow(Sale: Codeunit "NPR POS Sale"; var PostWorkflows: JsonObject)
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+    begin
+        Sale.GetLastSalePOSEntry(POSEntry);
+
+        POSUnit.SetLoadFields("POS Receipt Profile");
+        if not POSUnit.Get(POSEntry."POS Unit No.") then
+            exit;
+        POSReceiptProfile.SetLoadFields("Enable Digital Receipt");
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit;
+        if not POSReceiptProfile."Enable Digital Receipt" then
+            exit;
+
+        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Cancelled Sale"]) then
+            exit;
+
+        PostWorkflows.Add('ISSUE_DIG_RCPT', '');
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

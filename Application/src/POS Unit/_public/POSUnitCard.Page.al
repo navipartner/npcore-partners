@@ -166,6 +166,11 @@
                     ToolTip = 'Configure Stockout warnings on the POS.';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Receipt Profile"; Rec."POS Receipt Profile")
+                {
+                    ToolTip = 'Specifies POS Receipt Profile on this POS Unit.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
