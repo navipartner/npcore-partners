@@ -1007,5 +1007,9 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeFinishSale(SalePOS: Record "NPR POS Sale")
+    begin
+    end;
     #endregion
 }
