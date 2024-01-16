@@ -161,6 +161,11 @@
             OptionCaption = 'Plain,HTML,Attachment,Wallet';
             OptionMembers = PLAIN,HTML,ATTACHMENT,WALLET;
         }
+        field(85; TicketHolderName; Text[100])
+        {
+            Caption = 'Ticket Holder Name';
+            DataClassification = CustomerContent;
+        }
         field(90; "DIY Print Order Requested"; Boolean)
         {
             Caption = 'DIY Print Order Requested';

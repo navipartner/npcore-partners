@@ -17,11 +17,14 @@
         {
             group(General)
             {
-                //The GridLayout property is only supported on controls of type Grid
-                //GridLayout = Columns;
                 group(Control6014411)
                 {
                     ShowCaption = false;
+                    field(TicketHolderName; Rec.TicketHolderName)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Ticket Holder Name field';
+                    }
                     field("Notification Method"; Rec."Notification Method")
                     {
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -184,19 +187,14 @@
 
     trigger OnAfterGetCurrRecord()
     begin
-
-        //-TM1.23 [284752]
         NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, DATABASE::"NPR TM Ticket Reservation Req.", Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-        //+TM1.23 [284752]
     end;
 
     trigger OnAfterGetRecord()
     begin
-        //-TM1.38 [332109]
-        //IF ("Notification Address" <> '') THEN BEGIN
+
         if ((Rec."Notification Address" <> '') or (SuggestNotificationMethod <> SuggestNotificationMethod::NA)) then begin
-            //+TM1.38 [332109]
 
             Rec."Notification Address" := SuggestNotificationAddress;
 
@@ -209,11 +207,13 @@
                     Rec."Notification Method" := Rec."Notification Method"::NA;
             end;
         end;
+
+        if (Rec.TicketHolderName <> '') then
+            Rec.TicketHolderName := SuggestTicketHolderName;
     end;
 
     trigger OnOpenPage()
     begin
-        //-TM1.23 [284752]
 
         NPRAttrManagement.GetAttributeVisibility(DATABASE::"NPR TM Ticket Reservation Req.", NPRAttrVisibleArray);
         NPRAttrVisible01 := NPRAttrVisibleArray[1];
@@ -228,7 +228,7 @@
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
         NPRAttrEditable := CurrPage.Editable();
-        //+TM1.23 [284752]
+
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -251,6 +251,7 @@
         RequireNotificationAddress: Boolean;
         SuggestNotificationMethod: Option NA,EMAIL,SMS;
         SuggestNotificationAddress: Text[100];
+        SuggestTicketHolderName: Text[100];
         NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
@@ -291,11 +292,12 @@
         RequireNotificationAddress := (Admission."Ticketholder Notification Type" = Admission."Ticketholder Notification Type"::REQUIRED);
     end;
 
-    internal procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100])
+    internal procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100]; Name: Text[100])
     begin
 
         SuggestNotificationMethod := Method;
         SuggestNotificationAddress := Address;
+        SuggestTicketHolderName := Name;
     end;
 }
 

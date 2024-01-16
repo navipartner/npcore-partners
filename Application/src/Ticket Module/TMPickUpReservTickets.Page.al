@@ -44,6 +44,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Payment Option field';
                 }
+                field(TicketHolderName; Rec.TicketHolderName)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Holder Name field';
+                }
                 field("Notification Method"; Rec."Notification Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

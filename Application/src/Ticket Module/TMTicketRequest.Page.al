@@ -118,6 +118,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Receipt No. field';
                 }
+                field(TicketHolderName; Rec.TicketHolderName)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Holder Name field';
+                }
                 field("Notification Address"; Rec."Notification Address")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

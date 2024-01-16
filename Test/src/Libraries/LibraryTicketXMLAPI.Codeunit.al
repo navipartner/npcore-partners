@@ -200,6 +200,11 @@ codeunit 85012 "NPR Library - Ticket XML API"
     end;
 
     procedure ConfirmTicketReservation(Token: Text[100]; SendNotificationTo: Text; ExternalOrderNo: Text; ScannerStation: Code[20]; var TmpResultingTickets: Record "NPR TM Ticket" temporary; var ResponseMessage: Text) ConfirmationStatus: Boolean
+    begin
+        exit(ConfirmTicketReservation(Token, SendNotificationTo, ExternalOrderNo, '', ScannerStation, TmpResultingTickets, ResponseMessage));
+    end;
+
+    procedure ConfirmTicketReservation(Token: Text[100]; SendNotificationTo: Text; ExternalOrderNo: Text; TicketHolderName: Text[100]; ScannerStation: Code[20]; var TmpResultingTickets: Record "NPR TM Ticket" temporary; var ResponseMessage: Text) ConfirmationStatus: Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
@@ -234,6 +239,8 @@ codeunit 85012 "NPR Library - Ticket XML API"
             TicketTokens.Add(AddElement('send_notification_to', SendNotificationTo, NameSpace));
         if (ExternalOrderNo <> '') then
             TicketTokens.Add(AddElement('external_order_no', ExternalOrderNo, NameSpace));
+        if (TicketHolderName <> '') then
+            TicketTokens.Add(AddElement('ticket_holder_name', TicketHolderName, NameSpace));
 
         Tickets := XmlElement.Create('tickets', NameSpace);
         Tickets.Add(TicketTokens);

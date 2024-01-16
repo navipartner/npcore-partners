@@ -574,6 +574,8 @@ codeunit 85174 "NPR TM ImportTicketTest"
             TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
             Assert.AreEqual(TicketImportLine.TicketRequestToken, TicketRequest."Session Token ID", TicketRequest.FieldCaption("Session Token ID"));
             Assert.AreEqual(TicketImportLine.TicketRequestTokenLine, TicketRequest."Ext. Line Reference No.", TicketRequest.FieldCaption("Ext. Line Reference No."));
+            Assert.AreEqual(TicketImportLine.TicketHolderName, TicketRequest.TicketHolderName, TicketRequest.FieldCaption(TicketHolderName));
+            Assert.AreEqual(TicketImportLine.TicketHolderEMail, TicketRequest."Notification Address", TicketRequest.FieldCaption("Notification Address"));
             TicketRequest.TestField("Admission Code");
 
         until (TicketImportLine.Next() = 0);
@@ -673,8 +675,13 @@ codeunit 85174 "NPR TM ImportTicketTest"
                 TicketLibrary.GenerateRandomCode(TempTicketImport.PaymentReference, MaxStrLen(TempTicketImport.PaymentReference));
 
             TempTicketImport.CurrencyCode := CurrencyCode;
+            TicketLibrary.GenerateRandomText(TempTicketImport.TicketHolderEMail, MaxStrLen(TempTicketImport.TicketHolderEMail));
+            TempTicketImport.TicketHolderEMail[3 + Random(10)] := '@';
+            TempTicketImport.TicketHolderEMail[StrLen(TempTicketImport.TicketHolderEMail) - 3] := '.';
+            TicketLibrary.GenerateRandomText(TempTicketImport.TicketHolderName, MaxStrLen(TempTicketImport.TicketHolderName));
 
             for TicketIndex := 1 to TicketsPerOrder do begin
+                TempTicketImportLine.Init();
                 TempTicketImportLine.OrderId := TempTicketImport.OrderId;
                 TempTicketImportLine.ItemReferenceNumber := ItemReference;
                 TempTicketImportLine.ExpectedVisitDate := ExpectedVisitDate;
@@ -682,10 +689,9 @@ codeunit 85174 "NPR TM ImportTicketTest"
 
                 TicketLibrary.GenerateRandomCode(TempTicketImportLine.PreAssignedTicketNumber, MaxStrLen(TempTicketImportLine.PreAssignedTicketNumber));
                 TicketLibrary.GenerateRandomText(TempTicketImportLine.Description, MaxStrLen(TempTicketImportLine.Description));
-                TicketLibrary.GenerateRandomText(TempTicketImportLine.TicketHolderEMail, MaxStrLen(TempTicketImportLine.TicketHolderEMail));
-                TempTicketImportLine.TicketHolderEMail[3 + Random(10)] := '@';
-                TempTicketImportLine.TicketHolderEMail[StrLen(TempTicketImportLine.TicketHolderEMail) - 3] := '.';
-                TicketLibrary.GenerateRandomText(TempTicketImportLine.TicketHolderName, MaxStrLen(TempTicketImportLine.TicketHolderName));
+
+                TempTicketImportLine.TicketHolderEMail := TempTicketImport.TicketHolderEMail;
+                TempTicketImportLine.TicketHolderName := TempTicketImport.TicketHolderName;
 
                 TempTicketImportLine.Amount := (1000 + Random(1000)) / 100;
                 TempTicketImportLine.AmountInclVat := TempTicketImportLine.Amount * VatRate;
