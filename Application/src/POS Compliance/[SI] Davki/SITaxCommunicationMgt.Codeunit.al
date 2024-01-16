@@ -342,6 +342,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         GetEORCodeFromResponse(SIPOSAuditLogAuxInfo, ResponseText);
         SaveResponseToAuditLog(SIPOSAuditLogAuxInfo, ResponseText);
 
+        ReverseBaseValueFormat(BaseValue);
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(BaseValue);
         TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
@@ -379,6 +380,11 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
             BaseValue += BaseChunk;
         end;
         BaseValue := BaseValue.Replace('"', '\"');
+    end;
+
+    local procedure ReverseBaseValueFormat(var BaseValue: Text)
+    begin
+        BaseValue := BaseValue.Replace('\"', '"');
     end;
 
     internal procedure GetEORCodeFromResponse(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; ResponseText: Text)
