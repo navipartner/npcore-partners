@@ -88,7 +88,7 @@ xmlport 6060137 "NPR MM Confirm Members. Pay."
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin

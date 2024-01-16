@@ -505,7 +505,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
                 end;
@@ -626,7 +626,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+                    MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
                     MembershipSetup: Record "NPR MM Membership Setup";
                     ConfirmLbl: Label 'This action will attempt to delete the membership and its related information. It can not be undone. ';
                 begin
@@ -901,7 +901,7 @@
 
     trigger OnAfterGetCurrRecord()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidFromDate: Date;
         ValidUntilDate: Date;
         MaxValidUntilDate: Date;
@@ -998,7 +998,7 @@
         GuardianMember: Record "NPR MM Member";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ResponseMessage: Text;
     begin
 
@@ -1046,7 +1046,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MemberInfoCapture."Membership Entry No." := Rec."Entry No.";
@@ -1093,7 +1093,7 @@
 
     local procedure ActivateMembership()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -1119,7 +1119,7 @@
     local procedure AutoRenewMembership(MembershipEntryNo: Integer)
     var
         MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         TempMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         RenewStartDate: Date;

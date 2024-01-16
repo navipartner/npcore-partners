@@ -20,7 +20,7 @@
 
             trigger OnValidate()
             var
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 NotFoundReasonText: Text;
             begin
 

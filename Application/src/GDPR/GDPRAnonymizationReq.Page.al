@@ -204,7 +204,7 @@
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
     begin

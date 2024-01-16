@@ -144,7 +144,7 @@
 
     procedure AutoRenewOneMembership(InfoCaptureEntryNo: Integer; MembershipEntryNo: Integer; var TmpMembershipAutoRenew: Record "NPR MM Membership Auto Renew" temporary; var StartDate: Date; var UntilDate: Date; var RenewUnitPrice: Decimal; WithPostInvoice: Boolean) MemberInfoCaptureEntryNo: Integer
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         ReasonText: Text;
         MembershipRenewNotAllowedLbl: Label 'Membership is already valid on %1 and does not require auto-renew at this time.';

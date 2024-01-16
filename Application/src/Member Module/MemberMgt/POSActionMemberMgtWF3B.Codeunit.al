@@ -83,7 +83,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
     internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MEMBERSHIP_BLOCKED_NOT_FOUND: Label 'Membership %1 is either blocked or not found.', Comment = '%1= CardNo.';
         FailReasonText: Text;
     begin
@@ -157,7 +157,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipEvents: Codeunit "NPR MM Membership Events";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ExternalItemNo: Code[50];
         LogEntryNo: Integer;
@@ -295,7 +295,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         MembershipSelected: Boolean;
         Member: Record "NPR MM Member";
         ExtMemberNo: Code[20];
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         POSMemberCardEdit: Page "NPR MM Member Card";
         SelectingMemberError: Label 'There was an error selecting member %1:\\%2';
     begin
@@ -347,7 +347,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
     var
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberEntryNo: Integer;
         ExternalMemberCardNo: Text[100];
     begin
@@ -387,7 +387,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         SaleLinePOS: Record "NPR POS Sale Line";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfoEntryNo: Integer;
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
@@ -426,7 +426,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         MemberInfoCapture: Record "NPR MM Member Info Capture";

@@ -145,7 +145,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         VATPostingSetup: Record "VAT Posting Setup";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         Item: Record Item;
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
@@ -287,7 +287,7 @@
     local procedure ImportAddMembershipMember(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipEntryNo: Integer;
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -366,7 +366,7 @@
     local procedure ImportAddAnonymousMember(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
     begin
 
@@ -446,7 +446,7 @@
     local procedure ImportGetMemberQuery(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
@@ -529,7 +529,7 @@
     local procedure ImportUpdateMember(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Member: Record "NPR MM Member";
     begin
 
@@ -579,7 +579,7 @@
     local procedure ImportAddReplaceCardWorker(Element: XmlElement; DocumentID: Text[100])
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberNotification: Codeunit "NPR MM Member Notification";
         ReasonText: Text;
     begin
@@ -677,7 +677,7 @@
     local procedure ImportBlockMembership(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
     begin
 
@@ -733,7 +733,7 @@
     local procedure ImportBlockMember(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -804,7 +804,7 @@
     local procedure ImportChangeMembership(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
@@ -902,7 +902,7 @@
     local procedure ImportGetChangeMembershipItems(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MemberInfoCapture.Init();
@@ -951,7 +951,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipEntry: Record "NPR MM Membership Entry";
         TargetDocumentId: Text[100];
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MemberInfoCapture.Init();
@@ -1002,7 +1002,7 @@
     local procedure ImportGdprApprovalRequest(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipRole: Record "NPR MM Membership Role";
         GDPRManagement: Codeunit "NPR MM GDPR Management";
         ResponseMessage: Text;
@@ -1069,7 +1069,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberCard: Record "NPR MM Member Card";
         MembershipNotification: Record "NPR MM Membership Notific.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberNotification: Codeunit "NPR MM Member Notification";
         ResponseMessage: Text;
         NotificationEntryNo: Integer;

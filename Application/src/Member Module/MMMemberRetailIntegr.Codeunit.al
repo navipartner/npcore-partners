@@ -47,7 +47,7 @@
     local procedure POS_ValidateMemberCardNoWorker(FailWithError: Boolean; AllowVerboseMode: Boolean; InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; ActivateMembership: Boolean; var ExternalMemberCardNo: Text[100]; ForcedConfirmMember: Boolean): Boolean
     var
         MembershipEntryNo: Integer;
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
@@ -205,7 +205,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         NotFoundReasonText: Text;
     begin
 
@@ -248,7 +248,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         ShouldPrint: Boolean;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberCard: Record "NPR MM Member Card";
         MemberCard2: Record "NPR MM Member Card";
     begin
@@ -337,7 +337,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberEntryNo: Integer;
         MembershipEntryNo: Integer;
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
@@ -389,7 +389,7 @@
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
@@ -475,7 +475,7 @@
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
         InvalidTicketType: Label 'Item number %1 has no ticket type specified.';
@@ -888,7 +888,7 @@
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");

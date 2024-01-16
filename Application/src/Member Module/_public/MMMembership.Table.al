@@ -270,7 +270,7 @@
 
     trigger OnDelete()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MembershipManagement.DeleteMembership("Entry No.", false);
@@ -278,7 +278,7 @@
 
     trigger OnModify()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Community: Record "NPR MM Member Community";
     begin
         if (not (Community.Get("Community Code"))) then

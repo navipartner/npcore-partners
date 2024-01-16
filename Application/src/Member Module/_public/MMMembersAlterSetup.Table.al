@@ -37,7 +37,7 @@
             var
                 Item: Record Item;
                 MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
             begin
                 if "Sales Item No." <> '' then begin
                     MembershipSalesSetup.SetRange(Type, MembershipSalesSetup.Type::ITEM);
@@ -111,7 +111,7 @@
 
             trigger OnValidate()
             var
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
             begin
 
                 MembershipManagement.ApplyGracePeriodPreset(Rec."Grace Period Presets", Rec);

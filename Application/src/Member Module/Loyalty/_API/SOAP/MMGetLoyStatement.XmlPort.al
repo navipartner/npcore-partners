@@ -183,7 +183,7 @@ xmlport 6060145 "NPR MM Get Loy. Statement"
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin

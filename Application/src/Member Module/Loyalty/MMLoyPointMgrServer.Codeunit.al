@@ -187,7 +187,7 @@
         Membership: Record "NPR MM Membership";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         TmpAuthorizationIn.Reset();

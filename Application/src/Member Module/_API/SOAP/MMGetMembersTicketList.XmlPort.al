@@ -231,7 +231,7 @@ xmlport 6060133 "NPR MM Get Members. TicketList"
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin

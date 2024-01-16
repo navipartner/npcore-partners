@@ -104,7 +104,7 @@ xmlport 6060140 "NPR MM Confirm AutoRenew Pay."
     internal procedure AddResponse(RequestMemberInfoCapture: Record "NPR MM Member Info Capture")
     var
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         StartDate: Date;
         EndDate: Date;
         UnitPrice: Decimal;

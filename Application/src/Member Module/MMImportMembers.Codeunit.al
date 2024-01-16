@@ -344,7 +344,7 @@
     procedure insertMember(EntryNo: Integer)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberEntryNo: Integer;

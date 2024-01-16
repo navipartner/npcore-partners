@@ -219,7 +219,7 @@
     var
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         FromDate: Date;
         UntilDate: Date;
         NotActiveLbl: Label 'Not active for date %1', Comment = '%1 = Valid on Date';

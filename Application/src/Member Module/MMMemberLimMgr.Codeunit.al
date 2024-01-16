@@ -15,7 +15,7 @@
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         LogEntryNo: Integer;
     begin
 
@@ -117,7 +117,7 @@
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         NewResponseMessage: Text;
         NewResponseCode: Integer;
         MembershipNotFoundLbl: Label 'Membership not found.';
@@ -413,7 +413,7 @@
 
     local procedure IsTemporaryCard(ExternalCardNo: Code[100]): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberCard: Record "NPR MM Member Card";
     begin
 

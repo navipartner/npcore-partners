@@ -495,7 +495,7 @@
         MembershipNotification: Record "NPR MM Membership Notific.";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
         MemberNotification: Codeunit "NPR MM Member Notification";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         EntryNo: Integer;
         MissingWalletCount: Integer;
         Window: Dialog;
@@ -598,7 +598,7 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipNotification: Record "NPR MM Membership Notific.";
         MemberNotification: Codeunit "NPR MM Member Notification";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         EntryNo: Integer;
         UpdateWalletCount: Integer;
         Window: Dialog;

@@ -122,7 +122,7 @@ xmlport 6060139 "NPR MM Get AutoRenew Product"
     internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ResponseMessage: Text;
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin

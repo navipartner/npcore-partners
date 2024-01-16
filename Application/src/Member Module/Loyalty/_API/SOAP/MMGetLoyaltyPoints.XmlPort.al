@@ -234,7 +234,7 @@ xmlport 6060141 "NPR MM Get Loyalty Points"
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin

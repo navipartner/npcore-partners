@@ -434,7 +434,7 @@
     }
 
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         TEXT6060000: Label 'The %1 %2 is already in use.';
 
     internal procedure GetImageContent(var TenantMedia: Record "Tenant Media")

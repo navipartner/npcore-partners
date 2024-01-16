@@ -60,7 +60,7 @@
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         UnitPrice: Decimal;

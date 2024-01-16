@@ -26,7 +26,7 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
     internal procedure ProcessMemberUpdateQueue(AzureRegistrationSetupCode: Code[10]; var ProcessCount: Integer; var FailCount: Integer)
     var
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         QueueMessageListText: Text;
         XmlDoc: XmlDocument;
         MessageList: XmlElement;

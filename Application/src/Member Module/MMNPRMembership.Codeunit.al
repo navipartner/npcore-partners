@@ -420,7 +420,7 @@ codeunit 6060147 "NPR MM NPR Membership"
 
     local procedure CreateLocalMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
     begin
 

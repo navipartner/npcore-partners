@@ -38,7 +38,7 @@
 
     procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary; FailWithError: Boolean) Success: Boolean
     var
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         MembershipEntryNo: Integer;
         Membership: Record "NPR MM Membership";
@@ -137,7 +137,7 @@
 
     procedure PromptForMemberGuestArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; PosUnitNo: Code[10]; var TicketToken: Text[100]): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
         MemberEntryNo: Integer;
         ErrorReason: Text;
@@ -406,7 +406,7 @@
     var
         Member: Record "NPR MM Member";
         Admission: Record "NPR TM Admission";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Method: Code[10];
         NotificationEngine: Option;

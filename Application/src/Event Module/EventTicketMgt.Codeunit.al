@@ -295,7 +295,7 @@
     local procedure AcquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
     var
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         Member: Record "NPR MM Member";
         SuggestMethod: Option NA,EMAIL,SMS;
         SuggestAddress: Text[100];

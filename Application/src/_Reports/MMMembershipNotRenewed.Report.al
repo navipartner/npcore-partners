@@ -52,7 +52,7 @@
                 trigger OnAfterGetRecord()
                 var
                     MembershipEntry: Record "NPR MM Membership Entry";
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                     ValidForReferenceDate: Boolean;
                     ValidForReferenceDate2: Boolean;
                 begin

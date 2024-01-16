@@ -502,7 +502,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                     MemberCard: Record "NPR MM Member Card";
                     CardEntryNo: Integer;
                     ResponseMessage: Text;
@@ -556,7 +556,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.TakeMemberPicture(Rec);
                 end;

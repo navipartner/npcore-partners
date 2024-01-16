@@ -3,7 +3,7 @@
     Access = Internal;
     procedure MemberSearchWithFacialRecognition(var MemberEntryNo: Integer) MemberFound: Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Member: Record "NPR MM Member";
         RecRef: RecordRef;
         MCSPersonBusinessEntities: Record "NPR MCS Person Bus. Entit.";

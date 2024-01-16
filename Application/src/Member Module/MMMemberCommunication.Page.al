@@ -101,7 +101,7 @@
 
     local procedure CreateMemberDefaultSetup(MemberEntryNo: Integer)
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MembershipManagement.CreateMemberCommunicationDefaultSetup(MemberEntryNo);

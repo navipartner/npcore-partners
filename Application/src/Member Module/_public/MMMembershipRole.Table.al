@@ -33,7 +33,7 @@
             var
                 Contact: Record Contact;
                 MembershipRole: Record "NPR MM Membership Role";
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
             begin
                 Rec."Blocked At" := CreateDateTime(0D, 0T);
                 Rec."Blocked By" := '';

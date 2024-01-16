@@ -616,7 +616,7 @@
     end;
 
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         _SearchTerm: Text[100];
         CONFIRM_SYNC: Label 'Do you want to sync the customers and contacts for %1 memberships?';
         DisplayName: Text[200];

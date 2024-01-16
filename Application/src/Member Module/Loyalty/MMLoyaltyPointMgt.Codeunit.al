@@ -318,7 +318,7 @@
         MembershipEntry: Record "NPR MM Membership Entry";
         POSUnit: Record "NPR POS Unit";
         AwardPoints: Boolean;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         CreatePointEntry: Boolean;
     begin
 
@@ -1627,7 +1627,7 @@
     local procedure AlterMembership(MembershipEntryNo: Integer; LoyaltyAlterMembership: Record "NPR MM Loyalty Alter Members."): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         MembershipChangedLbl: Label 'Membership Change %1->%2 (%3)';
