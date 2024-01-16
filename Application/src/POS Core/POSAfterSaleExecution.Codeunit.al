@@ -17,6 +17,8 @@
                 end;
             OnRunType::OnFinishSale:
                 begin
+                    PosSaleCodeunit.OnBeforeFinishSale(Rec);
+                    Commit();
                     PosSaleCodeunit.OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
                     Commit();
                 end;
