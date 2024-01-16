@@ -220,18 +220,14 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     local procedure PrintItemCategoryPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        POSUnit: Record "NPR POS Unit";
         WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity : Decimal;
-        FromEntryNo: Integer;
+        WithItemCategoryPriceCheckedCounter, WithoutItemCategoryPriceCheckedCounter : Integer;
     begin
-        POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
-        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
-
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, ItemCategoryCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
-        PrintItemCategories(Printer, FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.", POSUnit, WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity);
+        PrintItemCategories(Printer, POSWorkshiftCheckpoint, WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity, WithItemCategoryPriceCheckedCounter, WithoutItemCategoryPriceCheckedCounter);
 
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
 
@@ -242,46 +238,92 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, UncategorizedSalesCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(Round(WithoutItemCategoryQuantity, 1, '='))), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithoutItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(PriceLookupQuantityCaptionLbl, Format(WithoutItemCategoryPriceCheckedCounter)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, CategorizedSalesCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(Round(WithItemCategoryQuantity, 1, '='))), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(PriceLookupQuantityCaptionLbl, Format(WithItemCategoryPriceCheckedCounter)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
-    local procedure PrintItemCategories(var Printer: Codeunit "NPR RP Line Print Mgt."; FromEntryNo: Integer; ToPOSEntryNo: Integer; POSUnit: Record "NPR POS Unit"; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal)
+    local procedure PrintItemCategories(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer)
+    var
+        POSUnit: Record "NPR POS Unit";
+        PreviousZReport: Record "NPR POS Workshift Checkpoint";
+        PreviousZReportDateTime: DateTime;
+        FromEntryNo: Integer;
+        AlreadyProcessedItemCategories: List of [Code[20]];
+    begin
+        POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
+        FromEntryNo := NOReportStatisticsMgt.FindFromEntryNo(POSUnit."No.", POSWorkshiftCheckpoint."Entry No.");
+
+        if NOReportStatisticsMgt.FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
+            PreviousZReportDateTime := PreviousZReport.SystemCreatedAt
+        else
+            PreviousZReportDateTime := POSWorkshiftCheckpoint.SystemCreatedAt;
+
+        PrintItemCategoriesBasedOnQuery(Printer, POSWorkshiftCheckpoint, POSUnit, PreviousZReportDateTime, FromEntryNo, WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity, WithItemCategoryPriceCheckedCounter, WithoutItemCategoryPriceCheckedCounter, AlreadyProcessedItemCategories);
+        PrintNotProcessedItemCategories(Printer, POSWorkshiftCheckpoint, PreviousZReportDateTime, WithItemCategoryPriceCheckedCounter, AlreadyProcessedItemCategories);
+    end;
+
+    local procedure PrintItemCategoriesBasedOnQuery(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSUnit: Record "NPR POS Unit"; PreviousZReportDateTime: DateTime; FromEntryNo: Integer; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
     var
         ItemCategory: Record "Item Category";
         ItemCategoryQuery: Query "NPR NO Sales By Item Category";
+        PriceCheckedCounter: Integer;
     begin
-        Clear(WithItemCategoryAmount);
-        Clear(WithItemCategoryQuantity);
-        Clear(WithoutItemCategoryAmount);
-        Clear(WithoutItemCategoryQuantity);
-
-        ItemCategoryQuery.SetFilter(EntryNo, '%1..%2', FromEntryNo, ToPOSEntryNo);
+        ItemCategoryQuery.SetFilter(EntryNo, '%1..%2', FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.");
         ItemCategoryQuery.SetFilter(EntryType, '%1|%2', ItemCategoryQuery.EntryType::"Direct Sale", ItemCategoryQuery.EntryType::"Credit Sale");
         ItemCategoryQuery.SetRange(POSUnitNo, POSUnit."No.");
         ItemCategoryQuery.SetRange(POSStoreCode, POSUnit."POS Store Code");
 
         ItemCategoryQuery.Open();
+
         while ItemCategoryQuery.Read() do begin
             if ItemCategoryQuery.ItemCategoryCode = '' then begin
                 WithoutItemCategoryQuantity := ItemCategoryQuery.Quantity;
                 WithoutItemCategoryAmount := ItemCategoryQuery.AmountInclVATLCY;
+                WithoutItemCategoryPriceCheckedCounter := NOReportStatisticsMgt.GetHowManyTimesPriceIsCheckedForItemCategoryFromPOSAuditLog('', POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime);
             end;
 
             if ItemCategory.Get(ItemCategoryQuery.ItemCategoryCode) then begin
                 PrintThermalLine(Printer, ItemCategory.Description, 'A11', true, 'CENTER', true, false);
                 PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(Round(ItemCategoryQuery.Quantity, 1, '='))), 'A11', false, 'LEFT', true, false);
                 PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(ItemCategoryQuery.AmountInclVATLCY)), 'A11', false, 'LEFT', true, false);
+                PriceCheckedCounter := NOReportStatisticsMgt.GetHowManyTimesPriceIsCheckedForItemCategoryFromPOSAuditLog(ItemCategory.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime);
+                if PriceCheckedCounter <> 0 then
+                    PrintThermalLine(Printer, CaptionValueFormat(PriceLookupQuantityCaptionLbl, Format(PriceCheckedCounter)), 'A11', false, 'LEFT', true, false);
 
                 WithItemCategoryQuantity += ItemCategoryQuery.Quantity;
                 WithItemCategoryAmount += ItemCategoryQuery.AmountInclVATLCY;
+                WithItemCategoryPriceCheckedCounter += PriceCheckedCounter;
+                AlreadyProcessedItemCategories.Add(ItemCategory.Code);
             end;
         end;
+
         ItemCategoryQuery.Close();
+    end;
+
+    local procedure PrintNotProcessedItemCategories(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PreviousZReportDateTime: DateTime; var WithItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
+    var
+        ItemCategory: Record "Item Category";
+        PriceCheckedCounter: Integer;
+    begin
+        if ItemCategory.FindSet() then
+            repeat
+                if not AlreadyProcessedItemCategories.Contains(ItemCategory.Code) then begin
+                    PriceCheckedCounter := NOReportStatisticsMgt.GetHowManyTimesPriceIsCheckedForItemCategoryFromPOSAuditLog(ItemCategory.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime);
+                    if PriceCheckedCounter <> 0 then begin
+                        PrintThermalLine(Printer, ItemCategory.Description, 'A11', true, 'CENTER', true, false);
+                        PrintThermalLine(Printer, CaptionValueFormat(PriceLookupQuantityCaptionLbl, Format(PriceCheckedCounter)), 'A11', false, 'LEFT', true, false);
+                    end;
+
+                    WithItemCategoryPriceCheckedCounter += PriceCheckedCounter;
+                    AlreadyProcessedItemCategories.Add(ItemCategory.Code);
+                end
+            until ItemCategory.Next() = 0;
     end;
 
     local procedure PrintSalespersonPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
@@ -369,7 +411,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         Clear(Quantity);
         Quantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE);
         PrintThermalLine(Printer, CaptionValueFormat(ZeroLinesQtyCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
-        NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaser.Code, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE);
+        NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE);
         PrintThermalLine(Printer, CaptionValueFormat(ZeroLinesAmountCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
 
@@ -686,7 +728,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         // TODO: total pro forma
         PrintThermalLine(Printer, CaptionValueFormat(ProformaReceiptsAmountCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
 
-        NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode, POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
+        NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
 
         PrintThermalLine(Printer, CaptionValueFormat(TotalOnCancelledCaptionLbl, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
 

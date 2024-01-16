@@ -32,8 +32,6 @@ codeunit 6150852 "NPR POS Action - Item Price" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-
     begin
         case Step of
             'createitem':
@@ -65,7 +63,6 @@ codeunit 6150852 "NPR POS Action - Item Price" implements "NPR IPOS Workflow"
         PriceExclVat: Boolean;
         HtmlTagLbl: Label '%1<br><h4>%2</h4>', Locked = true;
         PriceInfoHtml: Label '<center><table border="0"><tr><td align="left">%1</td><td align="right"><h2>%2</h2></td></tr><tr><td align="left">%3</td><td align="right"><h2>%4</h2></td></tr><tr><td align="left">%5</td><td align="right"><h2>%6</h2></td></tr></table>';
-
     begin
         LineNumber := Context.GetInteger('LastSaleLineNoBeforeAddItem');
 
@@ -85,9 +82,15 @@ codeunit 6150852 "NPR POS Action - Item Price" implements "NPR IPOS Workflow"
               SaleLinePOS.FieldCaption(Description), StrSubstNo(HtmlTagLbl, SaleLinePOS.Description, SaleLinePOS."Description 2"),
               SaleLinePOS.FieldCaption("Amount Including VAT"), SaleLinePOS."Amount Including VAT"));
 
+        OnGatherInfoOnBeforeDeleteLines(SaleLinePOS, PriceExclVat);
+
         // Delete the lines from the end until we find the last line before inserting
         POSActionItemPriceB.DeleteLines(POSSession, LineNumber);
+    end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnGatherInfoOnBeforeDeleteLines(SaleLinePOS: Record "NPR POS Sale Line"; PriceExclVAT: Boolean)
+    begin
     end;
 
     local procedure GetActionScript(): Text
