@@ -30,7 +30,7 @@ codeunit 6150844 "NPR EFT Planet PAX Req."
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('Amount');
-        XmlE.Add(XmlText.Create(Format(Amount)));
+        XmlE.Add(XmlText.Create(Format(Amount, 0, 9)));
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('EmvTerminalId');
@@ -70,7 +70,7 @@ codeunit 6150844 "NPR EFT Planet PAX Req."
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('Amount');
-        XmlE.Add(XmlText.Create(Format(Amount)));
+        XmlE.Add(XmlText.Create(Format(Amount, 0, 9)));
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('EmvTerminalId');
@@ -110,7 +110,7 @@ codeunit 6150844 "NPR EFT Planet PAX Req."
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('Amount');
-        XmlE.Add(XmlText.Create(Format(OldAmount)));
+        XmlE.Add(XmlText.Create(Format(OldAmount, 0, 9)));
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('EmvTerminalId');
@@ -150,7 +150,7 @@ codeunit 6150844 "NPR EFT Planet PAX Req."
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('Amount');
-        XmlE.Add(XmlText.Create(Format(OldAmount)));
+        XmlE.Add(XmlText.Create(Format(OldAmount, 0, 9)));
         XmlRequestElement.Add(XmlE);
 
         XmlE := XmlElement.Create('EmvTerminalId');
