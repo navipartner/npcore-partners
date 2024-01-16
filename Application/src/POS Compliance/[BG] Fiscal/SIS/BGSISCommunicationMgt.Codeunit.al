@@ -439,11 +439,15 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         PaymentAmount: Decimal;
         ReceiptPayments: Dictionary of [Integer, Decimal];
+        CashBGSISPaymentMethod: Enum "NPR BG SIS Payment Method";
         PaymentMedium: Integer;
     begin
+        CashBGSISPaymentMethod := Enum::"NPR BG SIS Payment Method"::Cash;
+
         JsonTextReaderWriter.WriteStartArray('receiptPayments');
 
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntryPaymentLine.SetFilter(Amount, '<>0');
         if POSEntryPaymentLine.FindSet() then
             repeat
                 BGSISPOSPaymMethMap.Get(POSEntryPaymentLine."POS Payment Method Code");
@@ -456,13 +460,15 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         foreach PaymentMedium in ReceiptPayments.Keys() do begin
             PaymentAmount := ReceiptPayments.Get(PaymentMedium);
-            JsonTextReaderWriter.WriteStartObject('');
-            if Refund then
-                JsonTextReaderWriter.WriteStringProperty('amount', Format(-(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'))
-            else
-                JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(PaymentAmount, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
-            JsonTextReaderWriter.WriteRawProperty('medium', PaymentMedium);
-            JsonTextReaderWriter.WriteEndObject();
+            if (PaymentAmount <> 0) or ((PaymentAmount = 0) and (PaymentMedium = CashBGSISPaymentMethod.AsInteger())) then begin
+                JsonTextReaderWriter.WriteStartObject('');
+                if Refund then
+                    JsonTextReaderWriter.WriteStringProperty('amount', Format(-(Round(PaymentAmount, 0.01)), 0, '<Sign><Precision,2:2><Integer><Decimals>'))
+                else
+                    JsonTextReaderWriter.WriteStringProperty('amount', Format(Round(PaymentAmount, 0.01), 0, '<Sign><Precision,2:2><Integer><Decimals>'));
+                JsonTextReaderWriter.WriteRawProperty('medium', PaymentMedium);
+                JsonTextReaderWriter.WriteEndObject();
+            end;
         end;
 
         JsonTextReaderWriter.WriteEndArray();
