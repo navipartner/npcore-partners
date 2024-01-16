@@ -18,7 +18,6 @@ codeunit 6151548 "NPR NO Audit Mgt."
         _CertificateLoaded: Boolean;
         _Initialized: Boolean;
         _DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
-        AdditionalInfoLbl: Label '%1:%2:%3', Locked = true, Comment = '%1 - specifies Item No., %2 - specifies old Unit Price, %3 - specifies new Unit Price';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
@@ -61,21 +60,6 @@ codeunit 6151548 "NPR NO Audit Mgt."
     #endregion
 
     #region Subscribers - POS Audit Logging
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Run Page", 'OnBeforeRunPage', '', false, false)]
-    local procedure NPRPOSActionRunPage_OnBeforeRunPage(PageId: Integer; RunModal: Boolean; Sale: Codeunit "NPR POS Sale");
-    var
-        POSAuditLog: Record "NPR POS Audit Log";
-        POSSale: Record "NPR POS Sale";
-        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-        AuditLogDesc: Label 'Price checked by %1';
-    begin
-        if not IsNOFiscalActive() then
-            exit;
-
-        Sale.GetCurrentSale(POSSale);
-        POSAuditLogMgt.CreateEntryExtended(POSSale.RecordId, POSAuditLog."Action Type"::PRICE_CHECK, 0, '', POSSale."Register No.", StrSubstNo(AuditLogDesc, POSSale."Salesperson Code"), '');
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Delete POS Line", 'OnBeforeDeleteSaleLinePOS', '', false, false)]
     local procedure NPRPOSActionDeletePOSLine_OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "NPR POS Sale Line");
     var
@@ -83,14 +67,14 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSSaleLineRecord: Record "NPR POS Sale Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-        AuditLogDesc: Label 'POS Sales Line deleted';
+        AuditLogDescriptionTxt: Label 'POS Sales Line deleted.';
     begin
         POSSaleLine.GetCurrentSaleLine(POSSaleLineRecord);
         POSUnit.Get(POSSaleLineRecord."Register No.");
         if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDesc, Format(POSSaleLineRecord."Amount Including VAT"));
+        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Cancel Sale B", 'OnBeforeDeletePOSSaleLine', '', false, false)]
@@ -100,7 +84,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-        AuditLogDesc: Label 'POS Sales Line canceled';
+        AuditLogDescriptionTxt: Label 'POS Sales Line canceled.';
         POSSaleLineRecord: Record "NPR POS Sale Line";
     begin
         POSSaleLine.GetCurrentSaleLine(POSSaleLineRecord);
@@ -119,7 +103,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         until POSSaleLineRecord.Next() = 0;
 
         POSSaleLineRecord.CalcSums("Amount Including VAT");
-        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDesc, Format(POSSaleLineRecord."Amount Including VAT"));
+        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Discount B", 'OnBeforeSetDiscount', '', false, false)]
@@ -128,8 +112,9 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLog: Record "NPR POS Audit Log";
         POSUnit: Record "NPR POS Unit";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
-        AuditLogDescTxt, AdditionalInfoTxt : Text;
+        AuditLogDesc, AdditionalInfo : Text;
         AuditLogDescLbl: Label 'Price changed on Item: %1 from %2 to %3.', Comment = '%1 - specifies Item No., %2 - specifies old Unit Price, %3 - specifies new Unit Price';
+        AdditionalInfoLbl: Label '%1:%2:%3', Locked = true, Comment = '%1 - specifies Item No., %2 - specifies old Unit Price, %3 - specifies new Unit Price';
     begin
         if DiscountType <> _DiscountType::LineUnitPrice then
             exit;
@@ -143,10 +128,10 @@ codeunit 6151548 "NPR NO Audit Mgt."
         if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        AuditLogDescTxt := StrSubstNo(AuditLogDescLbl, SaleLinePOS."No.", SaleLinePOS."Unit Price", DiscountAmount);
-        AdditionalInfoTxt := StrSubstNo(AdditionalInfoLbl, SaleLinePOS."No.", SaleLinePOS."Unit Price", DiscountAmount);
+        AuditLogDesc := StrSubstNo(AuditLogDescLbl, SaleLinePOS."No.", SaleLinePOS."Unit Price", DiscountAmount);
+        AdditionalInfo := StrSubstNo(AdditionalInfoLbl, SaleLinePOS."No.", SaleLinePOS."Unit Price", DiscountAmount);
 
-        POSAuditLogMgt.CreateEntryExtended(SaleLinePOS.RecordId, POSAuditLog."Action Type"::PRICE_CHANGE, 0, '', SalePOS."Register No.", AuditLogDescTxt, AdditionalInfoTxt);
+        POSAuditLogMgt.CreateEntryExtended(SaleLinePOS.RecordId, POSAuditLog."Action Type"::PRICE_CHANGE, 0, '', SalePOS."Register No.", AuditLogDesc, AdditionalInfo);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnBeforeInsertPOSSalesLine', '', false, false)]
@@ -181,6 +166,37 @@ codeunit 6151548 "NPR NO Audit Mgt."
             exit;
 
         ErrorIfThereArePOSSavedSales(SalePOS);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Item Price", 'OnGatherInfoOnBeforeDeleteLines', '', false, false)]
+    local procedure HandleOnGatherInfoOnBeforeDeleteLines(SaleLinePOS: Record "NPR POS Sale Line"; PriceExclVAT: Boolean)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSale: Record "NPR POS Sale";
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        RecordId: RecordId;
+        PriceCheckedByTxt: Label 'Price checked by %1.';
+        AdditionalInfoLbl: Label '%1|%2|%3|%4', Locked = true, Comment = '%1 - Item Number value, %2 - Item Description value, %3 - Item Description 2 value, %4 - Item Price value';
+        ItemPriceAsText: Text;
+        AuditLogDescription, AdditionalInfo : Text;
+    begin
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
+            exit;
+
+        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSale.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+        AuditLogDescription := StrSubstNo(PriceCheckedByTxt, POSSale."Salesperson Code");
+        if PriceExclVAT then
+            ItemPriceAsText := Format(SaleLinePOS.Amount)
+        else
+            ItemPriceAsText := Format(SaleLinePOS."Amount Including VAT");
+
+        AdditionalInfo := StrSubstNo(AdditionalInfoLbl, SaleLinePOS."No.", SaleLinePOS.Description, SaleLinePOS."Description 2", ItemPriceAsText);
+
+        POSAuditLogMgt.CreateEntryExtended(RecordId, POSAuditLog."Action Type"::PRICE_CHECK, 0, '', SaleLinePOS."Register No.", AuditLogDescription, AdditionalInfo);
     end;
     #endregion
 
