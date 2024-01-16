@@ -333,6 +333,12 @@
             ObsoleteTag = 'NPR27.0';
             ObsoleteReason = 'New parameter SelectCustReq and SelectMemberReq in POS Action Login created, use this instead.';
         }
+        field(680; "POS Receipt Profile"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Receipt Profile';
+            TableRelation = "NPR POS Receipt Profile";
+        }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';

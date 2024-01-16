@@ -2,20 +2,39 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
 {
     Access = Internal;
 
-    procedure PrintReceipt(SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large"; ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson; PresetTableView: Text; SelectionDialogType: Option TextField,List; ManualReceiptNo: Code[20]; ObfuscationMethod: Option None,MI; PrintTickets: Boolean; PrintMemberships: Boolean; PrintRetailVoucher: Boolean; PrintTerminalReceipt: Boolean; PrintTaxFreeVoucher: Boolean)
+
+    procedure PrintReceipt(POSSetup: Codeunit "NPR POS Setup"; POSUnit: Record "NPR POS Unit"; SalesTicketNo: Code[20]; PrintTickets: Boolean; PrintMemberships: Boolean; PrintRetailVoucher: Boolean; PrintTerminalReceipt: Boolean; PrintTaxFreeVoucher: Boolean)
+    begin
+        if SalesTicketNo = '' then
+            exit;
+
+        AdditionalPrints(POSUnit."No.", SalesTicketNo, PrintTickets, PrintMemberships, PrintRetailVoucher, PrintTerminalReceipt, PrintTaxFreeVoucher);
+    end;
+
+    internal procedure GetDigitalReceiptQRCodeLink(SalesTicketNo: Code[20]) DigitalReceiptQRCodeLink: Text;
+    var
+        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+    begin
+        if SalesTicketNo = '' then
+            exit;
+
+        POSSaleDigitalReceiptEntry.Reset();
+        POSSaleDigitalReceiptEntry.SetCurrentKey("Sales Ticket No.");
+        POSSaleDigitalReceiptEntry.SetRange("Sales Ticket No.", SalesTicketNo);
+        POSSaleDigitalReceiptEntry.SetLoadFields("Sales Ticket No.", "QR Code Link");
+        if not POSSaleDigitalReceiptEntry.FindFirst() then
+            exit;
+
+        DigitalReceiptQRCodeLink := POSSaleDigitalReceiptEntry."QR Code Link";
+    end;
+
+    internal procedure GetSalesTicketNo(POSSetup: Codeunit "NPR POS Setup"; POSUnit: Record "NPR POS Unit"; SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large"; ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson; PresetTableView: Text; SelectionDialogType: Option TextField,List; ManualReceiptNo: Code[20]; ObfuscationMethod: Option None,MI) SalesTicketNo: Code[20];
     var
         Salesperson: Record "Salesperson/Purchaser";
         POSStore: Record "NPR POS Store";
-        POSUnit: Record "NPR POS Unit";
         POSEntryMgt: Codeunit "NPR POS Entry Management";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
         FilterEntityCode: Code[20];
-        SalesTicketNo: Code[20];
     begin
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
-
         if (ReceiptListFilterOption < 0) or (ReceiptListFilterOption > ReceiptListFilterOption::Salesperson) then
             ReceiptListFilterOption := ReceiptListFilterOption::"POS Unit";
         case ReceiptListFilterOption of
@@ -63,8 +82,6 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
             SettingOption::"Last Balance Large":
                 SalesTicketNo := LastBalancePOSEntry(POSUnit, SettingOption = SettingOption::"Last Balance Large");
         end;
-        if SalesTicketNo <> '' then
-            AdditionalPrints(POSUnit."No.", SalesTicketNo, PrintTickets, PrintMemberships, PrintRetailVoucher, PrintTerminalReceipt, PrintTaxFreeVoucher);
     end;
 
     local procedure ChooseReceiptPOSEntry(SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large"; ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson; ListTableView: Text; FilterOn: Option; FilterEntityCode: Code[20]; SalesTicketNo: Code[20]): Code[20]

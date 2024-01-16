@@ -12,12 +12,14 @@ codeunit 6184580 "NPR POSAction SS PrintReceipt" implements "NPR IPOS Workflow"
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
+        POSUnit: Record "NPR POS Unit";
         BusinessLogicRun: Codeunit "NPR POS Action: Print Rcpt.-B";
         SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large";
         ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson;
         SelectionDialogType: Option TextField,List;
         PresetTableView: Text;
         ManualReceiptNo: Code[20];
+        SalesTicketNo: Code[20];
         ObfuscationMethod: Option None,MI;
         PrintTickets: Boolean;
         PrintMemberships: Boolean;
@@ -39,17 +41,23 @@ codeunit 6184580 "NPR POSAction SS PrintReceipt" implements "NPR IPOS Workflow"
         PrintTerminalReceipt := true;
         PrintTaxFreeVoucher := false;
 
-        BusinessLogicRun.PrintReceipt(SettingOption,
-                                    ReceiptListFilterOption,
-                                    PresetTableView,
-                                    SelectionDialogType,
-                                    ManualReceiptNo,
-                                    ObfuscationMethod,
-                                    PrintTickets,
-                                    PrintMemberships,
-                                    PrintRetailVoucher,
-                                    PrintTerminalReceipt,
-                                    PrintTaxFreeVoucher);
+        Setup.GetPOSUnit(POSUnit);
+        SalesTicketNo := BusinessLogicRun.GetSalesTicketNo(Setup,
+                                                           POSUnit,
+                                                           SettingOption,
+                                                           ReceiptListFilterOption,
+                                                           PresetTableView,
+                                                           SelectionDialogType,
+                                                           ManualReceiptNo,
+                                                           ObfuscationMethod);
+        BusinessLogicRun.PrintReceipt(Setup,
+                                      POSUnit,
+                                      SalesTicketNo,
+                                      PrintTickets,
+                                      PrintMemberships,
+                                      PrintRetailVoucher,
+                                      PrintTerminalReceipt,
+                                      PrintTaxFreeVoucher);
     end;
 
 
