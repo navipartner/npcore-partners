@@ -297,7 +297,7 @@
 
     internal procedure UpdateContactFromMember()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipRole: Record "NPR MM Membership Role";
     begin
         "Display Name" := StrSubstNo(PlaceHolderLbl, "First Name", "Last Name");

@@ -72,7 +72,7 @@
 
     local procedure NotificationIsValid(MembershipNotification: Record "NPR MM Membership Notific."): Integer
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         Coupon: Record "NPR NpDc Coupon";
         FromDate: Date;
@@ -215,7 +215,7 @@
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCommunity: Record "NPR MM Member Community";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
@@ -411,7 +411,7 @@
 
     local procedure GetMemberNotificationAddress(MembershipNotification: Record "NPR MM Membership Notific."; MembershipEntryNo: Integer; MemberEntryNo: Integer; var NotificationMethod: Option; var NotificationAddress: Text[100]; var NotificationEngine: Option) FoundAddress: Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
         Method: Code[10];
     begin
@@ -1048,7 +1048,7 @@
         SeparatorLength: Integer;
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
         MemberEntryNo: Integer;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         B64Image: Text;
     begin
         StartSeparator := '{[';

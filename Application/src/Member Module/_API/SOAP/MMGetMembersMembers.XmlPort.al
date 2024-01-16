@@ -128,7 +128,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
 
                             trigger OnBeforePassVariable()
                             var
-                                MemberMgt: Codeunit "NPR MM Membership Mgt.";
+                                MemberMgt: Codeunit "NPR MM MembershipMgtInternal";
                             begin
                                 base64Image := '';
                                 if (_IncludeMemberImageBool) then

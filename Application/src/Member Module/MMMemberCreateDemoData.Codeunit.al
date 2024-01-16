@@ -132,7 +132,7 @@
 
     local procedure CreateFictionousMembers()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfo: Record "NPR MM Member Info Capture";
         SalesSetup: Record "NPR MM Members. Sales Setup";
     begin

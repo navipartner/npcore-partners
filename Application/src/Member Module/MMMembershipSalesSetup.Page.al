@@ -245,7 +245,7 @@
         MembershipPage: Page "NPR MM Membership Card";
         Membership: Record "NPR MM Membership";
         ExternalCardNumber: Text[100];
-        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         FOREIGN_MEMBERSHIP_CREATED: Label 'Foreign membership created with card number %1';
     begin
 

@@ -42,7 +42,7 @@
 
     local procedure AttemptCreateMemberships(var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipEntryNo: Integer;
         ResponseMessage: Text;
@@ -127,7 +127,7 @@
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
-        MemberManagement: Codeunit "NPR MM Membership Mgt.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         ResponseMessage: Text;

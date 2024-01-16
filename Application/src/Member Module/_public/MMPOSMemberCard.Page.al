@@ -341,7 +341,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.TakeMemberPicture(Rec);
                 end;
@@ -505,7 +505,7 @@
     var
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidFrom2: Date;
         ValidUntil2: Date;
         RemainAmt: Decimal;
@@ -623,7 +623,7 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
@@ -647,7 +647,7 @@
 
     local procedure ActivateMembership()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";

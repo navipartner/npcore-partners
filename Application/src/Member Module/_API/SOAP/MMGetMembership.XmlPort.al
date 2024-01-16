@@ -224,7 +224,7 @@ xmlport 6060129 "NPR MM Get Membership"
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin
@@ -266,7 +266,7 @@ xmlport 6060129 "NPR MM Get Membership"
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         MemberCommunity: Record "NPR MM Member Community";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         AdminMemberCount: Integer;
         NamedMemberCount: Integer;
         AnonMemberCount: Integer;

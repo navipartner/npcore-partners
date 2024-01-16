@@ -410,7 +410,7 @@
                     var
                         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
                         MembershipSetup: Record "NPR MM Membership Setup";
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         ReasonText: Text;
                         ReasonLbl: Label ' {%5 must be %4 %3 => (%1 + %2)}';
                         ReasonDateLbl: Label '<+%1Y>', Locked = true;
@@ -472,7 +472,7 @@
 
                     trigger OnValidate()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         Member: Record "NPR MM Member";
                         ReasonText: Text;
                     begin
@@ -868,7 +868,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.TakeMemberInfoPicture(Rec);
                 end;
@@ -1002,7 +1002,7 @@
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Member: Record "NPR MM Member";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidEmail: Boolean;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberCommunity: Record "NPR MM Member Community";
@@ -1097,7 +1097,7 @@
         NameTotalLength: Integer;
         Customer: Record Customer;
         Member: Record "NPR MM Member";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidEmail: Boolean;
     begin
 
@@ -1526,7 +1526,7 @@
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
         OutStr: OutStream;
@@ -1771,7 +1771,7 @@
 
     local procedure OnValidateReplaceExternalCardNumber()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";

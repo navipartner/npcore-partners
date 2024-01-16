@@ -24,7 +24,7 @@ codeunit 6060106 "NPR POS Action Create Member B"
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         SelectMembershipPage: Page "NPR MM Create Membership";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
     begin

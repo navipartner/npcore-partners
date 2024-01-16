@@ -27,7 +27,7 @@
             trigger OnValidate()
             var
                 MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-                MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
             begin
                 if (Type = Type::ITEM) and ("No." <> '') then begin
                     MembershipAlterationSetup.SetRange("Sales Item No.", "No.");

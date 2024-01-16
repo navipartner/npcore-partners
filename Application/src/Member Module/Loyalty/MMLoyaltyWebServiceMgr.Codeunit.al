@@ -57,7 +57,7 @@
     local procedure DecodeLoyaltyPointsQuery(Request: XmlElement; DocumentID: Text[100]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         NotFoundReason: Text;
     begin

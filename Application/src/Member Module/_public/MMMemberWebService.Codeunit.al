@@ -9,7 +9,7 @@
 
     procedure MemberValidation(ExternalMemberNo: Code[20]; ScannerStationId: Code[10]) IsValid: Boolean
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
     begin
 
@@ -19,7 +19,7 @@
 
     procedure MembershipValidation(ExternalMembershipNo: Code[20]; ScannerStationId: Code[10]) IsValid: Boolean
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
     begin
 
@@ -39,7 +39,7 @@
 
     procedure MemberCardNumberValidation(ExternalMemberCardNo: Text[50]; ScannerStationId: Code[10]) IsValid: Boolean
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
         NotFoundReasonText: Text;
     begin
@@ -61,7 +61,7 @@
     procedure MemberCardRegisterArrival(ExternalMemberCardNo: Code[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; var MessageText: Text) IsRegistered: Boolean
     var
         Member: Record "NPR MM Member";
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         MemberEntryNo: Integer;
         Success: Integer;
     begin
@@ -173,7 +173,7 @@
 
     procedure ActivateMembership(ExternalMembershipNo: Code[20]; ScannerStationId: Code[10]) IsValid: Boolean
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
     begin
 
@@ -524,7 +524,7 @@
 
     procedure UpdateMemberImage(MemberExternalNo: Code[20]; Base64StringImage: Text; ScannerStationId: Code[10]) Success: Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberEntryNo: Integer;
     begin
 
@@ -536,7 +536,7 @@
 
     procedure GetMemberImage(MemberExternalNo: Code[20]; var Base64StringImage: Text; ScannerStationId: Code[10]) Success: Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberEntryNo: Integer;
     begin
 
@@ -809,7 +809,7 @@
     procedure PrintMemberCard(ExternalMemberCardNo: Code[50]; PrintDirective: Integer): Boolean
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberNotification: Codeunit "NPR MM Member Notification";
         MemberCard: Record "NPR MM Member Card";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -996,7 +996,7 @@
         OutStr: OutStream;
         MemberCommunication: Record "NPR MM Member Communication";
         TempMemberCommunication: Record "NPR MM Member Communication" temporary;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ExternalMemberNo: Code[20];
         ExternalMembershipNo: Code[20];
         MemberEntryNo: Integer;
@@ -1242,7 +1242,7 @@
 
     local procedure IsMembershipValid(MembershipEntryNo: Integer) IsValid: Boolean
     var
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         if (MembershipEntryNo = 0) then
@@ -1263,7 +1263,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MembershipMgr: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgr: Codeunit "NPR MM MembershipMgtInternal";
         LimitLogEntry: Integer;
         MemberCardEntryNo: Integer;
         MembershipEntryNo: Integer;

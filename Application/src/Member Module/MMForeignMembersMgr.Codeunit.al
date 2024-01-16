@@ -39,7 +39,7 @@
     var
         ForeignValidationSetup: Record "NPR MM Foreign Members. Setup";
         IsHandled: Boolean;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MembershipEntryNo := 0;

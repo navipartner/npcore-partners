@@ -237,7 +237,7 @@ xmlport 6060149 "NPR MM Get Loyalty Rcpt. List"
     }
 
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
 
     internal procedure GetRequest(var TmpMemberInfoCaptureOut: Record "NPR MM Member Info Capture" temporary)
     begin
