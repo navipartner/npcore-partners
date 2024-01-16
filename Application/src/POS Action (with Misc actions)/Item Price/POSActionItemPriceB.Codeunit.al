@@ -40,14 +40,13 @@ codeunit 6059853 "NPR POS Action - Item Price B"
         POSSaleLine.SetLast();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if (LineNumber = -1) then begin
-            POSSaleLine.DeleteAll();
-        end else begin
+        if (LineNumber = -1) then
+            POSSaleLine.DeleteAll()
+        else
             while (SaleLinePOS."Line No." > LineNumber) do begin
                 POSSaleLine.DeleteLine();
                 POSSaleLine.SetLast();
                 POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
             end;
-        end;
     end;
 }

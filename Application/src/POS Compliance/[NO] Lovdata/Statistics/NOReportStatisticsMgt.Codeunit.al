@@ -163,7 +163,7 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         Clear(CopyTicketAmount);
         Clear(Quantity);
         Clear(Quantity2);
-        POSAuditLog.Reset();
+
         POSEntry.SetLoadFields("Amount Incl. Tax");
         POSAuditLog.SetLoadFields("Acted on POS Entry No.", "Action Type");
         if POSEntry.FindSet() then
@@ -181,17 +181,19 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSEntry.Next() = 0;
     end;
 
-    internal procedure CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode: Code[20]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; var Amount: Decimal; ActionType: Option)
+    internal procedure CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode: Code[20]; POSUnitNo: Code[10]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; var Amount: Decimal; ActionType: Option)
     var
         POSAuditLog: Record "NPR POS Audit Log";
         ConvertVar: Decimal;
     begin
         Clear(Amount);
-        POSAuditLog.Reset();
+
+        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
+        POSAuditLog.SetRange("Active POS Unit No.", POSUnitNo);
+        POSAuditLog.SetRange("Action Type", ActionType);
         if SalespersonPurchaserCode <> '' then
             POSAuditLog.SetRange("Active Salesperson Code", SalespersonPurchaserCode);
-        POSAuditLog.SetRange("Action Type", ActionType);
 
         POSAuditLog.SetLoadFields("Additional Information");
         if POSAuditLog.FindSet() then
@@ -201,11 +203,33 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSAuditLog.Next() = 0;
     end;
 
+    internal procedure GetHowManyTimesPriceIsCheckedForItemCategoryFromPOSAuditLog(ItemCategoryCode: Code[20]; POSUnitNo: Code[10]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime) PriceCheckedCounter: Integer
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        Item: Record Item;
+        ItemNoAsText: Text;
+    begin
+        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
+        POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
+        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::PRICE_CHECK);
+        POSAuditLog.SetRange("Active POS Unit No.", POSUnitNo);
+
+        POSAuditLog.SetLoadFields("Additional Information");
+        if POSAuditLog.FindSet() then
+            repeat
+                if POSAuditLog."Additional Information" <> '' then
+                    if POSAuditLog."Additional Information".Split('|').Get(1, ItemNoAsText) then begin
+                        Item.Get(ItemNoAsText);
+                        if Item."Item Category Code" = ItemCategoryCode then
+                            PriceCheckedCounter += 1;
+                    end;
+            until POSAuditLog.Next() = 0;
+    end;
+
     internal procedure GetPOSAuditLogCount(SalespersonPurchaserCode: Code[20]; POSUnitNo: Code[10]; CurrentZReportDateTime: DateTime; PreviousZReportDateTime: DateTime; ActionType: Option): Integer
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
-        POSAuditLog.Reset();
         POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', PreviousZReportDateTime, CurrentZReportDateTime);
         if SalespersonPurchaserCode <> '' then
