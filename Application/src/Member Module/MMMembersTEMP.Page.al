@@ -565,7 +565,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberInfoCapturePage: Page "NPR MM Member Info Capture";
         PageAction: Action;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");

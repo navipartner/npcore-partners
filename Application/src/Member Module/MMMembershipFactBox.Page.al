@@ -126,7 +126,7 @@
 
     trigger OnAfterGetCurrRecord()
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidFromDate: Date;
         ValidUntilDate: Date;
         PlaceHolder2Lbl: Label '%1 - %2', Locked = true;

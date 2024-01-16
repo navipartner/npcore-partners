@@ -1222,7 +1222,7 @@
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
     begin
         if (TmpContact."Exclude from Segment") then
@@ -1251,7 +1251,7 @@
     local procedure AddMembershipMember(var TmpContact: Record Contact temporary; var Contact: Record Contact; CorporateContactNo: Code[20]): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipRole: Record "NPR MM Membership Role";
         MemberEntryNo: Integer;
         ReasonText: Text;
@@ -1283,7 +1283,7 @@
     local procedure UpdateMember(var TmpContact: Record Contact temporary): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Member: Record "NPR MM Member";
     begin
@@ -1309,7 +1309,7 @@
     local procedure BlockMember(Contact: Record Contact): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MembershipRole.SetCurrentKey("Contact No.");
         MembershipRole.SetFilter("Contact No.", '=%1', Contact."No.");

@@ -26,7 +26,7 @@ codeunit 6150819 "NPR POS Action: MM BackEnd B"
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberSalesSetupItemNumber);
 

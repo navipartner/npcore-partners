@@ -634,7 +634,7 @@
         MMMembershipSetup: Record "NPR MM Membership Setup";
         AdmissionCode: Code[20];
         MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         SelectLatestVersion();

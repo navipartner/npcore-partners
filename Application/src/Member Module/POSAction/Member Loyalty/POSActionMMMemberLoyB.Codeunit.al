@@ -14,7 +14,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
 
     procedure ViewPoints(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
         Member: Record "NPR MM Member";
         POSMemberCard: Page "NPR MM POS Member Card";

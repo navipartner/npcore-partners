@@ -167,7 +167,7 @@
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipEvents: Codeunit "NPR MM Membership Events";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ExternalItemNo: Code[50];
         LogEntryNo: Integer;
@@ -293,7 +293,7 @@
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         SaleLinePOS: Record "NPR POS Sale Line";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ItemNo: Code[20];
         MemberInfoEntryNo: Integer;
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
@@ -337,7 +337,7 @@
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         NOT_MEMBERSHIP_SALES: Label 'The selected sales line is not a membership sales.';
@@ -479,7 +479,7 @@
     local procedure GetMembershipFromCardNumberWithUI(InputMethod: option; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MEMBERSHIP_BLOCKED_NOT_FOUND: Label 'Membership %1 is either blocked or not found.';
         FailReasonText: Text;
     begin
@@ -567,7 +567,7 @@
     local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") Options: Text
     var
         TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         OptionsArray: JsonArray;
     begin
 

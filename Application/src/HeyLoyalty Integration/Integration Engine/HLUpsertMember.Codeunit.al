@@ -136,7 +136,7 @@ codeunit 6060000 "NPR HL Upsert Member"
     local procedure FindReusableCustomerNo(var Customer: Record Customer): Boolean
     var
         Membership: Record "NPR MM Membership";
-        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if Customer.Find('-') then
             repeat
@@ -161,7 +161,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         MembershipNotification: Record "NPR MM Membership Notific.";
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
-        MembershipMgt: Codeunit "NPR MM Membership Mgt.";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntryNo: Integer;
     begin
         clear(MembershipEntry);

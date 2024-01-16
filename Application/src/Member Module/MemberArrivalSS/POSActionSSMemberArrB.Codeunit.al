@@ -20,7 +20,7 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
         ExternalTicketNo: Text[30];
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         POSActionMemberManagement: Codeunit "NPR POS Action Member MgtWF3-B";
         MembershipEvents: Codeunit "NPR MM Membership Events";

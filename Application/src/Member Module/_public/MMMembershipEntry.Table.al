@@ -194,7 +194,7 @@
 
     internal procedure CalculateRemainingAmount(var OriginalAmountLCY: Decimal; var RemainingAmountLCY: Decimal; var DueDate: Date): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         exit(MembershipManagement.CalculateRemainingAmount(Rec, OriginalAmountLCY, RemainingAmountLCY, DueDate));

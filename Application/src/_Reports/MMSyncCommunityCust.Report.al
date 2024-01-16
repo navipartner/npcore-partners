@@ -34,7 +34,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Window: Dialog;
         CurrentRow: Integer;
         MaxRow: Integer;

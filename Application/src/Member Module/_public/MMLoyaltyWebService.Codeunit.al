@@ -348,7 +348,7 @@
         TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipEntryNo: Integer;
         ImportEntry: Record "NPR Nc Import Entry";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         OutStr: OutStream;
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         ResponseMessage: Text;
@@ -408,7 +408,7 @@
         ImportEntry: Record "NPR Nc Import Entry";
         Coupon: Record "NPR NpDc Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         OutStr: OutStream;
         ResponseMessage: Text;
@@ -488,7 +488,7 @@
         Coupon: Record "NPR NpDc Coupon";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         OutStr: OutStream;
         ResponseMessage: Text;
         MembershipEntryNo: Integer;
@@ -566,7 +566,7 @@
         Membership: Record "NPR MM Membership";
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         NpDcExtCouponReservation: Record "NPR NpDc Ext. Coupon Reserv.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
         OutStr: OutStream;
         MembershipEntryNo: Integer;

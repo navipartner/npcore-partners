@@ -218,7 +218,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ExternalItemNo: Code[50];
         LogEntryNo: Integer;
@@ -307,7 +307,7 @@
     local procedure CancelMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -334,7 +334,7 @@
     local procedure RenewMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -370,7 +370,7 @@
     local procedure UpgradeMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -397,7 +397,7 @@
     local procedure ExtendMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -424,7 +424,7 @@
     local procedure RegretMembership(POSSession: Codeunit "NPR POS Session"; InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -447,7 +447,7 @@
     local procedure ViewMembershipEntry(InputMethod: Option; ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         TempMembershipEntries: Record "NPR MM Membership Entry" temporary;
@@ -482,7 +482,7 @@
 
     local procedure AssignPOSMembership(var SalePOS: Record "NPR POS Sale"; var ExternalMemberCardNo: Text[100]): Boolean
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ReasonNotFound: Text;
         MembershipEntryNo: Integer;
     begin
@@ -569,7 +569,7 @@
     var
         POSSaleLine: Codeunit "NPR POS Sale Line";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         SaleLinePOS: Record "NPR POS Sale Line";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
@@ -713,7 +713,7 @@
 
     local procedure GetAlterMembershipItemSelection(Type: Option; ExternalCardNo: Text[100]; ReferenceDate: Date; NotValidMessage: Text): Code[20]
     var
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Membership: Record "NPR MM Membership";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         ItemNo: Code[20];
@@ -742,7 +742,7 @@
     local procedure ShowAlterMembershipLookupList(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; LookupCaption: Text; NotFoundMessage: Text) ItemNo: Code[20]
     var
         TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         if (not MembershipAlterationSetup.FindFirst()) then

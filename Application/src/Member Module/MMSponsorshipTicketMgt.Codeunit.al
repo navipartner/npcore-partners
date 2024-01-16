@@ -102,7 +102,7 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Member: Record "NPR MM Member";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         SponsorshipTicketEntry.SetCurrentKey("Membership Entry No.");

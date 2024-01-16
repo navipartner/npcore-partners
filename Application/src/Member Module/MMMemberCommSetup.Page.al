@@ -128,7 +128,7 @@
 
                 trigger OnAction()
                 var
-                    MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                    MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                     Membership: Record "NPR MM Membership";
                     ApplyDefault: Label 'Apply the default communication setup to %1 memberships?';
                     MembershipCount, ProcessCount : Integer;

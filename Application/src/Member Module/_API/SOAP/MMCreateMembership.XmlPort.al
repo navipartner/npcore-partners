@@ -124,7 +124,7 @@ xmlport 6060127 "NPR MM Create Membership"
 
                     trigger OnAfterGetRecord()
                     var
-                        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+                        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                         DateValidFromDate: Date;
                         DateValidUntilDate: Date;
                     begin

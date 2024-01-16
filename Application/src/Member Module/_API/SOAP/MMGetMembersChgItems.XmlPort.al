@@ -191,7 +191,7 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
     internal procedure AddResponse(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
 

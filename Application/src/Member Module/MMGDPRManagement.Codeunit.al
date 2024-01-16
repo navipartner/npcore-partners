@@ -136,7 +136,7 @@
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         GDPRAgreement: Record "NPR GDPR Agreement";
-        MembershipManagement: Codeunit "NPR MM Membership Mgt.";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         DeleteAfterDateTime: Datetime;
     begin
         Membership.Get(MembershipEntryNo);
