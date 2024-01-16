@@ -347,6 +347,23 @@
 
     actions
     {
+        area(Processing)
+        {
+            action(Reschedule)
+            {
+                Caption = 'Replan Reservations';
+                ToolTip = 'Shows list of open reservation for selected time slot and allows to move them to a different time slot.';
+                ApplicationArea = NPRTicketAdvanced;
+                Image = Replan;
+                Scope = Repeater;
+                Promoted = false;
+                trigger OnAction()
+                begin
+                    ReplanReservations();
+                    CurrPage.Update(false);
+                end;
+            }
+        }
         area(navigation)
         {
             action("Show Ticket Holder List")
@@ -461,6 +478,24 @@
         ResultText := '-/-';
         if (TicketManagement.CalculateConcurrentCapacity(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntry."Admission Start Date", Actual, MaxCapacity)) then
             ResultText := StrSubstNo(ResultLbl, Actual, MaxCapacity);
+    end;
+
+    local procedure ReplanReservations()
+    var
+        ReplanReservationPage: Page "NPR TM Replan Schedule";
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        Commit();
+        DetailedTicketAccessEntry.FilterGroup(180);
+        DetailedTicketAccessEntry.SetFilter("External Adm. Sch. Entry No.", '=%1', Rec."External Schedule Entry No.");
+        DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::RESERVATION);
+        DetailedTicketAccessEntry.SetFilter(Open, '=%1', true);
+        DetailedTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+        DetailedTicketAccessEntry.FilterGroup(0);
+
+        ReplanReservationPage.SetAdmissionCode(Rec."Admission Code");
+        ReplanReservationPage.SetTableView(DetailedTicketAccessEntry);
+        ReplanReservationPage.RunModal();
     end;
 }
 

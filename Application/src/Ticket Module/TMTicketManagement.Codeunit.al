@@ -812,6 +812,62 @@
 
     end;
 
+    internal procedure ReplanReservation(DetTicketAccessEntryNo: Integer; NewExternalEntryNo: Integer; IncludeInitialEntry: Boolean): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+        OldDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NewDetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        NewAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+    begin
+        if (not OldDetTicketAccessEntry.Get(DetTicketAccessEntryNo)) then
+            exit(false);
+
+        if (OldDetTicketAccessEntry.Type <> OldDetTicketAccessEntry.Type::RESERVATION) then
+            exit(false);
+
+        NewAdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', NewExternalEntryNo);
+        NewAdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (not NewAdmissionScheduleEntry.FindFirst()) then
+            exit(false);
+
+        if (not Ticket.Get(OldDetTicketAccessEntry."Ticket No.")) then
+            exit(false);
+
+        OldDetTicketAccessEntry.Type := OldDetTicketAccessEntry.Type::CANCELED_RESERVATION;
+        OldDetTicketAccessEntry."Closed By Entry No." := RegisterReservation_Worker(Ticket, OldDetTicketAccessEntry."Ticket Access Entry No.", NewAdmissionScheduleEntry."Entry No.");
+        OldDetTicketAccessEntry.Open := false;
+        OldDetTicketAccessEntry.Modify();
+
+        if (IncludeInitialEntry) then begin
+            OldDetTicketAccessEntry.Reset();
+            OldDetTicketAccessEntry.SetFilter(Type, '=%1', OldDetTicketAccessEntry.Type::INITIAL_ENTRY);
+            OldDetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', OldDetTicketAccessEntry."Ticket Access Entry No.");
+            OldDetTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
+            OldDetTicketAccessEntry.FindLast();
+
+            // Make new entry with new time
+            NewDetTicketAccessEntry.TransferFields(OldDetTicketAccessEntry, false);
+            NewDetTicketAccessEntry."Entry No." := 0;
+            NewDetTicketAccessEntry."External Adm. Sch. Entry No." := NewAdmissionScheduleEntry."External Schedule Entry No.";
+            NewDetTicketAccessEntry."Created Datetime" := CurrentDateTime();
+            NewDetTicketAccessEntry.Insert();
+
+            // reverse original initial entry
+            NewDetTicketAccessEntry."Entry No." := 0;
+            NewDetTicketAccessEntry."External Adm. Sch. Entry No." := OldDetTicketAccessEntry."External Adm. Sch. Entry No.";
+            NewDetTicketAccessEntry.Quantity := OldDetTicketAccessEntry.Quantity * -1;
+            NewDetTicketAccessEntry.Open := false;
+            NewDetTicketAccessEntry.Insert();
+
+            // link original entry with reversal entry instead of payment entry
+            OldDetTicketAccessEntry."Closed By Entry No." := NewDetTicketAccessEntry."Entry No.";
+            OldDetTicketAccessEntry.Open := false;
+            OldDetTicketAccessEntry.Modify();
+        end;
+
+        exit(true);
+    end;
+
     procedure IsRescheduleAllowed(ExternalTicketNumber: Text[30]; ExtAdmSchEntryNo: Integer; ReferenceDateTime: DateTime): Boolean
     var
         Ticket: Record "NPR TM Ticket";
