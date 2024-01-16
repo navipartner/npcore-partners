@@ -3,8 +3,8 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     Access = Internal;
     SingleInstance = true;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', false, false)]
-    local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale");
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeFinishSale', '', false, false)]
+    local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale");
     var
         HUMSPaymentMethodMap: Record "NPR HU MS Payment Method Map.";
         POSEntry: Record "NPR POS Entry";
