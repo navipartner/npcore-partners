@@ -13,12 +13,15 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
             MaxOccurs = Once;
             tableelement(tmpticketreservationrequest; "NPR TM Ticket Reservation Req.")
             {
+                XmlName = 'ticket_tokens';
                 MaxOccurs = Once;
                 MinOccurs = Once;
-                XmlName = 'ticket_tokens';
                 UseTemporary = true;
                 fieldelement(ticket_token; tmpTicketReservationRequest."Session Token ID")
                 {
+                    XmlName = 'ticket_token';
+                    MinOccurs = Once;
+                    MaxOccurs = Once;
 
                     trigger OnAfterAssignField()
                     begin
@@ -28,11 +31,21 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
                 }
                 fieldelement(send_notification_to; tmpTicketReservationRequest."Notification Address")
                 {
+                    XmlName = 'send_notification_to';
                     MinOccurs = Zero;
+                    MaxOccurs = Once;
                 }
                 fieldelement(external_order_no; tmpTicketReservationRequest."External Order No.")
                 {
+                    XmlName = 'external_order_no';
                     MinOccurs = Zero;
+                    MaxOccurs = Once;
+                }
+                fieldelement(TicketHolderName; tmpTicketReservationRequest.TicketHolderName)
+                {
+                    XmlName = 'ticket_holder_name';
+                    MinOccurs = Zero;
+                    MaxOccurs = Once;
                 }
             }
             textelement(ticket_results)

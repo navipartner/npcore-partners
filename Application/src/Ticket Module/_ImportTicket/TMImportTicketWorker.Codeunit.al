@@ -100,7 +100,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        TicketRequestManager.SetReservationRequestExtraInfo(TempTicketImport.TicketRequestToken, TempTicketImport.TicketHolderEMail, TempTicketImport.PaymentReference);
+        TicketRequestManager.SetReservationRequestExtraInfo(TempTicketImport.TicketRequestToken, TempTicketImport.TicketHolderEMail, TempTicketImport.PaymentReference, TempTicketImport.TicketHolderName);
         Success := TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage);
     end;
 

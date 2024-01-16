@@ -133,8 +133,8 @@ codeunit 6184689 "NPR TM ImportTicketControl"
             TempTicketImport.CurrencyCode := Format(GetAsText(TicketOrder, 'currencyCode', MaxStrLen(TempTicketImport.CurrencyCode), true));
             TempTicketImport.SalesDate := GetAsDate(TicketOrder, 'salesDate', true);
             TempTicketImport.PaymentReference := Format(GetAsText(TicketOrder, 'paymentReference', MaxStrLen(TempTicketImport.PaymentReference), false));
-            TempTicketImport.TicketHolderEMail := LowerCase(GetAsText(TicketHolder, 'eMail', MaxStrLen(TempTicketImport.TicketHolderEMail), false));
-            TempTicketImport.TicketHolderName := GetAsText(TicketHolder, 'name', MaxStrLen(TempTicketImport.TicketHolderName), false);
+            TempTicketImport.TicketHolderEMail := LowerCase(GetAsText(TicketOrder, 'eMail', MaxStrLen(TempTicketImport.TicketHolderEMail), false));
+            TempTicketImport.TicketHolderName := GetAsText(TicketOrder, 'name', MaxStrLen(TempTicketImport.TicketHolderName), false);
 
             TicketOrder.Get('tickets', JToken);
             Tickets := JToken.AsArray();

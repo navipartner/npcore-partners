@@ -1179,7 +1179,7 @@
         exit(true);
     end;
 
-    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]): Boolean
+    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -1191,7 +1191,6 @@
 
         repeat
             TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
-
             if (NotificationAddress <> '') then begin
                 if (StrPos(NotificationAddress, '@') > 1) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
@@ -1203,12 +1202,14 @@
             end;
 
             TicketReservationRequest."External Order No." := ExternalOrderNo;
-
             if (ExternalOrderNo <> '') then
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
 
             if ((TicketReservationRequest."Receipt No." = '') and (TicketReservationRequest."External Order No." = '')) then
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::UNPAID;
+
+            if (TicketHolderName <> '') then
+                TicketReservationRequest.TicketHolderName := TicketHolderName;
 
             TicketReservationRequest.Modify();
         until (TicketReservationRequest.Next() = 0);

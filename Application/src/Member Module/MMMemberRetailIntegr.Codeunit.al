@@ -500,7 +500,7 @@
         TicketRequestManager.LockResources('IssueTicketFromMemberScan');
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, VariantCode, 1, Member."External Member No.");
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, Member."External Member No.");
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, Member."External Member No.", Member."Display Name");
         ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, FailWithError, ResponseMessage);
         if (ResponseCode <> 0) then
             exit(ResponseCode);
