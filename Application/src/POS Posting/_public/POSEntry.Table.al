@@ -610,7 +610,14 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
-
+        field(6011; "POS Sales Digital Receipts"; Integer)
+        {
+            CalcFormula = count("NPR POSSaleDigitalReceiptEntry" where("POS Entry No." = field("Entry No."),
+                                                                        "POS Unit No." = field("POS Unit No.")));
+            Caption = 'POS Sales Digital Receipts';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys

@@ -978,6 +978,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'PLANET_PAX', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: EFT Planet PAX";
     }
+    value(200; ISSUE_DIG_RCPT)
+    {
+        Caption = 'ISSUE_DIG_RCPT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: IssueDigRcpt";
+    }
+    value(201; VIEW_DIG_RCPT_QRCODE)
+    {
+        Caption = 'VIEW_DIG_RCPT_QRCODE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action QRViewDigRcpt";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;

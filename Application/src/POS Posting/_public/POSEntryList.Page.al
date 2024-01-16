@@ -430,6 +430,14 @@
                     POSAuditLogMgt.ShowAuditLogForPOSEntry(Rec);
                 end;
             }
+            action("POS Receipt Profile")
+            {
+                Caption = 'POS Receipt Profile';
+                Image = Receipt;
+                RunObject = Page "NPR POS Receipt Profiles";
+                ToolTip = 'Displays the list of POS Receipt Profiles.';
+                ApplicationArea = NPRRetail;
+            }
             action("Related Sales Documents")
             {
                 Caption = 'Related Sales Documents';
