@@ -263,7 +263,8 @@
 
             TicketRequestManager.SetReservationRequestExtraInfo(Token,
                 GetXmlText80(Reservation, 'send_notification_to', 80, false),
-                GetXmlText20(Reservation, 'external_order_no', 20, false));
+                GetXmlText20(Reservation, 'external_order_no', 20, false),
+                GetXmlText100(Reservation, 'ticket_holder_name', 100, false));
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage);
@@ -662,7 +663,8 @@
 
             TicketRequestManager.SetReservationRequestExtraInfo(Token,
               GetXmlText80(Element, 'send_notification_to', 80, false),
-              GetXmlText20(Element, 'external_order_no', 20, false));
+              GetXmlText20(Element, 'external_order_no', 20, false),
+              GetXmlText100(Element, 'ticket_holder_name', 100, false));
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);

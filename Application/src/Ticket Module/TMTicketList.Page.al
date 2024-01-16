@@ -474,7 +474,7 @@
     begin
 
         TicketReservationRequest.Get(Rec."Ticket Reservation Entry No.");
-        TicketNotifyParticipant.AcquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
+        TicketNotifyParticipant.AcquireTicketParticipantForce(TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", TicketReservationRequest.TicketHolderName, true);
 
     end;
 

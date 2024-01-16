@@ -133,6 +133,7 @@ codeunit 85013 "NPR TM API SmokeTest"
     procedure ConfirmTicketReservation()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
@@ -145,6 +146,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         ScannerStation: Code[10];
         SendNotificationTo: Text;
         ExternalOrderNo: Text;
+        TicketHolderName: Text[100];
     begin
 
         ItemNo := SelectSmokeTestScenario();
@@ -157,9 +159,18 @@ codeunit 85013 "NPR TM API SmokeTest"
 
         // [Test]
         ExternalOrderNo := 'abc'; // Note: Without External Order No., the ticket will not be valid for arrival, capacity will be allocated only.
-        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        SendNotificationTo := 'tsa@navipartner.dk';
+        TicketHolderName := 'Foo Bar Baz';
+
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, TicketHolderName, ScannerStation, TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
+
+        TicketRequest.SetFilter("Session Token ID", '=%1', ResponseToken);
+        TicketRequest.FindFirst();
+        Assert.AreEqual(UpperCase(ExternalOrderNo), TicketRequest."External Order No.", 'External Order Number from Request does not match value on token.');
+        Assert.AreEqual(SendNotificationTo, TicketRequest."Notification Address", 'Notification Address from Request does not match value on token.');
+        Assert.AreEqual(TicketHolderName, TicketRequest.TicketHolderName, 'Ticket Holder Name from Request does not match value on token.');
     end;
 
     [Test]

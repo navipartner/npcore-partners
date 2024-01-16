@@ -298,6 +298,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteStringProperty('token', Token);
             JBuilder.WriteStringProperty('notificationAddress', GetAsText(Request, 'notificationAddress', ''));
             JBuilder.WriteStringProperty('paymentReference', GetAsText(Request, 'paymentReference', ''));
+            JBuilder.WriteStringProperty('ticketHolderName', GetAsText(Request, 'ticketHolderName', ''));
 
             if (Token <> '') then begin
                 TicketRequest.SetCurrentKey("Session Token ID");
@@ -319,7 +320,9 @@ codeunit 6151543 "NPR TM Client API BL"
 
                 TicketRequestManager.SetReservationRequestExtraInfo(Token,
                     CopyStr(GetAsText(Request, 'notificationAddress', ''), 1, 80),
-                    CopyStr(GetAsText(Request, 'paymentReference', ''), 1, 20));
+                    CopyStr(GetAsText(Request, 'paymentReference', ''), 1, 20),
+                    CopyStr(GetAsText(Request, 'ticketHolderName', ''), 1, 100)
+                    );
 
                 if not (TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage)) then
                     ValidationErrorList.Add(ErrorMessage);

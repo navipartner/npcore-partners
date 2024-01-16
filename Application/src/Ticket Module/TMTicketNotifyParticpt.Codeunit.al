@@ -193,21 +193,21 @@
 
     end;
 
-    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]): Boolean
+    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
     begin
 
-        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, false));
 
     end;
 
-    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
+    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
     begin
 
-        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, ForceDialog));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, ForceDialog));
 
     end;
 
-    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; ForceDialog: Boolean): Boolean
+    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -292,6 +292,7 @@
         // Note, External Member Card No. might not be assigned at this point in time.
         if (Ticket."External Member Card No." <> '') then begin
             if (GetMember(Ticket."External Member Card No.", Member)) then begin
+                SuggestTicketHolderName := Member."Display Name";
                 case (Member."Notification Method") of
                     Member."Notification Method"::EMAIL:
                         begin
@@ -320,7 +321,7 @@
         DisplayTicketParticipant.Editable(true);
 
         DisplayTicketParticipant.SetAdmissionCode(AdmissionCode);
-        DisplayTicketParticipant.SetDefaultNotification(SuggestNotificationMethod, SuggestNotificationAddress);
+        DisplayTicketParticipant.SetDefaultNotification(SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
 
         // 2 contains the original
         TicketReservationRequest2.Get(TicketReservationRequest."Entry No.");
@@ -334,6 +335,7 @@
         repeat
             TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
             TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
+            TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
             TicketReservationRequest.Modify();
 
             AttributeManagement.CopyEntryAttributeValue(Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest2."Entry No.", TicketReservationRequest."Entry No.");

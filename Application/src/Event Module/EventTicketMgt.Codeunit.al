@@ -299,6 +299,7 @@
         Member: Record "NPR MM Member";
         SuggestMethod: Option NA,EMAIL,SMS;
         SuggestAddress: Text[100];
+        SuggestName: Text[100];
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         if Token = '' then
@@ -307,6 +308,7 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if TicketReservationRequest.FindFirst() then begin
             SuggestAddress := TicketReservationRequest."Notification Address";
+            SuggestName := TicketReservationRequest.TicketHolderName;
             case TicketReservationRequest."Notification Method" of
                 TicketReservationRequest."Notification Method"::EMAIL:
                     SuggestMethod := SuggestMethod::EMAIL;
@@ -319,6 +321,7 @@
 
         if ExternalMemberNo <> '' then
             if Member.Get(MemberManagement.GetMemberFromExtMemberNo(ExternalMemberNo)) then begin
+                SuggestName := Member."Display Name";
                 case Member."Notification Method" of
                     Member."Notification Method"::EMAIL:
                         begin
@@ -328,7 +331,7 @@
                 end;
             end;
 
-        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
+        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress, SuggestName));
     end;
 
     procedure RevokeTicketWithLog(var JobPlanningLine: Record "Job Planning Line")
