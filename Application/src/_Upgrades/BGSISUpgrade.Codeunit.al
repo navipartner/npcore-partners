@@ -16,6 +16,11 @@
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'add-salesperson-to-bg-sis-audit-log'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'blank-item-description')) then begin
+            PopulateBlankItemDescriptionOnPOSEntrySalesLines();
+            UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'blank-item-description'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -31,5 +36,28 @@
                     BGSISPOSAuditLogAux.Modify();
                 end;
             until BGSISPOSAuditLogAux.Next() = 0;
+    end;
+
+    local procedure PopulateBlankItemDescriptionOnPOSEntrySalesLines()
+    var
+        Item: Record Item;
+        BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        if not BGFiscalizationSetup.Get() then
+            exit;
+
+        if not BGFiscalizationSetup."BG SIS Fiscal Enabled" then
+            exit;
+
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetRange(Description, '');
+        if POSEntrySalesLine.FindSet(true) then
+            repeat
+                if Item.Get(POSEntrySalesLine."No.") then begin
+                    POSEntrySalesLine.Description := Item.Description;
+                    POSEntrySalesLine.Modify();
+                end;
+            until POSEntrySalesLine.Next() = 0;
     end;
 }

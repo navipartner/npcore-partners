@@ -151,6 +151,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
         CheckAreMandatoryMappingsPopulated(SaleHeader);
         DoNotAllowUsingOtherPaymentMethodThanCashForReturn(SaleHeader);
+        DoNotAllowHavingBlankItemDescriptions(SaleHeader);
     end;
     #endregion
 
@@ -425,6 +426,20 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
                 BGSISPOSPaymMethMap.Get(POSSaleLine."No.");
                 BGSISPOSPaymMethMap.TestField("BG SIS Payment Method", BGSISPOSPaymMethMap."BG SIS Payment Method"::Cash);
             until POSSaleLine.Next() = 0;
+    end;
+
+    local procedure DoNotAllowHavingBlankItemDescriptions(SaleHeader: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        BlankItemDescriptionErr: Label '%1 related to %2 %3 cannot have blank %4.', Comment = '%1 - POS Sale Line table caption, %2 - Line Type Item value, %3 - Item No. value, %4 - Description value';
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetRange(Description, '');
+        if POSSaleLine.FindFirst() then
+            Error(BlankItemDescriptionErr, POSSaleLine.TableCaption(), Format(POSSaleLine."Line Type"::Item), POSSaleLine."No.", POSSaleLine.FieldCaption(Description));
     end;
     #endregion
 
