@@ -1978,9 +1978,6 @@
 
     internal procedure CalculateNewExpireTime(): DateTime;
     begin
-
-
-
         exit(CurrentDateTime() + (GetExpirySeconds() * 1000));
     end;
 
@@ -2009,10 +2006,10 @@
                             ExpirySeconds := TicketSetup.PosUnattendedExpireTimeSeconds;
                         Pos."POS Type"::EXTERNAL:
                             ExpirySeconds := TicketSetup.PosExternalExpireTimeSeconds;
-                        else
-                            ExpirySeconds := TicketSetup.UserDefaultExpireTimeSeconds;
                     end;
                 end;
+                if (ExpirySeconds = 0) then
+                    ExpirySeconds := TicketSetup.UserDefaultExpireTimeSeconds;
             end;
         end;
 
