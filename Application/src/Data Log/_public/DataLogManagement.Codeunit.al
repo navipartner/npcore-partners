@@ -325,7 +325,7 @@
                         DataLogField."Table ID" := RecRef.Number;
                         DataLogField."Log Date" := LastModified;
                         DataLogField."Field No." := FieldRef.Number;
-                        DataLogField."Field Value" := Format(FieldRef.Value, 0, 9);
+                        DataLogField."Field Value" := CopyStr(Format(FieldRef.Value, 0, 9), 1, MaxStrLen(DataLogField."Field Value"));
                         DataLogField."Data Log Record Entry No." := RecordEntryNo;
                         DataLogField."Field Value Changed" := FieldValueChanged;
                         if FieldValueChanged then
