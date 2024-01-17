@@ -45,6 +45,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
             //This is because values like LastSaleTotals are implemented via data extensions on BUILTIN_SALE and are shown on the login screen even when no new sale is started yet.
             POSSession.GetSetup(POSSetup);
             TempSale."Register No." := POSSetup.GetPOSUnitNo();
+            TempSale.Date := Today();
             TempSale.Insert();
             Data.Add('currentPosition', TempSale.GetPosition(true));
         end;
@@ -83,6 +84,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
             //For backwards compatibility reasons we support refreshing the POS sale record even if no sale is currently active.
             //This is because values like LastSaleTotals are implemented via data extensions on BUILTIN_SALE and are shown on the login screen even when no new sale is started yet.
             TempSale."Register No." := POSSetup.GetPOSUnitNo();
+            TempSale.Date := Today();
             TempSale.Insert();
             Insert(TempSale);
         end;
