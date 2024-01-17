@@ -251,6 +251,34 @@
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
+        field(350; DefaultExpireTimeSeconds; Integer)
+        {
+            Caption = 'Default Expire Time (Seconds)';
+            DataClassification = CustomerContent;
+            InitValue = 1500;
+            MinValue = 60;
+        }
+        field(351; UserDefaultExpireTimeSeconds; Integer)
+        {
+            Caption = 'User Expire Time (Seconds)';
+            DataClassification = CustomerContent;
+            InitValue = 1500;
+            MinValue = 60;
+        }
+        field(352; PosUnattendedExpireTimeSeconds; Integer)
+        {
+            Caption = 'POS Unattended Expire Time (Seconds)';
+            DataClassification = CustomerContent;
+            InitValue = 1500;
+            MinValue = 60;
+        }
+        field(353; PosExternalExpireTimeSeconds; Integer)
+        {
+            Caption = 'POS External Expire Time (Seconds)';
+            DataClassification = CustomerContent;
+            InitValue = 1500;
+            MinValue = 60;
+        }
         field(400; "Ticket Admission Web Url"; Text[250])
         {
             Caption = 'Ticket Admission Web Url';

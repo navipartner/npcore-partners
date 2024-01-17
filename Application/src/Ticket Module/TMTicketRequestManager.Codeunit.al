@@ -1976,13 +1976,54 @@
           ToFile);
     end;
 
-    procedure CalculateNewExpireTime(): DateTime;
+    internal procedure CalculateNewExpireTime(): DateTime;
     begin
-        exit(CurrentDateTime() + 1500 * 1000);
+
+
+
+        exit(CurrentDateTime() + (GetExpirySeconds() * 1000));
+    end;
+
+    internal procedure GetExpirySeconds() ExpirySeconds: Integer
+    var
+        UserSetup: Record "User Setup";
+        Pos: Record "NPR POS Unit";
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+
+        ExpirySeconds := 0;
+        if (not TicketSetup.Get()) then
+            ExpirySeconds := 1500;
+
+        if (ExpirySeconds = 0) then
+            if ((TicketSetup.DefaultExpireTimeSeconds = TicketSetup.UserDefaultExpireTimeSeconds) and
+                (TicketSetup.UserDefaultExpireTimeSeconds = TicketSetup.PosUnattendedExpireTimeSeconds) and
+                (TicketSetup.PosUnattendedExpireTimeSeconds = TicketSetup.PosExternalExpireTimeSeconds)) then
+                ExpirySeconds := TicketSetup.DefaultExpireTimeSeconds;
+
+        if (ExpirySeconds = 0) then begin
+            if (UserSetup.Get(CopyStr(UserId, 1, MaxStrLen(UserSetup."User ID")))) then begin
+                if (Pos.Get(UserSetup."NPR POS Unit No.") and (UserSetup."NPR POS Unit No." <> '')) then begin
+                    case (Pos."POS Type") of
+                        Pos."POS Type"::UNATTENDED:
+                            ExpirySeconds := TicketSetup.PosUnattendedExpireTimeSeconds;
+                        Pos."POS Type"::EXTERNAL:
+                            ExpirySeconds := TicketSetup.PosExternalExpireTimeSeconds;
+                        else
+                            ExpirySeconds := TicketSetup.UserDefaultExpireTimeSeconds;
+                    end;
+                end;
+            end;
+        end;
+
+        if (ExpirySeconds = 0) then
+            ExpirySeconds := TicketSetup.DefaultExpireTimeSeconds;
+
+        if (ExpirySeconds = 0) then
+            ExpirySeconds := 1500;
     end;
 
     // ***************** EVENTS
-
     [IntegrationEvent(false, false)]
     internal procedure OnAfterBlockTicketPublisher(TicketNo: Code[20])
     begin
