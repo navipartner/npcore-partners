@@ -683,6 +683,7 @@
     local procedure CreateResponse(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; var TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp."): Boolean
     var
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
         // One response per Ext. Line Reference No.
@@ -702,7 +703,7 @@
             // unconfirmed change request entry can be reused in order to invalidate the previous token.
             if (TicketReservationResponse."Session Token ID" <> TicketReservationRequest."Session Token ID") then begin
                 TicketReservationResponse."Session Token ID" := TicketReservationRequest."Session Token ID";
-                TicketReservationResponse."Exires (Seconds)" := 1500;
+                TicketReservationResponse."Exires (Seconds)" := TicketRequestManager.GetExpirySeconds();
                 TicketReservationResponse.Status := true;
                 TicketReservationResponse.Confirmed := false;
                 TicketReservationResponse.Modify();
@@ -719,7 +720,7 @@
             TicketReservationResponse."Request Entry No." := TicketReservationRequest2."Entry No.";
             TicketReservationResponse."Session Token ID" := TicketReservationRequest."Session Token ID";
             TicketReservationResponse."Ext. Line Reference No." := TicketReservationRequest."Ext. Line Reference No.";
-            TicketReservationResponse."Exires (Seconds)" := 1500;
+            TicketReservationResponse."Exires (Seconds)" := TicketRequestManager.GetExpirySeconds();
             TicketReservationResponse.Status := true;
             TicketReservationResponse.Confirmed := false;
             TicketReservationResponse.Insert();

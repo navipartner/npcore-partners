@@ -251,6 +251,35 @@
                     ToolTip = 'Specifies the value of the Wizard Item No. Series field';
                 }
             }
+            group(Advanced)
+            {
+                Caption = 'Advanced Settings';
+
+                group(ExpiryTime)
+                {
+                    Caption = 'Ticket Expiry';
+                    field(DefaultExpireTimeSeconds; Rec.DefaultExpireTimeSeconds)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Default Expire Time (Seconds) field.';
+                    }
+                    field(UserDefaultExpireTimeSeconds; Rec.UserDefaultExpireTimeSeconds)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the User Expire Time (Seconds) field.';
+                    }
+                    field(PosExternalExpireTimeSeconds; Rec.PosExternalExpireTimeSeconds)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the POS External Expire Time (Seconds) field.';
+                    }
+                    field(PosUnattendedExpireTimeSeconds; Rec.PosUnattendedExpireTimeSeconds)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the POS Unattended Expire Time (Seconds) field.';
+                    }
+                }
+            }
         }
     }
 
