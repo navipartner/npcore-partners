@@ -209,9 +209,9 @@
         until (TicketRequest.Next() = 0);
     end;
 
-    procedure PrintTicketBatch(var Ticket: Record "NPR TM Ticket")
+    procedure PrintTicketBatch(var TicketFilter: Record "NPR TM Ticket")
     var
-        Ticket2: Record "NPR TM Ticket";
+        Ticket, Ticket2 : Record "NPR TM Ticket";
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketDIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
@@ -219,6 +219,8 @@
         PrintTicket: Boolean;
         PublishError: Boolean;
     begin
+        Ticket.CopyFilters(TicketFilter);
+        Ticket.SetFilter(Blocked, '=%1', false);
         if (not (Ticket.FindSet())) then
             exit;
 
