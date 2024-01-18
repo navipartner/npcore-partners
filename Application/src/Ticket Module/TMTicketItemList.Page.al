@@ -174,8 +174,10 @@ page 6059888 "NPR TM Ticket Item List"
                 trigger OnAction()
                 var
                     ResyncTicket: Codeunit "NPR TM TicketToDataLog";
+                    SyncMessage: Label 'Ticket item %1 was scheduled for synchronization, endpoints will be updated in a moment.';
                 begin
                     ResyncTicket.DeepRefreshItem(Rec."Item No.");
+                    Message(SyncMessage, Rec."Item No.");
                 end;
             }
         }
