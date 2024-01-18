@@ -456,7 +456,9 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
                     ReceiptPayments.Set(BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger(), PaymentAmount + Round(POSEntryPaymentLine.Amount, 0.01))
                 else
                     ReceiptPayments.Add(BGSISPOSPaymMethMap."BG SIS Payment Method".AsInteger(), Round(POSEntryPaymentLine.Amount, 0.01));
-            until POSEntryPaymentLine.Next() = 0;
+            until POSEntryPaymentLine.Next() = 0
+        else
+            ReceiptPayments.Add(CashBGSISPaymentMethod.AsInteger(), Round(0, 0.01));
 
         foreach PaymentMedium in ReceiptPayments.Keys() do begin
             PaymentAmount := ReceiptPayments.Get(PaymentMedium);
