@@ -89,12 +89,10 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
         BGSISPOSAuditLogAux."Salesperson Code" := POSEntry."Salesperson Code";
 
-        case true of
-            BGSISPOSAuditLogAux."Amount Incl. Tax" > 0:
-                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale;
-            BGSISPOSAuditLogAux."Amount Incl. Tax" < 0:
-                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
-        end;
+        if BGSISPOSAuditLogAux."Amount Incl. Tax" >= 0 then
+            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
+        else
+            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
 
         BGSISPOSAuditLogAux.Insert();
     end;
