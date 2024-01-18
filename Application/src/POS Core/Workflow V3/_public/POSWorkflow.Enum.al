@@ -923,6 +923,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SI_PREINV_INSERT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: SIPreInv Ins.";
     }
+    value(188; "BG_SIS_REPRINT_FR")
+    {
+        Caption = 'BG_SIS_REPRINT_FR', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: BG SIS Repr FR";
+    }
     value(189; BG_SIS_CASH_MGT)
     {
         Caption = 'BG_SIS_CASH_MGT', Locked = true, MaxLength = 20;

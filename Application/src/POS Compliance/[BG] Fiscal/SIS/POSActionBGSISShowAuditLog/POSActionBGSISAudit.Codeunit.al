@@ -29,13 +29,13 @@ codeunit 6184626 "NPR POS Action: BG SIS Audit" implements "NPR IPOS Workflow"
 
         case Show of
             Show::AllFiscalized:
-                BGSISPOSAuditLogAux.SetFilter("Receipt Timestamp", '<>%1', '');
+                BGSISPOSAuditLogAux.SetFilter("Grand Receipt No.", '<>%1', '');
             Show::AllNonFiscalized:
-                BGSISPOSAuditLogAux.SetRange("Receipt Timestamp", '');
+                BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", '');
             Show::LastTransaction:
                 begin
                     BGSISPOSAuditLogAux2.SetLoadFields("Audit Entry Type", "Audit Entry No.");
-                    BGSISPOSAuditLogAux2.SetFilter("Receipt Timestamp", '<>%1', '');
+                    BGSISPOSAuditLogAux2.SetFilter("Grand Receipt No.", '<>%1', '');
                     BGSISPOSAuditLogAux2.FindLast();
 
                     BGSISPOSAuditLogAux.SetRange("Audit Entry Type", BGSISPOSAuditLogAux2."Audit Entry Type");
