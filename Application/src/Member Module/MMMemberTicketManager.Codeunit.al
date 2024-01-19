@@ -370,7 +370,7 @@
         Membership: Record "NPR MM Membership";
         MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ItemNo: Code[20];
+        ItemNo, PrevItemNo : Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
     begin
@@ -395,6 +395,10 @@
                 TmpTicketReservationRequest."Admission Description" := CopyStr(MembershipAdmissionSetup.Description, 1, MaxStrLen(TmpTicketReservationRequest."Admission Description"));
 
             TmpTicketReservationRequest."Entry No." += 1;
+            if (PrevItemNo <> ItemNo) then begin
+                PrevItemNo := ItemNo;
+                TmpTicketReservationRequest."Ext. Line Reference No." := TmpTicketReservationRequest."Entry No."; // Separate different items as different ticket requests within the token.
+            end;
             TmpTicketReservationRequest.Insert();
 
         until (MembershipAdmissionSetup.Next() = 0);
