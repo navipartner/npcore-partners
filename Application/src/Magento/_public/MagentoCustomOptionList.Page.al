@@ -86,8 +86,24 @@
 
                     ToolTip = 'Specifies the value of the Item Count field';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowItemsWithMagentoCustomOption(Rec."No.");
+                    end;
                 }
             }
         }
     }
+
+    local procedure ShowItemsWithMagentoCustomOption(CustomOptionNo: Code[20])
+    var
+        MagentoItemCustomOption: Record "NPR Magento Item Custom Option";
+    begin
+        MagentoItemCustomOption.FilterGroup(2);
+        MagentoItemCustomOption.SetRange("Custom Option No.", CustomOptionNo);
+        MagentoItemCustomOption.SetRange(Enabled, true);
+        MagentoItemCustomOption.FilterGroup(0);
+        Page.Run(Page::"NPR Magento Item CO Preview", MagentoItemCustomOption);
+    end;
 }

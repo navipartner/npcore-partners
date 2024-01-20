@@ -87,6 +87,12 @@
             FieldClass = FlowField;
             InitValue = true;
         }
+        field(1120; "Item Description"; Text[100])
+        {
+            CalcFormula = Lookup(Item.Description where("No." = field("Item No.")));
+            Caption = 'Item Description';
+            FieldClass = FlowField;
+        }
     }
 
     keys
