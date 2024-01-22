@@ -58,12 +58,13 @@ codeunit 85075 "NPR POS Act. InsAddCusId Tests"
         LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+
         if _Initialized then begin
             //Refresh Allowed Tax Rates
             RSTaxCommunicationMgt.PullAndFillAllowedTaxRates();
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
         end else begin
             NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
