@@ -353,6 +353,9 @@
         if TotalAmountInclVAT <= 0 then
             exit(0);
 
+        if TotalAmountInclVAT <= TempMixedDiscount."Total Amount" then
+            exit(0);
+
         case TempMixedDiscount."Discount Type" of
             TempMixedDiscount."Discount Type"::"Total Amount per Min. Qty.",
             TempMixedDiscount."Discount Type"::"Total Discount Amt. per Min. Qty.":
@@ -361,12 +364,20 @@
                         TotalAmountAfterDisc := BatchQty * TempMixedDiscount."Total Amount"
                     else
                         TotalAmountAfterDisc := TotalAmountInclVAT - BatchQty * TempMixedDiscount."Total Discount Amount";
+
+                    if TotalAmountInclVAT <= TotalAmountAfterDisc then
+                        exit(0);
+
                     if AmountExclVat(TempMixedDiscount) then begin
                         AvgDiscPct := 1 - (TotalAmountAfterDisc / (TotalAmountInclVAT - TotalVATAmount));
                         LineDiscAmount := NPRPOSSaleTaxCalc.UnitPriceExclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                        if LineDiscAmount > TempSaleLinePOSApply.Amount then
+                            LineDiscAmount := TempSaleLinePOSApply.Amount;
                     end else begin
                         AvgDiscPct := 1 - TotalAmountAfterDisc / TotalAmountInclVAT;
                         LineDiscAmount := NPRPOSSaleTaxCalc.UnitPriceInclTax(TempSaleLinePOSApply) * TempSaleLinePOSApply."MR Anvendt antal" * AvgDiscPct;
+                        if LineDiscAmount > TempSaleLinePOSApply."Amount Including VAT" then
+                            LineDiscAmount := TempSaleLinePOSApply."Amount Including VAT";
                     end;
                 end;
             TempMixedDiscount."Discount Type"::"Total Discount %":
@@ -396,6 +407,9 @@
         TotalDiscQty: Decimal;
     begin
         if TotalAmountInclVAT <= 0 then
+            exit(0);
+
+        if TotalAmountInclVAT <= TempMixedDiscount."Total Amount" then
             exit(0);
 
         case TempMixedDiscount."Discount Type" of
@@ -429,7 +443,11 @@
         end;
 
         TotalDiscAmount := Round(TotalDiscAmount, GLSetup."Amount Rounding Precision");
-        exit(TotalDiscAmount);
+
+        if TotalDiscAmount < 0 then
+            exit(0)
+        else
+            exit(TotalDiscAmount);
     end;
 
     procedure CalcExpectedDiscAmount(MixedDiscount: Record "NPR Mixed Discount"; MaxDisc: Boolean) ExpectedDiscAmount: Decimal
@@ -816,6 +834,7 @@
         TotalAmountInclVAT: Decimal;
         TotalDiscAmount: Decimal;
         TotalVATAmount: Decimal;
+        AdditionalDiscountAmount: Decimal;
     begin
         TempSaleLinePOSApply.CalcSums("MR Anvendt antal", "Amount Including VAT", Amount);
 
@@ -855,11 +874,28 @@
             AppliedDiscAmountTaxAdjusted -= TempSaleLinePOSApply."Discount Amount";
             case true of
                 TempMixedDiscount.AbsoluteAmountDiscount() and AmountExclVat(TempMixedDiscount) and TempSaleLinePOSApply."Price Includes VAT":
-                    TempSaleLinePOSApply."Discount Amount" += (TotalDiscAmount - AppliedDiscAmountRaw) * (1 + TempSaleLinePOSApply."VAT %" / 100);
+                    begin
+                        AdditionalDiscountAmount := TempSaleLinePOSApply."Discount Amount" + (TotalDiscAmount - AppliedDiscAmountRaw) * (1 + TempSaleLinePOSApply."VAT %" / 100);
+                        if AdditionalDiscountAmount >= TempSaleLinePOSApply.Amount then
+                            TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Amount Including VAT"
+                        else
+                            TempSaleLinePOSApply."Discount Amount" := AdditionalDiscountAmount;
+                    end;
                 TempMixedDiscount.AbsoluteAmountDiscount() and not AmountExclVat(TempMixedDiscount) and not TempSaleLinePOSApply."Price Includes VAT":
-                    TempSaleLinePOSApply."Discount Amount" += (TotalDiscAmount - AppliedDiscAmountRaw) / (1 + TempSaleLinePOSApply."VAT %" / 100);
-                else
-                    TempSaleLinePOSApply."Discount Amount" += TotalDiscAmount - AppliedDiscAmountRaw;
+                    begin
+                        AdditionalDiscountAmount := TempSaleLinePOSApply."Discount Amount" + (TotalDiscAmount - AppliedDiscAmountRaw) / (1 + TempSaleLinePOSApply."VAT %" / 100);
+                        if AdditionalDiscountAmount >= TempSaleLinePOSApply.Amount then
+                            TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply.Amount
+                        else
+                            TempSaleLinePOSApply."Discount Amount" := AdditionalDiscountAmount;
+                    end;
+                else begin
+                    AdditionalDiscountAmount := TempSaleLinePOSApply."Discount Amount" + TotalDiscAmount - AppliedDiscAmountRaw;
+                    if AdditionalDiscountAmount > TempSaleLinePOSApply."Amount Including VAT" then
+                        TempSaleLinePOSApply."Discount Amount" := TempSaleLinePOSApply."Amount Including VAT"
+                    else
+                        TempSaleLinePOSApply."Discount Amount" := AdditionalDiscountAmount;
+                end;
             end;
             TempSaleLinePOSApply."Discount Amount" := Round(TempSaleLinePOSApply."Discount Amount", GLSetup."Amount Rounding Precision");
             TempSaleLinePOSApply.Modify();
