@@ -267,79 +267,65 @@ codeunit 6151077 "NPR Total Discount Management"
         TotalDiscountSalesAmount := TempTotalDiscountSaleLinePOS."Amount Including VAT";
     end;
 
-    local procedure GetTotalDiscountAmountCalculationPOSSaleLines(NPRTotalDiscountHeader: Record "NPR Total Discount Header";
-                                                                  var TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
-                                                                  var TempTotalDiscountSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    local procedure GetTotalDiscountAmountCalculationPOSSaleLines(NPRTotalDiscountHeader: Record "NPR Total Discount Header"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempTotalDiscountSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         TempCalcTotalDiscountSaleLinePOS: Record "NPR POS Sale Line" temporary;
         NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        Found: Boolean;
     begin
         TempTotalDiscountSaleLinePOS.Reset();
         if not TempTotalDiscountSaleLinePOS.IsEmpty then
             TempTotalDiscountSaleLinePOS.DeleteAll();
 
-        CopySaleLinesPOS(TempSaleLinePOS,
-                         TempCalcTotalDiscountSaleLinePOS,
-                         true);
+        CopySaleLinesPOS(TempSaleLinePOS, TempCalcTotalDiscountSaleLinePOS, true);
 
         case NPRTotalDiscountHeader."Step Amount Calculation" of
             NPRTotalDiscountHeader."Step Amount Calculation"::"No Filters":
                 begin
                     TempCalcTotalDiscountSaleLinePOS.Reset();
                     TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS,
-                                     TempTotalDiscountSaleLinePOS,
-                                     true);
+                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, true);
                 end;
             NPRTotalDiscountHeader."Step Amount Calculation"::"Discount Filters":
                 begin
+                    NPRTotalDiscountLine.Reset();
+                    NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
+                    if NPRTotalDiscountLine.IsEmpty then
+                        exit;
 
                     NPRTotalDiscountLine.Reset();
                     NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
-                    if not NPRTotalDiscountLine.FindSet(false) then
+                    NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::All);
+                    if not NPRTotalDiscountLine.IsEmpty then begin
+                        TempCalcTotalDiscountSaleLinePOS.Reset();
+                        TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                        CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, true);
                         exit;
+                    end;
 
-                    repeat
-                        case NPRTotalDiscountLine.Type of
-                            NPRTotalDiscountLine.Type::All:
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS,
-                                                     TempTotalDiscountSaleLinePOS,
-                                                     true);
-                                    exit;
-                                end;
-                            NPRTotalDiscountLine.Type::"Item Category":
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Item Category Code", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS,
-                                                      TempTotalDiscountSaleLinePOS,
-                                                      false);
+                    TempCalcTotalDiscountSaleLinePOS.Reset();
+                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                    if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
+                        repeat
+                            NPRTotalDiscountLine.Reset();
+                            NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
+                            NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Item);
+                            NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."No.");
+                            Found := not NPRTotalDiscountLine.IsEmpty;
+                            if not Found then begin
+                                NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::"Item Category");
+                                NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Item Category Code");
+                                Found := not NPRTotalDiscountLine.IsEmpty;
+                            end;
+                            if not Found then begin
+                                NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Vendor);
+                                NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Vendor No.");
+                                Found := not NPRTotalDiscountLine.IsEmpty;
+                            end;
+                            if Found then
+                                CopySaleLinePOS(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS);
 
-                                end;
-                            NPRTotalDiscountLine.Type::Item:
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("No.", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS,
-                                                     TempTotalDiscountSaleLinePOS,
-                                                     false);
-                                end;
-                            NPRTotalDiscountLine.Type::Vendor:
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Vendor No.", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS,
-                                                     TempTotalDiscountSaleLinePOS,
-                                                     false);
-                                end;
-                        end;
-                    until NPRTotalDiscountLine.Next() = 0;
+                        until TempCalcTotalDiscountSaleLinePOS.Next() = 0;
                 end;
         end;
         Clear(TempTotalDiscountSaleLinePOS);
@@ -351,6 +337,7 @@ codeunit 6151077 "NPR Total Discount Management"
     var
         TempCalcTotalDiscountSaleLinePOS: Record "NPR POS Sale Line" temporary;
         NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        Found: Boolean;
     begin
         TempTotalDiscountSaleLinePOS.Reset();
         if not TempTotalDiscountSaleLinePOS.IsEmpty then
@@ -369,59 +356,41 @@ codeunit 6151077 "NPR Total Discount Management"
                 end;
             NPRTotalDiscountHeader."Discount Application"::"Discount Filters":
                 begin
+                    NPRTotalDiscountLine.Reset();
+                    NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
+                    if NPRTotalDiscountLine.IsEmpty then
+                        exit;
 
                     NPRTotalDiscountLine.Reset();
                     NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
-                    if not NPRTotalDiscountLine.FindSet(false) then
+                    NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::All);
+                    if not NPRTotalDiscountLine.IsEmpty then begin
+                        CopySaleLinesPOSWithCalculation(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, false);
                         exit;
+                    end;
 
-                    repeat
-                        case NPRTotalDiscountLine.Type of
-                            NPRTotalDiscountLine.Type::All:
-                                begin
-                                    CopySaleLinesPOSWithCalculation(TempCalcTotalDiscountSaleLinePOS,
-                                                                   TempTotalDiscountSaleLinePOS,
-                                                                   false);
-                                    exit;
-                                end;
-                            NPRTotalDiscountLine.Type::"Item Category":
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Item Category Code", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
-                                        repeat
-                                            CopySaleLineWithCalculation(TempCalcTotalDiscountSaleLinePOS,
-                                                                        TempTotalDiscountSaleLinePOS,
-                                                                        false);
-                                        until TempCalcTotalDiscountSaleLinePOS.Next() = 0;
-                                end;
-                            NPRTotalDiscountLine.Type::Item:
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("No.", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
-                                        repeat
-                                            CopySaleLineWithCalculation(TempCalcTotalDiscountSaleLinePOS,
-                                                                        TempTotalDiscountSaleLinePOS,
-                                                                        false);
-                                        until TempCalcTotalDiscountSaleLinePOS.Next() = 0;
-                                end;
-                            NPRTotalDiscountLine.Type::Vendor:
-                                begin
-                                    TempCalcTotalDiscountSaleLinePOS.Reset();
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Vendor No.", NPRTotalDiscountLine."No.");
-                                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
-                                    if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
-                                        repeat
-                                            CopySaleLineWithCalculation(TempCalcTotalDiscountSaleLinePOS,
-                                                                        TempTotalDiscountSaleLinePOS,
-                                                                        false);
-                                        until TempCalcTotalDiscountSaleLinePOS.Next() = 0;
-                                end;
-                        end;
-                    until NPRTotalDiscountLine.Next() = 0;
+                    TempCalcTotalDiscountSaleLinePOS.Reset();
+                    TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                    if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
+                        repeat
+                            NPRTotalDiscountLine.Reset();
+                            NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
+                            NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Item);
+                            NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."No.");
+                            Found := not NPRTotalDiscountLine.IsEmpty;
+                            if not Found then begin
+                                NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::"Item Category");
+                                NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Item Category Code");
+                                Found := not NPRTotalDiscountLine.IsEmpty;
+                            end;
+                            if not Found then begin
+                                NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Vendor);
+                                NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Vendor No.");
+                                Found := not NPRTotalDiscountLine.IsEmpty;
+                            end;
+                            if Found then
+                                CopySaleLineWithCalculation(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, false);
+                        until TempCalcTotalDiscountSaleLinePOS.Next() = 0;
                 end;
         end;
         Clear(TempTotalDiscountSaleLinePOS);
@@ -455,22 +424,32 @@ codeunit 6151077 "NPR Total Discount Management"
         if not ToTempSaleLinePOS.IsTemporary() then
             exit;
 
-        if ClearBuffer then begin
-            Clear(ToTempSaleLinePOS);
-            if not ToTempSaleLinePOS.IsEmpty then
-                ToTempSaleLinePOS.DeleteAll();
-        end;
+        if ClearBuffer then
+            DeleteBuffer(ToTempSaleLinePOS);
 
         if not FromTempSaleLinePOS.FindSet(false) then
             exit;
 
         repeat
-            if not ToTempSaleLinePOS.Get(FromTempSaleLinePOS.RecordId) then begin
-                ToTempSaleLinePOS.Init();
-                ToTempSaleLinePOS := FromTempSaleLinePOS;
-                ToTempSaleLinePOS.Insert(false);
-            end;
+            CopySaleLinePOS(FromTempSaleLinePOS, ToTempSaleLinePOS);
         until FromTempSaleLinePOS.Next() = 0;
+    end;
+
+    local procedure CopySaleLinePOS(var FromTempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ToTempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    begin
+        if ToTempSaleLinePOS.Get(FromTempSaleLinePOS.RecordId) then
+            exit;
+
+        ToTempSaleLinePOS.Init();
+        ToTempSaleLinePOS := FromTempSaleLinePOS;
+        ToTempSaleLinePOS.Insert(false);
+    end;
+
+    local procedure DeleteBuffer(var ToTempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    begin
+        Clear(ToTempSaleLinePOS);
+        if not ToTempSaleLinePOS.IsEmpty then
+            ToTempSaleLinePOS.DeleteAll();
     end;
 
     local procedure ApplyTotalDiscount(SalePOS: Record "NPR POS Sale";
@@ -681,6 +660,14 @@ codeunit 6151077 "NPR Total Discount Management"
                                              "Starting Date",
                                              "Ending date",
                                              "Customer Disc. Group Filter");
+    end;
+
+    internal procedure ActiveTotalDiscountsExist(CalculationDate: Date) ActiveTotalDiscountsExist: Boolean;
+    var
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+    begin
+        FilterActiveTotalDiscountHeaders(NPRTotalDiscountHeader, CalculationDate);
+        ActiveTotalDiscountsExist := not NPRTotalDiscountHeader.IsEmpty;
     end;
 
     local procedure CheckDiscountPriority(CurrNPRDiscountPriority: Record "NPR Discount Priority")
@@ -1474,24 +1461,41 @@ codeunit 6151077 "NPR Total Discount Management"
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
 
-        if LineOperation = LineOperation::Total then begin
+        if LineOperation = LineOperation::Total then
+            exit;
 
-            AddManualDiscountSaleLines(SalePOS,
-                                       TempSaleLinePOS);
 
-            ApplyTotalDiscount(SalePOS,
-                               TempSaleLinePOS,
-                               Today);
-        end else begin
-            CleanUpUnrelevantBenefitItems(SalePOS,
-                                          '',
-                                          0);
-            CleanUpManualDiscountLines(SalePOS,
-                                       Rec,
-                                       xRec);
-        end;
+        CleanUpUnrelevantBenefitItems(SalePOS,
+                                      '',
+                                      0);
+        CleanUpManualDiscountLines(SalePOS,
+                                   Rec,
+                                   xRec);
 
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscountTotal', '', true, true)]
+    local procedure ApplyDiscountTotal(DiscountPriority: Record "NPR Discount Priority";
+                                       SalePOS: Record "NPR POS Sale";
+                                       var TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+                                       Rec: Record "NPR POS Sale Line";
+                                       xRec: Record "NPR POS Sale Line";
+                                       LineOperation: Option Insert,Modify,Delete,Total;
+                                       RecalculateAllLines: Boolean)
+    begin
+        if not IsSubscribedDiscount(DiscountPriority) then
+            exit;
+
+        if LineOperation <> LineOperation::Total then
+            exit;
+
+
+        AddManualDiscountSaleLines(SalePOS, TempSaleLinePOS);
+
+        ApplyTotalDiscount(SalePOS, TempSaleLinePOS, Today)
+
+    end;
+
 
     [EventSubscriber(ObjectType::Table, DATABASE::"NPR POS Sale Line", 'OnBeforeModifyEvent', '', true, true)]
     local procedure OnAfterValidateQuantity(var Rec: Record "NPR POS Sale Line";
@@ -1579,6 +1583,42 @@ codeunit 6151077 "NPR Total Discount Management"
             if not tmpDiscountPriority.IsEmpty then
                 tmpDiscountPriority.DeleteAll();
         end;
+
+        FilterActiveTotalDiscountHeaders(NPRTotalDiscountHeader,
+                                         Today);
+
+        IsActive := not NPRTotalDiscountHeader.IsEmpty;
+
+        if IsActive then begin
+            tmpDiscountPriority.Init();
+            tmpDiscountPriority := DiscountPriority;
+            tmpDiscountPriority.Insert();
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscountsTotal', '', false, false)]
+    local procedure OnFindActiveSaleLineDiscountsTotal(var tmpDiscountPriority: Record "NPR Discount Priority" temporary;
+                                                       Rec: Record "NPR POS Sale Line";
+                                                       xRec: Record "NPR POS Sale Line";
+                                                       LineOperation: Option Insert,Modify,Delete,Total)
+    var
+        DiscountPriority: Record "NPR Discount Priority";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        IsActive: Boolean;
+    begin
+        if not DiscountPriority.Get(DiscSourceTableId()) then
+            exit;
+
+        if not IsSubscribedDiscount(DiscountPriority) then
+            exit;
+
+        if LineOperation <> LineOperation::Total then
+            exit;
+
+        tmpDiscountPriority.Reset();
+        if not tmpDiscountPriority.IsEmpty then
+            tmpDiscountPriority.DeleteAll();
+
 
         FilterActiveTotalDiscountHeaders(NPRTotalDiscountHeader,
                                          Today);
