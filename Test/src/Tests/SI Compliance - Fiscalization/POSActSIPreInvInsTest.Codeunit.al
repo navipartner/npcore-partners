@@ -61,11 +61,11 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
         LibraryRPTemplate: Codeunit "NPR Library - RP Template Data";
         LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-        end else begin
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+
+        if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultVoucherType(VoucherType, false);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);

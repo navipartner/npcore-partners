@@ -185,11 +185,9 @@ codeunit 85006 "NPR POS Payment Tests"
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-        end;
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
 
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
