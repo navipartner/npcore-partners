@@ -309,11 +309,15 @@ codeunit 6151310 "NPR POS Action: Calc Discounts" implements "NPR IPOS Workflow"
                                                             var PreWorkflows: JsonObject)
     var
         ActionParameters: JsonObject;
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
+        if not TotalDiscountManagement.ActiveTotalDiscountsExist(Today) then
+            exit;
         ActionParameters.Add('calculateLineDiscounst', false);
         ActionParameters.Add('calculateTotalDiscounst', true);
         ActionParameters.Add('handleBenefitItems', true);
         PreWorkflows.Add(GetCalculateDiscountsHandler(), ActionParameters);
+
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Doc Exp Events", 'OnAddPreWorkflowsToRun', '', true, true)]
@@ -322,7 +326,10 @@ codeunit 6151310 "NPR POS Action: Calc Discounts" implements "NPR IPOS Workflow"
                                                                    var PreWorkflows: JsonObject)
     var
         ActionParameters: JsonObject;
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
+        if not TotalDiscountManagement.ActiveTotalDiscountsExist(Today) then
+            exit;
         ActionParameters.Add('calculateLineDiscounst', false);
         ActionParameters.Add('calculateTotalDiscounst', true);
         ActionParameters.Add('handleBenefitItems', true);
