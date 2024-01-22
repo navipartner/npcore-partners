@@ -54,14 +54,18 @@
 
     local procedure TestReferenceNo()
     var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
         Voucher: Record "NPR NpRv Voucher";
     begin
         if "Reference No." = '' then
             exit;
 
         Voucher.SetRange("Reference No.", "Reference No.");
-        if Voucher.FindFirst() then
+        if not Voucher.IsEmpty() then
+            Error(Text000, "Reference No.");
+
+        ArchVoucher.SetRange("Reference No.", "Reference No.");
+        if not ArchVoucher.IsEmpty() then
             Error(Text000, "Reference No.");
     end;
 }
-
