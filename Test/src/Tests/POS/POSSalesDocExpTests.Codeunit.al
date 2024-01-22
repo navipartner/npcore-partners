@@ -653,11 +653,9 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibrarySales: Codeunit "Library - Sales";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-        end;
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
 
         if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);

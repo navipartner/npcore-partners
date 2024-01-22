@@ -85,7 +85,7 @@ codeunit 85004 "NPR EFT Tests"
         AssertPaymentLine(EFTTransactionRequest."Sales Line ID", EFTTransactionRequest."Result Amount", true);
     end;
 
-    procedure GenericEFTPaymentSuccess(POSSession: Codeunit "NPR POS Session"; SalePOS: Record "NPR POS Sale"; PaymentAmount: Decimal)
+    procedure GenericEFTPaymentSuccess(SalePOS: Record "NPR POS Sale"; PaymentAmount: Decimal; InitSession: Boolean)
     var
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -93,8 +93,7 @@ codeunit 85004 "NPR EFT Tests"
     begin
         // [Scenario] Add payment to an existing sales, can be used from by external test functions to add a successful EFT payment to sales
         // [Given] POS, EFT & Payment setup
-        InitializeData();
-        _POSSession := POSSession;
+        InitializeData(InitSession);
 
         // [Given] EFT mock integration set to simulate external approval
         BindSubscription(EFTTestMockIntegration);
@@ -2461,15 +2460,20 @@ codeunit 85004 "NPR EFT Tests"
     end;
 
     procedure InitializeData()
+    begin
+        InitializeData(true);
+    end;
+
+    procedure InitializeData(InitSession: Boolean)
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
+        if InitSession then begin
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
         end;
 
         if not _Initialized then begin

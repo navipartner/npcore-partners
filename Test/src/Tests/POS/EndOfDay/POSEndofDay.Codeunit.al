@@ -424,7 +424,7 @@ codeunit 85020 "NPR POS End of Day"
         TotalQty += LineQty;
 
         // Simulate EFT Payment & finish sale
-        EFTTest.GenericEFTPaymentSuccess(_POSSession, SalePOS, LineAmount);
+        EFTTest.GenericEFTPaymentSuccess(SalePOS, LineAmount, false);
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, 0, '');
         Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
 
@@ -502,7 +502,7 @@ codeunit 85020 "NPR POS End of Day"
         TotalQty += LineQty * 2;
 
         // Simulate EFT Payment & finish sale
-        EFTTest.GenericEFTPaymentSuccess(_POSSession, SalePOS, LineAmount);
+        EFTTest.GenericEFTPaymentSuccess(SalePOS, LineAmount, false);
         SaleEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, LineAmount, '');
         Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
 
@@ -819,12 +819,10 @@ codeunit 85020 "NPR POS End of Day"
         POSEndOfDayProfile: Record "NPR POS End of Day Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-            WorkDate(Today);
-        end;
+        //Clean any previous mock session
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+        WorkDate(Today);
 
         if not _Initialized then begin
             _PrimeNumbers[1] := 19;

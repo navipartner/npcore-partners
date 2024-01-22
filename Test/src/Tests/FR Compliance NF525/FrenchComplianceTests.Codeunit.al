@@ -729,11 +729,10 @@ codeunit 85039 "NPR French Compliance Tests"
         TemplateHeader: Record "NPR RP Template Header";
         ObjectOutputSelection: Record "NPR Object Output Selection";
     begin
-        if _Initialized then begin
-            //Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-        end else begin
+        _POSSession.ClearAll();
+        Clear(_POSSession);
+
+        if not _Initialized then begin
             NPRLibraryPOSMasterData.CreatePOSSetup(_POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultVoucherType(_VoucherType, false);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
