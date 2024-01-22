@@ -23,6 +23,7 @@ codeunit 6184471 "NPR TM OfflineTicketValidation"
     procedure GetReservation(TicketNo: Code[20]; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; var ReservationDate: Date; var ReservationTime: Time): Boolean
     var
         Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetailedAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionEntry: Record "NPR TM Admis. Schedule Entry";
     begin
@@ -32,8 +33,14 @@ codeunit 6184471 "NPR TM OfflineTicketValidation"
         if (Ticket.Blocked) then
             exit(false);
 
-        DetailedAccessEntry.SetCurrentKey("Ticket No.", Type);
-        DetailedAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        if (not TicketAccessEntry.FindFirst()) then
+            exit(false);
+
+        DetailedAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type);
+        DetailedAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         DetailedAccessEntry.SetFilter(Type, '=%1', DetailedAccessEntry.Type::RESERVATION);
         if (not DetailedAccessEntry.FindLast()) then
             exit(false);
