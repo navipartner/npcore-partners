@@ -89,12 +89,36 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
         BGSISPOSAuditLogAux."Salesperson Code" := POSEntry."Salesperson Code";
 
-        if BGSISPOSAuditLogAux."Amount Incl. Tax" >= 0 then
-            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
-        else
-            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
+        SetTransactionTypeOnBGSISPOSAuditLogAux(POSEntry."Entry No.", BGSISPOSAuditLogAux);
 
         BGSISPOSAuditLogAux.Insert();
+    end;
+
+    local procedure SetTransactionTypeOnBGSISPOSAuditLogAux(POSEntryNo: Integer; var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.")
+    var
+        BGSISPOSAuditLogAuxToRefund: Record "NPR BG SIS POS Audit Log Aux.";
+        OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        case true of
+            BGSISPOSAuditLogAux."Amount Incl. Tax" > 0:
+                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale;
+            BGSISPOSAuditLogAux."Amount Incl. Tax" < 0:
+                BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
+            BGSISPOSAuditLogAux."Amount Incl. Tax" = 0:
+                begin
+                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+                    POSEntrySalesLine.FindFirst();
+
+                    if not OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId") then
+                        BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
+                    else
+                        if not BGSISPOSAuditLogAuxToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.") then
+                            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Sale
+                        else
+                            BGSISPOSAuditLogAux."Transaction Type" := BGSISPOSAuditLogAux."Transaction Type"::Refund;
+                end;
+        end;
     end;
     #endregion
 
