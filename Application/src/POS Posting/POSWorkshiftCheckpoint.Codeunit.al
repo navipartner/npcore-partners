@@ -706,30 +706,33 @@
 
     end;
 
-    local procedure CalculateCheckpointStatistics(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    internal procedure FindPreviousCheckpointPOSEntryNo(POSUnitNo: Code[10]) EntryNo: Integer
     var
         PreviousUnitCheckpoint: Record "NPR POS Workshift Checkpoint";
-        FromEntryNo: Integer;
-        EntriesToBalance: Record "NPR POS Entry";
     begin
-
-        FromEntryNo := 1;
-        // PreviousUnitCheckpoint.SetCurrentKey("Entry No.");
+        EntryNo := 1;
         PreviousUnitCheckpoint.SetCurrentKey("POS Unit No.", Open, "Type");
         PreviousUnitCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnitNo);
         PreviousUnitCheckpoint.SetFilter(Open, '=%1', false);
         PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::ZREPORT);
-
         if (PreviousUnitCheckpoint.FindLast()) then
-            FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
+            EntryNo := PreviousUnitCheckpoint."POS Entry No.";
 
         // When a managed POS is balanced, the workshift is marked as WORKSHIFT_CLOSED. Z-REPORT is posted, WORKSHIFT is not.
         PreviousUnitCheckpoint.SetFilter(Type, '=%1', PreviousUnitCheckpoint.Type::WORKSHIFT_CLOSE);
         PreviousUnitCheckpoint.SetFilter("Entry No.", '%1..', PreviousUnitCheckpoint."Entry No.");
         if (PreviousUnitCheckpoint.FindLast()) then begin
             PreviousUnitCheckpoint.Get(PreviousUnitCheckpoint."Consolidated With Entry No.");
-            FromEntryNo := PreviousUnitCheckpoint."POS Entry No.";
+            EntryNo := PreviousUnitCheckpoint."POS Entry No.";
         end;
+    end;
+
+    local procedure CalculateCheckpointStatistics(POSStoreCode: Code[10]; POSUnitNo: Code[10]; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    var
+        EntriesToBalance: Record "NPR POS Entry";
+        FromEntryNo: Integer;
+    begin
+        FromEntryNo := FindPreviousCheckpointPOSEntryNo(POSUnitNo);
 
         EntriesToBalance.SetRange("POS Store Code", POSStoreCode);
         EntriesToBalance.SetFilter("Entry No.", '%1..', FromEntryNo);
