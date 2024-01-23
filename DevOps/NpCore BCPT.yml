@@ -1,12 +1,12 @@
 trigger: none
 
-schedules:
-  - cron: "0 1 * * *" #UTC TIME! mm HH DD MM DW
-    displayName: 'Daily BCPT container run'
-    branches:
-      include:
-      - master
-    always: true
+#schedules:
+#  - cron: "0 1 * * *" #UTC TIME! mm HH DD MM DW
+#    displayName: 'Daily BCPT container run'
+#    branches:
+#      include:
+#      - master
+#    always: true
 
 resources:
   repositories:
