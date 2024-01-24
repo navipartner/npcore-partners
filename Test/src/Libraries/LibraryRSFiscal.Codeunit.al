@@ -14,7 +14,7 @@ codeunit 85065 "NPR Library RS Fiscal"
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         PaymentMethod: Record "Payment Method";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
-
+        LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
     begin
         POSAuditProfile.Init();
         POSAuditProfile.Code := HandlerCode();
@@ -81,8 +81,10 @@ codeunit 85065 "NPR Library RS Fiscal"
         RSFiscalisationSetup."Configuration URL" := 'https://api.sandbox.suf.purs.gov.rs/';
         RSFiscalisationSetup.Insert();
 
+        BindSubscription(LibraryRSFiscal);
         RSTaxCommunicationMgt.PullAndFillSUFConfiguration();
         RSTaxCommunicationMgt.PullAndFillAllowedTaxRates();
+        UnbindSubscription(LibraryRSFiscal);
 
         POSStore.Get(POSUnit."POS Store Code");
         POSStore."Registration No." := 'Test';
