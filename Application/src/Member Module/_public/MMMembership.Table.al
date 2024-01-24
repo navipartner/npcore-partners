@@ -272,8 +272,8 @@
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
-
-        MembershipManagement.DeleteMembership("Entry No.", false);
+        MembershipManagement.DeleteMembershipFromTableTrigger(Rec."Entry No.", false);
+        Rec.Get(Rec."Entry No.");
     end;
 
     trigger OnModify()

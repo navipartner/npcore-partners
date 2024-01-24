@@ -634,6 +634,7 @@
                         MembershipMgt.DeleteMembership(Rec."Entry No.", (not MembershipSetup.Get(Rec."Membership Code")));
                 end;
             }
+
         }
         area(navigation)
         {
@@ -909,6 +910,9 @@
         PlaceHolder2Lbl: Label '%1 - %2', Locked = true;
         PlaceHolder3Lbl: Label '%1 - %2 (%3)', Locked = true;
     begin
+        if (not Rec.Find()) then
+            exit;
+
         MembershipManagement.GetMemberCount(Rec."Entry No.", AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
         ShowMemberCountAs := StrSubstNo(PlaceHolder1Lbl, AdminMemberCount, MemberMemberCount, AnonymousMemberCount);
 
@@ -930,14 +934,14 @@
 
         CurrPage.PointsSummary.PAGE.FillPageSummary(Rec."Entry No.");
         CurrPage.PointsSummary.PAGE.Update(false);
-
     end;
 
     trigger OnAfterGetRecord()
     begin
+        if (not Rec.Find()) then
+            exit;
 
         GetMasterDataAttributeValue();
-
     end;
 
     trigger OnOpenPage()
@@ -1145,31 +1149,23 @@
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
-
         NPRAttrManagement.SetEntryAttributeValue(GetAttributeTableId(), AttributeNumber, Rec."Entry No.", NPRAttrTextArray[AttributeNumber]);
-
     end;
 
     local procedure GetMasterDataAttributeValue()
     begin
-
         NPRAttrManagement.GetEntryAttributeValue(NPRAttrTextArray, GetAttributeTableId(), Rec."Entry No.");
         NPRAttrEditable := CurrPage.Editable();
-
     end;
 
     internal procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
     begin
-
         exit(NPRAttrVisibleArray[AttributeNumber]);
-
     end;
 
     local procedure GetAttributeTableId(): Integer
     begin
-
         exit(DATABASE::"NPR MM Membership");
-
     end;
 
     local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
@@ -1189,7 +1185,6 @@
         SponsorshipTicketMgmt: Codeunit "NPR MM Sponsorship Ticket Mgt";
         ResponseMessage: Text;
     begin
-
         if (not SponsorshipTicketMgmt.IssueAdHocTicket(MembershipEntryNo, ResponseMessage)) then
             Error(ResponseMessage);
     end;

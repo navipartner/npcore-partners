@@ -166,6 +166,16 @@
     end;
 
     internal procedure DeleteMembership(MembershipEntryNo: Integer; Force: Boolean)
+    begin
+        DeleteMembershipWorker(MembershipEntryNo, Force, true);
+    end;
+
+    internal procedure DeleteMembershipFromTableTrigger(MembershipEntryNo: Integer; Force: Boolean)
+    begin
+        DeleteMembershipWorker(MembershipEntryNo, Force, false);
+    end;
+
+    local procedure DeleteMembershipWorker(MembershipEntryNo: Integer; Force: Boolean; DeleteMembershipRecord: Boolean)
     var
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
@@ -183,11 +193,11 @@
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         MemberCommunication: Record "NPR MM Member Communication";
         RequestMemberFieldUpdate: Record "NPR MM Request Member Update";
-        NPGDPRManagement: Codeunit "NPR NP GDPR Management";
-        GDPRAnonymizationRequestWS: Codeunit "NPR GDPR Anon. Req. WS";
+        GdprManagement: Codeunit "NPR NP GDPR Management";
+        GdprAnonymizeRequestWS: Codeunit "NPR GDPR Anon. Req. WS";
         OriginalCustomerNo: Code[20];
         MembershipTimeFrameEntries: Boolean;
-        AnonymizationResponseCode: Integer;
+        AnonymizeResponseCode: Integer;
     begin
 
         if (MembershipEntryNo = 0) then
@@ -242,12 +252,12 @@
             if (not MembershipTimeFrameEntries) then
                 if (Customer.Get(OriginalCustomerNo)) then
                     if (not Customer.Delete(true)) then
-                        if (GDPRAnonymizationRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizationResponseCode)) then
-                            NPGDPRManagement.AnonymizeCustomer(OriginalCustomerNo);
+                        if (GdprAnonymizeRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizeResponseCode)) then
+                            GdprManagement.AnonymizeCustomer(OriginalCustomerNo);
 
             if (MembershipTimeFrameEntries) then
-                if (GDPRAnonymizationRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizationResponseCode)) then
-                    NPGDPRManagement.AnonymizeCustomer(OriginalCustomerNo);
+                if (GdprAnonymizeRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizeResponseCode)) then
+                    GdprManagement.AnonymizeCustomer(OriginalCustomerNo);
 
         end;
 
@@ -290,7 +300,8 @@
             until (TempMembershipRole.Next() = 0);
         end;
 
-        Membership.Delete();
+        if (DeleteMembershipRecord) then
+            Membership.Delete();
 
     end;
 
