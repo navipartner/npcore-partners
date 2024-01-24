@@ -5,6 +5,8 @@ page 6150757 "NPR POS Receipt Profile"
     PageType = Card;
     SourceTable = "NPR POS Receipt Profile";
     UsageCategory = None;
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/receipt_profile/';
+
 
     layout
     {
