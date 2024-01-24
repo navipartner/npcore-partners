@@ -8,6 +8,7 @@ page 6151321 "NPR POS Receipt Profiles"
     Editable = false;
     SourceTable = "NPR POS Receipt Profile";
     CardPageID = "NPR POS Receipt Profile";
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/reference/receipt_profile/';
 
     layout
     {

@@ -8,6 +8,8 @@ page 6150797 "NPR Digital Receipt Setup"
     SourceTable = "NPR Digital Receipt Setup";
     InsertAllowed = false;
     DeleteAllowed = false;
+    ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/digital_receipts/';
+
 
     layout
     {
