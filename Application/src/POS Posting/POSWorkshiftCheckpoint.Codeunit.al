@@ -1378,21 +1378,19 @@
             exit;
         SetManualCashDrawerOpen(POSWorkshiftCheckpoint, POSEntry);
 
-        POSEntry.Reset();
         POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
         POSEntry.SetRange("POS Store Code", POSStoreCode);
         POSEntry.SetRange("POS Unit No.", POSUnitNo);
         POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
         POSEntry.SetRange("System Entry", false);
+        POSEntry.SetFilter("No. Printed Receipt Copies", '<>%1', 0);
 
-        if POSEntry.IsEmpty() then
+        POSWorkshiftCheckpoint."Receipt Copies Count" := POSEntry.Count();
+        if POSWorkshiftCheckpoint."Receipt Copies Count" = 0 then
             exit;
 
-        POSEntry.SetLoadFields("Amount Incl. Tax");
-        POSEntry.FindSet();
-        repeat
-            SetCopyReceiptsQtyAndAmount(POSWorkshiftCheckpoint, POSEntry);
-        until POSEntry.Next() = 0;
+        POSEntry.CalcSums("Amount Incl. Tax");
+        POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" := POSEntry."Amount Incl. Tax";
     end;
 
     local procedure SetManualCashDrawerOpen(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FirstPOSEntry: Record "NPR POS Entry")
@@ -1405,21 +1403,6 @@
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
 
         POSWorkshiftCheckpoint."Cash Drawer Open Count" := POSAuditLog.Count();
-    end;
-
-    local procedure SetCopyReceiptsQtyAndAmount(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var POSEntry: Record "NPR POS Entry")
-    var
-        POSAuditLog: Record "NPR POS Audit Log";
-    begin
-        POSAuditLog.SetCurrentKey("Acted on POS Unit No.", "Action Type");
-        POSAuditLog.SetRange("Acted on POS Entry No.", POSEntry."Entry No.");
-        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_COPY);
-
-        if POSAuditLog.IsEmpty() then
-            exit;
-
-        POSWorkshiftCheckpoint."Receipt Copies Count" += 1;
-        POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" += POSEntry."Amount Incl. Tax";
     end;
 
     local procedure UpdateWorkshiftCheckpoint(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
