@@ -502,6 +502,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(660; "No. Printed Receipt Copies"; Integer)
+        {
+            CalcFormula = count("NPR POS Audit Log" where("Acted on POS Entry No." = field("Entry No."), "Action Type" = const(RECEIPT_COPY)));
+            Caption = '"No. Printed Receipt Copies';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(710; "NPRE Number of Guests"; Integer)
         {
             Caption = 'Number of Guests';
