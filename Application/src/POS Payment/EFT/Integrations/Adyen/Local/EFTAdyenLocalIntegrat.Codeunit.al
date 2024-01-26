@@ -19,9 +19,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     begin
-        if not IsEnabled() then
-            exit;
-
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
         tmpEFTIntegrationType.Description := Description;
@@ -33,8 +30,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     begin
-        if not IsEnabled() then
-            exit;
         //Any non standard EFT operations are registered here:
 
         tmpEFTAuxOperation.Init();
@@ -79,8 +74,6 @@
     var
         EFTAdyenLocalUnitSetup: Record "NPR EFT Adyen Local Unit Setup";
     begin
-        if not IsEnabled() then
-            exit;
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
@@ -95,8 +88,6 @@
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
-        if not IsEnabled() then
-            exit;
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
@@ -124,12 +115,5 @@
             EFTAdyenLocalUnitSetup."POS Unit No." := EFTSetup."POS Unit No.";
             EFTAdyenLocalUnitSetup.Insert();
         end;
-    end;
-
-    local procedure IsEnabled(): Boolean
-    var
-        EFTAdyenFeatureFlag: Codeunit "NPR EFT Adyen Feature Flag";
-    begin
-        exit(EFTAdyenFeatureFlag.IsEnabled());
     end;
 }

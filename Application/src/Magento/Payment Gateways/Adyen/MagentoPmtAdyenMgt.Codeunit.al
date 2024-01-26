@@ -200,7 +200,7 @@
     var
         SalesHeader: Record "Sales Header";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
+        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
         PrevRec: Text;
     begin
         if not IsAdyenPaymentLine(PaymentLine) then
