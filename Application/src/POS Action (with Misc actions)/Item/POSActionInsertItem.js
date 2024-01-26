@@ -13,7 +13,7 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         if (context.desc2 === null) return;
     }
 
-    const { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
+    var { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
 
     if (requiresAdditionalInformationCollection) {
 
@@ -28,7 +28,7 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         }
 
         context.additionalInformationCollected = true;
-        await workflow.respond("addSalesLine");
+        var { bomComponentLinesWithoutSerialNo, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
     }
 
     await processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions);
