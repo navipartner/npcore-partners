@@ -1,38 +1,7 @@
-﻿#if not CLOUD
-codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
+﻿codeunit 6184522 "NPR EFT Adyen Backgnd. Resp."
 {
     Access = Internal;
     ObsoleteState = Pending;
     ObsoleteTag = 'NPR28.0';
     ObsoleteReason = 'Replaced with version without .NET variables';
-
-    TableNo = "NPR EFT Transaction Request";
-
-    trigger OnRun()
-    var
-        EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Prot.";
-        EFTTrxBackgroundSessionMgt: Codeunit "NPR EFT Trx Bgd. Session Mgt";
-        EFTTransactionAsyncResponse: Record "NPR EFT Trx Async Resp.";
-    begin
-        //-NPR5.54 [364340]
-        case RunMode of
-            RunMode::FIND_RESPONSE:
-                EFTTrxBackgroundSessionMgt.TryGetResponseRecord(Rec."Entry No.", EFTTransactionAsyncResponse);
-            RunMode::PROCESS_RESPONSE:
-                EFTAdyenCloudProtocol.ProcessAsyncResponse(Rec."Entry No.");
-        end;
-        //+NPR5.54 [364340]
-    end;
-
-    var
-        RunMode: Option FIND_RESPONSE,PROCESS_RESPONSE;
-
-    procedure SetRunMode(ModeIn: Option FIND_RESPONSE,PROCESS_RESPONSE)
-    begin
-        //-NPR5.54 [364340]
-        RunMode := ModeIn;
-        //+NPR5.54 [364340]
-    end;
 }
-
-#endif

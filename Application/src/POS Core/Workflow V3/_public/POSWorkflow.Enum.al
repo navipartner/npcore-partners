@@ -831,13 +831,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'DISCOUNT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Discount";
     }
-#IF NOT CLOUD
-    value(170; SS_ADYEN_CLOUD)
-    {
-        Caption = 'SS_ADYEN_CLOUD', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action - SS Adyen";
-    }
-#ENDIF
     value(171; "SS-PAYMENT")
     {
         Caption = 'SS-PAYMENT', Locked = true, MaxLength = 20;
