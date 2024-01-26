@@ -37,6 +37,7 @@ codeunit 6059990 "NPR HL Attribute Mgt."
     procedure UpdateHLMemberAttributesFromMember(HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
     var
         HLMemberAttribute: Record "NPR HL Member Attribute";
+        NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         ChangesFound: Boolean;
     begin
@@ -48,18 +49,23 @@ codeunit 6059990 "NPR HL Attribute Mgt."
                 HLMemberAttribute.Mark(true);
             until HLMemberAttribute.Next() = 0;
 
-        NPRAttributeValueSet.SetRange("Table ID", Database::"NPR MM Member");
-        NPRAttributeValueSet.SetRange("MDR Code PK", Format(HLMember."Member Entry No.", 9));
-        NPRAttributeValueSet.SetFilter("Attribute Code", '<>%1', '');
-        if NPRAttributeValueSet.FindSet() then
+        NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
+        NPRAttributeKey.SetRange("Table ID", Database::"NPR MM Member");
+        NPRAttributeKey.SetRange("MDR Code PK", Format(HLMember."Member Entry No.", 9));
+        if NPRAttributeKey.FindSet() then
             repeat
-                if IsSendAttributeToHL(NPRAttributeValueSet."Attribute Code") then begin
-                    if UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet, HLMemberAttribute) then
-                        ChangesFound := true;
-                    if HLMemberAttribute."Attribute Code" <> '' then
-                        HLMemberAttribute.Mark(false);
-                end;
-            until NPRAttributeValueSet.Next() = 0;
+                NPRAttributeValueSet.SetRange("Attribute Set ID", NPRAttributeKey."Attribute Set ID");
+                NPRAttributeValueSet.SetFilter("Attribute Code", '<>%1', '');
+                if NPRAttributeValueSet.FindSet() then
+                    repeat
+                        if IsSendAttributeToHL(NPRAttributeValueSet."Attribute Code") then begin
+                            if UpdateHLMemberAttribute(HLMember, NPRAttributeValueSet, HLMemberAttribute) then
+                                ChangesFound := true;
+                            if HLMemberAttribute."Attribute Code" <> '' then
+                                HLMemberAttribute.Mark(false);
+                        end;
+                    until NPRAttributeValueSet.Next() = 0;
+            until NPRAttributeKey.Next() = 0;
 
         HLMemberAttribute.MarkedOnly(true);
         if not HLMemberAttribute.IsEmpty() then begin
