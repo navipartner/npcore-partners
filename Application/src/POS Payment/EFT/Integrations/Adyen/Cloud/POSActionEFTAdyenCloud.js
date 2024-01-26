@@ -2,16 +2,13 @@
 let main = async ({ workflow, context, popup, captions }) => {
     context.EntryNo = context.request.EntryNo;
 
-    let _dialogRef;
-    if (!context.unattended) {
-        _dialogRef = await popup.simplePayment({
-            title: context.request.TypeCaption,
-            initialStatus: captions.initialStatus,
-            showStatus: true,
-            amount: context.request.formattedAmount,
-            onAbort: async () => { await workflow.respond("requestAbort"); }
-        });
-    }    
+    let _dialogRef = await popup.simplePayment({
+        title: context.request.TypeCaption,
+        initialStatus: captions.initialStatus,
+        showStatus: true,
+        amount: context.request.formattedAmount,
+        onAbort: async () => { await workflow.respond("requestAbort"); }
+    });
 
     try {
         let startTrxResponse = await workflow.respond("startTransaction");
@@ -43,10 +40,10 @@ function trxPromise(context, captions, popup, workflow) {
                 }
                 if (pollResponse.signatureRequired) {
                     let signatureResult = false;
-                    if (pollResponse.signatureType === "Receipt") {
+                    if (!context.request.unattended && pollResponse.signatureType === "Receipt") {
                         signatureResult = await popup.confirm(captions.approveSignature);
                     }
-                    if (pollResponse.signatureType === "Bitmap") {
+                    if (!context.request.unattended && pollResponse.signatureType === "Bitmap") {
                         debugger;
                         let signatureData = JSON.parse(pollResponse.signatureBitmap);
                         let signaturePopup = await popup.signatureValidation({signature: signatureData.SignaturePoint});
