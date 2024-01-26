@@ -19,17 +19,11 @@ codeunit 6151434 "NPR Feature Management Install"
     internal procedure AddFeatures()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
-        UpgradeTag: Codeunit "Upgrade Tag";
     begin
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Feature Management Install', 'AddFeatures');
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures')) then begin
-            InitFeatures();
-            RefreshExperienceTierCurrentCompany(); // refresh of experience tier has to be done in order to trigger OnGetEssentialExperienceAppAreas publisher
-
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
-        end;
+        InitFeatures();
+        RefreshExperienceTierCurrentCompany(); // refresh of experience tier has to be done in order to trigger OnGetEssentialExperienceAppAreas publisher
 
         LogMessageStopwatch.LogFinish();
     end;
