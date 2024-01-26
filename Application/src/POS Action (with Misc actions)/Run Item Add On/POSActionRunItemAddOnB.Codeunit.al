@@ -18,7 +18,7 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         UpdateActiveSaleLine := SaleLinePOS."Line No." <> AppliesToLineNo;
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
+        if (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item) and (SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::"BOM List") then
             exit;
         IF UpdateActiveSaleLine THEN
             POSSaleLine.SetPosition(SaleLinePOS.GetPosition());

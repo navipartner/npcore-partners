@@ -60,7 +60,8 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         Response.Add('BaseLineNo', AppliesToLineNo);
 
         SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
-        SaleLinePOS.TestField("Line Type", SaleLinePOS."Line Type"::Item);
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"BOM List"]) then
+            SaleLinePOS.FieldError("Line Type");
 
         if not Context.GetStringParameter('ItemAddOnNo', AddOnNoTxt) then
             AddOnNo := ''
@@ -203,7 +204,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionRunItemAddOn.js###
-'let main=async({workflow:e,popup:t,captions:a,context:r})=>{debugger;const{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d,ItemAddonConfigAsString:i}=await e.respond("GetSalesLineAddonConfigJson");if(d){let A=JSON.parse(i);UserSelectedAddons=await t.configuration(A),await e.respond("SetItemAddons",{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d,UserSelectedAddons})}else await e.respond("SetItemAddons",{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d})};'
+'let main=async({workflow:e,popup:t})=>{const{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d,ItemAddonConfigAsString:i}=await e.respond("GetSalesLineAddonConfigJson");if(d){let A=JSON.parse(i);UserSelectedAddons=await t.configuration(A),await e.respond("SetItemAddons",{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d,UserSelectedAddons})}else await e.respond("SetItemAddons",{BaseLineNo:n,ApplyItemAddOnNo:o,CompulsoryAddOn:s,UserSelectionRequired:d})};'
         );
     end;
 }
