@@ -22,8 +22,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -45,8 +43,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -71,8 +67,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -102,8 +96,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -128,8 +120,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -143,8 +133,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         Handled := true;
@@ -158,8 +146,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
     local procedure OnPrepareRequestSend(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
 
@@ -196,8 +182,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         EFTAdyenContractMgmt: Codeunit "NPR EFT Adyen Contract Mgmt.";
     begin
-        if not IsEnabled() then
-            exit;
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
         if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::AUXILIARY then
@@ -674,12 +658,5 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         ValueEndIndex := Json.IndexOf('"', ValueStartIndex + 1);
 
         exit(Json.Remove(ValueStartIndex, 1).Remove(ValueEndIndex - 1, 1));
-    end;
-
-    local procedure IsEnabled(): Boolean
-    var
-        EFTAdyenFeatureFlag: Codeunit "NPR EFT Adyen Feature Flag";
-    begin
-        exit(EFTAdyenFeatureFlag.IsEnabled());
     end;
 }
