@@ -2,6 +2,7 @@ page 6151214 "NPR CRO Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'CRO Tax Fiscalisation Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/croatia/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

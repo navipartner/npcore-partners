@@ -3,6 +3,7 @@ page 6151327 "NPR DK SAF-T Cash Exports"
     Extensible = False;
     ApplicationArea = NPRDKFiscal;
     Caption = 'SAF-T Cash Register Exports';
+    ContextSensitiveHelpPage = 'docs/fiscalization/denmark/how-to/saft_export/';
     CardPageId = "NPR DK SAF-T Cash Export Card";
     Editable = false;
     PageType = List;
