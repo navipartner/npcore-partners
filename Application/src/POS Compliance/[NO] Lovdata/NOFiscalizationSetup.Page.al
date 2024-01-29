@@ -2,6 +2,7 @@ page 6151224 "NPR NO Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'NO Tax Fiscalisation Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/norway/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

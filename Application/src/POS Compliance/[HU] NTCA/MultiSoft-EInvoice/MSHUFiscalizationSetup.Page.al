@@ -2,6 +2,7 @@ page 6151363 "NPR MS HU Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'HU MultiSoft Fiscalisation Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/hungary/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

@@ -2,6 +2,7 @@ page 6151325 "NPR DK Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'DK Fiscalisation Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/denmark/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;
