@@ -2,6 +2,7 @@ page 6150854 "NPR RS Fiscalisation Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'RS Tax Fiscalisation Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

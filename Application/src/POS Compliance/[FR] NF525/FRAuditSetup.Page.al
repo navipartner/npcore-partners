@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'FR Compliance Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/france/how-to/setup/';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
