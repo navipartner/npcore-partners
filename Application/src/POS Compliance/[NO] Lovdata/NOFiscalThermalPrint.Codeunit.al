@@ -105,7 +105,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
         FirstLoginDatetime := CreateDateTime(DT2Date(POSWorkshiftCheckpoint.SystemCreatedAt), 060000T);
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', FirstLoginDatetime, POSWorkshiftCheckpoint.SystemCreatedAt);
-
+        POSAuditLog.SetRange("Active POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::SIGN_IN);
         if POSAuditLog.FindFirst() then begin
             PrintTxt2 := Format(POSAuditLog.SystemCreatedAt);
