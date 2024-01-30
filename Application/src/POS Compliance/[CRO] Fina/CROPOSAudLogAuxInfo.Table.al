@@ -94,7 +94,10 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
-                FindPaymentMethodMapping();
+                if Rec."Audit Entry Type" in [Rec."Audit Entry Type"::"POS Entry"] then
+                    FindPOSPaymentMethodMapping()
+                else
+                    FindPaymentMethodMapping();
             end;
         }
         field(15; "CRO Payment Method"; Enum "NPR CRO POS Payment Method")
@@ -190,6 +193,16 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
     begin
         if CROPaymentMethodMapping.Get("Payment Method Code") then
             "Payment Method" := CROPaymentMethodMapping."CRO Payment Method"
+        else
+            "Payment Method" := "NPR CRO Payment Method"::Other;
+    end;
+
+    local procedure FindPOSPaymentMethodMapping()
+    var
+        CROPOSPaymentMethodMapping: Record "NPR CRO POS Paym. Method Mapp.";
+    begin
+        if CROPOSPaymentMethodMapping.Get("Payment Method Code") then
+            "Payment Method" := CROPOSPaymentMethodMapping."Payment Method"
         else
             "Payment Method" := "NPR CRO Payment Method"::Other;
     end;
