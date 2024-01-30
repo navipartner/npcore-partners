@@ -8,11 +8,13 @@ pageextension 6014444 "NPR SalesPriceList" extends "Sales Price List"
             {
                 ToolTip = 'Specifies the value of the Retail Price List field.';
                 ApplicationArea = NPRRetail;
+                Visible = RetailLocalizationEnabled;
             }
             field("NPR Location Code"; Rec."NPR Location Code")
             {
                 ToolTip = 'Specifies Location Code for Sales Price List';
                 ApplicationArea = NPRRetail;
+                Visible = RetailLocalizationEnabled;
                 Editable = Rec."NPR Retail Price List";
             }
         }
@@ -76,4 +78,13 @@ pageextension 6014444 "NPR SalesPriceList" extends "Sales Price List"
             Error(CannotChangeActiveStatusErr);
     end;
 #endif
+    trigger OnOpenPage()
+    var
+        RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+    begin
+        RetailLocalizationEnabled := RetailLocalizationMgt.IsRetailLocalizationEnabled();
+    end;
+
+    var
+        RetailLocalizationEnabled: Boolean;
 }
