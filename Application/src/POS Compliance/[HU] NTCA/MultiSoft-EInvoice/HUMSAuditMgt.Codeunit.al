@@ -94,7 +94,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     begin
         POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
-        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::INVOICE);
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
         POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::Unposted);
         if not POSEntrySalesDocLink.FindFirst() then
             exit(false);
@@ -105,7 +105,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     var
         SalesHeader: Record "Sales Header";
     begin
-        SalesHeader.Get(SalesHeader."Document Type"::Invoice, POSEntrySalesDocLink."Sales Document No");
+        SalesHeader.Get(SalesHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No");
         SalesHeader."Payment Method Code" := HUMSPaymentMethodMap."Payment Method";
         SalesHeader.Modify(false);
     end;
