@@ -1,6 +1,6 @@
 ﻿table 6151420 "NPR Magento Store Item"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Magento Store Item';
     DataClassification = CustomerContent;
 
