@@ -1,6 +1,7 @@
 ﻿page 6060124 "NPR MM Membership Setup"
 {
     Caption = 'Membership Setup';
+    ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
     CardPageID = "NPR MM Members.Setup Card";
     DeleteAllowed = false;
     InsertAllowed = false;
