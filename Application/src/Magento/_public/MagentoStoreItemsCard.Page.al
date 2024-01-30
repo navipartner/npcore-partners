@@ -1,6 +1,6 @@
 ﻿page 6014425 "NPR Magento Store Items Card"
 {
-    Extensible = False;
+    Extensible = true;
     Caption = 'Magento Store Items Card';
     PageType = Card;
     UsageCategory = None;
