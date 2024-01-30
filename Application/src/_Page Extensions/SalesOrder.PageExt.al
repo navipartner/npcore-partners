@@ -214,7 +214,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
             field("NPR CRO POS Unit"; CROAuxSalesHeader."NPR CRO POS Unit")
             {
-                Caption = 'POS Unit No.';
+                Caption = 'CRO POS Unit No.';
                 ApplicationArea = NPRCROFiscal;
                 ToolTip = 'Specifies the value of the POS Unit No. field.';
                 TableRelation = "NPR POS Unit";

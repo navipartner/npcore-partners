@@ -440,11 +440,13 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         PaymentMappingNonExistentErr: Label 'Selected POS Payment Method Mapping does not exist.';
     begin
         POSEntry.CalcFields("Payment Lines");
-        POSEntryPaymentLine.SetLoadFields("POS Payment Method Code");
-        POSEntryPaymentLine2.SetLoadFields("POS Payment Method Code");
+        POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+        POSEntryPaymentLine2.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+
         case POSEntry."Payment Lines" of
             1:
                 begin
+                    POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
                     POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     if POSEntryPaymentLine.FindFirst() then begin
                         CROPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code");
@@ -452,8 +454,10 @@ codeunit 6151547 "NPR CRO Audit Mgt."
                     end;
                 end;
             else begin
+                POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
                 POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 POSEntryPaymentLine2.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryPaymentLine2.SetFilter("Amount (LCY)", '>0');
                 if not POSEntryPaymentLine.FindFirst() then
                     exit;
                 if not CROPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code") then
