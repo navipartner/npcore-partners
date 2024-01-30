@@ -2,6 +2,7 @@
 {
     Extensible = true;
     Caption = 'Member Card';
+    ContextSensitiveHelpPage = 'docs/entertainment/membership/explanation/member_card/';
     DataCaptionExpression = Rec."External Member No.";
     InsertAllowed = false;
     PageType = Document;
