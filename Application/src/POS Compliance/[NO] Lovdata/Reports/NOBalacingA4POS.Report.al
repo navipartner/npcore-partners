@@ -759,7 +759,7 @@ report 6014468 "NPR NO Balacing A4 POS"
         Clear(LoginDatetime);
         FirstLoginDatetime := CreateDateTime(DT2Date(POSWorkshiftCheckpoint.SystemCreatedAt), 060000T);
         POSAuditLog.SetFilter(SystemCreatedAt, '%1..%2', FirstLoginDatetime, POSWorkshiftCheckpoint.SystemCreatedAt);
-
+        POSAuditLog.SetRange("Active POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::SIGN_IN);
         if not POSAuditLog.FindFirst() then
             exit;
