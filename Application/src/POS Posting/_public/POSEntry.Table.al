@@ -706,17 +706,40 @@
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
-        POSEntryTaxCalc: codeunit "NPR POS Entry Tax Calc.";
+        POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
+        POSCostumerInput: Record "NPR POS Costumer Input";
+        POSEntryMediaInfo: Record "NPR POS Entry Media Info";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
-        POSSalesLine.DeleteAll();
+        if not POSSalesLine.IsEmpty() then
+            POSSalesLine.DeleteAll();
+
         POSPaymentLine.SetRange("POS Entry No.", "Entry No.");
-        POSPaymentLine.DeleteAll();
+        if not POSPaymentLine.IsEmpty() then
+            POSPaymentLine.DeleteAll();
+
         POSBalancingLine.SetRange("POS Entry No.", "Entry No.");
-        POSBalancingLine.DeleteAll();
+        if not POSBalancingLine.IsEmpty() then
+            POSBalancingLine.DeleteAll();
+
         POSEntryCommentLine.SetRange("POS Entry No.", "Entry No.");
-        POSEntryCommentLine.DeleteAll();
+        if not POSEntryCommentLine.IsEmpty() then
+            POSEntryCommentLine.DeleteAll();
+
         POSEntryTaxCalc.DeleteAllLines(Rec."Entry No.");
+
+        POSCostumerInput.SetRange("POS Entry No.", "Entry No.");
+        if not POSCostumerInput.IsEmpty() then
+            POSCostumerInput.DeleteAll();
+
+        POSEntryMediaInfo.SetRange("POS Entry No.", "Entry No.");
+        if not POSEntryMediaInfo.IsEmpty() then
+            POSEntryMediaInfo.DeleteAll();
+
+        POSSaleDigitalReceiptEntry.SetRange("POS Entry No.", "Entry No.");
+        if not POSSaleDigitalReceiptEntry.IsEmpty() then
+            POSSaleDigitalReceiptEntry.DeleteAll();
     end;
 
     internal procedure Recalculate()
