@@ -76,14 +76,6 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     ApplicationArea = NPRCROFiscal;
                     ToolTip = 'Specifies the JIR - unique receipt identifier.';
                 }
-                field("CRO Payment Method"; Rec."CRO Payment Method")
-                {
-                    ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies the Payment Method related to this transaction.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
-                    ObsoleteReason = 'Replaced by Payment Method field.';
-                }
                 field("Payment Method"; Rec."Payment Method")
                 {
                     ApplicationArea = NPRCROFiscal;
