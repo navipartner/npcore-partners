@@ -8,6 +8,7 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
             {
                 ToolTip = 'Specifies whether location is Retail or Warehouse. This field is affecting logic for POS Compilance.';
                 ApplicationArea = NPRRetail;
+                Visible = RetailLocalizationEnabled;
             }
             field("NPR Store Group Code"; Rec."NPR Store Group Code")
             {
@@ -55,6 +56,12 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
             end;
         }
     }
+    trigger OnOpenPage()
+    var
+        RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+    begin
+        RetailLocalizationEnabled := RetailLocalizationMgt.IsRetailLocalizationEnabled();
+    end;
 
     trigger OnAfterGetRecord()
     begin
@@ -73,4 +80,5 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
 
     var
         NoWhseEntrForPOSEnabled: Boolean;
+        RetailLocalizationEnabled: Boolean;
 }
