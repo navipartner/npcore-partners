@@ -140,7 +140,11 @@ page 6014537 "NPR APIV1 - Item Categories"
 
     trigger OnInit()
     begin
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         CurrentTransactionType := TransactionType::Update;
+#ELSE
+        Rec.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean

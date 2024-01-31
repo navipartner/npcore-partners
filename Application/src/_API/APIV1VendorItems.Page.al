@@ -65,7 +65,11 @@ page 6059848 "NPR API V1 Vendor Items"
 
     trigger OnInit()
     begin
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         CurrentTransactionType := TransactionType::Update;
+#ELSE
+        Rec.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
     end;
 
 }

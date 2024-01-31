@@ -156,6 +156,10 @@ page 6014470 "NPR APIV1 - Campaign Discount"
 
     trigger OnInit()
     begin
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         CurrentTransactionType := TransactionType::Update;
+#ELSE
+        Rec.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
     end;
 }
