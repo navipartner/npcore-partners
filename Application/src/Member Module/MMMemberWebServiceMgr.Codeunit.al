@@ -239,8 +239,8 @@
         MembershipEntry.FindFirst();
 
         MemberInfoCapture."Document No." := GetXmlText20(Request, 'externaldocumentnumber', false);
-        Evaluate(MemberInfoCapture.Amount, GetXmlText20(Request, 'amount', false));
-        Evaluate(MemberInfoCapture."Amount Incl VAT", GetXmlText20(Request, 'amountinclvat', false));
+        Evaluate(MemberInfoCapture.Amount, GetXmlText20(Request, 'amount', false), 9);
+        Evaluate(MemberInfoCapture."Amount Incl VAT", GetXmlText20(Request, 'amountinclvat', false), 9);
 
         MemberInfoCapture."Membership Entry No." := MembershipEntry."Membership Entry No.";
         MemberInfoCapture.Modify();
