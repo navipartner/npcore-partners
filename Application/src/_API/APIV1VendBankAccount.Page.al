@@ -150,7 +150,11 @@ page 6014692 "NPR APIV1 - Vend. Bank Account"
 
     trigger OnInit()
     begin
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         CurrentTransactionType := TransactionType::Update;
+#ELSE
+        Rec.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
     end;
 
 }

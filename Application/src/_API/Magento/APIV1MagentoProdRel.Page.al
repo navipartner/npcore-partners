@@ -66,6 +66,10 @@ page 6150847 "NPR API V1 Magento Prod. Rel."
 
     trigger OnInit()
     begin
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
         CurrentTransactionType := TransactionType::Update;
+#ELSE
+        Rec.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
     end;
 }
