@@ -7,7 +7,6 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR MM Loyalty Store Setup";
-    SourceTableView = WHERE(Setup = CONST(CLIENT));
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
     layout
