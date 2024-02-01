@@ -192,6 +192,18 @@ page 6060039 "NPR APIV1 PBIPurchase Line"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(promisedReceiptDate; Rec."Promised Receipt Date")
+                {
+                    Caption = 'Promised Receipt Date', Locked = true;
+                }
+                field(plannedReceiptDate; Rec."Planned Receipt Date")
+                {
+                    Caption = 'Planned Receipt Date', Locked = true;
+                }
+                field(expectedReceiptDate; Rec."Expected Receipt Date")
+                {
+                    Caption = 'Expected Receipt Date', Locked = true;
+                }
             }
         }
     }
