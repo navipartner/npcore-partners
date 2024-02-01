@@ -65,11 +65,15 @@
             XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
             Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
             HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
+            if (not Success) then
+                if (GuiAllowed()) then
+                    Message(ResponseMessage);
 
         end else begin
             EFTTransactionRequest.Successful := false;
             EFTTransactionRequest."Result Code" := -199;
             EFTTransactionRequest."Result Description" := 'Unsupported Process Type.';
+            EFTTransactionRequest."Result Display Text" := 'Unsupported Process Type.';
             EFTTransactionRequest.Modify();
         end;
 
@@ -122,14 +126,15 @@
 
         if (not ServiceSuccess) then begin
             EFTTransactionRequest.Successful := false;
+            EFTTransactionRequest."External Result Known" := true;
             EFTTransactionRequest."Result Code" := -198;
             EFTTransactionRequest."Result Description" := 'WebService fault.';
 
             EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
-            XmlResponseDoc.WriteTo(OStream);
-            EFTTransactionRequest.Modify();
+            if (not XmlResponseDoc.WriteTo(OStream)) then;
+
             EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
-            XmlResponseDoc.WriteTo(OStream);
+            if (not XmlResponseDoc.WriteTo(OStream)) then;
 
             EFTTransactionRequest.Modify();
             exit;
@@ -443,7 +448,7 @@
             if (not Evaluate(EFTTransactionRequest."Result Code", MessageCode)) then
                 EFTTransactionRequest."Result Code" := -99;
             EFTTransactionRequest."Result Description" := TEXT_DECLINED;
-            EFTTransactionRequest."Result Display Text" := TEXT_DECLINED;
+            EFTTransactionRequest."Result Display Text" := CopyStr(ResponseMessage, 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
 
             EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
             OStream.Write(ResponseMessage);
@@ -474,6 +479,8 @@
         EFTTransactionRequest."Card Number" := StrSubstNo(CardNumberLbl,
                                                CopyStr('XXXXxxxxXXXXxxxxXXXXxxxx', 1, StrLen(EFTTransactionRequest."Card Number") - 2),
                                                CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 1));
+
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure CreateReservePointsSlip(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReceiptType: Option CUSTOMER,MERCHANT) ReceiptText: Text
@@ -779,9 +786,6 @@
 
             if (not MembershipSetup.Get(Membership."Membership Code")) then
                 exit(false);
-
-            //  IF (NOT LoyaltySetup.Get() (MembershipSetup."Loyalty Code")) THEN
-            //    EXIT (FALSE);
 
             EFTTransactionRequest."Card Name" := CopyStr(LoyaltySetup.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
         end;

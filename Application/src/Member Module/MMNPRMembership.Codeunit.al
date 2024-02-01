@@ -624,8 +624,17 @@ codeunit 6060147 "NPR MM NPR Membership"
             exit;
         end;
 
-        ReasonText := WebResponse.ReasonPhrase;
-        Error('%1', ReasonText);
+        ResponseText := '<webServiceApi><fault>' +
+            StrSubstNo('<endpointCode>%1</endpointCode>', NPRRemoteEndpointSetup.Code) +
+            StrSubstNo('<endpoint>%1</endpoint>', NPRRemoteEndpointSetup."Endpoint URI") +
+            StrSubstNo('<reason>%1</reason>', ReasonText) +
+            StrSubstNo('<code>%1</code>', WebResponse.HttpStatusCode()) +
+            '</fault></webServiceApi>';
+        XmlDocument.ReadFrom(ResponseText, XmlDocOut);
+        XmlDocOut.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
+
+        ReasonText := StrSubstNo('[%1] (%2) %3: %4', NPRRemoteEndpointSetup.Code, WebResponse.HttpStatusCode(), WebResponse.ReasonPhrase(), NPRRemoteEndpointSetup."Endpoint URI");
+        Error(ReasonText);
     end;
 
     procedure MemberCardNumberValidationRequest(ExternalMemberCardNumber: Text[100]; ScannerStationId: Text; var SoapAction: Text[50]; var XmlDoc: XmlDocument)
