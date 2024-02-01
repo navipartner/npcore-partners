@@ -42,6 +42,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSUnit.Get(SaleHeader."Register No.");
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
+
+        CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
         VerifyPINCodeWithError(POSUnit."No.");
         VerifyGTINandTaxCategory(SaleHeader);
     end;
@@ -681,6 +683,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         POSUnit.GetProfile(POSAuditProfile);
         POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
+        POSAuditProfile.TestField(AllowSalesAndReturnInSameTrans, false);
 
         VerifyPINCodeWithError(POSUnit."No.");
     end;
@@ -742,6 +745,31 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSUnitMapping.TestField("RS Sandbox JID");
         RSPOSUnitMapping.TestField("RS Sandbox PIN");
         RSPOSUnitMapping.TestField("RS Sandbox Token");
+    end;
+
+    local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSSaleLine: Record "NPR POS Sale Line";
+        SalesAndReturnsNotAllowedInSameTransactionErr: Label 'It is not allowed to sale and return item(s) in same transaction.';
+    begin
+        POSAuditProfile.Get(POSAuditProfileCode);
+        if POSAuditProfile.AllowSalesAndReturnInSameTrans then
+            exit;
+
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetFilter(Quantity, '>0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        POSSaleLine.SetFilter(Quantity, '<0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        Error(SalesAndReturnsNotAllowedInSameTransactionErr);
     end;
 
     internal procedure IsDataSetOnSalesInvoiceDoc(RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header"): Boolean
