@@ -76,8 +76,8 @@ codeunit 6150814 "NPR Retail Sales Chart BT"
             Query1.SetFilter(Posting_Date, '%1..%2', StartDate, Enddate);
             Query1.Open();
             Query1.Read();
-            Result.Add('Margin ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual));
-            Result.Add('Turnover ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual));
+            Result.Add('Margin ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual + Query1.Sum_Cost_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
+            Result.Add('Turnover ' + Format(I - 1), Format(Query1.Sum_Sales_Amount_Actual, 0, '<Precision,2:2><Standard Format,9>'));
             Query1.Close();
         end;
 
