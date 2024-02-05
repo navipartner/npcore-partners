@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>7ffe1125-aed7-4646-bc77-0525ec7334de</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -872,7 +871,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Values_Number_6.Value</Value>
+                                  <Value>=Fields!Values_Number_4.Value+Fields!Values_Number_5.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <Format>n2</Format>
@@ -1220,7 +1219,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Values_Number_3.Value)</Value>
+                                  <Value>=SUM(Fields!Values_Number_3.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
@@ -1256,6 +1255,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1871,6 +1871,15 @@
                     <GroupExpressions>
                       <GroupExpression>=Fields!Number_Integer.Value</GroupExpression>
                     </GroupExpressions>
+                    <Filters>
+                      <Filter>
+                        <FilterExpression>=Fields!Number_Integer.Value</FilterExpression>
+                        <Operator>GreaterThan</Operator>
+                        <FilterValues>
+                          <FilterValue DataType="Integer">0</FilterValue>
+                        </FilterValues>
+                      </Filter>
+                    </Filters>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
