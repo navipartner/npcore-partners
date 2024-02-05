@@ -2,7 +2,7 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     debugger;
     var { AdjustInventoyCaption, UnitOfMeasureAssignmentPopUpSettings, UnitOfMeasureCode } = await workflow.respond("GetInventorySettings")
  
-    if (parameters.AdjustmentUnitOfMeasure == 3) {
+    if (parameters.UnitOfMeasure == 3) {
         var unitOfMeasureResponse = await popup.configuration(UnitOfMeasureAssignmentPopUpSettings);
         if (unitOfMeasureResponse === null) return;
         UnitOfMeasureCode = unitOfMeasureResponse.unitOfMeasure
