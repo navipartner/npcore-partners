@@ -113,13 +113,27 @@
         rapidstartBaseDataMgt: Codeunit "NPR RapidStart Base Data Mgt.";
         packageList: List of [Text];
         locPackage: Text;
+        BlobStorageMetadataLink: Label 'https://npretailbasedata.blob.core.windows.net/pos-test-data/?restype=container&comp=list&include=metadata', Locked = true;
+        PackageNumber: Integer;
     begin
+        PackageNumber := 0;
+
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage('https://npretailbasedata.blob.core.windows.net/pos-test-data/?restype=container&comp=list', packageList);
         foreach locPackage in packageList do begin
             TempRetailList.Number += 1;
             TempRetailList.Value := CopyStr(locPackage, 1, MaxStrLen(TempRetailList.Value));
             TempRetailList.Choice := CopyStr(locPackage, 1, MaxStrLen(TempRetailList.Choice));
             TempRetailList.Insert();
+        end;
+
+        Clear(packageList);
+        Clear(locPackage);
+        rapidstartBaseDataMgt.GetAllPackagesMetadataInBlobStorage(BlobStorageMetadataLink, packageList);
+        foreach locPackage in packageList do begin
+            PackageNumber += 1;
+            TempRetailList.Get(PackageNumber);
+            TempRetailList."Package Description" := CopyStr(locPackage, 1, MaxStrLen(TempRetailList."Package Description"));
+            TempRetailList.Modify();
         end;
 
         if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
