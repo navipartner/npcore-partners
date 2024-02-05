@@ -25,6 +25,12 @@
                     ToolTip = 'Specifies the value of the Choice field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Package Description"; Rec."Package Description")
+                {
+                    Editable = false;
+                    ToolTip = 'Provides a brief description of rapidstart package.';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Chosen; Rec.Chosen)
                 {
 

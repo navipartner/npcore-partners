@@ -56,6 +56,27 @@
     end;
 
     [NonDebuggable]
+    procedure GetAllPackagesMetadataInBlobStorage(URL: Text; var Packages: List of [Text])
+    var
+        HttpClient: HttpClient;
+        HttpResponseMessage: HttpResponseMessage;
+        XMLDoc: XmlDocument;
+        InStream: InStream;
+        XMLNode: XmlNode;
+        XMLNodeList: XmlNodeList;
+    begin
+        HttpClient.Get(URL, HttpResponseMessage);
+        httpResponseMessage.Content.ReadAs(InStream);
+        XmlDocument.ReadFrom(InStream, XMLDoc);
+
+        XMLDoc.SelectNodes('//Blob/Metadata/Description', XMLNodeList);
+
+        foreach XMLNode in XMLNodeList do begin
+            Packages.Add(XMLNode.AsXmlElement().InnerText());
+        end;
+    end;
+
+    [NonDebuggable]
     procedure ImportPackage(URL: Text; PackageCode: Text; AdjustPackageTableNames: Boolean)
     var
         configPackage: Record "Config. Package";
