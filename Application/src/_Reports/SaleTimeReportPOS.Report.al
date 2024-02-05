@@ -5,7 +5,6 @@ report 6014418 "NPR Sale Time Report POS"
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/SaleTimeReportPOS.rdlc';
-
     Caption = 'Sale Time Report';
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = NPRRetail;
@@ -423,7 +422,6 @@ report 6014418 "NPR Sale Time Report POS"
         Date: Record Date;
         DayFilter: Boolean;
         ItemAmt: Decimal;
-        Lines: Decimal;
         DiscountAmt: Decimal;
         OtherAmt: Decimal;
         InterruptedAmt: Decimal;
@@ -438,7 +436,7 @@ report 6014418 "NPR Sale Time Report POS"
         NetSalesExcVAT: Decimal;
         CostAmt: Decimal;
         DebitExcVat: Decimal;
-        DebitCostAmt: Decimal;
+        NoOfPOSSalesLines: Decimal;
         Values: array[14, 12] of Decimal;
         Text10600000: Label 'The Time in File %1 is less than %2';
         Text10600001: Label 'Monday,';
@@ -454,7 +452,7 @@ report 6014418 "NPR Sale Time Report POS"
         Page_Caption: Label 'Page ';
         TextTime: Label 'Time';
         TextItemExpedition: Label 'Item Sales';
-        TextExpedition: Label 'No. of Sales';
+        TextExpedition: Label 'No. of Sale Tickets';
         TextFrom: Label 'From';
         TextTo: Label 'To';
         TextAvgLines: Label 'Average Lines';
@@ -471,7 +469,7 @@ report 6014418 "NPR Sale Time Report POS"
         POSSalesline: Record "NPR POS Entry Sales Line";
         NoofSales: Integer;
         Noofdebtsales: Integer;
-        TextQty: Label 'Quantity';
+        TextQty: Label 'No. of Sales';
 
 
     internal procedure CalcValue()
@@ -529,6 +527,7 @@ report 6014418 "NPR Sale Time Report POS"
 
     internal procedure Calculate(FilterArray: array[2] of Date)
     var
+        POSUnitNoFilter: Text;
         I: Integer;
     begin
         PosEntry1.CopyFilters("POS Entry");
@@ -538,7 +537,6 @@ report 6014418 "NPR Sale Time Report POS"
             NoofSales := 0;
             Noofdebtsales := 0;
             CostAmt := 0;
-            Lines := 0;
             DiscountAmt := 0;
             DebitExcVat := 0;
             OtherAmt := 0;
@@ -547,30 +545,31 @@ report 6014418 "NPR Sale Time Report POS"
             db := 0;
             InterruptedAmt := 0;
             NetSalesExcVAT := 0;
-            DebitCostAmt := 0;
+            NoOfPOSSalesLines := 0;
 
             PosEntry1.SetFilter("Ending Time", '>=%1&<%2', TimeArray[I], TimeArray[I + 1]);
 
             if PosEntry1.FindSet() then begin
                 repeat
-                    NetSalesAmt += PosEntry1."Amount Excl. Tax";
                     NetSalesExcVAT += PosEntry1."Amount Excl. Tax";
 
                     POSSalesline.Reset();
-                    POSSalesline.SetRange(POSSalesline."POS Entry No.", PosEntry1."Entry No.");
+                    POSSalesline.SetRange("POS Entry No.", PosEntry1."Entry No.");
                     POSSalesline.SetRange(Type, POSSalesline.Type::Item);
                     POSSalesline.CalcSums("Unit Cost (LCY)", Quantity, "Line Dsc. Amt. Excl. VAT (LCY)");
-                    CostAmt += POSSalesline."Unit Cost (LCY)";
-                    Lines += POSSalesline.Quantity;
-                    DiscountAmt += POSSalesline."Line Discount Amount Incl. VAT";
+                    DiscountAmt += POSSalesline."Line Dsc. Amt. Excl. VAT (LCY)";
 
-                    POSSalesline.Reset();
-                    POSSalesline.SetRange(POSSalesline."POS Entry No.", PosEntry1."Entry No.");
-                    POSSalesline.SetRange(Type, POSSalesline.Type::"G/L Account");
-                    POSSalesline.CalcSums("Unit Cost (LCY)", Quantity, "Line Dsc. Amt. Excl. VAT (LCY)");
-
-                    CostAmt += POSSalesline."Unit Cost (LCY)";
-                    Lines += POSSalesline.Quantity;
+                    POSUnitNoFilter := "POS Entry".GetFilter("POS Unit No.");
+                    if POSUnitNoFilter <> '' then begin
+                        POSSalesline.SetRange("POS Unit No.", POSUnitNoFilter);
+                        NoOfPOSSalesLines += POSSalesline.Count();
+                    end;
+                    if POSSalesLine.FindSet() then
+                        repeat
+                            CostAmt += POSSalesline."Unit Cost (LCY)" * POSSalesline.Quantity;
+                            if POSSalesline."Amount Excl. VAT" >= 0 then
+                                NetSalesAmt += POSSalesline."Amount Excl. VAT";
+                        until POSSalesLine.Next() = 0;
                 until PosEntry1.Next() = 0;
             end;
 
@@ -589,12 +588,16 @@ report 6014418 "NPR Sale Time Report POS"
 
             PosEntry2.Reset();
             PosEntry2.CopyFilters(PosEntry1);
-            PosEntry2.SetRange("Entry Type", PosEntry2."Entry Type"::"Direct Sale");
+            PosEntry2.SetRange("Entry Type", PosEntry2."Entry Type"::"Credit Sale");
+            POSUnitNoFilter := "POS Entry".GetFilter("POS Unit No.");
+            if POSUnitNoFilter <> '' then
+                POSSalesline.SetRange("POS Unit No.", POSUnitNoFilter);
             if PosEntry2.FindSet() then begin
                 Noofdebtsales := PosEntry2.Count;
                 repeat
                     POSSalesline.Reset();
                     POSSalesline.SetRange("POS Entry No.", PosEntry2."Entry No.");
+                    POSSalesline.SetRange(Type, POSSalesline.Type::Item);
                     if POSSalesline.FindSet() then begin
                         repeat
                             DebitExcVat += POSSalesline."Amount Excl. VAT";
@@ -605,7 +608,7 @@ report 6014418 "NPR Sale Time Report POS"
 
             PosEntry2.Reset();
             PosEntry2.CopyFilters(PosEntry1);
-            PosEntry2.SetRange("Entry Type", PosEntry2."Entry Type"::"Credit Sale");
+            PosEntry2.SetRange("Entry Type", PosEntry2."Entry Type"::"Direct Sale");
             if PosEntry2.FindSet() then begin
                 NoofSales := PosEntry2.Count;
             end;
@@ -638,15 +641,17 @@ report 6014418 "NPR Sale Time Report POS"
                 InterruptedAmt := PosEntry2.Count;
             end;
 
-            db := (NetSalesExcVAT) - (CostAmt + DebitCostAmt);
+            db := NetSalesExcVAT - CostAmt;
             ItemAmt := NoofSales + Noofdebtsales;
-
             Values[I] [1] += ItemAmt;
-            Values[I] [2] += Lines;
+            if ItemAmt = 0 then
+                Values[I] [2] += 0
+            else
+                Values[I] [2] += NoOfPOSSalesLines;
             Values[I] [3] += NetSalesExcVAT;
             Values[I] [4] += NetSalesAmt;
             Values[I] [5] += SalesReturnAmt;
-            Values[I] [6] += NetSalesAmt + ABS(SalesReturnAmt);
+            Values[I] [6] += NetSalesAmt + SalesReturnAmt;
             Values[I] [7] += DiscountAmt;
             Values[I] [8] += DebitExcVat;
             Values[I] [9] += db;
