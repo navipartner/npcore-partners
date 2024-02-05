@@ -38,7 +38,7 @@ codeunit 85049 "NPR POS Act. Adjust Inv. Tests"
         POSSession.GetSaleLine(POSSaleLine);
         Quantity := LibraryRandom.RandDec(100, 4);
 
-        POSActionBusinessLogic.PerformAdjustInventory(POSSale, POSSaleLine, Quantity, ReasonCode, CustomDescription);
+        POSActionBusinessLogic.PerformAdjustInventory(POSSale, POSSaleLine, Quantity, '', ReasonCode, CustomDescription);
 
         Item.Get(ItemNo);
         Item.CalcFields(Inventory);
