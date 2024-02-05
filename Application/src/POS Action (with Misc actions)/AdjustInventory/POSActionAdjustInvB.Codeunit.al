@@ -2,7 +2,7 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
 {
     Access = Internal;
 
-    procedure PerformAdjustInventory(POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; CustomDescription: text[100])
+    procedure PerformAdjustInventory(POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; Quantity: Decimal; UnitOfMeasureCode: Code[10]; ReturnReasonCode: Code[10]; CustomDescription: text[100])
     var
         TempItemJnlLine: Record "Item Journal Line" temporary;
         SalePOS: Record "NPR POS Sale";
@@ -13,20 +13,20 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         POSSale.GetCurrentSale(SalePOS);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        if not ConfirmAdjustInventory(SaleLinePOS, Quantity) then
+        if not ConfirmAdjustInventory(SaleLinePOS, UnitOfMeasureCode, Quantity) then
             exit;
 
-        CreateItemJnlLine(SalePOS, SaleLinePOS, Quantity, ReturnReasonCode, TempItemJnlLine, CustomDescription);
+        CreateItemJnlLine(SalePOS, SaleLinePOS, Quantity, UnitOfMeasureCode, ReturnReasonCode, TempItemJnlLine, CustomDescription);
         PostItemJnlLine(TempItemJnlLine);
 
         Message(Text005, Quantity);
     end;
 
-    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal) PerformAdjustInventory: Boolean
+    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR POS Sale Line"; UnitOfMeasureCode: Code[10]; Quantity: Decimal) PerformAdjustInventory: Boolean
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        Text002: Label 'Inventory Adjustment:\- Item: %1 %2 %3\- Current Inventory: %4\- Adjust Quantity: %5\- New Inventory: %6\\Perform Inventory Adjustment?';
+        Text002: Label 'Inventory Adjustment:\- Item: %1 %2 %3\- Current Inventory: %4\- Adjust Unit of Measure: %5\- Adjust Quantity: %6\- New Inventory: %7\\Perform Inventory Adjustment?';
     begin
         if SaleLinePOS."Variant Code" <> '' then
             ItemVariant.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code");
@@ -36,11 +36,11 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         Item.SetFilter("Location Filter", SaleLinePOS."Location Code");
         Item.CalcFields(Inventory);
 
-        PerformAdjustInventory := Confirm(Text002, true, Item."No.", Item.Description, ItemVariant.Description, Item.Inventory, Quantity, Item.Inventory + Quantity);
+        PerformAdjustInventory := Confirm(Text002, true, Item."No.", Item.Description, ItemVariant.Description, Item.Inventory, UnitOfMeasureCode, Quantity, Item.Inventory + Quantity);
         exit(PerformAdjustInventory);
     end;
 
-    local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary; CustomDescription: Text[100])
+    local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; UnitOfMeasureCode: Code[10]; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary; CustomDescription: Text[100])
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -64,6 +64,7 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         TempItemJnlLine.Validate("Entry Type", TempItemJnlLine."Entry Type"::"Positive Adjmt.");
         if Quantity < 0 then
             TempItemJnlLine.Validate("Entry Type", TempItemJnlLine."Entry Type"::"Negative Adjmt.");
+        TempItemJnlLine.Validate("Unit of Measure Code", UnitOfMeasureCode);
         TempItemJnlLine.Validate(Quantity, Abs(Quantity));
         if ReturnReasonCode <> '' then
             TempItemJnlLine.Validate("Return Reason Code", ReturnReasonCode);
