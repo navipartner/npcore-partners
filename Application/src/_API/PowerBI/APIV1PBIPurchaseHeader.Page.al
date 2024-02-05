@@ -124,7 +124,7 @@ page 6060037 "NPR APIV1 PBIPurchase Header"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 field(invoiceReceivedDate; Rec."Invoice Received Date")
                 {
                     Caption = 'Invoice Received Date', Locked = true;
