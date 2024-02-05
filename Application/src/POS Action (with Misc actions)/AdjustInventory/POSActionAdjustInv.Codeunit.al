@@ -17,7 +17,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
         ReasonDescDescLbl: Label 'Add custom Return Reason Description with Reason Code';
         AddReasonDescLbl: Label 'Return Reason Description';
         InventoryAdjustmentUnitOfMeasureOptionsLbl: Label 'Purchase Unit of Measure,Sales Unit of Measure,Base Unit of Measure,Ask';
-        ParameterInventoryAdjustmentUnitOfMeasure_CptLbl: Label 'Adjustment Unit of Measure';
+        ParameterInventoryAdjustmentUnitOfMeasure_CptLbl: Label 'Unit of Measure';
         ParameterInventoryAdjustmentUnitOfMeasure_DescLbl: Label 'Specifies the unit of measure that is going to be used for the adjustment';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -37,7 +37,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
             ParametarOptionsLbl
         );
         WorkflowConfig.AddBooleanParameter('CustomReasonDescription', false, ReasonDescCptLbl, ReasonDescDescLbl);
-        WorkflowConfig.AddOptionParameter('AdjustmentUnitOfMeasure',
+        WorkflowConfig.AddOptionParameter('UnitOfMeasure',
                                           InventoryAdjustmentUnitOfMeasureOptionsLbl,
 #pragma warning disable AA0139
                                           SelectStr(1, InventoryAdjustmentUnitOfMeasureOptionsLbl),
@@ -131,7 +131,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
 
         Item.Get(SaleLinePOS."No.");
 
-        case Context.GetIntegerParameter('AdjustmentUnitOfMeasure') of
+        case Context.GetIntegerParameter('UnitOfMeasure') of
             0:
                 UnitOfMeasureCode := Item."Purch. Unit of Measure";
             1:
@@ -198,7 +198,7 @@ codeunit 6150848 "NPR POS Action: Adjust Inv." implements "NPR IPOS Workflow"
 
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionAdjustInv.js###
-'let main=async({workflow:t,context:d,parameters:e,popup:n,captions:i})=>{debugger;var{AdjustInventoyCaption:o,UnitOfMeasureAssignmentPopUpSettings:r,UnitOfMeasureCode:a}=await t.respond("GetInventorySettings");if(e.AdjustmentUnitOfMeasure==3){var s=await n.configuration(r);if(s===null)return;a=s.unitOfMeasure}var u=await n.numpad({title:o,caption:i.QtyCaption});if(u===null)return" ";await t.respond("GetReasonCode"),t.context.reasonCode&&e.CustomReasonDescription&&(t.context.customDescription=await n.input({caption:i.ReasonCodeCpt,value:t.context.defaultDescription})),await t.respond("AdjustInventory",{quantity:u,unitOfMeasureCode:a})};'
+'let main=async({workflow:t,context:d,parameters:e,popup:n,captions:i})=>{debugger;var{AdjustInventoyCaption:o,UnitOfMeasureAssignmentPopUpSettings:r,UnitOfMeasureCode:a}=await t.respond("GetInventorySettings");if(e.UnitOfMeasure==3){var s=await n.configuration(r);if(s===null)return;a=s.unitOfMeasure}var u=await n.numpad({title:o,caption:i.QtyCaption});if(u===null)return" ";await t.respond("GetReasonCode"),t.context.reasonCode&&e.CustomReasonDescription&&(t.context.customDescription=await n.input({caption:i.ReasonCodeCpt,value:t.context.defaultDescription})),await t.respond("AdjustInventory",{quantity:u,unitOfMeasureCode:a})};'
         );
     end;
 
