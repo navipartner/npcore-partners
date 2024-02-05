@@ -70,7 +70,10 @@
             Validate(Value, DefaultValue);
             Insert();
             Commit();
+            exit;
         end;
+
+        UpdatePrintTemplateParamValue(Rec, NameIn, DefaultValue);
     end;
 
     procedure LookupValue()
@@ -219,6 +222,30 @@
         String := Text;
         CharTxt := ',';
         Parts := String.Split(CharTxt);
+    end;
+
+    local procedure UpdatePrintTemplateParamValue(var POSPaymBinEjectParam: Record "NPR POS Paym. Bin Eject Param."; NameIn: Text; DefaultValue: Text)
+    var
+        ParamNameLbl: Label 'print_template', Locked = true;
+        RPTemplateHeader: Record "NPR RP Template Header";
+    begin
+        if DefaultValue = '' then
+            exit;
+
+        if POSPaymBinEjectParam.Value <> '' then
+            exit;
+
+        if NameIn <> ParamNameLbl then
+            exit;
+
+        if POSPaymBinEjectParam."Data Type" <> POSPaymBinEjectParam."Data Type"::Text then
+            exit;
+
+        if not RPTemplateHeader.Get(DefaultValue) then
+            exit;
+
+        POSPaymBinEjectParam.Validate(Value, DefaultValue);
+        POSPaymBinEjectParam.Modify();
     end;
 
     [IntegrationEvent(false, false)]

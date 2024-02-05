@@ -17,24 +17,49 @@
         exit('TEMPLATE');
     end;
 
+    local procedure InvokeParameterName(): Text
+    begin
+        exit('print_template');
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnEjectPaymentBin', '', false, false)]
     local procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
     var
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        RPTemplateHeader: Record "NPR RP Template Header";
         Template: Text[20];
+        DefaultPrintTemplateCode: Code[20];
         RecordVariant: Variant;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
 
-        Template := CopyStr(POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'print_template', ''), 1, 20);
+        SelectDefaultPrintTemplate(POSPaymentBin, DefaultPrintTemplateCode);
+
+        RPTemplateHeader.Get(DefaultPrintTemplateCode);
+
+        Template := CopyStr(POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", InvokeParameterName(), DefaultPrintTemplateCode), 1, 20);
 
         POSPaymentBin.SetRecFilter();
         RecordVariant := POSPaymentBin;
         RPTemplateMgt.PrintTemplate(Template, RecordVariant, 0);
 
         Ejected := true;
+    end;
+
+    local procedure SelectDefaultPrintTemplate(POSPaymentBin: Record "NPR POS Payment Bin"; var DefaultPrintTemplateCode: Code[20])
+    var
+        IsHandled: Boolean;
+        POSPaymBinEjectPublic: Codeunit "NPR POS Paym. Bin Eject Public";
+        PrintTemplateCodeLbl: Label 'EPSON_CASH_DRAWER', Locked = true;
+    begin
+        POSPaymBinEjectPublic.OnSelectDefaultPrintTemplate(DefaultPrintTemplateCode, InvokeParameterName(), POSPaymentBin, IsHandled);
+
+        if IsHandled then
+            exit;
+
+        DefaultPrintTemplateCode := PrintTemplateCodeLbl;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnLookupBinInvokeMethods', '', false, false)]
@@ -54,7 +79,7 @@
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
 
-        POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'print_template', '');
+        POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", InvokeParameterName(), '');
         POSPaymentBinInvokeMgt.ShowGenericParameters(POSPaymentBin);
     end;
 
@@ -69,7 +94,7 @@
             exit;
 
         case PaymentBinInvokeParameter.Name of
-            'print_template':
+            InvokeParameterName():
                 Caption := CaptionTemplate;
         end;
     end;
@@ -85,7 +110,7 @@
             exit;
 
         case PaymentBinInvokeParameter.Name of
-            'print_template':
+            InvokeParameterName():
                 Caption := DescriptionTemplate;
         end;
     end;
@@ -102,7 +127,7 @@
             exit;
 
         case Rec.Name of
-            'print_template':
+            InvokeParameterName():
                 begin
                     if Rec.Value <> '' then
                         RPTemplateHeader.Get(Rec.Value);
@@ -122,7 +147,7 @@
             exit;
 
         case POSPaymentBinEjectParam.Name of
-            'print_template':
+            InvokeParameterName():
                 begin
                     RPTemplateHeader.SetRange("Table ID", DATABASE::"NPR POS Payment Bin");
                     if PAGE.RunModal(0, RPTemplateHeader) = ACTION::LookupOK then
@@ -131,4 +156,3 @@
         end;
     end;
 }
-
