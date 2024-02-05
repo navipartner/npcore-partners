@@ -40,7 +40,7 @@ enum 6014602 "NPR Nc IL Process Handler" implements "NPR Nc Import List IProcess
 
     value(60; "MM Member WebService Mgr")
     {
-        Caption = 'TM Ticket WebService Mgr';
+        Caption = 'TM Member WebService Mgr';
         Implementation = "NPR Nc Import List IProcess" = "NPR MM Member WebService Mgr";
     }
 
