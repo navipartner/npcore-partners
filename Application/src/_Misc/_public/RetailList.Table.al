@@ -26,6 +26,11 @@
             Caption = 'Value';
             DataClassification = CustomerContent;
         }
+        field(11; "Package Description"; Text[250])
+        {
+            Caption = 'Package Description';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
