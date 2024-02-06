@@ -271,6 +271,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin" where("Bin Type" = const(SAFE));
         }
+        field(190; "Bin Transfer Number Series"; Code[20])
+        {
+            Caption = 'Bin Transfer Number Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
     }
 
     keys
