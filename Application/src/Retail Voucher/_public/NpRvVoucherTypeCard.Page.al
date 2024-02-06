@@ -47,23 +47,42 @@
                 group(Control6014424)
                 {
                     ShowCaption = false;
-                    field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
+                    field("Voucher Qty. (Open)"; VoucherQtyOpen)
                     {
-
+                        Caption = 'Voucher Qty. (Open)';
+                        Editable = false;
                         ToolTip = 'Specifies the value of the Voucher Qty. (Open) field';
                         ApplicationArea = NPRRetail;
-                    }
-                    field("Voucher Qty. (Closed)"; Rec."Voucher Qty. (Closed)")
-                    {
 
+                        trigger OnDrillDown()
+                        var
+                        begin
+                            Rec.DrilldownCalculatedFields(Rec.FieldNo("Voucher Qty. (Open)"));
+                        end;
+                    }
+                    field("Voucher Qty. (Closed)"; VoucherQtyClosed)
+                    {
+                        Caption = 'Voucher Qty. (Closed)';
+                        Editable = false;
                         ToolTip = 'Specifies the value of the Voucher Qty. (Closed) field';
                         ApplicationArea = NPRRetail;
+                        trigger OnDrillDown()
+                        var
+                        begin
+                            Rec.DrilldownCalculatedFields(Rec.FieldNo("Voucher Qty. (Closed)"));
+                        end;
                     }
-                    field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
+                    field("Arch. Voucher Qty."; VoucherQtyArchived)
                     {
-
+                        Caption = 'Archived Voucher Qty.';
+                        Editable = false;
                         ToolTip = 'Specifies the value of the Archived Voucher Qty. field';
                         ApplicationArea = NPRRetail;
+                        trigger OnDrillDown()
+                        var
+                        begin
+                            Rec.DrilldownCalculatedFields(Rec.FieldNo("Arch. Voucher Qty."));
+                        end;
                     }
                 }
             }
@@ -423,13 +442,29 @@
     begin
         SetHasSetup();
         UpdateControls();
+
+        VoucherQtyOpen := LoadingTxt;
+        VoucherQtyClosed := LoadingTxt;
+        VoucherQtyArchived := LoadingTxt;
+        EnqueueFlowFieldsCalculationBackgroundTask();
     end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    begin
+        VoucherQtyOpen := GetFieldValueFromBackgroundTaskResultSet(Results, Format(Rec.FieldNo("Voucher Qty. (Open)")));
+        VoucherQtyClosed := GetFieldValueFromBackgroundTaskResultSet(Results, Format(Rec.FieldNo("Voucher Qty. (Closed)")));
+        VoucherQtyArchived := GetFieldValueFromBackgroundTaskResultSet(Results, Format(Rec.FieldNo("Arch. Voucher Qty.")));
+    end;
+
 
     var
         HasApplyPaymentSetup: Boolean;
         HasIssueVoucherSetup: Boolean;
         HasValidateVoucherSetup: Boolean;
         PrintUsingTemplate: Boolean;
+        VoucherQtyOpen, VoucherQtyClosed, VoucherQtyArchived : Text;
+        BackgroundTaskId: Integer;
+        LoadingTxt: Label 'Loading...', Locked = true;
 
     local procedure SetHasSetup()
     var
@@ -450,5 +485,27 @@
     local procedure UpdateControls()
     begin
         PrintUsingTemplate := Rec."Print Object Type" = Rec."Print Object Type"::Template;
+    end;
+
+    local procedure EnqueueFlowFieldsCalculationBackgroundTask()
+    var
+        BackgroundTaskParameters: Dictionary of [Text, Text];
+    begin
+        if (BackgroundTaskId <> 0) then
+            CurrPage.CancelBackgroundTask(BackgroundTaskId);
+        BackgroundTaskParameters.Add('VoucherTypeCode', Rec.Code);
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Voucher Qty. (Open)")), '');
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Voucher Qty. (Closed)")), '');
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Arch. Voucher Qty.")), '');
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR NpRv Ret. Vouch. Type Task", BackgroundTaskParameters);
+    end;
+
+    local procedure GetFieldValueFromBackgroundTaskResultSet(var BackgroundTaskResults: Dictionary of [Text, Text]; FieldNo: Text) Result: Text
+    begin
+        if not BackgroundTaskResults.ContainsKey(FieldNo) then
+            exit('0');
+        Result := BackgroundTaskResults.Get(FieldNo);
+        if Result = '' then
+            Result := '0';
     end;
 }
