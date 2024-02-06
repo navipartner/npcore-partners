@@ -1084,7 +1084,7 @@
         ProfileRole.SetRange("Profile ID", SessionSettings.ProfileId());
         if not ProfileRole.FindFirst() then
             exit;
-        if (ProfileRole."Role Center ID" = Page::"NPR Retail Manager Role Center") or (ProfileRole."Role Center ID" = Page::"NPR Retail Setup RC") then begin
+        if (ProfileRole."Role Center ID" = Page::"NPR Retail Manager Role Center") or (ProfileRole."Role Center ID" = Page::"NPR Retail Setup RC") or (ProfileRole."Role Center ID" = Page::"NPR Entertainment RC") then begin
             IsHandled := true;
             TitleTxt := TitleTextLbl;
             DescriptionTxt := DescriptionTextLbl;
