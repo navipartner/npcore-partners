@@ -15,10 +15,15 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         PageAction: Action;
         SalePOS: Record "NPR POS Sale";
+        EndOfDayProfile: Record "NPR POS End of Day Profile";
+        POSUnit: Record "NPR POS Unit";
     begin
         WorkshiftCheckpoint.Get(CheckpointEntryNo);
         WorkshiftCheckpoint.Type := WorkshiftCheckpoint.Type::TRANSFER;
         WorkshiftCheckpoint.Modify();
+
+        POSUnit.Get(WorkShiftCheckpoint."POS Unit No.");
+        POSUnit.GetProfile(EndOfDayProfile);
 
         PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo, POSPaymentBinCheckpoint.type::TRANSFER);
         Commit();
@@ -45,7 +50,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
                 POSSession.GetSale(POSSale);
                 POSSale.GetCurrentSale(SalePOS);
 
-                PostWorkshiftCheckpoint(CheckpointEntryNo, SalePOS);  //Has a commit
+                PostWorkshiftCheckpoint(CheckpointEntryNo, SalePOS, EndOfDayProfile."Bin Transfer Number Series");  //Has a commit
 
                 POSSession.ChangeViewLogin();
             end;
@@ -463,7 +468,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
             exit(false);
         UpdateNotfinalizedPmtBinCheckpoints(PmtBinCheckpoint);
 
-        PostWorkshiftCheckpoint(WorkshiftCheckpoint."Entry No.", SalePOS);  //Has a commit
+        PostWorkshiftCheckpoint(WorkshiftCheckpoint."Entry No.", SalePOS, EndOfDayProfile."Bin Transfer Number Series");  //Has a commit
 
         if not PrintTransfer and TransferIn then
             PrintTransfer := BinTransferSetup.Get() and BinTransferSetup.PrintOnReceive;
@@ -659,12 +664,13 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         BinTransferJnlLine.Modify();
     end;
 
-    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOSIn: Record "NPR POS Sale")
+    local procedure PostWorkshiftCheckpoint(CheckpointEntryNo: Integer; var SalePOSIn: Record "NPR POS Sale"; BinTransferNoSeriesCode: Code[20])
     var
         POSEntryToPost: Record "NPR POS Entry";
         SalePOS: Record "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPostEntries: Codeunit "NPR POS Post Entries";
+        NoSeriesManagement: Codeunit NoSeriesManagement;
         POSEntryNo: Integer;
         Now: DateTime;
         NotReadyForPostingErr: Label 'Counting has not been completed for workshift checkpoint entry No. %1.';
@@ -675,7 +681,12 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         SalePOS.SystemId := CreateGuid();
         SalePOS."Register No." := SalePOSIn."Register No.";
         SalePOS."POS Store Code" := SalePOSIn."POS Store Code";
-        SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(Now, 0, 9), '=', DelChr(Format(Now, 0, 9), '=', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
+
+        if BinTransferNoSeriesCode <> '' then
+            SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(BinTransferNoSeriesCode, Today(), true)
+        else
+            SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(Now, 0, 9), '=', DelChr(Format(Now, 0, 9), '=', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
+
         SalePOS.Date := DT2Date(Now);
         SalePOS."Start Time" := DT2Time(Now);
         SalePOS."Salesperson Code" := SalePOSIn."Salesperson Code";

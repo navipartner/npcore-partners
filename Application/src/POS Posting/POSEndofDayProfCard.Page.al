@@ -70,6 +70,11 @@
                     ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created from running the X report.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Bin Transfer Number Series"; Rec."Bin Transfer Number Series")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the number series used for creating the Document No. in the POS entry for entries created when performing the Bin Transfer.';
+                }
                 field("Force Blind Counting"; Rec."Force Blind Counting")
                 {
                     ToolTip = 'If this field is checked on the balancing page the amount won''t be shown in the system.';
