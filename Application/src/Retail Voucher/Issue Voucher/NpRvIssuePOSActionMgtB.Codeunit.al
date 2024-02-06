@@ -101,10 +101,15 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
     procedure SelectVoucherType(var VoucherTypeCode: Text): Boolean
     var
         VoucherType: Record "NPR NpRv Voucher Type";
+        VoucherEventHandler: Codeunit "NPR NpRv Voucher Event Handler";
     begin
+        BindSubscription(VoucherEventHandler);
         VoucherTypeCode := '';
-        if Page.RunModal(0, VoucherType) <> Action::LookupOK then
+        if Page.RunModal(0, VoucherType) <> Action::LookupOK then begin
+            UnbindSubscription(VoucherEventHandler);
             exit(false);
+        end;
+        UnbindSubscription(VoucherEventHandler);
 
         VoucherTypeCode := VoucherType.Code;
         exit(true);

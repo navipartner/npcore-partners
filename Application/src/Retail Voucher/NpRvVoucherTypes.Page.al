@@ -40,18 +40,14 @@
                     ToolTip = 'Specifies the valid period for the Voucher Type';
                     ApplicationArea = NPRRetail;
                 }
-                field("Voucher Qty. (Open)"; Rec."Voucher Qty. (Open)")
-                {
-
-                    ToolTip = 'Specifies the quantity of open vouchers for the Voucher Type';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Arch. Voucher Qty."; Rec."Arch. Voucher Qty.")
-                {
-
-                    ToolTip = 'Specifies the quantity of archived vouchers for the Voucher Type';
-                    ApplicationArea = NPRRetail;
-                }
+            }
+        }
+        area(FactBoxes)
+        {
+            part(VoucherTypeFactbox; "NPR NpRv Voucher Type Factbox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Background Calculated Fields';
             }
         }
     }
@@ -83,4 +79,57 @@
             }
         }
     }
+    var
+        BackgroundTaskId: Integer;
+
+    trigger OnAfterGetCurrRecord()
+    var
+        BackgroundTaskParameters: Dictionary of [Text, Text];
+        IsHandled: Boolean;
+    begin
+        OnBeforeEnqueuePageBackgroundTask(IsHandled);
+        if not IsHandled then begin
+            CreateBackgroundTaskParameters(BackgroundTaskParameters);
+            CurrPage.VoucherTypeFactbox.Page.InitData(Rec, BackgroundTaskParameters);
+            EnqueueFlowFieldsCalculationBackgroundTask(BackgroundTaskParameters);
+        end;
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        IsHandled: Boolean;
+    begin
+        OnBeforeOnPageBackgroundTaskCompleted(IsHandled);
+        if not IsHandled then
+            CurrPage.VoucherTypeFactbox.Page.FinishFillData(Results);
+    end;
+
+    local procedure CreateBackgroundTaskParameters(var BackgroundTaskParameters: Dictionary of [Text, Text])
+    var
+    begin
+        clear(BackgroundTaskParameters);
+        BackgroundTaskParameters.Add('VoucherTypeCode', Rec.Code);
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Voucher Qty. (Open)")), '');
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Voucher Qty. (Closed)")), '');
+        BackgroundTaskParameters.Add(Format(Rec.FieldNo("Arch. Voucher Qty.")), '');
+    end;
+
+    local procedure EnqueueFlowFieldsCalculationBackgroundTask(BackgroundTaskParameters: Dictionary of [Text, Text])
+
+    begin
+        if (BackgroundTaskId <> 0) then
+            CurrPage.CancelBackgroundTask(BackgroundTaskId);
+
+        CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"NPR NpRv Ret. Vouch. Type Task", BackgroundTaskParameters);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeEnqueuePageBackgroundTask(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnPageBackgroundTaskCompleted(var IsHandled: Boolean)
+    begin
+    end;
 }
