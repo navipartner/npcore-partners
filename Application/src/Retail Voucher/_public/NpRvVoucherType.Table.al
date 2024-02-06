@@ -220,5 +220,31 @@
         {
         }
     }
+
+    internal procedure DrilldownCalculatedFields(FieldNo: Integer)
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+    begin
+        Case FieldNo of
+            Rec.FieldNo("Voucher Qty. (Open)"):
+                begin
+                    Voucher.SetRange("Voucher Type", Rec.Code);
+                    Voucher.SetRange(Open, true);
+                    Page.Run(0, Voucher);
+                end;
+            Rec.FieldNo("Voucher Qty. (Closed)"):
+                begin
+                    Voucher.SetRange("Voucher Type", Rec.Code);
+                    Voucher.SetRange(Open, false);
+                    Page.Run(0, Voucher);
+                end;
+            Rec.FieldNo("Arch. Voucher Qty."):
+                begin
+                    ArchVoucher.SetRange("Voucher Type", Rec.Code);
+                    Page.Run(0, ArchVoucher);
+                end;
+        End;
+    end;
 }
 
