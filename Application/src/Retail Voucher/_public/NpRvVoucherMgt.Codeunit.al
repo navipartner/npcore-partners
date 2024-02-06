@@ -1059,7 +1059,6 @@
 
     internal procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary; CustomRefereceNo: Text[50])
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         ReferenceNo: Text;
         ReferenceErr: Label 'Generated reference no. %1 is too long. Max length is %2.';
@@ -1072,13 +1071,11 @@
         if VoucherType."No. Series" <> '' then
             NoSeriesMgt.InitSeries(TempVoucher."No. Series", '', 0D, TempVoucher."No.", TempVoucher."No. Series");
 
-        if FeatureFlagsManagement.IsEnabled('newVoucherCustomReferenceNoExperienceEnabled') then begin
-            if CustomRefereceNo <> '' then
-                ReferenceNo := CustomRefereceNo
-            else
-                ReferenceNo := GenerateReferenceNo(TempVoucher);
-        end else
+        if CustomRefereceNo <> '' then
+            ReferenceNo := CustomRefereceNo
+        else
             ReferenceNo := GenerateReferenceNo(TempVoucher);
+
         if StrLen(ReferenceNo) > MaxStrLen(TempVoucher."Reference No.") then
             Error(ReferenceErr, ReferenceNo, MaxStrLen(TempVoucher."Reference No."))
         else
