@@ -103,6 +103,9 @@
         RetailSetups();
         RestaurantSetups();
         AttractionSetups();
+#if not BC18
+        HideChecklistIfPOSEntryExist();
+#endif
     end;
 
     #region Retail
@@ -1068,6 +1071,17 @@
             TempAllProfile.Insert();
         end;
     end;
+
+#if not BC18
+    local procedure HideChecklistIfPOSEntryExist()
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.SetRange("System Entry", false);
+        if POSEntry.Count() > 10 then
+            Checklist.SetChecklistVisibility(false);
+    end;
+#endif
     #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
