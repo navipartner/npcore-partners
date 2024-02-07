@@ -30,9 +30,9 @@ report 6014520 "NPR Update Modified Date"
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Open(ProgressLbl);
                     Dialog.Update(1, 1);
                     Dialog.Update(3, "NPR TM Det. Ticket AccessEntry".Count());
@@ -44,10 +44,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Sales Channel No." = '' then begin
                     "Sales Channel No." += ' ';
                     Modify();
@@ -60,15 +59,17 @@ report 6014520 "NPR Update Modified Date"
                     "Sales Channel No." := CopyStr(OneChar + "Sales Channel No.", 1, MaxStrLen("Sales Channel No."));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("G/L Entry"; "G/L Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 2);
                     Dialog.Update(3, "G/L Entry".Count());
                     Dialog.Update(4, "G/L Entry".TableCaption());
@@ -79,10 +80,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -95,15 +95,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("Item Ledger Entry"; "Item Ledger Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 3);
                     Dialog.Update(3, "Item Ledger Entry".Count());
                     Dialog.Update(4, "Item Ledger Entry".TableCaption());
@@ -114,10 +116,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -130,15 +131,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR MM Loy. LedgerEntry (Srvr)"; "NPR MM Loy. LedgerEntry (Srvr)")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 4);
                     Dialog.Update(3, "NPR MM Loy. LedgerEntry (Srvr)".Count());
                     Dialog.Update(4, "NPR MM Loy. LedgerEntry (Srvr)".TableCaption());
@@ -149,10 +152,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Reference Number" = '' then begin
                     "Reference Number" += ' ';
                     Modify();
@@ -165,15 +167,17 @@ report 6014520 "NPR Update Modified Date"
                     "Reference Number" := CopyStr(OneChar + "Reference Number", 1, MaxStrLen("Reference Number"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR MM Membership Entry"; "NPR MM Membership Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 5);
                     Dialog.Update(3, "NPR MM Membership Entry".Count());
                     Dialog.Update(4, "NPR MM Membership Entry".TableCaption());
@@ -184,10 +188,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -200,15 +203,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR POS Entry"; "NPR POS Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 6);
                     Dialog.Update(3, "NPR POS Entry".Count());
                     Dialog.Update(4, "NPR POS Entry".TableCaption());
@@ -219,10 +224,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -235,6 +239,8 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
                 CurrReport.Break();
             end;
         }
@@ -242,9 +248,9 @@ report 6014520 "NPR Update Modified Date"
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 7);
                     Dialog.Update(3, "NPR POS Entry Sales Line".Count());
                     Dialog.Update(4, "NPR POS Entry Sales Line".TableCaption());
@@ -255,10 +261,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -271,15 +276,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR POS Entry Tax Line"; "NPR POS Entry Tax Line")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 8);
                     Dialog.Update(3, "NPR POS Entry Tax Line".Count());
                     Dialog.Update(4, "NPR POS Entry Tax Line".TableCaption());
@@ -290,10 +297,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Print Description" = '' then begin
                     "Print Description" += ' ';
                     Modify();
@@ -306,15 +312,17 @@ report 6014520 "NPR Update Modified Date"
                     "Print Description" := CopyStr(OneChar + "Print Description", 1, MaxStrLen("Print Description"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR TM Admis. Schedule Entry"; "NPR TM Admis. Schedule Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 9);
                     Dialog.Update(3, "NPR TM Admis. Schedule Entry".Count());
                     Dialog.Update(4, "NPR TM Admis. Schedule Entry".TableCaption());
@@ -325,10 +333,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Reason Code" = '' then begin
                     "Reason Code" += ' ';
                     Modify();
@@ -341,15 +348,17 @@ report 6014520 "NPR Update Modified Date"
                     "Reason Code" := CopyStr(OneChar + "Reason Code", 1, MaxStrLen("Reason Code"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR TM Admis. Schedule Lines"; "NPR TM Admis. Schedule Lines")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 10);
                     Dialog.Update(3, "NPR TM Admis. Schedule Lines".Count());
                     Dialog.Update(4, "NPR TM Admis. Schedule Lines".TableCaption());
@@ -360,10 +369,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Concurrency Code" = '' then begin
                     "Concurrency Code" += ' ';
                     Modify();
@@ -376,15 +384,17 @@ report 6014520 "NPR Update Modified Date"
                     "Concurrency Code" := CopyStr(OneChar + "Concurrency Code", 1, MaxStrLen("Concurrency Code"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR TM Ticket Access Entry"; "NPR TM Ticket Access Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 11);
                     Dialog.Update(3, "NPR TM Ticket Access Entry".Count());
                     Dialog.Update(4, "NPR TM Ticket Access Entry".TableCaption());
@@ -395,10 +405,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Member Card Code" = '' then begin
                     "Member Card Code" += ' ';
                     Modify();
@@ -411,15 +420,17 @@ report 6014520 "NPR Update Modified Date"
                     "Member Card Code" := CopyStr(OneChar + "Member Card Code", 1, MaxStrLen("Member Card Code"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("Value Entry"; "Value Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 12);
                     Dialog.Update(3, "Value Entry".Count());
                     Dialog.Update(4, "Value Entry".TableCaption());
@@ -430,10 +441,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -446,15 +456,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 13);
                     Dialog.Update(3, "Vendor Ledger Entry".Count());
                     Dialog.Update(4, "Vendor Ledger Entry".TableCaption());
@@ -465,10 +477,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if Description = '' then begin
                     Description += ' ';
                     Modify();
@@ -481,15 +492,17 @@ report 6014520 "NPR Update Modified Date"
                     Description := CopyStr(OneChar + Description, 1, MaxStrLen(Description));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
         dataitem("NPR TM Ticket Access Stats"; "NPR TM Ticket Access Stats")
         {
             trigger OnPreDataItem()
             begin
-                SetRange(SystemModifiedAt, 0DT);
+                SetFilter(SystemModifiedAt, '<%1', CreateDateTime(19800101D, 0T));
+                i := 0;
                 if GuiAllowed then begin
-                    i := 0;
                     Dialog.Update(1, 14);
                     Dialog.Update(3, "NPR TM Ticket Access Stats".Count());
                     Dialog.Update(4, "NPR TM Ticket Access Stats".TableCaption());
@@ -500,10 +513,9 @@ report 6014520 "NPR Update Modified Date"
             var
                 OneChar: Text;
             begin
-                if GuiAllowed then begin
-                    i += 1;
+                i += 1;
+                if GuiAllowed then
                     Dialog.Update(2, i);
-                end;
                 if "Admission Code" = '' then begin
                     "Admission Code" += ' ';
                     Modify();
@@ -516,6 +528,8 @@ report 6014520 "NPR Update Modified Date"
                     "Admission Code" := CopyStr(OneChar + "Admission Code", 1, MaxStrLen("Admission Code"));
                     Modify();
                 end;
+                if i mod 10000 = 0 then
+                    Commit();
             end;
         }
     }
