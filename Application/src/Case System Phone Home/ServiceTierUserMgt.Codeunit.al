@@ -36,7 +36,6 @@
         Company: Record Company;
         NPREnvironmentInfo: Record "NPR Environment Information";
         EnvironmentInformation: Codeunit "Environment Information";
-        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
         SessionId: Integer;
     begin
         if NavApp.IsInstalling() then
@@ -55,8 +54,6 @@
         if NPREnvironmentInfo.IsEmpty then
             exit;
 
-        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then
-            exit;
 
         if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login", CompanyName, TempClientDiagnostic) then;
     end;
@@ -203,6 +200,26 @@
             TenantDiagnostic.DeleteAll();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::Company, 'OnAfterDeleteEvent', '', false, false)]
+    local procedure ClearPosUnitAndStoresData_OnAfterDeleteCompany(RunTrigger: Boolean; Rec: Record Company)
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        AzureAdTenant: Codeunit "Azure AD Tenant";
+        IsSaas: Boolean;
+        AzureAdTenantId: Text;
+    begin
+        if not RunTrigger then
+            exit;
+
+        IsSaas := EnvironmentInformation.IsSaaS(); //Just hardcode this to true if you want to simulate SaaS on container
+        AzureAdTenantId := AzureAdTenant.GetAadTenantId(); //Just hardcode this to some AD ID if you want to simulate SaaS on container, otherwise it will be 'common'
+
+        if IsSaas then
+            SendPosStoreAndUnitQtyFromSaasEnvironmentOnCompanyDelete(AzureAdTenantId, Rec)
+        else
+            SendPosStoreAndUnitQtyOnCompanyDelete();
+    end;
+
     procedure ValidateTenant()
     var
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
@@ -240,8 +257,12 @@
 
     procedure TestUserOnLogin(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
+        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
         CheckIsUsingRegularInvoicing, UsingRegularInvoicing, WebServiceCallSucceeded, Handled : Boolean;
     begin
+        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then
+            exit;
+
         OnShouldCheckIsUsingRegularInvoicing(CheckIsUsingRegularInvoicing);
         if CheckIsUsingRegularInvoicing then begin
             IsUsingRegularInvoicing(UsingRegularInvoicing, WebServiceCallSucceeded, IsSaas, AzureAdTenantId);
@@ -466,6 +487,7 @@
         TenantDiagnostic: Record "NPR Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
         PosUnit: Record "NPR POS Unit";
+        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
         ResponseMessage: Text;
         ShouldSendRequest: Boolean;
         POSUnitsLastSent, POSStoresLastSent : DateTime;
@@ -488,6 +510,16 @@
         TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
         TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
 
+        //This condition is handling situations when company had environment type "PROD" and had POS Stores and Units sent to case system in the past,
+        //but was switched to DEMO,TEST,SANDBOX etc., so it will send 0 quantities in order to clear data in the case system.
+        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then begin
+            if (TenantDiagnostic."POS Units Last Sent" <> 0DT) OR (TenantDiagnostic."POS Stores Last Sent" <> 0DT) then begin
+                TenantDiagnostic."POS Stores" := 0;
+                TenantDiagnostic."POS Units" := 0;
+                ShouldSendRequest := true;
+            end;
+        end;
+
         if not ShouldSendRequest then
             if (TenantDiagnostic."POS Stores" <> TenantDiagnostic."POS Stores Sent on Last Upd.") or (TenantDiagnostic."POS Units" <> TenantDiagnostic."POS Units Sent on Last Upd.") then
                 ShouldSendRequest := true;
@@ -507,11 +539,40 @@
         end;
     end;
 
+    procedure SendPosStoreAndUnitQtyOnCompanyDelete()
+    var
+        TenantDiagnostic: Record "NPR Tenant Diagnostic";
+        ResponseMessage: Text;
+    begin
+        InitTenantDiagnostic(TenantDiagnostic);
+
+        if (TenantDiagnostic."POS Units Last Sent" = 0DT) and (TenantDiagnostic."POS Stores Last Sent" = 0DT) then
+            exit;
+
+        TenantDiagnostic."POS Stores" := 0;
+        TenantDiagnostic."POS Units" := 0;
+        TenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+        TenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+
+        if not TryInitAndSendRequest('UpdatePosStoresAndUnits', GetDatabaseName(), TenantId(), CompanyName(), Format(TenantDiagnostic."POS Stores"), Format(TenantDiagnostic."POS Units"), ResponseMessage) then
+            exit;
+
+        if LowerCase(ResponseMessage) = 'true' then begin
+            TenantDiagnostic."POS Stores Sent on Last Upd." := TenantDiagnostic."POS Stores";
+            TenantDiagnostic."POS Units Sent on Last Upd." := TenantDiagnostic."POS Units";
+            TenantDiagnostic."POS Stores Last Sent" := CurrentDateTime();
+            TenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
+            TenantDiagnostic.Modify();
+        end;
+    end;
+
     procedure SendPosStoreAndUnitQtyFromSaasEnvironment(AzureAdTenantId: Text)
     var
         SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
         PosUnit: Record "NPR POS Unit";
+        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
+        EnvironmentInformation: Codeunit "Environment Information";
         ResponseMessage: Text;
         ShouldSendRequest: Boolean;
         POSUnitsLastSent, POSStoresLastSent : DateTime;
@@ -534,6 +595,16 @@
         SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
         SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
 
+        //This condition is handling situations when company had environment type "PROD" and had POS Stores and Units sent to case system in the past,
+        //but was switched to DEMO,TEST,SANDBOX etc., so it will send 0 quantities in order to clear data in the case system.
+        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then begin
+            if (SaasTenantDiagnostic."POS Units Last Sent" <> 0DT) or (SaasTenantDiagnostic."POS Stores Last Sent" <> 0DT) then begin
+                SaasTenantDiagnostic."POS Stores" := 0;
+                SaasTenantDiagnostic."POS Units" := 0;
+                ShouldSendRequest := true;
+            end;
+        end;
+
         if not ShouldSendRequest then
             if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
                 ShouldSendRequest := true;
@@ -541,12 +612,41 @@
         if not ShouldSendRequest then
             exit;
 
-        if not TryInitAndSendRequestFromSaasEnvironment('UpdateSaasPosStoresAndUnits', AzureAdTenantId, CompanyName(), Format(SaasTenantDiagnostic."POS Stores"), Format(SaasTenantDiagnostic."POS Units"), ResponseMessage) then
+        if not TryInitAndSendRequestFromSaasEnvironment('UpdateSaasPosStoresAndUnitsV2', AzureAdTenantId, CompanyName(), EnvironmentInformation.GetEnvironmentName(), Format(SaasTenantDiagnostic."POS Stores"), Format(SaasTenantDiagnostic."POS Units"), ResponseMessage) then
             exit;
 
         if LowerCase(ResponseMessage) = 'true' then begin
             SaasTenantDiagnostic."POS Stores Sent on Last Upd." := SaasTenantDiagnostic."POS Stores";
             SaasTenantDiagnostic."POS Units Sent on Last Upd." := SaasTenantDiagnostic."POS Units";
+            SaasTenantDiagnostic."POS Stores Last Sent" := CurrentDateTime();
+            SaasTenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
+            SaasTenantDiagnostic.Modify();
+        end;
+    end;
+
+    procedure SendPosStoreAndUnitQtyFromSaasEnvironmentOnCompanyDelete(AzureAdTenantId: Text; DeletedCompany: Record Company)
+    var
+        SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
+        EnvironmentInformation: Codeunit "Environment Information";
+        ResponseMessage: Text;
+    begin
+        InitSaasTenantDiagnostic(AzureAdTenantId, SaasTenantDiagnostic);
+
+        if (SaasTenantDiagnostic."POS Units Last Sent" = 0DT) AND (SaasTenantDiagnostic."POS Stores Last Sent" = 0DT) then
+            exit;
+
+        SaasTenantDiagnostic.ChangeCompany(DeletedCompany.Name);
+        SaasTenantDiagnostic."POS Stores" := 0;
+        SaasTenantDiagnostic."POS Units" := 0;
+        SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
+        SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
+
+        if not TryInitAndSendRequestFromSaasEnvironment('UpdateSaasPosStoresAndUnitsV2', AzureAdTenantId, DeletedCompany.Name, EnvironmentInformation.GetEnvironmentName(), Format(SaasTenantDiagnostic."POS Stores"), Format(SaasTenantDiagnostic."POS Units"), ResponseMessage) then
+            exit;
+
+        if LowerCase(ResponseMessage) = 'true' then begin
+            SaasTenantDiagnostic."POS Stores Sent on Last Upd." := 0;
+            SaasTenantDiagnostic."POS Units Sent on Last Upd." := 0;
             SaasTenantDiagnostic."POS Stores Last Sent" := CurrentDateTime();
             SaasTenantDiagnostic."POS Units Last Sent" := CurrentDateTime();
             SaasTenantDiagnostic.Modify();
@@ -627,11 +727,11 @@
     end;
 
     [TryFunction]
-    local procedure TryInitAndSendRequestFromSaasEnvironment(serviceMethod: Text; AzureADTenantID: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text; var responseMessage: Text)
+    local procedure TryInitAndSendRequestFromSaasEnvironment(serviceMethod: Text; AzureADTenantID: Text; ThisCompanyName: Text; ThisEnvironmentName: Text; ThisPosStores: Text; ThisPosUnits: Text; var responseMessage: Text)
     var
         Content: HttpContent;
     begin
-        Content.WriteFrom(InitRequestContentFromSaasEnvironment(serviceMethod, AzureADTenantID, ThisCompanyName, ThisPosStores, ThisPosUnits));
+        Content.WriteFrom(InitRequestContentFromSaasEnvironment(serviceMethod, AzureADTenantID, ThisCompanyName, ThisEnvironmentName, ThisPosStores, ThisPosUnits));
         TrySendRequest(Content, serviceMethod, true, responseMessage)
     end;
 
@@ -723,7 +823,7 @@
         exit(Builder.ToText());
     end;
 
-    local procedure InitRequestContentFromSaasEnvironment(serviceMethod: Text; ThisAzureAdTenantId: Text; ThisCompanyName: Text; ThisPosStores: Text; ThisPosUnits: Text): Text
+    local procedure InitRequestContentFromSaasEnvironment(serviceMethod: Text; ThisAzureAdTenantId: Text; ThisCompanyName: Text; ThisEnvironmentName: Text; ThisPosStores: Text; ThisPosUnits: Text): Text
     var
         Builder: TextBuilder;
     begin
@@ -738,6 +838,9 @@
 
         if ThisCompanyName <> '' then
             Builder.Append('      <companyNameIn>' + ThisCompanyName + '</companyNameIn>');
+
+        if ThisEnvironmentName <> '' then
+            Builder.Append('      <environmentNameIn>' + ThisEnvironmentName + '</environmentNameIn>');
 
         if ThisPosStores <> '' then
             Builder.Append('      <posStoresIn>' + ThisPosStores + '</posStoresIn>');
