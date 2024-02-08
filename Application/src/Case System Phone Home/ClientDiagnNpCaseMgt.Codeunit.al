@@ -8,7 +8,10 @@
     procedure CollectAndSendClientDiagnostics(IsSaas: Boolean; AzureAdTenantId: Text; UserLoginType: Enum "NPR User Login Type")
     var
         ClientDiagnostic: Record "NPR Client Diagnostic v2";
+        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
     begin
+        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then
+            exit;
         if not ShouldSendClientDiagnostic(UserLoginType, ClientDiagnostic) then
             exit;
 
