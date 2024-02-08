@@ -384,6 +384,12 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies if the item is active or not as a Magento Item.';
                         ApplicationArea = NPRRetail;
                     }
+                    field("NPR Visibility"; Rec."NPR Visibility")
+                    {
+                        Importance = Promoted;
+                        ToolTip = 'Specifies if the item is visible on Magento side.';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("NPR Magento Name"; Rec."NPR Magento Name")
                     {
                         ToolTip = 'Specifies the item Magento Name.';

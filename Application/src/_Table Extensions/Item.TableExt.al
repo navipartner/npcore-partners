@@ -249,6 +249,12 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Ticket Type';
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Ticket Type";
+
+            trigger OnValidate()
+            begin
+                if Rec."NPR Ticket Type" <> '' then
+                    Rec."NPR Visibility" := Rec."NPR Visibility"::Hidden;
+            end;
         }
         field(6059970; "NPR Variety 1"; Code[10])
         {
@@ -445,6 +451,11 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Display Only';
             DataClassification = CustomerContent;
         }
+        field(6151493; "NPR Visibility"; Enum "NPR Mag. Store Item Visibility")
+        {
+            Caption = 'Visibility';
+            DataClassification = CustomerContent;
+        }
         field(6151495; "NPR Custom Options"; Integer)
         {
             CalcFormula = Count("NPR Magento Item Custom Option" WHERE("Item No." = FIELD("No."),
@@ -572,6 +583,9 @@ tableextension 6014427 "NPR Item" extends Item
 
         if Rec."Item Category Code" <> '' then
             Rec.Validate("Item Category Code");
+
+        if Rec."NPR Ticket Type" <> '' then
+            Rec."NPR Visibility" := Rec."NPR Visibility"::Hidden;
 
         Rec.Modify();
     end;
