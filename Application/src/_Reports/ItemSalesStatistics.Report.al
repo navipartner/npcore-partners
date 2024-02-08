@@ -116,7 +116,6 @@
 
         trigger OnOpenPage()
         begin
-            ItemLedgerEntry.SetRange("Document Type", ItemLedgerEntry."Document Type"::"Sales Shipment");
             ItemLedgerEntry.SetFilter(Quantity, '<>%1', 0);
         end;
     }
