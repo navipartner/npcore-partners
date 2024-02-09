@@ -100,6 +100,12 @@
             Description = 'TM1.00';
             DataClassification = CustomerContent;
         }
+        field(50; DeferRevenueProfileCode; Code[10])
+        {
+            Caption = 'Defer Revenue Profile Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM DeferRevenueProfile";
+        }
         field(60; "Activation Method"; Option)
         {
             Caption = 'Activation Method';
@@ -113,6 +119,11 @@
             Caption = 'Defer Revenue';
             Description = 'TM1.00';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if (Rec."Defer Revenue") then
+                    Rec.TestField(DeferRevenueProfileCode);
+            end;
         }
         field(62; "Ticket Entry Validation"; Option)
         {

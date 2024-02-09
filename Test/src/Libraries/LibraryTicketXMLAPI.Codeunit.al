@@ -8,6 +8,18 @@ codeunit 85012 "NPR Library - Ticket XML API"
     end;
 
     procedure MakeReservation(OrderCount: Integer; ItemNumber: Code[20]; Quantity: Integer; AdmissionScheduleEntryNo: Integer; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text): Boolean
+    begin
+        exit(MakeReservation(OrderCount, ItemNumber, Quantity, 0, MemberReference, ScannerStation, 0, 0, Token, ResponseMessage));
+    end;
+
+    procedure MakeReservation(OrderCount: Integer;
+        ItemNumber: Code[20];
+        Quantity: Integer;
+        AdmissionScheduleEntryNo: Integer;
+        MemberReference: Code[20];
+        ScannerStation: Code[10];
+        UnitAmount: Decimal; UnitAmountInclVat: Decimal;
+        var Token: Text[100]; var ResponseMessage: Text): Boolean
     var
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
@@ -42,12 +54,17 @@ codeunit 85012 "NPR Library - Ticket XML API"
             repeat
                 TicketAdmission := XmlElement.Create('ticket', NameSpace);
                 TicketAdmission.SetAttribute('external_id', ItemNumber);
-                TicketAdmission.SetAttribute('line_no', Format(OrderNumber));
-                TicketAdmission.SetAttribute('qty', Format(Quantity));
+                TicketAdmission.SetAttribute('line_no', Format(OrderNumber, 0, 9));
+                TicketAdmission.SetAttribute('qty', Format(Quantity, 0, 9));
                 TicketAdmission.SetAttribute('admission_schedule_entry', Format(AdmissionScheduleEntryNo, 0, 9));
                 if (MemberReference <> '') then
                     TicketAdmission.SetAttribute('member_number', MemberReference);
                 TicketAdmission.SetAttribute('admission_code', TicketAdmissionBOM."Admission Code");
+
+                TicketAdmission.SetAttribute('unit_amount', Format(UnitAmount, 0, 9));
+                TicketAdmission.SetAttribute('unit_amount_incl_vat', Format(UnitAmountInclVat, 0, 9));
+                TicketAdmission.SetAttribute('amount', Format(UnitAmount * Quantity, 0, 9));
+                TicketAdmission.SetAttribute('amount_incl_vat', Format(UnitAmountInclVat * Quantity, 0, 9));
 
                 Reservation.Add(TicketAdmission);
             until (TicketAdmissionBOM.Next() = 0);

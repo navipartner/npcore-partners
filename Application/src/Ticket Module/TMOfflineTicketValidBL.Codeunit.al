@@ -255,6 +255,7 @@
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         StationIdLbl: Label 'Offline on %1';
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
     begin
         TicketAccessEntry.LockTable();
         TicketAccessEntry.Get(TicketAccessEntryNo);
@@ -262,6 +263,8 @@
             TicketAccessEntry."Access Date" := pDate;
             TicketAccessEntry."Access Time" := pTime;
             TicketAccessEntry.Modify();
+
+            DeferRevenue.ReadyToRecognize(TicketAccessEntryNo, pDate);
         end;
 
         if (AdmissionScheduleEntry.Get(TicketAdmissionSchEntryNo)) then;

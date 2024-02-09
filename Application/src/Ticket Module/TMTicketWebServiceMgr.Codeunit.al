@@ -848,6 +848,11 @@
             TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
         end;
 
+        TicketReservationRequest.UnitAmount := GetDecimalAmount(Element, 'unit_amount');
+        TicketReservationRequest.UnitAmountInclVat := GetDecimalAmount(Element, 'unit_amount_incl_vat');
+        TicketReservationRequest.Amount := GetDecimalAmount(Element, 'amount');
+        TicketReservationRequest.AmountInclVat := GetDecimalAmount(Element, 'amount_incl_vat');
+
         TicketReservationRequest.Insert();
     end;
 
@@ -1018,6 +1023,17 @@
                     TMTicketRequestManager.POS_AppendToReservationRequest(Token, TicketReservationRequest."Receipt No.", TicketReservationRequest."Line No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TMTicketAdmissionBOM."Admission Code", TicketReservationRequest.Quantity, 0, TicketReservationRequest."External Member No.", TicketReservationRequest."Ext. Line Reference No.");
             until (TMTicketAdmissionBOM.Next() = 0);
         end;
+    end;
+
+    local procedure GetDecimalAmount(Element: XmlElement; AttributeKey: Text) Amount: Decimal
+    var
+        DecimalText: Text;
+    begin
+        DecimalText := NpXmlDomMgt.GetXmlAttributeText(Element, AttributeKey, false);
+        if (DecimalText = '') then
+            exit(0.0);
+
+        Evaluate(Amount, DecimalText, 9);
     end;
 #pragma warning restore
 
