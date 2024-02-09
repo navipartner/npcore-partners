@@ -25,6 +25,11 @@
                 ApplicationArea = NPRRetail;
 
             }
+            part(DeferralCue; "NPR TM DeferredCuePart")
+            {
+                ApplicationArea = NPRRetail;
+
+            }
             part(MembershipStats; "NPR RC Membership Statistics")
             {
                 ApplicationArea = NPRRetail;

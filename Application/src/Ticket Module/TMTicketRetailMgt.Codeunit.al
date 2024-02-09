@@ -689,17 +689,17 @@
                     SaleLinePOS.UpdateAmounts(SaleLinePOS);
                     SaleLinePOS."Eksp. Salgspris" := false;
                     SaleLinePOS."Custom Price" := false;
-
-                    TicketReservationRequest.Reset();
-                    TicketReservationRequest.SetCurrentKey("Session Token ID");
-                    TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-                    TicketReservationRequest.SetFilter(Default, '=%1', true);
-                    if (TicketReservationRequest.FindFirst()) then
-                        SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
-
-                    SaleLinePOS.Modify();
                 end;
 
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+                TicketReservationRequest.SetFilter(Default, '=%1', true);
+                if (TicketReservationRequest.FindFirst()) then
+                    SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
+
+                SaleLinePOS.Modify();
                 Commit();
 
                 POSSession.GetFrontEnd(FrontEnd);
@@ -713,7 +713,7 @@
 
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then //-+TM1.45 [380754]
+        if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
 
         if (ResponseCode = 0) then begin

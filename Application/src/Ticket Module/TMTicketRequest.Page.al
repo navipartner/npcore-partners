@@ -269,6 +269,20 @@
                             TicketList.ShowTicketSalesTransaction(Ticket);
                     end;
                 }
+                action(Deferral)
+                {
+                    Caption = 'Ticket Revenue Deferral';
+                    ToolTip = 'View the deferral progress for this ticket request.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Image = Revenue;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
+
+                    RunObject = page "NPR TM RevenueRecognition";
+                    RunPageLink = TokenID = field("Session Token ID");
+                }
                 action("View Online Ticket")
                 {
                     ToolTip = 'Display the ticket as created on ticket server.';
@@ -411,130 +425,6 @@
                     TicketRequestManager.ExportTicketRequestListToClientExcel(TicketReservationRequest);
                 end;
             }
-#if DEV_CONTAINER 
-            action(ExportReservationRequest)
-            {
-                ToolTip = 'Export Reservation Request.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Export Reservation Request';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                begin
-                    TicketClientApi.ExportJsonToFile(
-                        'GetTicketReservation',
-                        TicketClientApi.GetReservationRequest(Rec."Session Token ID"));
-                end;
-            }
-            action(PreConfirmRequest)
-            {
-                ToolTip = 'PreConfirm Reservation Request.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'PreConfirm Reservation Request';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                begin
-                    TicketClientApi.ExportJsonToFile(
-                        'PreConfirmTicketReservation',
-                        TicketClientApi.PreConfirmReservationRequest(Rec."Session Token ID"));
-                end;
-            }
-            action(CancelRequest)
-            {
-                ToolTip = 'Cancel Reservation Request.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Cancel Reservation Request';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                begin
-                    TicketClientApi.ExportJsonToFile(
-                        'CancelTicketReservation',
-                        TicketClientApi.CancelReservationRequest(Rec."Session Token ID"));
-                end;
-            }
-
-            action(ExportReservationSchedules)
-            {
-                ToolTip = 'Export Request Schedules.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Export Request Schedules';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                begin
-                    TicketClientApi.ExportJsonToFile(
-                        'GetAdmissionCapacity',
-                        TicketClientApi.AdmissionCapacityRequest('TODAY', Rec."External Item Code", '', Today(), Rec."Customer No.", Rec.Quantity));
-                end;
-            }
-
-            action(MakeReservation)
-            {
-                ToolTip = 'Make Reservation.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Make Reservation';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                    TicketRequest: Record "NPR TM Ticket Reservation Req.";
-                    Request: JsonObject;
-                    Requests: JsonObject;
-                    RequestAdmissionLines: JsonArray;
-                begin
-                    TicketRequest.SetFilter("Session Token ID", '=%1', Rec."Session Token ID");
-                    TicketRequest.FindSet();
-                    repeat
-                        Request.ReadFrom('{}');
-                        Request.Add('itemReference', TicketRequest."External Item Code");
-                        Request.Add('admissionCode', TicketRequest."Admission Code");
-                        Request.Add('quantity', TicketRequest.Quantity);
-                        Request.Add('scheduleId', -1); // Make choice for me
-                        Request.Add('memberNumber', TicketRequest."External Member No.");
-                        Request.Add('notificationAddress', TicketRequest."Notification Address");
-                        RequestAdmissionLines.Add(Request);
-                    until (TicketRequest.Next() = 0);
-
-                    Request.ReadFrom('{}');
-                    Request.Add('token', '');
-                    Request.Add('lines', RequestAdmissionLines);
-                    Requests.Add('NPRetail.TM.MakeTicketReservation', Request);
-
-                    TicketClientApi.ExportJsonToFile(
-                        'MakeTicketReservation',
-                        TicketClientApi.MethodDispatch('NPRetail.TM.MakeTicketReservation', Requests));
-                end;
-            }
-
-            action(ConfirmReservation)
-            {
-                ToolTip = 'Confirm Reservation.';
-                ApplicationArea = NPRTicketAdvanced;
-                Caption = 'Confirm Reservation';
-                Image = ExportElectronicDocument;
-
-                trigger OnAction()
-                var
-                    TicketClientApi: Codeunit "NPR TM Client API";
-                begin
-                    TicketClientApi.ExportJsonToFile(
-                        'ConfirmReservationRequest',
-                        TicketClientApi.ConfirmReservationRequest(Rec."Session Token ID", '', 'abc123'));
-                end;
-            }
-
-#endif
         }
     }
 

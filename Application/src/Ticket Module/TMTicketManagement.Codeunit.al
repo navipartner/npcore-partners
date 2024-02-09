@@ -985,14 +985,7 @@
 
     end;
 
-    procedure CreatePaymentEntry(Ticket: Record "NPR TM Ticket")
-    var
-        PaymentType: Option PAYMENT,PREPAID,POSTPAID;
-    begin
-        CreatePaymentEntryType(Ticket, PaymentType::PAYMENT, 'POS', '');
-    end;
-
-    procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20])
+    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20])
     var
         AdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -2076,6 +2069,7 @@
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
         FirstAdmission: Boolean;
     begin
 
@@ -2089,6 +2083,8 @@
             TicketAccessEntry.Modify();
             if (DurationGroupCode <> '') then
                 SetDuration(TicketAccessEntryNo, TicketAdmissionSchEntryNo, DurationGroupCode, EventDate, EventTime);
+
+            DeferRevenue.ReadyToRecognize(TicketAccessEntryNo, EventDate);
         end;
 
         if (AdmissionScheduleEntry.Get(TicketAdmissionSchEntryNo)) then;
@@ -2276,6 +2272,7 @@
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         PaymentTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        DeferRevenue: Codeunit "NPR TM RevenueDeferral";
     begin
 
         TicketAccessEntry.Get(TicketAccessEntryNo);
@@ -2303,6 +2300,8 @@
         PaymentTicketAccessEntry."External Adm. Sch. Entry No." := 0;
         PaymentTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         PaymentTicketAccessEntry.Insert(true);
+
+        DeferRevenue.CreateDeferRevenueRequest(TicketAccessEntryNo, Today());
 
         CloseInitialEntry(PaymentTicketAccessEntry);
         OnDetailedTicketEvent(PaymentTicketAccessEntry);

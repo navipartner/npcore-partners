@@ -127,6 +127,16 @@
             Caption = 'Amount Incl. VAT';
             DataClassification = CustomerContent;
         }
+        field(54; UnitAmount; Decimal)
+        {
+            Caption = 'Unit Amount';
+            DataClassification = CustomerContent;
+        }
+        field(55; UnitAmountInclVat; Decimal)
+        {
+            Caption = 'Unit Amount Incl. VAT';
+            DataClassification = CustomerContent;
+        }
         field(60; "Admission Description"; Text[50])
         {
             Caption = 'Admission Description';

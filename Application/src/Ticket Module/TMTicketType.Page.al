@@ -126,6 +126,16 @@
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the eTicket Type Code used to create the eTicket. This value should correspond to a template design on the PassServer.';
                 }
+                field("Defer Revenue"; Rec."Defer Revenue")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Defer Revenue field.';
+                }
+                field(DeferRevenueProfileCode; Rec.DeferRevenueProfileCode)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Defer Revenue Profile Code field.';
+                }
             }
         }
     }

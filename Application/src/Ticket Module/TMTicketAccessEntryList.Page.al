@@ -154,6 +154,25 @@
                     ToggleBlockUnblock();
                 end;
             }
+            action(SubmitToDeferral)
+            {
+                ToolTip = 'Manually submit this ticket access entry to revenue deferral.';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Submit to Deferral';
+                Image = Revenue;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    DeferRevenue: Codeunit "NPR TM RevenueDeferral";
+                begin
+                    DeferRevenue.CreateDeferRevenueRequest(Rec."Entry No.", Today());
+                    if (Rec."Access Date" <> 0D) then
+                        DeferRevenue.ReadyToRecognize(Rec."Entry No.", Rec."Access Date");
+                end;
+            }
         }
     }
 
