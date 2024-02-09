@@ -20,40 +20,83 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                     Occurrence = Required;
                     XmlName = 'token';
                 }
-                tableelement(tmpticketreservationrequest; "NPR TM Ticket Reservation Req.")
+                tableelement(_TmpTicketReservationRequest; "NPR TM Ticket Reservation Req.")
                 {
                     XmlName = 'ticket';
                     UseTemporary = true;
-                    fieldattribute(external_id; tmpTicketReservationRequest."External Item Code")
+                    fieldattribute(_ExternalId; _TmpTicketReservationRequest."External Item Code")
                     {
-
+                        XmlName = 'external_id';
                         trigger OnAfterAssignField()
                         begin
                             ExternalIdCount += 1;
                         end;
                     }
-                    fieldattribute(line_no; tmpTicketReservationRequest."Ext. Line Reference No.") { }
-                    fieldattribute(qty; tmpTicketReservationRequest.Quantity)
+                    fieldattribute(_LineNo; _TmpTicketReservationRequest."Ext. Line Reference No.")
                     {
-
+                        XmlName = 'line_no';
+                    }
+                    fieldattribute(_Quantity; _TmpTicketReservationRequest.Quantity)
+                    {
+                        XmlName = 'qty';
                         trigger OnAfterAssignField()
                         begin
-                            QtySum += tmpTicketReservationRequest.Quantity;
+                            QtySum += _TmpTicketReservationRequest.Quantity;
                         end;
                     }
-                    fieldattribute(admission_schedule_entry; tmpTicketReservationRequest."External Adm. Sch. Entry No.") { Occurrence = Optional; }
-                    fieldattribute(member_number; tmpTicketReservationRequest."External Member No.") { Occurrence = Optional; }
-                    fieldattribute(admission_code; tmpTicketReservationRequest."Admission Code") { Occurrence = Optional; }
-                    fieldattribute(waitinglist_reference_code; tmpTicketReservationRequest."Waiting List Reference Code") { Occurrence = Optional; }
-                    fieldattribute("waitinglist_opt-in_address"; tmpTicketReservationRequest."Notification Address") { Occurrence = Optional; }
+                    fieldattribute(_AdmissionScheduleEntry; _TmpTicketReservationRequest."External Adm. Sch. Entry No.")
+                    {
+                        XmlName = 'admission_schedule_entry';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_MemberNumber; _TmpTicketReservationRequest."External Member No.")
+                    {
+                        XmlName = 'member_number';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_AdmissionCode; _TmpTicketReservationRequest."Admission Code")
+                    {
+                        XmlName = 'admission_code';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_WaitingListReferenceCode; _TmpTicketReservationRequest."Waiting List Reference Code")
+                    {
+                        XmlName = 'waitinglist_reference_code';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_WaitingListOptInAddress; _TmpTicketReservationRequest."Notification Address")
+                    {
+                        XmlName = 'waitinglist_opt-in_address';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_UnitAmount; _TmpTicketReservationRequest.UnitAmount)
+                    {
+                        XmlName = 'unit_amount';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_UnitAmountInclVat; _TmpTicketReservationRequest.UnitAmountInclVat)
+                    {
+                        XmlName = 'unit_amount_incl_vat';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_Amount; _TmpTicketReservationRequest.Amount)
+                    {
+                        XmlName = 'amount';
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(_AmountInclVat; _TmpTicketReservationRequest.AmountInclVat)
+                    {
+                        XmlName = 'amount_incl_vat';
+                        Occurrence = Optional;
+                    }
 
                     trigger OnBeforeInsertRecord()
                     begin
-                        tmpTicketReservationRequest."Entry No." := ExternalIdCount;
+                        _TmpTicketReservationRequest."Entry No." := ExternalIdCount;
                     end;
                 }
             }
-            tableelement(tmpticketreservationresponse; "NPR TM Ticket Reserv. Resp.")
+            tableelement(_TmpTicketReservationResponse; "NPR TM Ticket Reserv. Resp.")
             {
                 MaxOccurs = Once;
                 MinOccurs = Zero;
@@ -66,15 +109,15 @@ xmlport 6060114 "NPR TM Ticket Reservation"
 
                     trigger OnBeforePassVariable()
                     begin
-                        status := Format(tmpTicketReservationResponse.Status, 0, 9);
+                        status := Format(_TmpTicketReservationResponse.Status, 0, 9);
                     end;
                 }
-                fieldelement(reservation_token; tmpTicketReservationResponse."Session Token ID")
+                fieldelement(reservation_token; _TmpTicketReservationResponse."Session Token ID")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
-                fieldelement(expiry_time; tmpTicketReservationResponse."Exires (Seconds)")
+                fieldelement(expiry_time; _TmpTicketReservationResponse."Exires (Seconds)")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -84,11 +127,11 @@ xmlport 6060114 "NPR TM Ticket Reservation"
 
                         trigger OnBeforePassVariable()
                         begin
-                            AtUTC := Format(CurrentDateTime() + (tmpTicketReservationResponse."Exires (Seconds)" - 1) * 1000, 0, 9);
+                            AtUTC := Format(CurrentDateTime() + (_TmpTicketReservationResponse."Exires (Seconds)" - 1) * 1000, 0, 9);
                         end;
                     }
                 }
-                fieldelement(message; tmpTicketReservationResponse."Response Message")
+                fieldelement(message; _TmpTicketReservationResponse."Response Message")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
@@ -260,7 +303,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                         trigger OnAfterGetRecord()
                         begin
                             TempTicketAdmissionRequest.DeleteAll();
-                            PopulateResponseAdmissions(tmpTicketReservationResponse."Session Token ID", tmpResponseDetails."Request Entry No.");
+                            PopulateResponseAdmissions(_TmpTicketReservationResponse."Session Token ID", tmpResponseDetails."Request Entry No.");
                         end;
                     }
                 }
@@ -307,7 +350,7 @@ xmlport 6060114 "NPR TM Ticket Reservation"
     begin
         ReservationSuccess := true;
 
-        tmpTicketReservationResponse.DeleteAll();
+        _TmpTicketReservationResponse.DeleteAll();
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', DocumentID);
         TicketReservationResponse.FindSet();
         repeat
@@ -326,30 +369,30 @@ xmlport 6060114 "NPR TM Ticket Reservation"
 
         until (TicketReservationResponse.Next() = 0);
 
-        tmpTicketReservationResponse.TransferFields(TicketReservationResponse, true);
-        tmpTicketReservationResponse.Status := ReservationSuccess;
+        _TmpTicketReservationResponse.TransferFields(TicketReservationResponse, true);
+        _TmpTicketReservationResponse.Status := ReservationSuccess;
         if (ReservationSuccess) then
-            tmpTicketReservationResponse."Response Message" := 'OK';
+            _TmpTicketReservationResponse."Response Message" := 'OK';
 
-        tmpTicketReservationResponse.Insert();
-        tmpTicketReservationResponse.Reset();
+        _TmpTicketReservationResponse.Insert();
+        _TmpTicketReservationResponse.Reset();
         Commit();
     end;
 
     internal procedure SetErrorResult(DocumentID: Text[100]; ReasonText: Text)
     begin
-        tmpTicketReservationResponse.DeleteAll();
+        _TmpTicketReservationResponse.DeleteAll();
 
-        tmpTicketReservationResponse."Session Token ID" := DocumentID;
-        tmpTicketReservationResponse."Exires (Seconds)" := 0;
-        tmpTicketReservationResponse."Response Message" := CopyStr(ReasonText, 1, MaxStrLen(tmpTicketReservationResponse."Response Message"));
-        tmpTicketReservationResponse.Insert();
+        _TmpTicketReservationResponse."Session Token ID" := DocumentID;
+        _TmpTicketReservationResponse."Exires (Seconds)" := 0;
+        _TmpTicketReservationResponse."Response Message" := CopyStr(ReasonText, 1, MaxStrLen(_TmpTicketReservationResponse."Response Message"));
+        _TmpTicketReservationResponse.Insert();
     end;
 
     internal procedure GetResult(var TokenId: Text[100]; var ResponseMessage: Text): Boolean
     begin
-        TokenId := tmpTicketReservationResponse."Session Token ID";
-        ResponseMessage := tmpTicketReservationResponse."Response Message";
+        TokenId := _TmpTicketReservationResponse."Session Token ID";
+        ResponseMessage := _TmpTicketReservationResponse."Response Message";
 
         exit(ResponseMessage = 'OK');
     end;
