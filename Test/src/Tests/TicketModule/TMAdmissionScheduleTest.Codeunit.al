@@ -451,15 +451,21 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
         SoftRegenerateSchedule(AdmissionCode, Today());
 
-        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 090000T, 100000T, 5);
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 100000T, 110000T, 5);
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5); // Duplicate
         SoftRegenerateSchedule(AdmissionCode, Today());
 
         SlotCount := ScheduleEntry.Count();
-        Assert.AreEqual(2 * (5 + 1), SlotCount, 'Unexpected number of time slots.');
+        Assert.AreEqual(4 * (5 + 1), SlotCount, 'Unexpected number of time slots.');
 
         ScheduleEntry.SetFilter(Cancelled, '=%1', false);
         SlotCount := ScheduleEntry.Count();
-        Assert.AreEqual((5 + 1), SlotCount, 'Unexpected number of time slots (1).');
+        Assert.AreEqual(3 * (5 + 1), SlotCount, 'Unexpected number of time slots (1).');
     end;
 
 
@@ -483,17 +489,19 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
 
         CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
-        SoftRegenerateSchedule(AdmissionCode, Today());
+        ForceRegenerateSchedule(AdmissionCode, Today());
 
-        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 090000T, 100000T, 5);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 100000T, 110000T, 5);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5); // Duplicate
         ForceRegenerateSchedule(AdmissionCode, Today());
 
         SlotCount := ScheduleEntry.Count();
-        Assert.AreEqual(2 * (5 + 1), SlotCount, 'Unexpected number of time slots.');
+        Assert.AreEqual(4 * (5 + 1), SlotCount, 'Unexpected number of time slots.');
 
         ScheduleEntry.SetFilter(Cancelled, '=%1', false);
         SlotCount := ScheduleEntry.Count();
-        Assert.AreEqual((5 + 1), SlotCount, 'Unexpected number of time slots (1).');
+        Assert.AreEqual(3 * (5 + 1), SlotCount, 'Unexpected number of time slots (1).');
     end;
 
     [Test]
@@ -522,7 +530,21 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         ScheduleLine.Modify();
         SoftRegenerateSchedule(AdmissionCode, Today());
 
-        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 070000T, 080000T, 5);
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        ScheduleLine."Dynamic Price Profile Code" := 'XXX';
+        ScheduleLine."Process Order" := 1;
+        ScheduleLine.Modify();
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 140000T, 150000T, 5);
+        ScheduleLine.Get(AdmissionCode, ScheduleCode);
+        ScheduleLine."Dynamic Price Profile Code" := 'XXX';
+        ScheduleLine."Process Order" := 1;
+        ScheduleLine.Modify();
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5); // Duplicate
         ScheduleLine.Get(AdmissionCode, ScheduleCode);
         ScheduleLine."Dynamic Price Profile Code" := 'BAR';
         ScheduleLine."Process Order" := 1;
