@@ -353,7 +353,6 @@
         AdmissionScheduleLines2: Record "NPR TM Admis. Schedule Lines";
         TicketCalendarManagement: Codeunit "NPR TMBaseCalendarManager";
         EndDateTime: DateTime;
-        EntryNo: Integer;
     begin
 
         // we are not creating historical entries
@@ -376,11 +375,12 @@
 
         // the new entry
         TmpAdmissionScheduleEntry.Reset();
-        EntryNo := TmpAdmissionScheduleEntry.Count();
-        EntryNo += 1;
+        TmpAdmissionScheduleEntry.SetCurrentKey("Entry No.");
+        if (not TmpAdmissionScheduleEntry.FindLast()) then
+            TmpAdmissionScheduleEntry."Entry No." := 0;
 
         TmpAdmissionScheduleEntry.Init();
-        TmpAdmissionScheduleEntry."Entry No." := EntryNo;
+        TmpAdmissionScheduleEntry."Entry No." += 1;
         TmpAdmissionScheduleEntry.Insert();
 
         TmpAdmissionScheduleEntry."Admission Code" := Admission."Admission Code";
