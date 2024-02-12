@@ -1,13 +1,6 @@
 codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
 {
     Access = Internal;
-    SingleInstance = true;
-
-    var
-        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
-        POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
-        AuditLogFound, ExtendedReceipt, POSWorkshiftCheckpointFound, RequestTextRead : Boolean;
-        RequestText: Text;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
@@ -37,104 +30,48 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
 
     local procedure PrepareHTTPRequest(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject;
     var
-        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
-        BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
-        // TO-DO this will be finished in one of the future tasks
-        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance,getReceipt;
+        POSSale: Record "NPR POS Sale";
+        POSActionBGSISFPMgtB: Codeunit "NPR POS Action: BG SIS FP MgtB";
+        SalesTicketNo: Code[20];
+        CheckpointEntryNo: Integer;
         Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance;
     begin
-        ClearGlobalVariables();
-        BGSISPOSUnitMapping.Get(GetPOSUnitNo(Sale));
-        BGSISPOSUnitMapping.TestField("Fiscal Printer IP Address");
-
-        Response.Add('url', 'http://' + BGSISPOSUnitMapping."Fiscal Printer IP Address");
-
+        Sale.GetCurrentSale(POSSale);
         Method := Context.GetIntegerParameter('Method');
 
         case Method of
-            Method::getMfcInfo:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForRefreshFiscalPrinterInfo());
             Method::printReceipt:
-                if FindAuditLog(GetSalesTicketNo(Context)) then begin
-                    GetRequestText(true);
-                    Response.Add('requestBody', RequestText);
-                end;
-            Method::printXReport:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForPrintXReport());
-            Method::printZReport:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForPrintZReport());
-            Method::printDuplicate:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForPrintDuplicate());
+                SalesTicketNo := GetSalesTicketNo(Context);
             Method::cashHandling:
-                if GetPOSWorkshiftCheckpoint(GetCheckpointEntryNo(Context)) then
-                    Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForCashHandling(POSWorkshiftCheckpoint));
-            Method::printLastNotFiscalized:
-                if FindLastNotFiscalizedAuditLog(GetPOSUnitNo(Sale)) then begin
-                    GetRequestText(true);
-                    Response.Add('requestBody', RequestText);
-                end;
-            Method::printSelectedNotFiscalized:
-                if SelectNotFiscalizedAuditLog(GetPOSUnitNo(Sale)) then begin
-                    GetRequestText(true);
-                    Response.Add('requestBody', RequestText);
-                end;
-            Method::getCashBalance:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForGetCashBalance());
-        // TO-DO this will be finished in one of the future tasks
-        // Method::getReceipt:
-        //     if SelectFiscalizedAuditLog(GetPOSUnitNo(Sale)) then
-        //         Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForGetReceipt(BGSISPOSAuditLogAux));
+                CheckpointEntryNo := GetCheckpointEntryNo(Context);
         end;
+
+        Response := POSActionBGSISFPMgtB.PrepareHTTPRequest(Method, POSSale."Register No.", SalesTicketNo, CheckpointEntryNo)
     end;
 
     local procedure HandleResponse(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
-        BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
+        POSSale: Record "NPR POS Sale";
+        POSActionBGSISFPMgtB: Codeunit "NPR POS Action: BG SIS FP MgtB";
+        SalesTicketNo: Code[20];
+        CheckpointEntryNo: Integer;
         Response: JsonObject;
-        // TO-DO this will be finished in one of the future tasks
-        // Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance,getReceipt;
         Method: Option getMfcInfo,printReceipt,printXReport,printZReport,printDuplicate,cashHandling,printLastNotFiscalized,printSelectedNotFiscalized,getCashBalance;
         ResponseText: Text;
     begin
+        Sale.GetCurrentSale(POSSale);
         Response := Context.GetJsonObject('result');
-        Response.WriteTo(ResponseText);
-
         Method := Context.GetIntegerParameter('Method');
 
         case Method of
-            Method::getMfcInfo:
-                BGSISCommunicationMgt.ProcessFiscalPrinterInfoResponse(GetPOSUnitNo(Sale), ResponseText);
             Method::printReceipt:
-                if FindAuditLog(GetSalesTicketNo(Context)) then begin
-                    GetRequestText(false);
-                    BGSISCommunicationMgt.ProcessPrintSaleAndRefundResponse(BGSISPOSAuditLogAux, GetPOSUnitNo(Sale), ResponseText, RequestText, ExtendedReceipt);
-                end;
-            Method::printXReport:
-                BGSISCommunicationMgt.ProcessPrintXReportResponse(ResponseText);
-            Method::printZReport:
-                BGSISCommunicationMgt.ProcessPrintZReportResponse(ResponseText);
-            Method::printDuplicate:
-                BGSISCommunicationMgt.ProcessPrintDuplicateResponse(ResponseText);
+                SalesTicketNo := GetSalesTicketNo(Context);
             Method::cashHandling:
-                if GetPOSWorkshiftCheckpoint(GetCheckpointEntryNo(Context)) then
-                    BGSISCommunicationMgt.ProcessCashHandlingResponse(ResponseText);
-            Method::printLastNotFiscalized:
-                if FindLastNotFiscalizedAuditLog(GetPOSUnitNo(Sale)) then begin
-                    GetRequestText(false);
-                    BGSISCommunicationMgt.ProcessPrintSaleAndRefundResponse(BGSISPOSAuditLogAux, GetPOSUnitNo(Sale), ResponseText, RequestText, ExtendedReceipt);
-                end;
-            Method::printSelectedNotFiscalized:
-                if AuditLogFound then begin
-                    GetRequestText(false);
-                    BGSISCommunicationMgt.ProcessPrintSaleAndRefundResponse(BGSISPOSAuditLogAux, GetPOSUnitNo(Sale), ResponseText, RequestText, ExtendedReceipt);
-                end;
-            Method::getCashBalance:
-                BGSISCommunicationMgt.ProcessGetCashBalanceResponse(ResponseText);
-        // TO-DO this will be finished in one of the future tasks
-        // Method::getReceipt:
-        //     if AuditLogFound then
-        //         BGSISCommunicationMgt.ProcessGetReceiptResponse(BGSISPOSAuditLogAux, ResponseText);
+                CheckpointEntryNo := GetCheckpointEntryNo(Context);
         end;
+
+        Response.WriteTo(ResponseText);
+        POSActionBGSISFPMgtB.HandleResponse(ResponseText, Method, POSSale."Register No.", SalesTicketNo, CheckpointEntryNo);
     end;
 
     local procedure GetSalesTicketNo(var Context: Codeunit "NPR POS JSON Helper") SalesTicketNo: Code[20];
@@ -155,123 +92,6 @@ codeunit 6184606 "NPR POS Action: BG SIS FP Mgt." implements "NPR IPOS Workflow"
         TransferResult := Context.GetJsonObject('transferResult');
         TransferResult.Get('checkpointEntryNo', JsonToken);
         CheckpointEntryNo := JsonToken.AsValue().AsInteger();
-    end;
-
-    local procedure ClearGlobalVariables()
-    begin
-        Clear(BGSISPOSAuditLogAux);
-        Clear(POSWorkshiftCheckpoint);
-        Clear(AuditLogFound);
-        Clear(POSWorkshiftCheckpointFound);
-        Clear(RequestText);
-        Clear(RequestTextRead);
-        Clear(ExtendedReceipt);
-    end;
-
-    local procedure FindAuditLog(SalesTicketNo: Code[20]): Boolean
-    var
-        POSEntry: Record "NPR POS Entry";
-    begin
-        if AuditLogFound then
-            exit(true);
-
-        if not FindPOSEntry(SalesTicketNo, POSEntry) then
-            exit(false);
-
-        if not BGSISPOSAuditLogAux.FindAuditLog(POSEntry."Entry No.") then
-            exit(false);
-
-        AuditLogFound := true;
-        exit(true);
-    end;
-
-    local procedure FindPOSEntry(DocumentNo: Code[20]; var POSEntry: Record "NPR POS Entry"): Boolean
-    begin
-        POSEntry.SetCurrentKey("Document No.");
-        POSEntry.SetRange("Document No.", DocumentNo);
-        exit(POSEntry.FindFirst());
-    end;
-
-    local procedure FindLastNotFiscalizedAuditLog(POSUnitNo: Code[10]): Boolean
-    begin
-        if AuditLogFound then
-            exit(true);
-
-        BGSISPOSAuditLogAux.SetRange("POS Unit No.", POSUnitNo);
-        BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", '');
-        if not BGSISPOSAuditLogAux.FindLast() then
-            exit(false);
-
-        AuditLogFound := true;
-        exit(true);
-    end;
-
-    local procedure SelectNotFiscalizedAuditLog(POSUnitNo: Code[10]): Boolean
-    begin
-        if AuditLogFound then
-            exit(true);
-
-        BGSISPOSAuditLogAux.FilterGroup(10);
-        BGSISPOSAuditLogAux.SetRange("POS Unit No.", POSUnitNo);
-        BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", '');
-        BGSISPOSAuditLogAux.FilterGroup(0);
-        if not (Page.RunModal(0, BGSISPOSAuditLogAux) = Action::LookupOK) then
-            exit(false);
-
-        AuditLogFound := true;
-        exit(true);
-    end;
-
-    // TO-DO this will be finished in one of the future tasks
-    // local procedure SelectFiscalizedAuditLog(POSUnitNo: Code[10]): Boolean
-    // begin
-    //     if AuditLogFound then
-    //         exit(true);
-
-    //     BGSISPOSAuditLogAux.FilterGroup(10);
-    //     BGSISPOSAuditLogAux.SetRange("POS Unit No.", POSUnitNo);
-    //     BGSISPOSAuditLogAux.SetFilter("Grand Receipt No.", '<>%1', '');
-    //     BGSISPOSAuditLogAux.FilterGroup(0);
-    //     if not Page.RunModal(0, BGSISPOSAuditLogAux) = Action::LookupOK then
-    //         exit(false);
-
-    //         AuditLogFound := true;
-    //         exit(true);
-    // end;
-
-    local procedure GetRequestText(AskForExtendedReceipt: Boolean)
-    var
-        BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
-        ExtendedReceiptQst: Label 'Do you want to create extended fiscal receipt?';
-    begin
-        if RequestTextRead then
-            exit;
-
-        if AskForExtendedReceipt then
-            ExtendedReceipt := Confirm(ExtendedReceiptQst);
-
-        RequestText := BGSISCommunicationMgt.CreateJSONBodyForSaleAndRefund(BGSISPOSAuditLogAux, ExtendedReceipt);
-        RequestTextRead := true;
-    end;
-
-    local procedure GetPOSWorkshiftCheckpoint(CheckpointEntryNo: Integer): Boolean
-    begin
-        if POSWorkshiftCheckpointFound then
-            exit(true);
-
-        if not POSWorkshiftCheckpoint.Get(CheckpointEntryNo) then
-            exit(false);
-
-        POSWorkshiftCheckpointFound := true;
-        exit(true);
-    end;
-
-    local procedure GetPOSUnitNo(Sale: Codeunit "NPR POS Sale"): Code[10]
-    var
-        POSSale: Record "NPR POS Sale";
-    begin
-        Sale.GetCurrentSale(POSSale);
-        exit(POSSale."Register No.");
     end;
 
     local procedure GetActionScript(): Text

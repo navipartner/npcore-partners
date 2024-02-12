@@ -31,7 +31,7 @@ codeunit 85042 "NPR Replication API Tests"
         ImportTypeParameterLbl: Label 'import_type', locked = true;
         StrSubStNoText: Label '%1=%2,%3';
         ImportListProcessingCU: Codeunit "NPR Nc Import List Processing";
-        MockCU: Codeunit "Replication API Mock Handler";
+        MockCU: Codeunit "NPR Replication API Mock Hndlr";
         NewUOMsList: List of [Code[20]];
         i: Integer;
         RepCounter: BigInteger;
@@ -90,7 +90,7 @@ codeunit 85042 "NPR Replication API Tests"
         ImportTypeParameterLbl: Label 'import_type', locked = true;
         StrSubStNoText: Label '%1=%2,%3';
         ImportListProcessingCU: Codeunit "NPR Nc Import List Processing";
-        MockCU: Codeunit "Replication API Mock Handler";
+        MockCU: Codeunit "NPR Replication API Mock Hndlr";
         NewUOMsList: List of [Code[20]];
         i: Integer;
         RepCounter: BigInteger;

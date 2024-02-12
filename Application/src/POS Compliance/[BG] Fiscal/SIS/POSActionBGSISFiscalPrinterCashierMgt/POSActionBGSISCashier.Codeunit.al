@@ -29,47 +29,19 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
 
     local procedure PrepareHTTPRequest(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject;
     var
-        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
         POSSale: Record "NPR POS Sale";
-        Salesperson: Record "Salesperson/Purchaser";
-        BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
+        POSActionBGSISCashierB: Codeunit "NPR POS Action: BG SISCashierB";
         Method: Option getCashierData,isCashierSet,setCashier,deleteCashier,trySetCashier;
     begin
         Sale.GetCurrentSale(POSSale);
-        BGSISPOSUnitMapping.Get(POSSale."Register No.");
-        BGSISPOSUnitMapping.TestField("Fiscal Printer IP Address");
-
-        Response.Add('url', 'http://' + BGSISPOSUnitMapping."Fiscal Printer IP Address");
-
         Method := Context.GetIntegerParameter('Method');
-
-        case Method of
-            Method::getCashierData:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForGetCashierData(POSSale."Salesperson Code"));
-            Method::isCashierSet:
-                Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForGetCashierData(POSSale."Salesperson Code"));
-            Method::setCashier:
-                begin
-                    SelectSalesperson(Salesperson);
-                    Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForSetCashier(Salesperson));
-                end;
-            Method::deleteCashier:
-                begin
-                    SelectSalesperson(Salesperson);
-                    Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForDeleteCashier(Salesperson));
-                end;
-            Method::trySetCashier:
-                begin
-                    Salesperson.Get(POSSale."Salesperson Code");
-                    Response.Add('requestBody', BGSISCommunicationMgt.CreateJSONBodyForSetCashier(Salesperson));
-                end;
-        end;
+        Response := POSActionBGSISCashierB.PrepareHTTPRequest(Method, POSSale."Register No.", POSSale."Salesperson Code")
     end;
 
     local procedure HandleResponse(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
         POSSale: Record "NPR POS Sale";
-        BGSISCommunicationMgt: Codeunit "NPR BG SIS Communication Mgt.";
+        POSActionBGSISCashierB: Codeunit "NPR POS Action: BG SISCashierB";
         Response: JsonObject;
         Method: Option getCashierData,isCashierSet,setCashier,deleteCashier,trySetCashier;
         ResponseText: Text;
@@ -77,26 +49,8 @@ codeunit 6184641 "NPR POS Action: BG SIS Cashier" implements "NPR IPOS Workflow"
         Sale.GetCurrentSale(POSSale);
         Response := Context.GetJsonObject('result');
         Response.WriteTo(ResponseText);
-
         Method := Context.GetIntegerParameter('Method');
-
-        case Method of
-            Method::getCashierData:
-                BGSISCommunicationMgt.ProcessGetCashierDataResponse(ResponseText);
-            Method::isCashierSet:
-                BGSISCommunicationMgt.ProcessIsCashierSetResponse(POSSale."Salesperson Code", ResponseText);
-            Method::setCashier:
-                BGSISCommunicationMgt.ProcessSetCashierResponse(ResponseText);
-            Method::deleteCashier:
-                BGSISCommunicationMgt.ProcessDeleteCashierResponse(ResponseText);
-            Method::trySetCashier:
-                if BGSISCommunicationMgt.TryProcessSetCashierResponse(ResponseText) then;
-        end;
-    end;
-
-    local procedure SelectSalesperson(var Salesperson: Record "Salesperson/Purchaser"): Boolean
-    begin
-        exit(Page.RunModal(0, Salesperson) = Action::LookupOK);
+        POSActionBGSISCashierB.HandleResponse(ResponseText, Method, POSSale."Salesperson Code");
     end;
 
     local procedure GetActionScript(): Text
