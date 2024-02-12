@@ -230,11 +230,12 @@ table 6060014 "NPR RS VAT Entry"
         }
         field(6014401; "VAT Base Full VAT"; Decimal)
         {
+            AutoFormatType = 1;
             DataClassification = CustomerContent;
             Caption = 'VAT Base Full VAT';
             Editable = false;
         }
-        field(6014402; "Prepayment"; Boolean)
+        field(6014402; Prepayment; Boolean)
         {
             DataClassification = CustomerContent;
             Caption = 'Prepayment';
@@ -263,13 +264,15 @@ table 6060014 "NPR RS VAT Entry"
     begin
         if not VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
             exit;
+
         if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Full VAT" then
-            if (VATPostingSetup."NPR Base % For Full VAT" > 0) then begin
+            if VATPostingSetup."NPR Base % For Full VAT" > 0 then begin
                 if "Unrealized Amount" <> 0 then
-                    "VAT Base Full VAT" := "Unrealized Amount" * 100 / VATPostingSetup."NPR Base % For Full VAT";
-                if (Amount <> 0) then
-                    "VAT Base Full VAT" := Amount * 100 / VATPostingSetup."NPR Base % For Full VAT";
+                    "VAT Base Full VAT" := Round("Unrealized Amount" * 100 / VATPostingSetup."NPR Base % For Full VAT");
+                if Amount <> 0 then
+                    "VAT Base Full VAT" := Round(Amount * 100 / VATPostingSetup."NPR Base % For Full VAT");
             end;
+
         "VAT Report Mapping" := VATPostingSetup."NPR VAT Report Mapping";
     end;
 }
