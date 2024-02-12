@@ -22,30 +22,9 @@ codeunit 6184626 "NPR POS Action: BG SIS Audit" implements "NPR IPOS Workflow"
 
     local procedure ShowBGSISAuditLog(Show: Option All,AllFiscalized,AllNonFiscalized,LastTransaction)
     var
-        BGSISPOSAuditLogAux, BGSISPOSAuditLogAux2 : Record "NPR BG SIS POS Audit Log Aux.";
-        BGSISPOSAuditLogAuxPage: Page "NPR BG SIS POS Audit Log Aux.";
+        POSActionBGSISAuditB: Codeunit "NPR POS Action: BG SIS Audit B";
     begin
-        BGSISPOSAuditLogAux.FilterGroup(10);
-
-        case Show of
-            Show::AllFiscalized:
-                BGSISPOSAuditLogAux.SetFilter("Grand Receipt No.", '<>%1', '');
-            Show::AllNonFiscalized:
-                BGSISPOSAuditLogAux.SetRange("Grand Receipt No.", '');
-            Show::LastTransaction:
-                begin
-                    BGSISPOSAuditLogAux2.SetLoadFields("Audit Entry Type", "Audit Entry No.");
-                    BGSISPOSAuditLogAux2.SetFilter("Grand Receipt No.", '<>%1', '');
-                    BGSISPOSAuditLogAux2.FindLast();
-
-                    BGSISPOSAuditLogAux.SetRange("Audit Entry Type", BGSISPOSAuditLogAux2."Audit Entry Type");
-                    BGSISPOSAuditLogAux.SetRange("Audit Entry No.", BGSISPOSAuditLogAux2."Audit Entry No.");
-                end;
-        end;
-
-        BGSISPOSAuditLogAux.FilterGroup(0);
-        BGSISPOSAuditLogAuxPage.SetTableView(BGSISPOSAuditLogAux);
-        BGSISPOSAuditLogAuxPage.RunModal();
+        POSActionBGSISAuditB.ShowBGSISAuditLog(Show);
     end;
 
     local procedure GetActionScript(): Text
