@@ -4,6 +4,7 @@ page 6151116 "NPR VAT EV Entries"
     ApplicationArea = NPRRSLocal;
     UsageCategory = Documents;
     Caption = 'VAT EV Entries';
+    DataCaptionExpression = PageCaptionTxt;
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,XML';
     SourceTable = "NPR VAT EV Entry";
@@ -764,21 +765,37 @@ page 6151116 "NPR VAT EV Entries"
                             {
                                 ShowCaption = false;
                                 ApplicationArea = NPRRSLocal;
+                                trigger OnAssistEdit()
+                                begin
+                                    Rec.LookUpEntry(Rec.FieldNo("Field 3_9_1"));
+                                end;
                             }
                             field("Field 3_9_2"; Rec."Field 3_9_2")
                             {
                                 ShowCaption = false;
                                 ApplicationArea = NPRRSLocal;
+                                trigger OnAssistEdit()
+                                begin
+                                    Rec.LookUpEntry(Rec.FieldNo("Field 3_9_2"));
+                                end;
                             }
                             field("Field 3_9_3"; Rec."Field 3_9_3")
                             {
                                 ShowCaption = false;
                                 ApplicationArea = NPRRSLocal;
+                                trigger OnAssistEdit()
+                                begin
+                                    Rec.LookUpEntry(Rec.FieldNo("Field 3_9_3"));
+                                end;
                             }
                             field("Field 3_9_4"; Rec."Field 3_9_4")
                             {
                                 ShowCaption = false;
                                 ApplicationArea = NPRRSLocal;
+                                trigger OnAssistEdit()
+                                begin
+                                    Rec.LookUpEntry(Rec.FieldNo("Field 3_9_4"));
+                                end;
                             }
                         }
                     }
@@ -3544,6 +3561,7 @@ page 6151116 "NPR VAT EV Entries"
         DummyCaptionLbl: Label '', Locked = true;
         ConfirmManagement: Codeunit "Confirm Management";
         RSLocalXMLMgt: Codeunit "NPR RS Local. XML Mgt.";
+        PageCaptionTxt: Label 'VAT EV Entries';
         DatesInputQst: Label 'Both date fields are required. Do you want to enter them?';
         GeneralRateCaptionLbl: Label 'Opšta stopa', Locked = true;
         SpecialRateCaptionLbl: Label 'Posebna stopa', Locked = true;
