@@ -1,4 +1,4 @@
-codeunit 85043 "Replication API Mock Handler"
+codeunit 85043 "NPR Replication API Mock Hndlr"
 {
     EventSubscriberInstance = Manual;
 
