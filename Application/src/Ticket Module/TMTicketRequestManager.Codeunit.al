@@ -1966,13 +1966,13 @@
         DataTypeMgt.GetRecordRef(TicketReservationRequest, RecRef);
         Report.SaveAs(Report::"NPR TM Ticket Batch Resp.", '', ReportFormat::Excel, OutStr, RecRef);
         TempBlob.CreateInStream(NewStream);
-        ToFile := 'TicketReport.xls';
+        ToFile := 'TicketReport.xlsx';
 
         DownloadFromStream(
           NewStream,
           'Save file to client',
           '',
-          'Excel File *.xls| *.xls',
+          'Excel File *.xlsx| *.xlsx',
           ToFile);
     end;
 

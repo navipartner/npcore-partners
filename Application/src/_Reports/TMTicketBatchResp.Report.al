@@ -1,8 +1,8 @@
 ﻿report 6060124 "NPR TM Ticket Batch Resp."
 {
-    #IF NOT BC17 
+#IF NOT BC17
     Extensible = False; 
-    #ENDIF
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/TM Ticket Batch Response.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -17,7 +17,7 @@
             column(ExternalOrderNo; ReservationRequest."External Order No.")
             {
             }
-            column(Token; ReservationRequest."Session Token ID")
+            column(Token; OrderUrl)
             {
             }
             column(ItemNo; ReservationRequest."External Item Code")
@@ -31,14 +31,14 @@
             }
             dataitem(Item; Item)
             {
-                DataItemLink = "No." = FIELD("External Item Code");
+                DataItemLink = "No." = FIELD("Item No.");
                 column(ItemDescription; Item.Description)
                 {
                 }
             }
             dataitem(TicketBom; "NPR TM Ticket Admission BOM")
             {
-                DataItemLink = "Item No." = FIELD("External Item Code");
+                DataItemLink = "Item No." = FIELD("Item No.");
                 column(AdmissionCode; TicketBom."Admission Code")
                 {
                 }
@@ -68,6 +68,12 @@
                         TicketURL := StrSubstNo(Pct1Lbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.");
                 end;
             }
+            trigger OnAfterGetRecord()
+            begin
+                OrderUrl := ReservationRequest."Session Token ID";
+                if (ReservationRequest."DIY Print Order Requested") then
+                    OrderUrl := StrSubstNo(Pct1Lbl, TicketSetup."Print Server Order URL", ReservationRequest."Session Token ID");
+            end;
         }
     }
     requestpage
@@ -97,6 +103,7 @@
     var
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketURL: Text;
+        OrderUrl: Text;
         Pct1Lbl: Label '%1%2', locked = true;
 }
 
