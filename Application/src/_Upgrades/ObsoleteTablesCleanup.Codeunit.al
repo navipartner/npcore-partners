@@ -63,7 +63,10 @@ codeunit 6151581 "NPR Obsolete Tables Cleanup"
     local procedure CleanupAuditRoll(): Boolean
     var
         AuditRoll: Record "NPR Audit Roll";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
+        if EnvironmentInformation.IsSaaS() then
+            exit(false);
         if not (AuditRoll.ReadPermission() and AuditRoll.WritePermission()) then
             exit(false);
         AuditRoll.DeleteAll(false);
