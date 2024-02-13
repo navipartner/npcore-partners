@@ -12,6 +12,7 @@
         AddRetailSetupsWizard();
         AddRestaurantSetupsWizard();
         AddAttractionSetupsWizard();
+        AddCROFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -78,6 +79,23 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup Membership Wizard", MembershipSetupWizardTxt, AssistedSetupGroup::NPRetail);
     end;
 
+    local procedure AddCROFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        CROFiscalizationSetupTxt: Label 'Welcome to Croatian Fiscalization Setup';
+        CROPOSAuditProfileSetupTxt: Label 'Welcome to CRO POS Audit Profile Setup';
+        CROSalespeopleSetupTxt: Label 'Welcome to CRO Salespeople Setup';
+        CROPOSPaymMethodSetupTxt: Label 'Welcome to CRO POS Payment Method Setup';
+        CROPaymMethodSetupTxt: Label 'Welcome to CRO Payment Method Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO Fiscal", CROFiscalizationSetupTxt, AssistedSetupGroup::NPRCROFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO Audit Profile", CROPOSAuditProfileSetupTxt, AssistedSetupGroup::NPRCROFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO Salespeople", CROSalespeopleSetupTxt, AssistedSetupGroup::NPRCROFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO POS Paym. Meth.", CROPOSPaymMethodSetupTxt, AssistedSetupGroup::NPRCROFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO Paym. Meth.", CROPaymMethodSetupTxt, AssistedSetupGroup::NPRCROFiscal);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -103,6 +121,7 @@
         RetailSetups();
         RestaurantSetups();
         AttractionSetups();
+        CROFiscalizationSetups();
 #if not BC18
         HideChecklistIfPOSEntryExist();
 #endif
@@ -1041,7 +1060,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1053,6 +1072,9 @@
             Modul::Attraction:
                 //For Any change, increase version
                 exit('NPR-AssistedSetup-Attraction-v1.0');
+            Modul::CROFiscalizationSetup:
+                //For Any change, increase version
+                exit('NPR-AssistedSetup-CROFiscalization-v1.0');
         end;
     end;
 
@@ -1082,6 +1104,226 @@
             Checklist.SetChecklistVisibility(false);
     end;
 #endif
+    #endregion
+
+    #region CRO Fiscalization Wizards
+    local procedure CROFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup;
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::CROFiscalizationSetup)) then
+            exit;
+
+        RemoveCROFiscalizationSetupGuidedExperience();
+
+        AddCROFiscalizationSetupSteps();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::CROFiscalizationSetup));
+    end;
+
+    local procedure RemoveCROFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Audit Profile");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Salespeople");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO POS Paym. Meth.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.");
+    end;
+
+    local procedure AddCROFiscalizationSetupSteps()
+    begin
+        EnableCROFiscalSetupWizard();
+        EnableCROAuditProfileSetupWizard();
+        EnableCROSalespeopleSetupWizard();
+        EnableCROPOSPaymMethodMappSetupWizard();
+        EnableCROPaymentMethodSetupWizard();
+    end;
+
+    local procedure EnableCROFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup CRO Fiscal",
+                                                AssistedSetupGroup::NPRCROFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableCROAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Audit Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup CRO Audit Profile",
+                                                AssistedSetupGroup::NPRCROFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableCROSalespeopleSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Salespeople', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Salespeople', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Salespeople") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup CRO Salespeople",
+                                                AssistedSetupGroup::NPRCROFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableCROPOSPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO POS Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup CRO POS Paym. Meth.",
+                                                AssistedSetupGroup::NPRCROFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableCROPaymentMethodSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup CRO Paym. Meth.",
+                                                AssistedSetupGroup::NPRCROFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup CRO Salespeople", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupCROSalespeople_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupCROSalespeopleWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup CRO Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupCROFiscalWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupCROFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup CRO Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupCROAuditProfileSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupCROAuditProfileSetupWizard();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup CRO POS Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupCROPOSPaymMethodMappSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupCROPOSPaymMethodMappSetupWizard();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupCROPaymMethodMappSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupCROPaymMethodMappSetupWizard();
+    end;
+
+    local procedure UpdateSetupCROSalespeopleWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Salespeople");
+    end;
+
+    local procedure UpdateSetupCROFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Fiscal");
+    end;
+
+    local procedure UpdateSetupCROAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Audit Profile");
+    end;
+
+    local procedure UpdateSetupCROPOSPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO POS Paym. Meth.");
+    end;
+
+    local procedure UpdateSetupCROPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.");
+    end;
+
     #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
