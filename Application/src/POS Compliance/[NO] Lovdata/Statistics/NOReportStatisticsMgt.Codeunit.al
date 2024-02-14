@@ -7,12 +7,13 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
     internal procedure CalcCardsAmountAndQuantity(var POSEntry: Record "NPR POS Entry"; var AmountCards: Decimal; var CountCards: Integer)
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        Amount: Decimal;
     begin
         Clear(AmountCards);
         Clear(CountCards);
-        POSPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
+        POSEntryPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
         POSEntry.SetLoadFields("Document No.", "POS Unit No.");
         if POSEntry.FindSet() then
             repeat
@@ -20,40 +21,46 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
                 EFTTransactionRequest.SetRange("Register No.", POSEntry."POS Unit No.");
                 EFTTransactionRequest.SetRange(Successful, true);
                 if not EFTTransactionRequest.IsEmpty() then begin
-                    CountCards += 1;
-                    POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                    if POSPaymentLine.FindSet() then
+                    Clear(Amount);
+                    POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                    if POSEntryPaymentLine.FindSet() then
                         repeat
-                            POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
+                            POSPaymentMethod.Get(POSEntryPaymentLine."POS Payment Method Code");
                             if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::EFT then
-                                AmountCards += POSPaymentLine.Amount;
-                        until POSPaymentLine.Next() = 0;
+                                Amount += POSEntryPaymentLine.Amount;
+                        until POSEntryPaymentLine.Next() = 0;
+
+                    if Amount > 0 then begin
+                        AmountCards += Amount;
+                        CountCards += 1;
+                    end;
                 end;
             until POSEntry.Next() = 0;
     end;
 
     internal procedure CalcOtherPaymentsAmountAndQuantity(var POSEntry: Record "NPR POS Entry"; var AmountOther: Decimal; var CountOther: Integer)
     var
-        POSPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Amount: Decimal;
     begin
-        POSPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
+        POSEntryPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
                 Clear(Amount);
-                POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if POSPaymentLine.FindSet() then
+                POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                if POSEntryPaymentLine.FindSet() then
                     repeat
-                        POSPaymentMethod.Get(POSPaymentLine."POS Payment Method Code");
+                        POSPaymentMethod.Get(POSEntryPaymentLine."POS Payment Method Code");
                         if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
-                            Amount += POSPaymentLine.Amount;
-                    until POSPaymentLine.Next() = 0;
+                            Amount += POSEntryPaymentLine.Amount;
+                    until POSEntryPaymentLine.Next() = 0;
+
                 if Amount > 0 then begin
                     AmountOther += Amount;
                     CountOther += 1;
-                end
+                end;
             until POSEntry.Next() = 0;
     end;
 
@@ -82,40 +89,85 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
 
     internal procedure CalcTaxAmount(var POSEntry: Record "NPR POS Entry"; var Amount: Decimal; TaxPct: Decimal; IncludeTaxPctFilter: Boolean)
     var
-        POSTaxLine: Record "NPR POS Entry Tax Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
     begin
         Clear(Amount);
-        POSTaxLine.SetLoadFields("Tax Amount", "Tax %");
+        POSEntryTaxLine.SetLoadFields("Tax Amount", "Tax %");
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
-                POSTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 if IncludeTaxPctFilter then
-                    POSTaxLine.SetRange("Tax %", TaxPct);
-                if (POSTaxLine.FindSet()) then
-                    repeat
-                        Amount += POSTaxLine."Tax Amount";
-                    until POSTaxLine.Next() = 0;
+                    POSEntryTaxLine.SetRange("Tax %", TaxPct);
+
+                POSEntryTaxLine.CalcSums("Tax Amount");
+                Amount += POSEntryTaxLine."Tax Amount";
+            until POSEntry.Next() = 0;
+    end;
+
+    internal procedure CalcTaxAmounts(var POSEntry: Record "NPR POS Entry"; IncludeTaxPctFilter: Boolean; TaxPct: Decimal; var TaxBaseAmount: Decimal; var TaxAmount: Decimal; var AmountIncludingTax: Decimal)
+    var
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+    begin
+        Clear(TaxBaseAmount);
+        Clear(TaxAmount);
+        Clear(AmountIncludingTax);
+
+        POSEntryTaxLine.SetLoadFields("Tax Base Amount", "Tax Amount", "Amount Including Tax", "Tax %");
+        POSEntry.SetLoadFields("Entry No.");
+        if POSEntry.FindSet() then
+            repeat
+                POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                if IncludeTaxPctFilter then
+                    POSEntryTaxLine.SetRange("Tax %", TaxPct);
+
+                POSEntryTaxLine.CalcSums("Tax Base Amount", "Tax Amount", "Amount Including Tax");
+                TaxBaseAmount += POSEntryTaxLine."Tax Base Amount";
+                TaxAmount += POSEntryTaxLine."Tax Amount";
+                AmountIncludingTax += POSEntryTaxLine."Amount Including Tax";
             until POSEntry.Next() = 0;
     end;
 
     internal procedure CalcReturnTaxAmount(var POSEntry: Record "NPR POS Entry"; var Amount: Decimal; TaxPct: Decimal; IncludeTaxPctFilter: Boolean)
     var
-        POSTaxLine: Record "NPR POS Entry Tax Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
     begin
         Clear(Amount);
-        POSTaxLine.SetLoadFields("Tax Amount", Quantity);
+        POSEntryTaxLine.SetLoadFields("Tax Amount", Quantity);
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
-                POSTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSTaxLine.SetFilter(Quantity, '<%1', 0);
+                POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryTaxLine.SetFilter(Quantity, '<%1', 0);
                 if IncludeTaxPctFilter then
-                    POSTaxLine.SetRange("Tax %", TaxPct);
-                if (POSTaxLine.FindSet()) then
-                    repeat
-                        Amount += POSTaxLine."Tax Amount";
-                    until POSTaxLine.Next() = 0;
+                    POSEntryTaxLine.SetRange("Tax %", TaxPct);
+
+                POSEntryTaxLine.CalcSums("Tax Amount");
+                Amount += POSEntryTaxLine."Tax Amount";
+            until POSEntry.Next() = 0;
+    end;
+
+    internal procedure CalcReturnTaxAmounts(var POSEntry: Record "NPR POS Entry"; IncludeTaxPctFilter: Boolean; TaxPct: Decimal; var TaxBaseAmount: Decimal; var TaxAmount: Decimal; var AmountIncludingTax: Decimal)
+    var
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+    begin
+        Clear(TaxBaseAmount);
+        Clear(TaxAmount);
+        Clear(AmountIncludingTax);
+
+        POSEntryTaxLine.SetLoadFields("Tax Base Amount", "Tax Amount", "Amount Including Tax", "Tax %", Quantity);
+        POSEntry.SetLoadFields("Entry No.");
+        if POSEntry.FindSet() then
+            repeat
+                POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryTaxLine.SetFilter(Quantity, '<%1', 0);
+                if IncludeTaxPctFilter then
+                    POSEntryTaxLine.SetRange("Tax %", TaxPct);
+
+                POSEntryTaxLine.CalcSums("Tax Base Amount", "Tax Amount", "Amount Including Tax");
+                TaxBaseAmount += POSEntryTaxLine."Tax Base Amount";
+                TaxAmount += POSEntryTaxLine."Tax Amount";
+                AmountIncludingTax += POSEntryTaxLine."Amount Including Tax";
             until POSEntry.Next() = 0;
     end;
 
