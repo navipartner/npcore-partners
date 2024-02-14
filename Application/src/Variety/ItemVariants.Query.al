@@ -7,7 +7,11 @@
     {
         dataitem(Item_Variant; "Item Variant")
         {
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             DataItemTableFilter = "NPR Blocked" = const(false);
+#ELSE
+            DataItemTableFilter = Blocked = const(false);
+#ENDIF
             filter(Item_No_; "Item No.")
             {
             }

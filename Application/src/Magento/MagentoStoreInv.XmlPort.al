@@ -281,7 +281,11 @@
         if Item.FindSet() then
             repeat
                 ItemVariant.SetRange("Item No.", Item."No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+                ItemVariant.SetRange(Blocked, false);
+#ENDIF
                 if ItemVariant.FindSet() then begin
                     repeat
                         Sku := ItemVariant."Item No." + '_' + ItemVariant.Code;

@@ -32,7 +32,11 @@
         if TempVRTBuffer_."Variant Code" = '' then
             exit('-');
 
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         if ItemVariant.Get(TempVRTBuffer_."Item No.", TempVRTBuffer_."Variant Code") and ItemVariant."NPR Blocked" and ((VRTFieldSetup."Table No." <> Database::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo("NPR Blocked"))) then
+#ELSE
+        if ItemVariant.Get(TempVRTBuffer_."Item No.", TempVRTBuffer_."Variant Code") and ItemVariant.Blocked and ((VRTFieldSetup."Table No." <> Database::"Item Variant") or (VRTFieldSetup."Field No." <> ItemVariant.FieldNo(Blocked))) then
+#ENDIF
             exit('-');
 
         case VRTFieldSetup.Type of

@@ -30,8 +30,11 @@ report 6014455 "NPR Item Barcode Status Sheet"
             dataitem(ItemVariant; "Item Variant")
             {
                 DataItemLink = "Item No." = FIELD("No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 DataItemTableView = WHERE("NPR Blocked" = CONST(false));
-
+#ELSE
+                DataItemTableView = WHERE(Blocked = CONST(false));
+#ENDIF
                 trigger OnAfterGetRecord()
                 begin
                     ShowVariantInfo := 1;
@@ -41,7 +44,7 @@ report 6014455 "NPR Item Barcode Status Sheet"
 
             trigger OnAfterGetRecord()
             begin
-if not "NPR Has Variants" then
+                if not "NPR Has Variants" then
                     AddToBuffer("No.", '');
             end;
         }

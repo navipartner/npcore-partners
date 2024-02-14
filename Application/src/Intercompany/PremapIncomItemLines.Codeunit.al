@@ -798,7 +798,11 @@
                   HeaderRecordNo, RecordNo, Format(PurchaseLine.Type::Item, 0, 9));
                 if ItemReference."Variant Code" <> '' then
                     if ItemVariant.Get(ItemReference."Item No.", ItemReference."Variant Code") then
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                         if not ItemVariant."NPR Blocked" then
+#ELSE
+                        if not ItemVariant.Blocked then
+#ENDIF
                             IntermediateDataImport.InsertOrUpdateEntry(EntryNo, DATABASE::"Purchase Line", PurchaseLine.FieldNo("Variant Code"),
                               HeaderRecordNo, RecordNo, Format(ItemVariant.Code, 0, 9));
                 exit(true);

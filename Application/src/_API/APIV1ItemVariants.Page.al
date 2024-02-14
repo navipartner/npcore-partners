@@ -134,10 +134,17 @@ page 6014506 "NPR APIV1 - Item Variants"
                 {
                     Caption = 'Variety 4 Value', Locked = true;
                 }
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 field(blocked; Rec."NPR Blocked")
                 {
                     Caption = 'Blocked', Locked = true;
                 }
+#ELSE
+                field(blocked; Rec.Blocked)
+                {
+                    Caption = 'Blocked', Locked = true;
+                }
+#ENDIF
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'lastModifiedDateTime', Locked = true;

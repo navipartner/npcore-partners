@@ -120,7 +120,11 @@
                                 _ItemWkshVariantLine."Variant Code" := _ItemWkshVariantLine."Existing Variant Code";
                                 if _ItemWkshVariantLine.Description <> '' then
                                     ItemVariant.Description := _ItemWkshVariantLine.Description;
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                                 ItemVariant."NPR Blocked" := _ItemWkshVariantLine.Blocked;
+#ELSE
+                                ItemVariant.Blocked := _ItemWkshVariantLine.Blocked;
+#ENDIF
                                 ItemVariant.Modify(true);
                                 _ItemWkshVariantLine.UpdateBarcode();
                                 ProcessVariantLineSalesPrice(Item);
@@ -479,7 +483,11 @@
         ItemVariant."NPR Variety 4" := NprItemWkshVariantLine."Variety 4";
         ItemVariant."NPR Variety 4 Table" := NprItemWkshVariantLine."Variety 4 Table";
         ItemVariant."NPR Variety 4 Value" := NprItemWkshVariantLine."Variety 4 Value";
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ItemVariant."NPR Blocked" := NprItemWkshVariantLine.Blocked;
+#ELSE
+        ItemVariant.Blocked := NprItemWkshVariantLine.Blocked;
+#ENDIF
 
         if NprItemWkshVariantLine.Description <> '' then
             ItemVariant.Description := NprItemWkshVariantLine.Description
