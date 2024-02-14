@@ -13,6 +13,7 @@
         AddRestaurantSetupsWizard();
         AddAttractionSetupsWizard();
         AddCROFiscalizationSetupsWizard();
+        AddRSFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -96,6 +97,24 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup CRO Paym. Meth.", CROPaymMethodSetupTxt, AssistedSetupGroup::NPRCROFiscal);
     end;
 
+    local procedure AddRSFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        RSFiscalizationSetupTxt: Label 'Welcome to Serbial Fiscalization Setup';
+        RSPOSAuditProfileSetupTxt: Label 'Welcome to RS POS Audit Profile Setup';
+        RSPOSPaymMethodSetupTxt: Label 'Welcome to RS POS Payment Method Setup';
+        RSPaymMethodSetupTxt: Label 'Welcome to RS Payment Method Setup';
+        RSVATPostingSetupTxt: Label 'Welcome to RS VAT Posting Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS Fiscal", RSFiscalizationSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS Audit Profile", RSPOSAuditProfileSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS POS Paym. Meth.", RSPOSPaymMethodSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS Payment Methods", RSPaymMethodSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS VAT Posting", RSVATPostingSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS POS Unit", RSVATPostingSetupTxt, AssistedSetupGroup::NPRRSFiscal);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -122,6 +141,7 @@
         RestaurantSetups();
         AttractionSetups();
         CROFiscalizationSetups();
+        RSFiscalizationSetups();
 #if not BC18
         HideChecklistIfPOSEntryExist();
 #endif
@@ -1060,7 +1080,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1075,6 +1095,9 @@
             Modul::CROFiscalizationSetup:
                 //For Any change, increase version
                 exit('NPR-AssistedSetup-CROFiscalization-v1.0');
+            Modul::RSFiscalizationSetup:
+                //For Any change, increase version
+                exit('NPR-AssistedSetup-RSFiscalization-v1.0');
         end;
     end;
 
@@ -1322,6 +1345,264 @@
         GuidedExperience: Codeunit "Guided Experience";
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.");
+    end;
+
+    #endregion
+
+    #region RS Fiscalization Wizards
+    local procedure RSFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        Modul: Option Retail,Restaurant,Attractions,CROFiscalizationSetup,RSFiscalizationSetup;
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::RSFiscalizationSetup)) then
+            exit;
+
+        RemoveRSFiscalizationSetupGuidedExperience();
+
+        AddRSFiscalizationSetupSteps();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::RSFiscalizationSetup));
+    end;
+
+    local procedure RemoveRSFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Audit Profile");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS POS Paym. Meth.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Payment Methods");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS VAT Posting");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS POS Unit");
+    end;
+
+    local procedure AddRSFiscalizationSetupSteps()
+    begin
+        EnableRSFiscalSetupWizard();
+        EnableRSAuditProfileSetupWizard();
+        EnableRSVATPostingSetupWizard();
+        EnableRSPOSPaymMethodMappSetupWizard();
+        EnableRSPaymentMethodsSetupWizard();
+        EnableRSPOSUnitSetupWizard();
+    end;
+
+    local procedure EnableRSFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS Fiscal",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Audit Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS Audit Profile",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSVATPostingSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup VAT Posting', Locked = true;
+        SetupDescriptionTxt: Label 'Setup VAT Posting', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS VAT Posting") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS VAT Posting",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSPOSPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS POS Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS POS Paym. Meth.",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSPaymentMethodsSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS Payment Methods") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS Payment Methods",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSPOSUnitSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Units', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Units', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS POS Unit") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS POS Unit",
+                                                AssistedSetupGroup::NPRRSFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS VAT Posting", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSVATPosting_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSVATPostingWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSFiscalWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSAuditProfileSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSAuditProfileSetupWizard();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSPaymMethodsSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSPaymMethodMappSetupWizard();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS POS Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSPOSPaymMethodMappSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSPOSPaymMethodMappSetupWizard();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS POS Unit", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSPOSUnitSetupWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSPOSUnitSetupWizard();
+    end;
+
+    local procedure UpdateSetupRSVATPostingWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS VAT Posting");
+    end;
+
+    local procedure UpdateSetupRSFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS Fiscal");
+    end;
+
+    local procedure UpdateSetupRSAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS Audit Profile");
+    end;
+
+    local procedure UpdateSetupRSPOSPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS POS Paym. Meth.");
+    end;
+
+    local procedure UpdateSetupRSPaymMethodMappSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS Payment Methods");
+    end;
+
+    local procedure UpdateSetupRSPOSUnitSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS POS Unit");
     end;
 
     #endregion
