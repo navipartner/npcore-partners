@@ -193,8 +193,13 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     begin
         if POSEntry."Customer No." <> '' then begin
             CustomerIDNumberType := 0;
-            if Customer.Get(POSEntry."Customer No.") then
+            if Customer.Get(POSEntry."Customer No.") then begin
+                CustomerAddress := Customer.Address;
+                CustomerCity := Customer.City;
+                CustomerID := GetCustomerIdentificationNo(Customer);
+                CustomerName := Customer.Name;
                 CustomerVATNumber := Customer."VAT Registration No.";
+            end;
         end else
             CustomerIDNumberType := 1;
 
@@ -219,6 +224,13 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         if CustomerVATNumber <> '' then
             JsonTextReaderWriter.WriteStringProperty('vatIdentNumber', CopyStr(CustomerVATNumber, 1, 15));
         JsonTextReaderWriter.WriteEndObject();
+    end;
+
+    local procedure GetCustomerIdentificationNo(Customer: Record Customer) IdentificationNo: Text
+    var
+        Handled: Boolean;
+    begin
+        OnGetCustomerIdentificationNo(Customer, IdentificationNo, Handled);
     end;
 
     local procedure EnterInvoiceDataForSaleAndRefund(var CustomerIDNumberType: Integer; var CustomerAddress: Text; var CustomerCity: Text; var CustomerID: Text; var CustomerName: Text; var CustomerVATNumber: Text): Boolean
@@ -859,6 +871,13 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     local procedure IsAlphanumeric(CharToCheck: Code[1]) Alphanumeric: Boolean
     begin
         Alphanumeric := IsDigit(CharToCheck) or IsAlpha(CharToCheck);
+    end;
+    #endregion
+
+    #region event publishers
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCustomerIdentificationNo(Customer: Record Customer; var IdentificationNo: Text; var Handled: Boolean)
+    begin
     end;
     #endregion
 
