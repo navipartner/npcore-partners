@@ -6,6 +6,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         Enabled: Boolean;
         Initialized: Boolean;
+        RetailLocationExistsOnSalesLines: Boolean;
 
     #region Subscribers - POS Audit Logging
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnLookupAuditHandler', '', true, true)]
@@ -276,22 +277,14 @@ codeunit 6059942 "NPR RS Audit Mgt."
     local procedure OnAfterManualReleaseSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        SalesLines: Record "Sales Line";
-        Location: Record Location;
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
-        RetailLocationExists: Boolean;
     begin
         if not IsRSFiscalActive() then
             exit;
-        SalesLines.SetRange("Document No.", SalesHeader."No.");
-        if SalesLines.FindSet() then
-            repeat
-                Location.Get(SalesLines."Location Code");
-                if Location."NPR Retail Location" then
-                    RetailLocationExists := true;
-            until SalesLines.Next() = 0;
-        if not RetailLocationExists then
+
+        if not RetailLocationExistsOnSalesLines then
             exit;
+
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
                 begin
@@ -309,6 +302,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
         if not IsRSFiscalActive() then
+            exit;
+        if not RetailLocationExistsOnSalesLines then
             exit;
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
@@ -328,6 +323,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+        if not RetailLocationExistsOnSalesLines then
+            exit;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
         if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Sales"] then
             RSTaxCommunicationMgt.CreateProformaRefund(Rec, false);
@@ -344,6 +341,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+
         if SalesInvHdrNo <> '' then
             RSTaxCommunicationMgt.CreateNormalSale(SalesInvHdrNo);
         if SalesCrMemoHdrNo <> '' then
@@ -358,6 +358,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
     begin
         if not IsRSFiscalActive() then
+            exit;
+        if not RetailLocationExistsOnSalesLines then
             exit;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvoiceHeader);
@@ -393,8 +395,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not IsRSFiscalActive() then
             exit;
-        RSAuxSalesInvHeader.Get(Rec."No.");
-        RSAuxSalesInvHeader.Delete();
+        if RSAuxSalesInvHeader.Get(Rec."No.") then
+            RSAuxSalesInvHeader.Delete();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesInvHeaderInsert', '', false, false)]
@@ -404,6 +406,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
     begin
         if not IsRSFiscalActive() then
+            exit;
+        if not RetailLocationExistsOnSalesLines then
             exit;
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvHeader);
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
@@ -419,6 +423,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+        if not RetailLocationExistsOnSalesLines then
+            exit;
         RSAuxSalesCrMemoHeader.ReadRSAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesCrMemoHeader.TransferFields(RSAuxSalesHeader, false);
@@ -432,6 +438,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesHeader.Delete();
     end;
@@ -444,6 +454,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
     begin
+        CheckSalesLinesRetailLocation(SalesHeader);
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvHeader);
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesInvHeader.TransferFields(RSAuxSalesHeader, false);
@@ -719,24 +733,18 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSUnit: Record "NPR POS Unit";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
-        SalesLines: Record "Sales Line";
-        Location: Record Location;
-        RetailLocationExists: Boolean;
         NotRSAuditProfileErr: Label 'RS Audit Profile is not selected on POS Unit No.: %1', Comment = '%1 - POS Unit No.';
     begin
         if not IsRSFiscalActive() then
             exit;
+
+        CheckSalesLinesRetailLocation(SalesHeader);
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+
         SalesHeader.TestField("Salesperson Code");
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
-        SalesLines.SetRange("Document No.", SalesHeader."No.");
-        if SalesLines.FindSet() then
-            repeat
-                Location.Get(SalesLines."Location Code");
-                if Location."NPR Retail Location" then
-                    RetailLocationExists := true;
-            until SalesLines.Next() = 0;
-        if not RetailLocationExists then
-            exit;
+
         RSAuxSalesHeader.TestField("NPR RS POS Unit");
         POSUnit.Get(RSAuxSalesHeader."NPR RS POS Unit");
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
@@ -1033,6 +1041,28 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         end;
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+    end;
+
+    local procedure CheckSalesLinesRetailLocation(SalesHeader: Record "Sales Header")
+    var
+        SalesLines: Record "Sales Line";
+        Location: Record Location;
+    begin
+        RetailLocationExistsOnSalesLines := false;
+        SalesLines.SetCurrentKey("Document Type", "Document No.", "Location Code");
+        SalesLines.SetLoadFields("Document No.", "Location Code", Type);
+        SalesLines.SetFilter(Type, '%1|%2', SalesLines.Type::Item, SalesLines.Type::"Charge (Item)");
+        SalesLines.SetRange("Document No.", SalesHeader."No.");
+        if not SalesLines.FindSet() then
+            exit;
+
+        repeat
+            if Location.Get(SalesLines."Location Code") then
+                if Location."NPR Retail Location" then begin
+                    RetailLocationExistsOnSalesLines := true;
+                    exit;
+                end;
+        until SalesLines.Next() = 0;
     end;
     #endregion
 }
