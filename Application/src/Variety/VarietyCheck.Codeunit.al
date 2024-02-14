@@ -83,7 +83,11 @@
                 if not POSSalesLine.IsEmpty() then
                     Error(Text001, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
 
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVar."NPR Blocked" := true;
+#ELSE
+                ItemVar.Blocked := true;
+#ENDIF
                 ItemVar.Modify();
             until ItemVar.Next() = 0;
     end;
@@ -118,14 +122,22 @@
             VRTSetup."Item Journal Blocking"::TotalBlockItemIfVariants:
                 begin
                     ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                     ItemVar.SetRange("NPR Blocked", false);
+#ELSE
+                    ItemVar.SetRange(Blocked, false);
+#ENDIF
                     if not ItemVar.IsEmpty then
                         ItemJnlLine.TestField(ItemJnlLine."Variant Code");
                 end;
             VRTSetup."Item Journal Blocking"::SaleBlockItemIfVariants:
                 if ItemJnlLine."Entry Type" in [ItemJnlLine."Entry Type"::Purchase, ItemJnlLine."Entry Type"::Sale] then begin
                     ItemVar.SetRange("Item No.", ItemJnlLine."Item No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                     ItemVar.SetRange("NPR Blocked", false);
+#ELSE
+                    ItemVar.SetRange(Blocked, false);
+#ENDIF
                     if not ItemVar.IsEmpty then
                         ItemJnlLine.TestField(ItemJnlLine."Variant Code");
                 end;
@@ -134,7 +146,11 @@
 
         if ItemJnlLine."Variant Code" <> '' then begin
             ItemVar.Get(ItemJnlLine."Item No.", ItemJnlLine."Variant Code");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVar.TestField("NPR Blocked", false);
+#ELSE
+            ItemVar.TestField(Blocked, false);
+#ENDIF
         end;
 
     end;
@@ -454,7 +470,11 @@
     begin
         if Rec."Variant Code" <> '' then
             if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVariant.TestField("NPR Blocked", false);
+#ELSE
+                ItemVariant.TestField(Blocked, false);
+#ENDIF
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnAfterValidateEvent', 'Variant Code', true, false)]
@@ -464,7 +484,11 @@
     begin
         if Rec."Variant Code" <> '' then
             if ItemVariant.Get(Rec."No.", Rec."Variant Code") then
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVariant.TestField("NPR Blocked", false);
+#ELSE
+                ItemVariant.TestField(Blocked, false);
+#ENDIF
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Transfer Line", 'OnAfterValidateEvent', 'Variant Code', true, false)]
@@ -474,7 +498,11 @@
     begin
         if Rec."Variant Code" <> '' then
             if ItemVariant.Get(Rec."Item No.", Rec."Variant Code") then
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVariant.TestField("NPR Blocked", false);
+#ELSE
+                ItemVariant.TestField(Blocked, false);
+#ENDIF
     end;
 
 }

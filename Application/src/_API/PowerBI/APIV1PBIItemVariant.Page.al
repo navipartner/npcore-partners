@@ -92,10 +92,17 @@ page 6060036 "NPR APIV1 PBIItem Variant"
                 {
                     Caption = 'NPR Variety 4 Value', Locked = true;
                 }
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 field(nprBlocked; Rec."NPR Blocked")
                 {
                     Caption = 'NPR Blocked', Locked = true;
                 }
+#ELSE
+                field(nprBlocked; Rec.Blocked)
+                {
+                    Caption = 'NPR Blocked', Locked = true;
+                }
+#ENDIF
                 field(lastModifiedDateTime; PowerBIUtils.GetSystemModifedAt(Rec.SystemModifiedAt))
                 {
                     Caption = 'Last Modified Date', Locked = true;

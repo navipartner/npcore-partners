@@ -847,8 +847,13 @@ codeunit 6014608 "NPR Replication Register"
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("NPR Variety 4 Value"), 'variety4Value', 0, false, false);
 
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo("NPR Blocked"), 'blocked', 0, false, false);
+#ELSE
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(Blocked), 'blocked', 0, false, false);
+#ENDIF
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]

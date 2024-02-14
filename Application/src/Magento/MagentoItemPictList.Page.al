@@ -237,7 +237,11 @@
             ItemVariant.SetRange("NPR Variety 1", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 1 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 1 Value", VarietyValue.Value);
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVariant.SetRange(Blocked, false);
+#ENDIF
             if (not ItemVariant.IsEmpty()) then
                 Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
@@ -267,7 +271,11 @@
             ItemVariant.SetRange("NPR Variety 2", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 2 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 2 Value", VarietyValue.Value);
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVariant.SetRange(Blocked, false);
+#ENDIF
             if (not ItemVariant.IsEmpty()) then
                 Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
@@ -297,7 +305,11 @@
             ItemVariant.SetRange("NPR Variety 3", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 3 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 3 Value", VarietyValue.Value);
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVariant.SetRange(Blocked, false);
+#ENDIF
             if (not ItemVariant.IsEmpty()) then
                 Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;
@@ -327,7 +339,11 @@
             ItemVariant.SetRange("NPR Variety 4", VarietyValue.Type);
             ItemVariant.SetRange("NPR Variety 4 Table", VarietyValue.Table);
             ItemVariant.SetRange("NPR Variety 4 Value", VarietyValue.Value);
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVariant.SetRange(Blocked, false);
+#ENDIF
             if (not ItemVariant.IsEmpty()) then
                 Rec.AddNewEntry(UpperCase(VarietyValue.Value), VarietyValue.Description);
         until VarietyValue.Next() = 0;

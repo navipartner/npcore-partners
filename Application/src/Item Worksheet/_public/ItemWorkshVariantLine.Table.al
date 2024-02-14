@@ -205,8 +205,13 @@
         }
         field(170; "Existing Variant Blocked"; Boolean)
         {
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             CalcFormula = Lookup("Item Variant"."NPR Blocked" WHERE("Item No." = FIELD("Existing Item No."),
                                                                Code = FIELD("Existing Variant Code")));
+#ELSE
+            CalcFormula = Lookup("Item Variant".Blocked WHERE("Item No." = FIELD("Existing Item No."),
+                                                               Code = FIELD("Existing Variant Code")));
+#ENDIF
             Caption = 'Existing Variant Blocked';
             Editable = false;
             FieldClass = FlowField;
@@ -780,11 +785,19 @@
             ItemVar.SetRange("NPR Variety 2 Value", "Variety 2 Value");
             ItemVar.SetRange("NPR Variety 3 Value", "Variety 3 Value");
             ItemVar.SetRange("NPR Variety 4 Value", "Variety 4 Value");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVar.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVar.SetRange(Blocked, false);
+#ENDIF
             if ItemVar.FindFirst() then begin
                 exit(ItemVar.Code);
             end else begin
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVar.SetRange("NPR Blocked", true);
+#ELSE
+                ItemVar.SetRange(Blocked, true);
+#ENDIF
                 if ItemVar.FindFirst() then
                     exit(ItemVar.Code);
             end;

@@ -50,7 +50,11 @@ codeunit 6150985 "NPR M2 MSI Task Mgt."
 
                 if (not VariantCodeSpecified) then begin
                     ItemVariant.SetRange("Item No.", TempMSIRequest."Item No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                     ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+                    ItemVariant.SetRange(Blocked, false);
+#ENDIF
                     if (ItemVariant.FindSet()) then
                         repeat
                             TempMSIRequest."Variant Code" := ItemVariant.Code;

@@ -199,7 +199,12 @@
         Base64String := AFHelperFunctions.GetMagentoItemImage(Item, PictureFilename);
 
         ItemVariant.SetFilter("Item No.", Item."No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ItemVariant.SetFilter("NPR Blocked", '=%1', false);
+#ELSE
+        ItemVariant.SetFilter(Blocked, '=%1', false);
+#ENDIF
+
         if not ItemVariant.FindSet() then
             exit;
 
@@ -259,7 +264,11 @@
         Base64String := AFHelperFunctions.GetMagentoItemImage(Item, PictureFilename);
 
         ItemVariant.SetFilter("Item No.", Item."No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ItemVariant.SetFilter("NPR Blocked", '=%1', false);
+#ELSE
+        ItemVariant.SetFilter(Blocked, '=%1', false);
+#ENDIF
         if not ItemVariant.FindSet() then
             exit;
 

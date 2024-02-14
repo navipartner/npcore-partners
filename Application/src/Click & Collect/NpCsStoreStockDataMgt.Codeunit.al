@@ -197,7 +197,11 @@
     begin
         if TempStockkeepingUnit."Variant Code" = '' then begin
             ItemVariant.SetRange("Item No.", TempStockkeepingUnit."Item No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+            ItemVariant.SetRange(Blocked, false);
+#ENDIF
             if ItemVariant.FindFirst() then
                 exit;
         end;
@@ -278,7 +282,12 @@
         TempStockkeepingUnit: Record "Stockkeeping Unit" temporary;
     begin
         ItemVariant.SetRange("Item No.", Item."No.");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ItemVariant.SetRange("NPR Blocked", false);
+#ELSE
+        ItemVariant.SetRange(Blocked, false);
+#ENDIF
+
         if ItemVariant.IsEmpty then begin
             TempNpCsStore.FindSet();
             repeat

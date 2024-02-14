@@ -32,7 +32,6 @@ report 6014455 "NPR Item Barcode Status Sheet"
             {
                 DataItemLink = "Item No." = FIELD("No.");
                 DataItemTableView = WHERE("NPR Blocked" = CONST(false));
-
                 trigger OnAfterGetRecord()
                 begin
                     ShowVariantInfo := 1;
