@@ -58,7 +58,6 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                 Caption = 'RS POS Unit';
                 ApplicationArea = NPRRSFiscal;
                 ToolTip = 'Specifies the value of the RS POS Unit field.';
-                ShowMandatory = true;
                 TableRelation = "NPR POS Unit";
                 trigger OnValidate()
                 begin
