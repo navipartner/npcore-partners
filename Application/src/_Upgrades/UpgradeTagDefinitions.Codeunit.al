@@ -140,6 +140,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR FtpSftp Data Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Free", 'NPRTaxFreePOSProfileTable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Tax Free", 'NPRTaxFreePOSProfile'));
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Item Upgrade", 'PopulateItemVariantNewField'));
+#ENDIF
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdatePrimarySeating'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestSeatingAndWaiter'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'RefreshKitchenOrderStatus'));
@@ -537,6 +540,14 @@
                         exit('NPRE_UpdateDefaultNumberOfGuests_20230919');
                     'SetPrintOnSaleCancel':
                         exit('NPRE_SetPrintOnSaleCancel_20231026');
+                end;
+
+            Codeunit::"NPR Item Upgrade":
+                case UpgradeStep of
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                    'PopulateItemVariantNewField':
+                        exit('Item_PopulateItemVariant_20240213');
+#ENDIF
                 end;
             Codeunit::"NPR Feature Flags Install":
                 case UpgradeStep of

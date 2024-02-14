@@ -84,8 +84,13 @@
         }
         field(170; "Existing Variant Blocked"; Boolean)
         {
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             CalcFormula = Lookup("Item Variant"."NPR Blocked" WHERE("Item No." = FIELD("Existing Item No."),
                                                                Code = FIELD("Existing Variant Code")));
+#ELSE
+            CalcFormula = Lookup("Item Variant".Blocked WHERE("Item No." = FIELD("Existing Item No."),
+                                                               Code = FIELD("Existing Variant Code")));
+#ENDIF
             Caption = 'Existing Variant Blocked';
             Editable = false;
             FieldClass = FlowField;

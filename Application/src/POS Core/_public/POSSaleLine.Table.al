@@ -2639,7 +2639,11 @@
             _Item.TestField(_Item."VAT Bus. Posting Gr. (Price)");
         if "Variant Code" <> '' then begin
             ItemVariant.Get(_Item."No.", "Variant Code");
+#IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ItemVariant.TestField("NPR Blocked", false);
+#ELSE
+            ItemVariant.TestField(Blocked, false);
+#ENDIF
         end;
         if _Item."Sales Blocked" then
             Error(SalesBlockedErr);

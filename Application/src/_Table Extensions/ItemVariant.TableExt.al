@@ -95,6 +95,11 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Caption = 'Blocked';
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR31.0';
+            ObsoleteReason = 'Replaced with standard Microsoft field "Blocked"';
+#ENDIF
         }
 
         field(6151479; "NPR Replication Counter"; BigInteger)
