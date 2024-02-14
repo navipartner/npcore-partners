@@ -751,6 +751,8 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         BGSISPOSAuditLogAux."Fiscal Printer Device No." := BGSISPOSUnitMapping."Fiscal Printer Device No.";
         BGSISPOSAuditLogAux."Fiscal Printer Memory No." := BGSISPOSUnitMapping."Fiscal Printer Memory No.";
+        if ExtendedReceipt then
+            PopulateExtendedReceiptInfo(BGSISPOSAuditLogAux, RequestText);
         BGSISPOSAuditLogAux.Modify();
     end;
 
@@ -779,6 +781,35 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         InvoiceDataJsonObject.Replace('identNumber', '**********');
 
         MainJsonObject.WriteTo(RequestText);
+    end;
+
+    local procedure PopulateExtendedReceiptInfo(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; RequestText: Text)
+    var
+        InvoiceDataJsonObject, MainJsonObject : JsonObject;
+        JsonToken: JsonToken;
+    begin
+        MainJsonObject.ReadFrom(RequestText);
+        MainJsonObject.SelectToken('$.params.invoiceData', JsonToken);
+        InvoiceDataJsonObject := JsonToken.AsObject();
+
+        InvoiceDataJsonObject.Get('identNumberType', JsonToken);
+        if JsonToken.AsValue().AsInteger() <> 0 then
+            exit;
+
+        InvoiceDataJsonObject.Get('identNumber', JsonToken);
+        BGSISPOSAuditLogAux."Customer Identification No." := JsonToken.AsValue().AsText();
+
+        InvoiceDataJsonObject.Get('vatIdentNumber', JsonToken);
+        BGSISPOSAuditLogAux."Customer VAT Registration No." := JsonToken.AsValue().AsText();
+
+        InvoiceDataJsonObject.Get('recipientName', JsonToken);
+        BGSISPOSAuditLogAux."Customer Name" := JsonToken.AsValue().AsText();
+
+        InvoiceDataJsonObject.Get('recipientAddress', JsonToken);
+        BGSISPOSAuditLogAux."Customer Address" := JsonToken.AsValue().AsText();
+
+        InvoiceDataJsonObject.Get('city', JsonToken);
+        BGSISPOSAuditLogAux."Customer City" := JsonToken.AsValue().AsText();
     end;
 
     local procedure ThrowErrorIfCashierIsNotSet(ThisSalespersonCode: Code[20]; var TempJsonBuffer: Record "JSON Buffer" temporary)

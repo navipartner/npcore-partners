@@ -105,6 +105,31 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         //     Caption = 'Receipt Content';
         //     DataClassification = CustomerContent;
         // }
+        field(60; "Customer Identification No."; Text[30])
+        {
+            Caption = 'Customer Identification No.';
+            DataClassification = CustomerContent;
+        }
+        field(61; "Customer VAT Registration No."; Text[15])
+        {
+            Caption = 'Customer VAT Registration No.';
+            DataClassification = CustomerContent;
+        }
+        field(62; "Customer Name"; Text[30])
+        {
+            Caption = 'Customer Name';
+            DataClassification = CustomerContent;
+        }
+        field(63; "Customer Address"; Text[30])
+        {
+            Caption = 'Customer Address';
+            DataClassification = CustomerContent;
+        }
+        field(64; "Customer City"; Text[30])
+        {
+            Caption = 'Customer City';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

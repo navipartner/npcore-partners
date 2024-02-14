@@ -95,6 +95,31 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies whether the receipt from the related record is extended or not.';
                 }
+                field("Customer Identification No."; Rec."Customer Identification No.")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the identification number of the customer on the extended receipt.';
+                }
+                field("Customer VAT Registration No."; Rec."Customer VAT Registration No.")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the VAT registration number of the customer on the extended receipt.';
+                }
+                field("Customer Name"; Rec."Customer Name")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the name of the customer on the extended receipt.';
+                }
+                field("Customer Address"; Rec."Customer Address")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the address of the customer on the extended receipt.';
+                }
+                field("Customer City"; Rec."Customer City")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the city of the customer on the extended receipt.';
+                }
                 field("Extended Receipt Counter"; Rec."Extended Receipt Counter")
                 {
                     ApplicationArea = NPRBGSISFiscal;
