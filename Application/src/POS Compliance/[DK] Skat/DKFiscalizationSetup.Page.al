@@ -35,13 +35,13 @@ page 6151325 "NPR DK Fiscalization Setup"
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Signing Certificate Password field';
+                    ToolTip = 'Specifies the Password for the certificate that should be uploaded.';
                 }
                 field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field';
+                    ToolTip = 'Specifies the Signing Certificate Thumbprint.';
                 }
             }
             group(SAFTCash)
@@ -49,12 +49,12 @@ page 6151325 "NPR DK Fiscalization Setup"
                 field("SAF-T Audit File Sender"; Rec."SAF-T Audit File Sender")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the SAF-T Audit File Sender field.';
+                    ToolTip = 'Specifies the SAF-T Audit File Sender.';
                 }
                 field("SAF-T Contact No."; Rec."SAF-T Contact No.")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the SAF-T Contact No. field.';
+                    ToolTip = 'Specifies the SAF-T Export contact person.';
                 }
             }
         }
@@ -72,7 +72,7 @@ page 6151325 "NPR DK Fiscalization Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Upload Certificate action';
+                ToolTip = 'Click here to Upload Certificate.';
 
                 trigger OnAction()
                 var
