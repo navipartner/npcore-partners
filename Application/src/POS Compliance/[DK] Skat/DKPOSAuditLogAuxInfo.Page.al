@@ -18,37 +18,37 @@ page 6151324 "NPR DK POS Audit Log Aux. Info"
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Audit Entry Type of the transaction.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry No. field.';
+                    ToolTip = 'Specifies the Audit Entry No. of the transaction.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+                    ToolTip = 'Specifies the POS Entry record related to the transaction.';
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the entry date value.';
+                    ToolTip = 'Specifies the transaction date.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the POS store code value.';
+                    ToolTip = 'Specifies the POS store from which the transacion is created.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS unit number from which the transaction is created.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRDKFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document Number.';
                 }
             }
         }
