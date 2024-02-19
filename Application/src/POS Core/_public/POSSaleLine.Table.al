@@ -1166,6 +1166,30 @@
             Editable = false;
             FieldClass = FlowField;
         }
+
+        field(426; "Coupon Disc. Amount Incl. VAT"; Decimal)
+        {
+            AutoFormatType = 1;
+            CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount Including VAT" WHERE("Register No." = FIELD("Register No."),
+                                                                                                  "Sales Ticket No." = FIELD("Sales Ticket No."),
+                                                                                                  "Sale Date" = FIELD(Date),
+                                                                                                  "Sale Line No." = FIELD("Line No."),
+                                                                                                   Type = CONST(Discount)));
+            Editable = false;
+            FieldClass = FlowField;
+        }
+
+        field(427; "Coupon Disc. Amount Excl. VAT"; Decimal)
+        {
+            AutoFormatType = 1;
+            CalcFormula = Sum("NPR NpDc SaleLinePOS Coupon"."Discount Amount Excluding VAT" WHERE("Register No." = FIELD("Register No."),
+                                                                                                  "Sales Ticket No." = FIELD("Sales Ticket No."),
+                                                                                                  "Sale Date" = FIELD(Date),
+                                                                                                  "Sale Line No." = FIELD("Line No."),
+                                                                                                   Type = CONST(Discount)));
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(430; "Coupon Applied"; Boolean)
         {
             Caption = 'Coupon Applied';
