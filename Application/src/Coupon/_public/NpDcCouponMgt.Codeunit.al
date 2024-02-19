@@ -102,6 +102,7 @@
         NpDcModuleApplyDefault: Codeunit "NPR NpDc Module Apply: Default";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Handled: Boolean;
         DiscountType: Integer;
     begin
@@ -124,10 +125,23 @@
             SaleLinePOSCoupon2.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
             SaleLinePOSCoupon2.SetRange(Type, SaleLinePOSCoupon2.Type::Discount);
             SaleLinePOSCoupon2.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
-            SaleLinePOSCoupon2.CalcSums("Discount Amount");
-            if SaleLinePOSCoupon."Discount Amount" <> SaleLinePOSCoupon2."Discount Amount" then begin
-                SaleLinePOSCoupon."Discount Amount" := SaleLinePOSCoupon2."Discount Amount";
-                if (not SaleLinePOSCoupon.Modify()) then; // Note: A subscriber in ApplyDiscount might have deleted the coupon line
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+                SaleLinePOSCoupon2.SetRange("Applies-to Sale Line No.", SaleLinePOSCoupon."Sale Line No.");
+                SaleLinePOSCoupon2.SetRange("Applies-to Coupon Line No.", SaleLinePOSCoupon."Line No.");
+                SaleLinePOSCoupon2.CalcSums("Discount Amount", "Discount Amount Excluding VAT", "Discount Amount Including VAT");
+
+                if SaleLinePOSCoupon."Discount Amount" <> SaleLinePOSCoupon2."Discount Amount" then begin
+                    SaleLinePOSCoupon."Discount Amount" := SaleLinePOSCoupon2."Discount Amount";
+                    SaleLinePOSCoupon."Discount Amount Excluding VAT" := SaleLinePOSCoupon2."Discount Amount Excluding VAT";
+                    SaleLinePOSCoupon."Discount Amount Including VAT" := SaleLinePOSCoupon2."Discount Amount Including VAT";
+                    if (not SaleLinePOSCoupon.Modify()) then; // Note: A subscriber in ApplyDiscount might have deleted the coupon line
+                end;
+            end else begin
+                SaleLinePOSCoupon2.CalcSums("Discount Amount");
+                if SaleLinePOSCoupon."Discount Amount" <> SaleLinePOSCoupon2."Discount Amount" then begin
+                    SaleLinePOSCoupon."Discount Amount" := SaleLinePOSCoupon2."Discount Amount";
+                    if (not SaleLinePOSCoupon.Modify()) then; // Note: A subscriber in ApplyDiscount might have deleted the coupon line
+                end;
             end;
         until SaleLinePOSCoupon.Next() = 0;
 
@@ -162,6 +176,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         DiscountType: Integer;
     begin
         SaleLinePOSCoupon.SetRange("Register No.", SalePOS."Register No.");
@@ -183,10 +198,23 @@
         repeat
             DiscountType := SaleLinePOS."Discount Type";
 
-            SaleLinePOS.CalcFields("Coupon Discount Amount");
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+                SaleLinePOS.CalcFields("Coupon Disc. Amount Excl. VAT", "Coupon Disc. Amount Incl. VAT");
 
-            SaleLinePOS."Discount %" := 0;
-            SaleLinePOS."Discount Amount" := 0;
+                SaleLinePOS."Discount %" := 0;
+                if SaleLinePOS."Price Includes VAT" then
+                    SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Disc. Amount Incl. VAT"
+                else
+                    SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Disc. Amount Excl. VAT";
+
+                if SaleLinePOS."Discount Amount" > (SaleLinePOS."Unit Price" * SaleLinePOS.Quantity) then
+                    SaleLinePOS."Discount %" := 100;
+            end else begin
+                SaleLinePOS.CalcFields("Coupon Discount Amount");
+
+                SaleLinePOS."Discount %" := 0;
+                SaleLinePOS."Discount Amount" := 0;
+            end;
             SaleLinePOS.UpdateAmounts(SaleLinePOS);
             SaleLinePOS."Coupon Applied" := false;
             SaleLinePOS."Discount Type" := DiscountType;
@@ -198,6 +226,10 @@
         SaleLinePOSCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOSCoupon.SetRange("Sale Date", SalePOS.Date);
         SaleLinePOSCoupon.ModifyAll("Discount Amount", 0);
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+            SaleLinePOSCoupon.ModifyAll("Discount Amount Including VAT", 0);
+            SaleLinePOSCoupon.ModifyAll("Discount Amount Excluding VAT", 0);
+        end;
     end;
 
     #endregion Apply Discount
@@ -705,12 +737,18 @@
     internal procedure ScanCoupon(POSSession: Codeunit "NPR POS Session"; CouponReferenceNo: Text)
     var
         Coupon: Record "NPR NpDc Coupon";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         SaleLineOut: Codeunit "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
         ValidateCoupon(POSSession, CouponReferenceNo, Coupon);
 
         POSSession.GetSaleLine(SaleLineOut);
@@ -731,6 +769,15 @@
         SaleLinePOSCoupon."Coupon No." := Coupon."No.";
         SaleLinePOSCoupon.Description := Coupon.Description;
         SaleLinePOSCoupon."Discount Amount" := GetAmountPerQty(Coupon);
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then
+            if SaleLinePOS."Price Includes VAT" then begin
+                SaleLinePOSCoupon."Discount Amount Including VAT" := SaleLinePOSCoupon."Discount Amount";
+                SaleLinePOSCoupon."Discount Amount Excluding VAT" := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(SaleLinePOSCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+            end else begin
+                SaleLinePOSCoupon."Discount Amount Including VAT" := NPRPOSSaleTaxCalc.CalcAmountWithVAT(SaleLinePOSCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                SaleLinePOSCoupon."Discount Amount Excluding VAT" := SaleLinePOSCoupon."Discount Amount";
+            end;
+
         SaleLinePOSCoupon.Insert(true);
         POSSalesDiscountCalcMgt.OnAfterInsertSaleLinePOSCoupon(SaleLinePOSCoupon);
 
@@ -856,6 +903,8 @@
     end;
 
     local procedure InsertCouponEntry(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Quantity: Decimal; Coupon: Record "NPR NpDc Coupon"; var CouponEntry: Record "NPR NpDc Coupon Entry")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         CouponEntry.Init();
         CouponEntry."Entry No." := 0;
@@ -864,7 +913,10 @@
         CouponEntry."Coupon Type" := Coupon."Coupon Type";
         CouponEntry.Quantity := -Quantity;
         CouponEntry."Remaining Quantity" := -Quantity;
-        CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then
+            CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount Including VAT"
+        else
+            CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
         CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
         CouponEntry.Positive := CouponEntry.Quantity > 0;
         CouponEntry."Posting Date" := SaleLinePOSCoupon."Sale Date";

@@ -25,6 +25,7 @@
         DiscountAmountExcludingVAT: Decimal;
         DiscountAmount: Decimal;
         POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         CouponType.Get(SaleLinePOSCoupon."Coupon Type");
         if not FindExtraCouponItem(CouponType, ExtraCouponItem) then
@@ -103,6 +104,10 @@
             else
                 DiscountAmount := DiscountAmountExcludingVAT;
 
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+            end;
             SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
             SaleLinePOSCouponApply.Modify();
         end;
