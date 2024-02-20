@@ -1054,6 +1054,9 @@
         TicketAccessEntry.FindSet();
         repeat
 
+            if (TicketAccessEntry.Quantity = NewTicketQuantity) then
+                exit;
+
             TicketBom.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
 
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
@@ -1065,14 +1068,19 @@
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
             DetTicketAccessEntry.SetFilter(Quantity, '>0');
-            DetTicketAccessEntry.SetFilter("Closed By Entry No.", '=%1', 0);
-            if (not DetTicketAccessEntry.FindFirst()) then
+            if (not DetTicketAccessEntry.FindLast()) then
                 RaiseError(StrSubstNo(ENTRY_NOT_FOUND, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), ENTRY_NOT_FOUND_NO);
 
             OriginalQty := DetTicketAccessEntry.Quantity;
             ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
-            DetTicketAccessEntry.Quantity := NewTicketQuantity;
-            DetTicketAccessEntry.Modify();
+
+            if (DetTicketAccessEntry."Closed By Entry No." = 0) then begin // not paid
+                DetTicketAccessEntry.Quantity := NewTicketQuantity;
+                DetTicketAccessEntry.Modify();
+
+                TicketAccessEntry.Quantity := NewTicketQuantity;
+                TicketAccessEntry.Modify();
+            end;
 
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
             if (DetTicketAccessEntry.FindFirst()) then begin
@@ -1098,13 +1106,11 @@
                 ValidateTicketAdmissionCapacityExceeded(Ticket, AdmissionScheduleEntry."Entry No.", _TicketExecutionContext::SALES, AllowAdmissionOverAllocation);
             end;
 
-            TicketAccessEntry.Quantity := NewTicketQuantity;
-            TicketAccessEntry.Modify();
-
         until (TicketAccessEntry.Next() = 0);
 
-        TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
 
+        //-> TODO: this assumes base 1 as the sales quantity and since the input is quantity to admit and not a factor of the base quantity, this is not correct
+        TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
         TicketRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
