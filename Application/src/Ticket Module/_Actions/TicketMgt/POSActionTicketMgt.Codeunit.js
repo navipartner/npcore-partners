@@ -67,7 +67,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             caption: captions.TicketQtyPrompt.substitute(context.TicketMaxQty), 
             title: windowTitle
         });
-        if (!ticketQuantity) 
+        if (ticketQuantity === null) // cancel returns null
             return;
     }
     let ticketReference;
