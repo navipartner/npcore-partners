@@ -162,9 +162,9 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         OutStream: OutStream;
         RequestTextLine: Text;
     begin
-        TempBlob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         "Request Content".ExportStream(OutStream);
-        TempBlob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         while not InStream.EOS do begin
             InStream.ReadText(RequestTextLine);
             RequestText += RequestTextLine;
@@ -187,9 +187,9 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
             if TenantMedia.Get("Request Content".MediaId) then
                 TenantMedia.Delete(true);
 
-        TempBlob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
-        TempBlob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         "Request Content".ImportStream(InStream, FieldCaption("Request Content"));
     end;
 

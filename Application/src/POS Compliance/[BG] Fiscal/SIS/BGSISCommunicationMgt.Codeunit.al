@@ -191,8 +191,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         CustomerName: Text;
         CustomerVATNumber: Text;
     begin
-        if POSEntry."Customer No." <> '' then begin
-            CustomerIDNumberType := 0;
+        if POSEntry."Customer No." <> '' then
             if Customer.Get(POSEntry."Customer No.") then begin
                 CustomerAddress := Customer.Address;
                 CustomerCity := Customer.City;
@@ -200,8 +199,6 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
                 CustomerName := Customer.Name;
                 CustomerVATNumber := Customer."VAT Registration No.";
             end;
-        end else
-            CustomerIDNumberType := 1;
 
         if not EnterInvoiceDataForSaleAndRefund(CustomerIDNumberType, CustomerAddress, CustomerCity, CustomerID, CustomerName, CustomerVATNumber) then begin
             ExtendedReceipt := false;
