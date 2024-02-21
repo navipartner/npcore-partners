@@ -142,10 +142,11 @@ codeunit 6014544 "NPR RP Citizen CLP Device Lib." implements "NPR IMatrix Printe
         DotNetCharArray: Codeunit "DotNet_Array";
         DotNetByteArray: Codeunit "DotNet_Array";
         DotNetString: Codeunit "DotNet_String";
+        TypeHelper: Codeunit "Type Helper";
     begin
         //This function over allocates and is verbose, all because of the beautiful DotNet wrapper codeunits.
 
-        DotNetString.Set(String);
+        DotNetString.Set(String + TypeHelper.CRLFSeparator());
         DotNetString.ToCharArray(0, DotNetString.Length(), DotNetCharArray);
         _DotNetEncoding.GetBytes(DotNetCharArray, 0, DotNetCharArray.Length(), DotNetByteArray);
         _DotNetStream.Write(DotNetByteArray, 0, DotNetByteArray.Length());
