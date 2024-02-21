@@ -1377,20 +1377,7 @@
         if not POSEntry.Get(FromPosEntryNo) then
             exit;
         SetManualCashDrawerOpen(POSWorkshiftCheckpoint, POSEntry);
-
-        POSEntry.SetCurrentKey("POS Store Code", "POS Unit No.");
-        POSEntry.SetRange("POS Store Code", POSStoreCode);
-        POSEntry.SetRange("POS Unit No.", POSUnitNo);
-        POSEntry.SetFilter("Entry No.", '%1..', FromPosEntryNo);
-        POSEntry.SetRange("System Entry", false);
-        POSEntry.SetFilter("No. Printed Receipt Copies", '<>%1', 0);
-
-        POSWorkshiftCheckpoint."Receipt Copies Count" := POSEntry.Count();
-        if POSWorkshiftCheckpoint."Receipt Copies Count" = 0 then
-            exit;
-
-        POSEntry.CalcSums("Amount Incl. Tax");
-        POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" := POSEntry."Amount Incl. Tax";
+        SetReceiptCopyStatistics(POSWorkshiftCheckpoint, POSStoreCode, POSUnitNo, FromPosEntryNo);
     end;
 
     local procedure SetManualCashDrawerOpen(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FirstPOSEntry: Record "NPR POS Entry")
@@ -1403,6 +1390,40 @@
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
 
         POSWorkshiftCheckpoint."Cash Drawer Open Count" := POSAuditLog.Count();
+    end;
+
+    local procedure SetReceiptCopyStatistics(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSStoreCode: Code[10]; POSUnitNo: Code[10]; FromPosEntryNo: Integer)
+    var
+        POSEntryReceiptCopies: Query "NPR POS Entry Receipt Copies";
+    begin
+        if not ReceiptCopyStatisticsEnabled(POSStoreCode, POSUnitNo) then
+            exit;
+
+        POSEntryReceiptCopies.SetRange(POSStoreCode, POSStoreCode);
+        POSEntryReceiptCopies.SetRange(POSUnitNo, POSUnitNo);
+        POSEntryReceiptCopies.SetFilter(POSEntryNo, '%1..', FromPosEntryNo);
+        if not POSEntryReceiptCopies.Open() then
+            exit;
+        if POSEntryReceiptCopies.Read() then begin
+            POSWorkshiftCheckpoint."Receipt Copies Count" := POSEntryReceiptCopies.NoOfReceiptCopies;
+            POSWorkshiftCheckpoint."Receipt Copies Sales (LCY)" := POSEntryReceiptCopies.AmountInclTax;
+        end;
+        POSEntryReceiptCopies.Close();
+    end;
+
+    local procedure ReceiptCopyStatisticsEnabled(POSStoreCode: Code[10]; POSUnitNo: Code[10]): Boolean
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        Calculate: Boolean;
+        Handled: Boolean;
+    begin
+        if not POSUnit.Get(POSUnitNo) then
+            Clear(POSUnit);
+        POSUnit.GetProfile(POSAuditProfile);
+
+        OnDefineIfReceiptCopyStatisticsMustBeCalculated(POSStoreCode, POSUnitNo, POSAuditProfile."Audit Handler", Calculate, Handled);
+        exit(Calculate);
     end;
 
     local procedure UpdateWorkshiftCheckpoint(var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
@@ -1419,6 +1440,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateBalancingEntry(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDefineIfReceiptCopyStatisticsMustBeCalculated(POSStoreCode: Code[10]; POSUnitNo: Code[10]; AuditHandler: Code[20]; var Calculate: Boolean; var Handled: Boolean)
     begin
     end;
 }
