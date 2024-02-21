@@ -1570,6 +1570,15 @@ codeunit 6184850 "NPR FR Audit Mgt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnDefineIfReceiptCopyStatisticsMustBeCalculated', '', false, false)]
+    local procedure EOD_CalcReceiptCopyStatistics(AuditHandler: Code[20]; var Calculate: Boolean; var Handled: Boolean)
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+        Calculate := true;
+        Handled := true;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDownloadArchive(TempBlob: Codeunit "Temp Blob"; var Handled: Boolean)
     begin

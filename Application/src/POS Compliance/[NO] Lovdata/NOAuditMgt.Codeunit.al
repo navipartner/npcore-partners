@@ -57,6 +57,15 @@ codeunit 6151548 "NPR NO Audit Mgt."
     begin
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Workshift Checkpoint", 'OnDefineIfReceiptCopyStatisticsMustBeCalculated', '', false, false)]
+    local procedure EOD_CalcReceiptCopyStatistics(AuditHandler: Code[20]; var Calculate: Boolean; var Handled: Boolean)
+    begin
+        if AuditHandler <> HandlerCode() then
+            exit;
+        Calculate := true;
+        Handled := true;
+    end;
     #endregion
 
     #region Subscribers - POS Audit Logging
