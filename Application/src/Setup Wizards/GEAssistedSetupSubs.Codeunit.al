@@ -31,7 +31,7 @@
     begin
         AssistedSetup.Add(GetAppId(), Codeunit::"NPR Welcome Video", POSStoresSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Download&Import Data", ProfilesSetupTxt, AssistedSetupGroup::NPRetail);
-        AssistedSetup.Add(GetAppId(), Page::"NPR Create Retail Vchr. Types", RetailVouchersSetupTxt, AssistedSetupGroup::NPRetail);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Modify Retail Vchr. Types", RetailVouchersSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Create POS Stores & Units", POSUnitsSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Modify POS Posting Profile", POSPayBinsSetupTxt, AssistedSetupGroup::NPRetail);
         AssistedSetup.Add(GetAppId(), Page::"NPR Modify POS Payment Methods", POSPayMethodsSetupTxt, AssistedSetupGroup::NPRetail);
@@ -177,7 +177,7 @@
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Salespeople");
-        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Retail Vchr. Types");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Retail Vchr. Types");
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -185,7 +185,7 @@
         CreateWelcomeVideoExperience();
         DownloadAndImportDataWizard();
         CreatePOSstoresAndUnitsWizard();
-        CreateRetailVouchersTypesWizard();
+        ModifyRetailVouchersTypesWizard();
         ModifyPOSPostingProfileWizard();
         ModifyPOSpaymentMethodsWizard();
         ModifyPOSPostingSetupWizard();
@@ -452,7 +452,7 @@
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Codeunit, Codeunit::"NPR Welcome Video", 1100, TempAllProfile, false);
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Download&Import Data", 1101, TempAllProfile, false);
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create POS Stores & Units", 1102, TempAllProfile, false);
-        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Create Retail Vchr. Types", 1103, TempAllProfile, false);
+        Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Retail Vchr. Types", 1103, TempAllProfile, false);
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Profile", 1104, TempAllProfile, false);
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Payment Methods", 1105, TempAllProfile, false);
         Checklist.Insert("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Modify POS Posting Setup", 1106, TempAllProfile, false);
@@ -808,29 +808,29 @@
         Checklist.InitializeGuidedExperienceItems();
     end;
 
-    local procedure CreateRetailVouchersTypesWizard()
+    local procedure ModifyRetailVouchersTypesWizard()
     var
         GuidedExperience: Codeunit "Guided Experience";
         GuidedExperienceType: Enum "Guided Experience Type";
         AssistedSetupGroup: Enum "Assisted Setup Group";
         VideoCategory: Enum "Video Category";
-        WizardNameLbl: Label 'Create Retail Voucher Types', Locked = true;
-        SetupDescriptionTxt: Label 'Create Retail Voucher Types', Locked = true;
+        WizardNameLbl: Label 'Modify Retail Voucher Types', Locked = true;
+        SetupDescriptionTxt: Label 'Modify Retail Voucher Types', Locked = true;
     begin
-        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Create Retail Vchr. Types") then
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Modify Retail Vchr. Types") then
             GuidedExperience.InsertAssistedSetup(WizardNameLbl,
                                                 WizardNameLbl,
                                                 SetupDescriptionTxt,
                                                 2,
                                                 ObjectType::Page,
-                                                Page::"NPR Create Retail Vchr. Types",
+                                                Page::"NPR Modify Retail Vchr. Types",
                                                 AssistedSetupGroup::NPRetail,
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"NPR Create Retail Vchr. Types", 'OnAfterFinishStep', '', false, false)]
+    [EventSubscriber(ObjectType::Page, Page::"NPR Modify Retail Vchr. Types", 'OnAfterFinishStep', '', false, false)]
     local procedure CreateRetailVchrTypesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
     begin
         if AnyDataToCreate then
@@ -841,7 +841,7 @@
     var
         GuidedExperience: Codeunit "Guided Experience";
     begin
-        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Create POS Stores & Units");
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Modify Retail Vchr. Types");
     end;
 
     #endregion
@@ -1070,7 +1070,7 @@
         case Modul of
             Modul::Retail:
                 //For Any change, increase version
-                exit('NPR-Checklist-v1.5');
+                exit('NPR-Checklist-v1.6');
             Modul::Restaurant:
                 //For Any change, increase version
                 exit('NPR-Checklist-Restaurant-v1.5');
@@ -1085,7 +1085,7 @@
         case Modul of
             Modul::Retail:
                 //For Any change, increase version
-                exit('NPR-AssistedSetup-v1.2');
+                exit('NPR-AssistedSetup-v1.3');
             Modul::Restaurant:
                 //For Any change, increase version
                 exit('NPR-AssistedSetup-Restaurant-v1.5');

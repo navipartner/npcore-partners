@@ -1,11 +1,8 @@
-page 6150792 "NPR Create Retail Vchr. Types"
+page 6150821 "NPR Modify Retail Vchr. Types"
 {
     Caption = 'Modify Retail Voucher Types';
     PageType = NavigatePage;
     Extensible = false;
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
-    ObsoleteReason = 'Not used anymore. Retail wizard was modified. Replaced with "NPR Modify Retail Vchr. Types".';
 
     layout
     {
