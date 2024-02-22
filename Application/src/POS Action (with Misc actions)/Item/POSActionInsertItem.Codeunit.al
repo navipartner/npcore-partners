@@ -377,7 +377,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSStore: Record "NPR POS Store";
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
-        POSActionInsertItem: Codeunit "NPR POS Action: Insert Item";
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         POSSession: Codeunit "NPR POS Session";
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
@@ -391,14 +390,14 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         RequiresSerialNoInputPrompt: Boolean;
         RequiresAdditionalInformationCollection: Boolean;
         SimpleInsertCanBeExecuted: Boolean;
-        AdditionalWorkflowsFound: Boolean;
+        PostworkflowSubscriptionExists: Boolean;
         BOMComponentsNeedSerialNoInput: Boolean;
         InputSerial: Text[50];
     begin
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        AdditionalWorkflowsFound := POSActionInsertItem.AddPostWorkflowsToRun(Context, SaleLinePOS).Keys.Count <> 0;
+        PostworkflowSubscriptionExists := CheckPostworkflowSubscriptionExists();
 
         Item.SetLoadFields("NPR Explode BOM auto", "Assembly BOM", "NPR Group sale", "Item Category Code", "Price Includes VAT", "VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group", "NPR Item Addon No.");
         Item.SetAutoCalcFields("Assembly BOM");
@@ -410,7 +409,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if Item."Assembly BOM" and Item."NPR Explode BOM auto" then
             BOMComponentsNeedSerialNoInput := POSActionInsertItemB.CheckBOMComponentsNeedSerialNoInput(Item);
 
-        SimpleInsertCanBeExecuted := (not AdditionalWorkflowsFound) and (not RequiresAdditionalInformationCollection) and (not ifAddItemAddOns(Item)) and (not BOMComponentsNeedSerialNoInput);
+        SimpleInsertCanBeExecuted := (not PostworkflowSubscriptionExists) and (not RequiresAdditionalInformationCollection) and (not ifAddItemAddOns(Item)) and (not BOMComponentsNeedSerialNoInput);
         ItemProcessingEvents.OnBeforeSimpleInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitPrice, SkipItemAvailabilityCheck, SerialSelectionFromList, UsePresetUnitPrice, Setup, FrontEnd, Response, Success, SimpleInsertCanBeExecuted);
         if not SimpleInsertCanBeExecuted then
             exit;
@@ -436,6 +435,18 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
 
         Success := true;
+    end;
+
+    internal procedure CheckPostworkflowSubscriptionExists() PostworkflowSubscriptionExists: Boolean;
+    var
+        EventSubscription: Record "Event Subscription";
+    begin
+        EventSubscription.Reset();
+        EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+        EventSubscription.SetRange("Publisher Object ID", Codeunit::"NPR POS Act. Insert Item Event");
+        EventSubscription.SetRange("Published Function", 'OnAddPostWorkflowsToRun');
+        EventSubscription.SetRange(Active, true);
+        PostworkflowSubscriptionExists := not EventSubscription.IsEmpty();
     end;
 
     internal procedure AddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; SaleLinePOS: Record "NPR POS Sale Line") PostWorkflows: JsonObject
