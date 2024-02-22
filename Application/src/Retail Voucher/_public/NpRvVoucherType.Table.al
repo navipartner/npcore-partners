@@ -212,6 +212,12 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1030; "Return Voucher Type"; Code[20])
+        {
+            Caption = 'Return Voucher Type';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpRv Ret. Vouch. Type";
+        }
     }
 
     keys
