@@ -84,7 +84,7 @@
 
         if FindBestMixedDiscount then begin
             if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
-                MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate)
+                MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate)
             else
                 MixedDiscountMgt.FindPotentiallyImpactedMixesAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, true, CalculationDate);
 
