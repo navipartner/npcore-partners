@@ -23,7 +23,6 @@ query 6014430 "NPR Item Sales Postings"
             }
             column(SalesLCY; "Sales Amount (Actual)")
             {
-                ColumnFilter = SalesLCY = filter(> 0);
                 Method = Sum;
             }
             column(DiscountAmount; "Discount Amount")
