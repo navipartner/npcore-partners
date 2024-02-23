@@ -26,7 +26,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
                 NcTask.Modify();
         end;
 
-        NoOfMinutesBetweenRuns := 10;
+        NoOfMinutesBetweenRuns := 1;
 
         JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTask."Task Processor Code", true, '', NoOfMinutesBetweenRuns);
     end;
