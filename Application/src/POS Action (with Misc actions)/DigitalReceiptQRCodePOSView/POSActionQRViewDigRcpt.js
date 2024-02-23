@@ -1,11 +1,11 @@
 let main = async ({ workflow }) => {
   debugger;
-  let { qrCodeText, timeoutIntervalSec } = await workflow.respond();
+  let { qrCodeText, timeoutIntervalSec, footerText } = await workflow.respond();
   if (qrCodeText) {
     let dialogRef = await popup.open({
       size: {
-        width: "450px",
-        height: "500px",
+        width: "500px",
+        height: "550px",
       },
       noScroll: true,
       isSupportedOnMobile: true,
@@ -23,7 +23,7 @@ let main = async ({ workflow }) => {
         {
           id: "html",
           type: "html",
-          html: "<div style='text-align: center; margin-top: 30px'><img src='data:image/png;base64," + qrCodeText + "' width='300' height='300'/></div>",
+          html: "<div style='text-align: center; margin-top: 30px'><img src='data:image/png;base64," + qrCodeText + "' width='300' height='300'/></div><br>" + footerText,
           className: "qrcode-dialog-html",
         }
       ],
