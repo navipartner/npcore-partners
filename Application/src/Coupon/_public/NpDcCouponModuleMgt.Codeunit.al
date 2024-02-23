@@ -64,5 +64,10 @@
     internal procedure OnBeforeValidateCoupon(var ReferenceNo: Text)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterSendVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; SalePOS: Record "NPR POS Sale")
+    begin
+    end;
 }
 
