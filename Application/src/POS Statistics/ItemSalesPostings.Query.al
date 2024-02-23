@@ -17,7 +17,7 @@ query 6014430 "NPR Item Sales Postings"
             filter(PostingDate; "Posting Date") { }
             column(SalesQty; "Invoiced Quantity")
             {
-                ColumnFilter = SalesQty = filter(> 0);
+                ColumnFilter = SalesQty = filter(<> 0);
                 Method = Sum;
                 ReverseSign = true;
             }
