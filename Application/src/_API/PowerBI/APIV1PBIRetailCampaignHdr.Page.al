@@ -37,16 +37,7 @@ page 6150868 "NPR APIV1 PBIRetailCampaignHdr"
             }
         }
     }
-
 #IF NOT (BC17 or BC18 or BC19 or BC20)
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
 #ENDIF
