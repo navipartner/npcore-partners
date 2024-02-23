@@ -138,14 +138,7 @@ page 6060037 "NPR APIV1 PBIPurchase Header"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
+
 }

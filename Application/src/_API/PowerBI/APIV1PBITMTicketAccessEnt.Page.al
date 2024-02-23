@@ -80,14 +80,6 @@ page 6059968 "NPR APIV1 PBITMTicketAccessEnt"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }

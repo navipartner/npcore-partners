@@ -115,15 +115,6 @@ page 6060035 "NPR APIV1 PBIG/L Budget Entry"
             }
         }
     }
-
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     trigger OnAfterGetRecord()
     begin
         DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
