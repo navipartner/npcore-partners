@@ -55,15 +55,6 @@ page 6150780 "NPR APIV1 PBISalesHeader"
             }
         }
     }
-
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }

@@ -140,14 +140,6 @@ page 6059925 "NPR APIV1 PBIGLEntry"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     trigger OnAfterGetRecord()
     begin
         DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);

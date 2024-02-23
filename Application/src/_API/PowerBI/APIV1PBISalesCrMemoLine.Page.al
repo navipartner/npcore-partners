@@ -83,15 +83,6 @@ page 6150778 "NPR APIV1 PBISalesCrMemoLine"
             }
         }
     }
-
-    trigger OnOpenPage()
-    var
-        CurrRecordRef: RecordRef;
-    begin
-        CurrRecordRef.GetTable(Rec);
-        PowerBIUtils.UpdateSystemModifiedAtfilter(CurrRecordRef);
-    end;
-
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }
