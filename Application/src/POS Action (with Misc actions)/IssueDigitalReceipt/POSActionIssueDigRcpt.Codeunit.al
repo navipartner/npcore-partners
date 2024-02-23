@@ -25,6 +25,7 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
     var
         LastSalePOSEntry: Record "NPR POS Entry";
         DigitalReceiptLink: Text;
+        FooterText: Text;
         SalesTicketNoText: Text;
     begin
         if not Context.GetStringParameter('salesTicketNo', SalesTicketNoText) then
@@ -35,16 +36,17 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
             SalesTicketNoText := LastSalePOSEntry."Document No.";
         end;
 #pragma warning disable AA0139
-        POSActionIssueDigRcptB.CreateDigitalReceipt(SalesTicketNoText, DigitalReceiptLink);
+        POSActionIssueDigRcptB.CreateDigitalReceipt(SalesTicketNoText, DigitalReceiptLink, FooterText);
 #pragma warning restore AA0139
         Response.Add('digitalReceiptLink', DigitalReceiptLink);
+        Response.Add('footerText', FooterText);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionIssueDigRcpt.js###
-'let main=async({workflow:e})=>{debugger;let{digitalReceiptLink:a}=await e.respond();a&&await e.run("VIEW_DIG_RCPT_QRCODE",{parameters:{qrCodeLink:a}})};'
+'let main=async({workflow:e})=>{debugger;let{digitalReceiptLink:t,footerText:a}=await e.respond();t&&await e.run("VIEW_DIG_RCPT_QRCODE",{parameters:{qrCodeLink:t,footerText:a}})};'
         );
     end;
 }
