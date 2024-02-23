@@ -61,6 +61,8 @@
         if ShowAutoCreatedClause then
             JobQueueDescription := StrSubstNo(GetAutoRecreateNoteTxt(), JobQueueDescription);
 
+        SetJobTimeout(4, 0);  //4 hours
+
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             NcSetupMgt.TaskListProcessingCodeunit(),
