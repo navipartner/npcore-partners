@@ -2,7 +2,7 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
 {
     Access = Internal;
 
-    internal procedure CreateDigitalReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text)
+    internal procedure CreateDigitalReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text; var FooterText: Text)
     var
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
@@ -58,5 +58,14 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
         FiskalyAPI.CreatePOSSaleDigitalReceiptEntry(TempPOSSaleDigitalReceiptEntry);
 
         DigitalReceiptLink := TempPOSSaleDigitalReceiptEntry."QR Code Link";
+        FooterText := SetFooterText();
     end;
+
+    internal procedure SetFooterText() FooterText: Text
+    var
+        FooterTextLabel: Label '<div style="text-align: center; margin-top: 10px">By using the digital receipt you agree to Fiskaly''s <a href="https://www.fiskaly.com/legal-terms-of-use" target="_blank">terms</a> and conditions.</div>', Locked = true;
+    begin
+        FooterText := FooterTextLabel;
+    end;
+
 }

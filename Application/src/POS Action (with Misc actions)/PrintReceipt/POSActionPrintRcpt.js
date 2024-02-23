@@ -10,8 +10,8 @@ let main = async ({ workflow, popup, parameters, captions }) => {
             return (" ")
         }
     }
-   const{ qrCodeLink } = await workflow.respond("ManualReceiptNo",{ManualReceiptNo: result});
+   const{ qrCodeLink, footerText } = await workflow.respond("ManualReceiptNo",{ManualReceiptNo: result});
    if (qrCodeLink){
-    await workflow.run('VIEW_DIG_RCPT_QRCODE', { parameters: { qrCodeLink: qrCodeLink } });
+    await workflow.run('VIEW_DIG_RCPT_QRCODE', { parameters: { qrCodeLink: qrCodeLink, footerText: footerText } });
    }
 }

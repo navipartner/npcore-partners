@@ -92,7 +92,7 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintRcpt.js###
-'let main=async({workflow:e,popup:o,parameters:i,captions:t})=>{debugger;if(!(i["Issue Digital Receipts"]||i["Print Physical Receipts"]))return;if(i.SelectionDialogType==i.SelectionDialogType.TextField&&(i.Setting==i.Setting["Choose Receipt"]||i.Setting==i.Setting["Choose Receipt Large"])){var n=await o.input({title:t.Title,caption:t.EnterReceiptNoLbl,value:""});if(n==null)return" "}const{qrCodeLink:l}=await e.respond("ManualReceiptNo",{ManualReceiptNo:n});l&&await e.run("VIEW_DIG_RCPT_QRCODE",{parameters:{qrCodeLink:l}})};'
+'let main=async({workflow:i,popup:l,parameters:e,captions:t})=>{debugger;if(!(e["Issue Digital Receipts"]||e["Print Physical Receipts"]))return;if(e.SelectionDialogType==e.SelectionDialogType.TextField&&(e.Setting==e.Setting["Choose Receipt"]||e.Setting==e.Setting["Choose Receipt Large"])){var n=await l.input({title:t.Title,caption:t.EnterReceiptNoLbl,value:""});if(n==null)return" "}const{qrCodeLink:o,footerText:c}=await i.respond("ManualReceiptNo",{ManualReceiptNo:n});o&&await i.run("VIEW_DIG_RCPT_QRCODE",{parameters:{qrCodeLink:o,footerText:c}})};'
         );
     end;
 
@@ -162,11 +162,16 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
     local procedure PrepareDigitalReceiptWorkflow(IssueDigitalReceipts: Boolean; SalesTicketNo: Code[20]) DigitalReceiptParameters: JsonObject
     var
         BusinessLogicRun: Codeunit "NPR POS Action: Print Rcpt.-B";
+        FooterTextMgt: Codeunit "NPR POS Action: IssueDigRcpt B";
         QrCodeLink: Text;
+        FooterText: Text;
     begin
-        if IssueDigitalReceipts then
+        if IssueDigitalReceipts then begin
             QrCodeLink := BusinessLogicRun.GetDigitalReceiptQRCodeLink(SalesTicketNo);
+            FooterText := FooterTextMgt.SetFooterText();
+        end;
         DigitalReceiptParameters.Add('qrCodeLink', QrCodeLink);
+        DigitalReceiptParameters.Add('footerText', FooterText)
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]
