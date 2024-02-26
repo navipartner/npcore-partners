@@ -22,7 +22,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     procedure PosEndOfSale_GenericAward()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
 
         Item: Record Item;
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
@@ -40,7 +40,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.Find();
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -54,7 +54,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     procedure PosEndOfSale_ItemRule_NotApplicable()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
 
         Item: Record Item;
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
@@ -87,7 +87,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -103,7 +103,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     procedure PosEndOfSale_ItemRule_Amount()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
 
         Item: Record Item;
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
@@ -135,7 +135,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -151,7 +151,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     procedure PosEndOfSale_ItemRule_AmountItemPoints()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
 
         Item: Record Item;
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
@@ -183,7 +183,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _LastMembership.TestField("Awarded Points (Sale)", 0);
 
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -198,8 +198,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     procedure PosEndOfSale_ItemRule_ItemPoints()
     var
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
-
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
         Item: Record Item;
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
@@ -232,7 +231,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         _Assert.AreEqual(0, _LastMembership."Awarded Points (Refund)", 'Unexpected initial value.');
         // Sale
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, UnitPrice, '');
@@ -244,7 +243,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         // Refund
         InitializeSales();
         LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", -1);
-        if (not POSActionMemberMgt.SelectMembership(_POSSession, DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", '')) then
+        if POSActionMemberMgt.SelectMembership(DialogMethod::NO_PROMPT, _LastMemberCard."External Card No.", false) = 0 then
             Error('Error assigning membership to sales.');
 
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, -1 * UnitPrice, '');
@@ -267,7 +266,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText : Text;
+        RequestXmlText: Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -304,7 +303,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
         ImportEntry: Record "NPR Nc Import Entry";
-        RequestXmlText : Text;
+        RequestXmlText: Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -339,7 +338,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        RequestXmlText : Text;
+        RequestXmlText: Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;
@@ -423,7 +422,7 @@ codeunit 85107 "NPR MM Loyalty Test"
         TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
         TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        RequestXmlText : Text;
+        RequestXmlText: Text;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         DocumentId: Text;

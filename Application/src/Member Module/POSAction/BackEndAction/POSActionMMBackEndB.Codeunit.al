@@ -4,8 +4,7 @@ codeunit 6150819 "NPR POS Action: MM BackEnd B"
 
     procedure CreateMember(ItemNumber: Code[20]; POSSetup: Codeunit "NPR POS Setup")
     var
-        POSActionMemberMgmt: Codeunit "NPR MM POS Action: MemberMgmt.";
-        POSSession: Codeunit "NPR POS Session";
+        POSActionMemberMgmt: Codeunit "NPR POS Action Member MgtWF3-B";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSStore: Record "NPR POS Store";
         CardNumber: Text[100];
@@ -19,7 +18,7 @@ codeunit 6150819 "NPR POS Action: MM BackEnd B"
 
         if (CardNumber <> '') then
             if (Confirm(AssignToSale, true)) then
-                POSActionMemberMgmt.SelectMembership(POSSession, 2, CardNumber, ''); //2 == NoPrompt
+                POSActionMemberMgmt.SelectMembership(2, CardNumber, false); //2 == NoPrompt
     end;
 
     local procedure CreateMembership(MemberSalesSetupItemNumber: Code[20]; SalespersonCode: Code[20]; StoreCode: Code[20]) ExternalCardNumber: Text[100];
