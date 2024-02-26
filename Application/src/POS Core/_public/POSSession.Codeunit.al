@@ -29,9 +29,6 @@
         _ServerStopwatch: Text;
         _POSPageId: Guid;
         _ACTION_STATE_ERROR: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
-#if not CLOUD
-        _Stargate: Codeunit "NPR POS Stargate Management";
-#endif
         _SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
         _SESSION_FINALIZED_ERROR: Label 'This POS window is no longer active.\This happens if you''ve opened the POS in a newer window. Please use that instead or reload this one.';
         _POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
@@ -52,9 +49,6 @@
         _POSPageId := PageId;
 
         _FrontEnd.Initialize();
-#if not CLOUD
-        Clear(_Stargate);
-#endif
         _Setup.Initialize();
         _Setup.GetPOSUnit(_POSUnit);
 
@@ -165,10 +159,6 @@
             UI.InitializeMenus(_POSUnit, Salesperson);
             DebugWithTimestamp('InitializeTheme');
             UI.InitializeTheme(_POSUnit);
-#if not CLOUD
-            DebugWithTimestamp('AdvertiseStargatePackages');
-            _FrontEnd.AdvertiseStargatePackages();
-#endif
         end;
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         UI.ConfigureReusableWorkflows(_Setup);
@@ -627,16 +617,6 @@
     begin
         exit(_DragonglassResponseQueue.PopQueuedRequests());
     end;
-
-
-#if not CLOUD
-    [Obsolete('Remove when stargate is gone', 'NPR23.0')]
-    procedure GetStargate(var StargateOut: Codeunit "NPR POS Stargate Management")
-    begin
-        ErrorIfNotInitialized();
-        StargateOut := _Stargate;
-    end;
-#endif
 
     [Obsolete('Remove when obsolete references are gone. Workflow v3 only supports nesting on frontend inside the javascript', 'NPR23.0')]
     procedure IsInAction(): Boolean

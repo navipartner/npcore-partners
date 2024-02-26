@@ -1,12 +1,12 @@
-﻿#if not CLOUD
-table 6150714 "NPR POS Stargate Pckg. Method"
+﻿table 6150714 "NPR POS Stargate Pckg. Method"
 {
     Access = Internal;
     Caption = 'POS Stargate Package Method';
     DataClassification = CustomerContent;
     DataPerCompany = false;
-    DrillDownPageID = "NPR POS Stargate Pckg Method";
-    LookupPageID = "NPR POS Stargate Pckg Method";
+    ObsoleteState = Removed;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'Stargate is replaced by hardware connector';
 
     fields
     {
@@ -36,4 +36,3 @@ table 6150714 "NPR POS Stargate Pckg. Method"
     {
     }
 }
-#endif

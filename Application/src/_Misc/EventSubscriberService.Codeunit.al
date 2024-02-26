@@ -13,9 +13,6 @@
         RegisterNpGpPOSSalesSetup(ServiceConnection);
         RegisterPrintNodeSetup(ServiceConnection);
         RegisterMMLoyStoreSetupServer(ServiceConnection);
-#if not CLOUD
-        RegisterDependencyMgtSetup(ServiceConnection);
-#endif
     end;
 
     local procedure RegisterSMSSetup(var ServiceConnection: Record "Service Connection")
@@ -113,24 +110,6 @@
             ServiceConnection, RaptorSetup.RecordId, ServiceNameRaptorLbl,
             HostName, PAGE::"NPR Raptor Setup");
     end;
-
-#if not CLOUD
-    local procedure RegisterDependencyMgtSetup(var ServiceConnection: Record "Service Connection")
-    var
-        DependencyMagtSetup: Record "NPR Dependency Mgt. Setup";
-        ServiceNameDepMgtLbl: Label 'Dependency Management Setup';
-        HostName: Text;
-    begin
-        HostName := '';
-        if not DependencyMagtSetup.Get() then begin
-            DependencyMagtSetup.Init();
-            DependencyMagtSetup.Insert();
-        end;
-        ServiceConnection.InsertServiceConnection(
-            ServiceConnection, DependencyMagtSetup.RecordId, ServiceNameDepMgtLbl,
-            HostName, PAGE::"NPR Dependency Mgt. Setup");
-    end;
-#endif
 #pragma warning restore
 }
 
