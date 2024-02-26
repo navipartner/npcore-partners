@@ -126,6 +126,32 @@
 
     #endregion
 
+    #region GDPR
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnBeforeAnonymizeMember(var Member: Record "NPR MM Member");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnBeforeAnonymizeMemberCard(var Member: Record "NPR MM Member Card");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnBeforeAnonymizeRole(var MembershipRole: Record "NPR MM Membership Role");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnBeforeAnonymizeMembership(var Membership: Record "NPR MM Membership");
+    begin
+    end;
+    #endregion
+
     [IntegrationEvent(false, false)]
     procedure OnAfterCreateMemberSoapRequest(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var XmlDoc: XmlDocument; SOAPAction: Text)
     begin

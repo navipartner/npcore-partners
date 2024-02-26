@@ -308,12 +308,14 @@
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
 #pragma warning disable AA0240
         DummyEMailAddressLbl: Label '%1@anon.%2.navipartner.com', Locked = true;
 #pragma warning restore
     begin
 
         Member.Get(MemberEntryNo);
+        MembershipEvents.OnBeforeAnonymizeMember(Member);
 
         Member."First Name" := '------';
         Member."Middle Name" := '-';
@@ -344,6 +346,7 @@
         MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         if (MemberCard.FindSet()) then begin
             repeat
+                MembershipEvents.OnBeforeAnonymizeMemberCard(MemberCard);
                 MemberCard.Blocked := true;
                 MemberCard."Blocked At" := CurrentDateTime();
                 MemberCard."Blocked By" := GetUserId();
@@ -356,15 +359,18 @@
     local procedure DoAnonymizeRole(var MembershipRole: Record "NPR MM Membership Role")
     var
         Contact: Record Contact;
+        MembershipEvents: Codeunit "NPR MM Membership Events";
     begin
+
+        MembershipEvents.OnBeforeAnonymizeRole(MembershipRole);
+
+        MembershipRole."User Logon ID" := '--------';
+        MembershipRole."Password Hash" := 'NO_PWD';
 
         MembershipRole.Blocked := true;
         MembershipRole."Blocked At" := CurrentDateTime();
         MembershipRole."Blocked By" := GetUserId();
         MembershipRole."Block Reason" := MembershipRole."Block Reason"::ANONYMIZED;
-
-        MembershipRole."User Logon ID" := '--------';
-        MembershipRole."Password Hash" := 'NO_PWD';
 
         if (MembershipRole."Contact No." <> '') then begin
             if (Contact.Get(MembershipRole."Contact No.")) then begin
@@ -377,9 +383,11 @@
     local procedure DoAnonymizeMembership(MembershipEntryNo: Integer)
     var
         Membership: Record "NPR MM Membership";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
     begin
 
         Membership.Get(MembershipEntryNo);
+        MembershipEvents.OnBeforeAnonymizeMembership(Membership);
 
         Membership.Description := '';
         Membership."Company Name" := '';
