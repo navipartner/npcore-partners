@@ -168,15 +168,21 @@ codeunit 6151356 "NPR POSAct. RV Save LayoutB"
     var
         Restaurant: Record "NPR NPRE Restaurant";
         SeatingLocation: Record "NPR NPRE Seating Location";
+        NewSeatingLocationCode: Code[10];
+        AlreadyExistsErr: Label 'Another seating location with the same ID (%1) already exists.';
     begin
-        if SeatingLocation.Get(CopyStr(JsonHelper.GetJCode(ComponentObject, 'id', true), 1, MaxStrLen(SeatingLocation.Code))) then begin
-            ModifyLocation(ComponentObject);
-            exit;
-        end;
+        NewSeatingLocationCode := CopyStr(JsonHelper.GetJCode(ComponentObject, 'id', true), 1, MaxStrLen(SeatingLocation.Code));
+        if NewSeatingLocationCode = '' then
+#pragma warning disable AA0139        
+            NewSeatingLocationCode := GenerateRandomCode(4, MaxStrLen(SeatingLocation.Code), Database::"NPR NPRE Seating Location")
+#pragma warning restore AA0139            
+        else
+            if SeatingLocation.Get(NewSeatingLocationCode) then
+                Error(AlreadyExistsErr, NewSeatingLocationCode);
 
         Restaurant.Get(CopyStr(JsonHelper.GetJCode(ComponentObject, 'restaurantId', true), 1, MaxStrLen(SeatingLocation."Restaurant Code")));
 
-        SeatingLocation.Code := SeatingLocation.Code;
+        SeatingLocation.Code := NewSeatingLocationCode;
         SeatingLocation.Description := CopyStr(JsonHelper.GetJText(ComponentObject, 'caption', false), 1, MaxStrLen(SeatingLocation.Description));
         SeatingLocation."Restaurant Code" := Restaurant.Code;
         SeatingLocation.TestField(Code);
@@ -187,13 +193,19 @@ codeunit 6151356 "NPR POSAct. RV Save LayoutB"
     local procedure ModifyLocation(ComponentObject: JsonToken)
     var
         SeatingLocation: Record "NPR NPRE Seating Location";
-        Restaurant: Record "NPR NPRE Restaurant";
     begin
         if not SeatingLocation.Get(CopyStr(JsonHelper.GetJCode(ComponentObject, 'id', true), 1, MaxStrLen(SeatingLocation.Code))) then begin
-            ModifyLocation(ComponentObject);
+            NewLocation(ComponentObject);
             exit;
         end;
 
+        ModifyLocation(ComponentObject, SeatingLocation);
+    end;
+
+    local procedure ModifyLocation(ComponentObject: JsonToken; var SeatingLocation: Record "NPR NPRE Seating Location")
+    var
+        Restaurant: Record "NPR NPRE Restaurant";
+    begin
         Restaurant.Get(CopyStr(JsonHelper.GetJCode(ComponentObject, 'restaurantId', true), 1, MaxStrLen(SeatingLocation."Restaurant Code")));
 
         SeatingLocation.Description := CopyStr(JsonHelper.GetJText(ComponentObject, 'caption', false), 1, MaxStrLen(SeatingLocation.Description));
@@ -253,6 +265,63 @@ codeunit 6151356 "NPR POSAct. RV Save LayoutB"
     begin
         if RestaurantCode <> '' then
             _UpdatedRestaurantCode := RestaurantCode;
+    end;
+
+    local procedure GenerateRandomCode(MinLength: Integer; MaxLength: Integer; TableID: Integer) Result: Text
+    var
+        NpRegEx: Codeunit "NPR RegEx";
+        Counter: Integer;
+        MaxPossibleLength: Integer;
+        FailedToGenerateLbl: Label 'The system has failed to generate a unique ID for your new record. Please try again or contact your system administrator if the problem persists.';
+    begin
+        if MinLength < 1 then
+            MinLength := 1;
+        if MaxLength < MinLength then
+            MaxLength := MinLength;
+        MaxPossibleLength := MaxCodeLength(TableID);
+        If (MaxLength < 1) or (MaxLength > MaxPossibleLength) then begin
+            MaxLength := MaxPossibleLength;
+            if MinLength > MaxLength then
+                MinLength := MaxLength;
+        end;
+
+        for Counter := 1 to MinLength do
+            Result += Format(NpRegEx.GenerateRandomChar());
+
+        if TableID = 0 then
+            exit;
+
+        while RecordExists(Result, TableID) and (Counter <= MaxLength) do begin
+            Counter += 1;
+            if Counter > MaxLength then
+                Error(FailedToGenerateLbl);
+            Result += Format(NpRegEx.GenerateRandomChar());
+        end;
+    end;
+
+    local procedure MaxCodeLength(TableID: Integer): Integer
+    var
+        SeatingLocation: Record "NPR NPRE Seating Location";
+    begin
+        case TableID of
+            Database::"NPR NPRE Seating Location":
+                exit(MaxStrLen(SeatingLocation.Code));
+            else
+                exit(20);
+        end;
+    end;
+
+    local procedure RecordExists(Result: Text; TableID: Integer): Boolean
+    var
+        SeatingLocation: Record "NPR NPRE Seating Location";
+        UnsupportedTableIDErr: Label 'Unsupported table ID: %1';
+    begin
+        case TableID of
+            Database::"NPR NPRE Seating Location":
+                exit(SeatingLocation.Get(CopyStr(Result, 1, MaxStrLen(SeatingLocation.Code))));
+            else
+                Error(UnsupportedTableIDErr, TableID);
+        end;
     end;
 
     var
