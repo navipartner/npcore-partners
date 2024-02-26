@@ -627,16 +627,16 @@
 
         if Type <> Type::ItemCategory then
             if ItemCategoryFilter <> '' then begin
-                ItemLedgerEntry.SetRange("Item Category Code", ItemCategoryFilter);
-                SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code, ItemCategoryFilter);
+                ItemLedgerEntry.SetFilter("Item Category Code", ItemCategoryFilter);
+                SalesStatisticsByPerson.SetFilter(Filter_Item_Category_Code, ItemCategoryFilter);
             end else begin
                 ItemLedgerEntry.SetRange("Item Category Code");
                 SalesStatisticsByPerson.SetRange(Filter_Item_Category_Code);
             end;
 
         if Dim1Filter <> '' then begin
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Dim1Filter);
-            SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code, Dim1Filter);
+            ItemLedgerEntry.SetFilter("Global Dimension 1 Code", Dim1Filter);
+            SalesStatisticsByPerson.SetFilter(Filter_Global_Dimension_1_Code, Dim1Filter);
         end else begin
             ItemLedgerEntry.SetRange("Global Dimension 1 Code");
             SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_1_Code);
@@ -644,8 +644,8 @@
 
         if not (Type = Type::Projectcode) then
             if Dim2Filter <> '' then begin
-                ItemLedgerEntry.SetRange("Global Dimension 2 Code", Dim2Filter);
-                SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code, Dim2Filter);
+                ItemLedgerEntry.SetFilter("Global Dimension 2 Code", Dim2Filter);
+                SalesStatisticsByPerson.SetFilter(Filter_Global_Dimension_2_Code, Dim2Filter);
             end else begin
                 ItemLedgerEntry.SetRange("Global Dimension 2 Code");
                 SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code);
@@ -653,8 +653,8 @@
 
         if not (Type = Type::Item) then
             if ItemNoFilter <> '' then begin
-                ItemLedgerEntry.SetRange("Item No.", ItemNoFilter);
-                SalesStatisticsByPerson.SetRange(Filter_Item_No_, ItemNoFilter);
+                ItemLedgerEntry.SetFilter("Item No.", ItemNoFilter);
+                SalesStatisticsByPerson.SetFilter(Filter_Item_No_, ItemNoFilter);
             end else begin
                 ItemLedgerEntry.SetRange("Item No.");
                 SalesStatisticsByPerson.SetRange(Filter_Item_No_);
@@ -662,19 +662,19 @@
 
         if not (Type = Type::Salesperson) then
             if SalespersonFilter <> '' then
-                SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code, SalespersonFilter)
+                SalesStatisticsByPerson.SetFilter(Filter_SalesPers_Purch_Code, SalespersonFilter)
             else
                 SalesStatisticsByPerson.SetRange(Filter_SalesPers_Purch_Code);
 
         if not (Type = Type::Customer) then
             if CustomerNoFilter <> '' then
-                SalesStatisticsByPerson.SetRange(Filter_Source_No, CustomerNoFilter)
+                SalesStatisticsByPerson.SetFilter(Filter_Source_No, CustomerNoFilter)
             else
                 SalesStatisticsByPerson.SetRange(Filter_Source_No);
 
         if not (Type = Type::Vendor) then
             if VendorNoFilter <> '' then
-                SalesStatisticsByPerson.SetRange(Filter_Vendor_No_, VendorNoFilter)
+                SalesStatisticsByPerson.SetFilter(Filter_Vendor_No_, VendorNoFilter)
             else
                 SalesStatisticsByPerson.SetRange(Filter_Vendor_No_);
 
@@ -733,48 +733,48 @@
 
         if Type <> Type::ItemCategory then
             if ItemCategoryFilter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Item_Category_Code, ItemCategoryFilter)
+                ValueEntryWithVendor.SetFilter(Filter_Item_Category_Code, ItemCategoryFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Item_Category_Code);
 
         if Dim1Filter <> '' then
-            ValueEntryWithVendor.SetRange(Filter_Dim_1_Code, Dim1Filter)
+            ValueEntryWithVendor.SetFilter(Filter_Dim_1_Code, Dim1Filter)
         else
             ValueEntryWithVendor.SetRange(Filter_Dim_1_Code);
 
         if not (Type = Type::Projectcode) then
             if Dim2Filter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Dim_2_Code, Dim2Filter)
+                ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, Dim2Filter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Dim_2_Code);
 
         if not (Type = Type::Item) then
             if ItemNoFilter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Item_No, ItemNoFilter)
+                ValueEntryWithVendor.SetFilter(Filter_Item_No, ItemNoFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Item_No);
 
         if not (Type = Type::Salesperson) then
             if SalespersonFilter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_SalesPers_Purch_Code, SalespersonFilter)
+                ValueEntryWithVendor.SetFilter(Filter_SalesPers_Purch_Code, SalespersonFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_SalesPers_Purch_Code);
 
         if not (Type = Type::Customer) then
             if CustomerNoFilter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Source_No, CustomerNoFilter)
+                ValueEntryWithVendor.SetFilter(Filter_Source_No, CustomerNoFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Source_No);
 
         if not (Type = Type::Vendor) then
             if VendorNoFilter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Vendor_No, VendorNoFilter)
+                ValueEntryWithVendor.SetFilter(Filter_Vendor_No, VendorNoFilter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Vendor_No);
 
         if not (Type = Type::Projectcode) then
             if Dim2Filter <> '' then
-                ValueEntryWithVendor.SetRange(Filter_Dim_2_Code, Dim2Filter)
+                ValueEntryWithVendor.SetFilter(Filter_Dim_2_Code, Dim2Filter)
             else
                 ValueEntryWithVendor.SetRange(Filter_Dim_2_Code);
 
