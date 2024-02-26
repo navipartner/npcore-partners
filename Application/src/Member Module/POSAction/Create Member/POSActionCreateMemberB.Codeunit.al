@@ -69,7 +69,7 @@ codeunit 6060106 "NPR POS Action Create Member B"
     local procedure AssignToSales(var POSSale: Record "NPR POS Sale"; MembershipEntryNo: Integer): Boolean
     var
         MemberCard: Record "NPR MM Member Card";
-        POSActionMemberMgmt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgmt: Codeunit "NPR POS Action Member MgtWF3-B";
     begin
         if (MembershipEntryNo = 0) then
             exit;
@@ -78,6 +78,6 @@ codeunit 6060106 "NPR POS Action Create Member B"
         if (not MemberCard.FindFirst()) then
             exit(false);
 
-        exit(POSActionMemberMgmt.AssignMembershipToPOSSale(POSSale, MembershipEntryNo, MemberCard."External Card No."));
+        exit(POSActionMemberMgmt.AssignMembershipToPOSWorker(POSSale, MembershipEntryNo, MemberCard."External Card No."));
     end;
 }

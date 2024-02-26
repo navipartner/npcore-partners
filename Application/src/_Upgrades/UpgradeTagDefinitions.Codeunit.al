@@ -160,6 +160,13 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'add-salesperson-to-bg-sis-audit-log'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'blank-item-description'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Rcpt. Profile", 'CreatePOSRcptProfileAssignToPOSUnits'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'SCAN_VOUCHER'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'ISSUE_RETURN_VOUCHER'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'PAYIN_PAYOUT'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'TM_TICKETMGMT'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'TM_TICKETMGMT_2'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -606,6 +613,23 @@
                 case UpgradeStep of
                     'CreatePOSRcptProfileAssignToPOSUnits':
                         exit('NPR-CreatePOSRcptProfileAssignToPOSUnits-20240124');
+                end;
+            Codeunit::"NPR UPG POSMenu Actions v3":
+                case UpgradeStep of
+                    'MM_MEMBERMGT':
+                        exit('NPR-MM_MEMBERMGT-20241602');
+                    'MM_MEMBERMGMT_WF2':
+                        exit('NPR-MM_MEMBERMGMT_WF2-20241602');
+                    'ISSUE_RETURN_VOUCHER':
+                        exit('NPR-ISSUE_RETURN_VOUCHER-20241602');
+                    'PAYIN_PAYOUT':
+                        exit('NPR-PAYIN_PAYOUT-20241602');
+                    'TM_TICKETMGMT':
+                        exit('NPR-TM_TICKETMGMT-20241602');
+                    'TM_TICKETMGMT_2':
+                        exit('NPR-TM_TICKETMGMT_2-20241602');
+                    'SCAN_VOUCHER':
+                        exit('NPR-SCAN_VOUCHER-20241602');
                 end;
         end;
     end;

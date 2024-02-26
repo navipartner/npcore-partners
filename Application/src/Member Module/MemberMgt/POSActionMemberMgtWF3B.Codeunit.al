@@ -107,7 +107,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             Error(MEMBERSHIP_BLOCKED_NOT_FOUND, ExternalMemberCardNo);
     end;
 
-    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
+    procedure AssignMembershipToPOSWorker(var SalePOS: Record "NPR POS Sale"; MembershipEntryNo: Integer; ExternalMemberCardNo: Text[100]): Boolean
     var
         Membership: Record "NPR MM Membership";
         POSSalesInfo: Record "NPR MM POS Sales Info";

@@ -3,7 +3,6 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
     Access = Internal;
 
     var
-        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         NO_MEMBER: Label 'No member/customer specified.';
         MULTIPLE_MEMBERSHIPS: Label 'Customer number %1 resolves to more than one membership. Before redeeming points for this customer, this issue needs to be corrected. One possible solution is to block the incorrect memberships for this customer.';
 
@@ -133,7 +132,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
 
     procedure SetCustomer(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
     var
-        POSActionMemberMgt: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         SalePOS: Record "NPR POS Sale";
@@ -145,7 +144,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
         POSSale.Refresh(SalePOS);
 
         if (SalePOS."Customer No." = '') then
-            if (not POSActionMemberMgt.SelectMembership(POSSession, DialogMethod::NO_PROMPT, MemberCardNumber, ForeignCommunityCode)) then
+            if (POSActionMemberMgt.SelectMembership(2, MemberCardNumber, false)) = 0 then
                 exit;
     end;
 

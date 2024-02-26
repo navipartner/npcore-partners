@@ -13,7 +13,6 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
 
     local procedure MemberArrival(InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ShowWelcomeMessage: Boolean; POSSetup: Codeunit "NPR POS Setup")
     var
-        POSSession: Codeunit "NPR POS Session";
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -23,7 +22,7 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
-        POSActionMemberManagement: Codeunit "NPR MM POS Action: MemberMgmt.";
+        POSActionMemberManagement: Codeunit "NPR POS Action Member MgtWF3-B";
         MembershipEvents: Codeunit "NPR MM Membership Events";
         //ExternalItemNo: Code[50];
         LogEntryNo: Integer;
@@ -44,7 +43,7 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
 
         case POSWorkflowType of
             POSWorkflowMethod::POS:
-                POSActionMemberManagement.MemberArrival(POSSession, InputMethod, ExternalMemberCardNo, '');
+                POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo);
             POSWorkflowMethod::Automatic,
             POSWorkflowMethod::GuestCheckin:
                 begin
