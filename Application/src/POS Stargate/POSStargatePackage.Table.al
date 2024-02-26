@@ -1,5 +1,4 @@
-﻿#if not CLOUD
-table 6150713 "NPR POS Stargate Package"
+﻿table 6150713 "NPR POS Stargate Package"
 {
     Access = Internal;
     Caption = 'POS Stargate Package';
@@ -7,6 +6,9 @@ table 6150713 "NPR POS Stargate Package"
     DataPerCompany = false;
     DrillDownPageID = "NPR POS Stargate Packages";
     LookupPageID = "NPR POS Stargate Packages";
+    ObsoleteState = Removed;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'Stargate is replaced by hardware connector';
 
     fields
     {
@@ -44,13 +46,4 @@ table 6150713 "NPR POS Stargate Package"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    var
-        StargatePackageMethod: Record "NPR POS Stargate Pckg. Method";
-    begin
-        StargatePackageMethod.SetRange("Package Name", Name);
-        StargatePackageMethod.DeleteAll();
-    end;
 }
-#endif

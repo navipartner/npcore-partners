@@ -1,13 +1,12 @@
 ﻿table 6014624 "NPR Web Client Dependency"
 {
     Access = Internal;
-    // NPRx.xx/VB/20151130 CASE 226832 Object created to support dynamic Web client objects (scripts, stylesheets, HTML, and image data uris)
-    // NPR5.00/NPKNAV/20160113  CASE 226832 NP Retail 2016
-    // NPR5.41/MMV /20180403 CASE 300611 Changed DataPerCompany to 'No'.
-
     Caption = 'Web Client Dependency';
     DataPerCompany = false;
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'New POS frontend+editor will no longer support customer specific injected web scripts/styling/html/fonts';
 
     fields
     {

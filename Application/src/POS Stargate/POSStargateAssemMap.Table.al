@@ -1,9 +1,11 @@
-﻿#if not CLOUD
-table 6150720 "NPR POS Stargate Assem. Map"
+﻿table 6150720 "NPR POS Stargate Assem. Map"
 {
     Access = Internal;
     Caption = 'POS Stargate Assembly Map';
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'Stargate is replaced by hardware connector';
 
     fields
     {
@@ -40,4 +42,3 @@ table 6150720 "NPR POS Stargate Assem. Map"
     {
     }
 }
-#endif

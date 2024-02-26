@@ -1,10 +1,12 @@
-﻿#if not CLOUD
-table 6014625 "NPR Dependency Mgt. Setup"
+﻿table 6014625 "NPR Dependency Mgt. Setup"
 {
     Access = Internal;
     Caption = 'Dependency Management Setup';
     DataPerCompany = false;
     DataClassification = CustomerContent;
+    ObsoleteState = Removed;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'No longer used';
 
     fields
     {
@@ -85,4 +87,3 @@ table 6014625 "NPR Dependency Mgt. Setup"
         }
     }
 }
-#endif

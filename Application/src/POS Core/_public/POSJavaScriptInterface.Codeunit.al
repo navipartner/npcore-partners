@@ -101,18 +101,10 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 Method_Login(POSSession, FrontEnd, Context);
             'TextEnter':
                 Method_TextEnter(POSSession, FrontEnd, Context);
-#if not CLOUD
-            'InvokeDeviceResponse':
-                Method_InvokeDeviceResponse(POSSession, FrontEnd, Context);
-            'Protocol':
-                Method_Protocol(POSSession, FrontEnd, Context);
-#endif
             'FrontEndId':
                 FrontEnd.HardwareInitializationComplete();
             'Unlock':
                 Method_Unlock(POSSession, FrontEnd, Context);
-            'ProtocolUIResponse':
-                Method_ProtocolUIResponse(POSSession, FrontEnd, Context);
             'InitializationComplete':
                 InitializationComplete(POSSession);
             else
@@ -368,65 +360,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Setup.Action_TextEnter(Action, POSSession);
         InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd);
     end;
-#if not CLOUD
 
-    [Obsolete('Delete when stargate is removed', 'NPR23.0')]
-    local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Stargate: Codeunit "NPR POS Stargate Management";
-        Method: Text;
-        Response: Text;
-        ActionName: Text;
-        Step: Text;
-        Success: Boolean;
-        ReadingDeviceResponseErr: Label 'reading from device response';
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        Method := JSON.GetStringOrFail('id', ReadingDeviceResponseErr);
-        Success := JSON.GetBooleanOrFail('success', ReadingDeviceResponseErr);
-        Response := JSON.GetStringOrFail('response', ReadingDeviceResponseErr);
-        ActionName := JSON.GetStringOrFail('action', ReadingDeviceResponseErr);
-        Step := JSON.GetStringOrFail('step', ReadingDeviceResponseErr);
-
-        POSSession.GetStargate(Stargate);
-        if Success then
-            Stargate.DeviceResponse(Method, Response, POSSession, FrontEnd, ActionName, Step)
-        else
-            Stargate.DeviceError(Method, Response, POSSession, FrontEnd);
-    end;
-
-    [Obsolete('Delete when stargate is removed', 'NPR23.0')]
-    local procedure Method_Protocol(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        Stargate: Codeunit "NPR POS Stargate Management";
-        EventName: Text;
-        SerializedArguments: Text;
-        ActionName: Text;
-        Step: Text;
-        Callback: Boolean;
-        Forced: Boolean;
-        ReadingFromProtocolMethodErr: Label 'reading from Protocol method context';
-    begin
-        POSSession.GetStargate(Stargate);
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-
-        SerializedArguments := JSON.GetStringOrFail('arguments', ReadingFromProtocolMethodErr);
-        ActionName := JSON.GetStringOrFail('action', ReadingFromProtocolMethodErr);
-        Step := JSON.GetStringOrFail('step', ReadingFromProtocolMethodErr);
-
-        if JSON.GetBoolean('closeProtocol') then begin
-            Forced := JSON.GetBooleanOrFail('forced', ReadingFromProtocolMethodErr);
-            Stargate.AppGatewayProtocolClosed(ActionName, Step, SerializedArguments, Forced, FrontEnd);
-            exit;
-        end;
-
-        EventName := JSON.GetStringOrFail('event', ReadingFromProtocolMethodErr);
-        Callback := JSON.GetBooleanOrFail('callback', ReadingFromProtocolMethodErr);
-        Stargate.AppGatewayProtocol(ActionName, Step, EventName, SerializedArguments, Callback, FrontEnd);
-    end;
-#endif
     local procedure Method_Unlock(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         "Action": Record "NPR POS Action";
@@ -436,42 +370,6 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             InvokeAction(Action.Code, '', 0, 0, Context, POSSession, FrontEnd)
         else
             POSSession.ChangeViewSale();
-    end;
-
-    [Obsolete('Delete when workflow v1/v2 are gone', 'NPR23.0')]
-    local procedure Method_ProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
-    var
-        JSON: Codeunit "NPR POS JSON Management";
-        ModelID: Guid;
-        Sender: Text;
-        EventName: Text;
-        ErrorMessage: Text;
-        Handled: Boolean;
-        IsTimer: Boolean;
-        ReadingFromProtocolUIResponseErr: Label 'reading from protocol UI response';
-        Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
-        Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
-    begin
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        Evaluate(ModelID, JSON.GetStringOrFail('modelId', ReadingFromProtocolUIResponseErr));
-        Sender := JSON.GetStringOrFail('sender', ReadingFromProtocolUIResponseErr);
-        EventName := JSON.GetStringOrFail('event', ReadingFromProtocolUIResponseErr);
-
-        if (Sender = 'n$_timer') and (EventName = 'n$_timer') then begin
-            IsTimer := true;
-            OnProtocolUITimer(POSSession, FrontEnd, ModelID, Handled)
-        end else
-            OnProtocolUIResponse(POSSession, FrontEnd, ModelID, Sender, EventName, Handled);
-
-        if not Handled then begin
-            if IsTimer then
-                ErrorMessage := StrSubstNo(Text007, ModelID)
-            else
-                ErrorMessage := StrSubstNo(Text006, 'ProtocolUIResponse', Sender, EventName, ModelID);
-
-            FrontEnd.CloseModel(ModelID);
-            FrontEnd.ReportBugAndThrowError(ErrorMessage);
-        end;
     end;
 
     [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', 'NPR23.0')]

@@ -5,6 +5,9 @@
     DataCaptionFields = "Code", Name;
     DataPerCompany = false;
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'New POS frontend+editor will no longer support customer specific injected web scripts/styling/html/fonts';
 
     fields
     {

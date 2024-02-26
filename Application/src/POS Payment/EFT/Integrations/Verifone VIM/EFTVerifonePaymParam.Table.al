@@ -1,7 +1,9 @@
 ﻿table 6184514 "NPR EFT Verifone Paym. Param."
 {
     Access = Internal;
-    // NPR5.53/MMV /20191204 CASE 349520 Added object
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'No longer used';
 
     Caption = 'EFT Verifone Payment Parameter';
     DataClassification = CustomerContent;
