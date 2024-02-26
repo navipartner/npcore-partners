@@ -491,37 +491,6 @@
         Request.Initialize(EventName, EventData);
         InvokeFrontEndAsync(Request);
     end;
-#if not CLOUD
-    procedure AdvertiseStargatePackages()
-    var
-        Package: Record "NPR POS Stargate Package";
-        PackageMethod: Record "NPR POS Stargate Pckg. Method";
-        Request: Codeunit "NPR Front-End: StargatePkg.";
-        Methods: JsonArray;
-        PackageDefinition: JsonObject;
-    begin
-        if Package.FindSet() then begin
-            repeat
-                PackageMethod.Reset();
-                PackageMethod.SetRange("Package Name", Package.Name);
-                if PackageMethod.FindSet() then begin
-                    Clear(Methods);
-                    repeat
-                        Methods.Add(PackageMethod."Method Name");
-                    until PackageMethod.Next() = 0;
-
-                    Clear(PackageDefinition);
-                    PackageDefinition.Add('Name', Package.Name);
-                    PackageDefinition.Add('Version', Package.Version);
-                    PackageDefinition.Add('Methods', Methods);
-                end;
-                Request.AddPackage(PackageDefinition);
-            until Package.Next() = 0;
-
-            InvokeFrontEndAsync(Request);
-        end;
-    end;
-#endif
 
     [Obsolete('Pending removal, not used', 'NPR23.0')]
     procedure ApplyAdministrativeTemplates(Templates: JsonArray)
@@ -691,51 +660,6 @@
         if EnvInfo.IsSandbox() then
             exit('Sandbox');
     end;
-#if not CLOUD
-
-    procedure InvokeDevice(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text)
-    var
-        Stargate: Codeunit "NPR POS Stargate Management";
-        DeviceRequest: Codeunit "NPR Front-End: InvokeDevice";
-        Envelope: DotNet NPRNetRequestEnvelope0;
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        MakeSureFrameworkIsAvailable(true);
-
-        POSSession.GetStargate(Stargate);
-        Stargate.ResetRequestState(ActionName);
-        Stargate.StoreRequest(Request, ActionName, Step);
-
-        Envelope := Envelope.RequestEnvelope(Request);
-        DeviceRequest.Initialize(Request.Method, Envelope.ToString());
-        DeviceRequest.SetAction(ActionName, Step);
-        DeviceRequest.SetMethod(Request.Method, Request.TypeName);
-        InvokeFrontEndAsync(DeviceRequest);
-    end;
-
-    procedure InvokeDeviceInternal(Request: DotNet NPRNetRequest0; ActionName: Text; Step: Text; Repeating: Boolean)
-    var
-        Stargate: Codeunit "NPR POS Stargate Management";
-        DeviceRequest: Codeunit "NPR Front-End: InvokeDevice";
-        Envelope: DotNet NPRNetRequestEnvelope0;
-        POSSession: Codeunit "NPR POS Session";
-    begin
-        // Do not invoke this function from action codeunits. This function is intended to be used only from Stargate infrastructure code.
-
-        MakeSureFrameworkIsAvailable(true);
-
-        if Repeating then begin
-            POSSession.GetStargate(Stargate);
-            Stargate.StoreRequest(Request, ActionName, Step);
-        end;
-
-        Envelope := Envelope.RequestEnvelope(Request);
-        DeviceRequest.Initialize(Request.Method, Envelope.ToString());
-        DeviceRequest.SetAction(ActionName, Step);
-        DeviceRequest.SetMethod(Request.Method, Request.TypeName);
-        InvokeFrontEndAsync(DeviceRequest);
-    end;
-#endif
 
     [Obsolete('Not supported in workflow v3', 'NPR23.0')]
     procedure InvokeWorkflow(var POSAction: Record "NPR POS Action")
@@ -882,66 +806,6 @@
         Request.SetOptions(Options);
         InvokeFrontEndAsync(Request);
     end;
-
-    #region Model UI - TODO: refactor into Dragonglass!
-#if not CLOUD
-
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
-    procedure ShowModel(Model: DotNet NPRNetModel) ModelID: Guid
-    var
-        Request: Codeunit "NPR Front-End: Generic";
-        Html: Text;
-        Css: Text;
-        Script: Text;
-    begin
-        ModelID := CreateGuid();
-        Html := Model.ToString().Trim();
-        Css := Model.GetStyles().Trim();
-        Script := Model.GetScripts().Trim();
-        if (Html = '') and (Css = '') and (Script = '') then
-            exit;
-
-        Request.SetMethod('ShowModel');
-        Request.GetContent().Add('modelId', ModelID);
-        Request.GetContent().Add('html', Html);
-        Request.GetContent().Add('css', Css);
-        Request.GetContent().Add('script', Script);
-        InvokeFrontEndAsync(Request);
-    end;
-
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
-    procedure UpdateModel(Model: DotNet NPRNetModel; ModelID: Guid)
-    var
-        Request: Codeunit "NPR Front-End: Generic";
-        Html: Text;
-        Css: Text;
-        Script: Text;
-    begin
-        Html := Model.ToString().Trim();
-        Css := Model.GetStyles().Trim();
-        Script := Model.GetScripts().Trim();
-        if (Html = '') and (Css = '') and (Script = '') then
-            exit;
-
-        Request.SetMethod('UpdateModel');
-        Request.GetContent().Add('modelId', ModelID);
-        Request.GetContent().Add('html', Html);
-        Request.GetContent().Add('css', Css);
-        Request.GetContent().Add('script', Script);
-        InvokeFrontEndAsync(Request);
-    end;
-#endif
-
-    [Obsolete('Model UI is being deprecated. All functionality can and must be replaced with Workflows 2.0 `popup` object. Please, check the documentation here: https://dev.azure.com/navipartner/Dragonglass/_wiki/wikis/Dragonglass.wiki/36/Workflows-2.0-Front-end-API-popup-object', 'NPR23.0')]
-    procedure CloseModel(ModelID: Guid)
-    var
-        Request: Codeunit "NPR Front-End: Generic";
-    begin
-        Request.SetMethod('CloseModel');
-        Request.GetContent().Add('modelId', ModelID);
-        InvokeFrontEndAsync(Request);
-    end;
-    #endregion
 
     procedure StartTransaction(Sale: Record "NPR POS Sale")
     var

@@ -1,9 +1,12 @@
-﻿#if not CLOUD
-table 6014614 "NPR DotNet Assembly"
+﻿table 6014614 "NPR DotNet Assembly"
 {
     Access = Internal;
     Caption = '.NET Assembly';
     DataPerCompany = false;
+    ObsoleteState = Removed;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'No longer used';
+
 
     fields
     {
@@ -40,33 +43,4 @@ table 6014614 "NPR DotNet Assembly"
         {
         }
     }
-
-
-    procedure InstallAssembly(var InStr: InStream)
-    var
-        Asmbl: Record "NPR DotNet Assembly";
-        MemStream: DotNet MemoryStream;
-        OutStr: OutStream;
-        MD5: DotNet MD5;
-        Byte: DotNet Byte;
-        Asm: DotNet NPRNetAssembly;
-    begin
-        with Asmbl do begin
-            Init();
-            MemStream := MemStream.MemoryStream();
-            CopyStream(MemStream, InStr);
-            Asm := Asm.Load(MemStream.ToArray());
-            "Assembly Name" := Asm.FullName;
-            Assembly.CreateOutStream(OutStr);
-            MemStream.Seek(0, 0);
-            CopyStream(OutStr, MemStream);
-            MemStream.Seek(0, 0);
-            MD5 := MD5.Create();
-            foreach Byte in MD5.ComputeHash(MemStream) do
-                "MD5 Hash" += Byte.ToString('x2');
-
-            Insert();
-        end;
-    end;
 }
-#endif

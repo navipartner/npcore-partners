@@ -152,13 +152,8 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
     internal procedure LookupValue()
     var
         TempRetailList: Record "NPR Retail List" temporary;
-#if not CLOUD
-        Parts: DotNet NPRNetArray;
-        "Part": DotNet NPRNetString;
-#else
         Parts: List of [Text];
         "Part": Text;
-#endif
         OptionStringCaption: Text;
         Handled: Boolean;
     begin
@@ -299,22 +294,10 @@ table 6184483 "NPR EFT Type Pay. Gen. Param."
     begin
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
-#if not CLOUD
-    local procedure SplitString(Text: Text; var Parts: DotNet NPRNetArray)
-    var
-        String: DotNet NPRNetString;
-        Char: DotNet NPRNetString;
-    begin
-        String := Text;
-        Char := ',';
-        Parts := String.Split(Char.ToCharArray());
-    end;
-#else
     local procedure SplitString(Text: Text; var Parts: List of [Text])
     begin
         Parts := Text.Split(',');
     end;
-#endif
 
     [IntegrationEvent(false, false)]
     internal procedure OnGetParameterNameCaption(Parameter: Record "NPR EFT Type Pay. Gen. Param."; var Caption: Text)

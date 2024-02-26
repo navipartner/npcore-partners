@@ -10,11 +10,7 @@
         FrontEnd: Codeunit "NPR POS Front End Management";
         Text003: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
         ActionCode: Text;
-#if not CLOUD
-        ActionState: DotNet NPRNetDictionary_Of_T_U;
-#else
         ActionState: Dictionary of [Text, Text];
-#endif
         ActionStateRecRef: array[1024] of RecordRef;
         ActionStateRecRefCounter: Integer;
 
@@ -22,9 +18,6 @@
     begin
         FrontEnd := FrontEndIn;
         ActionCode := ActionCodeIn;
-#if not CLOUD
-        ActionState := ActionState.Dictionary();
-#endif
     end;
 
     procedure StoreActionState("Key": Text; "Object": Variant)
@@ -38,11 +31,7 @@
 
     procedure RetrieveActionState("Key": Text; var "Object": Variant)
     begin
-#if not CLOUD
-        Object := ActionState.Item(ActionCode + '.' + Key);
-#else
         Object := ActionState.Get(ActionCode + '.' + Key);
-#endif
     end;
 
     procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
@@ -57,11 +46,7 @@
     var
         Index: Integer;
     begin
-#if not CLOUD
-        Index := ActionState.Item(ActionCode + '.' + Key);
-#else
         Evaluate(Index, ActionState.Get(ActionCode + '.' + Key));
-#endif
         RecRef := ActionStateRecRef[Index];
     end;
 

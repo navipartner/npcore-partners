@@ -4,8 +4,10 @@
     Caption = 'Web Client Dependencies';
     PageType = List;
     SourceTable = "NPR Web Client Dependency";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR31.0';
+    ObsoleteReason = 'New POS frontend+editor will no longer support customer specific injected web scripts/styling/html/fonts';
 
 
     layout
@@ -64,31 +66,6 @@
                     ImportFile();
                 end;
             }
-#if not CLOUD
-            action("Export Managed Dependency Manifest")
-            {
-                Caption = 'Export Managed Dependency Manifest';
-                Image = ExportElectronicDocument;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                ToolTip = 'Executes the Export Managed Dependency Manifest action';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    Rec2: Record "NPR Web Client Dependency";
-                    ManagedDepMgt: Codeunit "NPR Managed Dependency Mgt.";
-                    JArray: JsonArray;
-                begin
-                    CurrPage.SetSelectionFilter(Rec2);
-                    ManagedDepMgt.RecordToJArray(Rec2, JArray);
-                    ManagedDepMgt.ExportManifest(Rec2, JArray, 0);
-                end;
-            }
-#endif
             action("Export File")
             {
                 Caption = 'Export File';
