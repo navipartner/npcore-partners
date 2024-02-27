@@ -487,61 +487,22 @@ codeunit 6184739 "NPR TM RevenueDeferral"
             DeferProfile.Get(RevenueRecognitionBuffer.DeferRevenueProfileCode);
             GetDimValue.GetShortcutDimensions(RevenueRecognitionBuffer.DimensionSetId, ShortcutDimCode);
 
-            if (RevenueRecognitionBuffer.SalesPostingDate = RevenueRecognitionBuffer.AchievedPostingDate) then begin
-                MakeGenJournalLine(DeferProfile.JournalTemplateName,
-                    RevenueRecognitionBuffer.SalesAccount,
-                    RevenueRecognitionBuffer.AchievedAccount,
-                    RevenueRecognitionBuffer.SalesPostingDate,
-                    Today(),
-                    RevenueRecognitionBuffer.DocumentNo,
-                    DeferProfile.DeferralPostingDescription,
-                    RevenueRecognitionBuffer.Amount,
-                    ShortcutDimCode[1],
-                    ShortcutDimCode[2],
-                    RevenueRecognitionBuffer.DimensionSetId,
-                    DeferProfile.DeferralReasonCode,
-                    RevenueRecognitionBuffer.SourceDocumentNo,
-                    DeferProfile.SourceCode,
-                    TempGenJournalLine
-                    );
-            end;
-
-            if (RevenueRecognitionBuffer.SalesPostingDate <> RevenueRecognitionBuffer.AchievedPostingDate) then begin
-                // Reverse revenue on sales date
-                MakeGenJournalLine(DeferProfile.JournalTemplateName,
-                    RevenueRecognitionBuffer.SalesAccount,
-                    DeferProfile.InterimAdjustmentAccount,
-                    RevenueRecognitionBuffer.SalesPostingDate,
-                    Today(),
-                    RevenueRecognitionBuffer.DocumentNo,
-                    DeferProfile.ReversalPostingDescription,
-                    RevenueRecognitionBuffer.Amount,
-                    ShortcutDimCode[1],
-                    ShortcutDimCode[2],
-                    RevenueRecognitionBuffer.DimensionSetId,
-                    DeferProfile.ReversalReasonCode,
-                    RevenueRecognitionBuffer.SourceDocumentNo,
-                    DeferProfile.SourceCode,
-                    TempGenJournalLine
-                    );
-
-                MakeGenJournalLine(DeferProfile.JournalTemplateName,
-                    DeferProfile.InterimAdjustmentAccount,
-                    RevenueRecognitionBuffer.AchievedAccount,
-                    RevenueRecognitionBuffer.AchievedPostingDate,
-                    Today(),
-                    RevenueRecognitionBuffer.DocumentNo,
-                    DeferProfile.DeferralPostingDescription,
-                    RevenueRecognitionBuffer.Amount,
-                    ShortcutDimCode[1],
-                    ShortcutDimCode[2],
-                    RevenueRecognitionBuffer.DimensionSetId,
-                    DeferProfile.DeferralReasonCode,
-                    RevenueRecognitionBuffer.SourceDocumentNo,
-                    DeferProfile.SourceCode,
-                    TempGenJournalLine
-                    );
-            end;
+            MakeGenJournalLine(DeferProfile.JournalTemplateName,
+                RevenueRecognitionBuffer.SalesAccount,
+                RevenueRecognitionBuffer.AchievedAccount,
+                RevenueRecognitionBuffer.AchievedPostingDate,
+                Today(),
+                RevenueRecognitionBuffer.DocumentNo,
+                DeferProfile.DeferralPostingDescription,
+                RevenueRecognitionBuffer.Amount,
+                ShortcutDimCode[1],
+                ShortcutDimCode[2],
+                RevenueRecognitionBuffer.DimensionSetId,
+                DeferProfile.DeferralReasonCode,
+                RevenueRecognitionBuffer.SourceDocumentNo,
+                DeferProfile.SourceCode,
+                TempGenJournalLine
+                );
 
         until (RevenueRecognitionBuffer.Next() = 0);
     end;
@@ -627,7 +588,7 @@ codeunit 6184739 "NPR TM RevenueDeferral"
             DeferRevenueRequest.AchievedRevenueAccount := DeferRevenueProfile.AchievedRevenueAccount;
         DeferRevenueRequest.InterimAdjustmentAccount := DeferRevenueProfile.InterimAdjustmentAccount;
 
-        exit((DeferRevenueRequest.AchievedRevenueAccount <> '') and (DeferRevenueRequest.InterimAdjustmentAccount <> ''));
+        exit((DeferRevenueRequest.AchievedRevenueAccount <> '') and (DeferRevenueRequest.OriginalSalesAccount <> ''));
     end;
 
 }
