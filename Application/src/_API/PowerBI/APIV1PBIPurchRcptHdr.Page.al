@@ -112,6 +112,10 @@ page 6060064 "NPR APIV1 PBIPurch. Rcpt. Hdr"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }
