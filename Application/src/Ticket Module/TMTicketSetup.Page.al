@@ -279,6 +279,26 @@
                         ToolTip = 'Specifies the value of the POS Unattended Expire Time (Seconds) field.';
                     }
                 }
+                group(SOAPSanityCheck)
+                {
+                    Caption = 'SOAP Ticket Limits';
+
+                    field(MaxTicketsPerSOAPRequest; Rec.MaxTicketsPerSOAPRequest)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ToolTip = 'Specifies the value of the Max Tickets Per SOAP Request field.';
+                    }
+                    field(MaxDurationSOAPMakeTicketRes; Rec.MaxDurationSOAPMakeTicketRes)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ToolTip = 'Specifies the value of the Max Duration MakeTicketReservation Request (Seconds) field.';
+                    }
+                    field(CheckSOAPProgressAfterPct; Rec.CheckSOAPProgressAfterPct)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ToolTip = 'Specifies the value of the Check SOAP Request Progress After % field.';
+                    }
+                }
             }
         }
     }

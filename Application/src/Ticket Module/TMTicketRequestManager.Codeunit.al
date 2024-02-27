@@ -307,7 +307,20 @@
         Window: Dialog;
         AdditionalAdmissionCosts: Decimal;
         OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"];
+        StartTime: DateTime;
+        CheckMaxDuration: Boolean;
+        DurationExceeded: Label 'Service has exceeded the maximum allowed duration for making tickets. Please try again.';
+        QuantityExceeded: Label 'The number of tickets requested exceeds the maximum allowed per request-line.';
     begin
+
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        CheckMaxDuration := not ((TicketSetup.MaxDurationSOAPMakeTicketRes = 0) or (TicketSetup.CheckSOAPProgressAfterPct = 0));
+        if (CurrentClientType() = ClientType::SOAP) then
+            if (TicketSetup.MaxTicketsPerSOAPRequest <> 0) then
+                if (Abs(Quantity) > TicketSetup.MaxTicketsPerSOAPRequest) then
+                    Error(QuantityExceeded);
 
         Item.Get(ItemNo);
         if (not TicketType.Get(Item."NPR Ticket Type")) then
@@ -348,9 +361,6 @@
         ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
         ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
 
-        if (not TicketSetup.Get()) then
-            TicketSetup.Init();
-
         if (TicketSetup."Authorization Code Scheme" = '') then
             TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
 
@@ -362,6 +372,7 @@
             ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
         ReservationRequest.Modify();
 
+        StartTime := CurrentDateTime();
         for i := 1 to Abs(NumberOfTickets) do begin
             AdditionalAdmissionCosts := 0;
 
@@ -372,6 +383,14 @@
                     Window.Update(1, Round(i / NumberOfTickets * 10000, 1));
 
             AdditionCost += AdditionalAdmissionCosts;
+
+            // Check progress after some percentage of the max duration
+            if ((CurrentClientType() = ClientType::SOAP) and (CheckMaxDuration)) then
+                if (CurrentDateTime() > StartTime + TicketSetup.MaxDurationSOAPMakeTicketRes * 1000 * TicketSetup.CheckSOAPProgressAfterPct / 100) then begin
+                    if (NumberOfTickets * TicketSetup.CheckSOAPProgressAfterPct / 100 > i) then
+                        Error(DurationExceeded);
+                    CheckMaxDuration := false; // Only check once
+                end;
 
         end;
 

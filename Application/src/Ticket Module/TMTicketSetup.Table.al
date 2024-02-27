@@ -279,6 +279,28 @@
             InitValue = 1500;
             MinValue = 60;
         }
+        field(360; MaxTicketsPerSOAPRequest; Integer)
+        {
+            Caption = 'Max Tickets Per SOAP Request';
+            DataClassification = CustomerContent;
+            InitValue = 10000;
+            MinValue = 0;
+        }
+        field(361; MaxDurationSOAPMakeTicketRes; Integer)
+        {
+            Caption = 'Max Duration MakeTicketReservation Request (Seconds)';
+            DataClassification = CustomerContent;
+            InitValue = 10;
+            MinValue = 0;
+        }
+        field(362; CheckSOAPProgressAfterPct; Integer)
+        {
+            Caption = 'Check SOAP Request Progress After %';
+            DataClassification = CustomerContent;
+            InitValue = 50;
+            MinValue = 0;
+            MaxValue = 100;
+        }
         field(400; "Ticket Admission Web Url"; Text[250])
         {
             Caption = 'Ticket Admission Web Url';
