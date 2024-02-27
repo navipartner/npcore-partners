@@ -161,6 +161,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Invoiced Quantity', Locked = true;
                 }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }

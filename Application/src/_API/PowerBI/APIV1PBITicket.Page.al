@@ -92,6 +92,10 @@ page 6059939 "NPR APIV1 PBITicket"
                 {
                     Caption = 'Variant Code';
                 }
+                field(ticketReservationEntryNo; Rec."Ticket Reservation Entry No.")
+                {
+                    Caption = 'Ticket Reservation Entry No.';
+                }
             }
         }
     }

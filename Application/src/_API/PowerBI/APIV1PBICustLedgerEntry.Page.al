@@ -76,6 +76,10 @@ page 6059913 "NPR APIV1 PBICustLedgerEntry"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }

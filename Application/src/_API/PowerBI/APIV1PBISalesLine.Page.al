@@ -64,6 +64,10 @@ page 6150779 "NPR APIV1 PBISalesLine"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(dimensionSetID; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
+                }
             }
         }
     }
