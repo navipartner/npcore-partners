@@ -33,7 +33,7 @@ page 6151477 "NPR TM DeferRevenueProfileList"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Interim Adjustment Account (Ticketing) field.';
-                    ShowMandatory = true;
+                    Visible = false;
                 }
                 field(JournalTemplateName; Rec.JournalTemplateName)
                 {
