@@ -204,6 +204,7 @@ page 6151476 "NPR TM RevenueRecognition"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Interim Adjustment Account field.';
                     Editable = false;
+                    Visible = false;
                 }
             }
         }
