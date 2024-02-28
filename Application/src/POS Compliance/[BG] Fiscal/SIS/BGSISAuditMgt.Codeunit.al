@@ -170,10 +170,25 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
+        CheckArePricesIncludingVAT(SaleHeader);
         CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
         CheckAreMandatoryMappingsPopulated(SaleHeader);
         DoNotAllowUsingOtherPaymentMethodThanCashForReturn(SaleHeader);
         DoNotAllowHavingBlankItemDescriptions(SaleHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Cust. Select-B", 'OnAfterAttachCustomer', '', false, false)]
+    local procedure HandleOnAfterAttachCustomer(SaleHeader: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not POSUnit.Get(SaleHeader."Register No.") then
+            exit;
+
+        if not IsBGSISAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        TestDoesCustomerUsePricesIncludingVAT(SaleHeader);
     end;
     #endregion
 
@@ -369,6 +384,44 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     begin
         if not Evaluate(SalespersonCodeAsInteger, Salesperson.Code) then
             Error(CannotBeConvertedtoIntegerErr, Salesperson.TableCaption(), Salesperson.FieldCaption(Code), Salesperson.Code);
+    end;
+
+    local procedure CheckArePricesIncludingVAT(SaleHeader: Record "NPR POS Sale")
+    begin
+        TestDoesCustomerUsePricesIncludingVAT(SaleHeader);
+        DoCheckArePricesIncludingVAT(SaleHeader);
+    end;
+
+    local procedure TestDoesCustomerUsePricesIncludingVAT(SaleHeader: Record "NPR POS Sale")
+    var
+        Customer: Record Customer;
+    begin
+        if SaleHeader."Customer No." = '' then
+            exit;
+
+        Customer.Get(SaleHeader."Customer No.");
+        Customer.TestField("Prices Including VAT", true);
+    end;
+
+    local procedure DoCheckArePricesIncludingVAT(SaleHeader: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        CalculatedAmountIncludingVAT: Decimal;
+        PricesNotIncludingVATErr: Label 'Price on %1 for %2 %3 %4 is not including VAT. Please recreate the %1 in order to finish the sale.', Comment = '%1 - POS Sale Line table caption, %2 - Line Type Item value, %3 - Item Number value, %4 - Item Description value';
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetLoadFields("Line Type", Quantity, "Unit Price", "Amount Including VAT", "No.", Description);
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetFilter(Quantity, '<>0');
+
+        if POSSaleLine.FindSet() then
+            repeat
+                CalculatedAmountIncludingVAT := POSSaleLine."Unit Price" * POSSaleLine.Quantity;
+                if Abs(Round(CalculatedAmountIncludingVAT, 0.01)) <> Abs(Round(POSSaleLine."Amount Including VAT", 0.01)) then
+                    Error(PricesNotIncludingVATErr, POSSaleLine.TableCaption, POSSaleLine."Line Type"::Item, POSSaleLine."No.", POSSaleLine.Description);
+            until POSSaleLine.Next() = 0;
     end;
 
     local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
