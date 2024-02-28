@@ -188,6 +188,7 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
         end;
 
         RowObject.Add('position', Rec.GetPosition(true));
+        RowObject.Add('index', Rec."Line No.");
         RowObject.Add('negative', Rec.Quantity < 0);
         RowObject.Add('class', '');
         RowObject.Add('style', '');

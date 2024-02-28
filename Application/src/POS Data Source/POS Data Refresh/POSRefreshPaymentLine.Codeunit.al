@@ -178,6 +178,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         end;
 
         RowObject.Add('position', Rec.GetPosition(true));
+        RowObject.Add('index', Rec."Line No.");
         RowObject.Add('negative', false);
         RowObject.Add('class', '');
         RowObject.Add('style', '');
