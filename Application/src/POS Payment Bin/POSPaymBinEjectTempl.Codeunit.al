@@ -1,23 +1,17 @@
 ﻿codeunit 6150646 "NPR POS Paym.Bin Eject: Templ."
 {
     Access = Internal;
-    // NPR5.50/MMV /20190417 CASE 350812 Created object
-
-
-    trigger OnRun()
-    begin
-    end;
 
     var
         CaptionTemplate: Label 'Template';
         DescriptionTemplate: Label 'Retail print template to invoke for drawer opening';
 
-    local procedure InvokeMethodCode(): Text
+    internal procedure InvokeMethodCode(): Text
     begin
         exit('TEMPLATE');
     end;
 
-    local procedure InvokeParameterName(): Text
+    internal procedure InvokeParameterName(): Text
     begin
         exit('print_template');
     end;
@@ -28,18 +22,22 @@
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
         RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
         RPTemplateHeader: Record "NPR RP Template Header";
-        Template: Text[20];
-        DefaultPrintTemplateCode: Code[20];
+        Template: Code[20];
         RecordVariant: Variant;
+        PrinterEjectMethodLbl: Label 'PRINTER', Locked = true;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
 
-        SelectDefaultPrintTemplate(POSPaymentBin, DefaultPrintTemplateCode);
+        Template := CopyStr(POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", InvokeParameterName(), ''), 1, MaxStrLen(Template));
+        if Template = '' then
+            SelectDefaultPrintTemplate(POSPaymentBin, Template);
 
-        RPTemplateHeader.Get(DefaultPrintTemplateCode);
-
-        Template := CopyStr(POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", InvokeParameterName(), DefaultPrintTemplateCode), 1, 20);
+        if not RPTemplateHeader.Get(Template) then begin
+            POSPaymentBin."Eject Method" := PrinterEjectMethodLbl;
+            POSPaymentBinInvokeMgt.OnEjectPaymentBin(POSPaymentBin, Ejected);
+            exit;
+        end;
 
         POSPaymentBin.SetRecFilter();
         RecordVariant := POSPaymentBin;

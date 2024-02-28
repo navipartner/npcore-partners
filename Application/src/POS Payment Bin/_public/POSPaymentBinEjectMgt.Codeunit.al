@@ -208,7 +208,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
+    internal procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
     begin
     end;
 
