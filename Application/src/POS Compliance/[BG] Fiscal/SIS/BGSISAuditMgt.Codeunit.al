@@ -357,6 +357,7 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     begin
         BGSISPOSUnitMapping.Get(POSUnit."No.");
         BGSISPOSUnitMapping.TestField("Fiscal Printer IP Address");
+        BGSISPOSUnitMapping.CheckIsPrinterModelPopulated();
         BGSISPOSUnitMapping.TestField("Fiscal Printer Device No.");
         BGSISPOSUnitMapping.TestField("Fiscal Printer Memory No.");
     end;
