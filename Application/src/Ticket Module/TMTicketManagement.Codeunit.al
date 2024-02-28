@@ -532,7 +532,7 @@
         if (AdmissionSchEntry."Entry No." <= 0) then begin
             case GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", AdmissionCode) of
                 Admission."Default Schedule"::TODAY,
-              Admission."Default Schedule"::NEXT_AVAILABLE:
+                Admission."Default Schedule"::NEXT_AVAILABLE:
 
                     if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
                         RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);
@@ -597,11 +597,10 @@
         Admission.Get(AdmissionCode);
         TicketType.Get(Ticket."Ticket Type Code");
 
-
         if (AdmissionSchEntry."Entry No." <= 0) then begin
             case GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", AdmissionCode) of
                 Admission."Default Schedule"::TODAY,
-              Admission."Default Schedule"::NEXT_AVAILABLE:
+                Admission."Default Schedule"::NEXT_AVAILABLE:
 
                     if (not AdmissionSchEntry.Get(GetCurrentScheduleEntry(Ticket, Admission."Admission Code", true))) then
                         RaiseError(StrSubstNo(NO_DEFAULT_SCHEDULE, Admission."Admission Code", Admission.FieldCaption("Default Schedule"), Admission."Default Schedule"), NO_DEFAULT_SCHEDULE_NO);

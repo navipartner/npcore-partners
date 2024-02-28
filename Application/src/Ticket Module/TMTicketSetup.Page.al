@@ -285,18 +285,28 @@
 
                     field(MaxTicketsPerSOAPRequest; Rec.MaxTicketsPerSOAPRequest)
                     {
-                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ApplicationArea = NPRTicketAdvanced;
                         ToolTip = 'Specifies the value of the Max Tickets Per SOAP Request field.';
                     }
                     field(MaxDurationSOAPMakeTicketRes; Rec.MaxDurationSOAPMakeTicketRes)
                     {
-                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ApplicationArea = NPRTicketAdvanced;
                         ToolTip = 'Specifies the value of the Max Duration MakeTicketReservation Request (Seconds) field.';
                     }
                     field(CheckSOAPProgressAfterPct; Rec.CheckSOAPProgressAfterPct)
                     {
-                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced, NPRRetail;
+                        ApplicationArea = NPRTicketAdvanced;
                         ToolTip = 'Specifies the value of the Check SOAP Request Progress After % field.';
+                    }
+                }
+
+                group(UX)
+                {
+                    Caption = 'User Experience';
+                    field(UseFrontEndScheduleUX; Rec.UseFrontEndScheduleUX)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Use Front End Schedule UX field';
                     }
                 }
             }

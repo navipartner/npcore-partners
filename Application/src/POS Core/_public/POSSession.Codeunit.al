@@ -229,6 +229,25 @@
         _Sale.InitializeAtLogin(_POSUnit, _Setup);
     end;
 
+    internal procedure SetCursor(Context: JsonObject)
+    var
+        JToken: JsonToken;
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+    begin
+        GetSaleContext(POSSale, POSSaleLine, POSPaymentLine);
+
+        if (Context.SelectToken('data.positions.BUILTIN_SALE', JToken)) then
+            POSSale.SetPosition(JToken.AsValue().AsText());
+
+        if (Context.SelectToken('data.positions.BUILTIN_SALELINE', JToken)) then
+            POSSaleLine.SetPosition(JToken.AsValue().AsText());
+
+        if (Context.SelectToken('data.positions.BUILTIN_PAYMENTLINE', JToken)) then
+            POSPaymentLine.SetPosition(JToken.AsValue().AsText());
+    end;
+
     local procedure EmitPOSLayoutUsageTelemetry(POSUnit: Record "NPR POS Unit"; UsesLegacyPOSMenus: Boolean)
     var
         ActiveSession: Record "Active Session";

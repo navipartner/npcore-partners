@@ -1735,6 +1735,25 @@
         exit(false);
     end;
 
+    procedure RequestRequiresAttention(Token: Text[100]): boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::SELECTED, TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+        if (not TicketReservationRequest.IsEmpty()) then
+            exit(true); // dynamic contents requires attention
+
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+        TicketReservationRequest.SetFilter("Admission Created", '=%1', false);
+        exit(not TicketReservationRequest.IsEmpty());
+
+    end;
+
     procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1806,14 +1825,24 @@
         exit(false);
     end;
 
-    procedure GetTicketToken(InternalTicketNo: Code[20]; var Token: Text[100]): Boolean
+    procedure GetTicketToken(TicketNo: Code[30]; var Token: Text[100]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        TicketFound: Boolean;
     begin
         Token := '';
 
-        if (not Ticket.Get(InternalTicketNo)) then
+
+        if (StrLen(TicketNo) <= MaxStrLen(Ticket."No.")) then
+            TicketFound := Ticket.Get(TicketNo);
+
+        if (not TicketFound) then begin
+            Ticket.SetFilter("External Ticket No.", '=%1', TicketNo);
+            TicketFound := Ticket.FindFirst();
+        end;
+
+        if (not TicketFound) then
             exit(false);
 
         if (not TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then

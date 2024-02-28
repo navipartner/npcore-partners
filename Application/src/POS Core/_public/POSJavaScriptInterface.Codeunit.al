@@ -33,13 +33,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         Success: Boolean;
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
         JSInterfaceErrorHandler: Codeunit "NPR JS Interface Error Handler";
-        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         _Stopwatch.ResetAll();
         POSSession.RetrieveSessionAction(Action, POSAction);
         _Stopwatch.Start('All');
-        POSRefreshData.StartDataCollection(Context);
-        POSSession.SetPOSRefreshData(POSRefreshData);
+
+        POSSession.SetCursor(Context);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
 
@@ -58,13 +57,11 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
         if Success then begin
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd);
-            POSRefreshData.Refresh();
             _Stopwatch.Start('Data');
             _Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             POSSession.RequestFullRefresh(); //In case an action committed before error
-            POSRefreshData.Refresh();
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;
@@ -82,8 +79,12 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     var
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
+        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         POSSession.GetFrontEnd(FrontEnd, false);
+
+        POSRefreshData.StartDataCollection();
+        POSSession.SetPOSRefreshData(POSRefreshData);
 
         case Method of
             'OnAction20':
@@ -110,6 +111,8 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             else
                 InvokeCustomMethod(Method, Context, FrontEnd);
         end;
+
+        POSRefreshData.Refresh();
     end;
 
     local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")

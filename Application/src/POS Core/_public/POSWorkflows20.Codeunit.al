@@ -95,7 +95,6 @@
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         Handled: Boolean;
-        POSRefreshData: Codeunit "NPR POS Refresh Data";
     begin
         Stopwatch.ResetAll();
 
@@ -103,8 +102,8 @@
         FrontEnd.CloneForWorkflow20(WorkflowId, FrontEnd20);
 
         Stopwatch.Start('All');
-        POSRefreshData.StartDataCollection(Context);
-        POSSession.SetPOSRefreshData(POSRefreshData);
+        POSSession.SetCursor(Context);
+
         JSON.InitializeJObjectParser(Context, FrontEnd20);
 
         OnBeforeInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
@@ -121,14 +120,12 @@
             FrontEnd20.ReportBugAndThrowError(StrSubstNo(Text001, Action));
 
         if Success then begin
-            POSRefreshData.Refresh();
             OnAfterInvokeAction(POSAction, WorkflowStep, Context, POSSession, FrontEnd20);
             Stopwatch.Start('Data');
             Stopwatch.Stop('Data');
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             POSSession.RequestFullRefresh(); //In case an action committed before error
-            POSRefreshData.Refresh();
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
             FrontEnd20.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
         end;

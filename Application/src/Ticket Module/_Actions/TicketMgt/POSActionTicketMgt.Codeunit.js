@@ -21,11 +21,11 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     let functionId = Number(parameters.Function);
     let inputId = Number(parameters.InputMethod);
     let inputMethod = inputNames[inputId];
-    let responseObj = {};
+    let actionSettings = {};
     windowTitle = captions.TicketTitle.substitute(functionNames[functionId].toString());
-    responseObj.FunctionId = functionId;
-    responseObj.DefaultTicketNumber = parameters.DefaultTicketNumber;
-    await workflow.respond("ConfigureWorkflow", responseObj);
+    actionSettings.FunctionId = functionId;
+    actionSettings.DefaultTicketNumber = parameters.DefaultTicketNumber;
+    await workflow.respond("ConfigureWorkflow", actionSettings);
     
     let ticketNumber; 
     if (context.ShowTicketDialog) {
@@ -59,8 +59,8 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             ticketNumber = mposResult.Result.ID;
         }
     }
-    responseObj.TicketNumber = ticketNumber;
-    await workflow.respond("RefineWorkflow", responseObj);
+    actionSettings.TicketNumber = ticketNumber;
+    await workflow.respond("RefineWorkflow", actionSettings);
     let ticketQuantity;
     if (context.ShowTicketQtyDialog) { 
         ticketQuantity = await popup.numpad({
@@ -79,9 +79,15 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         if (ticketReference === null) // cancel returns null
             return;
     }
-    responseObj.TicketQuantity = ticketQuantity;
-    responseObj.TicketReference = ticketReference;
-    await workflow.respond("DoAction", responseObj);
+    debugger;
+    if (context.ShowScheduleSelectionDialog) {
+        let r = await popup.entertainment.scheduleSelection({ token: context.TicketToken });
+
+    } else {
+        actionSettings.TicketQuantity = ticketQuantity;
+        actionSettings.TicketReference = ticketReference;
+        await workflow.respond("DoAction", actionSettings);
+    }
 
     if (context.Verbose) { 
         await popup.message ({
