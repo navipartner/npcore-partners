@@ -8,7 +8,6 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
         _POSUnit: Record "NPR POS Unit";
         _Salesperson: Record "Salesperson/Purchaser";
         _Assert: Codeunit Assert;
-        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         _POSSession: Codeunit "NPR POS Session";
         _Initialized: Boolean;
 
@@ -17,6 +16,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSIAuditLogPageWithAllFiscalisedParameter()
     var
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening SI Audit Log Info
@@ -30,6 +30,8 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
 
         //[Then]
         ShowAllSIAuditLog(ParameterShow::AllFiscalised);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
     end;
 
@@ -38,6 +40,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSIAuditLogPageWithAllParameter()
     var
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening SI Audit Log Info
@@ -51,6 +54,8 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
 
         //[Then]
         ShowAllSIAuditLog(ParameterShow::All);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
     end;
 
@@ -59,6 +64,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSIAuditLogPageWithAllNonFiscalisedParameter()
     var
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening SI Audit Log Info
@@ -72,6 +78,8 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
 
         //[Then]
         ShowAllSIAuditLog(ParameterShow::AllNonFiscalised);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
     end;
 
@@ -80,6 +88,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenSIAuditLogPageWithLastTransactionParameter()
     var
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening SI Audit Log Info
@@ -93,6 +102,8 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
 
         //[Then]
         ShowAllSIAuditLog(ParameterShow::LastTransaction);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
     end;
 

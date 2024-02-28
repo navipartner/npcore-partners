@@ -58,6 +58,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
         SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+        IsHandled: Boolean;
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -77,6 +78,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
             SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, true, false);
 
         Commit();
+        OnBeforePrintFiscalReceipt(IsHandled);
+        if IsHandled then
+            exit;
         SIFiscalThermalPrint.PrintReceipt(SIPOSAuditLogAuxInfo);
     end;
 
@@ -364,6 +368,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
+        IsHandled: Boolean;
     begin
         SIFiscalSetup.SetAutoCalcFields("Signing Certificate");
         SIFiscalSetup.Get();
@@ -383,6 +388,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+        OnBeforeSendHttpRequestForSignZOICode(ResponseText, IsHandled);
+        if IsHandled then
+            exit(true);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
@@ -527,4 +535,14 @@ codeunit 6151546 "NPR SI Audit Mgt."
     end;
 #endif
     #endregion
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforePrintFiscalReceipt(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSignZOICode(var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
 }
