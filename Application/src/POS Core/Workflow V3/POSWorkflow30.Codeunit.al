@@ -86,7 +86,6 @@
         Signal: Codeunit "NPR Front-End: WkfCallCompl.";
         Success: Boolean;
         POSSession: Codeunit "NPR POS Session";
-        POSRefreshData: Codeunit "NPR POS Refresh Data";
         SentryScope: Codeunit "NPR Sentry Scope";
         SentryTransaction: Codeunit "NPR Sentry Transaction";
         SentrySpan: Codeunit "NPR Sentry Span";
@@ -94,9 +93,7 @@
         SentryTraceSpanId: Text;
     begin
         FrontEnd.SetWorkflowID(WorkflowId);
-
-        POSRefreshData.StartDataCollection(Context);
-        POSSession.SetPOSRefreshData(POSRefreshData);
+        POSSession.SetCursor(Context);
         JSON.InitializeJObjectParser(Context);
 
         SentryScope.TryGetActiveTransaction(SentryTransaction);
@@ -111,11 +108,9 @@
         SentrySpan.Finish();
 
         if Success then begin
-            POSRefreshData.Refresh();
             Signal.SignalSuccess(WorkflowId, ActionId);
         end else begin
             POSSession.RequestFullRefresh(); //In case an action committed before error
-            POSRefreshData.Refresh();
             EmitError(ActionCode, WorkflowStep, JSON, GetLastErrorText());
             Signal.SignalFailureAndThrowError(WorkflowId, ActionId, GetLastErrorText);
         end;

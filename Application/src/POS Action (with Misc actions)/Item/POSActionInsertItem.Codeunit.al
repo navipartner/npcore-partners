@@ -85,13 +85,29 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 CheckAvailability(Context);
             'assignSerialNo':
                 FrontEnd.WorkflowResponse(AssignSerialNo(Context, Setup));
+            'cancelTicketItemLine':
+                CancelTicketItemLine(Context);
         end;
+    end;
+
+    local procedure CancelTicketItemLine(Context: Codeunit "NPR POS JSON Helper")
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        POSActionDeleteLine: Codeunit "NPR POSAction: Delete POS Line";
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+        POSActionDeleteLine.SetPositionForPOSSaleLine(Context, POSSaleLine);
+        POSActionDeleteLine.OnBeforeDeleteSaleLinePOS(POSSaleLine);
+        DeletePOSLineB.DeleteSaleLine(POSSaleLine);
     end;
 
     local procedure IfAddItemAddOns(Item: Record Item): Boolean
     begin
         exit(Item."NPR Item Addon No." <> '')
     end;
+
 
     local procedure Step_AddSalesLine(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
@@ -108,6 +124,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSSession: Codeunit "NPR POS Session";
         NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
         EditDesc: Boolean;
         EditDesc2: Boolean;
         SerialSelectionFromList: Boolean;
@@ -128,6 +146,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         CustomDescription: Text;
         CustomDescription2: Text;
         UnitOfMeasure: Text;
+        TicketToken: Text;
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
         UnitOfMeasure := Context.GetStringParameter('unitOfMeasure');
@@ -217,6 +236,12 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 CheckAvailability(PosInventoryProfile, PosItemCheckAvail);
 
         Response.Add('postAddWorkflows', AddPostWorkflowsToRun(Context, SaleLinePOS));
+
+        if (TicketRetailManager.UseFrontEndScheduleUX()) then
+            if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken)) then begin
+                if (TicketRequestManager.RequestRequiresAttention(TicketToken)) then
+                    Response.Add('ticketToken', TicketToken);
+            end;
 
         LogFinishTelem();
     end;
@@ -729,7 +754,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:t,context:i,popup:r,parameters:l,captions:e})=>{debugger;if(i.additionalInformationCollected=!1,!(l.EditDescription&&(i.desc1=await r.input({title:e.editDesc_title,caption:e.editDesc_lead,value:i.defaultDescription}),i.desc1===null))&&!(l.EditDescription2&&(i.desc2=await r.input({title:e.editDesc2_title,caption:e.editDesc2_lead,value:i.defaultDescription}),i.desc2===null))){var{bomComponentLinesWithoutSerialNo:n,requiresUnitPriceInputPrompt:s,requiresSerialNoInputPrompt:o,requiresAdditionalInformationCollection:a,addItemAddOn:d,baseLineNo:f,postAddWorkflows:u}=await t.respond("addSalesLine");if(a){if(s&&(i.unitPriceInput=await r.numpad({title:e.UnitPriceTitle,caption:e.unitPriceCaption}),i.unitPriceInput===null)||o&&(i.serialNoInput=await r.input({title:e.itemTracking_title,caption:e.itemTracking_lead}),i.serialNoInput===null))return;i.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialNo:n,addItemAddOn:d,baseLineNo:f,postAddWorkflows:u}=await t.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNo(n,t,i,l,r,e),d&&(await t.run("RUN_ITEM_ADDONS",{context:{baseLineNo:f},parameters:{SkipItemAvailabilityCheck:!0}}),await t.respond("checkAvailability")),u)for(const m of Object.entries(u)){let[c,N]=m;c&&await t.run(c,{parameters:N})}}};async function processBomComponentLinesWithoutSerialNo(t,i,r,l,e,n){if(!!t)for(var s=0;s<t.length;s++){let o=!0,a;for(;o;)o=!1,r.serialNoInput="",r.bomComponentLineWithoutSerialNo=t[s],l.SelectSerialNo&&r.bomComponentLineWithoutSerialNo.requiresSpecificSerialNo?(a=await i.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await e.confirm({title:n.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(o=!0)):(r.serialNoInput=await e.input({title:n.itemTracking_title,caption:format(n.bomItemTracking_Lead,r.bomComponentLineWithoutSerialNo.description,r.bomComponentLineWithoutSerialNo.parentBOMDescription)}),r.serialNoInput&&(a=await i.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await e.confirm({title:n.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(o=!0)))}}function format(t,...i){if(!t.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return t.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(r,l,e)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,n=>n[0]);if(e>=i.length)throw new Error("argument index is out of range in format");return i[e]})}'
+'let main=async({workflow:r,context:e,popup:t,parameters:l,captions:i})=>{debugger;if(e.additionalInformationCollected=!1,!(l.EditDescription&&(e.desc1=await t.input({title:i.editDesc_title,caption:i.editDesc_lead,value:e.defaultDescription}),e.desc1===null))&&!(l.EditDescription2&&(e.desc2=await t.input({title:i.editDesc2_title,caption:i.editDesc2_lead,value:e.defaultDescription}),e.desc2===null))){var{bomComponentLinesWithoutSerialNo:n,requiresUnitPriceInputPrompt:s,requiresSerialNoInputPrompt:o,requiresAdditionalInformationCollection:a,addItemAddOn:c,baseLineNo:f,postAddWorkflows:u,ticketToken:m}=await r.respond("addSalesLine");if(m){let d=await t.entertainment.scheduleSelection({token:m});debugger;if(d===null){await r.respond("cancelTicketItemLine");return}}if(a){if(s&&(e.unitPriceInput=await t.numpad({title:i.UnitPriceTitle,caption:i.unitPriceCaption}),e.unitPriceInput===null)||o&&(e.serialNoInput=await t.input({title:i.itemTracking_title,caption:i.itemTracking_lead}),e.serialNoInput===null))return;e.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialNo:n,addItemAddOn:c,baseLineNo:f,postAddWorkflows:u}=await r.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNo(n,r,e,l,t,i),c&&(await r.run("RUN_ITEM_ADDONS",{context:{baseLineNo:f},parameters:{SkipItemAvailabilityCheck:!0}}),await r.respond("checkAvailability")),u)for(const d of Object.entries(u)){let[N,S]=d;N&&await r.run(N,{parameters:S})}}};async function processBomComponentLinesWithoutSerialNo(r,e,t,l,i,n){if(!!r)for(var s=0;s<r.length;s++){let o=!0,a;for(;o;)o=!1,t.serialNoInput="",t.bomComponentLineWithoutSerialNo=r[s],l.SelectSerialNo&&t.bomComponentLineWithoutSerialNo.requiresSpecificSerialNo?(a=await e.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await i.confirm({title:n.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(o=!0)):(t.serialNoInput=await i.input({title:n.itemTracking_title,caption:format(n.bomItemTracking_Lead,t.bomComponentLineWithoutSerialNo.description,t.bomComponentLineWithoutSerialNo.parentBOMDescription)}),t.serialNoInput&&(a=await e.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await i.confirm({title:n.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(o=!0)))}}function format(r,...e){if(!r.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return r.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(t,l,i)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,n=>n[0]);if(i>=e.length)throw new Error("argument index is out of range in format");return e[i]})}'
         );
     end;
 

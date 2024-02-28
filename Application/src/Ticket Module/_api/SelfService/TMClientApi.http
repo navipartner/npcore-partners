@@ -130,24 +130,28 @@ Company: {{companyId}}
 {
     "method": "NPRetail.TM.MakeTicketReservation",
     "parameters": "{
-        \"_dragonglassResponseContext\": {\"invocationId\": \"{{$guid}}\", \"method\": \"NPRetail.TM.MakeTicketReservation\"}, 
-        \"NPRetail.TM.MakeTicketReservation\": [
+        \"_dragonglassResponseContext\":{\"invocationId\":\"{{$guid}}\",\"method\":\"NPRetail.TM.MakeTicketReservation\"},
+        \"NPRetail.TM.MakeTicketReservation\":[
             {
-                \"token\": \"\", 
-                \"lines\": [
-                    {\"itemReference\":\"{{itemNumber}}\",
+                \"token\":\"{{ticketToken}}\",
+                \"lines\":[{
+                    \"itemReference\":\"{{itemNumber}}\",
                     \"admissionCode\":\"{{admissionCode}}\",
                     \"quantity\":1,
-                    \"scheduleId\":-1,
+                    \"scheduleId\":{{scheduleId}},
                     \"memberNumber\":\"\",
-                    \"notificationAddress\":\"\"}
-                ]}  
-            ]}",
+                    \"notificationAddress\":\"\"
+                    }
+                ]}
+            ]
+        }",
     "lastServerId": ""
 }
 
 
 ###
+
+
 # @name MakeTicketRequest
 POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}

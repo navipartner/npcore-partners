@@ -301,6 +301,11 @@
             MinValue = 0;
             MaxValue = 100;
         }
+        field(370; UseFrontEndScheduleUX; Boolean)
+        {
+            Caption = 'Use Front End Schedule UX';
+            DataClassification = CustomerContent;
+        }
         field(400; "Ticket Admission Web Url"; Text[250])
         {
             Caption = 'Ticket Admission Web Url';
