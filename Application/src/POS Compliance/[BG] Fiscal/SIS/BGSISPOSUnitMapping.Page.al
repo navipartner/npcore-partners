@@ -33,6 +33,11 @@ page 6151281 "NPR BG SIS POS Unit Mapping"
                     ApplicationArea = NPRBGSISFiscal;
                     ToolTip = 'Specifies the IP address of the fiscal printer related to this POS unit.';
                 }
+                field("Printer Model"; Rec."Printer Model")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the model of the fiscal printer related to this POS unit.';
+                }
                 field("Fiscal Printer Device No."; Rec."Fiscal Printer Device No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;

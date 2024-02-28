@@ -40,6 +40,12 @@ page 6151269 "NPR BG Fiscalization Setup"
                     ShowCaption = false;
                     Visible = Rec."BG SIS Fiscal Enabled";
 
+                    field("BG SIS Print EFT Information"; Rec."BG SIS Print EFT Information")
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Print EFT Information';
+                        ToolTip = 'Specifies whether the EFT information should be printed on the fiscal receipt at the end of sale if there is any EFT information.';
+                    }
                     field("BG SIS on PDF"; Rec."BG SIS on PDF")
                     {
                         ApplicationArea = NPRRetail;

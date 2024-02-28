@@ -223,14 +223,15 @@ codeunit 85172 "NPR Library BG SIS Fiscal"
 
     local procedure InsertBGSISPOSUnitMapping(POSUnitNo: Code[10])
     var
-        RSPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
     begin
-        RSPOSUnitMapping.Init();
-        RSPOSUnitMapping."POS Unit No." := POSUnitNo;
-        RSPOSUnitMapping."Fiscal Printer IP Address" := '85.14.5.45:5064';
-        RSPOSUnitMapping."Fiscal Printer Device No." := 'BN610291';
-        RSPOSUnitMapping."Fiscal Printer Memory No." := '51610291';
-        RSPOSUnitMapping.Insert();
+        BGSISPOSUnitMapping.Init();
+        BGSISPOSUnitMapping."POS Unit No." := POSUnitNo;
+        BGSISPOSUnitMapping."Fiscal Printer IP Address" := '83.145.254.20:5064'; // dummy IP address
+        BGSISPOSUnitMapping."Printer Model" := BGSISPOSUnitMapping."Printer Model"::"MF-P1200DN 179";
+        BGSISPOSUnitMapping."Fiscal Printer Device No." := 'BN610291';
+        BGSISPOSUnitMapping."Fiscal Printer Memory No." := '51610291';
+        BGSISPOSUnitMapping.Insert();
     end;
 
     local procedure EnableBGSISFiscalization()

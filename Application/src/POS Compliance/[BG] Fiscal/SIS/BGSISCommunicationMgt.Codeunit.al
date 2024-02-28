@@ -155,7 +155,9 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         AddReceiptItemsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         AddReceiptPaymentsJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry."Entry No.", Refund);
         if Refund then
-            AddStornoInputJSONObjectForRefund(JsonTextReaderWriter, ExtendedReceipt, POSEntry."Entry No.");
+            AddStornoInputJSONObjectForRefund(JsonTextReaderWriter, ExtendedReceipt, POSEntry."Entry No.")
+        else
+            AddTextAfterPaymentJSONArrayForSaleAndRefund(JsonTextReaderWriter, POSEntry);
 
         JsonTextReaderWriter.WriteEndObject(); // params
         JsonTextReaderWriter.WriteEndObject();
@@ -513,6 +515,57 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         JsonTextReaderWriter.WriteStringProperty('receiptNumber', BGSISPOSAuditLogAuxToRefund."Grand Receipt No.".PadLeft(10, '0'));
 
         JsonTextReaderWriter.WriteEndObject();
+    end;
+
+    local procedure AddTextAfterPaymentJSONArrayForSaleAndRefund(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry")
+    var
+        BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+        EFTReceipt: Record "NPR EFT Receipt";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        TextAfterPaymentJSONOArrayAdded: Boolean;
+        MaxCharactersAllowed: Integer;
+        EFTReceiptText: Text;
+    begin
+        BGFiscalizationSetup.Get();
+        if not BGFiscalizationSetup."BG SIS Print EFT Information" then
+            exit;
+
+        BGSISPOSUnitMapping.Get(POSEntry."POS Unit No.");
+        BGSISPOSUnitMapping.CheckIsPrinterModelPopulated();
+        MaxCharactersAllowed := GetTextAfterPaymentMaxCharactersAllowed(BGSISPOSUnitMapping);
+
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        if not EFTTransactionRequest.FindSet() then
+            exit;
+
+        repeat
+            EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+            if EFTReceipt.FindSet() then
+                repeat
+                    if not TextAfterPaymentJSONOArrayAdded then begin
+                        JsonTextReaderWriter.WriteStartArray('textAfterPayment');
+                        TextAfterPaymentJSONOArrayAdded := true;
+                    end;
+
+                    EFTReceiptText := CopyStr(EFTReceipt.Text.Trim(), 1, MaxStrLen(EFTReceipt.Text));
+                    JsonTextReaderWriter.WriteStartObject('');
+                    JsonTextReaderWriter.WriteStringProperty('text', CopyStr(EFTReceiptText, 1, MaxCharactersAllowed));
+                    JsonTextReaderWriter.WriteStringProperty('type', 'text');
+                    JsonTextReaderWriter.WriteEndObject();
+
+                    if StrLen(EFTReceiptText) > MaxCharactersAllowed then begin
+                        JsonTextReaderWriter.WriteStartObject('');
+                        JsonTextReaderWriter.WriteStringProperty('text', CopyStr(EFTReceiptText, MaxCharactersAllowed + 1, MaxCharactersAllowed));
+                        JsonTextReaderWriter.WriteStringProperty('type', 'text');
+                        JsonTextReaderWriter.WriteEndObject();
+                    end;
+                until EFTReceipt.Next() = 0;
+        until EFTTransactionRequest.Next() = 0;
+
+        if TextAfterPaymentJSONOArrayAdded then
+            JsonTextReaderWriter.WriteEndArray();
     end;
 
     internal procedure CreateJSONBodyForPrintXReport() JsonBody: Text
@@ -899,6 +952,24 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     local procedure IsAlphanumeric(CharToCheck: Code[1]) Alphanumeric: Boolean
     begin
         Alphanumeric := IsDigit(CharToCheck) or IsAlpha(CharToCheck);
+    end;
+    #endregion
+
+    #region Printer Model Helper Functions
+    local procedure GetTextAfterPaymentMaxCharactersAllowed(BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping") MaxCharactersAllowed: Integer
+    begin
+        case BGSISPOSUnitMapping."Printer Model" of
+            BGSISPOSUnitMapping."Printer Model"::"MF-P1200DN 179":
+                MaxCharactersAllowed := 42;
+            BGSISPOSUnitMapping."Printer Model"::"MF-TH250QR 100":
+                MaxCharactersAllowed := 42;
+            BGSISPOSUnitMapping."Printer Model"::"MF-TH230QR 203":
+                MaxCharactersAllowed := 42;
+            BGSISPOSUnitMapping."Printer Model"::"BULPRINT T2QR 143":
+                MaxCharactersAllowed := 46;
+            BGSISPOSUnitMapping."Printer Model"::"BULPRINT T3QR 169":
+                MaxCharactersAllowed := 46;
+        end;
     end;
     #endregion
 
