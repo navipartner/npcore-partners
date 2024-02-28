@@ -75,7 +75,7 @@
                 if ErrorMessage2.FindSet() then
                     repeat
                         if Format(ErrorMessage2."Record ID") = Format(ErrorMessage."Record ID") then begin
-#IF NOT CLOUD OR BC21 OR BC20
+#IF BC17 or BC18 or BC19 or BC20 or BC21
 #pragma warning disable AL0432
                             case ErrorMessage2."Field Number" of
                                 ItemWorksheetLine.FieldNo("Vend Item No."):

@@ -1,4 +1,4 @@
-#if CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
 report 6014517 "NPR NpRv Voucher Cloud 2 QR"
 {
     Extensible = False;
