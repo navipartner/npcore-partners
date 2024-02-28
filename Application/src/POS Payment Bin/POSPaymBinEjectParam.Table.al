@@ -61,19 +61,17 @@
 
     procedure FindOrCreateRecord(BinNoIn: Code[10]; NameIn: Text; DataType: Integer; DefaultValue: Variant; OptionStringIn: Text)
     begin
-        if not Get(BinNoIn, NameIn) then begin
-            Init();
-            "Bin No." := BinNoIn;
-            Name := CopyStr(NameIn, 1, 30);
-            "Data Type" := DataType;
-            OptionString := CopyStr(OptionStringIn, 1, 250);
-            Validate(Value, DefaultValue);
-            Insert();
-            Commit();
+        if Get(BinNoIn, NameIn) then
             exit;
-        end;
 
-        UpdatePrintTemplateParamValue(Rec, NameIn, DefaultValue);
+        Init();
+        "Bin No." := BinNoIn;
+        Name := CopyStr(NameIn, 1, 30);
+        "Data Type" := DataType;
+        OptionString := CopyStr(OptionStringIn, 1, 250);
+        Validate(Value, DefaultValue);
+        Insert();
+        Commit();
     end;
 
     procedure LookupValue()
@@ -224,30 +222,6 @@
         Parts := String.Split(CharTxt);
     end;
 
-    local procedure UpdatePrintTemplateParamValue(var POSPaymBinEjectParam: Record "NPR POS Paym. Bin Eject Param."; NameIn: Text; DefaultValue: Text)
-    var
-        ParamNameLbl: Label 'print_template', Locked = true;
-        RPTemplateHeader: Record "NPR RP Template Header";
-    begin
-        if DefaultValue = '' then
-            exit;
-
-        if POSPaymBinEjectParam.Value <> '' then
-            exit;
-
-        if NameIn <> ParamNameLbl then
-            exit;
-
-        if POSPaymBinEjectParam."Data Type" <> POSPaymBinEjectParam."Data Type"::Text then
-            exit;
-
-        if not RPTemplateHeader.Get(DefaultValue) then
-            exit;
-
-        POSPaymBinEjectParam.Validate(Value, DefaultValue);
-        POSPaymBinEjectParam.Modify();
-    end;
-
     [IntegrationEvent(false, false)]
     internal procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     begin
@@ -268,4 +242,3 @@
     begin
     end;
 }
-
