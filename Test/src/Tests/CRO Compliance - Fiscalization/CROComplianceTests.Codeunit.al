@@ -32,12 +32,14 @@ codeunit 85163 "NPR CRO Compliance Tests"
         // [When] Ending normal cash sale
         EntryNumber := DoItemSale();
 
-        UnbindSubscription(LibraryCROFiscal);
         // [Then] For normal cash sale CRO Audit Log is created and filled by the Tax Authority
         CROPOSAuditLogAuxInfo.SetRange("Audit Entry Type", CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
         CROPOSAuditLogAuxInfo.SetRange("POS Entry No.", EntryNumber);
         CROPOSAuditLogAuxInfo.FindFirst();
         _Assert.IsTrue(CROPOSAuditLogAuxInfo."JIR Code" <> '', 'Fiscal Bill must be signed by the Tax Authority.');
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
+        UnbindSubscription(LibraryCROFiscal);
     end;
 
     [Test]
@@ -62,7 +64,6 @@ codeunit 85163 "NPR CRO Compliance Tests"
         POSEntry.Get(EntryNumber);
         ReturnEntryNumber := DoReturnSale(POSEntry."Document No.");
 
-        UnbindSubscription(LibraryCROFiscal);
         // [Then] For normal cash sale CRO Audit Log is created and filled by the Tax Authority for both sales and refund
         CROPOSAuditLogAuxInfo.SetRange("Audit Entry Type", CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
         CROPOSAuditLogAuxInfo.SetRange("POS Entry No.", EntryNumber);
@@ -73,6 +74,9 @@ codeunit 85163 "NPR CRO Compliance Tests"
         CROPOSAuditLogAuxInfo.SetRange("POS Entry No.", ReturnEntryNumber);
         CROPOSAuditLogAuxInfo.FindFirst();
         _Assert.IsTrue(CROPOSAuditLogAuxInfo."JIR Code" <> '', 'Fiscal Bill must be signed by the Tax Authority.');
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
+        UnbindSubscription(LibraryCROFiscal);
     end;
 
     [Test]
@@ -92,13 +96,15 @@ codeunit 85163 "NPR CRO Compliance Tests"
 
         // [When] Ending and returning receipt
         EntryNumber := DoItemSaleWithParagon();
-        UnbindSubscription(LibraryCROFiscal);
 
         // [Then] For normal cash sale with paragon number CRO Audit Log is created and fields are filled by the Tax Authority
         CROPOSAuditLogAuxInfo.SetRange("Audit Entry Type", CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
         CROPOSAuditLogAuxInfo.SetRange("POS Entry No.", EntryNumber);
         CROPOSAuditLogAuxInfo.FindFirst();
         _Assert.IsTrue(CROPOSAuditLogAuxInfo."JIR Code" <> '', 'Fiscal Bill must be signed by the Tax Authority.');
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
+        UnbindSubscription(LibraryCROFiscal);
     end;
 
     internal procedure InitializeData()

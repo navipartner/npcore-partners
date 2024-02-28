@@ -38,6 +38,7 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
         SIPOSSale.Get(SalePOS.SystemId);
         _Assert.IsTrue((SIPOSSale."SI Set Number" = NewDesc) and (SIPOSSale."SI Serial Number" = NewDesc2), 'Set and Serial Numbers are not inserted.');
 
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
     end;
 

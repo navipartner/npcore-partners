@@ -7,7 +7,6 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
         _POSPaymentMethod: Record "NPR POS Payment Method";
         _POSUnit: Record "NPR POS Unit";
         _Salesperson: Record "Salesperson/Purchaser";
-        LibraryCROFiscal: Codeunit "NPR Library CRO Fiscal";
         _Assert: Codeunit Assert;
         _POSSession: Codeunit "NPR POS Session";
         _Initialized: Boolean;
@@ -17,6 +16,7 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenCROAuditLogPageWithAllFiscalisedParameter()
     var
+        LibraryCROFiscal: Codeunit "NPR Library CRO Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening CRO Audit Log Info
@@ -30,6 +30,8 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
 
         //[Then]
         ShowAllCROAuditLog(ParameterShow::AllFiscalised);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibraryCROFiscal);
     end;
 
@@ -38,6 +40,7 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenCROAuditLogPageWithAllParameter()
     var
+        LibraryCROFiscal: Codeunit "NPR Library CRO Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening CRO Audit Log Info
@@ -51,6 +54,8 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
 
         //[Then]
         ShowAllCROAuditLog(ParameterShow::All);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibraryCROFiscal);
     end;
 
@@ -59,6 +64,7 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenCROAuditLogPageWithAllNonFiscalisedParameter()
     var
+        LibraryCROFiscal: Codeunit "NPR Library CRO Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening CRO Audit Log Info
@@ -73,6 +79,9 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
         //[Then]
         ShowAllCROAuditLog(ParameterShow::AllNonFiscalised);
         UnbindSubscription(LibraryCROFiscal);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
+        UnbindSubscription(LibraryCROFiscal);
     end;
 
     [Test]
@@ -80,6 +89,7 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure OpenCROAuditLogPageWithLastTransactionParameter()
     var
+        LibraryCROFiscal: Codeunit "NPR Library CRO Fiscal";
         ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction;
     begin
         // [Scenario] Test action for opening CRO Audit Log Info
@@ -93,6 +103,9 @@ codeunit 85164 "NPR POS Act CRO Aud Look Tests"
 
         //[Then]
         ShowAllCROAuditLog(ParameterShow::LastTransaction);
+        UnbindSubscription(LibraryCROFiscal);
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibraryCROFiscal);
     end;
 

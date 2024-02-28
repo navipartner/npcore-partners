@@ -139,4 +139,17 @@ codeunit 85090 "NPR Library SI Fiscal"
         SIPOSStoreMapping.Modify();
         IsHandled := true;
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR SI Audit Mgt.", 'OnBeforePrintFiscalReceipt', '', false, false)]
+    local procedure OnBeforePrintFiscalReceipt(var IsHandled: Boolean)
+    begin
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR SI Audit Mgt.", 'OnBeforeSendHttpRequestForSignZOICode', '', false, false)]
+    local procedure OnBeforeSendHttpRequestForSignZOICode(var ResponseText: Text; var IsHandled: Boolean)
+    begin
+        ResponseText := '3024e56bf1ddd2e7eeb5715c6859a913';
+        IsHandled := true;
+    end;
 }
