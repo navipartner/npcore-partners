@@ -104,6 +104,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
+        IsHandled: Boolean;
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -122,6 +123,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROTaxCommunicationMgt.CreateNormalSale(CROPOSAuditLogAuxInfo, false);
 
         Commit();
+        OnBeforePrintFiscalReceipt(IsHandled);
+        if IsHandled then
+            exit;
         CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
     end;
 
@@ -929,6 +933,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSendHttpRequestForXMLSigning(var ResponseText: Text; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforePrintFiscalReceipt(var IsHandled: Boolean)
     begin
     end;
 }
