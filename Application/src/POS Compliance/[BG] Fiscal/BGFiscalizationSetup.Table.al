@@ -26,6 +26,11 @@ table 6060085 "NPR BG Fiscalization Setup"
             Caption = 'BG SIS Fiscalisation Enabled';
             DataClassification = CustomerContent;
         }
+        field(15; "BG SIS Print EFT Information"; Boolean)
+        {
+            Caption = 'BG SIS Print EFT Information';
+            DataClassification = CustomerContent;
+        }
         field(20; "BG SIS on PDF"; Boolean)
         {
             Caption = 'BG SIS on PDF';

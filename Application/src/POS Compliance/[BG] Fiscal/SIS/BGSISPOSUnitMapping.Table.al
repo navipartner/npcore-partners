@@ -32,8 +32,14 @@ table 6060097 "NPR BG SIS POS Unit Mapping"
                 if "Fiscal Printer IP Address" <> xRec."Fiscal Printer IP Address" then begin
                     Clear("Fiscal Printer Device No.");
                     Clear("Fiscal Printer Memory No.");
+                    "Printer Model" := "Printer Model"::" ";
                 end;
             end;
+        }
+        field(25; "Printer Model"; Enum "NPR BG SIS Printer Model")
+        {
+            Caption = 'Printer Model';
+            DataClassification = CustomerContent;
         }
         field(30; "Fiscal Printer Device No."; Text[8])
         {
@@ -83,5 +89,13 @@ table 6060097 "NPR BG SIS POS Unit Mapping"
         ShouldRefresh := true;
         if ("Fiscal Printer Device No." <> '') and ("Fiscal Printer Memory No." <> '') and ("Fiscal Printer Info Refreshed" <> 0DT) then
             ShouldRefresh := DT2Date("Fiscal Printer Info Refreshed") < Today(); // refresh should happen only when the date is changed in case when fiscal printer info is already populated
+    end;
+
+    internal procedure CheckIsPrinterModelPopulated()
+    var
+        NotPopulatedErr: Label '%1 must be populated for %2 POS Unit Mapping.', Comment = '%1 - Printer Model field caption, %2 - POS Unit No. field caption';
+    begin
+        if "Printer Model" = "Printer Model"::" " then
+            Error(NotPopulatedErr, FieldCaption("Printer Model"), "POS Unit No.");
     end;
 }
