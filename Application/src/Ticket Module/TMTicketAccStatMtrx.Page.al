@@ -101,7 +101,7 @@
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
-                        OptionCaption = 'Admitted Count,Admitted count with Revoked,Admitted incl. Revisits';
+                        OptionCaption = 'Admitted Count,Admitted count with Revoked,Admitted (All)';
                         ToolTip = 'Specifies the value of the Admission Count Def. field';
 
                         trigger OnValidate()
@@ -529,7 +529,7 @@
         BlockedTicketTypeFactFilter: Text;
         BlockedHourFactFilter: Text;
         BlockedVariantFactFilter: Text;
-        AdmissionDefinition: Option ADMITTED_COUNT,ADMITTED_REVOKED_COUNT,ADMITTED_REVIST;
+        AdmissionDefinition: Option ADMITTED_COUNT,ADMITTED_REVOKED_COUNT,ADMITTED_ALL;
 
     internal procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
     var
