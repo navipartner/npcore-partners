@@ -39,6 +39,7 @@
                 {
                     ToolTip = 'Specifies which method is used to physically eject the POS Payment Bin, if it is a cash drawer.';
                     ApplicationArea = NPRRetail;
+                    StyleExpr = StyleByPrintTemplateAvailability;
                 }
                 field("Bin Type"; Rec."Bin Type")
                 {
@@ -162,7 +163,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'dds an initial cash float to the system.';
+                ToolTip = 'Adds an initial cash float to the system.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
@@ -175,6 +176,15 @@
 
     var
         InitialFloatDesc: Label 'Initial Float';
+        StyleByPrintTemplateAvailability: Text;
+
+    trigger OnAfterGetRecord()
+    begin
+        if IsPrintTemplateMissing(Rec) then
+            StyleByPrintTemplateAvailability := 'Unfavorable'
+        else
+            StyleByPrintTemplateAvailability := 'Standard';
+    end;
 
     local procedure TransferContentsToBin()
     var
@@ -338,5 +348,18 @@
         //
         // EXIT (ROUND (CurrExchRate.ExchangeAmtFCYToLCY (TransactionDate, CurrencyCode, Amount,
         //                                               1 / CurrExchRate.ExchangeRate (TransactionDate, CurrencyCode))));
+    end;
+
+    local procedure IsPrintTemplateMissing(POSPaymentBin: Record "NPR POS Payment Bin"): Boolean
+    var
+        POSPaymBinEjectParam: Record "NPR POS Paym. Bin Eject Param.";
+        RPTemplateHeader: Record "NPR RP Template Header";
+        POSPaymBinEjectTempl: Codeunit "NPR POS Paym.Bin Eject: Templ.";
+    begin
+        if POSPaymentBin."Eject Method" <> POSPaymBinEjectTempl.InvokeMethodCode() then
+            exit;
+        if not POSPaymBinEjectParam.Get(POSPaymentBin."No.", POSPaymBinEjectTempl.InvokeParameterName()) or (POSPaymBinEjectParam.Value = '') then
+            exit(true);
+        exit(not RPTemplateHeader.Get(CopyStr(POSPaymBinEjectParam.Value, 1, MaxStrLen(RPTemplateHeader.Code))));
     end;
 }
