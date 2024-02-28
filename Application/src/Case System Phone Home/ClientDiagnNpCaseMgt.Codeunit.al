@@ -262,7 +262,7 @@
     local procedure AppendLicenseInfo(MethodNS: Text; var Element: XmlElement)
     var
         User: Record User;
-#IF CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
         AzureADUserManagement: Codeunit "Azure AD User Management";
 #ENDIF
         XmlElementLicenseInfo: XmlElement;
@@ -277,7 +277,7 @@
         XmlElementLicenseInfo.Add(AddElement('no_of_full_users', '', MethodNS));
         XmlElementLicenseInfo.Add(AddElement('no_of_isv_users', '', MethodNS));
         XmlElementLicenseInfo.Add(AddElement('no_of_limited_users', '', MethodNS));
-#IF CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
         if AzureADUserManagement.IsUserDelegated(UserSecurityId()) then
             XmlElementLicenseInfo.Add(AddElement('delegated_user', 'true', MethodNS));
 #ENDIF

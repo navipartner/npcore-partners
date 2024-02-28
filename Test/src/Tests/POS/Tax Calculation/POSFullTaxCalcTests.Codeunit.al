@@ -2,7 +2,8 @@ codeunit 85029 "NPR POS Full Tax Calc. Tests"
 {
     // // [Feature] POS Active Full Tax Calculation
     Subtype = Test;
-    Permissions = TableData "G/L Entry" = rimd;
+    Permissions = TableData "G/L Entry" = rimd,
+                  TableData "VAT Entry" = rimd;
 
     trigger OnRun()
     begin
