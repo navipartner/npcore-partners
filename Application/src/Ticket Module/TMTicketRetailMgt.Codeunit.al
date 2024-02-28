@@ -52,6 +52,16 @@
         exit(false);
     end;
 
+    procedure UseFrontEndScheduleUX(): Boolean
+    var
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if (not TicketSetup.Get()) then
+            exit(false);
+
+        exit(TicketSetup.UseFrontEndScheduleUX);
+    end;
+
     procedure AcquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "NPR POS Sale Line"; HaveSalesLine: Boolean; var ResponseMessage: Text) LookupOK: Boolean
     var
         PageAction: Action;
@@ -87,7 +97,8 @@
         end;
 
         ResultCode := 0;
-
+        if (UseFrontEndScheduleUX()) then
+            exit(false); // Schedule selection will be shown later
 
         if (Session.CurrentClientType = Session.CurrentClientType::Phone) then begin
             repeat
@@ -637,6 +648,7 @@
     local procedure NewTicketSales(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ResponseCode: Integer;
         ResponseMessage: Text;
@@ -715,6 +727,9 @@
         ResponseMessage := ABORTED;
         if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
+
+        if (ResponseCode = -1) and (TicketRetailManager.UseFrontEndScheduleUX()) then
+            ResponseCode := 0;
 
         if (ResponseCode = 0) then begin
             Commit();

@@ -13,8 +13,17 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         if (context.desc2 === null) return;
     }
 
-    var { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
+    var { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows, ticketToken } = await workflow.respond("addSalesLine");
 
+    if (ticketToken) {
+        let r = await popup.entertainment.scheduleSelection({ token: ticketToken });
+        debugger;
+        if (r === null) {
+            // selection cancelled
+            await workflow.respond("cancelTicketItemLine");
+            return;
+        }
+    }
     if (requiresAdditionalInformationCollection) {
 
         if (requiresUnitPriceInputPrompt) {
@@ -46,7 +55,6 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
             };
         };
     };
-
 }
 
 async function processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions) {

@@ -8,30 +8,11 @@ codeunit 6150791 "NPR POS Refresh Data"
         _POSRefreshSale: Codeunit "NPR POS Refresh Sale";
         _RefreshAll: Boolean;
 
-    procedure StartDataCollection(Context: JsonObject)
-    var
-        JToken: JsonToken;
-        POSSession: Codeunit "NPR POS Session";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
+    procedure StartDataCollection()
     begin
-        POSSession.GetSaleContext(POSSale, POSSaleLine, POSPaymentLine);
-
         BindSubscription(_POSRefreshSale);
-        if Context.SelectToken('data.positions.BUILTIN_SALE', JToken) then begin
-            POSSale.SetPosition(JToken.AsValue().AsText());
-        end;
-
         BindSubscription(_POSRefreshSaleLine);
-        if Context.SelectToken('data.positions.BUILTIN_SALELINE', JToken) then begin
-            POSSaleLine.SetPosition(JToken.AsValue().AsText());
-        end;
-
         BindSubscription(_POSRefreshPaymentLine);
-        if Context.SelectToken('data.positions.BUILTIN_PAYMENTLINE', JToken) then begin
-            POSPaymentLine.SetPosition(JToken.AsValue().AsText());
-        end
     end;
 
     procedure Refresh()
@@ -41,6 +22,10 @@ codeunit 6150791 "NPR POS Refresh Data"
         DataSets: JsonObject;
         POSDataManagement: Codeunit "NPR POS Data Management";
     begin
+
+        if (not POSSession.IsInitialized()) then
+            exit;
+            
         // For backwards compatibility we need to always refresh the sale header record, as the POS Sale data drivers depend on a refresh to ship
         // their values to frontend, even when the POS Sale record has not been modified.
         DataSets.Add(POSDataManagement.POSDataSource_BuiltInSale(), _POSRefreshSale.GetFullDataInCurrentSale());
