@@ -27,7 +27,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
             UpdateBGSISAuditLogForSaleAndRefund(BGSISPOSAuditLogAux, BGSISPOSUnitMapping, TempJsonBuffer, RequestText, ExtendedReceipt);
         end else begin
             ErrorLogReceiptFiscalisated(ResponseText);
-            UpdateBGSISAuditLogRequestContent(BGSISPOSAuditLogAux, RequestText, ExtendedReceipt);
+            UpdateBGSISAuditLogRequestContent(BGSISPOSAuditLogAux, RequestText);
         end;
     end;
 
@@ -281,7 +281,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
                 if not AllInvoiceDataEntered then
                     Message(MustEnterNecessaryExtendedReceiptDataMsg)
                 else begin
-                    AllInvoiceDataCorrect := IsCustomerIDNumberTypealueAllowed(CustomerIDNumberType);
+                    AllInvoiceDataCorrect := IsCustomerIDNumberTypeValueAllowed(CustomerIDNumberType);
                     if not AllInvoiceDataCorrect then
                         Message(CustomerIDNumberTypeMsg)
                     else begin
@@ -303,7 +303,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         exit(true);
     end;
 
-    local procedure IsCustomerIDNumberTypealueAllowed(CustomerIDNumberType: Integer): Boolean
+    local procedure IsCustomerIDNumberTypeValueAllowed(CustomerIDNumberType: Integer): Boolean
     begin
         if not (CustomerIDNumberType in [0, 1, 2]) then
             exit(false);
@@ -784,9 +784,6 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
-        if ExtendedReceipt then
-            RemoveCustomerIDWhenNotBGCompany(RequestText);
-
         BGSISPOSAuditLogAux.SetRequestText(RequestText);
 
         BGSISPOSAuditLogAux."Grand Receipt No." := GetPropertyValueWithCheck(TempJsonBuffer, 'grandReceiptNum');
@@ -806,35 +803,22 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         BGSISPOSAuditLogAux.Modify();
     end;
 
+    [Obsolete('Replaced by local overload procedure UpdateBGSISAuditLogRequestContent.', 'NPR31.0')]
     internal procedure UpdateBGSISAuditLogRequestContent(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; RequestText: Text; ExtendedReceipt: Boolean)
     begin
-        if ExtendedReceipt then
-            RemoveCustomerIDWhenNotBGCompany(RequestText);
-
         BGSISPOSAuditLogAux.SetRequestText(RequestText);
         BGSISPOSAuditLogAux.Modify();
     end;
 
-    local procedure RemoveCustomerIDWhenNotBGCompany(var RequestText: Text)
-    var
-        InvoiceDataJsonObject, MainJsonObject : JsonObject;
-        JsonToken: JsonToken;
+    local procedure UpdateBGSISAuditLogRequestContent(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; RequestText: Text)
     begin
-        MainJsonObject.ReadFrom(RequestText);
-        MainJsonObject.SelectToken('$.params.invoiceData', JsonToken);
-        InvoiceDataJsonObject := JsonToken.AsObject();
-
-        InvoiceDataJsonObject.Get('identNumberType', JsonToken);
-        if JsonToken.AsValue().AsInteger() = 0 then
-            exit;
-
-        InvoiceDataJsonObject.Replace('identNumber', '**********');
-
-        MainJsonObject.WriteTo(RequestText);
+        BGSISPOSAuditLogAux.SetRequestText(RequestText);
+        BGSISPOSAuditLogAux.Modify();
     end;
 
     local procedure PopulateExtendedReceiptInfo(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; RequestText: Text)
     var
+        BGSISCustIDNoType: Enum "NPR BG SIS Cust. ID No. Type";
         InvoiceDataJsonObject, MainJsonObject : JsonObject;
         JsonToken: JsonToken;
     begin
@@ -843,14 +827,17 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         InvoiceDataJsonObject := JsonToken.AsObject();
 
         InvoiceDataJsonObject.Get('identNumberType', JsonToken);
-        if JsonToken.AsValue().AsInteger() <> 0 then
+        if not (JsonToken.AsValue().AsInteger() in [0, 1, 2]) then
             exit;
+
+        BGSISCustIDNoType := Enum::"NPR BG SIS Cust. ID No. Type".FromInteger(JsonToken.AsValue().AsInteger());
+        BGSISPOSAuditLogAux."Customer ID No. Type" := BGSISCustIDNoType;
 
         InvoiceDataJsonObject.Get('identNumber', JsonToken);
         BGSISPOSAuditLogAux."Customer Identification No." := JsonToken.AsValue().AsText();
 
-        InvoiceDataJsonObject.Get('vatIdentNumber', JsonToken);
-        BGSISPOSAuditLogAux."Customer VAT Registration No." := JsonToken.AsValue().AsText();
+        if InvoiceDataJsonObject.Get('vatIdentNumber', JsonToken) then
+            BGSISPOSAuditLogAux."Customer VAT Registration No." := JsonToken.AsValue().AsText();
 
         InvoiceDataJsonObject.Get('recipientName', JsonToken);
         BGSISPOSAuditLogAux."Customer Name" := JsonToken.AsValue().AsText();

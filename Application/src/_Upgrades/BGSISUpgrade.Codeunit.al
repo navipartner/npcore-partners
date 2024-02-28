@@ -21,6 +21,11 @@
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'blank-item-description'));
         end;
 
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'init-customer-id-no-type-on-bg-sis-audit-log')) then begin
+            InitCustomerIDNoTypeOnBGSISPOSAuditLog();
+            UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'init-customer-id-no-type-on-bg-sis-audit-log'));
+        end;
+
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -59,5 +64,12 @@
                     POSEntrySalesLine.Modify();
                 end;
             until POSEntrySalesLine.Next() = 0;
+    end;
+
+    local procedure InitCustomerIDNoTypeOnBGSISPOSAuditLog()
+    var
+        BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux.";
+    begin
+        BGSISPOSAuditLogAux.ModifyAll("Customer ID No. Type", BGSISPOSAuditLogAux."Customer ID No. Type"::" ");
     end;
 }
