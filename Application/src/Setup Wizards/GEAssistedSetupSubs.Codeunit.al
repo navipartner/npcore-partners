@@ -14,6 +14,7 @@
         AddAttractionSetupsWizard();
         AddCROFiscalizationSetupsWizard();
         AddRSFiscalizationSetupsWizard();
+        AddBGSISFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -115,6 +116,20 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS POS Unit", RSVATPostingSetupTxt, AssistedSetupGroup::NPRRSFiscal);
     end;
 
+    local procedure AddBGSISFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        BGSISFiscalizationSetupTxt: Label 'Welcome to Bulgarian SIS Fiscalization Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS Fiscal", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS POS Aud Prof", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS POS Unit", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS VAT PostSetup", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS POS Pay Meth", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup BG SIS Return Reason", BGSISFiscalizationSetupTxt, AssistedSetupGroup::NPRBGSISFiscal);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -142,6 +157,7 @@
         AttractionSetups();
         CROFiscalizationSetups();
         RSFiscalizationSetups();
+        BGSISFiscalizationSetups();
 #if not BC18
         HideChecklistIfPOSEntryExist();
 #endif
@@ -152,11 +168,10 @@
     local procedure RetailSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail)) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Retail)) then
             exit;
 
         RemoveRetailGuidedExperience();
@@ -164,7 +179,7 @@
         AddRetailSetupsWizard();
         CreateRetailChecklistItems();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Retail));
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Retail));
     end;
 
     local procedure RemoveRetailGuidedExperience()
@@ -466,10 +481,9 @@
     local procedure AddRestaurantSetupsWizard()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant;
     begin
 
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Restaurant)) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Restaurant)) then
             exit;
 
 
@@ -482,23 +496,22 @@
         CreateRestaurantLayoutWizard();
         CreateKitchenLayoutWizard();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Restaurant));
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Restaurant));
     end;
 
     local procedure RestaurantSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant)) then
+        if UpgradeTag.HasUpgradeTag(GetChecklistUpgradeTag(ThisModul::Restaurant)) then
             exit;
 
         AddRestaurantSetupsWizard();
         CreateRestaurantChecklistItems();
 
-        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(Modul::Restaurant));
+        UpgradeTag.SetUpgradeTag(GetChecklistUpgradeTag(ThisModul::Restaurant));
     end;
 
     local procedure WelcomeVideoRestaurantExperience()
@@ -851,18 +864,17 @@
     local procedure AttractionSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant,Attraction;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Attraction)) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Attraction)) then
             exit;
 
         RemoveAttractionGuidedExperience();
 
         AddAttractionSetupsWizard();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::Attraction));
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Attraction));
     end;
 
     local procedure RemoveAttractionGuidedExperience()
@@ -1060,12 +1072,268 @@
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup Membership Wizard");
     end;
+    #endregion
 
+    #region BG SIS Fiscalization Wizards
+    local procedure BGSISFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::BGSISFiscalization)) then
+            exit;
+
+        RemoveBGSISFiscalizationSetupGuidedExperience();
+
+        AddBGSISFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::BGSISFiscalization));
+    end;
+
+    local procedure RemoveBGSISFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Aud Prof");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Unit");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS VAT PostSetup");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Pay Meth");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS Return Reason");
+    end;
+
+    local procedure AddBGSISFiscalizationSetupsWizard()
+    begin
+        EnableBGSISFiscalSetupWizard();
+        EnableBGSISAuditProfileSetupWizard();
+        EnableBGSISPOSUnitSetupWizard();
+        EnableBGSISVATPostingSetupWizard();
+        EnableBGSISPOSPaymentMethodSetupWizard();
+        EnableBGSISReturnReasonSetupWizard();
+    end;
+
+    local procedure EnableBGSISFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS Fiscal",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableBGSISAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Aud Prof") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS POS Aud Prof",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableBGSISPOSUnitSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Units', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Units', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Unit") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS POS Unit",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableBGSISVATPostingSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup VAT Posting Setups', Locked = true;
+        SetupDescriptionTxt: Label 'Setup VAT Posting Setups', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS VAT PostSetup") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS VAT PostSetup",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableBGSISPOSPaymentMethodSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS POS Pay Meth") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS POS Pay Meth",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableBGSISReturnReasonSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Return Reasons', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Return Reasons', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BG SIS Return Reason") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BG SIS Return Reason",
+                                                AssistedSetupGroup::NPRBGSISFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISFiscalWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS POS Aud Prof", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISAuditProfileWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISAuditProfileWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS POS Unit", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISPOSUnitWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISPOSUnitWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS VAT PostSetup", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISVATPostSetupWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISVATPostSetupWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS POS Pay Meth", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISPOSPayMethWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISPOSPayMethWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BG SIS Return Reason", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBGSISReturnReasonWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupBGSISReturnReasonWizardStatus();
+    end;
+
+    local procedure UpdateSetupBGSISFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS Fiscal");
+    end;
+
+    local procedure UpdateSetupBGSISAuditProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS POS Aud Prof");
+    end;
+
+    local procedure UpdateSetupBGSISPOSUnitWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS POS Unit");
+    end;
+
+    local procedure UpdateSetupBGSISVATPostSetupWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS VAT PostSetup");
+    end;
+
+    local procedure UpdateSetupBGSISPOSPayMethWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS POS Pay Meth");
+    end;
+
+    local procedure UpdateSetupBGSISReturnReasonWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS Return Reason");
+    end;
     #endregion
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1080,7 +1348,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1098,6 +1366,9 @@
             Modul::RSFiscalizationSetup:
                 //For Any change, increase version
                 exit('NPR-AssistedSetup-RSFiscalization-v1.0');
+            Modul::BGSISFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-BGSISFiscalization-v1.0');
         end;
     end;
 
@@ -1133,18 +1404,17 @@
     local procedure CROFiscalizationSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::CROFiscalizationSetup)) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::CROFiscalizationSetup)) then
             exit;
 
         RemoveCROFiscalizationSetupGuidedExperience();
 
         AddCROFiscalizationSetupSteps();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::CROFiscalizationSetup));
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::CROFiscalizationSetup));
     end;
 
     local procedure RemoveCROFiscalizationSetupGuidedExperience()
@@ -1353,18 +1623,17 @@
     local procedure RSFiscalizationSetups()
     var
         UpgradeTag: Codeunit "Upgrade Tag";
-        Modul: Option Retail,Restaurant,Attractions,CROFiscalizationSetup,RSFiscalizationSetup;
     begin
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
-        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(Modul::RSFiscalizationSetup)) then
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::RSFiscalizationSetup)) then
             exit;
 
         RemoveRSFiscalizationSetupGuidedExperience();
 
         AddRSFiscalizationSetupSteps();
 
-        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(Modul::RSFiscalizationSetup));
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::RSFiscalizationSetup));
     end;
 
     local procedure RemoveRSFiscalizationSetupGuidedExperience()
@@ -1632,5 +1901,6 @@
 
     var
         Checklist: Codeunit Checklist;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization;
 #endif
 }
