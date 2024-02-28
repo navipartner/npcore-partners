@@ -538,7 +538,7 @@ tableextension 6014427 "NPR Item" extends Item
     {
         key("NPR Key1"; "NPR Group sale", "NPR Item Group")
         {
-#IF NOT CLOUD
+#IF BC17 or BC18 or BC19 or BC20 or BC21
             Enabled = false;
             //Obsoleting keys generates an error when using CurrentKeyIndex with RecRef.
             //See details: https://github.com/microsoft/AL/issues/6734
@@ -550,7 +550,7 @@ tableextension 6014427 "NPR Item" extends Item
         }
         key("NPR Key2"; "NPR Primary Key Length")
         {
-#IF NOT CLOUD
+#IF BC17 or BC18 or BC19 or BC20 or BC21
             Enabled = false;
 #ELSE
             ObsoleteState = Removed;

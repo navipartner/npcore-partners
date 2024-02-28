@@ -37,7 +37,7 @@ codeunit 6059813 "NPR Stripe Subs Usage Handler"
     var
         User: Record User;
         StripeSubscriptionUsage: Record "NPR Stripe Subscription Usage";
-#IF CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
         AzureADUserManagement: Codeunit "Azure AD User Management";
 #ENDIF
         Handled: Boolean;
@@ -51,7 +51,7 @@ codeunit 6059813 "NPR Stripe Subs Usage Handler"
             exit(false);
 
         ShouldUpdate := not StripeSubscriptionUsage.Get(StripeSubscription.Id, StripePOSUser."User ID", StripeSubscription."Current Period Start");
-#IF CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
         if ShouldUpdate then
             ShouldUpdate := not AzureADUserManagement.IsUserDelegated(User."User Security ID");
 #ENDIF
