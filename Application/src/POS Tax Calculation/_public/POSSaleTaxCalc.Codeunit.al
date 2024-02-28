@@ -68,6 +68,9 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterDeleteEvent', '', true, true)]
     local procedure DeleteTaxAmountPOSOnAfterDeleteSaleLinePOS(var Rec: Record "NPR POS Sale Line")
     begin
+        if Rec.IsTemporary then
+            exit;
+
         DeleteTaxAmount(Rec);
     end;
 
