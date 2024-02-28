@@ -105,6 +105,12 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
         //     Caption = 'Receipt Content';
         //     DataClassification = CustomerContent;
         // }
+        field(59; "Customer ID No. Type"; Enum "NPR BG SIS Cust. ID No. Type")
+        {
+            Caption = 'Customer ID No. Type';
+            DataClassification = CustomerContent;
+            InitValue = " ";
+        }
         field(60; "Customer Identification No."; Text[30])
         {
             Caption = 'Customer Identification No.';
