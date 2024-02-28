@@ -122,6 +122,11 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                     Editable = false;
                     ToolTip = 'Specifies whether the receipt from the related record is extended or not.';
                 }
+                field("Customer ID No. Type"; Rec."Customer ID No. Type")
+                {
+                    ApplicationArea = NPRBGSISFiscal;
+                    ToolTip = 'Specifies the identification number type of the customer on the extended receipt. (0 - BG Company; 1 - BG Physical Person; 2 - Foreign Company or Physical Person)';
+                }
                 field("Customer Identification No."; Rec."Customer Identification No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;

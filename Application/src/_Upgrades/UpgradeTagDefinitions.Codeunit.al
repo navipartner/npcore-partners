@@ -159,6 +159,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Input Box Events", 'UpgradeTicketArrivalActionCode'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'add-salesperson-to-bg-sis-audit-log'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'blank-item-description'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR BG SIS Upgrade", 'init-customer-id-no-type-on-bg-sis-audit-log'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Rcpt. Profile", 'CreatePOSRcptProfileAssignToPOSUnits'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2'));
@@ -608,6 +609,8 @@
                         exit('NPR-add-salesperson-to-bg-sis-audit-log-20240111');
                     'blank-item-description':
                         exit('NPR-blank-item-description-20240115');
+                    'init-customer-id-no-type-on-bg-sis-audit-log':
+                        exit('NPR-init-customer-id-no-type-on-bg-sis-audit-log-20240226');
                 end;
             Codeunit::"NPR UPG POS Rcpt. Profile":
                 case UpgradeStep of
