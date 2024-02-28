@@ -24,6 +24,8 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
 
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
+
+        OnAfterAttachCustomer(SalePOS);
     end;
 
     procedure AttachCustomerRequired(SalePOS: Record "NPR POS Sale")
@@ -47,6 +49,8 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
 
         if PrevRec <> Format(SalePOS) then
             SalePOS.Modify(true);
+
+        OnAfterAttachCustomer(SalePOS);
     end;
 
 
@@ -65,5 +69,10 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
         Customer.CalcFields("Balance Due (LCY)");
         BalanceAmount := Customer."Balance Due (LCY)";
         exit(BalanceAmount > 0);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAttachCustomer(SaleHeader: Record "NPR POS Sale")
+    begin
     end;
 }
