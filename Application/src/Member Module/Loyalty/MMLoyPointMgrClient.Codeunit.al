@@ -248,9 +248,6 @@
                 TempRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
 
-        if TempRegisterSalesLines.IsEmpty then
-            exit(false);
-
         EFTTransactionRequest2.SetCurrentKey("Sales Ticket No.");
 
         EFTTransactionRequest2.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
@@ -853,10 +850,15 @@
     end;
 
     procedure CreateRegisterSalesEftTransaction(IntegrationName: Code[20]; SalePOS: Record "NPR POS Sale"; var EFTTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
     begin
+        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
+        if SaleLinePOS.IsEmpty() then
+            exit(false);
 
         EFTTransactionRequest."Entry No." := 0;
-
         EFTTransactionRequest.Token := CreateGuid();
         EFTTransactionRequest."User ID" := CopyStr(UserId(), 1, MaxStrLen(EFTTransactionRequest."User ID"));
         EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
@@ -884,7 +886,6 @@
 
         exit(true);
     end;
-
     internal procedure CreateRegisterSaleTestXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
     begin
 
