@@ -1,4 +1,4 @@
-#if not CLOUD
+#if BC17 or BC18 or BC19 or BC20 or BC21
 dotnet
 {
     assembly("System.Xml")
@@ -440,93 +440,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Stargate.Messaging.EmptyResponse"; "NPRNetEmptyResponse")
-        {
-        }
-    }
-
-    assembly("Microsoft.Exchange.WebServices")
-    {
-        Version = '15.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '31bf3856ad364e35';
-
-        type("Microsoft.Exchange.WebServices.Data.ExchangeService"; "NPRNetExchangeService")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.ExchangeCredentials"; "NPRNetExchangeCredentials")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.ExchangeVersion"; "NPRNetExchangeVersion")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.Appointment"; "NPRNetAppointment")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.ItemId"; "NPRNetItemId")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.MessageBody"; "NPRNetMessageBody")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.BodyType"; "NPRNetBodyType")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.StringList"; "NPRNetStringList")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.LegacyFreeBusyStatus"; "NPRNetLegacyFreeBusyStatus")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.PropertySet"; "NPRNetPropertySet")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.MeetingResponseType"; "NPRNetMeetingResponseType")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.Attendee"; "NPRNetAttendee")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.DeleteMode"; "NPRNetDeleteMode")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.SendCancellationsMode"; "NPRNetSendCancellationsMode")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.SendInvitationsMode"; "NPRNetSendInvitationsMode")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.ConflictResolutionMode"; "NPRNetConflictResolutionMode")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.SendInvitationsOrCancellationsMode"; "NPRNetSendInvitationsOrCancellationsMode")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.EmailMessage"; "NPRNetEmailMessage")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.EmailAddress"; "NPRNetEmailAddress")
-        {
-        }
-
-        type("Microsoft.Exchange.WebServices.Data.EmailAddressCollection"; "NPRNetEmailAddressCollection")
         {
         }
     }
@@ -978,13 +891,6 @@ dotnet
         }
     }
 
-    assembly("Microsoft.Dynamics.Nav.Client.PingPong")
-    {
-        type("Microsoft.Dynamics.Nav.Client.PingPong.PingPongAddIn"; "NPRMicrosoft.Dynamics.Nav.Client.PingPong")
-        {
-            IsControlAddIn = true;
-        }
-    }
     assembly("NavHelper.AssemblyResolver")
     {
         Version = '2.4.0.0';
@@ -995,6 +901,101 @@ dotnet
         {
         }
     }
+#endif
 
+#if BC17 or BC18 or BC19 or BC20
+    assembly("Microsoft.Exchange.WebServices")
+#endif
+#if BC21
+    assembly("Microsoft.Exchange.WebServices.NETStandard")
+#endif
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    {
+        Culture = 'neutral';
+        PublicKeyToken = '31bf3856ad364e35';
+
+        type("Microsoft.Exchange.WebServices.Data.ExchangeService"; "NPRNetExchangeService")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.ExchangeCredentials"; "NPRNetExchangeCredentials")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.ExchangeVersion"; "NPRNetExchangeVersion")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.Appointment"; "NPRNetAppointment")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.ItemId"; "NPRNetItemId")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.MessageBody"; "NPRNetMessageBody")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.BodyType"; "NPRNetBodyType")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.StringList"; "NPRNetStringList")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.LegacyFreeBusyStatus"; "NPRNetLegacyFreeBusyStatus")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.PropertySet"; "NPRNetPropertySet")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.MeetingResponseType"; "NPRNetMeetingResponseType")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.Attendee"; "NPRNetAttendee")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.DeleteMode"; "NPRNetDeleteMode")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.SendCancellationsMode"; "NPRNetSendCancellationsMode")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.SendInvitationsMode"; "NPRNetSendInvitationsMode")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.ConflictResolutionMode"; "NPRNetConflictResolutionMode")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.SendInvitationsOrCancellationsMode"; "NPRNetSendInvitationsOrCancellationsMode")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.EmailMessage"; "NPRNetEmailMessage")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.EmailAddress"; "NPRNetEmailAddress")
+        {
+        }
+
+        type("Microsoft.Exchange.WebServices.Data.EmailAddressCollection"; "NPRNetEmailAddressCollection")
+        {
+        }
+    }
+#endif
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
 }
 #endif

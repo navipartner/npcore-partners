@@ -84,7 +84,7 @@
             CopyDefaultDimensions(ItemGroup, ItemCategory);
         until ItemGroup.Next() = 0;
 
-#if not CLOUD
+#IF BC17 or BC18 or BC19 or BC20 or BC21
         ItemCategory.Reset();
         if ItemCategory.FindSet(true) then
             repeat
@@ -94,7 +94,7 @@
 #endif
     end;
 
-#if not CLOUD
+#IF BC17 or BC18 or BC19 or BC20 or BC21
     local procedure DoItemCategoryPresentation(var ItemCategory: Record "Item Category")
     var
         ParentItemCategory: Record "Item Category";

@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-#IF NOT CLOUD
+#IF BC17 or BC18 or BC19
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterInitialization', '', true, false)]
 #ELSE
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, false)]
