@@ -4,7 +4,7 @@ page 6059859 "NPR Aux Conf. Template Subform"
     Extensible = False;
     PageType = ListPart;
     SourceTable = "Config. Template Line";
-#if not CLOUD
+#IF BC17 or BC18 or BC19 or BC20 or BC21
     UsageCategory = None;
 
     [Obsolete('Only available in cloud version', 'NPR23.0')]
@@ -12,7 +12,7 @@ page 6059859 "NPR Aux Conf. Template Subform"
     begin
     end;
 #endif
-#if CLOUD
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
     AutoSplitKey = true;
     Caption = 'Aux Lines';
     LinksAllowed = false;

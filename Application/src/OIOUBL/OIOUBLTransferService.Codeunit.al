@@ -56,12 +56,10 @@ codeunit 6060015 "NPR OIOUBL Transfer Service"
         IStream: InStream;
         FileHandle: File;
     begin
-#IF NOT CLOUD
         TempBlob.CreateOutStream(OStream);
         FileHandle.Open(RecordExportBuffer.ServerFilePath);
         FileHandle.CreateInStream(IStream);
         CopyStream(OStream, IStream);
-#ENDIF
     end;
 #ENDIF
 

@@ -5,7 +5,8 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
     Subtype = Test;
     EventSubscriberInstance = Manual;
-    Permissions = TableData "G/L Entry" = rimd;
+    Permissions = TableData "G/L Entry" = rimd,
+                  TableData "VAT Entry" = rimd;
 
     trigger OnRun()
     begin
