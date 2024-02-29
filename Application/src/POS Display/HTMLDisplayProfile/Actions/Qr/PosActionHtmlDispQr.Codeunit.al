@@ -39,7 +39,7 @@ codeunit 6184547 "NPR POS Action: HD Qr" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:PosActionHtmlDispQr.js### 
-'let main=async({context:r,parameters:s,captions:i})=>{r.HtmlDisplayVersion=Number.parseInt(i.HtmlDisplayVersion),r.IsNestedWorkflow||(r.QrShow=s.QrShow,r.QrTitle=s.QrTitle,r.QrMessage=s.QrMessage,r.QrContent=s.QrContent,r.IsNestedWorkflow=!1),r.QrShow??=!1,r.QrTitle??="",r.QrMessage??="",r.QrContent??="";let l=null;try{let e={HtmlDisplayVersion:r.HtmlDisplayVersion,DisplayAction:"SendJs",JsParameter:JSON.stringify({JSAction:"QRPaymentScan",Provider:r.QrTitle,PaymentAmount:r.QrMessage,QrContent:r.QrContent,Command:r.QrShow?"Open":"Close"})};l=await hwc.invoke("HTMLDisplay",e)}catch(e){popup.error({title:"Customer Display Error: QR",message:""+e})}return l};'
+'let main=async({context:r,parameters:s,captions:l})=>{r.HtmlDisplayVersion=Number.parseInt(l.HtmlDisplayVersion),r.IsNestedWorkflow||(r.QrShow=s.QrShow,r.QrTitle=s.QrTitle,r.QrMessage=s.QrMessage,r.QrContent=s.QrContent,r.IsNestedWorkflow=!1),r.QrShow??=!1,r.QrTitle??="",r.QrMessage??="",r.QrContent??="";let i=null;try{let e={HtmlDisplayVersion:r.HtmlDisplayVersion,DisplayAction:"SendJs",JsParameter:JSON.stringify({JSAction:"QRPaymentScan",Provider:r.QrTitle,PaymentAmount:r.QrMessage,QrContent:r.QrContent,Command:r.QrShow?"Open":"Close"})};i=await hwc.invoke("HTMLDisplay",e)}catch(e){r.IsNestedWorkflow||popup.error({title:"Customer Display Error: QR",message:`The ${r.QrShow?"Open":"Close"} operation failed with: ${e.message}`})}return i};'
         );
     end;
 }
