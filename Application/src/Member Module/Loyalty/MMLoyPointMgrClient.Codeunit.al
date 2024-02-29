@@ -220,7 +220,7 @@
         GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TempTransactionAuthorization);
         GeneralLedgerSetup.Get();
 
-        // Sales items are points rewarding
+        // Sales items are points rewarding        
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
         SaleLinePOS.SetFilter("Line Type", '=%1', SaleLinePOS."Line Type"::Item);
         if (SaleLinePOS.FindSet()) then
@@ -248,7 +248,11 @@
                 TempRegisterSalesLines.Insert();
             until (SaleLinePOS.Next() = 0);
 
+        if TempRegisterSalesLines.IsEmpty then
+            exit(false);
+
         EFTTransactionRequest2.SetCurrentKey("Sales Ticket No.");
+
         EFTTransactionRequest2.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
         EFTTransactionRequest2.SetRange("Integration Type", LoyaltyPointsPSPClient.IntegrationName());
         EFTTransactionRequest2.SetFilter("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
@@ -1039,5 +1043,6 @@
     begin
         exit(DelChr(InText, '<=>', '"<>&/'));
     end;
+
 }
 

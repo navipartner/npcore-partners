@@ -479,7 +479,7 @@
                     exit(PAGE::"NPR NpCs Coll. Store Orders");
                 end;
         end;
-    end;
+    end;   
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeCreateTenantWebservice(ObjectType: Option; ObjectId: Integer; ServiceName: Text; var Handled: Boolean)
