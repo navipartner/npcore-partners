@@ -118,10 +118,9 @@ codeunit 6184740 "NPR Vipps Mp Qr Mgt."
         Message(Result);
     end;
 
-    internal procedure CreateUpdateMobilepayQrUI()
+    internal procedure CreateUpdateMobilepayQrUI(VippsMpQrCallback: Record "NPR Vipps Mp QrCallback")
     var
         VippsMpQrCallbackPage: Page "NPR Vipps Mp QrCallback";
-        VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
     begin
         VippsMpQrCallbackPage.SetMobilePaySetup();
         VippsMpQrCallbackPage.SetRecord(VippsMpQrCallback);
