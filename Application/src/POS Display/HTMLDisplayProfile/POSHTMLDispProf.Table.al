@@ -45,7 +45,7 @@ table 6059809 "NPR POS HTML Disp. Prof."
         {
             DataClassification = CustomerContent;
             InitValue = False;
-            Caption = 'Show Mobilepay QR';
+            Caption = 'Show Vipps Mobilepay QR';
         }
     }
 

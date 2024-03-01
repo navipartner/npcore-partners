@@ -29,7 +29,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Description';
-                    ToolTip = 'Speccifies the description of the profile, to help distinguish between profiles.';
+                    ToolTip = 'Specifies the description of the profile, to help distinguish between profiles.';
                 }
                 field("Content Lines Code"; Rec."Display Content Code")
                 {
@@ -52,8 +52,8 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 field("Show MobilePay QR"; Rec."MobilePay QR")
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Show Mobilepay QR';
-                    ToolTip = 'Specifies if the mobilepay QR code should appear on the second display';
+                    Caption = 'Show Vipps Mobilepay QR';
+                    ToolTip = 'Specifies if the Vipps Mobilepay QR code should appear on the second display';
                 }
             }
             group("Input Options")
@@ -83,17 +83,19 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                     fileName: Text;
                     inStream: InStream;
                     outStream: OutStream;
+                    LblUplaod: Label 'Please upload an html file';
+                    LblUplaodFail: Label 'Upload failed';
                 begin
                     if (UploadIntoStream('', '', '', fileName, inStream)) then begin
                         if (not filename.EndsWith('.html')) then begin
-                            Message('please upload an html file');
+                            Message(LblUplaod);
                             exit;
                         end;
                         Rec."HTML Blob".CreateOutStream(outStream);
                         CopyStream(outStream, inStream);
                         Rec.Modify();
                     end else begin
-                        Message('Upload failed');
+                        Message(LblUplaodFail);
                     end;
                 end;
             }
@@ -107,6 +109,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                 var
                     fileName: Text;
                     inStream: InStream;
+                    NoValLbl: Label 'There is not data to download.';
                 begin
                     filename := Rec."Code" + '-profile.html';
                     if (Rec."HTML Blob".HasValue()) then begin
@@ -114,7 +117,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
                         Rec."HTML Blob".CreateInStream(inStream);
                         DownloadFromStream(inStream, 'Download html', '', '.html', filename);
                     end else begin
-                        Message('Html field does not have a value');
+                        Message(NoValLbl);
                     end;
 
                 end;
@@ -177,6 +180,7 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
         htmlContent: Text;
+        LblDownloadFail: Label 'Failed download: %1';
     begin
         rapidstartBaseDataMgt.GetAllPackagesInBlobStorage('https://npretailbasedata.blob.core.windows.net/pos-html-profile/?restype=container&comp=list', packageList);
         foreach package in packageList do begin
@@ -189,11 +193,11 @@ page 6150771 "NPR POS HTML Disp. Prof. Card"
         if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
             exit;
         if (not Client.Get('https://npretailbasedata.blob.core.windows.net/pos-html-profile/' + TempRetailList.Value, ResponseMessage)) then
-            Error('Failed download: %1', ResponseMessage.ReasonPhrase);
+            Error(LblDownloadFail, ResponseMessage.ReasonPhrase);
         if (not ResponseMessage.IsSuccessStatusCode) then
-            Error('Web servie was not successfull: %1', ResponseMessage.ReasonPhrase);
+            Error(LblDownloadFail, ResponseMessage.ReasonPhrase);
         if not (ResponseMessage.Content.ReadAs(htmlContent)) then
-            Error('Could not read the content of the file');
+            Error(LblDownloadFail);
         Rec."HTML Blob".CreateOutStream(outStream);
         outStream.WriteText(htmlContent);
         Rec.Modify();

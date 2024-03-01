@@ -986,6 +986,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'VIEW_DIG_RCPT_QRCODE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action QRViewDigRcpt";
     }
+    value(202; "VIPPS_MOBILEPAY")
+    {
+        Caption = 'VIPPS_MOBILEPAY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: Vipps Mp";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;
