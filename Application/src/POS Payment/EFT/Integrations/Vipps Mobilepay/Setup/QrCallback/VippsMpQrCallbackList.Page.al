@@ -124,6 +124,59 @@ page 6151375 "NPR Vipps Mp QrCallback List"
                     VippsMpQrMgt.RemoveQrBarcode(Rec);
                 end;
             }
+
+            action(CreateMobilePay)
+            {
+                ApplicationArea = NPRRetail;
+                Image = Redo;
+                Description = 'Creates/Updates a new QR using an old Mobilepay QR.';
+                Caption = 'Create/Update Mobilepay QR';
+                Tooltip = 'Creates/Updates a new QR using an old Mobilepay QR.';
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction();
+                var
+                    VippsMpSetupState: Codeunit "NPR Vipps Mp SetupState";
+                    VippsMpQrMgt: Codeunit "NPR Vipps Mp Qr Mgt.";
+                    VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
+                    POSUnit: Record "NPR POS Unit";
+                    EFTSetup: Record "NPR EFT Setup";
+                    MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
+                    LblError: Label 'No such Mobilepay V10 setup.';
+                    LblSamePos: Label 'A matching setup was found for POS %1 %2, do you want to use that setup?';
+                begin
+                    POSUnit.Get(VippsMpSetupState.GetCurrentPosUnitNo());
+                    EFTSetup.SetFilter("POS Unit No.", POSUnit."No.");
+                    EFTSetup.SetFilter("EFT Integration Type", 'MOBILEPAY_V10');
+                    if (EFTSetup.FindFirst()) then begin
+                        if (Confirm(StrSubstNo(LblSamePos, POSUnit."No.", POSUnit.Name))) then begin
+                            MobilePayV10UnitSetup.Get(POSUnit."No.");
+                        end;
+
+                    end;
+                    if (MobilePayV10UnitSetup."POS Unit No." = '') then begin
+                        EFTSetup.Reset();
+                        EFTSetup.SetFilter("EFT Integration Type", 'MOBILEPAY_V10');
+                        if (Page.RunModal(Page::"NPR EFT Setup", EFTSetup) <> Action::LookupOK) then
+                            exit;
+                        if (not MobilePayV10UnitSetup.Get(EFTSetup."POS Unit No.")) then
+                            Error(LblError);
+                    end;
+                    if (not VippsMpQrCallback.Get(MobilePayV10UnitSetup."Beacon ID")) then begin
+                        VippsMpQrCallback.Init();
+                        VippsMpQrCallback."Merchant Qr Id" := MobilePayV10UnitSetup."Beacon ID";
+                        VippsMpQrCallback."Location Description" := POSUnit.Name;
+                        VippsMpQrCallback."Merchant Serial Number" := VippsMpSetupState.GetCurrentMsn();
+                        VippsMpQrCallback.Insert();
+                        VippsMpQrMgt.CreateUpdateMobilepayQr(VippsMpQrCallback);
+                    end else begin
+                        VippsMpQrMgt.CreateUpdateMobilepayQrUI(Rec);
+                    end;
+                end;
+            }
         }
     }
 }
