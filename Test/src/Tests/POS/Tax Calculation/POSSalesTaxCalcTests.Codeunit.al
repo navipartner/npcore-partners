@@ -741,7 +741,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -761,7 +761,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
@@ -823,7 +823,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -851,7 +851,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
@@ -909,7 +909,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -929,7 +929,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
@@ -991,7 +991,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -1019,7 +1019,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
@@ -1077,7 +1077,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -1097,13 +1097,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
         Qty := 1;
         LineDisc := 0;
-        LineDiscPct := LibraryRandom.RandDecInRange(1, 100, 5);
+        LineDiscPct := 50;
 
         //Store random decimal values in temporary record
         SetRandomValues(TempPOSActiveTaxAmountLine, Item, Qty, 0, LineDisc, LineDiscPct);
@@ -1159,7 +1159,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -1187,13 +1187,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500; //LibraryRandom.RandDecInRange(1, 100, 5);
         Item.Modify();
 
         //Quantity to sell without discount
         Qty := 1;
         LineDisc := 0;
-        LineDiscPct := LibraryRandom.RandDecInRange(1, 100, 5);
+        LineDiscPct := 50;
 
         //Store random decimal values in temporary record
         SetRandomValues(TempPOSActiveTaxAmountLine, Item, Qty, 0, LineDisc, LineDiscPct);
@@ -1245,7 +1245,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -1265,13 +1265,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price        
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
         Qty := 1;
         LineDisc := 0;
-        LineDiscPct := LibraryRandom.RandDecInRange(1, 100, 5);
+        LineDiscPct := 50;
 
         //Store random decimal values in temporary record
         SetRandomValues(TempPOSActiveTaxAmountLine, Item, Qty, 0, LineDisc, LineDiscPct);
@@ -1327,7 +1327,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Tax Detail on state, county and city level for US localization (Tax Country US)
         LibraryTaxCalc.CreateTaxArea(TaxArea, 2, 0);
-        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5), LibraryRandom.RandDec(10, 5));
+        LibraryTaxCalc.CreateTaxDetail(TaxDetail, TaxArea.Code, TaxGroup.Code, 3, 5, 7);
 
         //If it's set, reset maximum amount on Tax Details
         TaxDetail.SetRange("Tax Jurisdiction Code");
@@ -1355,13 +1355,13 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
 
         // [GIVEN] Item with unit price
         CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", TaxGroup.Code, false);
-        Item."Unit Price" := LibraryRandom.RandDecInRange(1, 100, 5);
+        Item."Unit Price" := 500;
         Item.Modify();
 
         //Quantity to sell without discount
         Qty := 1;
         LineDisc := 0;
-        LineDiscPct := LibraryRandom.RandDecInRange(1, 100, 5);
+        LineDiscPct := 50;
 
         //Store random decimal values in temporary record
         SetRandomValues(TempPOSActiveTaxAmountLine, Item, Qty, 0, LineDisc, LineDiscPct);

@@ -44,7 +44,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service min & max for eligible store
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
@@ -184,7 +184,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service min & max for eligible store
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
@@ -322,7 +322,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service below min for not eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
@@ -395,7 +395,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
@@ -469,7 +469,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 
@@ -551,7 +551,7 @@ codeunit 85019 "NPR Tax Free Tests"
 
         // [Given] Item line unit price between service min & max for eligible store LCY
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
-        Item."Unit Price" := NPRLibraryTaxFree.GenerateRandomDecBetween(_TaxFreeservice."Maximum Purchase Amount", _TaxFreeservice."Minimum Purchase Amount", 2);
+        Item."Unit Price" := 700;
         Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
 

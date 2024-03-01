@@ -100,8 +100,8 @@ codeunit 85017 "NPR Library - Tax Free"
         TaxFreeService.Init();
         TaxFreeService."Tax Free Unit" := TaxFreeUnit."Tax Free Profile";
         TaxFreeService."Service ID" := Random(50);
-        TaxFreeService."Minimum Purchase Amount" := GenerateRandomDec(999, 2);
-        TaxFreeService."Maximum Purchase Amount" := GenerateRandomDecBetween(9999, TaxFreeService."Minimum Purchase Amount", 2);
+        TaxFreeService."Minimum Purchase Amount" := 500;
+        TaxFreeService."Maximum Purchase Amount" := 1000; 
         TaxFreeService."Void Limit In Days" := Random(30);
         TaxFreeService.Insert();
     end;

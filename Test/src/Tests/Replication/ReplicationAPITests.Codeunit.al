@@ -190,10 +190,11 @@ codeunit 85042 "NPR Replication API Tests"
 
     local procedure CreateReplicationEndpointUOM(var RepEndpoint: Record "NPR Replication Endpoint")
     var
+        EndpointIDLbl: Label 'E1,=K[sG:f2/1)RNytnr*uUCI^Yj5/1&#czvSjpRj|v7&n(l_S', Locked = true;
     begin
         RepEndpoint.Init();
         RepEndpoint."Service Code" := RepSetup."API Version";
-        RepEndpoint."EndPoint ID" := LibraryUtility.GenerateRandomText(50);
+        RepEndpoint."EndPoint ID" := EndpointIDLbl;
         RepEndpoint."Endpoint Method" := RepEndpoint."Endpoint Method"::"Get BC Generic Data";
         RepEndpoint."Table ID" := Database::"Unit of Measure";
 #IF (BC17 or BC18 or BC19 or BC20)
