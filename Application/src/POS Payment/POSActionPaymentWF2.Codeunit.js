@@ -21,6 +21,7 @@ let main = async ({ workflow, popup, scope, parameters, context }) => {
     if ((!HideAmountDialog) && ((!HideZeroAmountDialog) || (remainingAmount > 0))) {
         suggestedAmount = await popup.numpad({ title: paymentDescription, caption: amountPrompt, value: remainingAmount });
         if (suggestedAmount === null) return; // user cancelled dialog
+        if ((suggestedAmount == 0) && (remainingAmount > 0)) return;// user paid 0 with remaining amount
     };
 
     if(remainingAmount == 0){
