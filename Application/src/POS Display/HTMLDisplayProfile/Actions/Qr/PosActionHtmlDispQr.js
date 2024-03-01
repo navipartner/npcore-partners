@@ -33,7 +33,8 @@ let main = async ({context, parameters, captions}) => {
     } 
     catch(e)
     {
-        popup.error({title: "Customer Display Error: QR", message: "" + e});
+        if (!context.IsNestedWorkflow)
+            popup.error({title: "Customer Display Error: QR", message: `The ${(context.QrShow ? 'Open' : 'Close')} operation failed with: ${e.message}`});
     }
     return response;
 }
