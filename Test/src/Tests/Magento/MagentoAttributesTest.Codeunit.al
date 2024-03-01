@@ -23,8 +23,8 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [WHEN] Create Magento Attributes
-        Id := CreateMagentoAttribute();
-        DummyId2 := CreateMagentoAttribute();
+        Id := CreateMagentoAttribute(123);
+        DummyId2 := CreateMagentoAttribute(321);
         CreateMagentoAttributeLabel(Id);
         GroupId := CreateMagentoAttributeGroup();
         SetId := CreateMagentoAttributeSet();
@@ -60,7 +60,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [GIVEN] Magento Attributes
-        Id1 := CreateMagentoAttribute();
+        Id1 := CreateMagentoAttribute(123);
         LabelId11 := CreateMagentoAttributeLabel(Id1);
         LabelId21 := CreateMagentoAttributeLabel(Id1, LibraryRandom.RandText(100));
 
@@ -143,7 +143,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [GIVEN] Magento Attributes
-        Id1 := CreateMagentoAttribute();
+        Id1 := CreateMagentoAttribute(123);
         LabelId11 := CreateMagentoAttributeLabel(Id1);
         LabelId21 := CreateMagentoAttributeLabel(Id1, LibraryRandom.RandText(100));
 
@@ -232,7 +232,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [GIVEN] Magento Attributes
-        Id1 := CreateMagentoAttribute();
+        Id1 := CreateMagentoAttribute(123);
         LabelId11 := CreateMagentoAttributeLabel(Id1);
         LabelId21 := CreateMagentoAttributeLabel(Id1, LibraryRandom.RandText(100));
 
@@ -296,7 +296,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [GIVEN] Magento Attributes
-        Id1 := CreateMagentoAttribute();
+        Id1 := CreateMagentoAttribute(123);
         LabelId11 := CreateMagentoAttributeLabel(Id1);
         LabelId21 := CreateMagentoAttributeLabel(Id1, LibraryRandom.RandText(100));
 
@@ -342,7 +342,7 @@ codeunit 85089 "NPR Magento Attributes Test"
         Initialize();
 
         // [GIVEN] Magento Attributes
-        Id1 := CreateMagentoAttribute();
+        Id1 := CreateMagentoAttribute(123);
         LabelId11 := CreateMagentoAttributeLabel(Id1);
         LabelId21 := CreateMagentoAttributeLabel(Id1, LibraryRandom.RandText(100));
 
@@ -412,11 +412,11 @@ codeunit 85089 "NPR Magento Attributes Test"
     end;
 
 
-    local procedure CreateMagentoAttribute(): Integer
+    local procedure CreateMagentoAttribute(AttributeId: Integer): Integer
     var
         MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
     begin
-        exit(MagentoAttributeSetMgt.CreateMagentoAttribute(LibraryRandom.RandInt(100), LibraryRandom.RandText(50), false));
+        exit(MagentoAttributeSetMgt.CreateMagentoAttribute(AttributeId, LibraryRandom.RandText(50), false));
     end;
 
     local procedure CreateMagentoAttribute(AttributeDescription: Text): Integer

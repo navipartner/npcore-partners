@@ -25,6 +25,7 @@
         _InitializedUI: Boolean;
         _ActionsDiscovered: Boolean;
         _ErrorOnInitialize: Boolean;
+        _ReportErrorMessage: Boolean;
         _DebugTrace: Text;
         _ServerStopwatch: Text;
         _POSPageId: Guid;
@@ -113,6 +114,7 @@
         Clear(_POSBackgroundTaskAPI);
         Clear(_DragonglassResponseQueue);
         Clear(_POSRefreshData);
+        Clear(_ReportErrorMessage);
     end;
 
     procedure IsInitialized(): Boolean
@@ -752,6 +754,16 @@
     begin
         ErrorIfNotInitialized();
         _FrontEnd.RestaurantView(_Setup);
+    end;
+
+    procedure SetReportErrorMessage(SendErrorMessage: Boolean)
+    begin
+        _ReportErrorMessage := SendErrorMessage;
+    end;
+
+    procedure GetReportErrorMessage(): Boolean
+    begin
+        exit(_ReportErrorMessage);
     end;
 
     //#endregion

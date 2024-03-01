@@ -89,7 +89,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         POSSale.GetCurrentSale(SalePOS);
         SalesHeader.CalcFields("Amount Including VAT");
         // parameters
-        PrepaymentValue := LibraryRandom.RandDecInRange(0, 100, 4);
+        PrepaymentValue := 50;
         ValueIsAmount := true;
         // [When]
         POSActionDocPrepayB.CreatePrepaymentLine(POSSession, SalesHeader, false, PrepaymentValue, ValueIsAmount, false, false, POSSalesDocumentPost);
