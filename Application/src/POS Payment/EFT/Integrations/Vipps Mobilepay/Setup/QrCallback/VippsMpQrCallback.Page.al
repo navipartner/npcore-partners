@@ -22,18 +22,6 @@ page 6151463 "NPR Vipps Mp QrCallback"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the unique identifier of the static QR.';
                 Editable = IsMobilePaySetup;
-
-                trigger OnLookup(var Text: Text): Boolean
-                var
-                    MpRec: Record "NPR MobilePayV10 POS";
-                begin
-                    if (not IsMobilePaySetup) then
-                        exit;
-                    if (Page.RunModal(Page::"NPR MobilePayV10 POS", MpRec) = Action::LookupCancel) then
-                        exit;
-                    Rec."Merchant Qr Id" := MpRec."Beacon ID";
-                end;
-
             }
             field("Merchant Serial Number"; Rec."Merchant Serial Number")
             {
