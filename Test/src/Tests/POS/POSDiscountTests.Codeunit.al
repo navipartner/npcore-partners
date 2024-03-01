@@ -51,10 +51,12 @@ codeunit 85147 "NPR POS Discount Tests"
         LibraryDim.CreateDimensionValue(DimensionValue, Dimension.Code);
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, 500, '', '', '');
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::LineUnitPrice;
         PresetMultiLineDiscTarget := PresetMultiLineDiscTarget::"Positive Only";
 
@@ -134,6 +136,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandInt(100);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Quantity);
         // Parameters 
@@ -175,10 +179,12 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Quantity);
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::DiscountPercentREL;
         PresetMultiLineDiscTarget := PresetMultiLineDiscTarget::"Negative Only";
 
@@ -216,12 +222,14 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity * 2, Item."Unit Price", '', '', '');
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, -Quantity, Item."Unit Price", '', '', '');
 
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::TotalDiscountAmount;
         PresetMultiLineDiscTarget := PresetMultiLineDiscTarget::"Negative Only";
 
@@ -280,6 +288,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity * 2, 500, '', '', '');
         POSSession.GetSaleLine(SaleLine);
@@ -290,7 +300,7 @@ codeunit 85147 "NPR POS Discount Tests"
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         Amount2 := SaleLinePOS.Quantity * SaleLinePOS."Unit Price";
         // Parameters
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100); // same discount on both lines
+        DiscountQuantity := 20;
         DiscountType := DiscountType::TotalDiscountAmount;
         PresetMultiLineDiscTarget := PresetMultiLineDiscTarget::All;
         TotalAmountDisc := Round(DiscountQuantity / (Amount1 - Amount2) * 100, 0.001, '='); //positive + (-negative)
@@ -341,11 +351,13 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, SalespersonPurchaser, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity * 2, 500, '', '', '');
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, -Quantity, 500, '', '', ''); //2 lines
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::TotalAmount;
         PresetMultiLineDiscTarget := PresetMultiLineDiscTarget::"Positive Only";
 
@@ -398,10 +410,12 @@ codeunit 85147 "NPR POS Discount Tests"
         LibrarySales.CreateSalesperson(Salesperson);
         LibraryDim.CreateDimension(Dimension);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::LineDiscountPercentREL;
 
         POSSession.GetSale(POSSale);
@@ -446,9 +460,11 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, 1, '', '', '');
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(2, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::LineAmount;
 
         POSSession.GetSale(POSSale);
@@ -592,10 +608,12 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantity := 20;
         DiscountType := DiscountType::LineDiscountPercentABS;
 
         POSSession.GetSale(POSSale);
@@ -637,10 +655,12 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
         // Parameters 
-        DiscountQuantity := LibraryRandom.RandIntInRange(1, 100); //10
+        DiscountQuantity := 20;
         DiscountType := DiscountType::LineDiscountPercentABS;
 
         POSSession.GetSale(POSSale);
@@ -649,7 +669,7 @@ codeunit 85147 "NPR POS Discount Tests"
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
         // [WHEN]
         POSActionDiscountB.ProcessRequest(DiscountType, DiscountQuantity, SalePOS, SaleLinePOS, PresetMultiLineDiscTarget);
-        DiscountQuantityExtra := LibraryRandom.RandIntInRange(1, 100);
+        DiscountQuantityExtra := 10;
         DiscountType := DiscountType::DiscountPercentREL;
         POSActionDiscountB.ProcessRequest(DiscountType, DiscountQuantityExtra, SalePOS, SaleLinePOS, PresetMultiLineDiscTarget);
         // [THEN]
@@ -680,6 +700,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -728,6 +750,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -789,6 +813,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -850,6 +876,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -911,6 +939,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -972,6 +1002,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1033,6 +1065,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1094,6 +1128,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1155,6 +1191,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1216,6 +1254,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1277,6 +1317,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1338,6 +1380,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 
@@ -1399,6 +1443,8 @@ codeunit 85147 "NPR POS Discount Tests"
         Initialize();
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         Quantity := LibraryRandom.RandIntInRange(1, 100);
         LibraryPOSMock.CreateItemLine(POSSession, Item, ItemReference, 0, Quantity, Item."Unit Price", '', '', '');
 

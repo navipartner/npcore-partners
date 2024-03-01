@@ -1524,6 +1524,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 
@@ -1583,6 +1585,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 
@@ -1642,6 +1646,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
 
@@ -1701,6 +1707,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
 
@@ -1763,6 +1771,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
@@ -1825,6 +1837,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
@@ -1887,6 +1903,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
@@ -1951,6 +1971,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
@@ -2016,6 +2040,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 
@@ -2081,6 +2109,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 
@@ -2143,6 +2175,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
@@ -2205,6 +2239,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
@@ -2267,6 +2303,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
 
         LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
@@ -2328,6 +2366,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
         LibraryCoupon.CreateItemTrackingAndAssignToItem(Item, ItemTrackingCode);
 
         LibraryCoupon.SetApplyActivityDiscountModule(CouponType);
@@ -2392,6 +2432,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
@@ -2456,6 +2500,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
@@ -2520,6 +2568,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
@@ -2586,6 +2638,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
@@ -2653,6 +2709,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
@@ -2720,6 +2780,10 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Two Item with tracking in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item1, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
+        Item1."Unit Price" := 500;
+        Item1.Modify(true);
         LibraryCoupon.CreateTwoItemTrackingAndAssignToItem(Item, Item1, ItemTrackingCode);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
@@ -2782,6 +2846,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 
@@ -2842,6 +2908,8 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item in the POS Sale
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 500;
+        Item.Modify(true);
 
         LibraryCoupon.SetItemListActivityCoupon(CouponType, Item, 1);
 

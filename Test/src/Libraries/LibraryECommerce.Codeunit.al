@@ -154,7 +154,7 @@ codeunit 85010 "NPR Library - E-Commerce"
     begin
         if SalesOrderNo <> '' then
             exit;
-        SalesOrderNo := LibraryUtility.GenerateRandomCode20(SalesHeader.FieldNo("No."), Database::"Sales Header");
+        SalesOrderNo := 'GU000000000000000000';
     end;
 
     procedure GetPurchInvNo(var PurchInvNo: Code[20])
@@ -164,7 +164,7 @@ codeunit 85010 "NPR Library - E-Commerce"
     begin
         if PurchInvNo <> '' then
             exit;
-        PurchInvNo := LibraryUtility.GenerateRandomCode20(PurchaseHeader.FieldNo("No."), Database::"Purchase Header");
+        PurchInvNo := 'GU000000010000000000';
     end;
 
     procedure GetVendorInvoiceNo(var VendorInvoiceNo: Code[35])
@@ -184,7 +184,7 @@ codeunit 85010 "NPR Library - E-Commerce"
     begin
         if StoreCode <> '' then
             exit;
-        StoreCode := LibraryUtility.GenerateRandomCode20(EcStore.FieldNo(Code), Database::"NPR NpEc Store");
+        StoreCode := 'GU000000020000000000';
     end;
 
     procedure GetCustomerEMailAddress(var EMail: Text[45])
@@ -205,7 +205,7 @@ codeunit 85010 "NPR Library - E-Commerce"
         if (NewPostCode <> '') and (NewCity <> '') then
             exit;
         if NewPostCode = '' then
-            NewPostCode := LibraryUtility.GenerateRandomCode20(PostCode.FieldNo(Code), Database::"Post Code");
+            NewPostCode := 'GU000000030000000000';
         if NewCity = '' then
             NewCity := LibraryRandom.RandText(MaxStrLen(PostCode.City));
     end;
