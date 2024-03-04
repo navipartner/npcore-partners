@@ -10,17 +10,25 @@ codeunit 6184710 "NPR Vipps Mp Util"
     end;
 
     [TryFunction]
+    [NonDebuggable]
     internal procedure InitHttpClient(var http: HttpClient; VippsMpStore: Record "NPR Vipps Mp Store"; WithAccessToken: Boolean)
     var
         accessTokenApi: Codeunit "NPR Vipps Mp AccessToken API";
         accessToken: Text;
+        azureVault: Codeunit "NPR Azure Key Vault Mgt.";
+        partner_client_sub: Text;
     begin
         InitHttpClient(http, VippsMpStore.Sandbox);
         if (WithAccessToken) then begin
             accessTokenApi.GetAccessToken(VippsMpStore, accessToken);
             http.DefaultRequestHeaders().Add('Authorization', 'Bearer ' + accessToken);
         end;
-        http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', VippsMpStore."Client Sub. Key");
+        if (VippsMpStore."Partner API Enabled") then begin
+            partner_client_sub := azureVault.GetAzureKeyVaultSecret('VippsMp_PartnerClientSubscribtionKey');
+            http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', partner_client_sub);
+        end else begin
+            http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', VippsMpStore."Client Sub. Key");
+        end;
         http.DefaultRequestHeaders().Add('Merchant-Serial-Number', VippsMpStore."Merchant Serial Number");
     end;
 
