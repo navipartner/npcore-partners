@@ -7,6 +7,12 @@ codeunit 6184709 "NPR Vipps Mp AccessToken API"
         _AccessTokens: Dictionary of [Text, Text];
         _AccessTokensExpiresAt: Dictionary of [Text, DateTime];
 
+    internal procedure ClearCachedAccessTokens()
+    begin
+        clear(_AccessTokens);
+        clear(_AccessTokensExpiresAt);
+    end;
+
     internal procedure SetCachedAccessToken(client_id: Text; token: Text; expiresAt: DateTime)
     begin
         _AccessTokens.Set(client_id, token);

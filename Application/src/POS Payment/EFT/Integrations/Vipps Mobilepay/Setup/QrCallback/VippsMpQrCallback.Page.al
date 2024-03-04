@@ -21,7 +21,6 @@ page 6151463 "NPR Vipps Mp QrCallback"
             {
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the unique identifier of the static QR.';
-                Editable = IsMobilePaySetup;
             }
             field("Merchant Serial Number"; Rec."Merchant Serial Number")
             {
@@ -38,14 +37,4 @@ page 6151463 "NPR Vipps Mp QrCallback"
             }
         }
     }
-
-
-
-    internal procedure SetMobilePaySetup()
-    begin
-        IsMobilePaySetup := True;
-    end;
-
-    var
-        IsMobilePaySetup: Boolean;
 }
