@@ -60,6 +60,13 @@ table 6150781 "NPR Vipps Mp Store"
         {
             Caption = 'Use Sandbox.';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                VippsMpAccessTokenAPI: Codeunit "NPR Vipps Mp AccessToken API";
+            begin
+                VippsMpAccessTokenAPI.ClearCachedAccessTokens();
+            end;
         }
     }
 }
