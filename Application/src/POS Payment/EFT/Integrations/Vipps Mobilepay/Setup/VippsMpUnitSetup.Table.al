@@ -81,7 +81,7 @@ table 6150754 "NPR Vipps Mp Unit Setup"
         }
         Key(Key2; "Merchant Qr Id")
         {
-            Unique = True;
+
         }
     }
 }
