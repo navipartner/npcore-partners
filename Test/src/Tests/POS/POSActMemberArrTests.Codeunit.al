@@ -47,7 +47,7 @@ codeunit 85134 "NPR POS Act. MemberArr Tests"
         CardNo := AddMemberCard();
         POSSession.GetSetup(POSSetup);
 
-        POSActionMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethod, POSWorkflowType, CardNo, AdmissionCode, POSSetup);
+        POSActionMemberArrival.MemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethod, POSWorkflowType, CardNo, AdmissionCode, POSSetup, '');
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
