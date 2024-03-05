@@ -75,12 +75,22 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         exit(Member."External Member No." <> '');
     end;
 
-    procedure ChooseMemberCard(var ExtMemberCardNo: Text[100]): Boolean
+    procedure ChooseMemberCard(var ExtMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]): Boolean
+    var
+        NPRMembershipMgt: Codeunit "NPR MM NPR Membership";
     begin
+        if (ForeignCommunityCode <> '') then
+            exit(NPRMembershipMgt.SearchForeignMembers(ForeignCommunityCode, ExtMemberCardNo));
+
         exit(ChooseMemberCardViaMemberSearchUI(ExtMemberCardNo));
     end;
 
     internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
+    begin
+        GetMembershipFromCardNumberWithUI(InputMethod, ExternalMemberCardNo, Membership, MemberCard, WithActivate, '');
+    end;
+
+    internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean; ForeignCommunityCode: Code[20])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
@@ -91,7 +101,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             InputMethod := InputMethod::NO_PROMPT;
 
         if ((ExternalMemberCardNo = '') and (InputMethod = InputMethod::NO_PROMPT)) then begin
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo, ForeignCommunityCode)) then
                 Error('');
         end;
 
@@ -146,7 +156,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
-    procedure POSMemberArrival(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100])
+    procedure POSMemberArrival(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -166,7 +176,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         ResponseMessage: Text;
         PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
-        GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
+        GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true, ForeignCommunityCode);
 
         MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, '', 'POS', LogEntryNo, ResponseMessage, ResponseCode);
         Commit(); // so log entry stays
@@ -285,7 +295,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
-    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; SelectReq: Boolean) MembershipEntryNo: Integer
+    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]; SelectReq: Boolean) MembershipEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
@@ -332,7 +342,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             until (MembershipSelected);
 
         end else begin
-            GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true);
+            GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true, ForeignCommunityCode);
 
             if (AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo)) then begin
                 POSSale.Refresh(SalePOS);
@@ -392,7 +402,8 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
     begin
-        GetMembershipFromCardNumberWithUI(InputMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
+        if (ExternalMemberCardNo = '') then
+            GetMembershipFromCardNumberWithUI(InputMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         case AlterationType of
             MembershipAlterationSetup."Alteration Type"::REGRET:
@@ -453,17 +464,17 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
-    internal procedure ShowMember(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100])
+    internal procedure ShowMember(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
     begin
         if ((FrontEndInputMethod = MemberSelectionMethod::NO_PROMPT) and (ExternalMemberCardNo = '')) then
-            if (not ChooseMemberCard(ExternalMemberCardNo)) then
+            if (not ChooseMemberCard(ExternalMemberCardNo, ForeignCommunityCode)) then
                 Error('');
 
         if ((FrontEndInputMethod = MemberSelectionMethod::CARD_SCAN)) then begin
             if (ExternalMemberCardNo = '') then
-                if (not ChooseMemberCard(ExternalMemberCardNo)) then
+                if (not ChooseMemberCard(ExternalMemberCardNo, ForeignCommunityCode)) then
                     Error('');
             FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT;
         end;
