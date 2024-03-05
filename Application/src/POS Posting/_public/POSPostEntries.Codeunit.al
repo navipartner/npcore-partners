@@ -1540,6 +1540,8 @@
         VATPostingSetup: Record "VAT Posting Setup";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        PaymentMethodExchangeRate: Decimal;
         DoPostVAT: Boolean;
         TempPosPostingProfile: Record "NPR POS Posting Profile" temporary;
     begin
@@ -1567,9 +1569,16 @@
         if StrLen(PostingDescription) > MaxStrLen(GenJournalLine.Description) then
             GenJournalLine.Comment := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Comment));
 
+        if (POSPaymentMethod.Get(POSBalancingLine."POS Payment Method Code")) and (POSPaymentMethod."Currency Code" <> '') then
+            if (not POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then
+                PaymentMethodExchangeRate := 100 / POSPaymentMethod."Fixed Rate";
+
         GenJournalLine."Currency Code" := POSBalancingLine."Currency Code";
-        if (GenJournalLine."Currency Code" <> '') then
-            GenJournalLine.Validate("Currency Code");
+        if (GenJournalLine."Currency Code" <> '') and (POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then
+            GenJournalLine.Validate("Currency Code")
+        else
+            GenJournalLine.Validate("Currency Factor", PaymentMethodExchangeRate);
+
         if PostingAmount <> 0 then
             GenJournalLine.Validate(Amount, PostingAmount);
 

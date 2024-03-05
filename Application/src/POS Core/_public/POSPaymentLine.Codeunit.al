@@ -391,6 +391,7 @@
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "NPR POS Sale Line"; PrecalculatedAmount: Boolean; ForeignAmount: Decimal)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
+        CurrExchRate: Record "Currency Exchange Rate";
     begin
         SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
 
@@ -403,8 +404,11 @@
         if (PrecalculatedAmount) then
             SaleLinePOS."Currency Amount" := ForeignAmount;
 
-        if (POSPaymentMethod."Fixed Rate" <> 0) then
-            SaleLinePOS.Validate("Amount Including VAT", Round(SaleLinePOS."Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
+        if POSPaymentMethod."Use Stand. Exc. Rate for Bal." then
+            SaleLinePOS.Validate("Amount Including VAT", Round(CurrExchRate.ExchangeAmtFCYToLCY(SaleLinePOS.Date, POSPaymentMethod."Currency Code", SaleLinePOS."Currency Amount", CurrExchRate.ExchangeRate(SaleLinePOS.Date, POSPaymentMethod."Currency Code"))))
+        else
+            if (POSPaymentMethod."Fixed Rate" <> 0) then
+                SaleLinePOS.Validate("Amount Including VAT", Round(SaleLinePOS."Currency Amount" * POSPaymentMethod."Fixed Rate" / 100, 0.01, POSPaymentMethod.GetRoundingType()));
     end;
 
     procedure ReverseUnrealizedSalesVAT(var SaleLinePOS: Record "NPR POS Sale Line")
@@ -458,12 +462,17 @@
 
 
     procedure CalculateForeignAmount(POSPaymentMethod: Record "NPR POS Payment Method"; AmountLCY: Decimal) Amount: Decimal
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
     begin
 
-        if (POSPaymentMethod."Fixed Rate" <> 0) then
-            Amount := AmountLCY / POSPaymentMethod."Fixed Rate" * 100
+        if POSPaymentMethod."Use Stand. Exc. Rate for Bal." then
+            Amount := CurrExchRate.ExchangeAmtLCYToFCY(Today(), POSPaymentMethod."Currency Code", AmountLCY, CurrExchRate.ExchangeRate(Today(), POSPaymentMethod."Currency Code"))
         else
-            Amount := AmountLCY;
+            if POSPaymentMethod."Fixed Rate" <> 0 then
+                Amount := CurrExchRate.ExchangeAmtLCYToFCY(Today(), POSPaymentMethod."Currency Code", AmountLCY, 100 / POSPaymentMethod."Fixed Rate")
+            else
+                Amount := AmountLCY;
     end;
 
     procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; AllowNegativePaymentBalance: Boolean): Decimal
