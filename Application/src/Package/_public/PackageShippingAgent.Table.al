@@ -42,7 +42,7 @@
         }
         field(52; "LxWxH Dimensions Required"; Boolean)
         {
-            Caption = 'Length_Width_Height Dimensions Required';
+            Caption = 'Length-Width-Height Dimensions Required';
             DataClassification = CustomerContent;
         }
         field(53; "Volume Required"; Boolean)
@@ -52,7 +52,7 @@
         }
         field(54; "running_metre required"; Boolean)
         {
-            Caption = 'running_metre';
+            Caption = 'Running Metre Required';
             DataClassification = CustomerContent;
         }
         field(60; "Email Mandatory"; Boolean)
