@@ -16,13 +16,15 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         ParamPOSWorkflow_OptCptLbl: Label 'POSSales,Automatic,With Guests';
         ParamAdmissionCode_CptLbl: Label 'Admission Code';
         ParamAdmissionCode_DescLbl: Label 'Specifies the Admission Code';
-        ParamDefaultinputValue_CptLbl: Label 'Default Input Value';
-        ParamDefaultinputValue_DescLbl: Label 'Specifies the Default Input Value';
+        ParamDefaultInputValue_CptLbl: Label 'Default Input Value';
+        ParamDefaultInputValue_DescLbl: Label 'Specifies the Default Input Value';
         ParamSuppressWelcomeMessage_CptLbl: Label 'Suppress Welcome Message';
         ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
         ParamPOSWorkflow_DefaultValue, ParamDialogPrompt_DefaultValue : Text[250];
+        ParamForeignCommunity_CptLbl: Label 'Foreign Community Code';
+        ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -42,8 +44,9 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
                                 ParamPOSWorkflow_DescLbl,
                                 ParamPOSWorkflow_OptCptLbl);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
-        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultinputValue_CptLbl, ParamDefaultinputValue_DescLbl);
+        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInputValue_CptLbl, ParamDefaultInputValue_DescLbl);
         WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
+        WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
     end;
@@ -67,16 +70,17 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         ShowWelcomeMessage: Boolean;
         POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
-        POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
+        POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
+        ForeignCommunityCode: Code[20];
     begin
         ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
         DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
-        DialogPrompt := Context.GetIntegerParameter('DialogPrompt');
-
-        if (DialogPrompt < 0) then
-            DialogPrompt := 1;
+        ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
         DialogMethodType := DialogMethod::CARD_SCAN;
+        DialogPrompt := Context.GetIntegerParameter('DialogPrompt');
+        if (DialogPrompt < 0) then
+            DialogPrompt := 1;
 
         case DialogPrompt of
             0:
@@ -103,7 +107,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
 
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
-        POSActionMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
+        POSActionMemberArrival.MemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup, ForeignCommunityCode);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -134,6 +138,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'DefaultInputValue', true, '');
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'DialogPrompt', false, 'No Prompt');
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Member Arrival');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'ForeignCommunityCode', false, 'Foreign Community Code');
                 end;
         end;
     end;
