@@ -177,6 +177,7 @@
             Error('EFT Integration %1 is not subscribing to OnSendRequestSynchronously correctly.', EFTTransactionRequest."Integration Type");
     end;
 
+    [Obsolete('Pending Removal due to move to a new function GetEFTReceiptText because this one supports only one sucesfull EFT Transaction, not all of them.', 'NPR32.0')]
     procedure GetEFTReceiptText(SalesTicketNo: Code[20]; ReceiptNo: Integer): Text
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -200,6 +201,27 @@
             repeat
                 EFTReceiptText += EFTReceipt.Text + Format(NewLine);
             until EFTReceipt.Next() = 0;
+        exit(EFTReceiptText);
+    end;
+
+    procedure GetEFTReceiptText(SalesTicketNo: Code[20]): Text
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceipt: Record "NPR EFT Receipt";
+        EFTReceiptText: Text;
+        NewLine: Text;
+    begin
+        NewLine[1] := 13; // CR
+        NewLine[2] := 10; // LF
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        if EFTTransactionRequest.FindSet() then
+            repeat
+                EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+                if EFTReceipt.FindSet() then
+                    repeat
+                        EFTReceiptText += EFTReceipt.Text + Format(NewLine);
+                    until EFTReceipt.Next() = 0;
+            until EFTTransactionRequest.Next() = 0;
         exit(EFTReceiptText);
     end;
 
