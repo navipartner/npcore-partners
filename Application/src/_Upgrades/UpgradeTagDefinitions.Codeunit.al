@@ -169,6 +169,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'TM_TICKETMGMT'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'TM_TICKETMGMT_2'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vipps Mp Setup", 'VippsMobilepaySetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Standard Exch. Rate", 'UpdateStandardExchangeRateForBalancing'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -638,6 +639,11 @@
             Codeunit::"NPR UPG Vipps Mp Setup":
                 begin
                     exit('VippsMobilepaySetup');
+                end;
+            Codeunit::"NPR UPG Standard Exch. Rate":
+                case UpgradeStep of
+                    'UpdateStandardExchangeRateForBalancing':
+                        exit('NPR-UpdateStandardExchangeRateForBalancing-20240304');
                 end;
         end;
     end;
