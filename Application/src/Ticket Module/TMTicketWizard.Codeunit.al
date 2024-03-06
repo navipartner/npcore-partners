@@ -296,7 +296,7 @@
         ConfigTemplateLine.DeleteAll();
 
         TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
-        TicketType."Activation Method" := TicketType."Activation Method"::SCAN;
+        TicketType."Activation Method" := "NPR TM ActivationMethod_Type"::SCAN;
         TicketType."Ticket Entry Validation" := TicketType."Ticket Entry Validation"::SAME_DAY;
 
         AddConfigTemplateLine(TemplateCode, 0, TicketType.FieldNo("External Ticket Pattern"), '[S][A*4]-[N]');
@@ -366,7 +366,7 @@
         ConfigTemplateLine.DeleteAll();
 
         TicketBOM."Admission Entry Validation" := TicketBOM."Admission Entry Validation"::SAME_DAY;
-        TicketBOM."Activation Method" := TicketBOM."Activation Method"::SCAN;
+        TicketBOM."Activation Method" := "NPR TM ActivationMethod_Bom"::SCAN;
         TicketBOM."Revisit Condition (Statistics)" := TicketBOM."Revisit Condition (Statistics)"::DAILY_NONINITIAL;
         Evaluate(TicketBOM."Duration Formula", '<12M>');
 

@@ -76,7 +76,6 @@
                 field("Activation Method"; Rec."Activation Method")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Ticket Activation Method';
                     ToolTip = 'Specifies the Activation Method. POS (Default), will admit the default admission after sale from POS. POS (All Admissions), Will admit all the admissions after sale on POS. Scan will require the ticket to be scanned for admission.';
                 }
                 field("Ticket Configuration Source"; Rec."Ticket Configuration Source")

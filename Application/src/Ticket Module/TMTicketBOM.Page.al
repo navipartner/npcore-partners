@@ -66,7 +66,6 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Determines how the ticket should be admitted: On Scan - the ticket will be admitted upon scanning; On Sale - the ticket will be admitted during its sale, often in the context of the POS sale; Always - similar to On-Sale, except it allows for the ticket to be re-admitted later; Per Unit - reacts based on the setup in Default admission per a POS Unit.';
-                    Caption = 'Admission Method';
                 }
                 field("Percentage of Adm. Capacity"; Rec."Percentage of Adm. Capacity")
                 {

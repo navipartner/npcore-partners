@@ -151,9 +151,9 @@
 
         CreateStakeholder('TREASURE', 'E-WEEKDAYS-01', 'tsa@navipartner.dk', AdmissionSchedule."Notify Stakeholder"::ALL);
 
-        TicketType.Get(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
-        TicketType.Get(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
-        TicketType.Get(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, TicketType."Admission Registration"::GROUP, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('POS-MSCAN', 'Manual Scan', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('POS-AUTO', 'Auto Admit on Sale', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(CreateTicketType('GROUP', 'Group Ticket', '<+7D>', 0, TicketType."Admission Registration"::GROUP, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
 
         // Single ticket same day
         CreateItem('31001', '', 'POS-AUTO', 'Adult Ticket', 157);
@@ -190,46 +190,46 @@
         AddItemToAdmission('31112', AdmissionList[10]);
 
 
-        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31001', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31002', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31003', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31004', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, true, '<CY>', 4, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE, 0);
+        CreateTicketBOM('31006', '', AdmissionList[1], SeasonBaseCalendar, 1, true, '<CY>', 4, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::MULTIPLE, 0);
 
-        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31008', '', AdmissionList[1], '', 4, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
-        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31009', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31009', '', AdmissionList[2], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
-        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31010', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31010', '', AdmissionList[2], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31010', '', AdmissionList[3], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('32001', '', AdmissionList[1], '', 10, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31031', 'ADULT', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31031', 'CHILD', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31041', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31041', '', AdmissionList[4], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31042', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31042', '', AdmissionList[5], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31043', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31043', '', AdmissionList[6], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
-        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31044', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31044', '', AdmissionList[7], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
 
-        CreateTicketBOM('31100', '', AdmissionList[1], '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
-        CreateTicketBOM('31100', '', AdmissionList[2], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31100', '', AdmissionList[3], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        CreateTicketBOM('31100', '', AdmissionList[8], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
-        CreateTicketBOM('31100', '', AdmissionList[9], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
-        CreateTicketBOM('31100', '', AdmissionList[10], '', 1, false, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
+        CreateTicketBOM('31100', '', AdmissionList[1], '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SAME_DAY, 0);
+        CreateTicketBOM('31100', '', AdmissionList[2], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31100', '', AdmissionList[3], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM('31100', '', AdmissionList[8], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
+        CreateTicketBOM('31100', '', AdmissionList[9], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
+        CreateTicketBOM('31100', '', AdmissionList[10], '', 1, false, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 2);
 
         TicketSetup."Print Server Generator URL" := 'http://test.ticket.navipartner.dk/import/api/rest/v1/ticket/orders';
         TicketSetup."Timeout (ms)" := 30000;
@@ -272,11 +272,11 @@
             CreateScheduleLine(AdmissionCode, StrSubstNo(MembershipGuestTicket2Lbl, AdmissionCode), 1, false, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0);
         end;
 
-        CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        CreateTicketType('MM-AUTO', 'Members and Member Guests', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
 
         CreateItem(ItemCode, '', 'MM-AUTO', ItemDescription, 0);
 
-        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        CreateTicketBOM(ItemCode, '', AdmissionCode, '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
         exit(StrSubstNo(MembershipGuestTicket3Lbl, ItemCode));
     end;
@@ -606,7 +606,7 @@
         Schedule.Modify();
     end;
 
-    procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Option; EntryValidation: Option; AdmissionInclusion: Option)
+    procedure CreateTicketBOM(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Enum "NPR TM ActivationMethod_Bom"; EntryValidation: Option; AdmissionInclusion: Option)
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
@@ -638,7 +638,7 @@
         TicketBom.Modify();
     end;
 
-    procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Option; EntryValidation: Option; ConfigurationSource: Option): Code[10]
+    procedure CreateTicketType(TicketTypeCode: Code[10]; Description: text; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Enum "NPR TM ActivationMethod_Type"; EntryValidation: Option; ConfigurationSource: Option): Code[10]
     var
         TicketType: Record "NPR TM Ticket Type";
     begin

@@ -1136,10 +1136,10 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         TicketType: Record "NPR TM Ticket Type";
         Admission: Record "NPR TM Admission";
     begin
-        TicketTypeCode := TicketTestLibrary.CreateTicketType(TicketTestLibrary.GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
+        TicketTypeCode := TicketTestLibrary.CreateTicketType(TicketTestLibrary.GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         ItemNo := TicketTestLibrary.CreateItem('', TicketTypeCode, Random(200) + 100);
         AdmissionCode := (TicketTestLibrary.CreateAdmissionCode(TicketTestLibrary.GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', ''));
-        TicketTestLibrary.CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
+        TicketTestLibrary.CreateTicketBOM(ItemNo, '', AdmissionCode, '', 1, true, '<+7D>', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE);
     end;
 
     local procedure CreateTimeSlot(AdmissionCode: Code[20]; var ScheduleCode: Code[20]; StartFromDate: Date; AdmissionStartTime: Time; AdmissionEndTime: Time; NumberOfDays: Integer)

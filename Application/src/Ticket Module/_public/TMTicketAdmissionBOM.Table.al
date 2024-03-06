@@ -132,12 +132,10 @@
             Caption = 'Admission Unit Price';
             DataClassification = CustomerContent;
         }
-        field(60; "Activation Method"; Option)
+        field(60; "Activation Method"; Enum "NPR TM ActivationMethod_Bom")
         {
-            Caption = 'Activation Method';
+            Caption = 'Ticket Activation Method';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,On Scan,On Sale,Always,Per Unit';
-            OptionMembers = NA,SCAN,POS,ALWAYS,PER_UNIT;
         }
         field(62; "Admission Entry Validation"; Option)
         {
