@@ -118,10 +118,10 @@
                     if (TicketType.Get(Ticket."Ticket Type Code")) then begin
 
                         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
-                            if (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) then
+                            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) then
                                 RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
 
-                            if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
                                 RegisterAllAdmissionArrivalOnPosSales(Ticket);
                         end;
 
@@ -1236,21 +1236,21 @@
 
             if (AttemptAdmission) then begin
                 if (ScannerStationId <> '') then
-                    TicketBom."Activation Method" := TicketBom."Activation Method"::PER_UNIT;
+                    TicketBom."Activation Method" := "NPR TM ActivationMethod_Bom"::PER_UNIT;
 
                 case TicketBom."Activation Method" of
-                    TicketBom."Activation Method"::SCAN:
+                    "NPR TM ActivationMethod_Bom"::SCAN:
                         if (ProcessFlow = ProcessFlow::SCAN) then
                             TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
 
-                    TicketBom."Activation Method"::POS:
+                    "NPR TM ActivationMethod_Bom"::POS:
                         if (ProcessFlow = ProcessFlow::SALES) then
                             TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
 
-                    TicketBom."Activation Method"::ALWAYS:
+                    "NPR TM ActivationMethod_Bom"::ALWAYS:
                         TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
 
-                    TicketBom."Activation Method"::PER_UNIT:
+                    "NPR TM ActivationMethod_Bom"::PER_UNIT:
                         begin
                             if (PosUnitNo <> '') then begin
                                 StationType := PosDefaultAdmission."Station Type"::POS_UNIT;
@@ -1271,13 +1271,13 @@
                                     TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
                         end;
 
-                    TicketBom."Activation Method"::NA: // Fallback (default) to Ticket Type setup
+                    "NPR TM ActivationMethod_Bom"::NA: // Fallback (default) to Ticket Type setup
                         begin
                             if (ProcessFlow = ProcessFlow::SALES) then begin
-                                if ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBom.Default) then
+                                if ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) and TicketBom.Default) then
                                     TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
 
-                                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                                if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
                                     TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
                             end;
 
@@ -2763,16 +2763,16 @@
             if (TicketType.Get(Item."NPR Ticket Type")) then begin
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
                     DurationFormula := TicketBOM."Duration Formula";
-                    ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
-                    if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
+                    ActivateOnSales := (TicketBOM."Activation Method" = "NPR TM ActivationMethod_Bom"::POS);
+                    if (TicketBOM."Activation Method" = "NPR TM ActivationMethod_Bom"::NA) then
                         // if activate method on BOM is undefined, delegate back to Ticket Type setup
-                        ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
-                                           ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+                        ActivateOnSales := ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) or
+                                           ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) and TicketBOM.Default));
                 end;
 
                 if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
-                    ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
-                                        ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+                    ActivateOnSales := ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) or
+                                        ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) and TicketBOM.Default));
                     DurationFormula := TicketType."Duration Formula";
                 end;
 
