@@ -250,7 +250,8 @@ codeunit 85107 "NPR MM Loyalty Test"
 
         _LastMembership.Find();
         _Assert.AreEqual(ItemLoyalty.Points, _LastMembership."Awarded Points (Sale)", 'Incorrect points after refund.');
-        _Assert.AreEqual(ItemLoyalty.Points, _LastMembership."Awarded Points (Refund)", 'Incorrect points after refund.');
+        _Assert.AreEqual(ItemLoyalty.Points * -1, _LastMembership."Awarded Points (Refund)", 'Incorrect points after refund.');
+        _Assert.AreEqual(0, _LastMembership."Remaining Points", 'Incorrect points after refund.');
 
     end;
 
