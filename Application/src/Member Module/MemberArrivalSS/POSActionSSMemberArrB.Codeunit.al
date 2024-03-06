@@ -29,7 +29,7 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
         ResponseMessage: Text;
         Token: Text[100];
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
-        POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
+        POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
         PosUnitNo: Code[10];
     begin
@@ -42,9 +42,9 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
 
         case POSWorkflowType of
             POSWorkflowMethod::POS:
-                POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo);
+                POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo, '');
             POSWorkflowMethod::Automatic,
-            POSWorkflowMethod::GuestCheckin:
+            POSWorkflowMethod::GuestCheckIn:
                 begin
                     LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
                     Commit();
@@ -65,7 +65,7 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
                         MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ShowWelcomeMessage);
 
-                    if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
+                    if (POSWorkflowType = POSWorkflowMethod::GuestCheckIn) then begin
                         MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, Token);
                         MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ShowWelcomeMessage);
                     end;

@@ -116,24 +116,24 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
 
     internal procedure HandleWorkflowResponse(var Response: JsonObject; ActionContextIn: JsonObject): Boolean
     var
-        Jobj: JsonObject;
-        Jtoken: JsonToken;
+        JObj: JsonObject;
+        JToken: JsonToken;
     begin
-        if not ActionContextIn.Get('name', Jtoken) then begin
+        if not ActionContextIn.Get('name', JToken) then begin
             Response.Add('workflowName', '');
             exit(true);
         end;
-        if Jtoken.AsValue().AsText() = '' then
+        if JToken.AsValue().AsText() = '' then
             exit(true);
 
-        Response.Add('workflowName', Jtoken.AsValue().AsText());
+        Response.Add('workflowName', JToken.AsValue().AsText());
 
-        ActionContextIn.Get('version', Jtoken);
-        Response.Add('workflowVersion', Jtoken.AsValue().AsText());
+        ActionContextIn.Get('version', JToken);
+        Response.Add('workflowVersion', JToken.AsValue().AsText());
 
-        ActionContextIn.Get('parameters', Jtoken);
-        Jobj := Jtoken.AsObject();
-        Response.Add('parameters', Jobj);
+        ActionContextIn.Get('parameters', JToken);
+        JObj := JToken.AsObject();
+        Response.Add('parameters', JObj);
     end;
 }
 

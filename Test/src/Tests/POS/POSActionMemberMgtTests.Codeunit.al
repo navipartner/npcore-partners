@@ -37,7 +37,7 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         SelectReq := false;
         CardNo := AddMemberCard();
         // [When]
-        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, SelectReq);
+        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, '', SelectReq);
         // [Then]
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
@@ -63,7 +63,7 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         DialogMethod := DialogMethod::NO_PROMPT;
         CardNo := AddMemberCard();
         // [When]
-        POSActionMemberMgtWF3B.POSMemberArrival(DialogMethod, CardNo);
+        POSActionMemberMgtWF3B.POSMemberArrival(DialogMethod, CardNo, '');
         // [Then]
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -94,7 +94,7 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         DialogMethod := DialogMethod::NO_PROMPT;
         // [When] Card No is not provided
-        asserterror POSActionMemberMgtWF3B.ShowMember(DialogMethod, CardNo);
+        asserterror POSActionMemberMgtWF3B.ShowMember(DialogMethod, CardNo, '');
         // Card is not selected, error is expected
     end;
 
@@ -115,7 +115,7 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         CardNo := AddMemberCard();
         SelectReq := false;
         // [When]
-        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, SelectReq);
+        POSActionMemberMgtWF3B.SelectMembership(DialogMethod, CardNo, '', SelectReq);
         POSActionMemberMgtWF3B.EditActiveMembership();
         // [Then]
         //page is opened

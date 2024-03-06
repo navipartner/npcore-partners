@@ -22,6 +22,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         DialogTitleLbl: Label '%1 - Membership Management.';
         ParamDefaultInput_CptLbl: Label 'Default Input Value';
         ParamDefaultInput_DescLbl: Label 'Specifies the default value of the Input';
+        ParamForeignCommunity_CptLbl: Label 'Foreign Community Code';
+        ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
     begin
         WorkflowConfig.AddActionDescription(Action_Description);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -42,6 +44,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                                         ParamDialogPrompt_DescLbl,
                                         ParamDialogPrompt_OptCptLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInput_CptLbl, ParamDefaultInput_DescLbl);
+        WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPromptLbl);
         WorkflowConfig.AddLabel('MemberNumberPrompt', MemberNumberPromptLbl);
         WorkflowConfig.AddLabel('MembershipNumberPrompt', MembershipNumberPromptLbl);
@@ -70,18 +73,21 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         FrontEndInputMethod: Option;
         ExternalMemberCardNo: Text[100];
         SelectReq: Boolean;
+        ForeignCommunityCode: Code[20];
     begin
-        if not Context.GetIntegerParameter('Function', FunctionId) then
+        if (not Context.GetIntegerParameter('Function', FunctionId)) then
             FunctionId := 0;
+
         GetCustomParam(Context, SelectReq);
         GetFrontEndInputs(Context, ExternalMemberCardNo, FrontEndInputMethod);
+        ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
         JsonText := '{}';
         case FunctionId of
             0:
-                POSActionMemberMgtWF3B.POSMemberArrival(FrontEndInputMethod, ExternalMemberCardNo);
+                POSActionMemberMgtWF3B.POSMemberArrival(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
             1:
-                POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo, SelectReq);
+                POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode, SelectReq);
             2:
                 JsonText := GetMembershipEntryLookupJson(FrontEndInputMethod, ExternalMemberCardNo);
             3:
@@ -97,7 +103,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
             8:
                 POSActionMemberMgtWF3B.EditMembership();
             9:
-                POSActionMemberMgtWF3B.ShowMember(FrontEndInputMethod, ExternalMemberCardNo);
+                POSActionMemberMgtWF3B.ShowMember(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
             10:
                 POSActionMemberMgtWF3B.EditActiveMembership();
         end;
@@ -170,17 +176,17 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         TextOut: Text;
         IntegerOut: Integer;
     begin
-        if not Context.GetIntegerParameter('Function', IntegerOut) then
+        if (not Context.GetIntegerParameter('Function', IntegerOut)) then
             IntegerOut := 0;
         FunctionId := IntegerOut;
 
-        if not Context.GetString('memberCardInput', TextOut) then
+        if (not Context.GetString('memberCardInput', TextOut)) then
             TextOut := '';
         ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
+
         POSActionMemberMgtWF3B.GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
         MembershipAlterationSetup.SetFilter("From Membership Code", '=%1', Membership."Membership Code");
-
         case FunctionId of
             3:
                 begin
@@ -355,18 +361,18 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 Message('%1', MemberRetailIntegration.GetErrorText(ReturnCode));
     end;
 
-    local procedure GetFrontEndInputs(Context: Codeunit "NPR POS JSON Helper"; var ExternalMemberCardNo: Text[100]; FrontEndInputMethod: Option)
+    local procedure GetFrontEndInputs(Context: Codeunit "NPR POS JSON Helper"; var ExternalMemberCardNo: Text[100]; var FrontEndInputMethod: Option)
     var
         TextOut: Text;
-        IntegerOut: Integer;
     begin
-        if not Context.GetString('memberCardInput', TextOut) then
+        if (not Context.GetString('memberCardInput', TextOut)) then
             TextOut := '';
         ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
 
-        if not Context.GetInteger('DialogPrompt', IntegerOut) then
-            IntegerOut := 0;
-        FrontEndInputMethod := IntegerOut;
+        // DialogPrompt can be obsoleted, alway returns NO_PROMPT
+        //if not Context.GetInteger('DialogPrompt', IntegerOut) then
+        //    IntegerOut := 0;
+        FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT;
     end;
 
 
