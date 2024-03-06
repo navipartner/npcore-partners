@@ -159,7 +159,8 @@
         RSFiscalizationSetups();
         BGSISFiscalizationSetups();
 #if not BC18
-        HideChecklistIfPOSEntryExist();
+        if Checklist.IsChecklistVisible() then
+            HideChecklistIfPOSEntryExist();
 #endif
     end;
 
