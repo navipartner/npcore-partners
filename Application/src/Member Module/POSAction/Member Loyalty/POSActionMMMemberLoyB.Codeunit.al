@@ -144,7 +144,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
         POSSale.Refresh(SalePOS);
 
         if (SalePOS."Customer No." = '') then
-            if (POSActionMemberMgt.SelectMembership(2, MemberCardNumber, false)) = 0 then
+            if (POSActionMemberMgt.SelectMembership(2, MemberCardNumber, ForeignCommunityCode, false)) = 0 then
                 exit;
     end;
 

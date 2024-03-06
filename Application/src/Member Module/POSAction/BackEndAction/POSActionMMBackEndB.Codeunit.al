@@ -18,7 +18,7 @@ codeunit 6150819 "NPR POS Action: MM BackEnd B"
 
         if (CardNumber <> '') then
             if (Confirm(AssignToSale, true)) then
-                POSActionMemberMgmt.SelectMembership(2, CardNumber, false); //2 == NoPrompt
+                POSActionMemberMgmt.SelectMembership(2, CardNumber, '', false); //2 == NoPrompt
     end;
 
     local procedure CreateMembership(MemberSalesSetupItemNumber: Code[20]; SalespersonCode: Code[20]; StoreCode: Code[20]) ExternalCardNumber: Text[100];

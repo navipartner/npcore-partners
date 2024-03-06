@@ -15,8 +15,8 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
         ParamPOSWorkflow_OptCptLbl: Label 'POSSales,Automatic,With Guests';
         ParamAdmissionCode_CptLbl: Label 'Admission Code';
         ParamAdmissionCode_DescLbl: Label 'Specifies the Admission Code';
-        ParamDefaultinputValue_CptLbl: Label 'Default Input Value';
-        ParamDefaultinputValue_DescLbl: Label 'Specifies the Default Input Value';
+        ParamDefaultInputValue_CptLbl: Label 'Default Input Value';
+        ParamDefaultInputValue_DescLbl: Label 'Specifies the Default Input Value';
         ParamSuppressWelcomeMessage_CptLbl: Label 'Suppress Welcome Message';
         ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
@@ -40,7 +40,7 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
                                 ParamPOSWorkflow_DescLbl,
                                 ParamPOSWorkflow_OptCptLbl);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
-        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultinputValue_CptLbl, ParamDefaultinputValue_DescLbl);
+        WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInputValue_CptLbl, ParamDefaultInputValue_DescLbl);
         WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
@@ -66,7 +66,7 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
         ShowWelcomeMessage: Boolean;
         POSActionSSMemberArrival: Codeunit "NPR POS Action SS: MemberArr.B";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
-        POSWorkflowMethod: Option POS,Automatic,GuestCheckin;
+        POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
     begin
         ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
         DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
@@ -101,6 +101,9 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
             POSWorkflowType := POSWorkflowMethod::POS;
 
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
+
+        if ((MemberCardNumber = '') and (DialogMethodType <> DialogMethod::FACIAL_RECOGNITION)) then
+            Error('Member Card Number is required for Member Arrival.');
 
         POSActionSSMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
     end;
