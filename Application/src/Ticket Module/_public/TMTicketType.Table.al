@@ -106,13 +106,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR TM DeferRevenueProfile";
         }
-        field(60; "Activation Method"; Option)
+        field(60; "Activation Method"; Enum "NPR TM ActivationMethod_Type")
         {
-            Caption = 'Activation Method';
+            Caption = 'Ticket Activation Method';
             Description = 'TM1.00';
-            OptionCaption = 'Scan,(POS) Default Admission,Invoice,(POS) All Admissions,Not Applicable';
-            OptionMembers = SCAN,POS_DEFAULT,INVOICE,POS_ALL,NA;
             DataClassification = CustomerContent;
+            ValuesAllowed = SCAN, POS_DEFAULT, POS_ALL, NA;
         }
         field(61; "Defer Revenue"; Boolean)
         {

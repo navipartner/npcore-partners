@@ -104,7 +104,7 @@
         TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKDAYS', 1, false, 17, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
         TicketDemo.CreateScheduleLine('MM-CASTLE', 'MM-WEEKENDS', 1, false, 23, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', AllowAdmissionBeforeStart, AllowAdmissionAfterStart);
 
-        TicketType.Get(TicketDemo.CreateTicketType('MM-AUTO', 'Auto admit ticket', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, TicketType."Activation Method"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
+        TicketType.Get(TicketDemo.CreateTicketType('MM-AUTO', 'Auto admit ticket', '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::POS_DEFAULT, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM));
 
         // Single ticket same day
         TicketDemo.CreateItem('320100-0', '', 'MM-AUTO', 'Member Ticket', 0);
@@ -112,10 +112,10 @@
         TicketDemo.CreateItem('320100-2', '', 'MM-AUTO', 'Child Guest Ticket', 0);
         TicketDemo.CreateItem('320100-3', '', 'MM-AUTO', 'Senior Guesy Ticket', 0);
 
-        TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
-        TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, TicketBom."Activation Method"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-0', '', 'MM-CASTLE', '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-1', '', 'MM-CASTLE', '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-2', '', 'MM-CASTLE', '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
+        TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
         MembershipSetup.Get('GOLD');
         MembershipSetup."Ticket Item Barcode" := 'IXRF-320100-0';
