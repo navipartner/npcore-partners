@@ -414,6 +414,9 @@
               MembershipPointsEntry."Awarded Amount (LCY)", MembershipPointsEntry."Awarded Points", MembershipPointsEntry."Loyalty Item Point Line No.");
 
             MembershipPointsEntry."Awarded Points" *= MembershipPointsEntry.Quantity;
+            if (MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND) then
+                MembershipPointsEntry."Awarded Amount (LCY)" *= -1;
+
             if (LoyaltySetup."Rounding on Earning" = LoyaltySetup."Rounding on Earning"::NEAREST) then
                 MembershipPointsEntry.Points := Round(MembershipPointsEntry."Awarded Amount (LCY)", 1, '=') + MembershipPointsEntry."Awarded Points";
             if (LoyaltySetup."Rounding on Earning" = LoyaltySetup."Rounding on Earning"::UP) then
@@ -421,11 +424,6 @@
             if (LoyaltySetup."Rounding on Earning" = LoyaltySetup."Rounding on Earning"::DOWN) then
                 MembershipPointsEntry.Points := Round(MembershipPointsEntry."Awarded Amount (LCY)", 1, '<') + MembershipPointsEntry."Awarded Points";
 
-            if (MembershipPointsEntry."Entry Type" = MembershipPointsEntry."Entry Type"::REFUND) then begin
-                MembershipPointsEntry.Points *= -1;
-                MembershipPointsEntry."Awarded Points" *= -1;
-                MembershipPointsEntry."Awarded Amount (LCY)" *= -1;
-            end;
         end;
 
         CalculatePointsValidPeriod(LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
