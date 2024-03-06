@@ -24,7 +24,7 @@ codeunit 6184710 "NPR Vipps Mp Util"
             http.DefaultRequestHeaders().Add('Authorization', 'Bearer ' + accessToken);
         end;
         if (VippsMpStore."Partner API Enabled") then begin
-            partner_client_sub := azureVault.GetAzureKeyVaultSecret('VippsMp_PartnerClientSubscribtionKey');
+            partner_client_sub := azureVault.GetAzureKeyVaultSecret('VippsMpPartnerClientSubscribtionKey');
             http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', partner_client_sub);
         end else begin
             http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', VippsMpStore."Client Sub. Key");
@@ -44,9 +44,9 @@ codeunit 6184710 "NPR Vipps Mp Util"
         partner_client_sub: Text;
     begin
         InitHttpClient(http, False);
-        partner_client_id := azureVault.GetAzureKeyVaultSecret('VippsMp_PartnerClientId');
-        partner_client_secret := azureVault.GetAzureKeyVaultSecret('VippsMp_PartnerClientSecret');
-        partner_client_sub := azureVault.GetAzureKeyVaultSecret('VippsMp_PartnerClientSubscribtionKey');
+        partner_client_id := azureVault.GetAzureKeyVaultSecret('VippsMpPartnerClientId');
+        partner_client_secret := azureVault.GetAzureKeyVaultSecret('VippsMpPartnerClientSecret');
+        partner_client_sub := azureVault.GetAzureKeyVaultSecret('VippsMpPartnerClientSubscribtionKey');
         accessTokenApi.GetAccessToken(Msn, partner_client_id, partner_client_secret, partner_client_sub, False, accessToken);
         http.DefaultRequestHeaders().Add('Authorization', 'Bearer ' + accessToken);
         http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', partner_client_sub);
