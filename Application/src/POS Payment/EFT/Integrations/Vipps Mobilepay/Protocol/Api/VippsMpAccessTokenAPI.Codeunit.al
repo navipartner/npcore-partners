@@ -38,9 +38,9 @@ codeunit 6184709 "NPR Vipps Mp AccessToken API"
     begin
         if (VippsMpStore."Partner API Enabled") then begin
             if (VippsMpStore.Sandbox) then Error('Can''t use Partner keys in Sandbox mode.');
-            Partner_client_id := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMp_PartnerClientId');
-            Partner_client_secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMp_PartnerClientSecret');
-            Partner_client_sub := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMp_PartnerClientSubscribtionKey');
+            Partner_client_id := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientId');
+            Partner_client_secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientSecret');
+            Partner_client_sub := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientSubscribtionKey');
             GetAccessToken(VippsMpStore."Merchant Serial Number", Partner_client_id, Partner_client_secret, Partner_client_sub, False, AccessToken, ExpiresAt);
         end else begin
             GetAccessToken(VippsMpStore."Merchant Serial Number", VippsMpStore."Client Id", VippsMpStore."Client Secret", VippsMpStore."Client Sub. Key", VippsMpStore.Sandbox, AccessToken, ExpiresAt);
