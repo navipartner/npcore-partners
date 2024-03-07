@@ -470,7 +470,7 @@
             Amount := CurrExchRate.ExchangeAmtLCYToFCY(Today(), POSPaymentMethod."Currency Code", AmountLCY, CurrExchRate.ExchangeRate(Today(), POSPaymentMethod."Currency Code"))
         else
             if POSPaymentMethod."Fixed Rate" <> 0 then
-                Amount := CurrExchRate.ExchangeAmtLCYToFCY(Today(), POSPaymentMethod."Currency Code", AmountLCY, 100 / POSPaymentMethod."Fixed Rate")
+                Amount := AmountLCY / POSPaymentMethod."Fixed Rate" * 100
             else
                 Amount := AmountLCY;
     end;
