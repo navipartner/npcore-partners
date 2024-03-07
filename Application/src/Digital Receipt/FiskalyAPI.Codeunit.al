@@ -246,18 +246,25 @@ codeunit 6184663 "NPR Fiskaly API"
 
         POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryTaxLine.SetLoadFields("Tax %", "Amount Including Tax", "Tax Base Amount", "Tax Amount");
-        if not POSEntryTaxLine.FindSet() then
-            exit;
-        repeat
+        if POSEntryTaxLine.FindSet() then
+            repeat
+                Clear(TotalVatAmountJsonObject);
+
+                TotalVatAmountJsonObject.Add('percentage', Format(POSEntryTaxLine."Tax %" / 100, 0, '<Precision,2:2><Standard Format,2>'));
+                TotalVatAmountJsonObject.Add('incl_vat', Format(POSEntryTaxLine."Amount Including Tax", 0, '<Precision,2:2><Standard Format,2>'));
+                TotalVatAmountJsonObject.Add('excl_vat', Format(POSEntryTaxLine."Tax Base Amount", 0, '<Precision,2:2><Standard Format,2>'));
+                TotalVatAmountJsonObject.Add('vat', Format(POSEntryTaxLine."Tax Amount", 0, '<Precision,2:2><Standard Format,2>'));
+                TotalVatAmountJsonArray.Add(TotalVatAmountJsonObject);
+            until POSEntryTaxLine.Next() = 0
+        else begin
             Clear(TotalVatAmountJsonObject);
 
-            TotalVatAmountJsonObject.Add('percentage', Format(POSEntryTaxLine."Tax %" / 100, 0, '<Precision,2:2><Standard Format,2>'));
-            TotalVatAmountJsonObject.Add('incl_vat', Format(POSEntryTaxLine."Amount Including Tax", 0, '<Precision,2:2><Standard Format,2>'));
-            TotalVatAmountJsonObject.Add('excl_vat', Format(POSEntryTaxLine."Tax Base Amount", 0, '<Precision,2:2><Standard Format,2>'));
-            TotalVatAmountJsonObject.Add('vat', Format(POSEntryTaxLine."Tax Amount", 0, '<Precision,2:2><Standard Format,2>'));
+            TotalVatAmountJsonObject.Add('percentage', '0.00');
+            TotalVatAmountJsonObject.Add('incl_vat', '0.00');
+            TotalVatAmountJsonObject.Add('excl_vat', '0.00');
+            TotalVatAmountJsonObject.Add('vat', '0.00');
             TotalVatAmountJsonArray.Add(TotalVatAmountJsonObject);
-        until POSEntryTaxLine.Next() = 0;
-
+        end;
         DataJsonObject.Add('lines', LinesJsonArray);
         DataJsonObject.Add('vat_amounts', TotalVatAmountJsonArray);
         if TotalDiscountValue > 0 then begin
