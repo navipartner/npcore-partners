@@ -52,11 +52,7 @@ page 6151366 "NPR MM AchMemberGoalList"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Reward Code field.';
                 }
-                field(RewardCollectedAt; Rec.RewardCollectedAt)
-                {
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the Reward Collected At field.';
-                }
+
             }
         }
     }

@@ -28,11 +28,6 @@ page 6151374 "NPR MM Achievement"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Reward Code field.';
                 }
-                field(RewardCollectedAt; Rec.RewardCollectedAt)
-                {
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the Reward Collected At field.';
-                }
                 field(RewardId; Rec.RewardId)
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -51,5 +46,36 @@ page 6151374 "NPR MM Achievement"
             }
         }
     }
+    actions
+    {
+        area(processing)
+        {
+            group(PrintGroup)
+            {
+                Caption = '&Print';
+                Image = Print;
+                action(Print)
+                {
+                    Caption = 'Print';
+                    Image = Print;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
 
+                    ToolTip = 'Prints the selected reward.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnAction()
+                    var
+                        Coupon: Record "NPR NpDc Coupon";
+                        NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+                    begin
+                        if (Coupon.Get(Rec.RewardId)) then
+                            NpDcCouponMgt.PrintCoupon(Coupon);
+                    end;
+                }
+            }
+        }
+    }
 }
