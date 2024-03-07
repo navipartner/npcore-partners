@@ -24,10 +24,15 @@
     local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
     var
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSunit: Record "NPR POS Unit";
     begin
 
         if (ValueEntry."Document Type" = ValueEntry."Document Type"::" ") then begin
 
+            if (not POSunit.Get(CopyStr(ItemJournalLine."NPR Register Number", 1, 10))) then
+                Clear(POSUnit);
+
+            POSSalesWorkflowStep.SetFilter("Set Code", '=%1', POSunit."POS Sales Workflow Set");
             POSSalesWorkflowStep.SetFilter("Subscriber Function", '=%1', PointAssignmentStepName());
             if (POSSalesWorkflowStep.FindFirst()) then
                 if (POSSalesWorkflowStep.Enabled) then
