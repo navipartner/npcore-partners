@@ -2,7 +2,7 @@
 {
     Extensible = False;
 
-    Caption = 'TM Pick-Up Reserved Tickets';
+    Caption = 'Pick-Up Reserved Tickets';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
@@ -271,21 +271,20 @@
                     PrintTicket();
                 end;
             }
-        }
-        area(navigation)
-        {
-            action("Show Ticket")
+
+            action(ListTickets)
             {
                 ToolTip = 'Navigate to Ticket List';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Ticket';
+                Caption = 'List Tickets';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedIsBig = true;
+                PromotedCategory = Process;
+
                 RunObject = Page "NPR TM Ticket List";
                 RunPageLink = "Ticket Reservation Entry No." = FIELD("Entry No.");
-
             }
         }
     }

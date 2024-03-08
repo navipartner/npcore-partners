@@ -2,14 +2,14 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 {
     Access = Internal;
 
-    internal procedure PickupPreConfirmedTicket(TicketReference: Code[30]; AllowPayment: Boolean; AllowUI: Boolean; AllowReprint: Boolean)
+    internal procedure PickupPreConfirmedTicket(TicketReference: Code[50]; AllowPayment: Boolean; AllowUI: Boolean; AllowReprint: Boolean)
     var
         TempTicketsOut: Record "NPR TM Ticket" temporary;
     begin
         PickupPreConfirmedTicket(TicketReference, AllowPayment, AllowUI, AllowReprint, TempTicketsOut);
     end;
 
-    internal procedure PickupPreConfirmedTicket(TicketReference: Code[30]; AllowPayment: Boolean; AllowUI: Boolean; AllowReprint: Boolean; var TempTickets: Record "NPR TM Ticket" temporary)
+    internal procedure PickupPreConfirmedTicket(TicketReference: Code[50]; AllowPayment: Boolean; AllowUI: Boolean; AllowReprint: Boolean; var TempTickets: Record "NPR TM Ticket" temporary)
     var
         PickUpReservedTickets: Page "NPR TM Pick-Up Reserv. Tickets";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -33,6 +33,15 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
                 TicketReservationRequest.FindFirst();
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
+                ReservationFound := TicketReservationRequest.FindFirst();
+                if (ReservationFound) then
+                    ListOfTokens.Add(TicketReservationRequest."Session Token ID");
+            end;
+
+            if (not ReservationFound) then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetCurrentKey("External Order No.");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', CopyStr(TicketReference, 1, MaxStrLen(TicketReservationRequest."Session Token ID")));
                 ReservationFound := TicketReservationRequest.FindFirst();
                 if (ReservationFound) then
                     ListOfTokens.Add(TicketReservationRequest."Session Token ID");
@@ -229,7 +238,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         end;
     end;
 
-    internal procedure GetTicketsFromOrderReference(OrderReference: Code[20]; var TempTickets: Record "NPR TM Ticket" temporary)
+    internal procedure GetTicketsFromOrderReference(OrderReference: Code[50]; var TempTickets: Record "NPR TM Ticket" temporary)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -239,39 +248,52 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("External Order No.");
-        TicketReservationRequest.SetFilter("External Order No.", '=%1', OrderReference);
-        if (not TicketReservationRequest.FindSet()) then
-            exit;
+        TicketReservationRequest.SetFilter("External Order No.", '=%1', CopyStr(OrderReference, 1, MaxStrLen(TicketReservationRequest."External Order No.")));
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                Ticket.Reset();
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                if (Ticket.FindSet()) then begin
+                    repeat
+                        TempTickets.TransferFields(Ticket, true);
+                        TempTickets.Insert();
+                    until (Ticket.Next() = 0);
+                end;
 
-        repeat
-            Ticket.Reset();
-            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-            if (Ticket.FindSet()) then begin
-                repeat
-                    TempTickets.TransferFields(Ticket, true);
-                    TempTickets.Insert();
-                until (Ticket.Next() = 0);
-            end;
+            until (TicketReservationRequest.Next() = 0);
 
-        until (TicketReservationRequest.Next() = 0);
         TicketReservationRequest.SetCurrentKey("External Order No.");
-        TicketReservationRequest.SetFilter("External Order No.", '=%1', OrderReference);
-        if (not TicketReservationRequest.FindSet()) then
-            exit;
+        TicketReservationRequest.SetFilter("External Order No.", '=%1', CopyStr(OrderReference, 1, MaxStrLen(TicketReservationRequest."External Order No.")));
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                Ticket.Reset();
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                if (Ticket.FindSet()) then begin
+                    repeat
+                        TempTickets.TransferFields(Ticket, true);
+                        TempTickets.Insert();
+                    until (Ticket.Next() = 0);
+                end;
 
-        repeat
-            Ticket.Reset();
-            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
-            if (Ticket.FindSet()) then begin
-                repeat
-                    TempTickets.TransferFields(Ticket, true);
-                    TempTickets.Insert();
-                until (Ticket.Next() = 0);
-            end;
+            until (TicketReservationRequest.Next() = 0);
 
-        until (TicketReservationRequest.Next() = 0);
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', CopyStr(OrderReference, 1, MaxStrLen(TicketReservationRequest."Session Token ID")));
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                Ticket.Reset();
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                if (Ticket.FindSet()) then begin
+                    repeat
+                        TempTickets.TransferFields(Ticket, true);
+                        TempTickets.Insert();
+                    until (Ticket.Next() = 0);
+                end;
+
+            until (TicketReservationRequest.Next() = 0);
     end;
 
 }

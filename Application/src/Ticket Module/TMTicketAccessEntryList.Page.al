@@ -118,7 +118,7 @@
                 var
                     TicketManagement: Codeunit "NPR TM Ticket Management";
                 begin
-                    TicketManagement.RegisterArrivalScanTicket(0, Rec."Ticket No.", Rec."Admission Code", -1, '', '', false);
+                    TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Rec."Ticket No.", Rec."Admission Code", -1, '', '', false);
                 end;
             }
             action("Register Departure")
@@ -136,7 +136,7 @@
                     TicketManagement: Codeunit "NPR TM Ticket Management";
                 begin
 
-                    TicketManagement.ValidateTicketForDeparture(0, Rec."Ticket No.", Rec."Admission Code");
+                    TicketManagement.ValidateTicketForDeparture("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Rec."Ticket No.", Rec."Admission Code");
                 end;
             }
             action("Block/Unblock")

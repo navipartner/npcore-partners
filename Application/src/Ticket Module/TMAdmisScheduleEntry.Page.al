@@ -356,7 +356,8 @@
                 ApplicationArea = NPRTicketAdvanced;
                 Image = Replan;
                 Scope = Repeater;
-                Promoted = false;
+                Promoted = true;
+                PromotedOnly = true;
                 trigger OnAction()
                 begin
                     ReplanReservations();

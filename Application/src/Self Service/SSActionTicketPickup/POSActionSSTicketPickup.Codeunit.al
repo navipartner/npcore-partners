@@ -16,7 +16,7 @@ codeunit 6151430 "NPR POSAction SS TicketPickup" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         POSActionTicketMgtB: Codeunit "NPR POS Action - Ticket Mgt B.";
-        TicketReferenceNumber: Text[30];
+        TicketReferenceNumber: Text[50];
     begin
         case Step of
             'printTickets':
