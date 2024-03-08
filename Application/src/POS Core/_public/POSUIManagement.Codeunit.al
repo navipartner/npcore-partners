@@ -643,6 +643,10 @@
         GlobalSettingsSystemWorkFlowMakePaymentLbl: Label 'Make Payment :';
         GlobalSettingsSystemWorkFlowSelectWorkflowLbl: Label 'Select Workflow';
         GlobalSettingsSystemWorkNoEditableVariablesLbl: Label 'No Editable Variables';
+        GlobalSettingsSystemWorkflowTextEnterLbl: Label 'Enter text :';
+        ColorSettingsSelectPrimaryColorLbl: Label 'Select color to be used as primary color : ';
+        ColorSettingsSelectSecondaryColorLbl: Label 'Select color to be used as secondary color : ';
+        ColorSettingsChangeColorLbl: Label 'Change Color';
         ColorPickerDeleteColorLbl: Label 'Delete Color';
         ColorPickerSaveColorLbl: Label 'Save Color';
         ScheduleDialogAdmissionsTableAdmissionCodeLbl: Label 'Admission Code';
@@ -1064,12 +1068,16 @@
         Captions.Add('Global_Settings_SystemWorkFlowCustomer_Select', GlobalSettingsSystemWorkFlowCustomerSelectLbl);
         Captions.Add('Global_Settings_SystemWorkFlowSelectWorkflow', GlobalSettingsSystemWorkFlowSelectWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkNoEditableVariables', GlobalSettingsSystemWorkNoEditableVariablesLbl);
+        Captions.Add('Global_Settings_SystemWorkFlowText_Enter', GlobalSettingsSystemWorkflowTextEnterLbl);
         Captions.Add('Global_Settings_SystemWorkFlowEditVariables', GlobalSettingsEditVariablesLbl);
         Captions.Add('Global_Settings_ImportOldLayout', GlobalSettingsImportOldLayoutLbl);
         Captions.Add('Global_Settings_ImportOldLayout_ImportButtonLabel', GlobalSettingsImportOldLayoutImportButtonLabelLbl);
         Captions.Add('Global_Settings_ImportOldLayout_IsImportingStatusLabel', GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessTitle', GlobalSettingsImportOldLayoutSuccessTitleLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessMessage', GlobalSettingsImportOldLayoutSuccessMessageLbl);
+        Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
+        Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
+        Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
         Captions.Add('Dialog_ItemSelection_QuantityOutOf', DialogItemSelectionQuantityOutOfLbl);
         Captions.Add('Dialog_ItemSelection_OutOf', DialogItemSelectionOutOfLbl);
         Captions.Add('Dialog_ItemSelection_EnterTheNumber', DialogItemSelectionEnterTheNumberLbl);
