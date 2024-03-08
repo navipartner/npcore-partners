@@ -12,7 +12,7 @@ codeunit 6059874 "NPR TM Test Ticket"
         ValidLbl: Label 'Ticket Valid.';
         NotFound: Label 'Ticket %1 not found.';
     begin
-        if (not TicketManagement.GetTicket(1, Rec."Ticket Reference No.", Ticket)) then
+        if (not TicketManagement.GetTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, Rec."Ticket Reference No.", Ticket)) then
             Error(NotFound, Rec."Ticket Reference No.");
 
         TicketManagement.ValidateTicketForArrival(Ticket, Rec."Admission Code", -1, Rec."Event Date", Rec."Event Time");

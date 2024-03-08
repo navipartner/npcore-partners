@@ -120,7 +120,7 @@
         if (MemberRetailIntegration.IssueTicketFromMemberScan(Member, ItemCrossReference, TicketNo, ResponseMessage) <> 0) then
             exit(-1);
 
-        TicketManagement.RegisterArrivalScanTicket(0, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
+        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
 
 
         if (AdmissionCode = '') then

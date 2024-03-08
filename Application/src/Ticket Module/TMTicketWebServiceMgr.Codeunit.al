@@ -620,7 +620,7 @@
         TicketNumber := GetXmlText30(Node.AsXmlElement(), 'Request/TicketNumber', MaxStrLen(TicketNumber), true);
         PinCode := GetXmlText10(Node.AsXmlElement(), 'Request/PinCode', MaxStrLen(PinCode), true);
 
-        TicketManager.ValidateTicketReference(1, TicketNumber, '', TicketAccessEntryNo);
+        TicketManager.ValidateTicketReference("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, TicketNumber, '', TicketAccessEntryNo);
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
 

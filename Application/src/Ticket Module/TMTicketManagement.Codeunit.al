@@ -381,7 +381,7 @@
 
     end;
 
-    procedure ValidateTicketForDeparture(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20])
+    procedure ValidateTicketForDeparture(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -1044,7 +1044,7 @@
         ENTRY_NOT_FOUND: Label 'Ticket %1 has been paid and quantity cannot be changed. %2 %3.';
     begin
 
-        ValidateTicketReference(0, TicketNo, AdmissionCode, TicketAccessEntryNo, true);
+        ValidateTicketReference("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, TicketAccessEntryNo, true);
         Ticket.Get(TicketNo);
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
@@ -1173,8 +1173,54 @@
         exit(TicketRequest."Admission Inclusion" = TicketRequest."Admission Inclusion"::SELECTED);
     end;
 
+    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean)
+    var
+        AdmittedTicketCount: Integer;
+    begin
+        RegisterArrivalScanTicket(TicketIdentifierType, TicketReference, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, WithPrint, AdmittedTicketCount);
+    end;
+
     [CommitBehavior(CommitBehavior::Error)]
-    procedure RegisterArrivalScanTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketNumber: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean)
+    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean; var AdmittedTicketCount: Integer)
+    begin
+        if (TicketIdentifierType <> TicketIdentifierType::EXTERNAL_ORDER_REF) then begin
+            ValidateRegisterArrivalScanTicketWorker(TicketIdentifierType, TicketReference, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, WithPrint);
+            AdmittedTicketCount := 1;
+        end;
+
+        if (TicketIdentifierType = TicketIdentifierType::EXTERNAL_ORDER_REF) then
+            ValidateRegisterArrivalScanOrderWorker(TicketIdentifierType, TicketReference, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, WithPrint, AdmittedTicketCount);
+    end;
+
+    local procedure ValidateRegisterArrivalScanOrderWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean; var AdmittedTicketCount: Integer)
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if (TicketIdentifierType <> "NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF) then
+            Error(UNSUPPORTED_VALIDATION_METHOD);
+
+        TicketRequest.SetCurrentKey("Session Token ID");
+        TicketRequest.SetFilter("Session Token ID", '=%1', TicketReference);
+        if (not TicketRequest.FindSet()) then
+            RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketReference), INVALID_REFERENCE_NO);
+
+        repeat
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+            if (Ticket.FindSet()) then begin
+                repeat
+                    ValidateRegisterArrivalScanTicketWorker("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Ticket."No.", AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, false);
+                    AdmittedTicketCount += 1;
+                until (Ticket.Next() = 0);
+            end;
+        until (TicketRequest.Next() = 0);
+
+        if (WithPrint) then
+            PrintTicketsFromToken(TicketReference);
+
+    end;
+
+    local procedure ValidateRegisterArrivalScanTicketWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketNumber: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Ticket: Record "NPR TM Ticket";
@@ -1358,12 +1404,12 @@
 
     end;
 
-    procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
+    procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
     begin
@@ -2644,7 +2690,7 @@
         end;
     end;
 
-    internal procedure GetTicket(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; var Ticket: Record "NPR TM Ticket"): Boolean
+    internal procedure GetTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; var Ticket: Record "NPR TM Ticket"): Boolean
     begin
         Clear(Ticket);
 

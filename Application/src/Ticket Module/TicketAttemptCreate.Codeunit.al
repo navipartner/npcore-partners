@@ -32,7 +32,7 @@
         _TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         _ReusedTokenId: Text[100];
         _TicketNo: Code[20];
-        _TicketIdentifierType: Option;
+        _TicketIdentifierType: Enum "NPR TM TicketIdentifierType";
         _TicketIdentifier: Text[50];
         _AdmissionCode: Code[20];
         _AdmissionScheduleEntryNo: Integer;
@@ -79,7 +79,7 @@
         exit(Successful);
     end;
 
-    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; var ResponseMessage: Text): Boolean
+    procedure AttemptValidateTicketForArrival(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; var ResponseMessage: Text): Boolean
     begin
 
         _AttemptFunction := _AttemptFunction::VALIDATE_ARRIVAL;
@@ -90,6 +90,7 @@
         _AdmissionScheduleEntryNo := AdmissionScheduleEntryNo;
         _PosUnitNo := PosUnitNo;
         _ScannerStationId := ScannerStationId;
+        ResponseMessage := '';
 
         exit(InvokeAttemptAction(ResponseMessage));
     end;
@@ -169,7 +170,7 @@
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
                     if (Ticket.FindSet()) then begin
                         repeat
-                            TicketManagement.RegisterArrivalScanTicket(0, Ticket."No.", '', 0, '', '', false);
+                            TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Ticket."No.", '', 0, '', '', false);
                         until (Ticket.Next() = 0);
                     end;
                 until (TicketReservationRequest.Next() = 0);
@@ -184,7 +185,7 @@
 
     end;
 
-    local procedure DoValidateTicketForArrival(TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10])
+    local procedure DoValidateTicketForArrival(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10])
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
