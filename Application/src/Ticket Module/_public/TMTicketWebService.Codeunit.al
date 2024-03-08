@@ -5,21 +5,25 @@
     end;
 
     var
-        TicketIdentifierType: Option INTERNAL_TICKET_NO,EXTERNAL_TICKET_NO,PRINTED_TICKET_NO;
         SETUP_MISSING: Label 'Setup is missing for %1';
 
     procedure ValidateTicketArrival(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
     var
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
+        ArrivalSuccess: Boolean;
     begin
-        exit(AttemptTicket.AttemptValidateTicketForArrival(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText));
+        ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
+        if (not ArrivalSuccess) then
+            ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
+
+        exit(ArrivalSuccess);
     end;
 
     procedure ValidateTicketDeparture(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; MessageText: Text): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
     begin
-        TicketManagement.ValidateTicketForDeparture(TicketIdentifierType::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode);
+        TicketManagement.ValidateTicketForDeparture("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode);
         exit(true);
     end;
 
