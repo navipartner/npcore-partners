@@ -951,6 +951,13 @@
         UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnBeforeModifyUpdatedJobQueueEntry', '', true, false)]
+    local procedure SetDefaultValuesOnBeforeModifyUpdatedJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        AutoRestartRetentionPolicyJQ(JobQueueEntry);
+        UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
     local procedure RescheduleAfterError(JobQueueEntry: Record "Job Queue Entry")
     var
