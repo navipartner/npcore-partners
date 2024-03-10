@@ -10,7 +10,7 @@ pageextension 6014514 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 ToolTip = 'Runs a Purchase Price Calculation report.';
                 ApplicationArea = NPRRSRLocal;
                 Image = Print;
-
+                Enabled = RetailLocationCodeExists;
                 trigger OnAction()
                 var
                     RetailPurchPriceCalc: Report "NPR RS Ret. Purch. Price Calc.";
@@ -21,4 +21,14 @@ pageextension 6014514 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    var
+        RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        RetailLocationCodeExists := RSRetailLocalizationMgt.CheckForRetailLocationLines(Rec);
+    end;
+
+    var
+        RetailLocationCodeExists: Boolean;
 }

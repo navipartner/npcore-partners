@@ -37,7 +37,7 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
                 column(InvLine_SalesPrice; InvLineSalesPrice) { }
                 column(InvLine_PurchasePrice; InvLinePurchasePrice) { }
                 column(InvLine_LinePurchasePriceExclVAT; InvLineTotalPurchasePriceExclVAT) { }
-                column(InvLine_LineValueExclVAT; "Line Amount") { }
+                column(InvLine_LineValueExclVAT; CalculateLineAmountLCY()) { }
                 column(InvLine_ItemChargeAssigned; InvLineItemChargeAssigned) { }
                 column(InvLine_MarginAmount; InvLineMarginAmount) { }
                 column(InvLine_LineWithChargeAmountExclVAT; InvLineLineWChargeAmountExclVAT) { }
@@ -200,6 +200,8 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
         ValueEntry.SetRange("Document No.", "Purch. Inv. Line"."Document No.");
         ValueEntry.SetRange("Location Code", "Purch. Inv. Line"."Location Code");
         ValueEntry.SetRange("Document Line No.", "Purch. Inv. Line"."Line No.");
+        if not ValueEntry.FindSet() then
+            exit;
         ValueEntry.CalcSums("Cost Amount (Actual)");
 
         ItemLedgerEntry.SetCurrentKey("Entry No.");
@@ -209,6 +211,7 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
         ItemLedgerEntry.SetRange("Item No.", ValueEntry."Item No.");
         if not ItemLedgerEntry.FindFirst() then
             exit;
+        ItemLedgerEntry.CalcFields("Cost Amount (Actual)");
         if ItemLedgerEntry."Cost Amount (Actual)" <> Abs(ValueEntry."Cost Amount (Actual)") then
             LineItemChargeAmount := ItemLedgerEntry."Cost Amount (Actual)" - Abs(ValueEntry."Cost Amount (Actual)");
     end;
@@ -227,8 +230,8 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
         Item: Record Item;
         PriceListLine: Record "Price List Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        StartingDateFilter: Label '<=%1', Locked = true;
-        EndingDateFilter: Label '>=%1|''''', Locked = true;
+        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
+        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
         VATBreakDown: Decimal;
     begin
         PriceListLine.SetRange("Price Type", "Price Type"::Sale);
@@ -243,26 +246,36 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
         if VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
             VATBreakDown := (100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100;
 
-        InvLinePurchasePrice := "Purch. Inv. Line"."Line Amount" / "Purch. Inv. Line".Quantity;
+        InvLinePurchasePrice := CalculateLineAmountLCY() / "Purch. Inv. Line".Quantity;
         InvLineLineWChargeAmountInclVAT := InvLineSalesPrice * "Purch. Inv. Line".Quantity;
         InvLineVATAmount := InvLineLineWChargeAmountInclVAT * VATBreakDown;
         InvLineVATPercentage := VATPostingSetup."VAT %";
         InvLineLineWChargeAmountExclVAT := InvLineLineWChargeAmountInclVAT - (InvLineLineWChargeAmountInclVAT * VATBreakDown);
         CalculateItemCharge(InvLineItemChargeAssigned);
-        InvLineMarginAmount := InvLineLineWChargeAmountExclVAT - ("Purch. Inv. Line"."Line Amount" + InvLineItemChargeAssigned);
+        InvLineMarginAmount := InvLineLineWChargeAmountExclVAT - (CalculateLineAmountLCY() + InvLineItemChargeAssigned);
     end;
 
     local procedure CalcTotals()
     begin
         TotalQty += "Purch. Inv. Line".Quantity;
         TotalPurchasePrice += InvLinePurchasePrice;
-        TotalPurchaseLineValue += "Purch. Inv. Line"."Line Amount";
+        TotalPurchaseLineValue += CalculateLineAmountLCY();
         TotalItemChargeAssigned += InvLineItemChargeAssigned;
         TotalMargin += InvLineMarginAmount;
         TotalVATAmount += InvLineVATAmount;
         TotalInvPurchaseValueExclVAT += InvLineLineWChargeAmountExclVAT;
         TotalValueWithChargeInclVAT += InvLineLineWChargeAmountInclVAT;
         TotalSalesPricePerUnit += InvLineSalesPricePerUnit;
+    end;
+
+    local procedure CalculateLineAmountLCY(): Decimal
+    var
+        CurrExchRate: Record "Currency Exchange Rate";
+    begin
+        if PurchInvHeader."Currency Code" <> '' then
+            exit(CurrExchRate.ExchangeAmtFCYToLCY(PurchInvHeader."Posting Date", PurchInvHeader."Currency Code", "Purch. Inv. Line".Amount, PurchInvHeader."Currency Factor"))
+        else
+            exit("Purch. Inv. Line".Amount);
     end;
 
     internal procedure SetFilters(PurchInvNo: Code[20]; PurchInvDate: Date)

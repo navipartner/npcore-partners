@@ -189,5 +189,15 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             TableRelation = "NPR Item Benefit List Header".Code;
 
         }
+
+        modify("Location Code")
+        {
+            trigger OnAfterValidate()
+            var
+                RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+            begin
+                RSRetailLocalizationMgt.GetPriceFromSalesPriceList(Rec);
+            end;
+        }
     }
 }

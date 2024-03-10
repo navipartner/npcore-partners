@@ -2,7 +2,6 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 {
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
-                  tabledata "VAT Entry" = rimd,
                   tabledata "Item Ledger Entry" = rimd,
                   tabledata "Value Entry" = rimd,
                   tabledata "Item Journal Line" = rimd;
@@ -18,9 +17,9 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         if not PostedNivelationLine.FindSet() then
             exit;
         repeat
-            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationLine, RSGLEntryType::Margin);
-            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationLine, RSGLEntryType::VAT);
-            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationLine, RSGLEntryType::MarginNoVAT);
+            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationHeader, PostedNivelationLine, RSGLEntryType::Margin);
+            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationHeader, PostedNivelationLine, RSGLEntryType::VAT);
+            CreateAndPostGLEntries(GenJnlPostLine, PostedNivelationHeader, PostedNivelationLine, RSGLEntryType::MarginNoVAT);
 
             PostValueItemLedgEntries(PostedNivelationHeader, PostedNivelationLine);
         until PostedNivelationLine.Next() = 0;
@@ -28,7 +27,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
     #region Posting GL Entries
 
-    local procedure CreateAndPostGLEntries(var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    local procedure CreateAndPostGLEntries(var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     var
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
@@ -37,7 +36,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         GenJournalLine.Init();
-        InitGenJnlLine(GenJournalLine, PostedNivelationLines);
+        InitGenJnlLine(GenJournalLine, PostedNivelationHeader, PostedNivelationLines, RSGLEntryType);
         GenJournalLine."Document Type" := "Gen. Journal Document Type"::"NPR Nivelation";
         GenJnlPostLine.GetGLReg(GLRegister);
         GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
@@ -48,16 +47,16 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        if PostedNivelationLines."Price Difference" < 0 then
+        if PostedNivelationLines."Value Difference" < 0 then
             if RSGLEntryType = RSGLEntryType::Margin then
-                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationLines, RSGLEntryType))
+                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
             else
-                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationLines, RSGLEntryType))
+                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
         else
             if RSGLEntryType = RSGLEntryType::Margin then
-                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationLines, RSGLEntryType))
+                GenJournalLine.Validate("Debit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType))
             else
-                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationLines, RSGLEntryType));
+                GenJournalLine.Validate("Credit Amount", CalculateRSAmount(PostedNivelationHeader, PostedNivelationLines, RSGLEntryType));
 
         GenJnlCheckLine.RunCheck(GenJournalLine);
         InitAmounts(GenJournalLine);
@@ -71,7 +70,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
         GenJournalLine."VAT Bus. Posting Group" := PostedNivelationLines."VAT Bus. Posting Gr. (Price)";
 
-        PostGLAcc(GenJournalLine, GLEntry, GLSetup, RSGLEntryType);
+        PostGLAcc(GenJournalLine, GLEntry);
     end;
 
     local procedure InitGLEntry(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry"; GLAccNo: Code[20]; Amount: Decimal; AmountAddCurr: Decimal; UseAmountAddCurr: Boolean; SystemCreatedEntry: Boolean)
@@ -102,10 +101,9 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
           GLCalcAddCurrency(Amount, AmountAddCurr, GLEntry."Additional-Currency Amount", UseAmountAddCurr, GenJnlLine);
     end;
 
-    local procedure PostGLAcc(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry"; GLSetup: Record "General Ledger Setup"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    local procedure PostGLAcc(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry")
     var
         GLAcc: Record "G/L Account";
-        VATPostingSetup: Record "VAT Posting Setup";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         GLAcc.Get(GenJnlLine."Account No.");
@@ -125,12 +123,9 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
             GLEntry."Additional-Currency Amount" := GenJnlLine.Amount;
             GLEntry.Amount := 0;
         end;
-        InitVAT(GenJnlLine, GLEntry, VATPostingSetup);
         GenJnlPostLine.InsertGLEntry(GenJnlLine, GLEntry, true);
         PostJob(GenJnlLine, GLEntry);
         GLEntry.Insert();
-        if RSGLEntryType = RSGLEntryType::Margin then
-            PostVAT(GenJnlLine, GLEntry, VATPostingSetup, GLSetup);
     end;
 
     local procedure PostJob(GenJnlLine: Record "Gen. Journal Line"; GLEntry: Record "G/L Entry")
@@ -175,14 +170,24 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         end;
     end;
 
-    local procedure InitGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines")
+    local procedure InitGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
     var
         Item2: Record Item;
-        GenJnlLineDescriptionLbl: Label 'Nivelation';
+        GenJnlLineMarginLbl: Label 'G/L Calculation Margin';
+        GenJnlLineMarginNoVATLbl: Label 'G/L Calculation Margin Excl. VAT';
+        GenJnlLineVATLbl: Label 'G/L Calculation VAT';
     begin
-        GenJournalLine."Document No." := PostedNivelationLines."Document No.";
+        GenJournalLine."Document No." := PostedNivelationHeader."No.";
+        GenJournalLine."External Document No." := PostedNivelationHeader."Referring Document Code";
         GenJournalLine."Posting Date" := PostedNivelationLines."Posting Date";
-        GenJournalLine.Description := GenJnlLineDescriptionLbl;
+        case RSGLEntryType of
+            RSGLEntryType::Margin:
+                GenJournalLine.Description := GenJnlLineMarginLbl;
+            RSGLEntryType::MarginNoVAT:
+                GenJournalLine.Description := GenJnlLineMarginNoVATLbl;
+            RSGLEntryType::VAT:
+                GenJournalLine.Description := GenJnlLineVATLbl;
+        end;
         if Item2.Get(PostedNivelationLines."Item No.") then begin
             GenJournalLine."VAT Bus. Posting Group" := Item2."VAT Bus. Posting Gr. (Price)";
             GenJournalLine."VAT Prod. Posting Group" := Item2."VAT Prod. Posting Group";
@@ -194,263 +199,11 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
     #endregion
 
-    #region VAT Posting
-
-    local procedure PostVAT(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry"; VATPostingSetup: Record "VAT Posting Setup"; GLSetup: Record "General Ledger Setup")
-    var
-        TaxDetail2: Record "Tax Detail";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
-        TaxDetailFound: Boolean;
-        RemSrcCurrVATAmount: Decimal;
-        SalesTaxBaseAmount: Decimal;
-        SrcCurrSalesTaxBaseAmount: Decimal;
-        SrcCurrVATAmount: Decimal;
-        SrcCurrVATBase: Decimal;
-        VATAmount: Decimal;
-        VATAmount2: Decimal;
-        VATBase: Decimal;
-        VATBase2: Decimal;
-    begin
-        case GenJnlLine."VAT Calculation Type" of
-            GenJnlLine."VAT Calculation Type"::"Normal VAT",
-            GenJnlLine."VAT Calculation Type"::"Reverse Charge VAT",
-            GenJnlLine."VAT Calculation Type"::"Full VAT":
-                begin
-                    if GenJnlLine."VAT Posting" = GenJnlLine."VAT Posting"::"Automatic VAT Entry" then
-                        GenJnlLine."VAT Base Amount (LCY)" := GLEntry.Amount - GLEntry."VAT Amount";
-                    if GenJnlLine."Gen. Posting Type" = GenJnlLine."Gen. Posting Type"::Settlement then
-                        AddCurrGLEntryVATAmt := GenJnlLine."Source Curr. VAT Amount";
-                    InsertVAT(
-                          GenJnlLine, VATPostingSetup,
-                          GLEntry.Amount - GLEntry."VAT Amount", GLEntry."VAT Amount", GenJnlLine."VAT Base Amount (LCY)", GenJnlLine."Source Currency Code",
-                          GLEntry."Additional-Currency Amount", AddCurrGLEntryVATAmt, GenJnlLine."Source Curr. VAT Base Amount", GLSetup);
-                    NextConnectionNo := NextConnectionNo + 1;
-                end;
-            GenJnlLine."VAT Calculation Type"::"Sales Tax":
-                begin
-                    case GenJnlLine."VAT Posting" of
-                        GenJnlLine."VAT Posting"::"Automatic VAT Entry":
-                            SalesTaxBaseAmount := GLEntry.Amount - GLEntry."VAT Amount";
-                        GenJnlLine."VAT Posting"::"Manual VAT Entry":
-                            SalesTaxBaseAmount := GenJnlLine."VAT Base Amount (LCY)";
-                    end;
-                    if (GenJnlLine."VAT Posting" = GenJnlLine."VAT Posting"::"Manual VAT Entry") and
-                       (GenJnlLine."Gen. Posting Type" = GenJnlLine."Gen. Posting Type"::Settlement)
-                    then
-                        InsertVAT(
-                           GenJnlLine, VATPostingSetup,
-                           GLEntry.Amount - GLEntry."VAT Amount", GLEntry."VAT Amount", GenJnlLine."VAT Base Amount (LCY)", GenJnlLine."Source Currency Code",
-                           GenJnlLine."Source Curr. VAT Base Amount", GenJnlLine."Source Curr. VAT Amount", GenJnlLine."Source Curr. VAT Base Amount", GLSetup)
-                    else begin
-                        Clear(SalesTaxCalculate);
-                        SalesTaxCalculate.InitSalesTaxLines(
-                          GenJnlLine."Tax Area Code", GenJnlLine."Tax Group Code", GenJnlLine."Tax Liable",
-                          SalesTaxBaseAmount, GenJnlLine.Quantity, GenJnlLine."Posting Date", GLEntry."VAT Amount");
-                        SrcCurrVATAmount := 0;
-                        SrcCurrSalesTaxBaseAmount := GenJnlPostLine.CalcLCYToAddCurr(SalesTaxBaseAmount);
-                        RemSrcCurrVATAmount := AddCurrGLEntryVATAmt;
-                        TaxDetailFound := false;
-                        while SalesTaxCalculate.GetSalesTaxLine(TaxDetail2, VATAmount, VATBase) do begin
-                            RemSrcCurrVATAmount := RemSrcCurrVATAmount - SrcCurrVATAmount;
-                            if TaxDetailFound then
-                                InsertVAT(
-                                  GenJnlLine, VATPostingSetup,
-                                  SalesTaxBaseAmount, VATAmount2, VATBase2, GenJnlLine."Source Currency Code",
-                                  SrcCurrSalesTaxBaseAmount, SrcCurrVATAmount, SrcCurrVATBase, GLSetup);
-                            TaxDetailFound := true;
-                            TaxDetail := TaxDetail2;
-                            VATAmount2 := VATAmount;
-                            VATBase2 := VATBase;
-                            SrcCurrVATAmount := GenJnlPostLine.CalcLCYToAddCurr(VATAmount);
-                            SrcCurrVATBase := GenJnlPostLine.CalcLCYToAddCurr(VATBase);
-                        end;
-                        if TaxDetailFound then
-                            InsertVAT(
-                              GenJnlLine, VATPostingSetup,
-                              SalesTaxBaseAmount, VATAmount2, VATBase2, GenJnlLine."Source Currency Code",
-                              SrcCurrSalesTaxBaseAmount, RemSrcCurrVATAmount, SrcCurrVATBase, GLSetup);
-                    end;
-                end;
-        end;
-    end;
-
-    local procedure InsertVAT(GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup"; GLEntryAmount: Decimal; GLEntryVATAmount: Decimal; GLEntryBaseAmount: Decimal; SrcCurrCode: Code[10]; SrcCurrGLEntryAmt: Decimal; SrcCurrGLEntryVATAmt: Decimal; SrcCurrGLEntryBaseAmt: Decimal; GLSetup: Record "General Ledger Setup")
-    var
-        TaxJurisdiction: Record "Tax Jurisdiction";
-        VATEntry: Record "VAT Entry";
-        UnrealizedVAT: Boolean;
-        SrcCurrVATAmount: Decimal;
-        SrcCurrVATBase: Decimal;
-        SrcCurrVATDifference: Decimal;
-        VATAmount: Decimal;
-        VATBase: Decimal;
-        VATDifferenceLCY: Decimal;
-    begin
-        VATEntry.Init();
-        VATEntry.CopyFromGenJnlLine(GenJnlLine);
-        FindLastVATEntryNo();
-        VATEntry."Entry No." := NextVATEntryNo;
-        VATEntry."EU Service" := VATPostingSetup."EU Service";
-        VATEntry."Transaction No." := NextTransactionNo;
-        VATEntry."Sales Tax Connection No." := NextConnectionNo;
-
-        if GenJnlLine."VAT Difference" = 0 then
-            VATDifferenceLCY := 0
-        else
-            if GenJnlLine."Currency Code" = '' then
-                VATDifferenceLCY := GenJnlLine."VAT Difference"
-            else
-                VATDifferenceLCY :=
-                  Round(
-                    CurrExchRate.ExchangeAmtFCYToLCY(
-                      GenJnlLine."Posting Date", GenJnlLine."Currency Code", GenJnlLine."VAT Difference",
-                      CurrExchRate.ExchangeRate(GenJnlLine."Posting Date", GenJnlLine."Currency Code")));
-
-        if GenJnlLine."VAT Calculation Type" = GenJnlLine."VAT Calculation Type"::"Sales Tax" then
-            UpdateVATEntryTaxDetails(GenJnlLine, VATEntry, TaxDetail, TaxJurisdiction);
-
-        if AddCurrencyCode <> '' then
-            if AddCurrencyCode <> SrcCurrCode then begin
-                SrcCurrGLEntryAmt := ExchangeAmtLCYToFCY2(GLEntryAmount);
-                SrcCurrGLEntryVATAmt := ExchangeAmtLCYToFCY2(GLEntryVATAmount);
-                SrcCurrGLEntryBaseAmt := ExchangeAmtLCYToFCY2(GLEntryBaseAmount);
-                SrcCurrVATDifference := ExchangeAmtLCYToFCY2(VATDifferenceLCY);
-            end else
-                SrcCurrVATDifference := GenJnlLine."VAT Difference";
-
-        UnrealizedVAT := CheckUnrealizedVAT(VATPostingSetup, TaxJurisdiction, GenJnlLine);
-
-        if GLSetup."Prepayment Unrealized VAT" and not GLSetup."Unrealized VAT" and
-           (VATPostingSetup."Unrealized VAT Type" > 0)
-        then
-            UnrealizedVAT := GenJnlLine.Prepayment;
-
-        if GenJnlLine."Gen. Posting Type" <> GenJnlLine."Gen. Posting Type"::" " then begin
-            case GenJnlLine."VAT Posting" of
-                GenJnlLine."VAT Posting"::"Automatic VAT Entry":
-                    begin
-                        VATAmount := GLEntryVATAmount;
-                        VATBase := GLEntryBaseAmount;
-                        SrcCurrVATAmount := SrcCurrGLEntryVATAmt;
-                        SrcCurrVATBase := SrcCurrGLEntryBaseAmt;
-                    end;
-                GenJnlLine."VAT Posting"::"Manual VAT Entry":
-                    begin
-                        if GenJnlLine."Gen. Posting Type" = GenJnlLine."Gen. Posting Type"::Settlement then begin
-                            VATAmount := GLEntryAmount;
-                            SrcCurrVATAmount := SrcCurrGLEntryVATAmt;
-                            VATEntry.Closed := true;
-                        end else begin
-                            VATAmount := GLEntryVATAmount;
-                            SrcCurrVATAmount := SrcCurrGLEntryVATAmt;
-                        end;
-                        VATBase := GLEntryBaseAmount;
-                        SrcCurrVATBase := SrcCurrGLEntryBaseAmt;
-                    end;
-            end;
-
-            if UnrealizedVAT then begin
-                VATEntry.Amount := 0;
-                VATEntry.Base := 0;
-                VATEntry."Unrealized Amount" := VATAmount;
-                VATEntry."Unrealized Base" := VATBase;
-                VATEntry."Remaining Unrealized Amount" := VATEntry."Unrealized Amount";
-                VATEntry."Remaining Unrealized Base" := VATEntry."Unrealized Base";
-            end else begin
-                VATEntry.Amount := VATAmount;
-                VATEntry.Base := VATBase;
-                VATEntry."Unrealized Amount" := 0;
-                VATEntry."Unrealized Base" := 0;
-                VATEntry."Remaining Unrealized Amount" := 0;
-                VATEntry."Remaining Unrealized Base" := 0;
-            end;
-
-            if AddCurrencyCode = '' then begin
-                VATEntry."Additional-Currency Base" := 0;
-                VATEntry."Additional-Currency Amount" := 0;
-                VATEntry."Add.-Currency Unrealized Amt." := 0;
-                VATEntry."Add.-Currency Unrealized Base" := 0;
-            end else
-                if UnrealizedVAT then begin
-                    VATEntry."Additional-Currency Base" := 0;
-                    VATEntry."Additional-Currency Amount" := 0;
-                    VATEntry."Add.-Currency Unrealized Base" := SrcCurrVATBase;
-                    VATEntry."Add.-Currency Unrealized Amt." := SrcCurrVATAmount;
-                end else begin
-                    VATEntry."Additional-Currency Base" := SrcCurrVATBase;
-                    VATEntry."Additional-Currency Amount" := SrcCurrVATAmount;
-                    VATEntry."Add.-Currency Unrealized Base" := 0;
-                    VATEntry."Add.-Currency Unrealized Amt." := 0;
-                end;
-            VATEntry."Add.-Curr. Rem. Unreal. Amount" := VATEntry."Add.-Currency Unrealized Amt.";
-            VATEntry."Add.-Curr. Rem. Unreal. Base" := VATEntry."Add.-Currency Unrealized Base";
-            VATEntry."VAT Difference" := VATDifferenceLCY;
-            VATEntry."Add.-Curr. VAT Difference" := SrcCurrVATDifference;
-            if GenJnlLine."System-Created Entry" then
-                VATEntry."Base Before Pmt. Disc." := GenJnlLine."VAT Base Before Pmt. Disc."
-            else
-                VATEntry."Base Before Pmt. Disc." := GLEntryAmount;
-
-            VATEntry."Document No." := GenJnlLine."Document No.";
-            VATEntry."Document Type" := GenJnlLine."Document Type";
-
-            VATEntry.Insert(true);
-            NextVATEntryNo := NextVATEntryNo + 1;
-        end;
-    end;
-
-    local procedure CheckUnrealizedVAT(VATPostingSetup: Record "VAT Posting Setup"; TaxJurisdiction: Record "Tax Jurisdiction"; GenJnlLine: Record "Gen. Journal Line"): Boolean
-    begin
-        if (((VATPostingSetup."Unrealized VAT Type" > 0) and
-            (VATPostingSetup."VAT Calculation Type" in
-             [VATPostingSetup."VAT Calculation Type"::"Normal VAT",
-              VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT",
-              VATPostingSetup."VAT Calculation Type"::"Full VAT"])) or
-           ((TaxJurisdiction."Unrealized VAT Type" > 0) and
-            (VATPostingSetup."VAT Calculation Type" in
-             [VATPostingSetup."VAT Calculation Type"::"Sales Tax"]))) and
-          IsNotPayment(GenJnlLine."Document Type") then
-            exit(true);
-        exit(false);
-    end;
-
-    local procedure InitVAT(var GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry"; var VATPostingSetup: Record "VAT Posting Setup")
-    begin
-        LCYCurrency.InitRoundingPrecision();
-        if GenJnlLine."Gen. Posting Type" in [GenJnlLine."Gen. Posting Type"::" "] then
-            exit;
-        VATPostingSetup.Get(GenJnlLine."VAT Bus. Posting Group", GenJnlLine."VAT Prod. Posting Group");
-        VATPostingSetup.TestField(Blocked, false);
-
-        GenJnlLine.TestField("VAT Calculation Type", VATPostingSetup."VAT Calculation Type");
-        case GenJnlLine."VAT Posting" of
-            GenJnlLine."VAT Posting"::"Automatic VAT Entry":
-                InitVATAutomaticEntry(GLEntry, GenJnlLine, VATPostingSetup);
-            GenJnlLine."VAT Posting"::"Manual VAT Entry":
-                InitVATManualEntry(GLEntry, GenJnlLine);
-        end;
-    end;
-
-    local procedure UpdateVATEntryTaxDetails(GenJnlLine: Record "Gen. Journal Line"; var VATEntry: Record "VAT Entry"; TaxDetailParam: Record "Tax Detail"; var TaxJurisdiction: Record "Tax Jurisdiction")
-    begin
-        if TaxDetailParam."Tax Jurisdiction Code" <> '' then
-            TaxJurisdiction.Get(TaxDetailParam."Tax Jurisdiction Code");
-        if GenJnlLine."Gen. Posting Type" <> GenJnlLine."Gen. Posting Type"::Settlement then begin
-            VATEntry."Tax Group Used" := TaxDetailParam."Tax Group Code";
-            VATEntry."Tax Type" := TaxDetailParam."Tax Type";
-            VATEntry."Tax on Tax" := TaxDetailParam."Calculate Tax on Tax";
-        end;
-        VATEntry."Tax Jurisdiction Code" := TaxDetailParam."Tax Jurisdiction Code";
-    end;
-
-    #endregion
 
     #region Retail Price Calculation
 
     local procedure GetRSAccountNoFromSetup(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Code[20]
     var
-        InventoryPostingSetup: Record "Inventory Posting Setup";
         LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
         LocalizationSetup.Get();
@@ -461,11 +214,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
                     exit(LocalizationSetup."RS Calc. VAT GL Account");
                 end;
             RSGLEntryType::Margin:
-                begin
-                    InventoryPostingSetup.SetRange("Location Code", PostedNivelationLines."Location Code");
-                    if InventoryPostingSetup.FindFirst() then
-                        exit(InventoryPostingSetup."Inventory Account");
-                end;
+                exit(GetInventoryAccountFromInvPostingSetup(PostedNivelationLines));
             RSGLEntryType::MarginNoVAT:
                 begin
                     LocalizationSetup.TestField("RS Calc. Margin GL Account");
@@ -474,161 +223,76 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         end;
     end;
 
-    local procedure CalculateRSAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Decimal
+    local procedure CalculateRSAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Decimal
     begin
         case RSGLEntryType of
             RSGLEntryType::VAT:
-                exit(CalculateRSGLVATAmount(PostedNivelationLines));
+                exit(CalculateRSGLVATAmount(PostedNivelationHeader, PostedNivelationLines));
             RSGLEntryType::Margin:
-                exit(CalculateRSGLMarginAmount(PostedNivelationLines));
+                exit(CalculateRSGLMarginAmount(PostedNivelationHeader, PostedNivelationLines));
             RSGLEntryType::MarginNoVAT:
-                exit(CalculateRSGLMarginNoVATAmount(PostedNivelationLines));
+                exit(CalculateRSGLMarginNoVATAmount(PostedNivelationHeader, PostedNivelationLines));
         end;
     end;
 
-    local procedure CalculateRSGLVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    local procedure CalculateRSGLVATAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
-        exit(Abs(PostedNivelationLines."Calculated VAT"));
-    end;
-
-    local procedure CalculateRSGLMarginAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
-    begin
-        exit(Abs(PostedNivelationLines."Value Difference"));
-    end;
-
-    local procedure CalculateRSGLMarginNoVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
-    begin
-        exit(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT"));
-    end;
-
-    #endregion
-
-    #region VAT Init
-    local procedure InitVATAutomaticEntry(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup")
-    begin
-        GLEntry.CopyPostingGroupsFromGenJnlLine(GenJnlLine);
-        case GenJnlLine."VAT Calculation Type" of
-            GenJnlLine."VAT Calculation Type"::"Normal VAT":
-                InitNormalVATAmounts(GLEntry, GenJnlLine, VATPostingSetup);
-            GenJnlLine."VAT Calculation Type"::"Reverse Charge VAT":
-                InitReverseChargeVATAmounts(GLEntry, GenJnlLine, VATPostingSetup);
-            GenJnlLine."VAT Calculation Type"::"Full VAT":
-                InitFullVATAmounts(GLEntry, GenJnlLine, VATPostingSetup);
-            GenJnlLine."VAT Calculation Type"::"Sales Tax":
-                InitSalesTaxVATAmounts(GLEntry, GenJnlLine);
-        end;
-    end;
-
-    local procedure InitVATManualEntry(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line")
-    begin
-        if GenJnlLine."Gen. Posting Type" <> GenJnlLine."Gen. Posting Type"::Settlement then begin
-            GLEntry.CopyPostingGroupsFromGenJnlLine(GenJnlLine);
-            GLEntry."VAT Amount" := GenJnlLine."VAT Amount (LCY)";
-            if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-                AddCurrGLEntryVATAmt := GenJnlLine."Source Curr. VAT Amount"
+        case PostedNivelationHeader."Source Type" of
+            PostedNivelationHeader."Source Type"::"POS Entry":
+                exit(CalculatePOSEntryVATAmount(PostedNivelationLines));
+            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
+                exit(-(Abs(PostedNivelationLines."Calculated VAT")));
             else
-                AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GenJnlLine."VAT Amount (LCY)");
+                exit(Abs(PostedNivelationLines."Calculated VAT"));
         end;
     end;
 
-    local procedure InitNormalVATAmounts(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup")
+    local procedure CalculateRSGLMarginAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
-        if GenJnlLine."VAT Difference" <> 0 then begin
-            GLEntry."VAT Amount" := GenJnlLine."Amount (LCY)" - GLEntry.Amount;
-            GLEntry."Additional-Currency Amount" := GenJnlLine."Source Curr. VAT Base Amount";
-            if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-                AddCurrGLEntryVATAmt := GenJnlLine."Source Curr. VAT Amount"
+        case PostedNivelationHeader."Source Type" of
+            PostedNivelationHeader."Source Type"::"POS Entry":
+                exit(CalculatePOSEntryMarginAmount(PostedNivelationLines));
+            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
+                exit(-(Abs(PostedNivelationLines."Value Difference")));
             else
-                AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GLEntry."VAT Amount");
-        end else begin
-            GLEntry."VAT Amount" :=
-              Round(
-                GenJnlLine."Amount (LCY)" * VATPostingSetup."VAT %" / (100 + VATPostingSetup."VAT %"),
-                LCYCurrency."Amount Rounding Precision", LCYCurrency.VATRoundingDirection());
-            if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-                AddCurrGLEntryVATAmt :=
-                  Round(
-                    GenJnlLine."Source Currency Amount" * VATPostingSetup."VAT %" / (100 + VATPostingSetup."VAT %"),
-                    AddCurrency."Amount Rounding Precision", AddCurrency.VATRoundingDirection())
-            else
-                AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GLEntry."VAT Amount");
-            GLEntry."Additional-Currency Amount" := GenJnlLine."Source Currency Amount" - AddCurrGLEntryVATAmt;
+                exit(Abs(PostedNivelationLines."Value Difference"));
         end;
     end;
 
-    local procedure InitReverseChargeVATAmounts(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup")
+    local procedure CalculateRSGLMarginNoVATAmount(PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
-        case GenJnlLine."Gen. Posting Type" of
-            GenJnlLine."Gen. Posting Type"::Purchase:
-                InitReverseChargeVATPurchase(GLEntry, GenJnlLine, VATPostingSetup);
-            GenJnlLine."Gen. Posting Type"::Sale:
-                begin
-                    GLEntry."VAT Amount" := 0;
-                    AddCurrGLEntryVATAmt := 0;
-                end;
-        end;
-        GLEntry."Additional-Currency Amount" :=
-          GLCalcAddCurrency(GLEntry.Amount, GLEntry."Additional-Currency Amount", GLEntry."Additional-Currency Amount", true, GenJnlLine);
-    end;
-
-    local procedure InitReverseChargeVATPurchase(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup")
-    begin
-        if GenJnlLine."VAT Difference" <> 0 then begin
-            GLEntry."VAT Amount" := GenJnlLine."VAT Amount (LCY)";
-            if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-                AddCurrGLEntryVATAmt := GenJnlLine."Source Curr. VAT Amount"
+        case PostedNivelationHeader."Source Type" of
+            PostedNivelationHeader."Source Type"::"POS Entry":
+                exit(CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines));
+            PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
+                exit(-(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT")));
             else
-                AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GLEntry."VAT Amount");
-        end else begin
-            GLEntry."VAT Amount" :=
-              Round(
-                GLEntry.Amount * VATPostingSetup."VAT %" / 100,
-                LCYCurrency."Amount Rounding Precision", LCYCurrency.VATRoundingDirection());
-            if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-                AddCurrGLEntryVATAmt :=
-                  Round(
-                    GLEntry."Additional-Currency Amount" * VATPostingSetup."VAT %" / 100,
-                    AddCurrency."Amount Rounding Precision", AddCurrency.VATRoundingDirection())
-            else
-                AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GLEntry."VAT Amount");
+                exit(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT"));
         end;
     end;
 
-    local procedure InitFullVATAmounts(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup")
+    local procedure CalculatePOSEntryVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
-        case GenJnlLine."Gen. Posting Type" of
-            GenJnlLine."Gen. Posting Type"::Sale:
-                GenJnlLine.TestField("Account No.", VATPostingSetup.GetSalesAccount(false));
-            GenJnlLine."Gen. Posting Type"::Purchase:
-                GenJnlLine.TestField("Account No.", VATPostingSetup.GetPurchAccount(false));
-        end;
-        GLEntry."Additional-Currency Amount" := 0;
-        GLEntry."VAT Amount" := GenJnlLine."Amount (LCY)";
-        if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-            AddCurrGLEntryVATAmt := GenJnlLine."Source Currency Amount"
+        if PostedNivelationLines.Quantity > 0 then
+            exit(Abs(PostedNivelationLines."Calculated VAT"))
         else
-            AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GenJnlLine."Amount (LCY)");
+            exit(-(Abs(PostedNivelationLines."Calculated VAT")));
     end;
 
-    local procedure InitSalesTaxVATAmounts(var GLEntry: Record "G/L Entry"; GenJnlLine: Record "Gen. Journal Line")
-    var
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+    local procedure CalculatePOSEntryMarginAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
-        if (GenJnlLine."Gen. Posting Type" = GenJnlLine."Gen. Posting Type"::Purchase) and
-           GenJnlLine."Use Tax"
-        then
-            GLEntry."VAT Amount" :=
-              Round(
-                SalesTaxCalculate.CalculateTax(
-                  GenJnlLine."Tax Area Code", GenJnlLine."Tax Group Code", GenJnlLine."Tax Liable",
-                  GenJnlLine."Posting Date", GenJnlLine."Amount (LCY)", GenJnlLine.Quantity, 0))
+        if PostedNivelationLines.Quantity > 0 then
+            exit(Abs(PostedNivelationLines."Value Difference"))
         else
-            GLEntry."VAT Amount" := GenJnlLine."Amount (LCY)" - GLEntry.Amount;
-        GLEntry."Additional-Currency Amount" := GenJnlLine."Source Currency Amount";
-        if GenJnlLine."Source Currency Code" = AddCurrencyCode then
-            AddCurrGLEntryVATAmt := GenJnlLine."Source Curr. VAT Amount"
+            exit(-(Abs(PostedNivelationLines."Value Difference")));
+    end;
+
+    local procedure CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
+    begin
+        if PostedNivelationLines.Quantity > 0 then
+            exit(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT"))
         else
-            AddCurrGLEntryVATAmt := GJnlPostLine.CalcLCYToAddCurr(GLEntry."VAT Amount");
+            exit(-(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT")));
     end;
 
     #endregion
@@ -638,17 +302,26 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
     var
         ItemJournalLine: Record "Item Journal Line";
         ItemLedgEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
     begin
-        InitItemJnlLine(ItemJournalLine, PostedNivelationLine);
+        InitItemJnlLine(ItemJournalLine, PostedNivelationHeader, PostedNivelationLine);
+
+        PostValueEntry(ValueEntry, ItemJournalLine, ItemLedgEntry);
 
         PostItemLedgerEntry(ItemLedgEntry, ItemJournalLine, PostedNivelationHeader);
 
-        PostValueEntry(ItemJournalLine, ItemLedgEntry, PostedNivelationHeader);
+        ValueEntry."Item Ledger Entry Type" := ItemLedgEntry."Entry Type";
+        ValueEntry."Item Ledger Entry No." := ItemLedgEntry."Entry No.";
+        ValueEntry.Modify();
+
+        InsertGLItemLedgerRelation(PostedNivelationLine, ValueEntry);
 
         ItemJournalLine.Delete();
     end;
 
-    local procedure InitItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; PostedNivelationLine: Record "NPR RS Posted Nivelation Lines")
+    local procedure InitItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr"; PostedNivelationLine: Record "NPR RS Posted Nivelation Lines")
+    var
+        Item: Record Item;
     begin
         ItemJournalLine.Init();
         ItemJournalLine."Item No." := PostedNivelationLine."Item No.";
@@ -656,9 +329,17 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ItemJournalLine."Posting Date" := PostedNivelationLine."Posting Date";
         ItemJournalLine.Amount := PostedNivelationLine."Value Difference";
         ItemJournalLine."Value Entry Type" := "Cost Entry Type"::"NPR Nivelation";
-        ItemJournalLine."Document No." := PostedNivelationLine."Document No.";
+        ItemJournalLine."Document No." := PostedNivelationHeader."No.";
+        ItemJournalLine."External Document No." := PostedNivelationHeader."Referring Document Code";
         ItemJournalLine."Document Type" := "Item Ledger Document Type"::"NPR Nivelation";
         ItemJournalLine."Location Code" := PostedNivelationLine."Location Code";
+        ItemJournalLine.Quantity := PostedNivelationLine.Quantity;
+        if Item.Get(PostedNivelationLine."Item No.") then begin
+            ItemJournalLine."Unit of Measure Code" := Item."Base Unit of Measure";
+            ItemJournalLine."Item Category Code" := Item."Item Category Code";
+            ItemJournalLine."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
+            ItemJournalLine."Inventory Posting Group" := Item."Inventory Posting Group";
+        end;
         ItemJournalLine.Correction := true;
 
         ItemJournalLine.Insert(false);
@@ -675,48 +356,31 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ItemLedgEntry."Item No." := ItemJnlLine."Item No.";
         ItemLedgEntry."Posting Date" := ItemJnlLine."Posting Date";
         ItemLedgEntry."Document No." := ItemJnlLine."Document No.";
+        ItemLedgEntry."External Document No." := ItemJnlLine."External Document No.";
         ItemLedgEntry."Document Type" := ItemJnlLine."Document Type";
         ItemLedgEntry."Document Line No." := ItemJnlLine."Document Line No.";
         ItemLedgEntry."Order Type" := ItemJnlLine."Order Type";
         ItemLedgEntry."Order No." := ItemJnlLine."Order No.";
         ItemLedgEntry."Order Line No." := ItemJnlLine."Order Line No.";
-        ItemLedgEntry."External Document No." := ItemJnlLine."External Document No.";
         ItemLedgEntry.Description := ItemJnlLine.Description;
         ItemLedgEntry."Location Code" := ItemJnlLine."Location Code";
-        ItemLedgEntry."Applies-to Entry" := ItemJnlLine."Applies-to Entry";
-        ItemLedgEntry."Source Type" := ItemJnlLine."Source Type";
-        ItemLedgEntry."No. Series" := ItemJnlLine."Posting No. Series";
-        ItemLedgEntry."Variant Code" := ItemJnlLine."Variant Code";
         ItemLedgEntry."Unit of Measure Code" := ItemJnlLine."Unit of Measure Code";
-        ItemLedgEntry."Qty. per Unit of Measure" := ItemJnlLine."Qty. per Unit of Measure";
-        ItemLedgEntry."Derived from Blanket Order" := ItemJnlLine."Derived from Blanket Order";
-        ItemLedgEntry."Item Reference No." := ItemJnlLine."Item Reference No.";
-        ItemLedgEntry."Originally Ordered No." := ItemJnlLine."Originally Ordered No.";
-        ItemLedgEntry."Originally Ordered Var. Code" := ItemJnlLine."Originally Ordered Var. Code";
-        ItemLedgEntry."Out-of-Stock Substitution" := ItemJnlLine."Out-of-Stock Substitution";
         ItemLedgEntry."Item Category Code" := ItemJnlLine."Item Category Code";
         ItemLedgEntry.Correction := ItemJnlLine.Correction;
+        ItemLedgEntry.CalcFields("Cost Amount (Actual)", "Sales Amount (Actual)");
 
         case PostedNivelationHeader.Type of
             PostedNivelationHeader.Type::"Price Change":
-                begin
-                    ItemLedgEntry."Entry Type" := "Item Ledger Entry Type"::Purchase;
-                    ItemLedgEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
-                end;
+                ItemLedgEntry."Entry Type" := "Item Ledger Entry Type"::Purchase;
             PostedNivelationHeader.Type::"Promotions & Discounts":
-                begin
-                    ItemLedgEntry."Entry Type" := "Item Ledger Entry Type"::Sale;
-                    ItemLedgEntry."Sales Amount (Actual)" := ItemJnlLine.Amount;
-                end;
+                ItemLedgEntry."Entry Type" := "Item Ledger Entry Type"::Sale;
         end;
 
         ItemLedgEntry.Insert(true);
     end;
 
-    local procedure PostValueEntry(ItemJnlLine: Record "Item Journal Line"; ItemLedgerEntry: Record "Item Ledger Entry"; PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr")
+    local procedure PostValueEntry(var ValueEntry: Record "Value Entry"; ItemJnlLine: Record "Item Journal Line"; ItemLedgerEntry: Record "Item Ledger Entry")
     var
-        Item: Record Item;
-        ValueEntry: Record "Value Entry";
         ValueEntryNo: Integer;
     begin
         ValueEntryNo := ValueEntry.GetLastEntryNo() + 1;
@@ -726,46 +390,52 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ValueEntry."Entry Type" := "Cost Entry Type"::"NPR Nivelation";
         ValueEntry."Item Ledger Entry Type" := ItemLedgerEntry."Entry Type";
         ValueEntry."Item Ledger Entry No." := ItemLedgerEntry."Entry No.";
+        ValueEntry."Item No." := ItemJnlLine."Item No.";
+        ValueEntry."Variant Code" := ItemJnlLine."Variant Code";
         ValueEntry."Document No." := ItemJnlLine."Document No.";
-
+        ValueEntry."External Document No." := ItemJnlLine."External Document No.";
+        ValueEntry."Location Code" := ItemJnlLine."Location Code";
+        ValueEntry."Gen. Prod. Posting Group" := ItemJnlLine."Gen. Prod. Posting Group";
+        ValueEntry."Inventory Posting Group" := ItemJnlLine."Inventory Posting Group";
         ValueEntry."No." := ItemJnlLine."No.";
         ValueEntry.Description := ItemJnlLine.Description;
-
-        case PostedNivelationHeader.Type of
-            PostedNivelationHeader.Type::"Price Change":
-                ValueEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
-            PostedNivelationHeader.Type::"Promotions & Discounts":
-                ValueEntry."Sales Amount (Actual)" := ItemJnlLine.Amount;
-        end;
-
-        if Item.Get(ItemJnlLine."Item No.") then begin
-            ValueEntry."Inventory Posting Group" := Item."Inventory Posting Group";
-            ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-        end;
-
         ValueEntry."Posting Date" := ItemJnlLine."Posting Date";
         ValueEntry."Valuation Date" := ItemJnlLine."Posting Date";
         ValueEntry."Document Type" := ItemJnlLine."Document Type";
-
         ValueEntry."Document Line No." := ItemJnlLine."Document Line No.";
         ValueEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(ValueEntry."User ID"));
-        ValueEntry."Journal Batch Name" := ItemJnlLine."Journal Batch Name";
+
+        ValueEntry."Sales Amount (Actual)" := Abs(ItemJnlLine.Amount);
+        ValueEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
+        ValueEntry."Cost Posted to G/L" := ItemJnlLine.Amount;
 
         ValueEntry.Insert(true);
     end;
 
+    local procedure InsertGLItemLedgerRelation(PostedNivelationLine: Record "NPR RS Posted Nivelation Lines"; ValueEntry: Record "Value Entry")
+    var
+        GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
+        GLEntry: Record "G/L Entry";
+        GLRegister: Record "G/L Register";
+        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+    begin
+        GenJnlPostLine.GetGLReg(GLRegister);
+        GLItemLedgerRelation.Init();
+        GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
+        GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
+
+        GLEntry.SetLoadFields("Entry No.", "G/L Account No.", "Document No.");
+        GLEntry.SetRange("G/L Account No.", GetInventoryAccountFromInvPostingSetup(PostedNivelationLine));
+        GLEntry.SetRange("Document No.", ValueEntry."Document No.");
+        GLEntry.SetRange(Amount, ValueEntry."Cost Amount (Actual)");
+        if not GLEntry.FindFirst() then
+            exit;
+        GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
+        GLItemLedgerRelation.Insert(true);
+    end;
     #endregion
 
     #region Helper procedures
-    local procedure FindLastVATEntryNo()
-    var
-        VATEntry2: Record "VAT Entry";
-    begin
-        if VATEntry2.FindLast() then
-            NextVATEntryNo := VATEntry2."Entry No." + 1
-        else
-            NextVATEntryNo := 1;
-    end;
 
     local procedure InitNextEntryNo()
     var
@@ -797,14 +467,6 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
     end;
 
-    local procedure IsNotPayment(DocumentType: Enum "Gen. Journal Document Type") Result: Boolean
-    begin
-        Result := DocumentType in [DocumentType::Invoice,
-                              DocumentType::"Credit Memo",
-                              DocumentType::"Finance Charge Memo",
-                              DocumentType::Reminder];
-    end;
-
     local procedure CheckGLAccDirectPosting(GenJnlLine: Record "Gen. Journal Line"; GLAcc: Record "G/L Account")
     begin
         if not GenJnlLine."System-Created Entry" then
@@ -834,22 +496,29 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
                  (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"G/L Account")) then
             exit(true);
     end;
+
+    local procedure GetInventoryAccountFromInvPostingSetup(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Code[20]
+    var
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+        Item: Record Item;
+        InvPostingSetupNotFoundErr: Label '%1 for %2 not found.', Comment = '%1 = Inventory Posting Setup Table Caption, %2 = Location Code';
+    begin
+        Item.Get(PostedNivelationLines."Item No.");
+        if not InventoryPostingSetup.Get(PostedNivelationLines."Location Code", Item."Inventory Posting Group") then
+            Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), PostedNivelationLines."Location Code");
+        exit(InventoryPostingSetup."Inventory Account");
+    end;
+
     #endregion
 
     var
         AddCurrency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
-        TaxDetail: Record "Tax Detail";
-        LCYCurrency: Record Currency;
-        GJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         JobLine: Boolean;
         AddCurrencyCode: Code[10];
-        AddCurrGLEntryVATAmt: Decimal;
         CurrencyFactor: Decimal;
-        NextConnectionNo: Integer;
         NextEntryNo: Integer;
         NextTransactionNo: Integer;
-        NextVATEntryNo: Integer;
         NeedsRoundingErr: Label '%1 needs to be rounded', Comment = '%1 - amount';
 
 #endif
