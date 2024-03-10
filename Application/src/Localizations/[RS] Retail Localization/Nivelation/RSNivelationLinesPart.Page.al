@@ -4,7 +4,6 @@ page 6151089 "NPR RS Nivelation Lines Part"
     Caption = 'Nivelation Lines';
     MultipleNewLines = true;
     PageType = ListPart;
-    CardPageId = "NPR RS Nivelation Header";
     SourceTable = "NPR RS Nivelation Lines";
     Extensible = false;
     SourceTableView = sorting("Line No.") order(ascending);
@@ -34,6 +33,7 @@ page 6151089 "NPR RS Nivelation Lines Part"
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Location Code field.';
+                    Editable = IsPriceChange;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -88,4 +88,26 @@ page 6151089 "NPR RS Nivelation Lines Part"
             }
         }
     }
+    trigger OnInit()
+    begin
+        CheckIsPriceChange();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        CheckIsPriceChange();
+    end;
+
+    local procedure CheckIsPriceChange()
+    var
+        NivelationHeader: Record "NPR RS Nivelation Header";
+    begin
+        NivelationHeader.SetRange("No.", Rec."Document No.");
+        if not NivelationHeader.FindFirst() then
+            exit;
+        IsPriceChange := NivelationHeader.Type = "NPR RS Nivelation Type"::"Price Change";
+    end;
+
+    var
+        IsPriceChange: Boolean;
 }

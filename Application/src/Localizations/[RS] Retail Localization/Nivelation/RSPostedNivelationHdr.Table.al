@@ -75,14 +75,21 @@ table 6060003 "NPR RS Posted Nivelation Hdr"
         {
             DataClassification = CustomerContent;
             Caption = 'Status';
-            InitValue = Unposted;
         }
         field(13; "Referring Document Code"; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Referring Document Code';
-            TableRelation = "Sales Header"."No.";
-            ValidateTableRelation = false;
+        }
+        field(14; "Last Posting No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Last Posting No.';
+        }
+        field(15; "Source Type"; Enum "NPR RS Nivelation Source Type")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Source Type';
         }
     }
 
@@ -112,7 +119,6 @@ table 6060003 "NPR RS Posted Nivelation Hdr"
         NavigatePage: Page Navigate;
     begin
         NavigatePage.SetDoc("Posting Date", "No.");
-        NavigatePage.SetRec(Rec);
         NavigatePage.Run();
     end;
 

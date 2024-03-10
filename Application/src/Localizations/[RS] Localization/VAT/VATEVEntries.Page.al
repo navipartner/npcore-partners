@@ -3,7 +3,7 @@ page 6151116 "NPR VAT EV Entries"
     Extensible = false;
     ApplicationArea = NPRRSLocal;
     UsageCategory = Documents;
-    Caption = 'VAT EV Entries';
+    Caption = 'RS VAT EV Entries';
     DataCaptionExpression = PageCaptionTxt;
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,XML';

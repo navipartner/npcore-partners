@@ -24,25 +24,24 @@ codeunit 6151343 "NPR RS Nivelation Post"
         PostedNivelationHeader.Amount := NivelationHeader.Amount;
         PostedNivelationHeader.Insert(true);
 
-        LineNo := PostedNivelationLines.GetInitialLine(PostedNivelationHeader);
+        LineNo := PostedNivelationLines.GetInitialLine() + 10000;
 
         NivelationLines.SetRange("Document No.", NivelationHeader."No.");
-        if NivelationLines.FindSet() then
-            repeat
-                PostedNivelationLines.Init();
-                PostedNivelationLines."Line No." := LineNo;
-                PostedNivelationLines.TransferFields(NivelationLines);
-                PostedNivelationLines."Document No." := PostedNivelationHeader."No.";
-                PostedNivelationLines.Insert(true);
-                LineNo += 10000;
-            until NivelationLines.Next() = 0;
-        NivelationHeader.Status := "NPR RS Nivelation Status"::Posted;
-        NivelationHeader."Last Posting No." := PostedNivelationHeader."No.";
-        if NivelationHeader.Modify() then begin
-            NivelationPosting.PostNivelationEntries(PostedNivelationHeader);
-            exit(true)
-        end else
+        NivelationLines.SetFilter(Quantity, '>0');
+        if not NivelationLines.FindSet() then
             exit(false);
+        repeat
+            PostedNivelationLines.Init();
+            PostedNivelationLines."Line No." := LineNo;
+            PostedNivelationLines.TransferFields(NivelationLines);
+            PostedNivelationLines."Document No." := PostedNivelationHeader."No.";
+            PostedNivelationLines.Insert(true);
+            LineNo += 10000;
+        until NivelationLines.Next() = 0;
+        NivelationPosting.PostNivelationEntries(PostedNivelationHeader);
+        NivelationHeader.Delete();
+        NivelationLines.DeleteAll();
+        exit(true);
     end;
 #endif
 }

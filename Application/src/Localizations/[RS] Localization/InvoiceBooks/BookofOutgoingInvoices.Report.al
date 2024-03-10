@@ -27,7 +27,7 @@ report 6014464 "NPR Book Of Outgoing Invoices"
             {
                 DataItemLink = "VAT Report Mapping" = field(Code);
                 DataItemLinkReference = VATReportMapping;
-                DataItemTableView = sorting("Entry No.") where("Document Type" = const(Invoice), Type = const(Sale));
+                DataItemTableView = sorting("Entry No.") where("Document Type" = filter(Invoice | "Credit Memo"), Type = const(Sale));
 
                 column(RSVATEntry_OrdinalNo; _OrdinalNo) { }
                 column(RSVATEntry_VATReportMapping; "VAT Report Mapping") { }

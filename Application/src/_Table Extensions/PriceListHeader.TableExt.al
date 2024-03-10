@@ -14,7 +14,7 @@ tableextension 6014458 "NPR Price List Header" extends "Price List Header"
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
-            TableRelation = Location WHERE("NPR Retail Location" = CONST(true));
+            TableRelation = Location where("NPR Retail Location" = const(true));
         }
         field(6151481; "NPR Retail Price List"; Boolean)
         {
