@@ -21,23 +21,31 @@ page 6151084 "NPR RS Nivelation Header"
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Type field.';
+                    trigger OnValidate()
+                    begin
+                        IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change"
+                    end;
+                }
+                field("Source Type"; Rec."Source Type")
+                {
+                    ApplicationArea = NPRRSRLocal;
+                    ToolTip = 'Specifies the value of the Source Type field.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
+                    Editable = IsPriceChange;
                     ToolTip = 'Specifies the value of the Location Code field.';
                 }
                 field("Location Name"; Rec."Location Name")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = false;
                     ToolTip = 'Specifies the value of the LocationName field.';
                 }
                 field("Price List Code"; Rec."Price List Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
+                    Editable = IsPriceChange;
                     ToolTip = 'Specifies the value of the Price List Code field.';
                 }
                 field("Posting Date"; Rec."Posting Date")
@@ -48,26 +56,17 @@ page 6151084 "NPR RS Nivelation Header"
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = false;
                     ToolTip = 'Specifies the value of the Amount field.';
                 }
                 field("Price Valid Date"; Rec."Price Valid Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
                     ToolTip = 'Specifies the value of the Price Valid Date field.';
                 }
                 field("Referring Document Code"; Rec."Referring Document Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    Editable = false;
                     ToolTip = 'Specifies the value of the Referring Document Code field.';
-                }
-                field(Status; Rec.Status)
-                {
-                    ApplicationArea = NPRRSRLocal;
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Status field.';
                 }
             }
             group(Parts)
@@ -82,12 +81,11 @@ page 6151084 "NPR RS Nivelation Header"
             }
         }
     }
-
-#if not (BC17 or BC18 or BC19)
     actions
     {
         area(Processing)
         {
+#if not (BC17 or BC18 or BC19)
             group(Posting)
             {
                 Caption = 'Posting';
@@ -96,7 +94,6 @@ page 6151084 "NPR RS Nivelation Header"
                 {
                     ApplicationArea = NPRRSRLocal;
                     Caption = 'Post';
-                    Enabled = not IsPosted;
                     Promoted = true;
                     PromotedIsBig = true;
                     PromotedCategory = Process;
@@ -108,26 +105,87 @@ page 6151084 "NPR RS Nivelation Header"
                     var
                         NivelationPost: Codeunit "NPR RS Nivelation Post";
                     begin
+                        CheckIsDataSet();
                         NivelationPost.RunNivelationPosting(Rec)
                     end;
                 }
             }
+#endif
+            action("Init")
+            {
+                ApplicationArea = NPRRSRLocal;
+                Caption = 'Init Price List Lines';
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Image = PostOrder;
+                Enabled = IsPriceChange;
+                ToolTip = 'Initialize Nivelation Lines from the chosen Price List.';
+
+                trigger OnAction()
+                begin
+                    InitializeLinesFromPriceList();
+                end;
+            }
         }
     }
 
-    trigger OnAfterGetRecord()
+    trigger OnInit()
     begin
-        SetActionEnabled();
+        IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change";
     end;
 
-    local procedure SetActionEnabled()
+    trigger OnAfterGetRecord()
     begin
-        IsPosted := false;
-        if Rec.Status in ["NPR RS Nivelation Status"::Posted] then
-            IsPosted := true;
+        IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change";
+    end;
+
+#if not (BC17 or BC18 or BC19)
+    local procedure CheckIsDataSet()
+    begin
+        Rec.TestField("Location Code");
+        Rec.TestField("Posting Date");
+    end;
+#endif
+    local procedure InitializeLinesFromPriceList()
+    var
+        NivelationLines: Record "NPR RS Nivelation Lines";
+        PriceListLines: Record "Price List Line";
+        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
+        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
+        LineNo: Integer;
+    begin
+        if Rec."Price List Code" = '' then
+            exit;
+        PriceListLines.SetRange("Price List Code", Rec."Price List Code");
+        PriceListLines.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, Rec."Price Valid Date"));
+        PriceListLines.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, Rec."Price Valid Date"));
+        PriceListLines.SetRange("Price List Code", Rec."Price List Code");
+
+        if not PriceListLines.FindSet() then
+            exit;
+
+        LineNo := NivelationLines.GetInitialLine() + 10000;
+
+        NivelationLines.SetRange("Document No.", Rec."No.");
+        repeat
+            NivelationLines.SetRange("Item No.", PriceListLines."Asset No.");
+            if not NivelationLines.FindFirst() then begin
+                NivelationLines.Init();
+                NivelationLines."Document No." := Rec."No.";
+                NivelationLines."Line No." := LineNo;
+                NivelationLines.Validate("Item No.", PriceListLines."Asset No.");
+                NivelationLines.Validate("Old Price", PriceListLines."Unit Price");
+                NivelationLines.Insert(true);
+                LineNo += 10000;
+            end else begin
+                NivelationLines.Validate("Old Price", PriceListLines."Unit Price");
+                NivelationLines.Modify();
+            end;
+        until PriceListLines.Next() = 0;
     end;
 
     var
-        IsPosted: Boolean;
-#endif
+        IsPriceChange: Boolean;
 }

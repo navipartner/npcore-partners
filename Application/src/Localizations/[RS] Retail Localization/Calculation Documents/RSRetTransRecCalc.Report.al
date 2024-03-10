@@ -203,9 +203,10 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
         Item: Record Item;
         PriceListLine: Record "Price List Line";
         VATPostingSetup: Record "VAT Posting Setup";
+        ValueEntry: Record "Value Entry";
         VATBreakDown: Decimal;
-        EndingDateFilter: Label '>=%1|''''', Locked = true;
-        StartingDateFilter: Label '<=%1', Locked = true;
+        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
+        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
     begin
         PriceListLine.SetRange("Price Type", "Price Type"::Sale);
         PriceListLine.SetRange(Status, "Price Status"::Active);
@@ -224,7 +225,16 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
         RecLineVATAmount := RecLineLineWChargeAmountInclVAT * VATBreakDown;
         RecLineVATPercentage := VATPostingSetup."VAT %";
 
-        RecLineCostValueExclVAT := ItemLedgerEntry."Cost Amount (Actual)";
+        ValueEntry.SetLoadFields("Document Type", "Document No.", "Item Ledger Entry No.", "Location Code", "Cost Amount (Actual)", "Entry No.");
+        ValueEntry.SetCurrentKey("Entry No.");
+        ValueEntry.SetRange("Document Type", ItemLedgerEntry."Document Type");
+        ValueEntry.SetRange("Document No.", ItemLedgerEntry."Document No.");
+        ValueEntry.SetRange("Location Code", ItemLedgerEntry."Location Code");
+        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+        if not ValueEntry.FindFirst() then
+            exit;
+
+        RecLineCostValueExclVAT := ValueEntry."Cost Amount (Actual)";
         RecLineCostAmount := RecLineCostValueExclVAT / ItemLedgerEntry.Quantity;
         RecLineLineWChargeAmountExclVAT := RecLineLineWChargeAmountInclVAT - RecLineVATAmount;
         RecLineMarginAmount := RecLineLineWChargeAmountExclVAT - RecLineCostValueExclVAT;
