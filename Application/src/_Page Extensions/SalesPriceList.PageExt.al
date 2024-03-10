@@ -57,9 +57,13 @@ pageextension 6014444 "NPR SalesPriceList" extends "Sales Price List"
                 trigger OnAction()
                 var
                     UpdatePriceList: Codeunit "NPR RS Update Sales Price List";
-                    VerifySuccesfullMsg: Label 'Price List is successfully verified.';
+                    ConfirmManagement: Codeunit "Confirm Management";
+                    VerifyPriceListQst: Label 'Are you sure you want to verify the current Price List?';
+                    VerifySuccesfullMsg: Label 'Price List has been successfully verified.';
                     UnsuccesfullVerifyingErr: Label 'Price List has not been verified successfully.';
                 begin
+                    if not ConfirmManagement.GetResponseOrDefault(VerifyPriceListQst, true) then
+                        exit;
                     if not UpdatePriceList.UpdatePriceListStatus(Rec) then
                         Error(UnsuccesfullVerifyingErr);
                     Message(VerifySuccesfullMsg);
@@ -70,10 +74,13 @@ pageextension 6014444 "NPR SalesPriceList" extends "Sales Price List"
     local procedure CheckPriceListStatus(): Boolean
     var
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        CannotChangeActiveStatusErr: Label 'Once Active, you cannot change the price status again.';
+        CannotChangeActiveStatusErr: Label 'Once Active, you cannot change the Price Status again.';
+        CannotChangeToActiveManuallyErr: Label 'You cannot change the Price Status to Active manually. Please use action Verify Price List.';
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
+        if Rec.Status in ["Price Status"::Active] then
+            Error(CannotChangeToActiveManuallyErr);
         if xRec.Status in ["Price Status"::Active] then
             Error(CannotChangeActiveStatusErr);
     end;

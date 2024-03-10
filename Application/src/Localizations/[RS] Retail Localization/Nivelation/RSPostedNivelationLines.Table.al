@@ -38,6 +38,7 @@ table 6060008 "NPR RS Posted Nivelation Lines"
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
+            TableRelation = Location;
         }
         field(7; Quantity; Decimal)
         {
@@ -110,17 +111,10 @@ table 6060008 "NPR RS Posted Nivelation Lines"
         }
     }
 
-    procedure GetInitialLine(NivelationHeader: Record "NPR RS Posted Nivelation Hdr"): Integer
+    procedure GetInitialLine(): Integer
     var
-        NivelationLines: Record "NPR RS Posted Nivelation Lines";
-        LineNo: Integer;
+        FindRecordManagement: Codeunit "Find Record Management";
     begin
-        LineNo := 10000;
-
-        NivelationLines.SetRange("Document No.", NivelationHeader."No.");
-        if NivelationLines.FindLast() then
-            LineNo += NivelationLines."Line No.";
-
-        exit(LineNo);
+        exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Line No.")))
     end;
 }

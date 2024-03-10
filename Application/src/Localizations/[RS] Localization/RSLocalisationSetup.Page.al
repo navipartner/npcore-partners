@@ -1,7 +1,7 @@
 page 6151108 "NPR RS Localisation Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'RS Localisation Setup';
+    Caption = 'RS Localization Setup';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

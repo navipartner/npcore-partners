@@ -1,6 +1,6 @@
 page 6151117 "NPR VAT Report Mapping Card"
 {
-    Caption = 'VAT Report Mapping Card';
+    Caption = 'RS VAT Report Mapping Card';
     Extensible = false;
     PageType = Card;
     SourceTable = "NPR VAT Report Mapping";

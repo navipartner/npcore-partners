@@ -28,33 +28,24 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Location Code field.';
-                    Visible = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
-                    ;
+                    Visible = IsPriceChange;
                 }
                 field("Location Name"; Rec."Location Name")
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the LocationName field.';
-                    Visible = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
-                    ;
+                    Visible = IsPriceChange;
                 }
                 field("Price List Code"; Rec."Price List Code")
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Price List Code field.';
-                    Visible = Rec.Type = "NPR RS Nivelation Type"::"Price Change";
-                    ;
+                    Visible = IsPriceChange;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Posting Date field.';
-                }
-                field("UserID"; UserId())
-                {
-                    Caption = 'Created by User';
-                    ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Created by User field.';
                 }
                 field(Amount; Rec.Amount)
                 {
@@ -65,8 +56,12 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                 {
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the Referring Document Code field.';
-                    Visible = not (Rec.Type = "NPR RS Nivelation Type"::"Price Change");
-                    Editable = false;
+                }
+                field("UserID"; UserId())
+                {
+                    Caption = 'Created by User';
+                    ApplicationArea = NPRRSRLocal;
+                    ToolTip = 'Specifies the value of the Created by User field.';
                 }
             }
             group(Parts)
@@ -102,6 +97,58 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                     Rec.Navigate();
                 end;
             }
+            action("Open Related Document")
+            {
+                ApplicationArea = NPRRSRLocal;
+                Caption = 'Open Related Document';
+                Image = Open;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                Scope = Repeater;
+                ToolTip = 'Executes the Open Related Document action.';
+
+                trigger OnAction()
+                var
+                    POSEntry: Record "NPR POS Entry";
+                    PostedSalesCrMemo: Record "Sales Cr.Memo Header";
+                    PostedSalesInvoice: Record "Sales Invoice Header";
+                    SalesPriceList: Record "Price List Header";
+                begin
+                    case Rec."Source Type" of
+                        Rec."Source Type"::"POS Entry":
+                            begin
+                                POSEntry.SetCurrentKey("Document No.");
+                                POSEntry.SetRange("Document No.", Rec."Referring Document Code");
+                                POSEntry.FindFirst();
+                                Page.RunModal(Page::"NPR POS Entry Card", POSEntry);
+                            end;
+                        Rec."Source Type"::"Posted Sales Invoice":
+                            begin
+                                PostedSalesInvoice.Get(Rec."Referring Document Code");
+                                Page.RunModal(Page::"Posted Sales Invoice", PostedSalesInvoice);
+                            end;
+                        Rec."Source Type"::"Posted Sales Credit Memo":
+                            begin
+                                PostedSalesCrMemo.Get(Rec."Referring Document Code");
+                                Page.RunModal(Page::"Posted Sales Credit Memo", PostedSalesCrMemo);
+                            end;
+                        Rec."Source Type"::"Sales Price List":
+                            begin
+                                SalesPriceList.Get(Rec."Referring Document Code");
+                                Page.RunModal(Page::"Sales Price List", SalesPriceList);
+                            end;
+                    end;
+                end;
+            }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        IsPriceChange := Rec.Type in ["NPR RS Nivelation Type"::"Price Change"];
+    end;
+
+    var
+        IsPriceChange: Boolean;
 }
