@@ -1,7 +1,7 @@
-page 6151348 "NPR CRO Salesperson Step"
+page 6151612 "NPR SI Salesperson Step"
 {
     Extensible = False;
-    Caption = 'CRO Salesperson Setup';
+    Caption = 'SI Salesperson Setup';
     PageType = ListPart;
     SourceTable = "Salesperson/Purchaser";
     SourceTableTemporary = true;
@@ -16,23 +16,23 @@ page 6151348 "NPR CRO Salesperson Step"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = NPRCROFiscal;
+                    ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the code of the record.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = NPRCROFiscal;
+                    ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the name of the Salesperson.';
                 }
-                field("NPR CRO OIB Code"; CROAuxSalespersonPurchaser."NPR CRO Salesperson OIB")
+                field("NPR SI Salesperson Tax Number"; SIAuxSalespersonPurchaser."NPR SI Salesperson Tax Number")
                 {
-                    ApplicationArea = NPRCROFiscal;
-                    ToolTip = 'Specifies OIB of the Salesperson.';
-                    Caption = 'Salesperson OIB';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies Tax Number of the Salesperson.';
+                    Caption = 'Salesperson Tax Number';
                     trigger OnValidate()
                     begin
-                        CROAuxSalespersonPurchaser.Validate("NPR CRO Salesperson OIB");
-                        CROAuxSalespersonPurchaser.SaveCROAuxSalespersonFields();
+                        SIAuxSalespersonPurchaser.Validate("NPR SI Salesperson Tax Number");
+                        SIAuxSalespersonPurchaser.SaveSIAuxSalespersonFields();
                     end;
                 }
             }
@@ -42,7 +42,7 @@ page 6151348 "NPR CRO Salesperson Step"
     trigger OnAfterGetRecord()
     begin
         if SalespersonPurchaser.Get(Rec.Code) then
-            CROAuxSalespersonPurchaser.ReadCROAuxSalespersonFields(SalespersonPurchaser);
+            SIAuxSalespersonPurchaser.ReadSIAuxSalespersonFields(SalespersonPurchaser);
     end;
 
     internal procedure CopyRealToTemp()
@@ -53,11 +53,11 @@ page 6151348 "NPR CRO Salesperson Step"
             Rec.TransferFields(SalespersonPurchaser);
             if not Rec.Insert() then
                 Rec.Modify();
-            CROAuxSalespersonPurchaser.ReadCROAuxSalespersonFields(SalespersonPurchaser);
+            SIAuxSalespersonPurchaser.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         until SalespersonPurchaser.Next() = 0;
     end;
 
-    internal procedure CROSalespersonPurchDataToCreate(): Boolean
+    internal procedure SISalespersonPurchDataToCreate(): Boolean
     begin
         exit(CheckIsDataSet());
     end;
@@ -81,8 +81,8 @@ page 6151348 "NPR CRO Salesperson Step"
             exit;
         repeat
             if SalespersonPurchaser.Get(Rec.Code) then begin
-                CROAuxSalespersonPurchaser.ReadCROAuxSalespersonFields(SalespersonPurchaser);
-                if CROAuxSalespersonPurchaser."NPR CRO Salesperson OIB" <> 0 then
+                SIAuxSalespersonPurchaser.ReadSIAuxSalespersonFields(SalespersonPurchaser);
+                if SIAuxSalespersonPurchaser."NPR SI Salesperson Tax Number" <> 0 then
                     exit(true);
             end;
         until Rec.Next() = 0;
@@ -90,6 +90,6 @@ page 6151348 "NPR CRO Salesperson Step"
     end;
 
     var
-        CROAuxSalespersonPurchaser: Record "NPR CRO Aux Salesperson/Purch.";
+        SIAuxSalespersonPurchaser: Record "NPR SI Aux Salesperson/Purch.";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
 }

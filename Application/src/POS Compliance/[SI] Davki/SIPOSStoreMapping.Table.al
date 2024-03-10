@@ -10,7 +10,7 @@ table 6150692 "NPR SI POS Store Mapping"
     {
         field(1; "POS Store Code"; Code[10])
         {
-            Caption = 'POS Unit Code';
+            Caption = 'POS Store Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Store";
         }
