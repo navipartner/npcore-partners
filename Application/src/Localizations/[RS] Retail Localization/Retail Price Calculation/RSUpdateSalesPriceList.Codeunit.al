@@ -23,6 +23,10 @@ codeunit 6151484 "NPR RS Update Sales Price List"
         PrevPriceListHeaders.SetFilter("Starting Date", '<%1', PriceListHeader."Starting Date");
         PrevPriceListHeaders.SetRange(Status, "Price Status"::Active);
         PrevPriceListHeaders.SetRange("NPR Location Code", PriceListHeader."NPR Location Code");
+        PrevPriceListHeaders.SetRange("Source Type", PriceListHeader."Source Type");
+#if not (BC17 or BC18 or BC19)
+        PrevPriceListHeaders.SetRange("Assign-to No.", PriceListHeader."Assign-to No.");
+#endif
         PrevPriceListHeaders.SetCurrentKey("Starting Date");
         if PrevPriceListHeaders.FindLast() then begin
             PrevPriceListHeaders."Ending Date" := CalcDate('<-1D>', PriceListHeader."Starting Date");

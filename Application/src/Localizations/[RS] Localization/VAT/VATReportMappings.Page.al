@@ -1,7 +1,7 @@
 page 6059931 "NPR VAT Report Mappings"
 {
     ApplicationArea = NPRRSLocal;
-    Caption = 'VAT Report Mappings';
+    Caption = 'RS VAT Report Mappings';
     PageType = List;
     SourceTable = "NPR VAT Report Mapping";
     UsageCategory = Lists;

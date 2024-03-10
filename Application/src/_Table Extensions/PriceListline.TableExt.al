@@ -33,6 +33,16 @@ tableextension 6014459 "NPR Price List line" extends "Price List Line"
 #ENDIF
 
     }
+    trigger OnBeforeModify()
+    begin
+        RSRetailLocalizationMgt.RetailCheckForModifyActiveLine(xRec);
+    end;
+
+    trigger OnBeforeDelete()
+    begin
+        RSRetailLocalizationMgt.RetailCheckForDeleteActiveLine(xRec);
+    end;
+
     internal procedure NPR_UpdateReferencedIds()
     var
         PriceListHeader: Record "Price List Header";
@@ -47,4 +57,7 @@ tableextension 6014459 "NPR Price List line" extends "Price List Line"
 
         "NPR Price List Id" := PriceListHeader.SystemId;
     end;
+
+    var
+        RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
 }

@@ -12,6 +12,9 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
         UnsuccessfulNivelationPostingMsg: Label 'Nivelation Document isn''t posted successfully. There was no Price Change or there are no Items in Inventory.';
         PreviousPriceListNotFoundErr: Label 'Nivelation Document isn''t posted successfully. Previous price list has not been found.';
     begin
+        if CheckIfNivelationPosted(SalesPriceListHeader) then
+            exit;
+
         PreviousPriceListHeader.SetRange(Status, "Price Status"::Active);
         PreviousPriceListHeader.SetRange("Ending Date", CalcDate('<-1D>', SalesPriceListHeader."Starting Date"));
         PreviousPriceListHeader.SetRange("NPR Location Code", SalesPriceListHeader."NPR Location Code");
@@ -21,13 +24,13 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
             Error(UnsuccessfulNivelationPostingMsg);
         NewNivelationHeader.Init();
         NewNivelationHeader.Type := "NPR RS Nivelation Type"::"Price Change";
+        NewNivelationHeader."Source Type" := "NPR RS Nivelation Source Type"::"Sales Price List";
         NewNivelationHeader.Validate("Location Code", SalesPriceListHeader."NPR Location Code");
-        NewNivelationHeader."Price List Code" := SalesPriceListHeader.Code;
+        NewNivelationHeader.Validate("Price List Code", SalesPriceListHeader.Code);
         NewNivelationHeader."Posting Date" := WorkDate();
-        NewNivelationHeader."Price Valid Date" := SalesPriceListHeader."Starting Date";
         NewNivelationHeader."Referring Document Code" := SalesPriceListHeader.Code;
         NewNivelationHeader.Insert(true);
-        LineNo := NewNivelationLines.GetInitialLine(NewNivelationHeader);
+        LineNo := NewNivelationLines.GetInitialLine() + 10000;
 
         CheckForUnitPriceDifferenceAndAddLines(SalesPriceListHeader, PreviousPriceListHeader, NewNivelationHeader, NewNivelationLines, LineNo);
 
@@ -66,8 +69,6 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
     begin
         SalesPriceListLine.SetCurrentKey(Status, "Price Type", "Amount Type", "Currency Code", "Unit of Measure Code", "Source Type", "Parent Source No.", "Source No.", "Asset Type", "Asset No.", "Work Type Code", "Starting Date", "Ending Date", "Minimum Quantity");
         SalesPriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price");
-        PreviousPriceListLine.SetCurrentKey(Status, "Price Type", "Amount Type", "Currency Code", "Unit of Measure Code", "Source Type", "Parent Source No.", "Source No.", "Asset Type", "Asset No.", "Work Type Code", "Starting Date", "Ending Date", "Minimum Quantity");
-        PreviousPriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price");
         SalesPriceListLine.SetRange("Price List Code", SalesPriceListHeader.Code);
         if SalesPriceListLine.FindSet() then
             repeat
@@ -82,10 +83,20 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
         PreviousPriceListHeader.Modify();
     end;
 
+    local procedure CheckIfNivelationPosted(SalesPriceListHeader: Record "Price List Header"): Boolean
+    var
+        PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr";
+        NivelationAlreadyPostedForPricelistErr: Label 'Nivelation Document has already been posted for current Price List. Posted Nivelation Document No: %1', Comment = '%1 - Posted Nivelation Header No.';
+    begin
+        PostedNivelationHeader.SetRange("Referring Document Code", SalesPriceListHeader.Code);
+        PostedNivelationHeader.SetRange(Type, "NPR RS Nivelation Type"::"Price Change");
+        if not PostedNivelationHeader.FindFirst() then
+            exit(false);
+        Error(NivelationAlreadyPostedForPricelistErr, PostedNivelationHeader."No.");
+    end;
+
     local procedure AddNivelationLine(PreviousSalesPriceListLine: Record "Price List Line"; SalesPriceListHeader: Record "Price List Header"; SalesPriceListLine: Record "Price List Line"; NivelationHeader: Record "NPR RS Nivelation Header"; var NewNivelationLines: Record "NPR RS Nivelation Lines"; var LineNo: Integer)
     var
-        VATSetup: Record "VAT Posting Setup";
-        Item: Record Item;
         Quantity: Decimal;
     begin
         FindItemLedgerQty(SalesPriceListHeader, SalesPriceListLine, Quantity);
@@ -94,17 +105,13 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
         NewNivelationLines.Init();
         NewNivelationLines."Line No." := LineNo;
         NewNivelationLines."Document No." := NivelationHeader."No.";
-        NewNivelationLines."Location Code" := SalesPriceListHeader."NPR Location Code";
+        NewNivelationLines.GetDataFromNivelationHeader();
         NewNivelationLines.Validate("Item No.", SalesPriceListLine."Asset No.");
-        NewNivelationLines.Quantity := Quantity;
         NewNivelationLines."Old Price" := PreviousSalesPriceListLine."Unit Price";
         NewNivelationLines."New Price" := SalesPriceListLine."Unit Price";
         NewNivelationLines."Posting Date" := WorkDate();
-        NewNivelationLines."Old Value" := NewNivelationLines."Old Price" * NewNivelationLines.Quantity;
+        NewNivelationLines.Validate(Quantity, Quantity);
         NewNivelationLines."VAT Bus. Posting Gr. (Price)" := SalesPriceListHeader."VAT Bus. Posting Gr. (Price)";
-        if Item.Get(SalesPriceListLine."Asset No.") then
-            if VATSetup.Get(SalesPriceListHeader."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                NewNivelationLines."VAT %" := VATSetup."VAT %";
         NewNivelationLines.Insert(true);
         LineNo += 10000;
     end;
@@ -114,11 +121,11 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         ItemLedgerEntry.SetCurrentKey("Item No.", "Posting Date");
-        ItemLedgerEntry.SetLoadFields("Item No.", "Posting Date", Quantity);
+        ItemLedgerEntry.SetLoadFields("Item No.", "Posting Date", "Location Code", Quantity);
+        ItemLedgerEntry.SetRange("Location Code", SalesPriceListHeader."NPR Location Code");
         ItemLedgerEntry.SetRange("Item No.", SalesPriceListLine."Asset No.");
         ItemLedgerEntry.SetFilter("Posting Date", '..%1', CalcDate('<-1D>', SalesPriceListHeader."Starting Date"));
-        if ItemLedgerEntry.FindSet() then
-            ItemLedgerEntry.CalcSums(Quantity);
+        ItemLedgerEntry.CalcSums(Quantity);
         if ItemLedgerEntry.Quantity <= 0 then begin
             Quantity := 0;
             exit;

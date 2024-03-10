@@ -3,7 +3,6 @@ page 6151099 "NPR RS Posted Niv. Lines Subp."
     PageType = ListPart;
     Caption = 'Nivelation Lines';
     UsageCategory = None;
-    CardPageId = "NPR RS Posted Nivelation Doc";
     SourceTable = "NPR RS Posted Nivelation Lines";
     Editable = false;
     Extensible = false;
