@@ -141,7 +141,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -159,9 +158,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         if SIAuxSalespPurch."NPR SI Salesperson Tax Number" = 0 then
             Error(MissingTaxNumberErr);
-
-        POSUnit.GetProfile(POSAuditProfile);
-        POSAuditProfile.TestField("Do Not Print Receipt on Sale", true);
     end;
 
     local procedure InsertSIPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
