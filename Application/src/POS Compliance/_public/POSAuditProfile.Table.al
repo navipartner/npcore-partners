@@ -142,6 +142,11 @@
             Caption = 'Allow Sales and Returns in Same Transaction';
             DataClassification = CustomerContent;
         }
+        field(140; "Bin Eject After Credit Sale"; Boolean)
+        {
+            Caption = 'Bin Eject After Credit Sale';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

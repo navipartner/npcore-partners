@@ -187,10 +187,10 @@
 
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnDiscoverPointAssignmentSaleWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-
         if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
 
@@ -202,12 +202,16 @@
         Rec.Enabled := false;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
 
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
@@ -215,6 +219,15 @@
         if (POSSalesWorkflowStep."Subscriber Function" <> PointAssignmentStepName()) then
             exit;
 
+        LoyPointAssignmentOnSale(SalePOS);
+
+    end;
+
+    procedure LoyPointAssignmentOnSale(SalePOS: Record "NPR POS Sale")
+    var
+        PosEntry: Record "NPR POS Entry";
+        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
         // Calculate points and assign.
         PosEntry.SetFilter("Document No.", SalePOS."Sales Ticket No.");
         if (PosEntry.FindFirst()) then begin
@@ -240,11 +253,13 @@
         end;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR MM Loyalty Point Mgt.");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure PointAssignmentStepName(): Text
     begin
         exit('PointAssignmentOnSale');

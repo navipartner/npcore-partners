@@ -308,10 +308,10 @@
         Printed := PrintTicketUsingFormatter(Ticket, TicketType."Print Object Type", TicketType."Print Object ID", TicketType."RP Template Code");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-
         if (Rec."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
             exit;
         if (Rec."Subscriber Function" <> 'PrintTicketsOnSale') then
@@ -321,14 +321,21 @@
         Rec."Sequence No." := 120;
     end;
 
+
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrentCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR TM Ticket Management");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
             exit;
         if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintTicketsOnSale') then

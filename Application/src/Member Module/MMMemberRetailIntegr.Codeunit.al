@@ -940,6 +940,7 @@
         end;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -953,29 +954,41 @@
         Rec."Sequence No." := 100;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
 
         exit(CODEUNIT::"NPR MM Member Retail Integr.");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure PrintMembershipsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
 
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
         if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintMembershipsOnSale') then
             exit;
 
+        PrintMemberships(SalePOS);
+
+    end;
+
+    procedure PrintMemberships(SalePOS: Record "NPR POS Sale")
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
         POSEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
         if (POSEntry.isempty()) then
             exit;
 
         PrintMembershipOnEndOfSalesWorker(SalePOS."Sales Ticket No.", false);
-
     end;
 
     procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean

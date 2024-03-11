@@ -403,6 +403,7 @@
         exit(MailReceipients);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -415,18 +416,20 @@
         Rec."Sequence No." := 70;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR E-mail Doc. Mgt.");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
-        POSEntry: Record "NPR POS Entry";
-        EmailManagement: Codeunit "NPR E-mail Management";
-        RecRef: RecordRef;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
         if not POSSalesWorkflowStep.Enabled then
             exit;
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
@@ -434,6 +437,32 @@
         if POSSalesWorkflowStep."Subscriber Function" <> 'EmailReceiptOnSale' then
             exit;
 
+        SendEmailReceipt(SalePOS);
+    end;
+
+    procedure SendEmailReceiptOnSale(SalePOS: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+    begin
+        If not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit;
+
+        if not POSReceiptProfile."E-mail Receipt On Sale" then
+            exit;
+
+        SendEmailReceipt(SalePOS);
+    end;
+
+    local procedure SendEmailReceipt(var SalePOS: Record "NPR POS Sale")
+    var
+        POSEntry: Record "NPR POS Entry";
+        EmailManagement: Codeunit "NPR E-mail Management";
+        RecRef: RecordRef;
+    begin
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         POSEntry.SetFilter("Entry Type", '%1|%2|%3', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::Other);
         if not POSEntry.FindFirst() then
