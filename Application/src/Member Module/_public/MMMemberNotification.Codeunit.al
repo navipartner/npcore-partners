@@ -1418,10 +1418,10 @@
             Error(GetLastErrorText());
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-
         if (Rec."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
         if (Rec."Subscriber Function" <> 'SendMemberNotificationOnSales') then
@@ -1432,9 +1432,9 @@
         Rec.Enabled := false;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
-
         exit(CODEUNIT::"NPR MM Member Notification");
     end;
 
@@ -1490,15 +1490,24 @@
         Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
         if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
             exit;
         if (POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales') then
             exit;
 
+        SendMemberNotification();
+    end;
+
+    procedure SendMemberNotification()
+    begin
         if (not SendInlineNotifications()) then
             ; // Do nothing, the test framework can not start session to send notifications
     end;

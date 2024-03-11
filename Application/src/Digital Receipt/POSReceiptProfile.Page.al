@@ -30,6 +30,11 @@ page 6150757 "NPR POS Receipt Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Choose how discount information should be displayed on the receipt: per line, summary, or no information.';
                 }
+                field("E-mail Receipt On Sale"; Rec."E-mail Receipt On Sale")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if e-mail with receipt will be sent after Sale';
+                }
             }
             group("Digital Receipt")
             {

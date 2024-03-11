@@ -943,12 +943,13 @@
 
     #region OnFinishSale Workflow
 
-
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure OnFinishSaleCode(): Code[20]
     begin
         exit('FINISH_SALE');
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     var
@@ -957,11 +958,13 @@
         Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), DuringEndSaleLbl, CurrCodeunitId(), 'OnFinishSale');
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR POS Sale");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
     var
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
@@ -977,6 +980,69 @@
         POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::Undefined);
     end;
 
+    local procedure InvokeOnFinishSaleWorkflows_OnRun(var TempExecutionOrderOnSale: Record "NPR Execution Order On Sale" temporary)
+    var
+        POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
+    begin
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::OnFinishSale);
+        POSAfterSaleExecution.OnRunPOSSalesWorkflow(TempExecutionOrderOnSale);
+        POSAfterSaleExecution.RecSet(_Rec);
+        POSAfterSaleExecution.PosSaleCodeunitSet(_This);
+        ClearLastError();
+        if not POSAfterSaleExecution.Run() then
+            Message(TempExecutionOrderOnSale."Error Msg", GetLastErrorText());
+        POSAfterSaleExecution.OnRunTypeSet(Enum::"NPR POS Sale OnRunType"::Undefined);
+    end;
+
+    local procedure InitializeExecutionOrder(var TempExecutionOrderOnSale: Record "NPR Execution Order On Sale")
+    var
+        CreateCleanCashError: Label 'The error occurred during the creation of clean cash: %1';
+        EjectPaymentBinError: Label 'The error occurred during the POS Payment Bin ejection: %1';
+        POSPrintReceiptError: Label 'The error occurred during printing POS Receipt: %1';
+        MMLoyAssignError: Label 'The error occurred during Loyalty assignment: %1';
+        TaxFreeVoucherError: Label 'The error occurred during issuing Tax Free Voucher: %1';
+        SendEmailReceiptError: Label 'The error occurred during the sending E-mail Receipt: %1';
+        MMMemberPrintReceiptError: Label 'The error occurred during the printing Member Receipt: %1';
+        TMTicketPrintError: Label 'The error occurred during the printing Ticket: %1';
+        NpCsDeliverCollectDocError: Label 'The error occurred during the delivering Collect Document: %1';
+        MMMemberNotifError: label 'The error occurred during sending Membership Notification: %1';
+        IsHandled: Boolean;
+    begin
+        // Clear existing data in the temporary table
+        if not TempExecutionOrderOnSale.IsEmpty() then
+            TempExecutionOrderOnSale.DeleteAll();
+
+        IsHandled := false;
+        OnBeforeInsertExecutionOrderOnSale(TempExecutionOrderOnSale, IsHandled);
+        if IsHandled then
+            exit;
+
+        // Populate the temporary table with the desired execution order
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR Create Clean Cash On Sale", 10, CreateCleanCashError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR Eject Payment Bin On Sale", 20, EjectPaymentBinError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR MM Loy. Assignment On Sale", 30, MMLoyAssignError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR POS Print Receipt On Sale", 40, POSPrintReceiptError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR Tax Free Voucher On Sale", 50, TaxFreeVoucherError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR MM Member Print On Sale", 60, MMMemberPrintReceiptError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR MM Member Notif. On Sale", 70, MMMemberNotifError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR TM Ticket Print On Sale", 80, TMTicketPrintError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR NpCs Del.CollectDoc OnSale", 90, NpCsDeliverCollectDocError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR E-mail Receipt On Sale", 100, SendEmailReceiptError);
+
+        OnAfterInsertExecutionOrderOnSale(TempExecutionOrderOnSale);
+    end;
+
+    procedure InsertExecutionOrder(var TempExecutionOrderOnSale: Record "NPR Execution Order On Sale"; CodeunitId: Integer; SequenceNo: Integer; ErrorMsg: Text[250])
+    begin
+        // Insert a record into the temporary table with the provided Codeunit ID, execution order and Error Msg
+        TempExecutionOrderOnSale.Init();
+        TempExecutionOrderOnSale."Sequence No." := SequenceNo;
+        TempExecutionOrderOnSale."Codeunit ID" := CodeunitId;
+        TempExecutionOrderOnSale."Error Msg" := ErrorMsg;
+        TempExecutionOrderOnSale.Insert();
+    end;
+
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     internal procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
         NPRPOSUnit: Record "NPR POS Unit";
@@ -1002,6 +1068,26 @@
         LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
+    internal procedure InvokeOnFinishSaleWorkflows(SalePOS: Record "NPR POS Sale")
+    var
+        StartTime: DateTime;
+        TempExecutionOrderOnSale: Record "NPR Execution Order On Sale" temporary;
+    begin
+        StartTime := CurrentDateTime;
+        InitializeExecutionOrder(TempExecutionOrderOnSale);
+        if not TempExecutionOrderOnSale.FindSet() then
+            exit;
+
+        Refresh(SalePOS);
+        repeat
+            InvokeOnFinishSaleWorkflows_OnRun(TempExecutionOrderOnSale);
+        until TempExecutionOrderOnSale.Next() = 0;
+
+        LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
+    end;
+
+    [Obsolete('Remove after POS Scenario is removed, use OnAfterEndSale', 'NPR30.0')]
+
     [IntegrationEvent(false, false)]
     internal procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
@@ -1011,5 +1097,16 @@
     internal procedure OnBeforeFinishSale(SalePOS: Record "NPR POS Sale")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertExecutionOrderOnSale(var TempExecutionOrderOnSale: Record "NPR Execution Order On Sale"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInsertExecutionOrderOnSale(var TempExecutionOrderOnSale: Record "NPR Execution Order On Sale")
+    begin
+    end;
+
     #endregion
 }

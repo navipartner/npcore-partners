@@ -11,6 +11,8 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     begin
         //FINISH_SALE scenario
         ShowReturnAmountDialog();
+        PrintCreditVoucherOnSale();
+        EmailReceiptOnSale();
 
         //AFTER_LOGIN scenario
         SelectRequiredParam();
@@ -25,9 +27,34 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
         //PAYMENT_VIEW scenario
         PopupDimension();
+
+        //FINISH_CREDIT_SALE scenario
         DimPopupEvery();
+        EjectPaymentBinOnCreditSale();
 
     end;
+
+    local procedure EjectPaymentBinOnCreditSale()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'EjectPaymentBinOnCreditSale');
+
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'EjectPaymentBinOnCreditSale')) then begin
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_CREDIT_SALE');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR POS Payment Bin Eject Mgt.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'EjectPaymentBinOnCreditSale');
+            POSSalesWorkflowStep.SetRange(Enabled, true);
+            if not POSSalesWorkflowStep.IsEmpty() then
+                if not POSAuditProfile.IsEmpty() then
+                    POSAuditProfile.ModifyAll("Bin Eject After Credit Sale", true);
+
+            UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'EjectPaymentBinOnCreditSale'));
+        end;
+    end;
+
 
     local procedure ShowReturnAmountDialog()
     var
@@ -309,6 +336,48 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             if ParamValue.FindSet() then
                 ParamValue.ModifyAll(Value, 'true');
         end;
+    end;
+
+    local procedure PrintCreditVoucherOnSale()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'PrintCreditVoucherOnSale');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PrintCreditVoucherOnSale')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR POS Sales Print Mgt.", 'PrintCreditVoucherOnSale');
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PrintCreditVoucherOnSale'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure EmailReceiptOnSale()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'EmailReceiptOnSale');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'EmailReceiptOnSale')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+        POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR E-mail Doc. Mgt.");
+        POSSalesWorkflowStep.SetRange("Subscriber Function", 'EmailReceiptOnSale');
+        POSSalesWorkflowStep.SetRange(Enabled, true);
+        if not POSSalesWorkflowStep.IsEmpty() then
+            if not POSReceiptProfile.IsEmpty() then
+                POSReceiptProfile.ModifyAll("E-mail Receipt On Sale", true);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'EmailReceiptOnSale'));
+        LogMessageStopwatch.LogFinish();
+
     end;
 
     procedure DimPopupEvery()

@@ -53,12 +53,11 @@
             PrintCleanCash(LinePrintMgt, PosEntry);
     end;
 
-
     // Insert the workflow step in  POS Workflows
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
-
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if Rec."Subscriber Function" <> 'CreateCleanCashOnSale' then
@@ -68,6 +67,7 @@
         Rec."Sequence No." := 10;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR CleanCash Wrapper");
@@ -84,18 +84,30 @@
 
 
     // The methods subscribes to event posted during end of sale
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure CreateCleanCashOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
         ResponseText: Text;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
 
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'CreateCleanCashOnSale' then
             exit;
 
+        CreateCleanCashOnPOSSale(SalePOS);
+    end;
+
+    procedure CreateCleanCashOnPOSSale(SalePOS: Record "NPR POS Sale")
+    var
+        PosEntry: Record "NPR POS Entry";
+        ResponseText: Text;
+    begin
         PosEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
         PosEntry.SetFilter("POS Unit No.", '%1', SalePOS."Register No.");
         if (not PosEntry.FindFirst()) then
@@ -111,8 +123,8 @@
             Message(ResponseText);
 
         HandleCleanCashXCCSPReceipt(PosEntry);
-
     end;
+
 
     // Check that CleanCash Audit Handler has been activated
     local procedure IsCleanCashXCCSPComplianceEnabled(POSUnitNo: Code[10]): Boolean

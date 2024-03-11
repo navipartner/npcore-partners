@@ -212,6 +212,7 @@
         Post: Boolean;
         Posted: Boolean;
         Type: Option Proforma,Draft;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
@@ -303,7 +304,11 @@
         if PrintProformaInv and (not Posted) then
             POSSalesDocumentOutputMgt.PrintNonPostedDocument(SalesHeader, type::Proforma);
 
-        InvokeOnFinishCreditSaleWorkflow(SalePOS);
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            InvokeOnAfterFinishCreditSale(SalePOS)
+        else
+            InvokeOnFinishCreditSaleWorkflow(SalePOS);
+
 
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
         SalesDocExpMgtPublic.OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
@@ -1244,21 +1249,26 @@ then
     begin
         if CustomerCreditCheck then
             exit;
+
         if CustCheckCrLimit.SalesHeaderCheck(SalesHeader) then
             if not Confirm(CustomerCreditWarningLbl) then
                 Error('');
     end;
 
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale');
     end;
 
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
     local procedure OnFinishCreditSaleCode(): Code[20]
     begin
         exit('FINISH_CREDIT_SALE');
     end;
+
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
@@ -1286,6 +1296,16 @@ then
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
+    local procedure InvokeOnAfterFinishCreditSale(SalePOS: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+        CreditSalePostProcessing: Codeunit "NPR Credit Sale Post-Process";
+    begin
+        if POSUnit.Get(SalePOS."Register No.") then begin
+            Clear(CreditSalePostProcessing);
+            if CreditSalePostProcessing.Run(SalePOS) then;
+        end;
+    end;
 
     local procedure GetImportedFromInvoiceNo(SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header")
     var

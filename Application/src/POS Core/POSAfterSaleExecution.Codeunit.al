@@ -2,6 +2,8 @@
 {
     Access = Internal;
     trigger OnRun()
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         case OnRunType of
             // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
@@ -10,7 +12,10 @@
                 exit;
             OnRunType::RunAfterEndSale:
                 begin
-                    PosSaleCodeunit.InvokeOnFinishSaleWorkflow(Rec);
+                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+                        PosSaleCodeunit.InvokeOnFinishSaleWorkflows(Rec)
+                    else
+                        PosSaleCodeunit.InvokeOnFinishSaleWorkflow(Rec);
                     Commit();
                     PosSaleCodeunit.OnAfterEndSale(OnRunXRec);
                     Commit();
@@ -19,7 +24,10 @@
                 begin
                     PosSaleCodeunit.OnBeforeFinishSale(Rec);
                     Commit();
-                    PosSaleCodeunit.OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
+                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+                        CODEUNIT.Run(OnRunExecutionOrderOnSale."Codeunit ID", Rec)
+                    else
+                        PosSaleCodeunit.OnFinishSale(OnRunPOSSalesWorkflowStep, Rec);
                     Commit();
                 end;
         end;
@@ -50,9 +58,16 @@
         OnRunType := OnRunTypePar;
     end;
 
+    procedure OnRunPOSSalesWorkflow(TempExecutionOrderOnSale: Record "NPR Execution Order On Sale")
+    begin
+        OnRunExecutionOrderOnSale := TempExecutionOrderOnSale;
+    end;
+
     var
         Rec: Record "NPR POS Sale";
         OnRunPOSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        OnRunExecutionOrderOnSale: Record "NPR Execution Order On Sale";
+
         OnRunXRec: Record "NPR POS Sale";
         PosSaleCodeunit: Codeunit "NPR POS Sale";
         OnRunType: Enum "NPR POS Sale OnRunType";

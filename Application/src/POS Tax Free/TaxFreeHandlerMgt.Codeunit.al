@@ -563,6 +563,7 @@
     #endregion
     #region OnFinishSale Workflow
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -575,23 +576,34 @@
         Rec."Sequence No." := 60;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Tax Free Handler Mgt.");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     var
-        POSEntry: Record "NPR POS Entry";
-        TaxFreeProfile: Record "NPR POS Tax Free Profile";
-        POSUnit: Record "NPR POS Unit";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'IssueTaxFreeVoucherOnSale' then
             exit;
 
+        IssueTaxFreeVoucher(SalePOS);
+    end;
+
+    procedure IssueTaxFreeVoucher(SalePOS: Record "NPR POS Sale")
+    var
+        POSEntry: Record "NPR POS Entry";
+        TaxFreeProfile: Record "NPR POS Tax Free Profile";
+        POSUnit: Record "NPR POS Unit";
+    begin
         POSEntry.SetRange("POS Unit No.", SalePOS."Register No.");
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         if not POSEntry.FindFirst() then
@@ -603,7 +615,6 @@
         POSUnit.Get(POSEntry."POS Unit No.");
         if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
             exit;
-        ;
 
         Commit();
 

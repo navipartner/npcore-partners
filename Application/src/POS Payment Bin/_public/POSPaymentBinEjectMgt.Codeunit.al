@@ -132,7 +132,7 @@
         exit(not POSPaymentLine.IsEmpty());
     end;
 
-    local procedure CarryOutPaymentBinEject(SalePOS: Record "NPR POS Sale"; Force: Boolean)
+    procedure CarryOutPaymentBinEject(SalePOS: Record "NPR POS Sale"; Force: Boolean)
     var
         POSPaymentBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
@@ -158,10 +158,11 @@
     begin
         if Manual then
             exit(POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
-        
+
         exit(POSAuditLog."Action Type"::AUTO_DRAWER_OPEN);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -173,9 +174,14 @@
         Rec."Sequence No." := 15;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure EjectPaymentBin(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"NPR POS Payment Bin Eject Mgt." then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBin' then
@@ -184,6 +190,7 @@
         CarryOutPaymentBinEject(SalePOS, false);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertCreditSaleWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -197,6 +204,7 @@
         Rec.Enabled := false;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale', '', true, true)]
     local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin
@@ -205,6 +213,17 @@
         if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
             exit;
         CarryOutPaymentBinEject(SalePOS, true);
+    end;
+
+    procedure EjectPaymeBinOnCreditSale(SalePOS: Record "NPR POS Sale")
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        If POSUnit.Get(SalePOS."Register No.") then
+            if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+                if POSAuditProfile."Bin Eject After Credit Sale" then
+                    CarryOutPaymentBinEject(SalePOS, true);
     end;
 
     [IntegrationEvent(false, false)]
