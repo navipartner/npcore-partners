@@ -101,6 +101,11 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
                 }
+                field("Bin Eject After Credit Sale"; Rec."Bin Eject After Credit Sale")
+                {
+                    ToolTip = 'Specifies the Bin Eject After Credit Sale';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

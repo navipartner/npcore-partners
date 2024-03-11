@@ -5,6 +5,7 @@
     var
         PRINT_RECEIPT: Label 'Print Sales Receipt';
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -20,14 +21,21 @@
         end;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR POS Sales Print Mgt.");
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
     local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            exit;
+
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
 

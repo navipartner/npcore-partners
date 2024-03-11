@@ -40,6 +40,11 @@ table 6150742 "NPR POS Receipt Profile"
             DataClassification = CustomerContent;
             BlankZero = true;
         }
+        field(60; "E-mail Receipt On Sale"; Boolean)
+        {
+            Caption = 'Send E-mail Receipt On Sale';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
