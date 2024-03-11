@@ -5,6 +5,7 @@ page 6150858 "NPR NPCamera Profile List"
     UsageCategory = Lists;
     SourceTable = "NPR NPCamera Profile";
     Extensible = false;
+    Caption = 'Np Camera Profiles';
 #if NOT BC17
     AboutTitle = 'Camera Profile';
     AboutText = 'A list of camera profiles which can be used in different contexts. Depending on the need for the specific usecsae.';
@@ -16,7 +17,7 @@ page 6150858 "NPR NPCamera Profile List"
         {
             repeater(GroupName)
             {
-                field(Code; Rec.Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies a unique code identifying a specific profile. Add code DEFAULT to be used everywhere except where other profiles are specified.';
@@ -67,8 +68,11 @@ page 6150858 "NPR NPCamera Profile List"
                 var
                     Camera: Page "NPR NPCamera";
                     inS: InStream;
+                    toFile: Text;
                 begin
-                    Camera.TakePicture(inS, Rec);
+                    toFile := Rec.Code + '.' + Format(Rec."File Type");
+                    if (Camera.TakePicture(inS, Rec)) then
+                        File.DownloadFromStream(inS, '', '', '', toFile);
                 end;
             }
             action("Test Default")
@@ -83,9 +87,16 @@ page 6150858 "NPR NPCamera Profile List"
                 trigger OnAction();
                 var
                     Camera: Page "NPR NPCamera";
+                    NPCameraProfile: Record "NPR NPCamera Profile";
                     inS: InStream;
+                    toFile: Text;
                 begin
-                    Camera.TakePicture(inS);
+                    if (NPCameraProfile.Get('DEFAULT')) then
+                        toFile := NPCameraProfile.Code + '.' + Format(NPCameraProfile."File Type")
+                    else
+                        toFile := 'default.jpeg';
+                    if (Camera.TakePicture(inS)) then
+                        File.DownloadFromStream(inS, '', '', '', toFile);
                 end;
             }
         }
