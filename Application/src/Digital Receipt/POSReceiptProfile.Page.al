@@ -25,11 +25,6 @@ page 6150757 "NPR POS Receipt Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies brief description of the POS receipt profile for easy identification and reference.';
                 }
-                field("Receipt Discount Information"; Rec."Receipt Discount Information")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Choose how discount information should be displayed on the receipt: per line, summary, or no information.';
-                }
                 field("E-mail Receipt On Sale"; Rec."E-mail Receipt On Sale")
                 {
                     ApplicationArea = NPRRetail;
@@ -56,6 +51,11 @@ page 6150757 "NPR POS Receipt Profile"
                         else
                             Error(CredentialsNotValidLbl);
                     end;
+                }
+                field("Receipt Discount Information"; Rec."Receipt Discount Information")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Choose how discount information should be displayed on the receipt: per line, summary, or no information.';
                 }
                 field("QRCode Timeout Interval Enabled"; Rec."QRCode Time Interval Enabled")
                 {
