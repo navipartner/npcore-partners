@@ -104,6 +104,7 @@ codeunit 6150926 "NPR SaaS Import Service"
     procedure GetTableInformation(TableId: Integer) Response: Text
     var
         Field: Record Field;
+        TableMetaData: Record "Table Metadata";
         JAFields: JsonArray;
         JOResponse, JOField : JsonObject;
     begin
@@ -112,6 +113,10 @@ codeunit 6150926 "NPR SaaS Import Service"
         Field.FindSet();
         JOResponse.Add('tableId', Field.TableNo);
         JOResponse.Add('tableName', Field.TableName);
+        if TableMetaData.Get(TableId) then begin
+            JOResponse.Add('tableObsoleteState', Field.ObsoleteState);
+            JOResponse.Add('tableObsoleteReason', Field.ObsoleteReason);
+        end;
         repeat
             JOField.Add('fieldID', Field."No.");
             JOField.Add('fieldName', Field.FieldName);
