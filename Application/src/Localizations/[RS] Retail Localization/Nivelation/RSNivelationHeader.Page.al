@@ -15,12 +15,12 @@ page 6151084 "NPR RS Nivelation Header"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the No. field.';
+                    ToolTip = 'Specifies the Nivelation Document Number.';
                 }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Type field.';
+                    ToolTip = 'Specifies the Nivelation Type.';
                     trigger OnValidate()
                     begin
                         IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change"
@@ -29,44 +29,44 @@ page 6151084 "NPR RS Nivelation Header"
                 field("Source Type"; Rec."Source Type")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Source Type field.';
+                    ToolTip = 'Specifies the Nivelation Document Source.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = NPRRSRLocal;
                     Editable = IsPriceChange;
-                    ToolTip = 'Specifies the value of the Location Code field.';
+                    ToolTip = 'Specifies the Retail Location Code.';
                 }
                 field("Location Name"; Rec."Location Name")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the LocationName field.';
+                    ToolTip = 'Specifies the Location Name - Store Name.';
                 }
                 field("Price List Code"; Rec."Price List Code")
                 {
                     ApplicationArea = NPRRSRLocal;
                     Editable = IsPriceChange;
-                    ToolTip = 'Specifies the value of the Price List Code field.';
+                    ToolTip = 'Specifies the Price List Code if the Source Type is Sales Price List.';
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Posting Date field.';
+                    ToolTip = 'Specifies the Posting Date.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Amount field.';
+                    ToolTip = 'Specifies the total value to be adjusted.';
                 }
                 field("Price Valid Date"; Rec."Price Valid Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Price Valid Date field.';
+                    ToolTip = 'Specifies the date when the given Sales Price list is valid from.';
                 }
                 field("Referring Document Code"; Rec."Referring Document Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Referring Document Code field.';
+                    ToolTip = 'Specifies the Referring Document Code.';
                 }
             }
             group(Parts)
@@ -100,7 +100,6 @@ page 6151084 "NPR RS Nivelation Header"
                     PromotedOnly = true;
                     Image = PostOrder;
                     ToolTip = 'Finalize the document or journal by posting the amounts and quantities to the related accounts in your company books.';
-
                     trigger OnAction()
                     var
                         NivelationPost: Codeunit "NPR RS Nivelation Post";
