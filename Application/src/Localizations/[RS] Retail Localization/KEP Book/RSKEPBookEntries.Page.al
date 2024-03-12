@@ -23,7 +23,7 @@ page 6151144 "NPR RS KEP Book Entries"
                 {
                     ApplicationArea = NPRRSRLocal;
                     Caption = 'Start Balance Amount';
-                    ToolTip = 'Specifies the value of the Start Balance Amount field.';
+                    ToolTip = 'Specifies the value of the Start Balance Amount.';
                 }
                 group(Amounts)
                 {
@@ -32,13 +32,13 @@ page 6151144 "NPR RS KEP Book Entries"
                     {
                         ApplicationArea = NPRRSRLocal;
                         Caption = 'Debit Amount';
-                        ToolTip = 'Specifies the value of the Debit Amount field.';
+                        ToolTip = 'Specifies the value of the Debit Amount.';
                     }
                     field(CreditAmount; StartCreditAmount)
                     {
                         ApplicationArea = NPRRSRLocal;
                         Caption = 'Credit Amount';
-                        ToolTip = 'Specifies the value of the Credit Amount field.';
+                        ToolTip = 'Specifies the value of the Credit Amount.';
                     }
                 }
             }
@@ -48,47 +48,47 @@ page 6151144 "NPR RS KEP Book Entries"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Location Code field.';
+                    ToolTip = 'Specifies the Location related to this KEP Book Entry.';
                 }
                 field(Year; Rec.Year)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Year field.';
+                    ToolTip = 'Specifies the Year of creation related KEP Book Entry.';
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies the Entry No. of the related KEP Book Entry.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Source No. field.';
+                    ToolTip = 'Specifies the Document Description of the related KEP Book Entry.';
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Posting Date field.';
+                    ToolTip = 'Specifies the Posting Date of the related KEP Book Entry.';
                 }
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Document Type field.';
+                    ToolTip = 'Specifies the Document Type of the related KEP Book Entry.';
                 }
                 field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Document No.  field.';
+                    ToolTip = 'Specifies the Document Number of the related KEP Book Entry.';
                 }
                 field("Debit Amout"; Rec."Debit Amount")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Debit Amount field.';
+                    ToolTip = 'Specifies the Debit Amount of the related KEP Book Entry.';
                 }
                 field("Credit Amount"; Rec."Credit Amount")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Credit Amount field.';
+                    ToolTip = 'Specifies the Credit Amount of the related KEP Book Entry.';
                 }
             }
             group(TotalBalances)
@@ -99,13 +99,13 @@ page 6151144 "NPR RS KEP Book Entries"
                 {
                     ApplicationArea = NPRRSRLocal;
                     Caption = 'Total Debit';
-                    ToolTip = 'Specifies the value of the Total Debit field.';
+                    ToolTip = 'Specifies the Total Debit Amount of the related KEP Book Entries.';
                 }
                 field(TotalCredit; TotalCredit)
                 {
                     ApplicationArea = NPRRSRLocal;
                     Caption = 'Total Credit';
-                    ToolTip = 'Specifies the value of the Total Credit field.';
+                    ToolTip = 'Specifies the Total Credit Amount of the related KEP Book Entries.';
                 }
             }
         }
