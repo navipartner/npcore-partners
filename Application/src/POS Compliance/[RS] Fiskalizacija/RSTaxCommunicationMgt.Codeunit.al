@@ -2492,7 +2492,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeSendHttpRequestForNormalRefund(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; StartTime: DateTime; var IsHandled: Boolean)
     begin
     end;
