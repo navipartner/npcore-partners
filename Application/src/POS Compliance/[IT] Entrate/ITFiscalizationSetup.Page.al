@@ -1,7 +1,7 @@
 page 6151312 "NPR IT Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'IT Tax Fiscalisation Setup';
+    Caption = 'IT Tax Fiscalization Setup';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;
@@ -20,7 +20,7 @@ page 6151312 "NPR IT Fiscalization Setup"
                 field("Enable IT Fiscal"; Rec."Enable IT Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable IT Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable IT Fiscalization field.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable IT Fiscal" <> Rec."Enable IT Fiscal" then
