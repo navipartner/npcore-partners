@@ -96,6 +96,41 @@ codeunit 6014608 "NPR Replication Register"
 #ELSE
         ItemSubstitutionsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemSubstitutions/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
 #ENDIF
+        ItemAttributesEndPointIDLbl: Label 'GetItemAttributes', Locked = true;
+        ItemAttributesEndPointDescriptionLbl: Label 'Gets Item Attributes from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        ItemAttributesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributes/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemAttributesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributes/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
+        ItemAttributeValuesEndPointIDLbl: Label 'GetItemAttributeValues', Locked = true;
+        ItemAttributeValuesEndPointDescriptionLbl: Label 'Gets Item Attribute Values from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        ItemAttributeValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValues/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemAttributeValuesPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValues/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
+        ItemAttributeValueMappingsEndPointIDLbl: Label 'GetItemAttributeValueMappings', Locked = true;
+        ItemAttributeValueMappingsEndPointDescriptionLbl: Label 'Gets Item Attribute Value Mappings from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        ItemAttributeValueMappingsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValueMappings/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemAttributeValueMappingsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValueMappings/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
+        ItemAttributeTranslationsEndPointIDLbl: Label 'GetItemAttributeTranslations', Locked = true;
+        ItemAttributeTranslationsEndPointDescriptionLbl: Label 'Gets Item Attribute Translations from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        ItemAttributeTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeTranslations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemAttributeTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeTranslations/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
+        ItemAttributeValueTranslationsEndPointIDLbl: Label 'GetItemAttributeValueTranslations', Locked = true;
+        ItemAttributeValueTranslationsEndPointDescriptionLbl: Label 'Gets Item Attribute Value Translations from related company. ', Locked = true;
+#IF (BC17 or BC18 or BC19 or BC20)
+        ItemAttributeValueTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValueTranslations/?$filter=replicationCounter gt %2&$orderby=replicationCounter', Locked = true;
+#ELSE
+        ItemAttributeValueTranslationsPathLbl: Label '/navipartner/core/v1.0/companies(%1)/itemAttributeValueTranslations/?$filter=systemRowVersion gt %2&$orderby=systemRowVersion', Locked = true;
+#ENDIF
         ManufacturersEndPointIDLbl: Label 'GetManufacturers', Locked = true;
         ManufacturersEndPointDescriptionLbl: Label 'Gets Manufacturers from related company. ', Locked = true;
 #IF (BC17 or BC18 or BC19 or BC20)
@@ -606,6 +641,26 @@ codeunit 6014608 "NPR Replication Register"
         ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ManufacturersEndPointIDLbl, ManufacturersPathLbl,
                     ManufacturersEndPointDescriptionLbl, true, 900, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
                     10000, Database::Manufacturer, false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemAttributesEndPointIDLbl, ItemAttributesPathLbl,
+                    ItemAttributesEndPointDescriptionLbl, true, 1000, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                    10000, Database::"Item Attribute", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemAttributeValuesEndPointIDLbl, ItemAttributeValuesPathLbl,
+                   ItemAttributeValuesEndPointDescriptionLbl, true, 1010, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                   10000, Database::"Item Attribute Value", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemAttributeValueMappingsEndPointIDLbl, ItemAttributeValueMappingsPathLbl,
+                   ItemAttributeValueMappingsEndPointDescriptionLbl, true, 1020, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                   10000, Database::"Item Attribute Value Mapping", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemAttributeTranslationsEndPointIDLbl, ItemAttributeTranslationsPathLbl,
+                   ItemAttributeTranslationsEndPointDescriptionLbl, true, 1030, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                   10000, Database::"Item Attribute Translation", false, false);
+
+        ServiceEndPoint.RegisterServiceEndPoint(ItemsServiceCodeLbl, ItemAttributeValueTranslationsEndPointIDLbl, ItemAttributeValueTranslationsPathLbl,
+                   ItemAttributeValueTranslationsEndPointDescriptionLbl, true, 1040, "NPR Replication EndPoint Meth"::"Get BC Generic Data", 0,
+                   10000, Database::"Item Attr. Value Translation", false, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
@@ -912,6 +967,102 @@ codeunit 6014608 "NPR Replication Register"
 
         Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
            Rec.FieldNo(SystemId), 'id', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemAttributeSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Attribute";
+    begin
+        if sender."Table ID" <> Database::"Item Attribute" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("ID"), 'attributeId', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemAttributeValueSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Attribute Value";
+    begin
+        if sender."Table ID" <> Database::"Item Attribute Value" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Attribute ID"), 'attributeId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+          Rec.FieldNo(ID), 'attributeValueId', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemAttributeValueMappingSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Attribute Value Mapping";
+    begin
+        if sender."Table ID" <> Database::"Item Attribute Value Mapping" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Table ID"), 'tableId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+          Rec.FieldNo("No."), 'no', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+         Rec.FieldNo("Item Attribute ID"), 'itemAttributeId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+         Rec.FieldNo("Item Attribute Value ID"), 'itemAttributeValueId', 0, false, false);
+    end;
+
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemAttributeTranslationSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Attribute Translation";
+    begin
+        if sender."Table ID" <> Database::"Item Attribute Translation" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Attribute ID"), 'attributeId', 0, false, false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR Replication Endpoint", 'OnRegisterServiceEndPoint', '', true, true)]
+    local procedure RegisterItemAttributeValueTranslationSpecialFieldMappings(sender: Record "NPR Replication Endpoint")
+    var
+        Mapping: Record "NPR Rep. Special Field Mapping";
+        Rec: Record "Item Attr. Value Translation";
+    begin
+        if sender."Table ID" <> Database::"Item Attr. Value Translation" then
+            exit;
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo(SystemId), 'id', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+           Rec.FieldNo("Attribute ID"), 'attributeId', 0, false, false);
+
+        Mapping.RegisterSpecialFieldMapping(sender."Service Code", sender."EndPoint ID", sender."Table ID",
+          Rec.FieldNo(ID), 'attributeValueId', 0, false, false);
     end;
 
     local procedure RegisterCustServiceEndPoints()
