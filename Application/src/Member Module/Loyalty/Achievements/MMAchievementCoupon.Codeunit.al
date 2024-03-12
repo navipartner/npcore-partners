@@ -6,9 +6,11 @@ codeunit 6184722 "NPR MM AchievementCoupon"
     var
         Coupon: Record "NPR NpDc Coupon";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+        CouponType: Record "NPR NpDc Coupon Type";
         Membership: Record "NPR MM Membership";
     begin
 
+        CouponType.Get(CouponTypeCode);
         Membership.Get(MembershipEntryNo);
 
         Coupon.Init();
@@ -20,6 +22,10 @@ codeunit 6184722 "NPR MM AchievementCoupon"
         Coupon.Modify();
 
         CouponMgt.PostIssueCoupon(Coupon);
+
+        if (CouponType."Print on Issue") then
+            CouponMgt.PrintCoupon(Coupon);
+
         exit(Coupon."No.");
     end;
 
