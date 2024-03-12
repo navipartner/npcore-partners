@@ -83,7 +83,7 @@
         POSSaleLineTemp.Insert();
 
         if FindBestMixedDiscount then begin
-            if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
+            if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
                 MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate)
             else
                 MixedDiscountMgt.FindPotentiallyImpactedMixesAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, true, CalculationDate);
@@ -106,7 +106,7 @@
             end;
         end;
 
-        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
+        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
             MixedDiscountMgt.ApplyMixedDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate)
         else
             MixedDiscountMgt.ApplyMixDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate);

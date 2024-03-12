@@ -1894,7 +1894,7 @@
         if (Rec.Quantity = xRec.Quantity) and (Rec."Unit of Measure Code" <> xRec."Unit of Measure Code") then begin
             UpdateAppliedLinesFromTriggeredLine(TempSaleLinePOS, Rec);
         end;
-        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation') then
+        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
             ApplyMixedDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today)
         else
             ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
