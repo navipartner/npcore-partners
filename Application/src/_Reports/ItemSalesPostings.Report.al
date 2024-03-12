@@ -15,7 +15,7 @@
     {
         dataitem(ItemDT; Item)
         {
-            CalcFields = "Positive Adjmt. (LCY)", Inventory;
+            CalcFields = Inventory;
             DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Date Filter", "Item Category Code", "Vendor No.";
             UseTemporary = true;
@@ -70,7 +70,7 @@
                 if not ItemSalesPostings.Read() then
                     CurrReport.Break();
 
-                Item.SetAutoCalcFields(Inventory, "Positive Adjmt. (LCY)");
+                Item.SetAutoCalcFields(Inventory);
 
                 if not Item.Get(ItemSalesPostings.ItemNo) then
                     CurrReport.Skip();
@@ -82,12 +82,14 @@
                 if Item.Type = Item.Type::Service then
                     ItemCOG := ItemSalesPostings.CostAmountNonInvtbl
                 else
-                    ItemCOG := Item."Positive Adjmt. (LCY)";
+                    ItemCOG := ItemSalesPostings.CostAmountActual;
 
-                Profit := ItemSalesPostings.SalesLCY - Abs(ItemCOG);
+                Profit := Abs(ItemSalesPostings.SalesLCY) - Abs(ItemCOG);
+                if ItemSalesPostings.SalesLCY < 0 then
+                    Profit := -Profit;
 
                 if ItemSalesPostings.SalesLCY <> 0 then
-                    ItemProfitPct := Round(Profit / ItemSalesPostings.SalesLCY, 0.1)
+                    ItemProfitPct := Profit / ItemSalesPostings.SalesLCY
                 else
                     ItemProfitPct := 0;
             end;
