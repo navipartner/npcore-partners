@@ -78,7 +78,7 @@ let main = async (obj) => {
       }
     }
   } catch (e) {
-    console.error("Vipps Mobileau Error");
+    console.error("Vipps Mobilepay Error");
     console.error(e);
     let err = e.message ? e.message : e;
     popup.error(err, "Vipps Mobilepay Error");

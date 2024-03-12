@@ -119,7 +119,10 @@ codeunit 6184692 "NPR Vipps Mp Integration"
             Request.Add('EFTEntryNo', EftTransactionRequest."Entry No.");
             Request.Add('PaymentSetupCode', EftTransactionRequest."Original POS Payment Type Code");
             Request.Add('ReferenceNumberInput', EftTransactionRequest."Reference Number Input");
-            Request.Add('Type', Format(EftTransactionRequest."Processing Type"));
+            if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::PAYMENT) then
+                Request.Add('Type', 'PAYMENT');
+            if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::REFUND) then
+                Request.Add('Type', 'REFUND');
             Request.Add('QrContent', VippsMpQrCallback."Qr Content");
             Request.Add('FormattedAmount', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
             if (POSUnit.Get(EftTransactionRequest."Register No.") and HtmlProfile.Get(POSUnit."POS HTML Display Profile")) then
