@@ -17,51 +17,51 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the No. field.';
+                    ToolTip = 'Specifies the Nivelation Document Number.';
                 }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Type field.';
+                    ToolTip = 'Specifies the Nivelation Type.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Location Code field.';
+                    ToolTip = 'Specifies the Retail Location Code.';
                     Visible = IsPriceChange;
                 }
                 field("Location Name"; Rec."Location Name")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the LocationName field.';
+                    ToolTip = 'Specifies the Location Name - Store Name.';
                     Visible = IsPriceChange;
                 }
                 field("Price List Code"; Rec."Price List Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Price List Code field.';
+                    ToolTip = 'Specifies the Price List Code from which the Nivelation is created from.';
                     Visible = IsPriceChange;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Posting Date field.';
+                    ToolTip = 'Specifies the Posting Date of the Nivelation.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Amount field.';
+                    ToolTip = 'Specifies the total value to be adjusted.';
                 }
                 field("Referring Document Code"; Rec."Referring Document Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Referring Document Code field.';
+                    ToolTip = 'Specifies the Referring Document number related to the posted Nivelation.';
                 }
                 field("UserID"; UserId())
                 {
                     Caption = 'Created by User';
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Created by User field.';
+                    ToolTip = 'Specifies the User.';
                 }
             }
             group(Parts)

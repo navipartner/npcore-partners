@@ -33,12 +33,12 @@ page 6151098 "NPR RS R Localization Setup"
                 field("RS Calc. VAT GL Account"; Rec."RS Calc. VAT GL Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Calc. VAT GL Account field.';
+                    ToolTip = 'Specifies the acount for posting Calculated VAT.';
                 }
                 field("RS Calc. Margin GL Account"; Rec."RS Calc. Margin GL Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Calc. Margin GL Account field.';
+                    ToolTip = 'Specifies the account for posting Calculated Margin.';
                 }
             }
             group(NoSeries)

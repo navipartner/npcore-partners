@@ -16,12 +16,12 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Code"; Rec."Code")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Code field.';
+                    ToolTip = 'Specifies the number of the report field.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the description related to the report field.';
                 }
             }
             group(Purchase)
@@ -30,7 +30,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Payment Base"; Rec."Purchase Payment Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Base Field field.';
+                    ToolTip = 'Specifies the field where the Base of the Purchase Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Payment Base");
@@ -39,7 +39,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Invoice Base"; Rec."Purchase Invoice Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Purchase Invoice Base field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Purchase Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Invoice Base");
@@ -48,7 +48,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Cr. Memo Base"; Rec."Purchase Cr. Memo Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Purchase Cr. Memo Base field.';
+                    ToolTip = 'Specifies the field where Base of the Purchase Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Cr. Memo Base");
@@ -57,7 +57,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Non-Deductable Base"; Rec."Non-Deductable Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Non-Deductable Base field.';
+                    ToolTip = 'Specifies the field where Base of the Non-Deductable VAT should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Non-Deductable Base");
@@ -72,7 +72,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Purchase Invoice Base"; Rec."Prep. Purchase Invoice Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Purchase Invoice Base field.';
+                    ToolTip = 'Specifies the field where Base of the Purchase Prepayment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Purchase Invoice Base");
@@ -81,7 +81,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Purchase Cr. Memo Base"; Rec."Prep. Purchase Cr. Memo Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Purchase Cr. Memo Base field.';
+                    ToolTip = 'Specifies the field where Base of the Purchase Prepayment Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Purchase Cr. Memo Base");
@@ -90,7 +90,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Payment Amount"; Rec."Purchase Payment Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Purchase Payment Amount field.';
+                    ToolTip = 'Specifies the field where VAT Amount of the Purchase Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Payment Amount");
@@ -99,7 +99,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Invoice Amount"; Rec."Purchase Invoice Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Purchase Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Purchase Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Invoice Amount");
@@ -108,7 +108,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Purchase Cr. Memo Amount"; Rec."Purchase Cr. Memo Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Purchase Cr. Memo Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Purchase Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Purchase Cr. Memo Amount");
@@ -117,7 +117,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Non-Deductable Amount"; Rec."Non-Deductable Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Non-Deductable Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Non-Deductable VAT should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Non-Deductable Amount");
@@ -126,7 +126,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Deductable Amount"; Rec."Deductable Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Deductable Amount field.';
+                    ToolTip = 'Specifies the field where the Deductable VAT Amount should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Deductable Amount");
@@ -135,7 +135,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Purchase Invoice Amount"; Rec."Prep. Purchase Invoice Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Purchase Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Purchase Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Purchase Invoice Amount");
@@ -144,7 +144,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Purchase Cr. Memo Amount"; Rec."Prep. Purchase Cr. Memo Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Purchase Cr. Memo Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Purchase Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Purchase Cr. Memo Amount");
@@ -158,7 +158,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Payment Base"; Rec."Sales Payment Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Payment Base field.';
+                    ToolTip = 'Specifies the field where the Base of the Sales Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Payment Base");
@@ -167,7 +167,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Invoice Base"; Rec."Sales Invoice Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Invoice Base field.';
+                    ToolTip = 'Specifies the field where the Base of the Sales Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Invoice Base");
@@ -176,7 +176,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Cr. Memo Base"; Rec."Sales Cr. Memo Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Cr. Memo Base field.';
+                    ToolTip = 'Specifies the field where the Base of the Sales Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Cr. Memo Base");
@@ -185,7 +185,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("VAT Base Full VAT"; Rec."VAT Base Full VAT")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the VAT Base Full VAT field.';
+                    ToolTip = 'Specifies the field where the Full VAT Base should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."VAT Base Full VAT");
@@ -194,7 +194,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Sales Invoice Base"; Rec."Prep. Sales Invoice Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Sales Invoice Base field.';
+                    ToolTip = 'Specifies the field where the Base of the Sales Prepayment Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Sales Invoice Base");
@@ -203,7 +203,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Sales Cr. Memo Base"; Rec."Prep. Sales Cr. Memo Base")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Sales Cr. Memo Base field.';
+                    ToolTip = 'Specifies the field where the Base of the Sales Prepayment Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Sales Cr. Memo Base");
@@ -212,7 +212,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Payment Amount"; Rec."Sales Payment Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Payment Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Sales Payment should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Payment Amount");
@@ -221,7 +221,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Invoice Amount"; Rec."Sales Invoice Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Sales Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Invoice Amount");
@@ -230,7 +230,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Sales Cr. Memo Amount"; Rec."Sales Cr. Memo Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Sales Cr. Memo Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Sales Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Sales Cr. Memo Amount");
@@ -245,7 +245,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Sales Invoice Amount"; Rec."Prep. Sales Invoice Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Sales Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Sales Prepayment Invoice should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Sales Invoice Amount");
@@ -254,7 +254,7 @@ page 6151117 "NPR VAT Report Mapping Card"
                 field("Prep. Sales Cr. Memo Amount"; Rec."Prep. Sales Cr. Memo Amount")
                 {
                     ApplicationArea = NPRRSLocal;
-                    ToolTip = 'Specifies the value of the Prepayment Sales Cr. Memo Amount field.';
+                    ToolTip = 'Specifies the field where the VAT Amount of the Sales Prepayment Credit Memo should be written in the report.';
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         LookupField(Rec."Prep. Sales Cr. Memo Amount");
@@ -267,13 +267,13 @@ page 6151117 "NPR VAT Report Mapping Card"
                 {
                     ApplicationArea = NPRRSLocal;
                     Caption = 'Invoice Base';
-                    ToolTip = 'Specifies the value of the Invoice Base field.';
+                    ToolTip = 'Specifies the field where the Invoice Base should be written in the Book of Incoming Invoices.';
                 }
                 field("Book of Inc. Inv. Amount"; Rec."Book of Inc. Inv. Amount")
                 {
                     ApplicationArea = NPRRSLocal;
                     Caption = 'Invoice Amount';
-                    ToolTip = 'Specifies the value of the Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the Invoice VAT Amount should be written in the Book of Incoming Invoices.';
                 }
             }
             group("Book of Outgoing Invoices")
@@ -282,13 +282,13 @@ page 6151117 "NPR VAT Report Mapping Card"
                 {
                     ApplicationArea = NPRRSLocal;
                     Caption = 'Invoice Base';
-                    ToolTip = 'Specifies the value of the Invoice Base field.';
+                    ToolTip = 'Specifies the field where the Invoice Base should be written in the Book of Outgoing Invoices.';
                 }
                 field("Book of Out. Inv. Amount"; Rec."Book of Out. Inv. Amount")
                 {
                     ApplicationArea = NPRRSLocal;
                     Caption = 'Invoice Amount';
-                    ToolTip = 'Specifies the value of the Invoice Amount field.';
+                    ToolTip = 'Specifies the field where the Invoice VAT Amount should be written in the Book of Outgoing Invoices.';
                 }
             }
         }
