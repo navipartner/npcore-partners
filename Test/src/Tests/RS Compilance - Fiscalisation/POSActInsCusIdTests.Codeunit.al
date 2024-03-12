@@ -15,11 +15,15 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
     var
         SalePOS: Record "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryRSFiscal: Codeunit "NPR Library RS Fiscal";
         POSSale: Codeunit "NPR POS Sale";
         RSPOSSale: Record "NPR RS POS Sale";
         NewDesc: Text;
     begin
         // [Scenario] Activate POS Session and add Additional Customer Identification to it
+        // [Given] Enable Mock response instead of real http response
+        BindSubscription(LibraryRSFiscal);
+
         // [Given] POS & Payment setup
         InitializeData();
 
@@ -33,6 +37,9 @@ codeunit 85064 "NPR POS Act. Ins. Cus.Id Tests"
         POSSale.GetCurrentSale(SalePOS);
         RSPOSSale.Get(SalePOS.SystemId);
         _Assert.IsTrue(RSPOSSale."RS Customer Identification" = NewDesc, 'New Customer Identification is not inserted.');
+
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
+        UnbindSubscription(LibraryRSFiscal);
     end;
 
     internal procedure InitializeData()
