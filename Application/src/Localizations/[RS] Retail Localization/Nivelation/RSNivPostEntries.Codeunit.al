@@ -367,7 +367,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ItemLedgEntry."Unit of Measure Code" := ItemJnlLine."Unit of Measure Code";
         ItemLedgEntry."Item Category Code" := ItemJnlLine."Item Category Code";
         ItemLedgEntry.Correction := ItemJnlLine.Correction;
-        ItemLedgEntry.CalcFields("Cost Amount (Actual)", "Sales Amount (Actual)");
+        ItemLedgEntry.CalcFields("Cost Amount (Actual)");
 
         case PostedNivelationHeader.Type of
             PostedNivelationHeader.Type::"Price Change":
@@ -405,7 +405,6 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ValueEntry."Document Line No." := ItemJnlLine."Document Line No.";
         ValueEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(ValueEntry."User ID"));
 
-        ValueEntry."Sales Amount (Actual)" := Abs(ItemJnlLine.Amount);
         ValueEntry."Cost Amount (Actual)" := ItemJnlLine.Amount;
         ValueEntry."Cost Posted to G/L" := ItemJnlLine.Amount;
 
