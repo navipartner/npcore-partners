@@ -626,7 +626,6 @@ codeunit 6184659 "NPR IT Printer Mgt."
 #if not (BC17 or BC18 or BC19) 
     internal procedure CreateSetLogoRequestMessage(ITPOSUnitMapping: Record "NPR IT POS Unit Mapping") RequestText: Text
     var
-        RetailLogo: Record "NPR Retail Logo";
         Document: XmlDocument;
         SoapEnvelope: XmlElement;
         SoapEnvelopeBody: XmlElement;
@@ -638,11 +637,8 @@ codeunit 6184659 "NPR IT Printer Mgt."
         LogoUploadedSuccessfullyLbl: Label 'Logo uploading finished successfully.';
         POSLogoNotUploadedInSetupErr: Label '%1 has not been uploaded to %2.';
     begin
-        RetailLogo.SetRange("Register No.", ITPOSUnitMapping."POS Unit No.");
-        if RetailLogo.IsEmpty() then
-            RetailLogo.Reset();
-        if not RetailLogo.FindFirst() then
-            Error(POSLogoNotUploadedInSetupErr, RetailLogo.FieldCaption("POS Logo"), RetailLogo.TableCaption);
+        if not ITPOSUnitMapping."Fiscal Printer Logo".HasValue() then
+            Error(POSLogoNotUploadedInSetupErr, ITPOSUnitMapping.FieldCaption("Fiscal Printer Logo"), ITPOSUnitMapping.TableCaption);
 
         Document := XmlDocument.Create('', '');
 
