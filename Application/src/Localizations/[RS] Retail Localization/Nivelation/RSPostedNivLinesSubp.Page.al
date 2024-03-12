@@ -3,6 +3,7 @@ page 6151099 "NPR RS Posted Niv. Lines Subp."
     PageType = ListPart;
     Caption = 'Nivelation Lines';
     UsageCategory = None;
+    CardPageId = "NPR RS Posted Nivelation Doc";
     SourceTable = "NPR RS Posted Nivelation Lines";
     Editable = false;
     Extensible = false;
@@ -17,72 +18,72 @@ page 6151099 "NPR RS Posted Niv. Lines Subp."
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Item No. field.';
+                    ToolTip = 'Specifies the Item Number.';
                 }
                 field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the Item Description.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Variant Code field.';
+                    ToolTip = 'Specifies the Variant Code of the given Item.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Location Code field.';
+                    ToolTip = 'Specifies the Location Code related to the chosen Sales Price List.';
                 }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Quantity field.';
+                    ToolTip = 'Specifies the Quantity of items for which the price is beeing adjusted.';
                 }
                 field("UOM Code"; Rec."UOM Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Unit of Measure Code field.';
+                    ToolTip = 'Specifies the Unit of Measure for the given item.';
                 }
                 field("Old Price"; Rec."Old Price")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Old Price field.';
+                    ToolTip = 'Specifies the Old Price of the given item.';
                 }
                 field("Old Value"; Rec."Old Value")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Old Value field.';
+                    ToolTip = 'Specifies the Old Value of the given item.';
                 }
                 field("New Price"; Rec."New Price")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the New Price field.';
+                    ToolTip = 'Specifies the New Price of the given item.';
                 }
                 field("New Value"; Rec."New Value")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the New Value field.';
+                    ToolTip = 'Specifies the New Value of the given item.';
                 }
                 field("Price Difference"; Rec."Price Difference")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Price Difference field.';
+                    ToolTip = 'Specifies the difference between new and old price.';
                 }
                 field("Value Difference"; Rec."Value Difference")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Price Difference field.';
+                    ToolTip = 'Specifies the difference between new and old value.';
                 }
                 field("VAT %"; Rec."VAT %")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the VAT % field.';
+                    ToolTip = 'Specifies the VAT rate.';
                 }
                 field("Calculated VAT"; Rec."Calculated VAT")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Calculated VAT field.';
+                    ToolTip = 'Specifies the Calculated VAT amount.';
                 }
             }
         }
