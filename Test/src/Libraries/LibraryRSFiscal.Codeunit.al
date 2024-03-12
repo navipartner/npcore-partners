@@ -151,6 +151,127 @@ codeunit 85065 "NPR Library RS Fiscal"
         IsHandled := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS Tax Communication Mgt.", 'OnBeforeSendHttpRequestForProformaSale', '', false, false)]
+    local procedure OnBeforeSendHttpRequestForProformaSale(sender: Codeunit "NPR RS Tax Communication Mgt."; var ResponseText: Text; var SalesHeader: Record "Sales Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+        ResponseText :=
+        '{' +
+            '"requestedBy":"YJLQTEQR",' +
+            '"sdcDateTime":"2024-02-29T17:07:27.4551405+01:00",' +
+            '"invoiceCounter":"25734/92455РП",' +
+            '"invoiceCounterExtension":"РП",' +
+            '"invoiceNumber":"YJLQTEQR-YJLQTEQR-92455",' +
+            '"taxItems":[' +
+                '{' +
+                    '"categoryType":0,' +
+                    '"label":"F",' +
+                    '"amount":72.3423,' +
+                    '"rate":11.00,' +
+                    '"categoryName":"ECAL"' +
+                '}' +
+            '],' +
+            '"verificationUrl":"https://sandbox.suf.purs.gov.rs/v/?vl=A1lKTFFURVFSWUpMUVRFUVInaQEAhmQAAKBjbwAAAAAAAAABjfWe498BAAAb18anZDcyY3Yzg5Q6B4i%2Bl%2F1RwuH3KC7LXOTDHGsDJ9b0GVJhnUmZdEGk3SpomTz3%2BCxBHYV3eEEIaJq7k1rEKzFI0ZBtQiaAb%2BAdG7DcQRSruOHKJYd%2FFidnT%2BtwyZlQf1ZX3lANsGrelzlkgqY6YXPGe%2Fk08W%2BtHP%2FH5KJqig1icvkeiY04D5S7WPDQenFAOv9ykoAa%2BOE7Go%2FhP3baoAS%2BU12r3FaOvLTVWXsppum0Xb0XOokPmT%2Bqs%2FhONQ%2FiO82pXyygB7xiZVHTsNdSbZy8mwnNUbi0VU21ENTFiPAaXCY7xDXB2swHpeNil%2FlqDsvzjzssQZWohUEr8vlIUjGtw2iBY8HwNhjT6ST0OLHj3FfvY7FQwx1ut2KPvZhnSQ2MLcD4oUewCTE72MhakxFKpPH8Gg5YZX85pJg4Z71sO3RLgJdyup7YGSlCDKbmpTvj5pYQPyrw6%2Bum97P1XyqgzN3b3K7hX2HfqvCFzkCQFKhdIrvf3rER%2Bnhf2JVmMLs%2BR9Xp5A%2Bwvgdou5LtOJekYm0sLeVGsUzEQnbl6KMyN8Z8%2FuGuAdOVjA1jV6vgLwIi4TccVVPKUWE%2FfS8nKh6ulrjCjLqMQBeLAET31NBwi8GToESeG3W0DwLPE5sUge2UvMoIEsPWd9yJWZTNW9OETLfgoDmhW9UYctRSiLSeKmRAAqt12JZUq4YkGtc%3D",' +
+            '"verificationQRCode":null,' +
+            '"journal":"======== ОВО НИЈЕ ФИСКАЛНИ РАЧУН ======= \r\nRS111911206 \r\nNAVIPARTNER \r\nNAVIPARTNER \r\nХЕРОЈА МИЛАНА ТЕПИЋА 13 \r\nБеоград \r\nКасир: AAAA \r\nЕСИР број: 1230/1.0 \r\n-----------ПРЕДРАЧУН ПРОДАЈА------------ \r\nАртикли \r\n======================================== \r\nНазив Цена Кол. Укупно \r\nMilka,cizkejk (F) \r\n 730,00 1 730,00 \r\n---------------------------------------- \r\nУкупан износ: 730,00 \r\nДруго безготовинско плаћање: 0,00 \r\n======================================== \r\n ОВО НИЈЕ ФИСКАЛНИ РАЧУН \r\n======================================== \r\nОзнака Име Стопа Порез \r\nF ECAL 11,00% 72,34 \r\n---------------------------------------- \r\nУкупан износ пореза: 72,34 \r\n======================================== \r\nПФР време: 29.02.2024. 17:07:27 \r\nПФР број рачуна: YJLQTEQR-YJLQTEQR-92455 \r\nБројач рачуна: 25734/92455РП \r\n======================================== \r\n======== ОВО НИЈЕ ФИСКАЛНИ РАЧУН ======= \r\n",' +
+            '"messages":"Success",' +
+            '"signedBy":"YJLQTEQR",' +
+            '"encryptedInternalData":"G9fGp2Q3MmN2M4OUOgeIvpf9UcLh9yguy1zkwxxrAyfW9BlSYZ1JmXRBpN0qaJk89/gsQR2Fd3hBCGiau5NaxCsxSNGQbUImgG/gHRuw3EEUq7jhyiWHfxYnZ0/rcMmZUH9WV95QDbBq3pc5ZIKmOmFzxnv5NPFvrRz/x+SiaooNYnL5HomNOA+Uu1jw0HpxQDr/cpKAGvjhOxqP4T922qAEvlNdq9xWjry01Vl7KabptF29FzqJD5k/qrP4TjUP4jvNqV8soAe8YmVR07DXUm2cvJsJzVG4tFVNtRDUxYjwGlwmO8Q1wdrMB6XjYpf5ag7L8487LEGVqIVBK/L5SA==",' +
+            '"signature":"UjGtw2iBY8HwNhjT6ST0OLHj3FfvY7FQwx1ut2KPvZhnSQ2MLcD4oUewCTE72MhakxFKpPH8Gg5YZX85pJg4Z71sO3RLgJdyup7YGSlCDKbmpTvj5pYQPyrw6+um97P1XyqgzN3b3K7hX2HfqvCFzkCQFKhdIrvf3rER+nhf2JVmMLs+R9Xp5A+wvgdou5LtOJekYm0sLeVGsUzEQnbl6KMyN8Z8/uGuAdOVjA1jV6vgLwIi4TccVVPKUWE/fS8nKh6ulrjCjLqMQBeLAET31NBwi8GToESeG3W0DwLPE5sUge2UvMoIEsPWd9yJWZTNW9OETLfgoDmhW9UYctRSiA==",' +
+            '"totalCounter":92455,' +
+            '"transactionTypeCounter":25734,' +
+            '"totalAmount":730.0,' +
+            '"taxGroupRevision":8,' +
+            '"businessName":"NAVIPARTNER",' +
+            '"tin":"RS111911206",' +
+            '"locationName":"NAVIPARTNER",' +
+            '"address":"ХЕРОЈА МИЛАНА ТЕПИЋА 13",' +
+            '"district":"Београд",' +
+            '"mrc":"00-1002-YJLQTEQR"' +
+        '}';
+        sender.TestFillRSAuditFromNormalSaleAndRefundResponse(SalesHeader, ResponseText, false, true, StartTime);
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS Tax Communication Mgt.", 'OnBeforeSendHttpRequestForPrepaymentSaleDocument', '', false, false)]
+    local procedure OnBeforeSendHttpRequestForPrepaymentSaleDocument(sender: Codeunit "NPR RS Tax Communication Mgt."; var ResponseText: Text; var SalesInvoiceHeader: Record "Sales Invoice Header"; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+        ResponseText :=
+        '{' +
+            '"requestedBy":"YJLQTEQR",' +
+            '"sdcDateTime":"2024-02-29T17:07:27.4551405+01:00",' +
+            '"invoiceCounter":"25734/92455РП",' +
+            '"invoiceCounterExtension":"РП",' +
+            '"invoiceNumber":"YJLQTEQR-YJLQTEQR-92455",' +
+            '"taxItems":[' +
+                '{' +
+                    '"categoryType":0,' +
+                    '"label":"F",' +
+                    '"amount":72.3423,' +
+                    '"rate":11.00,' +
+                    '"categoryName":"ECAL"' +
+                '}' +
+            '],' +
+            '"verificationUrl":"https://sandbox.suf.purs.gov.rs/v/?vl=A1lKTFFURVFSWUpMUVRFUVInaQEAhmQAAKBjbwAAAAAAAAABjfWe498BAAAb18anZDcyY3Yzg5Q6B4i%2Bl%2F1RwuH3KC7LXOTDHGsDJ9b0GVJhnUmZdEGk3SpomTz3%2BCxBHYV3eEEIaJq7k1rEKzFI0ZBtQiaAb%2BAdG7DcQRSruOHKJYd%2FFidnT%2BtwyZlQf1ZX3lANsGrelzlkgqY6YXPGe%2Fk08W%2BtHP%2FH5KJqig1icvkeiY04D5S7WPDQenFAOv9ykoAa%2BOE7Go%2FhP3baoAS%2BU12r3FaOvLTVWXsppum0Xb0XOokPmT%2Bqs%2FhONQ%2FiO82pXyygB7xiZVHTsNdSbZy8mwnNUbi0VU21ENTFiPAaXCY7xDXB2swHpeNil%2FlqDsvzjzssQZWohUEr8vlIUjGtw2iBY8HwNhjT6ST0OLHj3FfvY7FQwx1ut2KPvZhnSQ2MLcD4oUewCTE72MhakxFKpPH8Gg5YZX85pJg4Z71sO3RLgJdyup7YGSlCDKbmpTvj5pYQPyrw6%2Bum97P1XyqgzN3b3K7hX2HfqvCFzkCQFKhdIrvf3rER%2Bnhf2JVmMLs%2BR9Xp5A%2Bwvgdou5LtOJekYm0sLeVGsUzEQnbl6KMyN8Z8%2FuGuAdOVjA1jV6vgLwIi4TccVVPKUWE%2FfS8nKh6ulrjCjLqMQBeLAET31NBwi8GToESeG3W0DwLPE5sUge2UvMoIEsPWd9yJWZTNW9OETLfgoDmhW9UYctRSiLSeKmRAAqt12JZUq4YkGtc%3D",' +
+            '"verificationQRCode":null,"journal":"======== ОВО НИЈЕ ФИСКАЛНИ РАЧУН ======= \r\nRS111911206 \r\nNAVIPARTNER \r\nNAVIPARTNER \r\nХЕРОЈА МИЛАНА ТЕПИЋА 13 \r\nБеоград \r\nКасир: AAAA \r\nЕСИР број: 1230/1.0 \r\n-----------ПРЕДРАЧУН ПРОДАЈА------------ \r\nАртикли \r\n======================================== \r\nНазив Цена Кол. Укупно \r\nMilka,cizkejk (F) \r\n 730,00 1 730,00 \r\n---------------------------------------- \r\nУкупан износ: 730,00 \r\nДруго безготовинско плаћање: 0,00 \r\n======================================== \r\n ОВО НИЈЕ ФИСКАЛНИ РАЧУН \r\n======================================== \r\nОзнака Име Стопа Порез \r\nF ECAL 11,00% 72,34 \r\n---------------------------------------- \r\nУкупан износ пореза: 72,34 \r\n======================================== \r\nПФР време: 29.02.2024. 17:07:27 \r\nПФР број рачуна: YJLQTEQR-YJLQTEQR-92455 \r\nБројач рачуна: 25734/92455РП \r\n======================================== \r\n======== ОВО НИЈЕ ФИСКАЛНИ РАЧУН ======= \r\n",' +
+            '"messages":"Success",' +
+            '"signedBy":"YJLQTEQR",' +
+            '"encryptedInternalData":"G9fGp2Q3MmN2M4OUOgeIvpf9UcLh9yguy1zkwxxrAyfW9BlSYZ1JmXRBpN0qaJk89/gsQR2Fd3hBCGiau5NaxCsxSNGQbUImgG/gHRuw3EEUq7jhyiWHfxYnZ0/rcMmZUH9WV95QDbBq3pc5ZIKmOmFzxnv5NPFvrRz/x+SiaooNYnL5HomNOA+Uu1jw0HpxQDr/cpKAGvjhOxqP4T922qAEvlNdq9xWjry01Vl7KabptF29FzqJD5k/qrP4TjUP4jvNqV8soAe8YmVR07DXUm2cvJsJzVG4tFVNtRDUxYjwGlwmO8Q1wdrMB6XjYpf5ag7L8487LEGVqIVBK/L5SA==",' +
+            '"signature":"UjGtw2iBY8HwNhjT6ST0OLHj3FfvY7FQwx1ut2KPvZhnSQ2MLcD4oUewCTE72MhakxFKpPH8Gg5YZX85pJg4Z71sO3RLgJdyup7YGSlCDKbmpTvj5pYQPyrw6+um97P1XyqgzN3b3K7hX2HfqvCFzkCQFKhdIrvf3rER+nhf2JVmMLs+R9Xp5A+wvgdou5LtOJekYm0sLeVGsUzEQnbl6KMyN8Z8/uGuAdOVjA1jV6vgLwIi4TccVVPKUWE/fS8nKh6ulrjCjLqMQBeLAET31NBwi8GToESeG3W0DwLPE5sUge2UvMoIEsPWd9yJWZTNW9OETLfgoDmhW9UYctRSiA==",' +
+            '"totalCounter":92455,' +
+            '"transactionTypeCounter":25734,' +
+            '"totalAmount":730.0,' +
+            '"taxGroupRevision":8,' +
+            '"businessName":"NAVIPARTNER",' +
+            '"tin":"RS111911206",' +
+            '"locationName":"NAVIPARTNER",' +
+            '"address":"ХЕРОЈА МИЛАНА ТЕПИЋА 13",' +
+            '"district":"Београд",' +
+            '"mrc":"00-1002-YJLQTEQR"' +
+        '}';
+        sender.TestFillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime);
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS Tax Communication Mgt.", 'OnBeforeSendHttpRequestForNormalRefund', '', false, false)]
+    local procedure OnBeforeSendHttpRequestForNormalRefund(sender: Codeunit "NPR RS Tax Communication Mgt."; var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; var ResponseText: Text; StartTime: DateTime; var IsHandled: Boolean)
+    begin
+        ResponseText := '{' +
+        '"requestedBy":"YJLQTEQR",' +
+        '"sdcDateTime":"2024-03-01T12:50:46.6401271+01:00",' +
+        '"invoiceCounter":"25659/92714ПР",' +
+        '"invoiceCounterExtension":"ПР",' +
+        '"invoiceNumber":"YJLQTEQR-YJLQTEQR-92714",' +
+        '"taxItems":[' +
+            '{' +
+                '"categoryType":0,' +
+                '"label":"F",' +
+                '"amount":72.3423,' +
+                '"rate":11.00,' +
+                '"categoryName":"ECAL"' +
+            '}' +
+        '],' +
+        '"verificationUrl":"https://sandbox.suf.purs.gov.rs/v/?vl=A1lKTFFURVFSWUpMUVRFUVIqagEAO2QAAKBjbwAAAAAAAAABjfnaQHAAAQBUMhGsOlJR4UKEBQXU6O5Eq395VCY%2FNWuM0RRv%2Fzlax26reAEGzpBI20glwBwBm8Cv1lSbtvHWJoXUJcEEfQJWA1CzN5gFy%2F3WkvqtDiTPH8cl0%2BjFEratYJU1jG3qy%2FQOyWy49TO0Ow10sizdY1SrFXB8Ag%2BBgnP1mnijDF53SlhT45cOIkDzfK%2FUxxmc4kpSPAArDBBerZUwyC%2FpOEWOxKmRwevcOy3oUHuxJU7sCcxKs4Uv1PUDef83iSa7V5iRpbAs5pEocmdlF1rXtuaHJVdf5IgFwfae5Xfx1WjPunJ6a1UUnZ8%2ByMPlU19jxAkU6tWLntMp0JwjNAJSacUkJvHMqncFt3uLQpNa8r4PGdkXRwtqrpCCkc35VrxnD4qkC6C8rrCjksCCL33ySFQ78zz30iiX%2Bolr2EzUwcVWo5O%2BfTpLhArnsbCowjrznzHskOxJDSe80II1HGlnIJo8%2B6XE%2BaQ971L%2FSeVO1OXTg6RPV7ar0JxiHcGOLI4EjgOgMnJq4kZKI9wspiOnl8B7mNAfNgL1eL0qW2v8UU7cwxdUiqmNSm4SSU9VzOoJuihLNnkecih0h57i8q30ofOQig3Bb3pJUvXzHSWexHucy7KSmOUS5cy9yeXJNkBm8KSYeymJ0GpE0%2BKK4CKgFzEowWz%2BN3Ig2Rxv2osyIVYdhpCmVFjkdCXdWhkSe7hzwRQ%3D",' +
+        '"verificationQRCode":null,' +
+        '"journal":"============ ФИСКАЛНИ РАЧУН ============ \r\nRS111911206 \r\nNAVIPARTNER \r\nNAVIPARTNER \r\nХЕРОЈА МИЛАНА ТЕПИЋА 13 \r\nБеоград \r\nКасир: GU00000120 \r\nЕСИР број: 1230/1.0 \r\nРеф. број: YJLQTEQR-YJLQTEQR-92713 \r\nРеф. време: 01.03.2024. 12:48:11 \r\n-----------ПРОМЕТ РЕФУНДАЦИЈА----------- \r\nАртикли \r\n======================================== \r\nНазив Цена Кол. Укупно \r\nMilka,cizkejk (F) \r\n 730,00 1 -730,00 \r\n---------------------------------------- \r\nУкупна рефундација: 730,00 \r\nГотовина: 730,00 \r\n======================================== \r\nОзнака Име Стопа Порез \r\nF ECAL 11,00% 72,34 \r\n---------------------------------------- \r\nУкупан износ пореза: 72,34 \r\n======================================== \r\nПФР време: 01.03.2024. 12:50:46 \r\nПФР број рачуна: YJLQTEQR-YJLQTEQR-92714 \r\nБројач рачуна: 25659/92714ПР \r\n======================================== \r\n======== КРАЈ ФИСКАЛНОГ РАЧУНА =========\r\n",' +
+        '"messages":"Success",' +
+        '"signedBy":"YJLQTEQR",' +
+        '"encryptedInternalData":"VDIRrDpSUeFChAUF1OjuRKt/eVQmPzVrjNEUb/85Wsduq3gBBs6QSNtIJcAcAZvAr9ZUm7bx1iaF1CXBBH0CVgNQszeYBcv91pL6rQ4kzx/HJdPoxRK2rWCVNYxt6sv0DslsuPUztDsNdLIs3WNUqxVwfAIPgYJz9Zp4owxed0pYU+OXDiJA83yv1McZnOJKUjwAKwwQXq2VMMgv6ThFjsSpkcHr3Dst6FB7sSVO7AnMSrOFL9T1A3n/N4kmu1eYkaWwLOaRKHJnZRda17bmhyVXX+SIBcH2nuV38dVoz7pyemtVFJ2fPsjD5VNfY8QJFOrVi57TKdCcIzQCUmnFJA==",' +
+        '"signature":"JvHMqncFt3uLQpNa8r4PGdkXRwtqrpCCkc35VrxnD4qkC6C8rrCjksCCL33ySFQ78zz30iiX+olr2EzUwcVWo5O+fTpLhArnsbCowjrznzHskOxJDSe80II1HGlnIJo8+6XE+aQ971L/SeVO1OXTg6RPV7ar0JxiHcGOLI4EjgOgMnJq4kZKI9wspiOnl8B7mNAfNgL1eL0qW2v8UU7cwxdUiqmNSm4SSU9VzOoJuihLNnkecih0h57i8q30ofOQig3Bb3pJUvXzHSWexHucy7KSmOUS5cy9yeXJNkBm8KSYeymJ0GpE0+KK4CKgFzEowWz+N3Ig2Rxv2osyIVYdhg==",' +
+        '"totalCounter":92714,' +
+        '"transactionTypeCounter":25659,' +
+        '"totalAmount":730.0,' +
+        '"taxGroupRevision":8,' +
+        '"businessName":"NAVIPARTNER",' +
+        '"tin":"RS111911206",' +
+        '"locationName":"NAVIPARTNER",' +
+        '"address":"ХЕРОЈА МИЛАНА ТЕПИЋА 13",' +
+        '"district":"Београд",' +
+        '"mrc":"00-1002-YJLQTEQR"' +
+        '}';
+        sender.TestFillRSAuditFromNormalSaleAndRefundResponse(RSPOSAuditLogAuxInfo, ResponseText, StartTime);
+        IsHandled := true;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RS Tax Communication Mgt.", 'OnBeforeSendHttpRequestForVerifyPin', '', false, false)]
     local procedure OnBeforeSendHttpRequestForVerifyPin(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean);
     var
