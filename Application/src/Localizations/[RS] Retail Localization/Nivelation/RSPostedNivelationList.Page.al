@@ -19,32 +19,32 @@ page 6151095 "NPR RS Posted Nivelation List"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the No. field.';
+                    ToolTip = 'Specifies the Item Number.';
                 }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Type field.';
+                    ToolTip = 'Specifies the Nivelation Type.';
                 }
                 field("Source Type"; Rec."Source Type")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Source Type field.';
+                    ToolTip = 'Specifies the Nivelation Source Type.';
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Posting Date field.';
+                    ToolTip = 'Specifies the Posting Date.';
                 }
                 field("Referring Document Code"; Rec."Referring Document Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Referring Document Code field.';
+                    ToolTip = 'Specifies the Referring Document Code.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the value of the Amount field.';
+                    ToolTip = 'Specifies the total value to be adjusted.';
                 }
             }
         }

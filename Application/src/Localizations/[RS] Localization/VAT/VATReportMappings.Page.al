@@ -17,12 +17,12 @@ page 6059931 "NPR VAT Report Mappings"
             {
                 field("Code"; Rec."Code")
                 {
-                    ToolTip = 'Specifies the value of the Code field.';
+                    ToolTip = 'Specifies the field number in POPDV report.';
                     ApplicationArea = NPRRSLocal;
                 }
                 field(Description; Rec.Description)
                 {
-                    ToolTip = 'Specifies the value of the Description field.';
+                    ToolTip = 'Specifies the Description of the given POPDV Report field.';
                     ApplicationArea = NPRRSLocal;
                 }
             }
