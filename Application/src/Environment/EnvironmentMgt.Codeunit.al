@@ -46,7 +46,7 @@ codeunit 6060025 "NPR Environment Mgt."
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         if EnvironmentInformation.IsSaaS() then
-            exit(false);
+            exit(EnvironmentInformation.IsSandbox());
 
         if EnvironmentInfo.Get() then
             exit((EnvironmentInfo."Environment Type" = "NPR Environment Type"::DEMO) and EnvironmentInfo."Environment Verified");
