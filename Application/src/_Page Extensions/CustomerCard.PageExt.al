@@ -58,6 +58,25 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 }
             }
         }
+        addlast(Invoicing)
+        {
+            group("NPR LotteryCode")
+            {
+                Caption = 'IT Lottery Information';
+
+                field("NPR IT Customer Lottery Code"; ITAuxCustomer."NPR IT Customer Lottery Code")
+                {
+                    Caption = 'IT Lottery Code';
+                    ApplicationArea = NPRITFiscal;
+                    ToolTip = 'Specifies the value of the IT Lottery Code field.';
+                    trigger OnValidate()
+                    begin
+                        ITAuxCustomer.Validate("NPR IT Customer Lottery Code");
+                        ITAuxCustomer.SaveITAuxCustomerFields();
+                    end;
+                }
+            }
+        }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
 #IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
@@ -231,6 +250,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         ReasonText: Text;
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
         ToAnonymizeEditable: Boolean;
+        ITAuxCustomer: Record "NPR IT Aux Customer";
 
     trigger OnAfterGetRecord()
     begin
@@ -241,6 +261,8 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 ToAnonymizeEditable := false;
         Rec.CalcFields("NPR Total Sales POS", "Sales (LCY)");
         Rec."NPR Total Sales" := Rec."NPR Total Sales POS" + Rec."Sales (LCY)";
+
+        ITAuxCustomer.ReadITAuxCustomerFields(Rec);
     end;
 
 
