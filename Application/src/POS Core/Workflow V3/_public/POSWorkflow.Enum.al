@@ -991,6 +991,26 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'VIPPS_MOBILEPAY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Vipps Mp";
     }
+    value(203; "IT_PRINT_MGT")
+    {
+        Caption = 'IT_PRINT_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: IT FP Mgt.";
+    }
+    value(204; "IT_EJ_REPORT")
+    {
+        Caption = 'IT_EJ_REPORT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: IT EJ Report";
+    }
+    value(205; "IT_LOTT_CODE")
+    {
+        Caption = 'IT_LOTT_CODE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: IT In. Lottery";
+    }
+    value(206; "IT_CASH_MGT")
+    {
+        Caption = 'IT_CASH_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: IT FP Cash Mgt";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;
