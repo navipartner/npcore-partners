@@ -30,6 +30,10 @@ query 6014430 "NPR Item Sales Postings"
                 Method = Sum;
                 ReverseSign = true;
             }
+            column(CostAmountActual; "Cost Amount (Actual)")
+            {
+                Method = Sum;
+            }
             column(CostAmountNonInvtbl; "Cost Amount (Non-Invtbl.)") { Method = Sum; }
 
             dataitem(Item; Item)
