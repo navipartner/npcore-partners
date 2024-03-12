@@ -105,11 +105,16 @@
         EnvironmentInformation: Codeunit "Environment Information";
         AzureAdTenant: Codeunit "Azure AD Tenant";
         PosUnits: Integer;
+        AzureAdTenantId: Text;
+        IsSaas: Boolean;
     begin
+        IsSaas := EnvironmentInformation.IsSaaS(); //Just hardcode this to true if you want to simulate SaaS on container
+        AzureAdTenantId := AzureAdTenant.GetAadTenantId(); //Just hardcode this to some AD ID if you want to simulate SaaS on container, otherwise it will be 'common'
+
         PosUnit.SetFilter(Status, '<>%1', PosUnit.Status::INACTIVE);
         PosUnits := PosUnit.Count();
-        if EnvironmentInformation.IsSaaS() then begin
-            InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
+        if IsSaas then begin
+            InitSaasTenantDiagnostic(AzureAdTenantId, SaaSTenantDiagnostic);
 
             if SaaSTenantDiagnostic."POS Units" = PosUnits then
                 exit;
@@ -166,11 +171,16 @@
         EnvironmentInformation: Codeunit "Environment Information";
         AzureAdTenant: Codeunit "Azure AD Tenant";
         PosStores: Integer;
+        AzureAdTenantId: Text;
+        IsSaas: Boolean;
     begin
+        IsSaas := EnvironmentInformation.IsSaaS(); //Just hardcode this to true if you want to simulate SaaS on container
+        AzureAdTenantId := AzureAdTenant.GetAadTenantId(); //Just hardcode this to some AD ID if you want to simulate SaaS on container, otherwise it will be 'common'
+
         PosStore.SetRange(Inactive, false);
         PosStores := PosStore.Count();
-        if EnvironmentInformation.IsSaaS() then begin
-            InitSaasTenantDiagnostic(AzureAdTenant.GetAadTenantId(), SaaSTenantDiagnostic);
+        if IsSaas then begin
+            InitSaasTenantDiagnostic(AzureAdTenantId, SaaSTenantDiagnostic);
             if SaaSTenantDiagnostic."POS Stores" = PosStores then
                 exit;
 
@@ -200,8 +210,8 @@
             TenantDiagnostic.DeleteAll();
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Company, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure ClearPosUnitAndStoresData_OnAfterDeleteCompany(RunTrigger: Boolean; Rec: Record Company)
+    [EventSubscriber(ObjectType::Table, Database::Company, 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure ClearPosUnitAndStoresData_OnBeforeDeleteCompany(RunTrigger: Boolean; Rec: Record Company)
     var
         EnvironmentInformation: Codeunit "Environment Information";
         AzureAdTenant: Codeunit "Azure AD Tenant";
