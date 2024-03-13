@@ -5,6 +5,24 @@ codeunit 6184689 "NPR TM ImportTicketControl"
     var
         MandatoryKeyMissing: Label 'Expected and mandatory key "%1" missing in object.';
 
+    internal procedure ImportAndCreate(TicketJson: JsonObject) JobId: Code[40]
+    var
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        ImportTicket: Codeunit "NPR TM ImportTicketWorker";
+        StartTime: Time;
+        ImportDuration: Duration;
+    begin
+        JobId := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(JobId));
+        MapTicketJsonToTempTable(TicketJson, JobId, TempTicketImport, TempTicketImportLine);
+
+        ImportTicket.SetImportBuffer(TempTicketImport, TempTicketImportLine);
+        StartTime := Time;
+        ImportTicket.Import();
+        ImportDuration := Time() - StartTime;
+        LogImport(JobId, '', ImportDuration, TempTicketImportLine.Count(), true, '');
+    end;
+
     internal procedure ImportTicketsFromFile(Preview: Boolean) JobId: Code[40]
     var
         TempBlob: Codeunit "Temp Blob";
