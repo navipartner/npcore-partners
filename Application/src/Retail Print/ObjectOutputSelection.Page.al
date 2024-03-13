@@ -6,7 +6,7 @@ page 6014580 "NPR Object Output Selection"
     SourceTable = "NPR Object Output Selection";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    ContextSensitiveHelpPage = 'docs/retail/printing/print_template_output_setup/';
+    ContextSensitiveHelpPage = 'docs/retail/printing/print_template_setup/';
 
 
     layout

@@ -3,6 +3,7 @@ page 6060102 "NPR POS Layouts"
     Extensible = False;
     ApplicationArea = NPRRetail;
     Caption = 'POS Layouts';
+    ContextSensitiveHelpPage = 'docs/retail/pos_layout/how-to/activate_pos_editor/';
     PageType = List;
     SourceTable = "NPR POS Layout";
     UsageCategory = Administration;
