@@ -2,7 +2,7 @@ page 6059862 "NPR HWC Printers"
 {
     Extensible = false;
     PageType = List;
-    ContextSensitiveHelpPage = 'docs/retail/printing/print_template_output_setup/';
+    ContextSensitiveHelpPage = 'docs/retail/printing/printing_module_setup/';
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     DelayedInsert = true;
@@ -17,7 +17,7 @@ page 6059862 "NPR HWC Printers"
             {
                 field(ID; Rec.ID)
                 {
-                    ToolTip = 'The ID of the printed used for printer selection internally';
+                    ToolTip = 'The ID of the printer used for printer selection internally';
                     ApplicationArea = NPRRetail;
                 }
                 field(Name; Rec.Name)
