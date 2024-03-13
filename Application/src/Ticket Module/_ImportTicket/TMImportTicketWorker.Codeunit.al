@@ -107,13 +107,12 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
     local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; var ResponseMessage: Text) Success: Boolean
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
-        TicketResponse: Record "NPR TM Ticket Reserv. Resp.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketWebRequestManager: Codeunit "NPR TM Ticket WebService Mgr";
         ExternalId: List of [Integer];
         ResolvingTable: Integer;
+        ResponseCode: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
     begin
         TicketRequest.Init();
@@ -156,14 +155,9 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest.Insert();
 
         ExternalId.Add(TicketRequest."Ext. Line Reference No.");
-        TicketWebRequestManager.FinalizeTicketReservation(TicketRequest."Session Token ID", ExternalId);
 
-        TicketResponse.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
-        TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
-        if (TicketResponse.FindFirst()) then begin
-            ResponseMessage := TicketResponse."Response Message";
-            Success := TicketResponse.Status;
-        end;
+        ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(TicketRequest."Session Token ID", true, ResponseMessage);
+        Success := ResponseCode = 0;
     end;
 
     local procedure Archive(Token: Text[100]; TokenLine: Integer; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)

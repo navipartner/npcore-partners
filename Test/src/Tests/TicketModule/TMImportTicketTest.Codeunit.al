@@ -471,6 +471,34 @@ codeunit 85174 "NPR TM ImportTicketTest"
         ValidateReservationTimeSlot(JobId, 'PM');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ImportOrdersCheckCommitBehavior()
+    var
+        ItemNo: Code[20];
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        ResponseMessage: Text;
+        Success: Boolean;
+        JobId: Code[40];
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Schedules: Dictionary of [Code[20], Time];
+        EventTime: Time;
+        Assert: Codeunit Assert;
+    begin
+        ItemNo := SelectImportTestScenario(Schedules);
+        Schedules.Get('ALL_DAY', EventTime);
+
+        CreateTicketsToImport(ItemNo, Today(), CalcDate('<+5D>'), EventTime, 5, 3, true, TempTicketImport, TempTicketImportLine);
+        JobId := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine));
+
+        ValidateLog(JobId, true, 5 * 3, ResponseMessage);
+        ValidateHeader(JobId, true, TempTicketImport);
+        ValidateLine(JobId, true, TempTicketImportLine);
+        ValidateTickets(JobId);
+        ValidateArrival(JobId);
+    end;
+
     local procedure ValidateLog(JobIdTest: Code[40]; Success: Boolean; TotalTicketCount: Integer; ResponseMessage: Text)
     var
         Log: Record "NPR TM ImportTicketLog";
