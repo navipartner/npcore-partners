@@ -19,4 +19,13 @@ codeunit 6184690 "NPR TM Import Ticket Facade"
         exit(ImportTicket.ImportTicketFromJson(TicketJson, Preview, ResponseMessage, JobId));
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure ImportTicketsFromJson(TicketJson: JsonObject) JobId: Code[40]
+    var
+        ImportTicket: Codeunit "NPR TM ImportTicketControl";
+    begin
+        JobId := ImportTicket.ImportAndCreate(TicketJson);
+    end;
+
+
 }
