@@ -186,6 +186,8 @@
     end;
 
     local procedure GetAuthorization(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup"; var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary)
+    var
+        POSSalesInfo: Record "NPR MM POS Sales Info";
     begin
 
         TmpTransactionAuthorization."Entry No." := 1;
@@ -199,6 +201,12 @@
         TmpTransactionAuthorization."Transaction Time" := EFTTransactionRequest."Transaction Time";
         TmpTransactionAuthorization."Company Name" := CopyStr(DATABASE.CompanyName, 1, MaxStrLen(TmpTransactionAuthorization."Company Name"));
         TmpTransactionAuthorization."Retail Id" := EFTTransactionRequest."Sales ID";
+
+        POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::HEADER);
+        POSSalesInfo.SetFilter("Receipt No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
+        if (POSSalesInfo.FindFirst()) then
+            TmpTransactionAuthorization."Card Number" := CopyStr(POSSalesInfo."Scanned Card Data", 1, MaxStrLen(TmpTransactionAuthorization."Card Number"));
+
         TmpTransactionAuthorization.Insert();
     end;
 
@@ -886,6 +894,7 @@
 
         exit(true);
     end;
+
     internal procedure CreateRegisterSaleTestXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
     begin
 
