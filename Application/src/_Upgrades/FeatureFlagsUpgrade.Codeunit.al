@@ -4,9 +4,12 @@ codeunit 6151517 "NPR Feature Flags Upgrade"
     Subtype = Upgrade;
 
     trigger OnUpgradePerCompany()
+    var
+        FeatureFlagsInstall: Codeunit "NPR Feature Flags Install";
     begin
         CleanAndRecreateGetFeatureFlagJobQueueEntry();
         PrepareFeatureFlags();
+        FeatureFlagsInstall.PrepareStandardFeatureFlags();  //MS standard feature flag handling
     end;
 
     local procedure PrepareFeatureFlags()
