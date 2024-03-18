@@ -645,6 +645,11 @@
                     'UpdateStandardExchangeRateForBalancing':
                         exit('NPR-UpdateStandardExchangeRateForBalancing-20240304');
                 end;
+            Codeunit::"NPR Shipping Provider Upgrade":
+                case UpgradeStep of
+                    'UpgradeShippingProviderCodePackageShippingAgent':
+                        exit('NPR-UpgradeShippingProviderCodePackageShippingAgent-20240314');
+                end;
         end;
     end;
 }

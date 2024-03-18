@@ -198,6 +198,21 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Online Connect file Path';
             DataClassification = CustomerContent;
         }
+        field(202; "Default Height"; Decimal)
+        {
+            Caption = 'Default Height';
+            DataClassification = CustomerContent;
+        }
+        field(203; "Default Length"; Decimal)
+        {
+            Caption = 'Default Length';
+            DataClassification = CustomerContent;
+        }
+        field(204; "Default Width"; Decimal)
+        {
+            Caption = 'Default Width';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

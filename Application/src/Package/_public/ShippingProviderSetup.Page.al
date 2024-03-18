@@ -140,6 +140,25 @@ page 6014574 "NPR Shipping Provider Setup"
                     ToolTip = 'Specifies the value of the Default Weight field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Default Height"; Rec."Default Height")
+                {
+
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Default Height field.';
+                }
+
+                field("Default Length"; Rec."Default Length")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Default Length field.';
+                }
+
+                field("Default Width"; Rec."Default Width")
+                {
+
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Default Width field.';
+                }
                 field("Use Pakkelable Printer API"; Rec."Use Pakkelable Printer API")
                 {
 
