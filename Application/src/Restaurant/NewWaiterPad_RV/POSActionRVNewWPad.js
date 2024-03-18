@@ -1,13 +1,6 @@
-let main = async ({ workflow, context, captions }) => {
+let main = async ({ workflow, context }) => {
     await workflow.respond("checkSeating");
-    
-    let newWaiterpad = {
-        "caption": captions.Welcome, "title": captions.NewWaiterpad, "settings": [
-            { "type": "plusminus", "id": "guests", "caption": captions.NumberOfGuests, "minvalue": 0, "maxvalue": 100, "value": context.defaultNumberOfGuests },
-            { "type": "text", "id": "tablename", "caption": captions.Name },]
-    };
-
-    context.waiterpadInfo = await popup.configuration(newWaiterpad);
+    context.waiterpadInfo = await popup.configuration(context.waiterpadInfoConfig);
     if (context.waiterpadInfo) {
         await workflow.respond();
     }

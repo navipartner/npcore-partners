@@ -27,10 +27,10 @@ let main = async ({ workflow, popup, parameters, context, captions }) => {
         if (!result) { return };
     };
 
-    //Ask for number of guests
-    if (parameters.AskForNumberOfGuests) {
-        context.numberOfGuests = await popup.numpad({ caption: captions.NumberOfGuestsLabel, value: context.defaultNumberOfGuests });
-        if (context.numberOfGuests === null) { return }
+    //Ask for customer info
+    if (context.requestCustomerInfo) {
+        context.waiterpadInfo = await popup.configuration(context.waiterpadInfoConfig);
+        if (context.waiterpadInfo === null) { return };
     }
 
     //New waiter pad

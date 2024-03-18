@@ -361,6 +361,12 @@
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemID';
         }
+        field(180; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
         field(200; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';

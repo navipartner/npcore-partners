@@ -1593,7 +1593,12 @@
             Caption = 'Parent BOM Line No.';
             DataClassification = CustomerContent;
         }
-
+        field(6120; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
         field(7014; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';

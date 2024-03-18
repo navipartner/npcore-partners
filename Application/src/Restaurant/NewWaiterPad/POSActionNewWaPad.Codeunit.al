@@ -26,11 +26,18 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         ParamOpenWaiterPad_DescLbl: Label 'Open waiter pad after creation.';
         ParamAskForNumberOfGuests_CptLbl: Label 'Ask for number of guests';
         ParamAskForNumberOfGuests_DescLbl: Label 'Ask for number of guests before ne waiter pad is created.';
+        ParamAskForCustomerEmail_CptLbl: Label 'Request customer email';
+        ParamAskForCustomerEmail_DescLbl: Label 'Ask for customer email address.';
+        ParamAskForCustomerName_CptLbl: Label 'Request customer name';
+        ParamAskForCustomerName_DescLbl: Label 'Ask for customer name.';
+        ParamAskForCustomerPhoneNo_CptLbl: Label 'Request customer phone No.';
+        ParamAskForCustomerPhoneNo_DescLbl: Label 'Ask for customer phone number.';
         ParamUseSeatingFromContext_CptLbl: Label 'Use seating from context';
         ParamUseSeatingFromContext_DescLbl: Label 'Use seating code from context.';
+        ParamHideConfirmDialog_CptLbl: Label 'Hide Confirmation';
+        ParamHideConfirmDialog_DescLbl: Label 'Hide the confirmation dialog about the number of existing waiter pads for the seating.';
         ConfirmLbl: Label 'Open new waiter pad?';
         ActionMessageLbl: Label 'New Waiter Pad';
-        NumberOfGuestsLbl: Label 'Number of guests';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -46,23 +53,24 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('LocationFilter', '', ParamLocationFilter_CptLbl, ParamLocationFilter_DescLbl);
         WorkflowConfig.AddBooleanParameter('OpenWaiterPad', false, ParamOpenWaiterPad_CptLbl, ParamOpenWaiterPad_DescLbl);
         WorkflowConfig.AddBooleanParameter('AskForNumberOfGuests', false, ParamAskForNumberOfGuests_CptLbl, ParamAskForNumberOfGuests_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerName', false, ParamAskForCustomerName_CptLbl, ParamAskForCustomerName_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerPhone', false, ParamAskForCustomerPhoneNo_CptLbl, ParamAskForCustomerPhoneNo_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerEmail', false, ParamAskForCustomerEmail_CptLbl, ParamAskForCustomerEmail_DescLbl);
         WorkflowConfig.AddBooleanParameter('UseSeatingFromContext', false, ParamUseSeatingFromContext_CptLbl, ParamUseSeatingFromContext_DescLbl);
+        WorkflowConfig.AddBooleanParameter('HideConfirmDialog', false, ParamHideConfirmDialog_CptLbl, ParamHideConfirmDialog_DescLbl);
         WorkflowConfig.AddLabel('InputTypeLabel', NPRESeating.TableCaption);
         WorkflowConfig.AddLabel('ConfirmLabel', ConfirmLbl);
         WorkflowConfig.AddLabel('ActionMessageLabel', ActionMessageLbl);
-        WorkflowConfig.AddLabel('NumberOfGuestsLabel', NumberOfGuestsLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
-        POSSession: Codeunit "NPR POS Session";
     begin
         case Step of
             'addPresetValuesToContext':
-                AddPresetValuesToContext(Context, POSSession);
+                AddPresetValuesToContext(Context, Sale, Setup);
             'seatingInput':
                 SeatingInput(Context);
-            'SetNumberOfGuests':
+            'setNumberOfGuests':
                 SetNumberOfGuests(Context);
             'newWaiterPad':
                 NewWaiterPad(Context, Sale);
@@ -73,14 +81,13 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     var
         Seating: Record "NPR NPRE Seating";
         BusinessLogic: Codeunit "NPR POSAction New Wa. Pad-B";
-        POSActRVNewWPadB: Codeunit "NPR POSAct. RV New WPad-B";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         ConfirmString: Text;
     begin
         WaiterPadPOSMgt.FindSeating(Context, Seating);
-
         Context.SetContext('seatingCode', Seating.Code);
-        Context.SetContext('defaultNumberOfGuests', POSActRVNewWPadB.GetDefaultNumberOfGuests(Seating.Code));
+        if HideConfirmDialog(Context) then
+            exit;
         ConfirmString := BusinessLogic.GetSeatingConfirmString(Seating);
         if ConfirmString <> '' then
             Context.SetContext('confirmString', ConfirmString);
@@ -93,43 +100,100 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
 
     local procedure NewWaiterPad(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
     var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
         BusinessLogic: Codeunit "NPR POSAction New Wa. Pad-B";
+        CustomerDetails: Dictionary of [Text, Text];
         SeatingCode: Code[20];
-        NumberOfGuests: Integer;
         ActionMessage: Text;
         OpenWaiterPad: Boolean;
     begin
         SeatingCode := CopyStr(Context.GetString('seatingCode'), 1, MaxStrLen(SeatingCode));
-        if not Context.GetInteger('numberOfGuests', NumberOfGuests) then
-            NumberOfGuests := 0;
         if not Context.GetBooleanParameter('OpenWaiterPad', OpenWaiterPad) then
             OpenWaiterPad := false;
 
-        BusinessLogic.NewWaiterPad(Sale, SeatingCode, NumberOfGuests, OpenWaiterPad, ActionMessage);
+        CustomerDetails.Add(WaiterPad.FieldName(Description), TableName(Context));
+        CustomerDetails.Add(WaiterPad.FieldName("Customer Phone No."), PhoneNo(Context));
+        CustomerDetails.Add(WaiterPad.FieldName("Customer E-Mail"), Email(Context));
+        BusinessLogic.NewWaiterPad(Sale, SeatingCode, CustomerDetails, PartySize(Context), OpenWaiterPad, ActionMessage);
 
-        if not OpenWaiterPad and (ActionMessage <> '') then
+        if not OpenWaiterPad and (ActionMessage <> '') and not HideConfirmDialog(Context) then
             Context.SetContext('actionMessage', ActionMessage);
     end;
 
-    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session")
+    local procedure HideConfirmDialog(Context: Codeunit "NPR POS JSON Helper"): Boolean
+    var
+        ParamValue: Boolean;
+    begin
+        if not Context.GetBooleanParameter('HideConfirmDialog', ParamValue) then
+            ParamValue := false;
+        exit(ParamValue);
+    end;
+
+    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"; POSSetup: Codeunit "NPR POS Setup")
     var
         SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
-        POSActRVNewWPadB: Codeunit "NPR POSAct. RV New WPad-B";
-        POSSale: Codeunit "NPR POS Sale";
-        POSSetup: Codeunit "NPR POS Setup";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        WaiterpadInfoConfig: JsonObject;
+        AskForNumberOfGuests: Boolean;
+        RequestCustomerName: Boolean;
+        RequestCustomerPhone: Boolean;
+        RequestCustomerEmail: Boolean;
     begin
-        POSSession.GetSetup(POSSetup);
-        POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-
         Context.SetContext('restaurantCode', POSSetup.RestaurantCode());
-
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
             Context.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-            Context.SetContext('defaultNumberOfGuests', POSActRVNewWPadB.GetDefaultNumberOfGuests(SalePOS."NPRE Pre-Set Seating Code"));
         end;
+
+        if Context.GetBooleanParameter('AskForNumberOfGuests', AskForNumberOfGuests) then;
+        if Context.GetBooleanParameter('RequestCustomerName', RequestCustomerName) then;
+        if Context.GetBooleanParameter('RequestCustomerPhone', RequestCustomerPhone) then;
+        if Context.GetBooleanParameter('RequestCustomerEmail', RequestCustomerEmail) then;
+        if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, AskForNumberOfGuests, RequestCustomerName, RequestCustomerPhone, RequestCustomerEmail, WaiterpadInfoConfig) then begin
+            Context.SetContext('requestCustomerInfo', true);
+            Context.SetContext('waiterpadInfoConfig', WaiterpadInfoConfig);
+        end else
+            Context.SetContext('requestCustomerInfo', false);
+    end;
+
+    local procedure TableName(Context: Codeunit "NPR POS JSON Helper"): Text
+    begin
+        exit(GetConfigurableOption(Context, 'waiterpadInfo', 'tablename'));
+    end;
+
+    local procedure PhoneNo(Context: Codeunit "NPR POS JSON Helper"): Text
+    begin
+        exit(GetConfigurableOption(Context, 'waiterpadInfo', 'phoneNo'));
+    end;
+
+    local procedure Email(Context: Codeunit "NPR POS JSON Helper"): Text
+    begin
+        exit(GetConfigurableOption(Context, 'waiterpadInfo', 'email'));
+    end;
+
+    local procedure PartySize(Context: Codeunit "NPR POS JSON Helper"): Integer
+    var
+        NumberOfGuests: Integer;
+    begin
+        if not Evaluate(NumberOfGuests, GetConfigurableOption(Context, 'waiterpadInfo', 'guests')) then
+            NumberOfGuests := 1;
+        exit(NumberOfGuests);
+    end;
+
+    local procedure GetConfigurableOption(Context: Codeunit "NPR POS JSON Helper"; Scope: Text; "Key": Text): Text
+    var
+        ResultOut: text;
+    begin
+        Context.SetScopeRoot();
+        if not Context.TrySetScope(Scope) then
+            exit('');
+
+        if Context.GetString("Key", ResultOut) then
+            exit(ResultOut)
+        else
+            exit('');
     end;
 
     local procedure ThisExtension(): Text
@@ -216,7 +280,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionNewWaPad.js###
-'let main=async({workflow:n,popup:a,parameters:i,context:e,captions:s})=>{if(await n.respond("addPresetValuesToContext"),!e.seatingCode||!i.UseSeatingFromContext)if(e.seatingCode="",i.FixedSeatingCode)e.seatingCode=i.FixedSeatingCode;else switch(i.InputType+""){case"0":e.seatingCode=await a.input({caption:s.InputTypeLabel});break;case"1":e.seatingCode=await a.numpad({caption:s.InputTypeLabel});break;case"2":await n.respond("seatingInput");break}!e.seatingCode||e.confirmString&&(result=await a.confirm({title:s.ConfirmLabel,caption:e.confirmString}),!result)||i.AskForNumberOfGuests&&(e.numberOfGuests=await a.numpad({caption:s.NumberOfGuestsLabel,value:e.defaultNumberOfGuests}),e.numberOfGuests===null)||(e.seatingCode&&await n.respond("newWaiterPad"),e.actionMessage&&a.message({title:s.ActionMessageLabel,caption:e.actionMessage}))};'
+'let main=async({workflow:s,popup:a,parameters:e,context:i,captions:n})=>{if(await s.respond("addPresetValuesToContext"),!i.seatingCode||!e.UseSeatingFromContext)if(i.seatingCode="",e.FixedSeatingCode)i.seatingCode=e.FixedSeatingCode;else switch(e.InputType+""){case"0":i.seatingCode=await a.input({caption:n.InputTypeLabel});break;case"1":i.seatingCode=await a.numpad({caption:n.InputTypeLabel});break;case"2":await s.respond("seatingInput");break}!i.seatingCode||i.confirmString&&(result=await a.confirm({title:n.ConfirmLabel,caption:i.confirmString}),!result)||i.requestCustomerInfo&&(i.waiterpadInfo=await a.configuration(i.waiterpadInfoConfig),i.waiterpadInfo===null)||(i.seatingCode&&await s.respond("newWaiterPad"),i.actionMessage&&a.message({title:n.ActionMessageLabel,caption:i.actionMessage}))};'
         );
     end;
 }

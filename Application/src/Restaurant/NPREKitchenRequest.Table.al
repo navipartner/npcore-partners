@@ -30,11 +30,12 @@
         {
             Caption = 'Production Status';
             DataClassification = CustomerContent;
+            ValuesAllowed = "Not Started", Started, "On Hold", Finished, Cancelled;
         }
         field(45; "Station Production Status"; Enum "NPR NPRE K.Req.L. Prod.Status")
         {
             Caption = 'Station Production Status';
-            ValuesAllowed = "Not Started", Started, Finished, Cancelled;
+            ValuesAllowed = "Not Started", Pending, Started, Finished, Cancelled;
             Editable = false;
             FieldClass = FlowField;
             CalcFormula = lookup("NPR NPRE Kitchen Req. Station"."Production Status"
@@ -202,6 +203,18 @@
             Caption = 'On Hold';
             DataClassification = CustomerContent;
         }
+        field(180; "Parent Request No."; BigInteger)
+        {
+            Caption = 'Request No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Kitchen Request";
+        }
+        field(190; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
         field(1000; "Kitchen Station Filter"; Code[20])
         {
             Caption = 'Kitchen Station Filter';
@@ -264,19 +277,21 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1130; "Modifications Exist"; Boolean)
+        {
+            CalcFormula = exist("NPR NPRE Kitchen Req. Modif." where("Request No." = field("Request No.")));
+            Caption = 'Modifications Exist"';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
     {
-        key(Key1; "Request No.")
-        {
-        }
-        key(Key2; "Order ID")
-        {
-        }
-        key(Key3; "Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time")
-        {
-        }
+        key(Key1; "Request No.") { }
+        key(Key2; "Order ID") { }
+        key(Key3; "Restaurant Code", "Line Status", Priority, "Order ID", "Created Date-Time") { }
+        key(Key4; "Parent Request No.", "Line Status") { }
     }
 
     trigger OnDelete()
@@ -324,15 +339,43 @@
     end;
 
     internal procedure InitFromWaiterPadLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        ParentKitchenRequest: Record "NPR NPRE Kitchen Request";
     begin
         Init();
         "Request No." := 0;
+        "Parent Request No." := GetParentRequestNo(WaiterPadLine);
+        if "Parent Request No." = 0 then
+            Indentation := 0
+        else
+            if ParentKitchenRequest.Get("Parent Request No.") then
+                Indentation := ParentKitchenRequest.Indentation + 1;
         "Line Type" := WaiterPadLine."Line Type";
         "No." := WaiterPadLine."No.";
         "Variant Code" := WaiterPadLine."Variant Code";
         Description := WaiterPadLine.Description;
         "Unit of Measure Code" := WaiterPadLine."Unit of Measure Code";
         "Qty. per Unit of Measure" := WaiterPadLine."Qty. per Unit of Measure";
+    end;
+
+    local procedure GetParentRequestNo(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"): BigInteger
+    var
+        KitchenReqSourceLink: Record "NPR NPRE Kitchen Req.Src. Link";
+    begin
+        if WaiterPadLine."Attached to Line No." <> 0 then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+            KitchenReqSourceLink.ReadIsolation := IsolationLevel::ReadUncommitted;
+#ENDIF
+            KitchenReqSourceLink.SetCurrentKey(
+                "Source Document Type", "Source Document Subtype", "Source Document No.", "Source Document Line No.", "Serving Step", "Request No.");
+            KitchenReqSourceLink.SetRange("Source Document Type", KitchenReqSourceLink."Source Document Type"::"Waiter Pad");
+            KitchenReqSourceLink.SetRange("Source Document Subtype", 0);
+            KitchenReqSourceLink.SetRange("Source Document No.", WaiterPadLine."Waiter Pad No.");
+            KitchenReqSourceLink.SetRange("Source Document Line No.", WaiterPadLine."Attached to Line No.");
+            if KitchenReqSourceLink.FindFirst() then
+                exit(KitchenReqSourceLink."Request No.");
+        end;
+        exit(0);
     end;
 
     local procedure DeleteSourceLinks()

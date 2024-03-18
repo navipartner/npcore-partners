@@ -1,6 +1,10 @@
 ﻿codeunit 6150853 "NPR POS Ext.: Line Format."
 {
     Access = Internal;
+    local procedure CurrExtensionName(): Text
+    begin
+        exit('LineFormat');
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnDiscoverDataSourceExtensions', '', false, false)]
     local procedure OnDiscover(DataSourceName: Text; Extensions: List of [Text])
@@ -8,7 +12,7 @@
         POSDataMgt: Codeunit "NPR POS Data Management";
     begin
         if DataSourceName = POSDataMgt.POSDataSource_BuiltInSaleLine() then
-            Extensions.Add('LineFormat');
+            Extensions.Add(CurrExtensionName());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Data Management", 'OnGetDataSourceExtension', '', false, false)]
@@ -17,7 +21,7 @@
         POSDataMgt: Codeunit "NPR POS Data Management";
         DataType: Enum "NPR Data Type";
     begin
-        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> 'LineFormat') then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> CurrExtensionName()) then
             exit;
 
         Handled := true;
@@ -44,7 +48,7 @@
         Highlighted: Boolean;
         Indented: Boolean;
     begin
-        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> 'LineFormat') then
+        if (DataSourceName <> POSDataMgt.POSDataSource_BuiltInSaleLine()) or (ExtensionName <> CurrExtensionName()) then
             exit;
 
         Handled := true;
@@ -55,6 +59,8 @@
 
         if POSSetup.UsesNewPOSFrontEnd() then begin
             OnGetLineFormat(Highlighted, Indented, SaleLine);
+            OnGetLineFormatting(Highlighted, SaleLine);
+
             DataRow.Fields().Add('Highlighted', Highlighted);
             DataRow.Fields().Add('Indented', Indented);
         end else begin
@@ -71,7 +77,7 @@
         end;
     end;
 
-    [Obsolete('Move to OnGetLineFormat() subscriber with limited control over styling instead', 'NPR23.0')]
+    [Obsolete('Move to OnGetLineFormatting() subscriber with limited control over styling instead', 'NPR23.0')]
     [BusinessEvent(false)]
 #pragma warning disable AA0150
     local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -79,10 +85,14 @@
     begin
     end;
 
+    [Obsolete('Move to OnGetLineFormatting() subscriber as the former "Indented" parameter is now part of the core data source as field #6120 of type Integer', 'NPR32.0')]
     [IntegrationEvent(false, false)]
     local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-
+    [IntegrationEvent(false, false)]
+    local procedure OnGetLineFormatting(var Highlighted: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
 }
