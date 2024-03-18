@@ -85,6 +85,23 @@ codeunit 6151058 "NPR Job Queue User Handler"
         if User."License Type" = User."License Type"::"Limited User" then
             exit(false);
 
+        if not CanUserRefreshJobQueueEntriesWithUserPlan() then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure CanUserRefreshJobQueueEntriesWithUserPlan(): Boolean
+    var
+        UsersInPlans: Query "Users in Plans";
+        TeamMemberPlanId: Label 'fd1441b8-116b-4fa7-836e-d7956700e0fa', Locked = true;
+    begin
+        UsersInPlans.SetRange(User_Security_ID, UserSecurityId());
+        UsersInPlans.SetRange(Plan_ID, TeamMemberPlanId);
+        UsersInPlans.Open();
+        while UsersInPlans.Read() do
+            if UsersInPlans.Plan_Name <> '' then
+                exit(false);
         exit(true);
     end;
 
