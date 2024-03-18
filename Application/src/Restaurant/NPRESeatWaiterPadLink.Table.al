@@ -45,7 +45,7 @@
             FieldClass = FlowField;
             Editable = false;
         }
-        field(13; "Waiter Pad Description FF"; Text[80])
+        field(13; "Waiter Pad Description FF"; Text[100])
         {
             CalcFormula = Lookup("NPR NPRE Waiter Pad".Description WHERE("No." = FIELD("Waiter Pad No.")));
             Caption = 'Waiter Pad Description';

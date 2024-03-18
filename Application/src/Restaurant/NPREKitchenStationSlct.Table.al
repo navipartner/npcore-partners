@@ -43,6 +43,12 @@
             NotBlank = true;
             TableRelation = "NPR NPRE Kitchen Station".Code WHERE("Restaurant Code" = FIELD("Production Restaurant Code"));
         }
+        field(80; "Production Step"; Integer)
+        {
+            Caption = 'Production Step';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
     }
 
     keys

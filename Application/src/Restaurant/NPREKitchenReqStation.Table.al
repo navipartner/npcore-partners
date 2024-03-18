@@ -1,7 +1,7 @@
 ﻿table 6150679 "NPR NPRE Kitchen Req. Station"
 {
     Access = Internal;
-    Caption = 'Kitchen Order Line Station';
+    Caption = 'Kitchen Request Station';
     DataClassification = CustomerContent;
     DrillDownPageID = "NPR NPRE Kitchen Req. Stations";
     LookupPageID = "NPR NPRE Kitchen Req. Stations";
@@ -35,7 +35,7 @@
         {
             Caption = 'Production Status';
             DataClassification = CustomerContent;
-            ValuesAllowed = "Not Started", Started, Finished, Cancelled;
+            ValuesAllowed = "Not Started", Pending, Started, Finished, Cancelled;
         }
         field(40; "Start Date-Time"; DateTime)
         {
@@ -70,15 +70,26 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
         }
+        field(100; "Production Step"; Integer)
+        {
+            Caption = 'Production Step';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
+        field(110; "Parent Request No."; BigInteger)
+        {
+            Caption = 'Request No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Kitchen Request";
+        }
     }
 
     keys
     {
-        key(Key1; "Request No.", "Line No.")
-        {
-        }
-        key(Key2; "Production Restaurant Code", "Kitchen Station")
-        {
-        }
+        key(Key1; "Request No.", "Line No.") { }
+        key(Key2; "Production Restaurant Code", "Kitchen Station") { }
+        key(Key3; "Request No.", "Production Step") { }
+        key(Key4; "Request No.", "Production Status") { }
+        key(Key5; "Parent Request No.", "Production Status") { }
     }
 }

@@ -63,14 +63,18 @@
 
             trigger OnValidate()
             var
+                NotificationHandler: Codeunit "NPR NPRE Notification Handler";
                 KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
                 SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+                KDSActivated: Boolean;
             begin
                 if IsTemporary() or ("KDS Active" = "KDS Active"::No) then
                     exit;
                 Modify();
-                if SetupProxy.KDSActivatedForAnyRestaurant() then
+                KDSActivated := SetupProxy.KDSActivatedForAnyRestaurant();
+                if KDSActivated then
                     KitchenOrderMgt.EnableKitchenOrderRetentionPolicy();
+                NotificationHandler.CreateNotificationJobQueues(KDSActivated);
             end;
         }
         field(60; "Order ID Assign. Method"; Enum "NPR NPRE Ord.ID Assign. Method")

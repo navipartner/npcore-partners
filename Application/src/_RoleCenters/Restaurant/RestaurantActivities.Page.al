@@ -20,12 +20,26 @@
                     ToolTip = 'Specifies the number of currently opened waiter pads.';
                     ApplicationArea = NPRRetail;
                     Caption = 'Waiter Pads - Open';
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownWaiterPads();
+                    end;
                 }
                 field("Kitchen Requests - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitchen Requests - Open"))))
                 {
                     ToolTip = 'Specifies the number of currently active kitchen requests (the requests that hasn’t been finished or cancelled so far).';
                     ApplicationArea = NPRRetail;
                     Caption = 'Kitchen Requests - Open';
+
+                    trigger OnDrillDown()
+                    var
+                        KitchenRequest: Record "NPR NPRE Kitchen Request";
+                    begin
+                        Rec.CopyFilter("Restaurant Filter", KitchenRequest."Restaurant Code");
+                        KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
+                        Page.Run(0, KitchenRequest);
+                    end;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
                 {
@@ -42,25 +56,45 @@
                 {
                     ToolTip = 'Specifies the number of tables that are currently ready for next guests.';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Seatings: Ready';
+                    Caption = 'Ready';
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownSeatingList(0);
+                    end;
                 }
                 field("Seatings: Occupied"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Occupied"))))
                 {
                     ToolTip = 'Specifies the number of occupied tables.';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Seatings: Occupied';
+                    Caption = 'Occupied';
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownSeatingList(1);
+                    end;
                 }
                 field("Seatings: Reserved"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Reserved"))))
                 {
                     ToolTip = 'Specifies the number of reserved tables.';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Seatings: Reserved';
+                    Caption = 'Reserved';
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownSeatingList(2);
+                    end;
                 }
                 field("Seatings: Cleaning Required"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Seatings: Cleaning Required"))))
                 {
                     ToolTip = 'Specifies the number of tables requiring cleaning.';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Seatings: Cleaning Required';
+                    Caption = 'Cleaning Required';
+
+                    trigger OnDrillDown()
+                    begin
+                        DrillDownSeatingList(3);
+                    end;
                 }
             }
             cuegroup(SeatStatus)
@@ -327,6 +361,61 @@
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");  //?
         Rec.CopyFilter("POS Unit Filter", POSEntry."POS Unit No.");
         Page.run(Page::"NPR POS Entries", POSEntry);
+    end;
+
+    local procedure DrillDownWaiterPads()
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        SeatingWPLinkQry: Query "NPR NPRE Seating - W/Pad Link";
+        Window: Dialog;
+        CalculatingLbl: Label 'Working on it...';
+    begin
+        Window.Open(CalculatingLbl);
+        if Rec.GetFilter("Seating Location Filter") <> '' then
+            SeatingWPLinkQry.SetFilter(SeatingLocation, Rec.GetFilter("Seating Location Filter"));
+        SeatingWPLinkQry.SetRange(SeatingClosed, false);
+        SeatingWPLinkQry.Open();
+        while SeatingWPLinkQry.Read() do begin
+            WaiterPad."No." := SeatingWPLinkQry.WaiterPadNo;
+            if not WaiterPad.Mark() then
+                WaiterPad.Mark(true);
+        end;
+        SeatingWPLinkQry.Close();
+        Window.Close();
+        WaiterPad.MarkedOnly(true);
+        Page.Run(0, WaiterPad);
+    end;
+
+    local procedure DrillDownSeatingList(SeatingStatus: Option Ready,Occupied,Reserved,Cleaning)
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        Seating: Record "NPR NPRE Seating";
+    begin
+        RestaurantSetup.Get();
+        case SeatingStatus of
+            SeatingStatus::Ready:
+                begin
+                    RestaurantSetup.TestField("Seat.Status: Ready");
+                    Seating.SetRange(Status, RestaurantSetup."Seat.Status: Ready");
+                end;
+            SeatingStatus::Occupied:
+                begin
+                    RestaurantSetup.TestField("Seat.Status: Occupied");
+                    Seating.SetRange(Status, RestaurantSetup."Seat.Status: Occupied");
+                end;
+            SeatingStatus::Reserved:
+                begin
+                    RestaurantSetup.TestField("Seat.Status: Reserved");
+                    Seating.SetRange(Status, RestaurantSetup."Seat.Status: Reserved");
+                end;
+            SeatingStatus::Cleaning:
+                begin
+                    RestaurantSetup.TestField("Seat.Status: Cleaning Required");
+                    Seating.SetRange(Status, RestaurantSetup."Seat.Status: Cleaning Required");
+                end;
+        end;
+        Rec.CopyFilter("Seating Location Filter", Seating."Seating Location");
+        Page.Run(0, Seating);
     end;
 
     trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])

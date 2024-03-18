@@ -1,6 +1,7 @@
 ﻿codeunit 6150709 "NPR POS Action Param. Mgt."
 {
     Access = Internal;
+
     var
         Text001: Label 'There are no action parameters to edit for %1, %2, and action %3 does not define any parameters to copy from.';
         Text002: Label 'There are no action parameters defined for %1, %2. Do you want to insert the default parameters and their values?';
@@ -177,12 +178,15 @@
         exit(false);
     end;
 
-    procedure GetParametersAsJson(RecordID: RecordID; FieldID: Integer): Text
+    procedure GetParametersAsJson(RecordID: RecordID; FieldID: Integer) JObjectTextValue: Text
+    begin
+        GetParametersAsJsonObject(RecordID, FieldID).WriteTo(JObjectTextValue);
+    end;
+
+    procedure GetParametersAsJsonObject(RecordID: RecordID; FieldID: Integer) Parameters: JsonObject
     var
         ParamValue: Record "NPR POS Parameter Value";
         JObject: JsonObject;
-        JObjectTextValue: Text;
-        JParamLbl: Label '{"parameters" : %1}', Locked = true;
     begin
         JObject.ReadFrom('{}');
 
@@ -192,7 +196,6 @@
                 ParamValue.AddParameterToJObject(JObject);
             until (ParamValue.Next() = 0);
 
-        JObject.WriteTo(JObjectTextValue);
-        exit(StrSubstNo(JParamLbl, JObjectTextValue));
+        Parameters.Add('parameters', JObject);
     end;
 }

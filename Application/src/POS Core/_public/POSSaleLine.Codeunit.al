@@ -231,6 +231,7 @@
         Rec."Total Discount Code" := Line."Total Discount Code";
         Rec."Total Discount Step" := Line."Total Discount Step";
         Rec."Benefit List Code" := Line."Benefit List Code";
+        Rec.Indentation := Line.Indentation;
 
         Return := InsertLineInternal(Rec, true);
         Line := Rec;

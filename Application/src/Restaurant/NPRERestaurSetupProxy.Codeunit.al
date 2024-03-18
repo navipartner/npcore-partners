@@ -238,4 +238,52 @@
     begin
         Error(MustBeTempMsg, CallerName);
     end;
+
+    #region Microsoft Entra application
+    internal procedure CreateAzureADApplication()
+    var
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+        PermissionSets: List of [Code[20]];
+        AppDisplayNameLbl: Label 'NaviPartner KDS', MaxLength = 50, Locked = true;
+    begin
+        PermissionSets.Add('D365 BUS FULL ACCESS');
+#if BC17
+        PermissionSets.Add('NP RETAIL');
+#else
+        PermissionSets.Add('NPR NP RETAIL');
+#endif
+
+        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, SecretDisplayName(), PermissionSets);
+    end;
+
+    internal procedure CreateAzureADApplicationSecret()
+    var
+        AppInfo: ModuleInfo;
+        AADApplication: Record "AAD Application";
+        AADApplicationList: Page "AAD Application List";
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+        NoAppsToManageErr: Label 'No Micrsoft Entra Applications with App Name like %1 to manage.';
+    begin
+        NavApp.GetCurrentModuleInfo(AppInfo);
+
+        AADApplication.SetFilter("App Name", '@' + AppInfo.Name);
+        if AADApplication.IsEmpty() then
+            Error(NoAppsToManageErr, AppInfo.Name);
+
+        AADApplicationList.LookupMode(true);
+        AADApplicationList.SetTableView(AADApplication);
+        if AADApplicationList.RunModal() <> Action::LookupOK then
+            exit;
+
+        AADApplicationList.GetRecord(AADApplication);
+        AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", SecretDisplayName());
+    end;
+
+    local procedure SecretDisplayName(): Text
+    var
+        SecretDisplayNameLbl: Label 'NaviPartner KDS - %1', Comment = '%1 = today’s date', Locked = true;
+    begin
+        exit(StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
+    end;
+    #endregion
 }

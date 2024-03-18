@@ -45,6 +45,11 @@
                     ToolTip = 'Specifies the production restaurant kitchen station system should send kitchen requests to for the setup line.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Production Step"; Rec."Production Step")
+                {
+                    ToolTip = 'Specifies the production step at which this kitchen station should be engaged. This can be used if you have a sequential produciton flow where there are kitchen stations that depend on the production results of other kitchen stations.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(factboxes)
@@ -61,4 +66,10 @@
             }
         }
     }
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        if (Rec."Production Restaurant Code" <> '') and (Rec."Restaurant Code" = '') then
+            Rec."Restaurant Code" := Rec."Production Restaurant Code";
+    end;
 }

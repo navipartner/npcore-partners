@@ -103,7 +103,7 @@
         SeatingWPLinkQry.SetRange(SeatingClosed, false);
         SeatingWPLinkQry.Open();
         while SeatingWPLinkQry.Read() do
-            if WaiterPad.Get(SeatingWPLinkQry.WaiterNo) then
+            if WaiterPad.Get(SeatingWPLinkQry.WaiterPadNo) then
                 if not WaiterPad.Mark() then begin
                     WaiterPad.Mark(true);
                     RestaurantCue."Inhouse Guests" += SeatingWPLinkQry.NumberOfGuests;

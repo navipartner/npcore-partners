@@ -70,8 +70,9 @@
     procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
+        TempLineRelation: Record "Line Number Buffer" temporary;
         TempTouchedWaiterPadLine: Record "NPR NPRE Waiter Pad Line" temporary;
+        WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -86,7 +87,7 @@
             SaleLinePOS.FindSet(CleanupSale);
             CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", true);
             repeat
-                MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine);
+                MoveSaleLineFromPOSToWaiterPad(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, TempLineRelation);
                 TempTouchedWaiterPadLine := WaiterPadLine;
                 TempTouchedWaiterPadLine.Insert();
             until SaleLinePOS.Next() = 0;
@@ -202,12 +203,19 @@
     end;
 
     local procedure UpdateWPHdrFromSaleHdr(SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad")
+    var
+        xWaiterPad: Record "NPR NPRE Waiter Pad";
     begin
+        xWaiterPad := WaiterPad;
         WaiterPad."Customer No." := SalePOS."Customer No.";
+        if WaiterPad.Description = '' then
+            WaiterPad.Description := SalePOS."Customer Name";
+        if Format(xWaiterPad) = Format(WaiterPad) then
+            exit;
         WaiterPad.Modify();
     end;
 
-    procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    procedure MoveSaleLineFromPOSToWaiterPad(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var LineRelation: Record "Line Number Buffer")
     var
         WaiterPadLine2: Record "NPR NPRE Waiter Pad Line";
         NewLine: Boolean;
@@ -233,6 +241,7 @@
             WaiterPadLine."Variant Code" := SaleLinePOS."Variant Code";
             WaiterPadLine.Description := SaleLinePOS.Description;
             WaiterPadLine."Description 2" := SaleLinePOS."Description 2";
+            WaiterPadLine.Indentation := SaleLinePOS.Indentation;
             WaiterPadLine."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
             WaiterPadLine."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
             WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
@@ -241,6 +250,7 @@
 
             WaiterPadMgt.AssignWPadLinePrintCategories(WaiterPadLine, true);
         end;
+        AddLineRelation(LineRelation, SaleLinePOS."Line No.", WaiterPadLine."Line No.");
 
         WaiterPadLine.Quantity := SaleLinePOS.Quantity;
         WaiterPadLine."Quantity (Base)" := SaleLinePOS."Quantity (Base)";
@@ -257,6 +267,7 @@
         WaiterPadLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
         WaiterPadLine."Order No. from Web" := SaleLinePOS."Order No. from Web";
         WaiterPadLine."Order Line No. from Web" := SaleLinePOS."Order Line No. from Web";
+        CopyItemAddOnLinkInfoToWPLine(WaiterPadLine, SaleLinePOS, LineRelation);
         WaiterPadLine.Modify();
 
         WaiterPadLine.Mark := NewLine or (WaiterPadLine."Quantity (Base)" <> WaiterPadLine2."Quantity (Base)");
@@ -266,6 +277,7 @@
 
     procedure GetSaleFromWaiterPadToPOS(WaiterPad: Record "NPR NPRE Waiter Pad"; POSSession: Codeunit "NPR POS Session")
     var
+        TempLineRelation: Record "Line Number Buffer" temporary;
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
@@ -297,13 +309,13 @@
         if WaiterPadLine.FindSet(true) then
             repeat
                 POSSaleLine.GetNewSaleLine(SaleLinePOS);
-                GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine);
+                GetSaleLineFromWaiterPadToPOS(SalePOS, SaleLinePOS, WaiterPad, WaiterPadLine, POSSaleLine, TempLineRelation);
             until (0 = WaiterPadLine.Next());
 
         CopySaleHdrPOSInfo(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", WaiterPad."No.", false);
     end;
 
-    local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    local procedure GetSaleLineFromWaiterPadToPOS(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; var POSSaleLine: Codeunit "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
     begin
         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
 
@@ -314,6 +326,7 @@
 
         SaleLinePOS.Description := WaiterPadLine.Description;
         SaleLinePOS."Description 2" := WaiterPadLine."Description 2";
+        SaleLinePOS.Indentation := WaiterPadLine.Indentation;
         SaleLinePOS."Order No. from Web" := WaiterPadLine."Order No. from Web";
         SaleLinePOS."Order Line No. from Web" := WaiterPadLine."Order Line No. from Web";
         if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
@@ -342,7 +355,9 @@
         POSSaleLine.SetUseLinePriceVATParams(true);
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.SetUseLinePriceVATParams(false);
+        AddLineRelation(LineRelation, WaiterPadLine."Line No.", SaleLinePOS."Line No.");
         CopyPOSInfo(SaleLinePOS, WaiterPadLine."Waiter Pad No.", WaiterPadLine."Line No.", false);
+        CopyItemAddOnLinkInfoFromWPLine(WaiterPadLine, SaleLinePOS, LineRelation);
 
         WaiterPadLine."Sale Retail ID" := SalePOS.SystemId;
         WaiterPadLine."Sale Line Retail ID" := SaleLinePOS.SystemId;
@@ -504,8 +519,8 @@
         SeatingCode := GetSeatingCode(JSON, RestaurantCode);
         NPRESeating.Get(SeatingCode);
 
-        SeatingFilter := JSON.GetStringParameter('SeatingFilter');
-        LocationFilter := JSON.GetStringParameter('LocationFilter');
+        if JSON.GetStringParameter('SeatingFilter', SeatingFilter) then;
+        if JSON.GetStringParameter('LocationFilter', LocationFilter) then;
         if LocationFilter = '' then
             LocationFilter := SeatingManagement.RestaurantSeatingLocationFilter(RestaurantCode);
         if (SeatingFilter <> '') or (LocationFilter <> '') then begin
@@ -716,6 +731,56 @@
             WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
+    local procedure CopyItemAddOnLinkInfoToWPLine(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+        if not SaleLinePOSAddOn.FindFirst() then
+            exit;
+        LineRelation.Get(SaleLinePOSAddOn."Applies-to Line No.");
+        WaiterPadLine."Attached to Line No." := LineRelation."New Line Number";
+        WaiterPadLine."AddOn No." := SaleLinePOSAddOn."AddOn No.";
+        WaiterPadLine."AddOn Line No." := SaleLinePOSAddOn."AddOn Line No.";
+        WaiterPadLine."Fixed Quantity" := SaleLinePOSAddOn."Fixed Quantity";
+        WaiterPadLine."Per Unit" := SaleLinePOSAddOn."Per Unit";
+        WaiterPadLine.Mandatory := SaleLinePOSAddOn.Mandatory;
+        WaiterPadLine."Copy Serial No." := SaleLinePOSAddOn."Copy Serial No.";
+    end;
+
+    local procedure CopyItemAddOnLinkInfoFromWPLine(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        if (WaiterPadLine."Attached to Line No." = 0) or (WaiterPadLine."AddOn No." = '') then
+            exit;
+        LineRelation.Get(WaiterPadLine."Attached to Line No.");
+
+        SaleLinePOSAddOn.Init();
+        SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
+        SaleLinePOSAddOn."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        SaleLinePOSAddOn."Sale Date" := SaleLinePOS.Date;
+        SaleLinePOSAddOn."Sale Line No." := SaleLinePOS."Line No.";
+        SaleLinePOSAddOn."Line No." := 10000;
+        SaleLinePOSAddOn."Applies-to Line No." := LineRelation."New Line Number";
+        SaleLinePOSAddOn."AddOn No." := WaiterPadLine."AddOn No.";
+        SaleLinePOSAddOn."AddOn Line No." := WaiterPadLine."AddOn Line No.";
+        SaleLinePOSAddOn."Fixed Quantity" := WaiterPadLine."Fixed Quantity";
+        SaleLinePOSAddOn."Per Unit" := WaiterPadLine."Per Unit";
+        SaleLinePOSAddOn.Mandatory := WaiterPadLine.Mandatory;
+        SaleLinePOSAddOn."Copy Serial No." := WaiterPadLine."Copy Serial No.";
+        SaleLinePOSAddOn.Insert(true);
+    end;
+
+    local procedure AddLineRelation(var LineRelation: Record "Line Number Buffer"; FromLineNumber: Integer; ToLineNumber: Integer)
+    begin
+        LineRelation."Old Line Number" := FromLineNumber;
+        LineRelation."New Line Number" := ToLineNumber;
+        LineRelation.Insert();
+    end;
+
     procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; WaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
     var
         WaiterPad2: Record "NPR NPRE Waiter Pad";
@@ -784,6 +849,110 @@
             exit(true);
         end;
         exit(false);
+    end;
+
+    procedure GenerateNewWaiterPadConfig(SalePOS: Record "NPR POS Sale"; RequestNumberOfGuests: Boolean; RequestCustomerName: Boolean; RequestCustomerPhone: Boolean; RequestCustomerEmail: Boolean; var WaiterpadInfoConfig: JsonObject): Boolean
+    var
+        WaiterpadInfoConfigOption: JsonObject;
+        WaiterpadInfoConfigOptions: JsonArray;
+        DefaultNumberOfGuests: Integer;
+        EmailLbl: Label 'Email address';
+        NameLbl: Label 'Name';
+        NewWaiterpadLbl: Label 'New Waiterpad';
+        NumberOfGuestsLbl: Label 'Number of guests';
+        PhoneNoLbl: Label 'Phone No.';
+        WelcomeLbl: Label 'Please specify parameters for the new waiter pad';
+    begin
+        Clear(WaiterpadInfoConfig);
+        if not (RequestNumberOfGuests or RequestCustomerName or RequestCustomerPhone or RequestCustomerEmail) then
+            exit(false);
+
+        if RequestNumberOfGuests then begin
+            if SalePOS."NPRE Pre-Set Seating Code" <> '' then
+                DefaultNumberOfGuests := GetDefaultNumberOfGuests(SalePOS."NPRE Pre-Set Seating Code");
+            Clear(WaiterpadInfoConfigOption);
+            WaiterpadInfoConfigOption.Add('type', 'plusminus');
+            WaiterpadInfoConfigOption.Add('id', 'guests');
+            WaiterpadInfoConfigOption.Add('caption', NumberOfGuestsLbl);
+            WaiterpadInfoConfigOption.Add('minvalue', 0);
+            WaiterpadInfoConfigOption.Add('maxvalue', 1000);
+            WaiterpadInfoConfigOption.Add('value', DefaultNumberOfGuests);
+            WaiterpadInfoConfigOptions.Add(WaiterpadInfoConfigOption);
+        end;
+        if RequestCustomerName then begin
+            Clear(WaiterpadInfoConfigOption);
+            WaiterpadInfoConfigOption.Add('type', 'text');
+            WaiterpadInfoConfigOption.Add('id', 'tablename');
+            WaiterpadInfoConfigOption.Add('caption', NameLbl);
+            WaiterpadInfoConfigOptions.Add(WaiterpadInfoConfigOption);
+        end;
+        if RequestCustomerPhone then begin
+            Clear(WaiterpadInfoConfigOption);
+            WaiterpadInfoConfigOption.Add('type', 'phoneNumber');
+            WaiterpadInfoConfigOption.Add('id', 'phoneNo');
+            WaiterpadInfoConfigOption.Add('caption', PhoneNoLbl);
+            WaiterpadInfoConfigOptions.Add(WaiterpadInfoConfigOption);
+        end;
+        if RequestCustomerEmail then begin
+            Clear(WaiterpadInfoConfigOption);
+            WaiterpadInfoConfigOption.Add('type', 'text');
+            WaiterpadInfoConfigOption.Add('id', 'email');
+            WaiterpadInfoConfigOption.Add('caption', EmailLbl);
+            WaiterpadInfoConfigOptions.Add(WaiterpadInfoConfigOption);
+        end;
+        WaiterpadInfoConfig.Add('caption', WelcomeLbl);
+        WaiterpadInfoConfig.Add('title', NewWaiterpadLbl);
+        WaiterpadInfoConfig.Add('settings', WaiterpadInfoConfigOptions);
+        exit(true);
+    end;
+
+    procedure GetDefaultNumberOfGuests(SeatingCode: Code[20]): Integer
+    var
+        Seating: Record "NPR NPRE Seating";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+    begin
+        SetupProxy.SetSeating(SeatingCode);
+        case SetupProxy.DefaultNumberOfGuests() of
+            Enum::"NPR NPRE Default No. of Guests"::Zero:
+                exit(0);
+            Enum::"NPR NPRE Default No. of Guests"::"Min Party Size":
+                begin
+                    Seating.Get(SeatingCode);
+                    exit(Seating."Min Party Size");
+                end;
+        end;
+        exit(1);
+    end;
+
+    procedure AddSaveToWPadAndRequestNextServingWorkflow(Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup"; var PreWorkflows: JsonObject)
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        SalePOS: Record "NPR POS Sale";
+        ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        ActionParameters: JsonObject;
+        CustomParameters: JsonObject;
+        MainParameters: JsonObject;
+    begin
+        if RestaurantSetup.IsEmpty() then
+            exit;
+        Sale.GetCurrentSale(SalePOS);
+        if SalePOS."NPRE Pre-Set Seating Code" <> '' then
+            SetupProxy.SetSeating(SalePOS."NPRE Pre-Set Seating Code")
+        else
+            SetupProxy.SetRestaurant(Setup.RestaurantCode());
+        SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
+        If not ServiceFlowProfile."AutoSave to W/Pad on Sale End" then
+            exit;
+
+        MainParameters.Add('LinesToSend', 0);  //New/Updated
+        MainParameters.Add('WaiterPadAction', 2);  //Request Next Serving
+        MainParameters.Add('MoveSaleToWPadOnFinish', false);
+        MainParameters.Add('ReturnToDefaultView', false);
+        MainParameters.Add('Silent', true);
+        ActionParameters.Add('mainParameters', MainParameters);
+        ActionParameters.Add('customParameters', CustomParameters);
+        PreWorkflows.Add('RUN_W/PAD_ACTION', ActionParameters);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale", 'OnAfterDeleteEvent', '', true, false)]

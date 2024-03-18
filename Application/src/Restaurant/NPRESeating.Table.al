@@ -175,7 +175,7 @@
             Caption = 'Multiple Waiter Pad';
             FieldClass = FlowField;
         }
-        field(102; "Current Waiter Pad Description"; Text[80])
+        field(102; "Current Waiter Pad Description"; Text[100])
         {
             Caption = 'Waiter Pad Description';
             DataClassification = CustomerContent;

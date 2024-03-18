@@ -18,7 +18,8 @@
             repeater("Order Lines")
             {
                 Caption = 'Order Lines';
-                IndentationColumn = 0;
+                IndentationColumn = Rec.Indentation;
+                IndentationControls = Description;
                 field("Request No."; Rec."Request No.")
                 {
                     ToolTip = 'Specifies the request unique Id, assigned by the system according to an automatically maintained number series.';
@@ -47,6 +48,11 @@
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies a description of what you are preparing. Based on your choices in the Line Type and No. fields, the field may show product description or a comment line.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Modifications Exist"; Rec."Modifications Exist")
+                {
+                    ToolTip = 'Indicates if the customer has requested any changes to the ingredients or preparation of the product.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Quantity; Rec.Quantity)
@@ -93,6 +99,7 @@
                 {
                     ToolTip = 'Specifies the status of this request.';
                     ApplicationArea = NPRRetail;
+                    HideValue = HideLineStatusValue;
                 }
                 field("Production Status"; Rec."Production Status")
                 {
@@ -379,6 +386,7 @@
     trigger OnAfterGetRecord()
     begin
         Rec.GetSeatingAndWaiter(AssignedWaiters, SeatingCodes, SeatingNos);
+        HideLineStatusValue := IsExpediteMode and (Rec."Parent Request No." <> 0);
     end;
 
     local procedure GetPageCaption(): Text
@@ -410,7 +418,7 @@
                     KitchenStationAction::"Accept Qty. Change":
                         KitchenOrderMgt.AcceptQtyChange(KitchenRequestStation);
                     KitchenStationAction::"Start Production":
-                        KitchenOrderMgt.StartProduction(KitchenRequestStation);
+                        KitchenOrderMgt.StartProduction(KitchenRequest, KitchenRequestStation);
                     KitchenStationAction::"End Production":
                         KitchenOrderMgt.EndProduction(KitchenRequestStation);
                 end;
@@ -467,6 +475,7 @@
         SeatingCodes: Text;
         SeatingNos: Text;
         FinishedIsShown: Boolean;
+        HideLineStatusValue: Boolean;
         IsExpediteMode: Boolean;
         ServedIsShown: Boolean;
         TimerStarted: Boolean;

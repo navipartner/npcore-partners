@@ -16,6 +16,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         UpdateKitchenRequestSeatingAndWaiter();
         UpdateDefaultNumberOfGuests();
         SetPrintOnSaleCancel();
+        UpdateKitchenRequestProductionStatuses();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -129,6 +130,40 @@ codeunit 6151316 "NPR NPRE Upgrade"
             RestaurantSetup."Print on POS Sale Cancel" := true;
             RestaurantSetup.Modify();
         end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateKitchenRequestProductionStatuses()
+    var
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        KitchenRequest2: Record "NPR NPRE Kitchen Request";
+        KitchenReqStation: Record "NPR NPRE Kitchen Req. Station";
+        KitchenReqStation2: Record "NPR NPRE Kitchen Req. Station";
+    begin
+        UpgradeStep := 'UpdateKitchenRequestProductionStatuses';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
+
+        KitchenRequest.SetRange("Production Status",
+            KitchenRequest."Production Status"::"Started [Obsolete]", KitchenRequest."Production Status"::"Cancelled [Obsolete]");
+        if KitchenRequest.FindSet(true) then
+            repeat
+                KitchenRequest2 := KitchenRequest;
+                KitchenRequest2."Production Status" := "NPR NPRE K.Req.L. Prod.Status".FromInteger(KitchenRequest."Production Status".AsInteger() * 10);
+                KitchenRequest2.Modify();
+            until KitchenRequest.Next() = 0;
+
+        KitchenReqStation.SetRange("Production Status",
+            KitchenReqStation."Production Status"::"Started [Obsolete]", KitchenReqStation."Production Status"::"Cancelled [Obsolete]");
+        if KitchenReqStation.FindSet(true) then
+            repeat
+                KitchenReqStation2 := KitchenReqStation;
+                KitchenReqStation2."Production Status" := "NPR NPRE K.Req.L. Prod.Status".FromInteger(KitchenReqStation."Production Status".AsInteger() * 10);
+                KitchenReqStation2.Modify();
+            until KitchenReqStation.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

@@ -62,7 +62,7 @@
                 Caption = 'Station Selection Setup';
                 Image = Flow;
                 RunObject = Page "NPR NPRE Kitchen Station Slct.";
-                RunPageLink = "Restaurant Code" = FIELD("Restaurant Code"),
+                RunPageLink = "Production Restaurant Code" = FIELD("Restaurant Code"),
                               "Kitchen Station" = FIELD(Code);
                 ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                 ApplicationArea = NPRRetail;

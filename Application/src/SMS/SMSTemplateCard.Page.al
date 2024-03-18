@@ -5,6 +5,7 @@
     Caption = 'SMS Template Card';
     PromotedActionCategories = 'New,Process,Report,Functions';
     SourceTable = "NPR SMS Template Header";
+    PopulateAllFields = true;
 
     layout
     {
@@ -14,25 +15,21 @@
             {
                 field("Code"; Rec.Code)
                 {
-
                     ToolTip = 'Specifies the value of the Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Alt. Sender"; Rec."Alt. Sender")
                 {
-
                     ToolTip = 'Specifies the value of the Alt. Sender field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-
                     ToolTip = 'Specifies the value of the Table No. field';
                     ApplicationArea = NPRRetail;
 
@@ -44,16 +41,15 @@
                 }
                 field("Table Caption"; Rec."Table Caption")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Caption field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Recipient Type"; Rec."Recipient Type")
                 {
-
                     ToolTip = 'Specifies the value of the Recipient Type field';
                     ApplicationArea = NPRRetail;
+
                     trigger OnValidate()
                     begin
                         SetRecipientType()
@@ -65,7 +61,6 @@
                     ShowCaption = false;
                     field(Recipient; Rec.Recipient)
                     {
-
                         Lookup = true;
                         ToolTip = 'Specifies the value of the Recipient field';
                         ApplicationArea = NPRRetail;
@@ -77,7 +72,6 @@
                     ShowCaption = false;
                     field("Recipient Group"; Rec."Recipient Group")
                     {
-
                         Lookup = true;
                         ToolTip = 'Specifies the value of the Recipient Group field';
                         ApplicationArea = NPRRetail;
@@ -85,7 +79,6 @@
                 }
                 field("Filters on Table"; Rec."Table Filters".HasValue)
                 {
-
                     Caption = 'Filters on Table';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Filters on Table field';
@@ -93,7 +86,6 @@
                 }
                 field("Report ID"; Rec."Report ID")
                 {
-
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Report ID field';
                     ApplicationArea = NPRRetail;
@@ -112,7 +104,6 @@
                 SubPageView = SORTING("Template Code", "Line No.");
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
-
             }
         }
         area(factboxes)
@@ -124,7 +115,6 @@
                 SubPageView = SORTING(TableNo, "No.");
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -143,7 +133,6 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-
                     ToolTip = 'Executes the Send SMS action';
                     ApplicationArea = NPRRetail;
 
@@ -158,7 +147,6 @@
                 {
                     Caption = 'Send Batch SMS';
                     Image = SendToMultiple;
-
                     ToolTip = 'Executes the Send Batch SMS action';
                     ApplicationArea = NPRRetail;
 
@@ -181,7 +169,6 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-
                     ToolTip = 'Executes the Table Filters action';
                     ApplicationArea = NPRRetail;
 
@@ -214,4 +201,3 @@
         TableFiltersEnabled: Boolean;
         RecipientGroupVisible: Boolean;
 }
-
