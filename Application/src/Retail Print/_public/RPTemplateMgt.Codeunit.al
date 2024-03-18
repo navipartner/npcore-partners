@@ -12,12 +12,29 @@
         PrintTemplate(TemplateCode, "Record", 0);
     end;
 
+    procedure PrintTemplate(TemplateCode: Code[20]; var RecRef: RecordRef)
+    begin
+        PrintTemplate(TemplateCode, RecRef, 0);
+    end;
+
     procedure PrintTemplate(TemplateCode: Code[20]; "Record": Variant; MatrixIterationField: Integer)
+    var
+        RecRef: RecordRef;
+    begin
+        if Record.IsRecordRef() then begin
+            RecRef := Record;
+        end else begin
+            RecRef.GetTable(Record);
+        end;
+
+        PrintTemplate(TemplateCode, RecRef, MatrixIterationField);
+    end;
+
+    procedure PrintTemplate(TemplateCode: Code[20]; var RecRef: RecordRef; MatrixIterationField: Integer)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
         MatrixPrintMgt: Codeunit "NPR RP Matrix Print Mgt.";
         LinePrintMgt: Codeunit "NPR RP Line Print Mgt.";
-        RecRef: RecordRef;
         ActiveSession: Record "Active Session";
         CustomDimensions: Dictionary of [Text, Text];
         StartTime: Time;
@@ -29,11 +46,6 @@
     begin
         if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
             SentryActiveSpan.StartChildSpan('bc.print_template', 'bc.print_template', SentryPrintSpan);
-
-        if Record.IsRecordRef then
-            RecRef := Record
-        else
-            RecRef.GetTable(Record);
 
         RPTemplateHeader.Get(TemplateCode);
         case RPTemplateHeader."Printer Type" of

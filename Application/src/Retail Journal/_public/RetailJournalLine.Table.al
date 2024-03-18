@@ -567,6 +567,11 @@
             Caption = 'Unit Volume';
             DataClassification = CustomerContent;
         }
+        field(135; "Print Job ID"; Guid)
+        {
+            Caption = 'Print Job ID';
+            DataClassification = CustomerContent;
+        }
         field(6059970; "Is Master"; Boolean)
         {
             Caption = 'Is Master';

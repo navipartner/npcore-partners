@@ -110,11 +110,11 @@ codeunit 6014580 "NPR Object Output Mgt."
     begin
         if NoOfPrints < 1 then
             exit;
-        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
-            exit;
-
         OnBeforeSendMatrixPrint(TemplateCode, CodeunitId, ReportId, Printer, NoOfPrints, Skip);
         if Skip then
+            exit;
+
+        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
             exit;
 
         case ObjectOutput."Output Type" of
@@ -162,12 +162,12 @@ codeunit 6014580 "NPR Object Output Mgt."
     begin
         if NoOfPrints < 1 then
             exit;
-        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
-            exit;
-
         OnBeforeSendLinePrint(TemplateCode, CodeunitId, ReportId, Printer, NoOfPrints, Skip);
         if Skip then
             exit;
+        if not TryGetPrintOutput(TemplateCode, CodeunitId, ReportId, ObjectOutput) then
+            exit;
+
 
         case ObjectOutput."Output Type" of
             ObjectOutput."Output Type"::"Printer Name":
