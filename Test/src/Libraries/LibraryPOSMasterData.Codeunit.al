@@ -59,14 +59,7 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryUtility: Codeunit "Library - Utility";
         Location: Record Location;
         LibraryWarehouse: Codeunit "Library - Warehouse";
-#IF NOT BC17 AND NOT BC18 AND NOT BC19 AND NOT BC20
-        PermissionsMock: Codeunit "Permissions Mock";
-#ENDIF
     begin
-#IF NOT BC17 AND NOT BC18 AND NOT BC19 AND NOT BC20
-        PermissionsMock.Set('NPR NP RETAIL');
-        PermissionsMock.Assign('D365 BUS FULL ACCESS');
-#ENDIF
         if (not (POSStore.Get(POSStoreCode)) or (POSStoreCode = '')) then begin
             POSStore.Init();
 

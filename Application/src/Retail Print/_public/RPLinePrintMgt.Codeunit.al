@@ -182,24 +182,19 @@
         MergeBuffer(RPTemplateLine, DataJoinBuffer, 0, 0);
     end;
 
-    local procedure RunPrintEngine(TemplateHeader: Record "NPR RP Template Header"; "Table": Variant)
+    local procedure RunPrintEngine(TemplateHeader: Record "NPR RP Template Header"; RecRef: RecordRef)
     var
         DeviceSettings: Record "NPR RP Device Settings";
-        RecRef: RecordRef;
         DataJoinBuffer: Codeunit "NPR RP Data Join Buffer Mgt.";
     begin
         SetDefaultDistributions();
-
-        if Table.IsRecord then
-            RecRef.GetTable(Table)
-        else
-            RecRef := Table;
 
         SetAutoLineBreak(true);
         SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
 
         ParseColumnDistribution(TemplateHeader);
         DataJoinBuffer.SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
+
         if not DataJoinBuffer.ProcessDataJoin(RecRef, TemplateHeader.Code) then //Pulls data from tables and joins on the linked fields.        
             exit;
 
