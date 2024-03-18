@@ -82,6 +82,17 @@ table 6014691 "NPR Package Dimension"
             Caption = 'Package Description';
             DataClassification = CustomerContent;
         }
+        field(21; "Package Amount Incl. VAT"; Decimal)
+        {
+            Caption = 'Package Amount Incl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(22; "Package Amount Currency Code"; Code[10])
+        {
+            Caption = 'Package Amount Currency Code';
+            DataClassification = CustomerContent;
+            TableRelation = Currency;
+        }
         field(25; Items; Integer)
         {
             Caption = 'Items';
