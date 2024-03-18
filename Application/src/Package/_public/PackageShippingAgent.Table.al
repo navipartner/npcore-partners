@@ -14,6 +14,11 @@
             NotBlank = true;
             TableRelation = "Shipping Agent".Code;
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if Rec.Code <> xRec.Code then
+                    Rec."Shipping Provider Code" := Rec.Code;
+            end;
         }
         field(2; Name; Text[50])
         {
@@ -73,6 +78,16 @@
             DataClassification = CustomerContent;
             TableRelation = "Shipping Agent".Code;
         }
+        field(80; "Declared Value Required"; Boolean)
+        {
+            Caption = 'Declared Value Required';
+            DataClassification = CustomerContent;
+        }
+        field(90; "Shipping Provider Code"; Code[50])
+        {
+            Caption = 'Shipping Provider Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -81,13 +96,5 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete();
-    begin
-    end;
 }
 

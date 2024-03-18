@@ -26,6 +26,11 @@
                     ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Shipping Provider Product Code"; Rec."Shipping Provider Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Shipping Provider Code field.';
+                }
                 field("Ship to Contact Mandatory"; Rec."Ship to Contact Mandatory")
                 {
 
@@ -61,6 +66,12 @@
 
                     ToolTip = 'Specifies the value of the Package Type Required field';
                     ApplicationArea = NPRRetail;
+                }
+                field("Declared Value Required"; Rec."Declared Value Required")
+                {
+
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Declared Value Required field.';
                 }
 
             }
