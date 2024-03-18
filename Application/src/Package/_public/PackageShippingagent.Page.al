@@ -25,6 +25,12 @@
                     ToolTip = 'Specifies Shipping Agent Code Name';
                     ApplicationArea = NPRRetail;
                 }
+                field("Shipping Provider Product Code"; Rec."Shipping Provider Code")
+                {
+
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Shipping Provider Code field.';
+                }
                 group(Control6014412)
                 {
 
@@ -95,6 +101,11 @@
                 {
                     ToolTip = 'Specifies the value of the  Volume cubic metres  field.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Declared Value Required"; Rec."Declared Value Required")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Declared Value Required field.';
                 }
             }
             part("NPR Services Combination"; "NPR Services Combination")

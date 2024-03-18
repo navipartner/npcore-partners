@@ -346,6 +346,13 @@ codeunit 6059947 "NPR Package Management"
         PackageDimension."Document No." := rec."No.";
         PackageDimension."Line No." := 10000;
         PackageDimension.Quantity := Rec."npr Kolli";
+
+        if PakkeShippingAgent."Declared Value Required" then
+            PopulatePackageAmountFields(Rec, PackageDimension);
+
+        if PakkeShippingAgent."LxWxH Dimensions Required" then
+            PopulateDefaultPackageDimensions(PackageDimension, PackageProviderSetup);
+
         PackageDimension.Insert(true);
     end;
 
@@ -372,7 +379,157 @@ codeunit 6059947 "NPR Package Management"
             PackageDimension.Quantity := Rec."npr Kolli";
             PackageDimension.modify();
         end;
+    end;
 
+    local procedure GetPackageDimensions(Rec: Record "Sales Header"; var PackageDimension: Record "NPR Package Dimension") Found: Boolean;
+    begin
+        PackageDimension.Reset();
+        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.Setrange("Document No.", Rec."No.");
+        Found := (PackageDimension.Find('-') and (PackageDimension.Next() = 0));
+    end;
+
+    local procedure GetUseDefaultPackageDimensions(SalesHeader: Record "Sales Header") UseDefaultPackageDimensions: Boolean;
+    var
+        PackageShippingAgent: Record "NPR Package Shipping Agent";
+    begin
+        if not PackageShippingAgent.Get(SalesHeader."Shipping Agent Code") then
+            exit;
+
+        UseDefaultPackageDimensions := PackageShippingAgent."LxWxH Dimensions Required";
+    end;
+
+    local procedure UpdatePackageAmountFields(SalesHeader: Record "Sales Header");
+    var
+        PackageDimension: Record "NPR Package Dimension";
+        FieldsPopulated: Boolean;
+    begin
+        if not GetPackageAmountRequired(SalesHeader) then
+            exit;
+
+        if not GetPackageDimensions(SalesHeader, PackageDimension) then
+            exit;
+
+        FieldsPopulated := PopulatePackageAmountFields(SalesHeader, PackageDimension);
+        if not FieldsPopulated then
+            exit;
+
+        PackageDimension.Modify();
+    end;
+
+    local procedure PopulatePackageAmountFields(SalesHeader: Record "Sales Header"; var PackageDimension: Record "NPR Package Dimension") Populated: Boolean;
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PackageAmount: Decimal;
+        CurrnecyCode: Code[10];
+    begin
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        PackageAmount := CalcPakcageAmount(SalesHeader);
+        if PackageDimension."Package Amount Incl. VAT" <> PackageAmount then begin
+            PackageDimension."Package Amount Incl. VAT" := PackageAmount;
+            Populated := true;
+        end;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        CurrnecyCode := SalesHeader."Currency Code";
+        if CurrnecyCode = '' then
+            CurrnecyCode := GeneralLedgerSetup."LCY Code";
+
+        if PackageDimension."Package Amount Currency Code" <> CurrnecyCode then begin
+            PackageDimension."Package Amount Currency Code" := CurrnecyCode;
+            Populated := true;
+        end;
+    end;
+
+    local procedure CalcPakcageAmount(SalesHeader: Record "Sales Header") PakcageAmountInclVAT: Decimal;
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.SetFilter("Net Weight", '<>0');
+        if SalesLine.IsEmpty then
+            exit;
+
+        SalesLine.CalcSums("Amount Including VAT");
+        PakcageAmountInclVAT := SalesLine."Amount Including VAT";
+    end;
+
+    local procedure GetPackageAmountRequired(SalesHeader: Record "Sales Header") PackageAmountRequired: Boolean;
+    var
+        PackageShippingAgent: Record "NPR Package Shipping Agent";
+    begin
+        if not PackageShippingAgent.Get(SalesHeader."Shipping Agent Code") then
+            exit;
+
+        PackageAmountRequired := PackageShippingAgent."Declared Value Required";
+    end;
+
+    local procedure UpdateDefaultPackageDimensions(SalesHeader: Record "Sales Header"; ShippingProviderSetup: Record "NPR Shipping Provider Setup")
+    var
+        PackageDimension: Record "NPR Package Dimension";
+        Modi: Boolean;
+    begin
+        if not GetUseDefaultPackageDimensions(SalesHeader) then
+            exit;
+
+        if not GetPackageDimensions(SalesHeader, PackageDimension) then
+            exit;
+
+        Modi := PopulateDefaultPackageDimensions(PackageDimension, ShippingProviderSetup);
+
+        if Modi then
+            PackageDimension.Modify();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::ICInboxOutboxMgt, 'OnCreateSalesDocumentOnBeforeSalesHeaderModify', '', false, false)]
+    local procedure OnCreateSalesDocumentOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header")
+    begin
+        if SalesHeader.IsTemporary then
+            exit;
+
+        if not InitPackageProvider() then
+            exit;
+
+        ValidateShipmentMethodCode(SalesHeader);
+        UpdatePackageCode(SalesHeader);
+    end;
+
+    local procedure PopulateDefaultPackageDimensions(var PackageDimension: Record "NPR Package Dimension"; ShippingProviderSetup: Record "NPR Shipping Provider Setup") Populated: Boolean;
+    begin
+        if (ShippingProviderSetup."Default Height" <> 0) and (PackageDimension.Height = 0) then begin
+            PackageDimension.Height := ShippingProviderSetup."Default Height";
+            Populated := true;
+        end;
+
+        if (ShippingProviderSetup."Default Width" <> 0) and (PackageDimension.Width = 0) then begin
+            PackageDimension.Width := ShippingProviderSetup."Default Width";
+            Populated := true;
+        end;
+
+        if (ShippingProviderSetup."Default Length" <> 0) and (PackageDimension.Length = 0) then begin
+            PackageDimension.Length := ShippingProviderSetup."Default Length";
+            Populated := true;
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterReleaseSalesDoc', '', false, false)]
+    local procedure OnAfterReleaseSalesDoc(var SalesHeader: Record "Sales Header");
+    begin
+        if SalesHeader.IsTemporary then
+            exit;
+
+        if not InitPackageProvider() then
+            exit;
+
+        UpdatePackageAmountFields(SalesHeader);
+        UpdateDefaultPackageDimensions(SalesHeader, PackageProviderSetup);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterValidateEvent', 'Quantity', false, false)]
@@ -396,6 +553,8 @@ codeunit 6059947 "NPR Package Management"
 
         if Rec."Net Weight" = 0 then
             Rec."Net Weight" := PackageProviderSetup."Default Weight";
+
+        UpdatePackageAmountFields(SalesHeader);
     end;
 
 
@@ -407,6 +566,7 @@ codeunit 6059947 "NPR Package Management"
         if not InitPackageProvider() then
             exit;
         UpdatePackageCode(rec);
+        UpdatePackageAmountFields(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'NPR Kolli', false, false)]
@@ -417,6 +577,7 @@ codeunit 6059947 "NPR Package Management"
         if not InitPackageProvider() then
             exit;
         UpdatePackageQuantity(rec);
+        UpdatePackageAmountFields(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Shipping Agent Service Code', false, false)]
