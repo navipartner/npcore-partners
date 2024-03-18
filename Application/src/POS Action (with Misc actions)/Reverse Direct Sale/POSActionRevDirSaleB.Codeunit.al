@@ -127,6 +127,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::"GL Payment", SaleLinePOS."Line Type"::Comment]) then
             SaleLinePOS.Validate(Quantity, -POSSalesLine.Quantity);
 
+        SaleLinePOS.Validate("Unit of Measure Code", POSSalesLine."Unit of Measure Code");
         SaleLinePOS."VAT %" := POSSalesLine."VAT %";
         SaleLinePOS."Discount %" := Abs(POSSalesLine."Line Discount %");
         SaleLinePOS."Discount Amount" := -POSSalesLine."Line Discount Amount Excl. VAT";
