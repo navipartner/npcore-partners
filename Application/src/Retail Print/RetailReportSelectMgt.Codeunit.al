@@ -98,9 +98,14 @@
             Commit();
 
             repeat
-                RecRef := RecRefIn.Duplicate();
-                if not RecRef.IsEmpty() then begin
+                if RecRefIn.IsTemporary() then begin
+                    RecRef.Open(RecRefIn.Number, true);
+                    RecRef.Copy(RecRefIn, true);
+                end else begin
+                    RecRef := RecRefIn.Duplicate();
+                end;
 
+                if not RecRef.IsEmpty() then begin
                     Variant := RecRef;
                     case true of
                         StrLen(ReportSelection."Print Template") > 0:
@@ -115,6 +120,8 @@
 
                     OnAfterRunReportSelectionRecord(ReportSelection, RecRefIn);
                 end;
+
+                RecRef.Close();
             until ReportSelection.Next() = 0;
 
             POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection);
