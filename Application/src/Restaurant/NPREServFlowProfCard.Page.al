@@ -23,6 +23,28 @@
                     ToolTip = 'Specifies a text that describes the restaurant service flow profile.';
                     ApplicationArea = NPRRetail;
                 }
+                group(AutoCreateWaiterPad)
+                {
+                    ShowCaption = false;
+                    field("AutoSave to W/Pad on Sale End"; Rec."AutoSave to W/Pad on Sale End")
+                    {
+                        ToolTip = 'Specifies whether or not the system should automatically save items that exist in the POS sale to a waiter pad at the end of the sale.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("New Waiter Pad Action"; Rec."New Waiter Pad Action")
+                    {
+                        ToolTip = 'Specifies the code for the POS action that is used when a new waiter pad is created at the end of a sale. Recommended value is "NEW_WAITER_PAD"';
+                        ApplicationArea = NPRRetail;
+                        Enabled = Rec."AutoSave to W/Pad on Sale End";
+
+                        trigger OnAssistEdit()
+                        var
+                            ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+                        begin
+                            ParamMgt.EditParametersForField(Rec."New Waiter Pad Action", Rec.RecordId(), Rec.FieldNo("New Waiter Pad Action"));
+                        end;
+                    }
+                }
                 group(CloseWaiterPad)
                 {
                     ShowCaption = false;

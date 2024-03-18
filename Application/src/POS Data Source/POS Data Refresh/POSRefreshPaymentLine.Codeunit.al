@@ -158,6 +158,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
             FieldsObject.Add(Format(Rec.FieldNo(Description)), Rec.Description);
             FieldsObject.Add(Format(Rec.FieldNo("Currency Amount")), Rec."Currency Amount");
             FieldsObject.Add(Format(Rec.FieldNo("Amount Including VAT")), Rec."Amount Including VAT");
+            FieldsObject.Add(Format(Rec.FieldNo(Indentation)), Rec.Indentation);
 
             POSSession.GetFrontEnd(POSFrontEnd, true);
             POSDataManagement.OnDiscoverDataSourceExtensions(POSDataManagement.POSDataSource_BuiltInPaymentLine(), Extensions);

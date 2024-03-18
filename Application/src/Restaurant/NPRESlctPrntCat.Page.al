@@ -6,9 +6,8 @@
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Worksheet;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR NPRE Print/Prod. Cat.";
-    ApplicationArea = NPRRetail;
 
     layout
     {

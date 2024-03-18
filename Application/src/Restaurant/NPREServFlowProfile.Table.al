@@ -82,6 +82,32 @@
                     Message(AvailableWithKDS);
             end;
         }
+        field(80; "AutoSave to W/Pad on Sale End"; Boolean)
+        {
+            Caption = 'AutoSave to W/Pad on Sale End';
+            DataClassification = CustomerContent;
+        }
+        field(90; "New Waiter Pad Action"; Code[20])
+        {
+            Caption = 'New Waiter Pad Action';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+            begin
+                ParamMgt.ClearParametersForRecord(RecordId, FieldNo("New Waiter Pad Action"));
+                ParamMgt.CopyFromActionToField("New Waiter Pad Action", RecordId, FieldNo("New Waiter Pad Action"));
+            end;
+
+            trigger OnLookup()
+            var
+                ActionMgt: Codeunit "NPR POS Action Management";
+            begin
+                if ActionMgt.LookupAction("New Waiter Pad Action") then
+                    Validate("New Waiter Pad Action");
+            end;
+        }
     }
 
     keys

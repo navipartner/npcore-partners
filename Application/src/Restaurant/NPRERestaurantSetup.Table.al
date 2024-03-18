@@ -88,14 +88,18 @@
 
             trigger OnValidate()
             var
+                NotificationHandler: Codeunit "NPR NPRE Notification Handler";
                 KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
                 SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+                KDSActivated: Boolean;
             begin
                 if IsTemporary() or not "KDS Active" then
                     exit;
                 Modify();
-                if SetupProxy.KDSActivatedForAnyRestaurant() then
+                KDSActivated := SetupProxy.KDSActivatedForAnyRestaurant();
+                if KDSActivated then
                     KitchenOrderMgt.EnableKitchenOrderRetentionPolicy();
+                NotificationHandler.CreateNotificationJobQueues(KDSActivated);
             end;
         }
         field(40; "Station Req. Handl. On Serving"; Option)
@@ -340,6 +344,47 @@
             DataClassification = CustomerContent;
             InitValue = One;
             ValuesAllowed = Zero, One, "Min Party Size";
+        }
+        field(170; "Delayed Ord. Threshold 1 (min)"; Integer)
+        {
+            Caption = 'Delayed Ord. Threshold 1 (min)';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            var
+                NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+                SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+            begin
+                if ("Delayed Ord. Threshold 2 (min)" <= "Delayed Ord. Threshold 1 (min)") and ("Delayed Ord. Threshold 1 (min)" <> 0) and ("Delayed Ord. Threshold 2 (min)" <> 0) then
+                    "Delayed Ord. Threshold 2 (min)" := "Delayed Ord. Threshold 1 (min)" + 5;
+                NotificationHandler.CreateNotificationJobQueues(SetupProxy.KDSActivatedForAnyRestaurant());
+            end;
+        }
+        field(180; "Delayed Ord. Threshold 2 (min)"; Integer)
+        {
+            Caption = 'Delayed Ord. Threshold 2 (min)';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+
+            trigger OnValidate()
+            var
+                NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+                SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+            begin
+                if ("Delayed Ord. Threshold 2 (min)" <= "Delayed Ord. Threshold 1 (min)") and ("Delayed Ord. Threshold 2 (min)" <> 0) then begin
+                    "Delayed Ord. Threshold 1 (min)" := "Delayed Ord. Threshold 2 (min)" - 5;
+                    if "Delayed Ord. Threshold 1 (min)" < 0 then
+                        "Delayed Ord. Threshold 1 (min)" := 0;
+                end;
+                NotificationHandler.CreateNotificationJobQueues(SetupProxy.KDSActivatedForAnyRestaurant());
+            end;
+        }
+        field(190; "Notif. Resend Delay (min)"; Integer)
+        {
+            Caption = 'Notif. Resend Delay (min)';
+            DataClassification = CustomerContent;
+            MinValue = 0;
         }
     }
 

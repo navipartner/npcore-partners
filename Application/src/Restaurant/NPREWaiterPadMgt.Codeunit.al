@@ -80,15 +80,24 @@
         exit(LinkSeatingToWaiterPad(NewWaiterPad, SeatingCode, SeatingWaiterPadLink));
     end;
 
-    procedure CreateNewWaiterPad(SeatingCode: Code[20]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; Description: Text; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
+    procedure CreateNewWaiterPad(SeatingCode: Code[20]; NumberOfGuests: Integer; AssignedWaiterCode: Code[20]; CustomerDetails: Dictionary of [Text, Text]; var WaiterPad: Record "NPR NPRE Waiter Pad"): Boolean
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
         Clear(WaiterPad);
         SetPartySize(WaiterPad, NumberOfGuests);
         WaiterPad."Assigned Waiter Code" := AssignedWaiterCode;
-        WaiterPad.Description := CopyStr(Description, 1, MaxStrLen(WaiterPad.Description));
+        WaiterPad.Description := CopyStr(GetDictionaryValue(CustomerDetails, WaiterPad.FieldName(Description)), 1, MaxStrLen(WaiterPad.Description));
+        WaiterPad."Customer Phone No." := CopyStr(GetDictionaryValue(CustomerDetails, WaiterPad.FieldName("Customer Phone No.")), 1, MaxStrLen(WaiterPad."Customer Phone No."));
+        WaiterPad."Customer E-Mail" := CopyStr(GetDictionaryValue(CustomerDetails, WaiterPad.FieldName("Customer E-Mail")), 1, MaxStrLen(WaiterPad."Customer E-Mail"));
         exit(AddNewWaiterPadForSeating(SeatingCode, WaiterPad, SeatingWaiterPadLink));
+    end;
+
+    local procedure GetDictionaryValue(KeyValueDictionary: Dictionary of [Text, Text]; "Key": Text) Value: Text
+    begin
+        if not KeyValueDictionary.ContainsKey("Key") then
+            exit('');
+        KeyValueDictionary.Get("Key", Value);
     end;
 
     procedure SetPartySize(WaiterPadNo: Code[20]; NumberOfGuests: Integer)
@@ -169,6 +178,12 @@
         MergeToWaiterPad."Billed Number of Guests" := MergeToWaiterPad."Billed Number of Guests" + WaiterPad."Billed Number of Guests";
         if MergeToWaiterPad."Customer No." = '' then
             MergeToWaiterPad."Customer No." := WaiterPad."Customer No.";
+        if MergeToWaiterPad.Description = '' then
+            MergeToWaiterPad.Description := WaiterPad.Description;
+        if MergeToWaiterPad."Customer Phone No." = '' then
+            MergeToWaiterPad."Customer Phone No." := WaiterPad."Customer Phone No.";
+        if MergeToWaiterPad."Customer E-Mail" = '' then
+            MergeToWaiterPad."Customer E-Mail" := WaiterPad."Customer E-Mail";
         RestaurantPrint.SetWaiterPadPreReceiptPrinted(MergeToWaiterPad, false, true);
 
         WaiterPad."Number of Guests" := 0;

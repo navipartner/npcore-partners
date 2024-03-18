@@ -12,7 +12,7 @@
             Caption = 'No.';
             DataClassification = CustomerContent;
         }
-        field(5; Description; Text[80])
+        field(5; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
@@ -201,6 +201,26 @@
             Caption = 'Print Category Filter';
             FieldClass = FlowFilter;
             TableRelation = "NPR NPRE Print/Prod. Cat.";
+        }
+        field(220; "Customer Phone No."; Text[30])
+        {
+            Caption = 'Customer Phone No.';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = PhoneNo;
+        }
+        field(221; "Customer E-Mail"; Text[80])
+        {
+            Caption = 'Customer Email';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            var
+                MailManagement: Codeunit "Mail Management";
+            begin
+                if "Customer E-Mail" <> '' then
+                    MailManagement.CheckValidEmailAddresses("Customer E-Mail");
+            end;
         }
     }
 

@@ -34,7 +34,7 @@
                     {
                         Method = Sum;
                     }
-                    column(WaiterNo; "No.")
+                    column(WaiterPadNo; "No.")
                     {
                     }
                 }

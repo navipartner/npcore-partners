@@ -5,8 +5,8 @@
     var
         NoPhoneMessageErr: Label 'SMS Message and Phone No. must be suplied.';
         NotValidPhoneErr: Label '%1 is not a valid phone number.';
-        NotAllowedServiceErr: Label 'You are not allowed to use the %1 service.';
-        ErrorSendSMS: Label 'SMS wasn''t sent. The service returned:\%1';
+        NotAllowedServiceErr: Label 'You are not authorised to use the %1 service.';
+        ErrorSendSMS: Label 'SMS hasn’t been sent. The service returned:\%1';
 
     [NonDebuggable]
     procedure SendSMS(PhoneNo: Text; SenderNo: Text; Message: Text)
@@ -71,10 +71,13 @@
     local procedure SendHttpRequest(var HttpRespMessage: HttpResponseMessage; HttpCont: HttpContent; Uri: Text; Method: Text)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        TypeHelper: Codeunit "Type Helper";
         HttpClnt: HttpClient;
         RequestHeaders: HttpHeaders;
         HttpReqMessage: HttpRequestMessage;
         Content: Text;
+        ReasonPhraseText: Text;
+        ResponseText: Text;
     begin
         HttpReqMessage.GetHeaders(RequestHeaders);
         RequestHeaders.Add('Authorization', 'Basic ' + GetBasicAuthInfo(AzureKeyVaultMgt.GetAzureKeyVaultSecret('SMSMgtUsername'), AzureKeyVaultMgt.GetAzureKeyVaultSecret('SMSMgtPassword')));
@@ -85,10 +88,16 @@
         HttpClnt.SetBaseAddress(Uri);
         HttpClnt.Send(HttpReqMessage, HttpRespMessage);
 
-        if not HttpRespMessage.IsSuccessStatusCode then
-            Error('%1 - %2',
-                HttpRespMessage.HttpStatusCode, HttpRespMessage.ReasonPhrase);
+        if HttpRespMessage.IsSuccessStatusCode() then
+            exit;
 
+        ReasonPhraseText := HttpRespMessage.ReasonPhrase();
+        if ReasonPhraseText <> '' then
+            ReasonPhraseText := ' - ' + ReasonPhraseText;
+        if not HttpRespMessage.Content().ReadAs(ResponseText) then
+            ResponseText := '';
+        Error('%1%2%3%4',
+            HttpRespMessage.HttpStatusCode(), ReasonPhraseText, TypeHelper.CRLFSeparator(), ResponseText);
     end;
 
     [NonDebuggable]
@@ -126,6 +135,4 @@
     begin
         exit(DelChr(PhoneNo, '<=>', '+1234567890 ') = '');
     end;
-
-
 }

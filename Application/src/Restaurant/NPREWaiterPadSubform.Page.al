@@ -13,6 +13,9 @@
         {
             repeater(Group)
             {
+                IndentationColumn = Rec.Indentation;
+                IndentationControls = Description;
+                ShowCaption = false;
                 field(LineIsMarked; LineIsMarked)
                 {
                     Caption = 'Select';

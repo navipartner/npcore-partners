@@ -9,19 +9,51 @@ enum 6014540 "NPR NPRE K.Req.L. Prod.Status"
     {
         Caption = 'Not Started';
     }
-    value(1; Started)
+    value(1; "Started [Obsolete]")
+    {
+        Caption = 'Started [Obsolete]';
+        ObsoleteState = Pending;
+        ObsoleteTag = 'NPR31.0';
+        ObsoleteReason = 'Replaced by value 10.';
+    }
+    value(2; "On Hold [Obsolete]")
+    {
+        Caption = 'On Hold [Obsolete]';
+        ObsoleteState = Pending;
+        ObsoleteTag = 'NPR31.0';
+        ObsoleteReason = 'Replaced by value 20.';
+    }
+    value(3; "Finished [Obsolete]")
+    {
+        Caption = 'Finished [Obsolete]';
+        ObsoleteState = Pending;
+        ObsoleteTag = 'NPR31.0';
+        ObsoleteReason = 'Replaced by value 30.';
+    }
+    value(4; "Cancelled [Obsolete]")
+    {
+        Caption = 'Cancelled [Obsolete]';
+        ObsoleteState = Pending;
+        ObsoleteTag = 'NPR31.0';
+        ObsoleteReason = 'Replaced by value 40.';
+    }
+    value(5; Pending)
+    {
+        Caption = 'Pending';
+    }
+    value(10; Started)
     {
         Caption = 'Started';
     }
-    value(2; "On Hold")
+    value(20; "On Hold")
     {
         Caption = 'On Hold';
     }
-    value(3; Finished)
+    value(30; Finished)
     {
         Caption = 'Finished';
     }
-    value(4; Cancelled)
+    value(40; Cancelled)
     {
         Caption = 'Cancelled';
     }

@@ -46,8 +46,8 @@ codeunit 6150838 "NPR POS Action: Block Discount" implements "NPR IPOS Workflow"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormat', '', false, false)]
-    local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormatting', '', false, false)]
+    local procedure OnGetLineFormat(var Highlighted: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     begin
         if (SaleLinePOS."Custom Disc Blocked") then begin
             Highlighted := true;
