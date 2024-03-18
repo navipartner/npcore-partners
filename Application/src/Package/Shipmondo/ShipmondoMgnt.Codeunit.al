@@ -142,7 +142,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         Output += StrSubstNo(QueryParams2Lbl, own_agreement);
 
         Output += '"label_format": null,';
-        Output += StrSubstNo(QueryParams3Lbl, PakkelabelsShipment."Shipping Agent Code");
+        Output += StrSubstNo(QueryParams3Lbl, ShippingAgent."Shipping Provider Code");
         Output += StrSubstNo(QueryParams4Lbl, SetProductAndServices(PakkelabelsShipment));
         Output += StrSubstNo(QueryParams11Lbl, PakkelabelsShipment.Reference);
 
@@ -184,16 +184,21 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams8Lbl: label '"telephone": "%1",', Locked = true;
         QueryParams9Lbl: label '"email": "%1"', Locked = true;
         Runtrigger: Boolean;
+        SenderAddress1: Text;
+        SenderAddress2: Text;
     begin
         ShipProvPublicAccess.OnBeforeAssignSender(PakkelabelsShipment, Output, Runtrigger);
         if Runtrigger then
             exit;
         CompanyInformation.Get();
+
+        CreateAddressFields(CompanyInformation.Address, CompanyInformation."Address 2", SenderAddress1, SenderAddress2);
+
         Output := '{';
         Output += StrSubstNo(QueryParamsLbl, CompanyInformation.Name);
         Output += '"attention": null,';
-        Output += StrSubstNo(QueryParams2Lbl, CompanyInformation.Address);
-        Output += StrSubstNo(QueryParams3Lbl, CompanyInformation."Address 2");
+        Output += StrSubstNo(QueryParams2Lbl, SenderAddress1);
+        Output += StrSubstNo(QueryParams3Lbl, SenderAddress2);
         Output += StrSubstNo(QueryParams4Lbl, CompanyInformation."Post Code");
         Output += StrSubstNo(QueryParams5Lbl, CompanyInformation.City);
         Output += StrSubstNo(QueryParams6Lbl, CompanyInformation."Country/Region Code");
@@ -216,14 +221,17 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams9Lbl: label '"mobile": "%1",', Locked = true;
         QueryParams10Lbl: label '"telephone": "%1"', Locked = true;
         QueryParams11Lbl: label ',"instruction":"%1"', Locked = true;
+        ReceiverAddress1: Text;
+        ReceiverAddress2: Text;
     begin
+        CreateAddressFields(PakkelabelsShipment.Address, PakkelabelsShipment."Address 2", ReceiverAddress1, ReceiverAddress2);
+
         Output := '{';
         Output += StrSubstNo(QueryParamsLbl, PakkelabelsShipment.Name);
         Output += StrSubstNo(QueryParams2Lbl, PakkelabelsShipment.Contact);
-        Output += StrSubstNo(QueryParams3Lbl, PakkelabelsShipment.Address);
-        if PakkelabelsShipment."Address 2" <> '' then
-            Output += StrSubstNo(QueryParams4Lbl, PakkelabelsShipment."Address 2");
-
+        Output += StrSubstNo(QueryParams3Lbl, ReceiverAddress1);
+        if ReceiverAddress2 <> '' then
+            Output += StrSubstNo(QueryParams4Lbl, ReceiverAddress2);
         Output += StrSubstNo(QueryParams5Lbl, PakkelabelsShipment."Post Code");
         Output += StrSubstNo(QueryParams6Lbl, PakkelabelsShipment.City);
         Output += StrSubstNo(QueryParams7Lbl, PakkelabelsShipment."Country/Region Code");
@@ -262,6 +270,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams8Lbl: label '"volume":"%1"', Locked = true;
         QueryParams9Lbl: label '"running_metre":"%1"', Locked = true;
         QueryParams10Lbl: label '"description":"%1"', Locked = true;
+        QueryParams11Lbl: label '"declared_value":%1', Locked = true;
 
     begin
         PakkeShippingAgent.Get(PakkelabelsShipment."Shipping Agent Code");
@@ -305,6 +314,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                     Output += ',';
                     Output += StrSubstNo(QueryParams2Lbl, Format(ShippingPackageCode.Description, 0, 1));
                 end;
+                if PakkeShippingAgent."Declared Value Required" then begin
+                    Output += ',';
+                    Output += StrSubstNo(QueryParams11Lbl, BuildDeclaredValue(PackageDimension));
+                end;
                 if i <> J then
                     Output += '},'
                 else
@@ -313,6 +326,12 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             until PackageDimension.Next() = 0;
         Output += ']';
 
+    end;
+
+    local procedure BuildDeclaredValue(PackageDimension: Record "NPR Package Dimension") DeclaredValueJsonObject: JsonObject;
+    begin
+        DeclaredValueJsonObject.Add('amount', PackageDimension."Package Amount Incl. VAT");
+        DeclaredValueJsonObject.Add('currency_code', PackageDimension."Package Amount Currency Code");
     end;
 
     local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Shipping Provider Document"): Boolean;
@@ -409,7 +428,18 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         end;
     end;
 
+    local procedure CreateAddressFields(ShippingProviderDocumentAddress1: Text; ShippingProviderDocumentAddress2: Text; var ShipmondoAddress1: Text; var ShipmondoAddress2: Text)
+    var
+        FullAddress: Text;
+    begin
+        FullAddress := ShippingProviderDocumentAddress1;
+        if ShippingProviderDocumentAddress2 <> '' then
+            FullAddress += ' ' + ShippingProviderDocumentAddress2;
 
+        ShipmondoAddress1 := CopyStr(FullAddress, 1, 32);
+        if StrLen(FullAddress) > 32 then
+            ShipmondoAddress2 := CopyStr(FullAddress, 33);
+    end;
 
     local procedure PrintJob(ShipmentDocument: Record "NPR Shipping Provider Document") output: Text;
     var

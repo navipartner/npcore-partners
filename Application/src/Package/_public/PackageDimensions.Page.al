@@ -60,6 +60,17 @@ page 6059910 "NPR Package Dimensions"
                     ToolTip = 'Specifies the value of the Package Description field.';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Package Amount Incl. VAT"; Rec."Package Amount Incl. VAT")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Package Amount Incl. VAT field.';
+                }
+                field("Package Amount Currency Code"; Rec."Package Amount Currency Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Package Amount Currency Code field.';
+                }
                 field(Items; Rec.Items)
                 {
                     ApplicationArea = NPRRetail;
