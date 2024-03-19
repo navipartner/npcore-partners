@@ -157,4 +157,8 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnGetMembershipMembers_OnBeforeTempMemberInfoResponseInsert(var TempMemberInfoResponse: Record "NPR MM Member Info Capture")
+    begin
+    end;
 }
