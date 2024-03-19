@@ -17,7 +17,6 @@
         EXPIRE_CALC_NEXT: Label 'When testing %1, next period start %2 must be the day after previous period end %3.';
         MISSING_VALUE: Label 'Missing value in field %1.';
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
-        SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
         _MembershipEvents: Codeunit "NPR MM Membership Events";
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterInsertValueEntry', '', true, true)]
@@ -1197,12 +1196,8 @@
                                 if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount Amount") then
                                     TmpLoyaltyPointsSetup."Amount LCY" := TmpLoyaltyPointsSetup."Discount Amount";
 
-                                if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount %") then begin
-                                    if (SubTotal = 0) then
-                                        exit(ErrorExit(ReasonText, StrSubstNo(SUBTOTAL_ZERO, TmpLoyaltyPointsSetup.FieldName("Coupon Type Code"), TmpLoyaltyPointsSetup."Coupon Type Code")));
-
+                                if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount %") then
                                     TmpLoyaltyPointsSetup."Amount LCY" := SubTotal * TmpLoyaltyPointsSetup."Discount %" / 100;
-                                end;
 
                                 TmpLoyaltyPointsSetup.Insert();
                             end;
@@ -2010,6 +2005,7 @@
         Membership: Record "NPR MM Membership";
         LoyaltyPointSetup: Record "NPR MM Loyalty Point Setup";
         LoyaltyMgr: Codeunit "NPR MM Loyalty Coupon Mgr";
+        LoyaltySetup: Record "NPR MM Loyalty Setup";
     begin
         TempValidCouponToCreate.Reset();
         TempValidCouponToCreate.SetFilter("Notification Code", '<>%1', '');
@@ -2019,25 +2015,39 @@
         if (not Membership.Get(MembershipEntryNo)) then
             exit;
 
+        if (not LoyaltySetup.Get(TempValidCouponToCreate.Code)) then
+            exit;
+
         repeat
             if (NotificationSetup.Get(TempValidCouponToCreate."Notification Code")) then begin
-                Clear(CouponNotification);
-                CouponNotification."Membership Entry No." := MembershipEntryNo;
-                CouponNotification."Notification Trigger" := CouponNotification."Notification Trigger"::COUPON;
-                CouponNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
-                CouponNotification."Target Member Role" := NotificationSetup."Target Member Role";
-                CouponNotification."Processing Method" := NotificationSetup."Processing Method";
-                CouponNotification."Notification Method Source" := CouponNotification."Notification Method Source"::MEMBER;
-                CouponNotification."Date To Notify" := Today() + abs(NotificationSetup."Days Past");
-                CouponNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
+                CouponNotification.Reset();
+                CouponNotification.SetCurrentKey("Membership Entry No.");
+                CouponNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+                CouponNotification.SetFilter("Notification Trigger", '=%1', CouponNotification."Notification Trigger"::COUPON);
+                CouponNotification.SetFilter("Notification Code", '=%1', TempValidCouponToCreate."Notification Code");
+                CouponNotification.SetFilter("Loyalty Point Setup Id", '=%1', TempValidCouponToCreate.SystemId);
+                CouponNotification.SetFilter("Date To Notify", '=%1', Today() + abs(NotificationSetup."Days Past"));
+                if (not CouponNotification.FindFirst()) then begin
+                    Clear(CouponNotification);
+                    CouponNotification."Membership Entry No." := MembershipEntryNo;
+                    CouponNotification."Notification Trigger" := CouponNotification."Notification Trigger"::COUPON;
+                    CouponNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+                    CouponNotification."Target Member Role" := NotificationSetup."Target Member Role";
+                    CouponNotification."Processing Method" := NotificationSetup."Processing Method";
+                    CouponNotification."Notification Method Source" := CouponNotification."Notification Method Source"::MEMBER;
+                    CouponNotification."Date To Notify" := Today() + abs(NotificationSetup."Days Past");
+                    CouponNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
 
-                CouponNotification."Notification Code" := TempValidCouponToCreate."Notification Code";
-                CouponNotification."Loyalty Point Setup Id" := TempValidCouponToCreate.SystemId;
+                    CouponNotification."Notification Code" := TempValidCouponToCreate."Notification Code";
+                    CouponNotification."Loyalty Point Setup Id" := TempValidCouponToCreate.SystemId;
 
-                if (LoyaltyPointSetup.GetBySystemId(CouponNotification."Loyalty Point Setup Id")) then begin
-                    CouponNotification."Coupon No." := LoyaltyMgr.IssueOneCoupon(LoyaltyPointSetup."Coupon Type Code", CouponNotification."Membership Entry No.", '', Today(), LoyaltyPointSetup."Points Threshold", 0);
-                    CouponNotification.Insert();
-                end;
+                    if (LoyaltyPointSetup.GetBySystemId(CouponNotification."Loyalty Point Setup Id")) then begin
+                        CouponNotification."Coupon No." := 'USER_SELECTION';
+                        if (LoyaltySetup."Voucher Creation" <> LoyaltySetup."Voucher Creation"::PROMPT) then
+                            CouponNotification."Coupon No." := LoyaltyMgr.IssueOneCoupon(LoyaltyPointSetup."Coupon Type Code", CouponNotification."Membership Entry No.", '', Today(), LoyaltyPointSetup."Points Threshold", 0);
+                        CouponNotification.Insert();
+                    end;
+                end
             end;
         until (TempValidCouponToCreate.Next() = 0);
     end;

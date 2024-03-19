@@ -1087,9 +1087,10 @@
 
                 if (TempLoyaltyPointsSetup."Value Assignment" = TempLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
                     if (TempLoyaltyPointsSetup."Points Threshold" <= Membership."Remaining Points") then
-
-                        //LoyaltyCouponMgr.IssueOneCouponAndPrint (TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", TmpLoyaltyPointsSetup."Points Threshold",0);
                         LoyaltyCouponMgr.IssueOneCouponAndPrint(TempLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", Membership."External Membership No.", Today, TempLoyaltyPointsSetup."Points Threshold", 0);
+
+            // (TempLoyaltyPointsSetup."Value Assignment" = TempLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY)
+            // would require a user question to ask value of coupon to issue
 
             until (TempLoyaltyPointsSetup.Next() = 0);
         end;
