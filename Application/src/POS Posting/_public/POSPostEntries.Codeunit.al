@@ -124,7 +124,7 @@
         CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
 
         if (not CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry)) then begin
-            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false);
+            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true);
             MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end else begin
             UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false);
