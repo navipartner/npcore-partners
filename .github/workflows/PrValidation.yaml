@@ -1,0 +1,33 @@
+name: 'PR Validation'
+run-name: ${{ github.workflow }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - 'main'
+      - 'master'
+    paths:
+      - 'Application/**'
+      - 'Test/**'
+      - 'Performance Toolkit/**'
+      - '.github/**'
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  Run:
+    uses: navipartner/devops/.github/workflows/MainWorkflow.yaml@main
+    secrets: inherit
+    with:
+      pipelineType: other

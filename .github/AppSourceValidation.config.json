@@ -1,0 +1,11 @@
+{
+  "testAppFolder": "",
+  "bcptAppFolder": "",
+  "countries": ["W1","AT","BE","BG","BR","CA","CH","CO","CZ","VN","DE","EE","ES","FI","FR","GB","GR","HK","HR","HU","IE","AU","IN","IS","IT","KR","LT","LV","MX","NL","NO","NZ","PE","PH","PL","DK","PT","RS","SE","SI","SK","TH","TR","TW","UA","US","JP","RO"],
+  "containers": [
+    {
+      "name": "vLatest_CLOUD",
+      "useCompareApp": true
+    }
+  ]
+}

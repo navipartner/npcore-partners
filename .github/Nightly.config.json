@@ -1,0 +1,13 @@
+{
+  "containers": [
+    {
+      "name": "vLatest_CLOUD",
+      "useCompareApp": true
+    },
+    {
+      "name": "Insider_CLOUD",
+        "continueOnError": true,
+        "useCompareApp": true
+    }
+  ]
+}

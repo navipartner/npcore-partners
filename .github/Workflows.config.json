@@ -1,0 +1,111 @@
+{
+    "appFolder": "Application",
+    "testAppFolder": "Test",
+    "bcptAppFolder": "Performance Toolkit",
+    "countries": ["w1"],
+    "containers": [
+        {
+            "name": "Auto"
+        },
+        {
+            "name": "BC1700"
+        },
+        {
+            "name": "BC1704"
+        },
+        {
+            "name": "BC1711"
+        },
+        {
+            "name": "BC1804"
+        },
+        {
+            "name": "BC1906"
+        },
+        {
+            "name": "BC2103"
+        },
+        {
+            "name": "BC2117"
+        },
+        {
+            "name": "BC2304_CLOUD"
+        },
+        {
+            "name": "vPrevious_CLOUD"
+        },
+        {
+            "name": "vLatest_CLOUD",
+            "useCompareApp": true
+        },
+        {
+            "name": "Insider_CLOUD",
+            "useCompareApp": true,
+            "continueOnError": true
+        }
+    ],
+
+    "objectsVisibilityCheck": {
+        "enabled": true,
+        "publicFolderName": "_public"
+    },
+    "applicationAreasCheck": {
+        "enabled": true,
+        "allowed": ["NPRRetail", 
+        "NPRTicketEssential", 
+        "NPRTicketAdvanced",
+        "NPRTicketDynamicPrice",
+        "NPRTicketWallet",
+        "NPRMembershipEssential",
+        "NPRMembershipAdvanced",
+        "NPRNaviConnect",
+        "NPRHeyLoyalty",
+        "NPRRSRLocal",
+        "NPRRSLocal",
+        "NPRRSFiscal",
+        "NPRSIFiscal",
+        "NPRNOFiscal",
+        "NPRCROFiscal",
+        "NPRBGSISFiscal",
+        "NPRITFiscal",
+        "NPRDKFiscal",
+        "NPRHUMultiSoftEInv"],
+        "exceptions": [
+            {
+                "id": 6151094,
+                "name": "NPR Feature Management",
+                "type": "Page"
+            }
+        ]
+    },
+    "obsoleteTagsCheck": {
+        "enabled": true
+    },
+    "generatePermissions": {
+        "enabled": true,
+        "permissionSet": {
+            "path": "Permissions/NPRETAIL.PermissionSet.al",
+            "objectId": 6014400,
+            "objectName": "NPR NP RETAIL",
+            "objectCaption": "NP Retail"
+        },
+        "xml": {
+            "path": "Permissions/NPRETAIL.PermissionSet.xml",
+            "roleId": "NP RETAIL",
+            "roleName": "NP Retail"
+        }
+    },
+    "rulesetFile": "main.ruleset.json",
+    "analyzers": ["AppSourceCop", "UICop", "CodeCop"],
+    "translations": {
+        "repoUrl": "https://gitlab.com/navipartner1/npcore/npcore-translations.git",
+        "repoUser": "AzureDevOpsCI",
+        "repoPassword": "glpat-BDeGifhMZcZ89LAT4qBw",
+        "repoBranchName": "i10n_master",
+        "targetRepoBranchName": "master"
+    },
+    "useCompareAppVersion": "appsource",
+    "appSourceProductName": "NP Retail",
+    "NuGetFeed": "https://navipartner.pkgs.visualstudio.com/_packaging/NaviPartner.NavApps/nuget/v3/index.json",
+    "approvedReleaseActors": ["vhn", "gustavkauman", "slaven"]
+}

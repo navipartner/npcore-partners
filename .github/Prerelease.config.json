@@ -1,0 +1,41 @@
+{
+  "containers": [
+    {
+        "name": "Auto"
+    },
+    {
+        "name": "BC1700"
+    },
+    {
+        "name": "BC1704"
+    },
+    {
+        "name": "BC1711"
+    },
+    {
+        "name": "BC1804"
+    },
+    {
+        "name": "BC1906"
+    },
+    {
+        "name": "BC2103"
+    },
+    {
+        "name": "BC2117"
+    },
+    {
+        "name": "BC2304_CLOUD"
+    },
+    {
+        "name": "vPrevious_CLOUD"
+    },
+    {
+        "name": "vLatest_CLOUD"
+    },
+    {
+        "name": "Insider_CLOUD",
+        "continueOnError": true
+    }
+  ]
+}

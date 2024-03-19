@@ -1,0 +1,25 @@
+name: 'Nightly'
+run-name: ${{ github.workflow }}
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  Run:
+    uses: navipartner/devops/.github/workflows/MainWorkflow.yaml@main
+    secrets: inherit
+    with:
+      pipelineType: other
