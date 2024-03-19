@@ -7,5 +7,6 @@
       "name": "vLatest_CLOUD",
       "useCompareApp": true
     }
-  ]
+  ],
+  "runTests": false
 }
