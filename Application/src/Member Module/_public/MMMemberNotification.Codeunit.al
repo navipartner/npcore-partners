@@ -146,8 +146,10 @@
             MembershipNotification."Notification Trigger"::COUPON,
             MembershipNotification."Notification Trigger"::ACHIEVEMENT:
                 begin
-                    if (not Coupon.Get(MembershipNotification."Coupon No.")) then
-                        exit(_NOTIFICATION_ACTION::IGNORE); // Coupon not created yet or not valid
+                    if (MembershipNotification."Coupon No." <> '') then
+                        if (MembershipNotification."Coupon No." <> 'USER_SELECTION') then
+                            if (not Coupon.Get(MembershipNotification."Coupon No.")) then
+                                exit(_NOTIFICATION_ACTION::IGNORE); // Coupon not created yet or not valid
 
                     if ((Coupon."Ending Date" > CreateDateTime(0D, 0T)) and (Coupon."Ending Date" < CurrentDateTime())) then
                         exit(_NOTIFICATION_ACTION::CANCEL); // Coupon has expired - cancel notification
@@ -220,6 +222,7 @@
         MemberCommunity: Record "NPR MM Member Community";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
+        LoyaltyPointSetup: Record "NPR MM Loyalty Point Setup";
         Coupon: Record "NPR NpDc Coupon";
         AzureRegistrationSetup: Record "NPR MM AzureMemberRegSetup";
         AzureLog: Record "NPR MM AzureMemberUpdateLog";
@@ -334,8 +337,15 @@
             RequestMagentoPasswordUrl(Membership."Customer No.", MembershipRole."Contact No.", Member."E-Mail Address", MemberNotificationEntry."Magento Get Password URL", MemberNotificationEntry."Failed With Message");
 
         if (MembershipNotification."Coupon No." <> '') then begin
-            if (not Coupon.Get(MembershipNotification."Coupon No.")) then
-                Coupon.Init();
+            Coupon.Init();
+            if (not Coupon.Get(MembershipNotification."Coupon No.")) then begin
+                if (LoyaltyPointSetup.GetBySystemId(MembershipNotification."Loyalty Point Setup Id")) then begin
+                    Coupon.Description := CopyStr(LoyaltyPointSetup.Description, 1, MaxStrLen(Coupon.Description));
+                    Coupon."Discount %" := LoyaltyPointSetup."Discount %";
+                    Coupon."Discount Amount" := LoyaltyPointSetup."Discount Amount";
+                    Coupon."Discount Type" := LoyaltyPointSetup."Discount Type";
+                end;
+            end;
             MemberNotificationEntry."Coupon Reference No." := Coupon."Reference No.";
             MemberNotificationEntry."Coupon Description" := Coupon.Description;
             MemberNotificationEntry."Coupon Discount %" := Coupon."Discount %";
