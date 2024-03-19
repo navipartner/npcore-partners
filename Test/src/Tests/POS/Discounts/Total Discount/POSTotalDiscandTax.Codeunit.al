@@ -5318,6 +5318,232 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfPOSSaleTaxLinesExistAfterApplyTotalDiscountBeforePosting()
+    var
+        SalePOS: Record "NPR POS Sale";
+        Item: Record Item;
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscTimeIntervSecond: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountBenefitSecond: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountHeaderSecond: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        NPRTotalDiscountLineSecond: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DiscountFilter: Text;
+    begin
+        // [SCENARIO] Check if POS Sale Tax lines exist after total discount calculation before posting
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discouts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(DiscountFilter);
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] 2 Total Discounts
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLine);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 15000, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Amount, 500, false, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountHeader(NPRTotalDiscountHeaderSecond, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 1);
+        CreateTotalDiscountLine(NPRTotalDiscountHeaderSecond, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLineSecond);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeaderSecond, 15000, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Amount, 500, false, NPRTotalDiscountBenefitSecond);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeaderSecond, 0T, 0T, NPRTotalDiscTimeIntervSecond);
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeaderSecond.Status := NPRTotalDiscountHeaderSecond.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+        NPRTotalDiscountHeaderSecond.Modify();
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        CreateItem(Item,
+                  VATPostingSetup."VAT Bus. Posting Group",
+                  VATPostingSetup."VAT Prod. Posting Group",
+                  '',
+                  true);
+
+        Item."Unit Price" := 14000;
+        Item.Modify();
+
+        // [Given] POS Sale Line with the item
+        LibraryPOSMock.CreateItemLine(POSSession,
+                                      Item."No.",
+                                      1);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        //[THEN] POS Sale Tax Line should be created but discount not applied
+        Assert.IsTrue(POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId), 'POS Sale Tax Line not created.');
+        Assert.AreEqual(POSSaleTax."Source Discount Amount", 0, 'Total Discount was applied and that is not according to scenario.');
+
+        // [When] Total Pressed
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        //RefreshLine
+        if not SaleLinePOS.Get(SaleLinePOS.RecordId) then
+            Clear(SaleLinePOS);
+        Assert.IsTrue(POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId), 'POS Sale Tax Line not created.');
+
+        // [THEN] Total Discount should not be applied
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        Assert.IsTrue(SaleLinePOS."Total Discount Code" = '', 'Total Discount was applied.');
+        Assert.IsTrue(SaleLinePOS."Total Discount Step" = 0, 'The correct Total Discount Step was applied.');
+        Assert.IsTrue(SaleLinePOS."Discount Amount" = 0, 'The total discount amount is incorrect.');
+
+        // [THEN] Total Discount should be same on POS Sale Line and POS Sale Tax line
+        Assert.IsTrue(POSSaleTax."Source Rec. System Id" = SaleLinePOS.SystemId, 'POS Sale Tax Line not created.');
+        Assert.IsTrue(SaleLinePOS."Discount Amount" = POSSaleTax."Source Discount Amount", 'Total Discount amount not applied accordign to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckIfPOSSaleTaxLinesExistAfterApplyTotalDiscountAfterPosting()
+    var
+        SalePOS: Record "NPR POS Sale";
+        Item: Record Item;
+        NPRTotalDiscTimeInterv: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscTimeIntervSecond: Record "NPR Total Disc. Time Interv.";
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountBenefitSecond: Record "NPR Total Discount Benefit";
+        NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+        NPRTotalDiscountHeaderSecond: Record "NPR Total Discount Header";
+        NPRTotalDiscountLine: Record "NPR Total Discount Line";
+        NPRTotalDiscountLineSecond: Record "NPR Total Discount Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSSaleTax: Record "NPR POS Sale Tax";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+        POSEntry: Record "NPR POS Entry";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DiscountFilter: Text;
+        AmountToPay: Decimal;
+        SaleEnded: Boolean;
+    begin
+        // [SCENARIO] Check if POS Sale Tax lines exist after total discount calculation after posting
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] No Discouts
+        DeleteDiscounts();
+
+        // [GIVEN] Enable discount
+        EnableDiscount(DiscountFilter);
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] 2 Total Discounts
+        CreateTotalDiscountHeader(NPRTotalDiscountHeader, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 0);
+        CreateTotalDiscountLine(NPRTotalDiscountHeader, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLine);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeader, 15000, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Amount, 500, false, NPRTotalDiscountBenefit);
+
+        CreateTotalDiscountHeader(NPRTotalDiscountHeaderSecond, '', Enum::"NPR Total Discount Amount Calc"::"Discount Filters", Enum::"NPR Total Discount Application"::"Discount Filters", 1);
+        CreateTotalDiscountLine(NPRTotalDiscountHeaderSecond, Enum::"NPR Total Discount Line Type"::All, '', '', NPRTotalDiscountLineSecond);
+        CreateTotalDiscountBenefits(NPRTotalDiscountHeaderSecond, 15000, Enum::"NPR Total Disc. Benefit Type"::Discount, '', '', 0, Enum::"NPR Total Disc Ben Value Type"::Amount, 500, false, NPRTotalDiscountBenefitSecond);
+
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeader, 0T, 0T, NPRTotalDiscTimeInterv);
+        CreateTotalDiscountActiveTimeInterval(NPRTotalDiscountHeaderSecond, 0T, 0T, NPRTotalDiscTimeIntervSecond);
+        NPRTotalDiscountHeader.Status := NPRTotalDiscountHeader.Status::Active;
+        NPRTotalDiscountHeaderSecond.Status := NPRTotalDiscountHeaderSecond.Status::Active;
+        NPRTotalDiscountHeader.Modify();
+        NPRTotalDiscountHeaderSecond.Modify();
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSale);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        CreateItem(Item,
+                  VATPostingSetup."VAT Bus. Posting Group",
+                  VATPostingSetup."VAT Prod. Posting Group",
+                  '',
+                  true);
+
+        Item."Unit Price" := 14000;
+        Item.Modify();
+
+        // [Given] POS Sale Line with the item
+        LibraryPOSMock.CreateItemLine(POSSession,
+                                      Item."No.",
+                                      1);
+
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        //[THEN] POS Sale Tax Line should be created but discount not applied
+        Assert.IsTrue(POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId), 'POS Sale Tax Line not created.');
+        Assert.AreEqual(POSSaleTax."Source Discount Amount", 0, 'Total Discount was applied and that is not according to scenario.');
+
+        // [When] Total Pressed
+        POSSalesDiscountCalcMgt.OnAfterTotalPressedPOS(SaleLinePOS);
+
+        //RefreshLine
+        if not SaleLinePOS.Get(SaleLinePOS.RecordId) then
+            Clear(SaleLinePOS);
+        Assert.IsTrue(POSSaleTaxCalc.Find(POSSaleTax, SaleLinePOS.SystemId), 'POS Sale Tax Line not created.');
+
+        // [THEN] Total Discount should not be applied
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        Assert.IsTrue(SaleLinePOS."Total Discount Code" = '', 'Total Discount was not applied.');
+        Assert.IsTrue(SaleLinePOS."Total Discount Step" = 0, 'The correct Total Discount Step was not applied.');
+        Assert.IsTrue(SaleLinePOS."Discount Amount" = 0, 'The total discount amount is incorrect.');
+
+        // [THEN] Total Discount should be same on POS Sale Line and POS Sale Tax line
+        Assert.IsTrue(POSSaleTax."Source Rec. System Id" = SaleLinePOS.SystemId, 'POS Sale Tax Line not created.');
+        Assert.IsTrue(SaleLinePOS."Discount Amount" = POSSaleTax."Source Discount Amount", 'Total Discount amount not applied accordign to scenario.');
+
+        AmountToPay := GetAmountToPay(SaleLinePOS);
+        AmountToPay := Round(AmountToPay, 1, '>');
+
+        // [WHEN] End of Sale
+        SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
+        Assert.IsTrue(SaleEnded, 'Sale should have ended when applying full payment.');
+
+        // [THEN] Verify POS Entry and POS Entry Tax Line are created
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.FindFirst();
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryTaxLine.FindFirst();
+
+        //[THEN] Verify POS Entry Tax Line has correct line amount value
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", POSEntryTaxLine."Amount Including Tax", 'Amount on POS Entry Tax Line is not calculated according to scenario.');
+    end;
+
 
     local procedure CheckTotalDiscountBenefits(SalePOS: Record "NPR POS Sale";
                                                NPRTotalDiscountHeader: Record "NPR Total Discount Header";
@@ -5681,11 +5907,9 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         LibraryERM: Codeunit "Library - ERM";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
     begin
-        if Initialized then begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
-        end;
+        //Clean any previous mock session
+        POSSession.ClearAll();
+        Clear(POSSession);
 
         if not Initialized then begin
             SalesSetup.Get();
