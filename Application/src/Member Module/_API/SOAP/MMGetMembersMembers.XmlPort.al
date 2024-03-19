@@ -420,6 +420,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
         RequestMemberUpdate: Record "NPR MM Request Member Update";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
     begin
 
         if (ExtMembershipNo = '') and (ExtMemberNo = '') and (ExtCardNumber = '') then
@@ -487,6 +488,7 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         TempMemberInfoResponse."GDPR Approval" := TempMemberInfoResponse."GDPR Approval"::NA;
                 end;
 
+                MembershipEvents.OnGetMembershipMembers_OnBeforeTempMemberInfoResponseInsert(TempMemberInfoResponse);
                 TempMemberInfoResponse."Entry No." := TempMemberInfoResponse.Count() + 1;
                 TempMemberInfoResponse.Insert();
 
