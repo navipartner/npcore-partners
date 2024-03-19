@@ -96,7 +96,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         POSSession.ChangeViewPayment();
     end;
 
-    local procedure AddSaleDimensionWorkflow(SalePOS: Record "NPR POS Sale"; PreWorkflows: JsonObject)
+    procedure AddSaleDimensionWorkflow(SalePOS: Record "NPR POS Sale"; PreWorkflows: JsonObject)
     var
         Dimension: Record Dimension;
         POSPmtViewEventSetup: Record "NPR POS Paym. View Event Setup";
