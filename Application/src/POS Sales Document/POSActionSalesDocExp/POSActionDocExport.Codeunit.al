@@ -316,10 +316,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     var
         SalePOS: Record "NPR POS Sale";
         NPRPOSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
+        POSActionPaymentWF2: Codeunit "NPR POS Action: Payment WF2";
     begin
         Sale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." = '' then
             AddCustomerWorkflow(Context, PreWorkflows);
+        POSActionPaymentWF2.AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
         NPRPOSActionDocExpEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
 
