@@ -1,4 +1,4 @@
-﻿codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines" implements "NPR IPOS Workflow"
+codeunit 6151176 "NPR POSAction: Merg.Smlr.Lines" implements "NPR IPOS Workflow"
 {
     Access = Internal;
 
@@ -27,6 +27,5 @@
 'let main=async({})=>await workflow.respond();'
         )
     end;
-
 }
 
