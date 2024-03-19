@@ -7,6 +7,9 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
+        CollapseNotSupportedMsg: Label 'Collapse is not supported for the Items: %1';
+        NotCollapsedItems: text;
+        CollapseSupported: Boolean;
     begin
         SaleLinePOS.SetCurrentKey("No.");
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
@@ -29,19 +32,25 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
 
             if SaleLinePOS.Count() > 1 then begin
 
-                TempSaleLinePOS := SaleLinePOS;
-                TempSaleLinePOS.Insert();
+                CollapseSupported := true;
+                OnBeforeCollapseSaleLine(SaleLinePOS, CollapseSupported);
+                if not CollapseSupported then
+                    CollectNotCollapsedItem(NotCollapsedItems, SaleLinePOS."No.")
+                else begin
+                    TempSaleLinePOS := SaleLinePOS;
+                    TempSaleLinePOS.Insert();
 
-                POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
-                POSSaleLine.DeleteLine();
-
-                while SaleLinePOS.Next() > 0 do begin
-                    TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
                     POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
                     POSSaleLine.DeleteLine();
-                end;
 
-                TempSaleLinePOS.Modify();
+                    while SaleLinePOS.Next() > 0 do begin
+                        TempSaleLinePOS.Quantity += SaleLinePOS.Quantity;
+                        POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+                        POSSaleLine.DeleteLine();
+                    end;
+
+                    TempSaleLinePOS.Modify();
+                end;
             end;
 
             SaleLinePOS.SetRange("No.");
@@ -50,6 +59,9 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.SetRange("Unit of Measure Code");
             SaleLinePOS.SetRange("Discount %");
         until SaleLinePOS.Next() = 0;
+
+        if NotCollapsedItems <> '' then
+            Message(StrSubstNo(CollapseNotSupportedMsg, NotCollapsedItems));
 
         if not TempSaleLinePOS.FindSet() then
             exit;
@@ -63,5 +75,18 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.Modify();
             POSSaleLine.RefreshCurrent();
         until TempSaleLinePOS.Next() = 0;
+    end;
+
+    local procedure CollectNotCollapsedItem(var NotCollapsedItems: Text; ItemNo: Code[20])
+    begin
+        if NotCollapsedItems = '' then
+            NotCollapsedItems := ItemNo
+        else
+            NotCollapsedItems += ', ' + ItemNo;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCollapseSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var CollapseSupported: Boolean)
+    begin
     end;
 }
