@@ -2327,11 +2327,9 @@ codeunit 85035 "NPR POS Normal Tax Calc. Tests"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
-        if Initialized then begin
             //Clean any previous mock session
             POSSession.ClearAll();
             Clear(POSSession);
-        end;
 
         if not Initialized then begin
             LibraryTaxCalc.BindNormalTaxCalcTest();

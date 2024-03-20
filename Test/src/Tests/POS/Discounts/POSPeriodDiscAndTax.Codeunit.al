@@ -4673,11 +4673,9 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
-        if Initialized then begin
             //Clean any previous mock session
             POSSession.ClearAll();
             Clear(POSSession);
-        end;
 
         if not Initialized then begin
             SalesSetup.Get();

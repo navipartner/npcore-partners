@@ -333,7 +333,7 @@
         Commit();
         ClearLastError();
         if (not ChangeViewInitializeDataSources(Setup, DefaultView, Request)) then
-            ReportBugAndThrowError(StrSubstNo(CHANGE_VIEW_ERROR, GetLastErrorCode()));
+            ReportBugAndThrowError(StrSubstNo(CHANGE_VIEW_ERROR, GetLastErrorText()));
     end;
 
     [TryFunction]
@@ -418,7 +418,10 @@
             _POSSession.SetInAction(false);
             Request.Initialize(ErrorText);
             InvokeFrontEndAsync(Request);
-            Error(''); // Transaction must aborted and rolled back. It is mandatory.
+            if _POSSession.GetReportErrorMessage() then
+                Error(GetBugErrorMessage(ErrorText))
+            else
+                Error('');
         end else
             Error(GetBugErrorMessage(ErrorText));
     end;

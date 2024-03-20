@@ -22,6 +22,9 @@ codeunit 85003 "NPR Library - POS Mock"
 
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSBackgroundTaskAPI);
+
+        POSSession.SetReportErrorMessage(true);
+
         POSSession.StartPOSSession();
 
         POSAction.DiscoverActions();
@@ -71,6 +74,7 @@ codeunit 85003 "NPR Library - POS Mock"
 
         POSBackgroundTaskAPI.Initialize(_POSBackgroundTaskManager);
         POSSession.Constructor(POSBackgroundTaskAPI);
+        POSSession.SetReportErrorMessage(true);
         POSSession.StartPOSSession();
         POSSession.StartTransaction();
         POSSession.GetSale(POSSale);
