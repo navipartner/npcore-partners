@@ -32,7 +32,8 @@
             "name": "BC2304_CLOUD"
         },
         {
-            "name": "vPrevious_CLOUD"
+            "name": "vPrevious_CLOUD",
+            "useCompareApp": true
         },
         {
             "name": "vLatest_CLOUD",
@@ -40,7 +41,6 @@
         },
         {
             "name": "Insider_CLOUD",
-            "useCompareApp": true,
             "continueOnError": true
         }
     ],
