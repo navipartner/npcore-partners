@@ -24,6 +24,8 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
         ParamMoveSaleToWPadOnFinish_DescLbl: Label 'Move POS sale lines to waiter pad after the Waiter Pad Action has completed';
         ParamReturnToDefaultView_CptLbl: Label 'Return to Default View on Finish';
         ParamReturnToDefaultView_DescLbl: Label 'Switch to the default view defined for the POS Unit after the Waiter Pad Action has completed.';
+        ParamHideConfirmDialog_CptLbl: Label 'Hide Confirmation';
+        ParamHideConfirmDialog_DescLbl: Label 'Suppress confirmation dialogs.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -42,20 +44,37 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('ServingStep', '', ParamServingStep_CptLbl, ParamServingStep_DescLbl);
         WorkflowConfig.AddBooleanParameter('MoveSaleToWPadOnFinish', false, ParamMoveSaleToWPadOnFinish_CptLbl, ParamMoveSaleToWPadOnFinish_DescLbl);
         WorkflowConfig.AddBooleanParameter('ReturnToDefaultView', false, ParamReturnToDefaultView_CptLbl, ParamReturnToDefaultView_DescLbl);
+        WorkflowConfig.AddBooleanParameter('Silent', false, ParamHideConfirmDialog_CptLbl, ParamHideConfirmDialog_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
         BusinessLogic: Codeunit "NPR POSAction: Run WAct-B";
+        NewWaiterPadActionParams: JsonObject;
         WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Close w/out Saving";
         WPadLinesToSend: Option "New/Updated",All;
-        ServingStepToRequest: Code[10];
+        NewWaiterPadActionCode: Code[20];
         NewWaiterPadNo: Code[20];
+        SeatingCode: Code[20];
+        ServingStepToRequest: Code[10];
         CleanupMessageText: Text;
         ResultMessageText: Text;
         ClearSaleOnFinish: Boolean;
+        CreateNewWaiterPad: Boolean;
         ReturnToDefaultView: Boolean;
+        SuppressDialogs: Boolean;
     begin
+        if Step = 'createWaiterPad' then begin
+            CreateNewWaiterPad := BusinessLogic.WaiterPadShouldBeCreated(WPadAction, Sale, SeatingCode);
+            if CreateNewWaiterPad then begin
+                BusinessLogic.GetNewWaiterPadAction(Setup, SeatingCode, NewWaiterPadActionCode, NewWaiterPadActionParams);
+                Context.SetContext('newWaiterPadActionCode', NewWaiterPadActionCode);
+                Context.SetContext('newWaiterPadActionParams', NewWaiterPadActionParams);
+            end;
+            FrontEnd.WorkflowResponse(CreateNewWaiterPad);
+            exit;
+        end;
+
         WPadAction := Context.GetIntegerParameter('WaiterPadAction');
         if not Context.GetBooleanParameter('MoveSaleToWPadOnFinish', ClearSaleOnFinish) then
             ClearSaleOnFinish := false;
@@ -63,6 +82,8 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
             ReturnToDefaultView := false;
         if ReturnToDefaultView then
             ClearSaleOnFinish := true;
+        if not Context.GetBooleanParameter('Silent', SuppressDialogs) then
+            SuppressDialogs := false;
 
         case Step of
             'runMainAction':
@@ -80,10 +101,12 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
 
                     IF WPadAction = WPadAction::"Merge Waiter Pad" then
                         Context.SetContext('NewWaiterPadNo', NewWaiterPadNo);
-                    Context.SetContext('ShowResultMessage', ResultMessageText <> '');
-                    Context.SetContext('ResultMessageText', ResultMessageText);
-                    if CleanupMessageText <> '' then
-                        Context.SetContext('CleanupMessageText', CleanupMessageText);
+                    if not SuppressDialogs then begin
+                        Context.SetContext('ShowResultMessage', ResultMessageText <> '');
+                        Context.SetContext('ResultMessageText', ResultMessageText);
+                        if CleanupMessageText <> '' then
+                            Context.SetContext('CleanupMessageText', CleanupMessageText);
+                    end;
                 end;
 
             'runCleanup':
@@ -146,7 +169,7 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRunWaAct.js###
-'let main=async({workflow:s,context:e,popup:a})=>{let i=await s.respond("runMainAction");if(e.ShowResultMessage&&await a.message(e.ResultMessageText),e.CleanupMessageText)if(i){if(!await a.confirm(e.CleanupMessageText))return}else{a.error(e.CleanupMessageText);return}await s.respond("runCleanup")};'
+'let main=async({workflow:e,context:a,popup:i,parameters:r})=>{await e.respond("createWaiterPad")&&a.newWaiterPadActionCode&&await e.run(a.newWaiterPadActionCode,a.newWaiterPadActionParams);let s=await e.respond("runMainAction");if(a.ShowResultMessage&&await i.message(a.ResultMessageText),a.CleanupMessageText)if(s){if(!await i.confirm(a.CleanupMessageText))return}else{i.error(a.CleanupMessageText);return}await e.respond("runCleanup")};'
         );
     end;
 }

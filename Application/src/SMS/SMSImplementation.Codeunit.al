@@ -302,9 +302,16 @@ codeunit 6060035 "NPR SMS Implementation"
     var
         MessageLog: Record "NPR SMS Log";
     begin
+        InsertMessageLog(PhoneNo, SenderNo, Message, SendDT, MessageLog.Status::Pending, MessageLog);
+    end;
+
+    procedure InsertMessageLog(PhoneNo: Text; SenderNo: Text; Message: Text; SendDT: DateTime; Status: Enum "NPR SMS Log Status"; var MessageLog: Record "NPR SMS Log")
+    begin
         MessageLog.Init();
+        MessageLog."Entry No." := 0;
         MessageLog."Sender No." := CopyStr(SenderNo, 1, MaxStrLen(MessageLog."Sender No."));
         MessageLog."Reciepient No." := CopyStr(PhoneNo, 1, MaxStrLen(MessageLog."Reciepient No."));
+        MessageLog.Status := Status;
         MessageLog.SetMessage(Message);
         if SendDT <> 0DT then
             MessageLog."Send on Date Time" := SendDT
@@ -724,7 +731,7 @@ codeunit 6060035 "NPR SMS Implementation"
         exit(AFReportLinkTag());
     end;
 
-    local procedure AFReportLinkTag(): Text
+    internal procedure AFReportLinkTag(): Text
     begin
         exit('<<AFReportLink>>');
     end;

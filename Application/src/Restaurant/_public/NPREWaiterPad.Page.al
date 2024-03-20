@@ -44,6 +44,16 @@
                     ApplicationArea = NPRRetail;
                     Editable = false;
                 }
+                field("Customer Phone No."; Rec."Customer Phone No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the phone number of the customer who is to be notified about the order.';
+                }
+                field("Customer E-Mail"; Rec."Customer E-Mail")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the email address of the customer who is to be notified about the order.';
+                }
                 field("Number of Guests"; Rec."Number of Guests")
                 {
                     ApplicationArea = NPRRetail;

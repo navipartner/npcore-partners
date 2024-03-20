@@ -14,6 +14,8 @@
             repeater("Order Lines")
             {
                 Caption = 'Order Lines';
+                IndentationColumn = Rec.Indentation;
+                IndentationControls = Description;
                 field("Request No."; Rec."Request No.")
                 {
                     ToolTip = 'Specifies the request unique Id, assigned by the system according to an automatically maintained number series.';

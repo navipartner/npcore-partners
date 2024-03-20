@@ -2,7 +2,7 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
 {
     Access = Internal;
 
-    procedure RunItemAddOns(AppliesToLineNo: Integer; ApplyItemAddOnNo: Code[20]; CompulsoryAddOn: Boolean; SkipItemAvailabilityCheck: Boolean; UserSelectionRequired: Boolean; UserSelectionJToken: JsonToken)
+    procedure RunItemAddOns(AppliesToLineNo: Integer; ApplyItemAddOnNo: Code[20]; CompulsoryAddOn: Boolean; SkipItemAvailabilityCheck: Boolean; UserSelectionRequired: Boolean; UserSelectionJToken: JsonToken) RequestFrontEndRefresh: Boolean
     var
         ItemAddOn: Record "NPR NpIa Item AddOn";
         PosInventoryProfile: Record "NPR POS Inventory Profile";
@@ -10,7 +10,6 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
         ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        RequestFrontEndRefresh: Boolean;
         UpdateActiveSaleLine: Boolean;
         POSSession: Codeunit "NPR POS Session";
     begin
@@ -37,20 +36,13 @@ codeunit 6150919 "NPR POS Action: RunItemAddOn B"
         if not UserSelectionRequired then
             RequestFrontEndRefresh := ItemAddOnMgt.InsertMandatoryPOSAddOnLinesSilent(ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn)
         else begin
-            if UserSelectionJToken.IsValue then
-                if UserSelectionJToken.AsValue().IsNull and not CompulsoryAddOn then
+            if UserSelectionJToken.IsValue() then
+                if UserSelectionJToken.AsValue().IsNull() and not CompulsoryAddOn then
                     Error('');
             RequestFrontEndRefresh := ItemAddOnMgt.InsertPOSAddOnLines(ItemAddOn, UserSelectionJToken, POSSession, AppliesToLineNo, CompulsoryAddOn);
         end;
 
-        if RequestFrontEndRefresh then
-            if ItemAddOnMgt.InsertedWithAutoSplitKey() then
-                POSSession.ChangeViewSale();  //there is no other way to refresh the lines, so they appear in correct order
-
         if not SkipItemAvailabilityCheck and PosInventoryProfile."Stockout Warning" then
             PosItemCheckAvail.DefineScopeAndCheckAvailability(POSSession, false);
     end;
-
-
-
 }

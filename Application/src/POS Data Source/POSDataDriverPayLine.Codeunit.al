@@ -18,6 +18,7 @@
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Description), true, true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Currency Amount"), true, true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Amount Including VAT"), true, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Indentation), false, false);
 
         DataSource.Totals().Add('SaleAmount');
         DataSource.Totals().Add('PaidAmount');

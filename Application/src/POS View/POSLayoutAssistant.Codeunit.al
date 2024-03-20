@@ -8,6 +8,24 @@ codeunit 6059925 "NPR POS Layout Assistant"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
     local procedure OnRequestPOSLayoutRelatedData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
+        if Method in
+            ['RequestPOSLayoutData',
+             'SavePOSLayoutData',
+             'AssignPOSLayout',
+             'GetAssignedPOSLayout',
+             'POSLayout_SelectItem',
+             'POSLayout_SelectCustomer',
+             'POSLayout_SelectPaymentMethod',
+             'POSLayout_SelectPOSAction',
+             'POSLayout_GetPOSActionParameterList',
+             'POSLayout_SetPOSActionParameters',
+             'RequestWorkflowList',
+             'UserCulture',
+             'CallRefreshData',
+             'LegacyPOSMenus']
+        then
+            Handled := true;
+
         case Method of
             'RequestPOSLayoutData':
                 RefreshPOSLayoutData(Context, FrontEnd);
@@ -31,11 +49,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 CallRefreshData();
             'LegacyPOSMenus':
                 GetPOSMenus(Context, FrontEnd);
-            else
-                exit;
         end;
-
-        Handled := true;
     end;
 
     local procedure RefreshPOSLayoutData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")

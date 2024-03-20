@@ -2,7 +2,7 @@ codeunit 6151346 "NPR POSAction New Wa. Pad-B"
 {
     Access = Internal;
 
-    procedure NewWaiterPad(Sale: Codeunit "NPR POS Sale"; SeatingCode: Code[20]; NumberOfGuests: Integer; OpenWaiterPad: Boolean; var ActionMessage: Text)
+    procedure NewWaiterPad(Sale: Codeunit "NPR POS Sale"; SeatingCode: Code[20]; CustomerDetails: Dictionary of [Text, Text]; NumberOfGuests: Integer; OpenWaiterPad: Boolean; var ActionMessage: Text)
     var
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
@@ -17,7 +17,7 @@ codeunit 6151346 "NPR POSAction New Wa. Pad-B"
 
         Sale.GetCurrentSale(SalePOS);
 
-        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, NumberOfGuests, SalePOS."Salesperson Code", '', WaiterPad);
+        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, NumberOfGuests, SalePOS."Salesperson Code", CustomerDetails, WaiterPad);
 
         SalePOS.Find();
         SalePOS."NPRE Number of Guests" := NumberOfGuests;

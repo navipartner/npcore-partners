@@ -128,11 +128,32 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies when kitchen order is assigned "Ready for Serving" status. Please note that this setting may be overridden for each individual restaurant on Restaurant Card page.';
                     }
+                    group(TimeThresholds)
+                    {
+                        Caption = 'Delayed Order Time Thresholds';
+                        field("Delayed Ord. Threshold 1 (min)"; Rec."Delayed Ord. Threshold 1 (min)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Caption = 'Threshold 1 (min)';
+                            ToolTip = 'Specifies the number of minutes after which the system will send 1st delayed kitchen order notifications and change the colour of each such order on the KDS to yellow.';
+                        }
+                        field("Delayed Ord. Threshold 2 (min)"; Rec."Delayed Ord. Threshold 2 (min)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            Caption = 'Threshold 2 (min)';
+                            ToolTip = 'Specifies the number of minutes after which the system will send 2nd delayed kitchen order notifications and change the colour of each such order on the KDS to red.';
+                        }
+                        field("Notif. Resend Delay (min)"; Rec."Notif. Resend Delay (min)")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the number of minutes that the system will wait before sending another delayed order notification of the same level. Please set the field value to zero if you only want delayed order notifications to be sent once per level (threshold).';
+                        }
+                    }
                 }
             }
             group(POSActions)
             {
-                Caption = 'POS Actions';
+                Caption = 'POS Actions (Restaurant View)';
 
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
@@ -276,9 +297,49 @@
                     Caption = 'Station Selection Setup';
                     Image = Flow;
                     RunObject = Page "NPR NPRE Kitchen Station Slct.";
-                    RunPageLink = "Restaurant Code" = CONST('');
                     ToolTip = 'View or edit kitchen station selection setup. You can define which kitchen stations should be used to prepare products depending on item categories, serving steps etc.';
                     ApplicationArea = NPRRetail;
+                }
+            }
+        }
+        area(Processing)
+        {
+            group(InitialSetup)
+            {
+                Caption = 'Initial Setup';
+                group("MS Entra OAuth")
+                {
+                    Caption = 'Microsoft Entra OAuth';
+                    Image = XMLSetup;
+                    Visible = HasAzureADConnection and ShowKDS;
+                    action("Create MS Entra App")
+                    {
+                        Caption = 'Create Microsoft Entra App';
+                        ToolTip = 'Running this action will create a Microsoft Entra Application and a accompaning client secret. You’ll need this if you want to use the NaviParter KDS display functionality.';
+                        ApplicationArea = NPRRetail;
+                        Image = Setup;
+
+                        trigger OnAction()
+                        var
+                            SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+                        begin
+                            SetupProxy.CreateAzureADApplication();
+                        end;
+                    }
+                    action("Create MS Entra App Secret")
+                    {
+                        Caption = 'Create Microsoft Entra App Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Microsoft Entra Application.';
+                        ApplicationArea = NPRRetail;
+                        Image = Setup;
+
+                        trigger OnAction()
+                        var
+                            SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+                        begin
+                            SetupProxy.CreateAzureADApplicationSecret();
+                        end;
+                    }
                 }
             }
         }
@@ -286,15 +347,18 @@
 
     trigger OnOpenPage()
     var
+        AzureADTenant: Codeunit "Azure AD Tenant";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
     begin
         if not Rec.Get() then
             Rec.Insert(true);
 
         ShowKDS := KitchenOrderMgt.KDSAvailable();
+        HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
     end;
 
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        HasAzureADConnection: Boolean;
         ShowKDS: Boolean;
 }

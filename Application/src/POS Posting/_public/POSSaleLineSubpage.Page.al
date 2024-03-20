@@ -9,7 +9,6 @@
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR POS Entry Sales Line";
-    SourceTableView = ORDER(Descending);
 
     layout
     {
@@ -17,6 +16,9 @@
         {
             repeater(Group)
             {
+                IndentationColumn = Rec.Indentation;
+                IndentationControls = Description;
+                ShowCaption = false;
                 field(Type; Rec.Type)
                 {
                     ToolTip = 'Specifies the value of the Type field';

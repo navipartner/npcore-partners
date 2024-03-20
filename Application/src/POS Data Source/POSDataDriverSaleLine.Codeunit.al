@@ -33,6 +33,7 @@
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Location Code"), false, true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Bin Code"), false, true);
         DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo("Serial No."), false, true);
+        DataMgt.AddFieldToDataSource(DataSource, SaleLine, SaleLine.FieldNo(Indentation), false, false);
 
         DataSource.Totals().Add('AmountExclVAT');
         DataSource.Totals().Add('VATAmount');
