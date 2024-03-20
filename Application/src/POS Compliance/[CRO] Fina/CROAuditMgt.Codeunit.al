@@ -744,6 +744,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
+        IsHandled: Boolean;
     begin
         CROFiscalSetup.SetAutoCalcFields("Signing Certificate");
         CROFiscalSetup.Get();
@@ -763,6 +764,10 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
+
+        OnBeforeSendHttpRequestForSignZKICode(ResponseText, IsHandled);
+        if IsHandled then
+            exit(true);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
@@ -938,6 +943,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforePrintFiscalReceipt(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSignZKICode(var ResponseText: Text; var IsHandled: Boolean)
     begin
     end;
 }
