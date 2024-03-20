@@ -14,38 +14,39 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
         ParamSeatingCode_DescLbl: Label 'Selected seating code.';
         ParamSwitchToSaleView_CptLbl: Label 'Switch To Sale View';
         ParamSwitchToSaleView_DescLbl: Label 'Switch back to sale view if true.';
-        LabelWelcome_CptLbl: Label 'Welcome';
-        LabelNewWaiterpad_CptLbl: Label 'New Waiterpad';
-        LabelNumberOfGuests_CptLbl: Label 'Number of guests';
-        LabelName_CptLbl: Label 'Name';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddTextParameter('SeatingCode', '', ParamSeatingCode_CptLbl, ParamSeatingCode_DescLbl);
         WorkflowConfig.AddBooleanParameter('SwitchToSaleView', false, ParamSwitchToSaleView_CptLbl, ParamSwitchToSaleView_DescLbl);
-        WorkflowConfig.AddLabel('Welcome', LabelWelcome_CptLbl);
-        WorkflowConfig.AddLabel('NewWaiterpad', LabelNewWaiterpad_CptLbl);
-        WorkflowConfig.AddLabel('NumberOfGuests', LabelNumberOfGuests_CptLbl);
-        WorkflowConfig.AddLabel('Name', LabelName_CptLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     var
+        SalePOS: Record "NPR POS Sale";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         BusinessLogic: Codeunit "NPR POSAct. RV New WPad-B";
         FrontendAssistant: Codeunit "NPR NPRE Frontend Assistant";
         POSSession: Codeunit "NPR POS Session";
+        WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CustomerDetails: Dictionary of [Text, Text];
+        WaiterpadInfoConfig: JsonObject;
         RestaurantCode: Code[20];
         SwitchToSaleView: Boolean;
     begin
         If Step = 'checkSeating' then begin
             BusinessLogic.CheckSeating(SeatingCode(Context));
-            Context.SetContext('defaultNumberOfGuests', BusinessLogic.GetDefaultNumberOfGuests(SeatingCode(Context)));
+            Sale.GetCurrentSale(SalePOS);
+            if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, true, true, true, true, WaiterpadInfoConfig) then
+                Context.SetContext('waiterpadInfoConfig', WaiterpadInfoConfig);
             Exit;
         end;
 
         SwitchToSaleView := Context.GetBooleanParameter('SwitchToSaleView');
-        BusinessLogic.NewWaiterPad(Sale, Setup, SeatingCode(Context), TableName(Context), PartySize(Context), SwitchToSaleView, WaiterPad, RestaurantCode);
+        CustomerDetails.Add(WaiterPad.FieldName(Description), TableName(Context));
+        CustomerDetails.Add(WaiterPad.FieldName("Customer Phone No."), PhoneNo(Context));
+        CustomerDetails.Add(WaiterPad.FieldName("Customer E-Mail"), Email(Context));
+        BusinessLogic.NewWaiterPad(Sale, Setup, SeatingCode(Context), CustomerDetails, PartySize(Context), SwitchToSaleView, WaiterPad, RestaurantCode);
         FrontendAssistant.RefreshWaiterPadData(POSSession, FrontEnd, RestaurantCode, '');
         if SwitchToSaleView then
             SelectSalesView(POSSession);
@@ -59,6 +60,16 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     local procedure TableName(Context: Codeunit "NPR POS JSON Helper"): Text
     begin
         exit(GetConfigurableOption(Context, 'waiterpadInfo', 'tablename'));
+    end;
+
+    local procedure PhoneNo(Context: Codeunit "NPR POS JSON Helper"): Text
+    begin
+        exit(GetConfigurableOption(Context, 'waiterpadInfo', 'phoneNo'));
+    end;
+
+    local procedure Email(Context: Codeunit "NPR POS JSON Helper"): Text
+    begin
+        exit(GetConfigurableOption(Context, 'waiterpadInfo', 'email'));
     end;
 
     local procedure PartySize(Context: Codeunit "NPR POS JSON Helper"): Integer
@@ -93,7 +104,7 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRVNewWPad.js###
-'let main=async({workflow:t,context:a,captions:e})=>{await t.respond("checkSeating");let i={caption:e.Welcome,title:e.NewWaiterpad,settings:[{type:"plusminus",id:"guests",caption:e.NumberOfGuests,minvalue:0,maxvalue:100,value:a.defaultNumberOfGuests},{type:"text",id:"tablename",caption:e.Name}]};a.waiterpadInfo=await popup.configuration(i),a.waiterpadInfo&&await t.respond()};'
+'let main=async({workflow:i,context:a})=>{await i.respond("checkSeating"),a.waiterpadInfo=await popup.configuration(a.waiterpadInfoConfig),a.waiterpadInfo&&await i.respond()};'
         );
     end;
 }

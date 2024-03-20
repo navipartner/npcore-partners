@@ -509,8 +509,8 @@
         POSSession.RequestRefreshData();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormat', '', false, false)]
-    local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormatting', '', false, false)]
+    local procedure OnGetLineFormat(var Highlighted: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSInfo: Record "NPR POS Info";
         POSInfoTransaction: Record "NPR POS Info Transaction";

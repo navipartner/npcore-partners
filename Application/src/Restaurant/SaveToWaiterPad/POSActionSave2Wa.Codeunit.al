@@ -101,10 +101,11 @@ codeunit 6150666 "NPR POSAction: Save2Wa." implements "NPR IPOS Workflow"
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        CustomerDetails: Dictionary of [Text, Text];
     begin
         Sale.GetCurrentSale(SalePOS);
         WaiterPadPOSMgt.FindSeating(Context, Seating);
-        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, SalePOS."NPRE Number of Guests", SalePOS."Salesperson Code", '', WaiterPad);
+        WaiterPadMgt.CreateNewWaiterPad(Seating.Code, SalePOS."NPRE Number of Guests", SalePOS."Salesperson Code", CustomerDetails, WaiterPad);
     end;
 
     local procedure SelectWaiterPad(Context: Codeunit "NPR POS JSON Helper")

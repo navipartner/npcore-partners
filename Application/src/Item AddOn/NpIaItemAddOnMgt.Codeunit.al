@@ -196,12 +196,12 @@
                         ItemAddOnLine.Type::Select:
                             begin
                                 ItemAddOn_LineJObject.Add('type', 'radio');
+                                Clear(ValueJObject);
                                 if AddOnSaleLinePOS."No." <> '' then begin
-                                    Clear(ValueJObject);
                                     ValueJObject.Add('item', AddOnSaleLinePOS."No.");
                                     ValueJObject.Add('variant', AddOnSaleLinePOS."Variant Code");
-                                    ItemAddOn_LineJObject.Add('value', ValueJObject);
                                 end;
+                                ItemAddOn_LineJObject.Add('value', JObjectToText(ValueJObject));
 
                                 Clear(ItemAddOn_LineOptionsJArray);
                                 repeat
@@ -214,7 +214,7 @@
                                         ItemAddOnLineOption.Description :=
                                             CopyStr(ItemNoAndVariantCodeAsDescription(ItemAddOnLineOption."Item No.", ItemAddOnLineOption."Variant Code"), 1, MaxStrLen(ItemAddOnLineOption.Description));
                                     ItemAddOn_LineOptionJObject.Add('caption', ItemAddOnLineOption.Description);
-                                    ItemAddOn_LineOptionJObject.Add('value', ValueJObject);
+                                    ItemAddOn_LineOptionJObject.Add('value', JObjectToText(ValueJObject));
                                     ItemAddOn_LineOptionsJArray.Add(ItemAddOn_LineOptionJObject);
                                 until ItemAddOnLineOption.Next() = 0;
                                 ItemAddOn_LineJObject.Add('options', ItemAddOn_LineOptionsJArray);
@@ -310,7 +310,7 @@
         exit(StrSubstNo(CommentLbl, LineNo));
     end;
 
-    procedure UserInterfaceIsRequired(ItemAddOn: Record "NPR NpIa Item AddOn"): Boolean
+    procedure UserInterfaceIsRequired(ItemAddOn: Record "NPR NpIa Item AddOn"; CompulsoryAddOn: Boolean): Boolean
     var
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
     begin
@@ -320,7 +320,16 @@
         ItemAddOnLine.SetRange("Comment Enabled", true);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Select);
         ItemAddOnLine.FilterGroup(0);
-        exit(not ItemAddOnLine.IsEmpty());
+        if ItemAddOnLine.IsEmpty() then
+            exit(false);
+        if CompulsoryAddOn then
+            exit(true);
+        ItemAddOnLine.Reset();
+        ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        if ItemAddOnLine.Count() > 1 then
+            exit(true);
+        ItemAddOnLine.FindFirst();
+        exit(not ItemAddOnLine."Fixed Quantity" or ItemAddOnLine."Comment Enabled" or (ItemAddOnLine.Type = ItemAddOnLine.Type::Select));
     end;
 
     procedure InsertPOSAddOnLines(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLines: JsonToken; POSSession: Codeunit "NPR POS Session"; AppliesToLineNo: Integer; CompulsoryAddOn: Boolean): Boolean
@@ -337,14 +346,14 @@
         SelectedAddonLineKeys: List of [Text];
         LastErrorText: Text;
     begin
-        if SelectedAddOnLines.IsValue then
-            if SelectedAddOnLines.AsValue().IsNull then
+        if SelectedAddOnLines.IsValue() then
+            if SelectedAddOnLines.AsValue().IsNull() then
                 exit(InsertMandatoryPOSAddOnLines(ItemAddOn, POSSession, AppliesToLineNo, false, CompulsoryAddOn));
 
         TempItemAddOnLine.Reset();
         TempItemAddOnLine.DeleteAll();
 
-        SelectedAddonLineKeys := SelectedAddOnLines.AsObject().Keys;
+        SelectedAddonLineKeys := SelectedAddOnLines.AsObject().Keys();
         foreach AddonLineKey in SelectedAddonLineKeys do begin
             SelectedAddOnLines.AsObject().Get(AddonLineKey, JToken);
             if ParsePOSAddOnLine(ItemAddOn, JToken, AddonLineKey, ItemAddOnLine) then begin
@@ -359,10 +368,10 @@
 
         ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
 
-        if not ItemAddOnLine.IsEmpty then
+        if not ItemAddOnLine.IsEmpty() then
             CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, false);
 
-        if TempItemAddOnLine.IsEmpty then
+        if TempItemAddOnLine.IsEmpty() then
             exit(false);
 
         POSSession.GetSale(POSSale);
@@ -418,8 +427,18 @@
 
         ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
 
-        if ItemAddOnLine.IsEmpty() then
-            exit(false);
+        if ItemAddOnLine.IsEmpty() then begin
+            if CompulsoryAddOn then
+                exit(false);
+            ItemAddOnLine.SetRange(Mandatory);
+            ItemAddOnLine.SetRange("Comment Enabled");
+            ItemAddOnLine.SetRange(Type);
+            if ItemAddOnLine.Count <> 1 then
+                exit(false);
+            ItemAddOnLine.FindFirst();
+            if not ItemAddOnLine."Fixed Quantity" or ItemAddOnLine."Comment Enabled" or (ItemAddOnLine.Type = ItemAddOnLine.Type::Select) then
+                exit(false);
+        end;
         CopyItemAddOnLinesToTemp(ItemAddOnLine, TempItemAddOnLine, true);
 
         POSSession.GetSale(POSSale);
@@ -459,13 +478,17 @@
         ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         LineNo: Integer;
         PrevRec: Text;
+        BaseLineIndent: Integer;
     begin
         if not FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, SaleLinePOS) then begin
-            if ItemAddOnLine.Quantity <= 0 then
+            if ItemAddOnLine.Quantity = 0 then
                 exit(false);
 
             //Find last dependent line of current base line in order to insert new lines after it
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+            if SaleLinePOS."Line No." <> AppliesToLineNo then
+                SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+            BaseLineIndent := SaleLinePOS.Indentation;
             FilterAttachedItemAddonLines(SaleLinePOS, AppliesToLineNo, SaleLinePOSAddOn);
             if SaleLinePOSAddOn.FindLast() then begin
                 SaleLinePOS.Get(
@@ -492,6 +515,7 @@
             SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
             SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
             SaleLinePOS."Serial No." := ItemAddOnLine."Serial No.";
+            SaleLinePOS.Indentation := BaseLineIndent + 1;
 
             POSSaleLine.SetUsePresetLineNo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
@@ -521,7 +545,7 @@
             exit(true);
         end;
 
-        if ItemAddOnLine.Quantity <= 0 then begin
+        if ItemAddOnLine.Quantity = 0 then begin
             SaleLinePOS.Delete(true);
             exit(false);
         end;
@@ -555,7 +579,7 @@
         POSInfoTransaction: Record "NPR POS Info Transaction";
         Comment: Text;
     begin
-        if not AddOnLineComment.IsValue then
+        if not AddOnLineComment.IsValue() then
             exit;
         Comment := AddOnLineComment.AsValue().AsText();
         if Comment = '' then
@@ -591,6 +615,8 @@
     local procedure ParsePOSAddOnLine(ItemAddOn: Record "NPR NpIa Item AddOn"; SelectedAddOnLine: JsonToken; AddonLineKey: Text; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line"): Boolean
     var
         ItemAddOnLineOption: Record "NPR NpIa ItemAddOn Line Opt.";
+        JsonHelper: Codeunit "NPR Json Helper";
+        SelectedItemVariant: JsonToken;
         ItemNo: Code[20];
         VariantCode: Code[10];
         LineNo: Integer;
@@ -601,7 +627,7 @@
         case ItemAddOnLine.Type of
             ItemAddOnLine.Type::Quantity:
                 begin
-                    if SelectedAddOnLine.IsValue then begin
+                    if SelectedAddOnLine.IsValue() then begin
                         if ItemAddOnLine."Fixed Quantity" then begin
                             if not SelectedAddOnLine.AsValue().AsBoolean() then
                                 ItemAddOnLine.Quantity := 0;
@@ -614,10 +640,14 @@
             ItemAddOnLine.Type::Select:
                 begin
                     ItemAddOnLine.Quantity := 0;
-                    if SelectedAddOnLine.IsObject then begin
+                    if SelectedAddOnLine.IsValue() then
+                        SelectedItemVariant.ReadFrom(SelectedAddOnLine.AsValue().AsText())
+                    else
+                        SelectedItemVariant := SelectedAddOnLine;
+                    if SelectedItemVariant.IsObject() then begin
 #pragma warning disable AA0139
-                        ItemNo := GetJCode(SelectedAddOnLine, 'item', MaxStrLen(ItemNo), false);
-                        VariantCode := GetJCode(SelectedAddOnLine, 'variant', MaxStrLen(VariantCode), false);
+                        ItemNo := JsonHelper.GetJCode(SelectedItemVariant, 'item', MaxStrLen(ItemNo), false);
+                        VariantCode := JsonHelper.GetJCode(SelectedItemVariant, 'variant', MaxStrLen(VariantCode), false);
 #pragma warning restore
                         if ItemNo <> '' then begin
                             ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
@@ -728,36 +758,23 @@
 
         if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit(false);
-
         if SaleLinePOS."No." in ['', '*'] then
             exit(false);
 
         FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '>%1', 0);
-        if SaleLinePOSAddOn.FindSet() then
+        if SaleLinePOSAddOn.Find('-') then
             repeat
-                if SaleLinePOS2.Get(
-                    SaleLinePOSAddOn."Register No.",
-                    SaleLinePOSAddOn."Sales Ticket No.",
-                    SaleLinePOSAddOn."Sale Date",
-                    SaleLinePOSAddOn."Sale Type",
-                    SaleLinePOSAddOn."Applies-to Line No.")
-                then begin
-                    SaleLinePOS := SaleLinePOS2;
-                    if ItemAddOn.Get(SaleLinePOS2."No.") and ItemAddOn.Enabled then
-                        exit(true);
-                end;
+                if ItemAddOn.Get(SaleLinePOSAddOn."AddOn No.") and ItemAddOn.Enabled then
+                    exit(true);
             until SaleLinePOSAddOn.Next() = 0;
 
-        SaleLinePOS2 := SaleLinePOS;
-        if SaleLinePOS.Accessory then begin
+        if SaleLinePOS.Accessory then
             if not SaleLinePOS2.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", SaleLinePOS."Main Line No.") then
                 exit(false);
-        end;
 
         if not Item.Get(SaleLinePOS2."No.") then
             exit(false);
-
         if Item."NPR Item AddOn No." = '' then
             exit(false);
         if not ItemAddOn.Get(Item."NPR Item AddOn No.") then
@@ -896,6 +913,7 @@
         POSSession.RequestRefreshData();
     end;
 
+    [Obsolete('Remove as soon as the frontend supports the new field "Indatation" in the table "POS Sale Line"', 'NPR32.0')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormat', '', false, false)]
     local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     var
@@ -1020,49 +1038,13 @@
             until FromItemAddOnLine.Next() = 0;
     end;
 
+    local procedure JObjectToText(JObject: JsonObject) Text: Text
+    begin
+        JObject.WriteTo(Text);
+    end;
+
     procedure InsertedWithAutoSplitKey(): Boolean
     begin
         exit(IsAutoSplitKeyRecord);
     end;
-
-    #region Json helper functions
-    procedure GetJCode(Token: JsonToken; Path: Text; MaxLength: Integer; Required: Boolean) Value: Text
-    var
-        JValue: JsonValue;
-    begin
-        if GetJValue(Token, Path, JValue) then begin
-            Value := JValue.AsCode();
-            if MaxLength > 0 then
-                Value := CopyStr(Value, 1, MaxLength);
-            Value := UpperCase(Value);
-            exit(Value);
-        end;
-        if Required then
-            Error(GetLastErrorText());
-        exit('');
-    end;
-
-    [TryFunction]
-    local procedure GetJValue(Token: JsonToken; Path: Text; var JValue: JsonValue)
-    var
-        Token2: JsonToken;
-        ValueMissingErr: Label 'Required value missing: %1';
-    begin
-        if not Token.SelectToken(Path, Token2) then
-            Error(ValueMissingErr, GetAbsolutePath(Token, Path));
-
-        JValue := Token2.AsValue();
-        if JValue.IsNull() or JValue.IsUndefined() then
-            Error(ValueMissingErr, GetAbsolutePath(Token, Path));
-    end;
-
-    local procedure GetAbsolutePath(Token: JsonToken; Path: Text) AbsolutePath: Text
-    begin
-        AbsolutePath := Token.Path();
-        if (AbsolutePath <> '') and (Path <> '') then
-            AbsolutePath += '/';
-        AbsolutePath += Path;
-        exit(AbsolutePath);
-    end;
-    #endregion
 }

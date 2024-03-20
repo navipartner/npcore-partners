@@ -168,6 +168,7 @@ codeunit 6150693 "NPR POS Refresh Sale Line"
             FieldsObject.Add(Format(Rec.FieldNo("Location Code")), Rec."Location Code");
             FieldsObject.Add(Format(Rec.FieldNo("Bin Code")), Rec."Bin Code");
             FieldsObject.Add(Format(Rec.FieldNo("Serial No.")), Rec."Serial No.");
+            FieldsObject.Add(Format(Rec.FieldNo(Indentation)), Rec.Indentation);
 
             POSSession.GetFrontEnd(POSFrontEnd, true);
             POSDataManagement.OnDiscoverDataSourceExtensions(POSDataManagement.POSDataSource_BuiltInSaleLine(), Extensions);

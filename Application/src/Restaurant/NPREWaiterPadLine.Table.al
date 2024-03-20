@@ -445,6 +445,51 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(130; "Attached to Line No."; Integer)
+        {
+            Caption = 'Attached to Line No.';
+            DataClassification = CustomerContent;
+            Editable = false;
+            TableRelation = "NPR NPRE Waiter Pad Line"."Line No." where("Waiter Pad No." = field("Waiter Pad No."));
+        }
+        field(140; "AddOn No."; Code[20])
+        {
+            Caption = 'AddOn No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpIa Item AddOn"."No.";
+        }
+        field(141; "AddOn Line No."; Integer)
+        {
+            Caption = 'AddOn Line No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpIa Item AddOn Line"."Line No." where("AddOn No." = field("AddOn No."));
+        }
+        field(142; "Fixed Quantity"; Boolean)
+        {
+            Caption = 'Fixed Quantity';
+            DataClassification = CustomerContent;
+        }
+        field(143; "Per Unit"; Boolean)
+        {
+            Caption = 'Per unit';
+            DataClassification = CustomerContent;
+        }
+        field(144; Mandatory; Boolean)
+        {
+            Caption = 'Mandatory';
+            DataClassification = CustomerContent;
+        }
+        field(145; "Copy Serial No."; Boolean)
+        {
+            Caption = 'Copy Serial No.';
+            DataClassification = CustomerContent;
+        }
+        field(150; Indentation; Integer)
+        {
+            Caption = 'Indentation';
+            DataClassification = CustomerContent;
+            MinValue = 0;
+        }
     }
 
     keys
@@ -455,6 +500,8 @@
         key(LinkToPOSSale; "Sale Retail ID")
         { }
         key(LinkToPOSSaleLine; "Sale Line Retail ID")
+        { }
+        key(AttachedLines; "Waiter Pad No.", "Attached to Line No.")
         { }
     }
 
