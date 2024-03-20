@@ -104,6 +104,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure BuildShipmentRequest(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
     var
         ShippingAgent: Record "NPR Package Shipping Agent";
+        ShipmondoEvents: Codeunit "NPR Shipmondo Events";
         own_agreement: Text;
         test_mode: Text[10];
         QueryParamsLbl: label '"test_mode": %1,', Locked = true;
@@ -165,7 +166,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         end else
             Output += '"print": false';
 
-        OnBeforeEndShipmentBuild(PakkelabelsShipment, Output);
+        ShipmondoEvents.OnBeforeEndShipmentBuild(PakkelabelsShipment, Output);
 
         Output += '}';
     end;
@@ -702,12 +703,6 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure BaseURL(): Text[250]
     begin
         exit('https://app.shipmondo.com/api/public/v3/')
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeEndShipmentBuild(var PakkelabelsShipment: Record "NPR Shipping Provider Document"; var Output: Text)
-    begin
-
     end;
 }
 
