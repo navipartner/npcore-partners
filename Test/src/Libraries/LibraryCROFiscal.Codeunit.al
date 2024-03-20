@@ -125,4 +125,11 @@ codeunit 85162 "NPR Library CRO Fiscal"
     begin
         IsHandled := true;
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR CRO Audit Mgt.", 'OnBeforeSendHttpRequestForSignZKICode', '', false, false)]
+    local procedure OnBeforeSendHttpRequestForSignZKICode(var ResponseText: Text; var IsHandled: Boolean)
+    begin
+        ResponseText := 'e4d909c290d0fb1ca068ffaddf22cbd0';
+        IsHandled := true;
+    end;
 }
