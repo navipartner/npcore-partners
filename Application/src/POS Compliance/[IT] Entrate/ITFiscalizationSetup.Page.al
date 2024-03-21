@@ -2,6 +2,7 @@ page 6151312 "NPR IT Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'IT Tax Fiscalization Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/italy/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

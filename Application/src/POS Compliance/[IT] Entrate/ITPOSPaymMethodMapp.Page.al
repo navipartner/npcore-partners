@@ -2,6 +2,7 @@ page 6151319 "NPR IT POS Paym. Method Mapp."
 {
     ApplicationArea = NPRITFiscal;
     Caption = 'IT POS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/italy/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR IT POS Paym. Method Mapp.";

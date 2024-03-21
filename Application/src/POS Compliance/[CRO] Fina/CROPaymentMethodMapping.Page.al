@@ -2,6 +2,7 @@ page 6151303 "NPR CRO Payment Method Mapping"
 {
     ApplicationArea = NPRCROFiscal;
     Caption = 'CRO Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/croatia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR CRO Payment Method Mapping";

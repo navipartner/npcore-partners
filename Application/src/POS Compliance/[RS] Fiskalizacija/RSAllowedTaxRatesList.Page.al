@@ -1,6 +1,7 @@
 page 6059906 "NPR RS Allowed Tax Rates List"
 {
     Caption = 'RS Allowed Tax Rates List';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

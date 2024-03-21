@@ -2,6 +2,7 @@ page 6150856 "NPR RS POS Paym. Meth. Mapping"
 {
     ApplicationArea = NPRRSFiscal;
     Caption = 'RS POS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR RS POS Paym. Meth. Mapping";

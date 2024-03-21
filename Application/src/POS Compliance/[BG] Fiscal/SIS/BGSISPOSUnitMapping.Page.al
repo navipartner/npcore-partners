@@ -2,6 +2,7 @@ page 6151281 "NPR BG SIS POS Unit Mapping"
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG SIS POS Unit Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/bulgaria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR BG SIS POS Unit Mapping";

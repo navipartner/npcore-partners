@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'CleanCash POS Unit Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/sweden/how-to/setup/';
     PageType = List;
     SourceTable = "NPR CleanCash Setup";
     UsageCategory = Administration;
