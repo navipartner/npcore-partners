@@ -26,8 +26,12 @@ codeunit 6184586 "NPR RS KEP Book Mgt."
             KEPBook."Document Type" := KEPBookDataset.Document_Type;
             KEPBook."Source No." := KEPBookDataset.Source_No;
             KEPBook.Description := StrSubstNo('%1 %2 %3', KEPBookDataset.Document_Type, KEPBookDataset.Document_No, KEPBookDataset.Document_Date);
-            KEPBook."Credit Amount" := KEPBookDataset.Sales_Amount_Actual;
-            KEPBook."Debit Amount" := KEPBookDataset.Cost_Amount_Actual;
+            case (KEPBookDataset.Cost_Amount_Actual > 0) of
+                true:
+                    KEPBook."Debit Amount" := KEPBookDataset.Cost_Amount_Actual;
+                false:
+                    KEPBook."Credit Amount" := Abs(KEPBookDataset.Cost_Amount_Actual);
+            end;
             KEPBook.Insert();
         end;
 
@@ -47,8 +51,12 @@ codeunit 6184586 "NPR RS KEP Book Mgt."
         KEPBookDataset.Open();
 
         while KEPBookDataset.Read() do begin
-            CreditAmount += KEPBookDataset.Sales_Amount_Actual;
-            DebitAmount += KEPBookDataset.Cost_Amount_Actual;
+            case (KEPBookDataset.Cost_Amount_Actual > 0) of
+                true:
+                    DebitAmount += KEPBookDataset.Cost_Amount_Actual;
+                false:
+                    CreditAmount += Abs(KEPBookDataset.Cost_Amount_Actual);
+            end;
         end;
 
         KEPBookDataset.Close();
