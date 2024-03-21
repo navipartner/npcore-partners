@@ -759,22 +759,6 @@
                             ApplicationArea = NPRRetail;
                             ToolTip = 'Executes the Vendor/Customer by date action.';
                         }
-                        Action("NPR Vendor/Item Category")
-                        {
-                            Caption = 'Vendor/Item Category';
-                            Image = Report;
-                            RunObject = Report "NPR Vendor/Item Category";
-                            ApplicationArea = NPRRetail;
-                            ToolTip = 'Executes the Vendor/Item Category action.';
-                        }
-                        Action("NPR Vendor Trn. by Item Cat.")
-                        {
-                            Caption = 'Vendor Turnover by Item Category';
-                            Image = Report;
-                            RunObject = Report "NPR Vendor Trn. by Item Cat.";
-                            ApplicationArea = NPRRetail;
-                            ToolTip = 'Executes the Vendor Turnover by Item Category action.';
-                        }
                     }
                     group(Customer)
                     {

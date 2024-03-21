@@ -6,10 +6,12 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item Cat.rdlc';
     Caption = 'Vendor Turnover by Item Category';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     UseSystemPrinter = true;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR32.0';
+    ObsoleteReason = 'Not being used anymore.';
 
     dataset
     {
@@ -277,21 +279,21 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
         // vgvendor: Record "Item Category";
         // ValueEntry: Record "Value Entry";
         visudensalg: Boolean;
-        // slutdato: Date;
-        // startdato: Date;
-        // dg: Decimal;
-        // dgItemGrp: Decimal;
-        // pcttot: Decimal;
-        // pctvaresalgfjor: Decimal;
-        // TotalConsumptionAmt: Decimal;
-        // Totaldg: Decimal;
-        // TotalProfitLCY: Decimal;
-        // TotalPurchaseLCY: Decimal;
-        // TotalPurchaseQty: Decimal;
-        // TotalSaleLCY: Decimal;
-        // TotalSaleQty: Decimal;
-        // totalsalg: Decimal;
-        // varekobfjor: Decimal;
-        // varesalgfjor: Decimal;
+    // slutdato: Date;
+    // startdato: Date;
+    // dg: Decimal;
+    // dgItemGrp: Decimal;
+    // pcttot: Decimal;
+    // pctvaresalgfjor: Decimal;
+    // TotalConsumptionAmt: Decimal;
+    // Totaldg: Decimal;
+    // TotalProfitLCY: Decimal;
+    // TotalPurchaseLCY: Decimal;
+    // TotalPurchaseQty: Decimal;
+    // TotalSaleLCY: Decimal;
+    // TotalSaleQty: Decimal;
+    // totalsalg: Decimal;
+    // varekobfjor: Decimal;
+    // varesalgfjor: Decimal;
 }
 
