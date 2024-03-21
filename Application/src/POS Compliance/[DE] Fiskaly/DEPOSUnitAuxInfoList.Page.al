@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'DE Fiskaly POS Unit Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = List;
     SourceTable = "NPR DE POS Unit Aux. Info";
     UsageCategory = None;

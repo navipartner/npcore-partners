@@ -1,9 +1,10 @@
 page 6151331 "NPR IT VAT Department Codebook"
 {
+    ApplicationArea = NPRITFiscal;
     Caption = 'IT VAT Department Codebook';
+    ContextSensitiveHelpPage = 'docs/fiscalization/italy/how-to/setup/';
     Extensible = false;
     PageType = List;
-    ApplicationArea = NPRITFiscal;
     UsageCategory = Administration;
     SourceTable = "NPR IT VAT Department Codebook";
     SourceTableView = sorting("POS Unit No.") order(ascending);

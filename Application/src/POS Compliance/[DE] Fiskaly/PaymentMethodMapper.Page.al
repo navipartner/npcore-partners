@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Payment Method Mapper';
+    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = List;
     SourceTable = "NPR Payment Method Mapper";
     UsageCategory = Lists;

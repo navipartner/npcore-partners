@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'VAT Posting Setup Mapper List';
+    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = List;
     SourceTable = "NPR VAT Post. Group Mapper";
     UsageCategory = Lists;

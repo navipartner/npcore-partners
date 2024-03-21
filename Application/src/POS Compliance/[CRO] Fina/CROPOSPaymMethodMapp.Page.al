@@ -2,6 +2,7 @@ page 6151183 "NPR CRO POS Paym. Method Mapp."
 {
     ApplicationArea = NPRCROFiscal;
     Caption = 'CRO POS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/croatia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR CRO POS Paym. Method Mapp.";

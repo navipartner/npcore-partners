@@ -2,6 +2,7 @@ page 6151272 "NPR BG SIS POS Paym. Meth. Map"
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG SIS POS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/bulgaria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR BG SIS POS Paym. Meth. Map";

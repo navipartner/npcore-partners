@@ -2,6 +2,7 @@ page 6151273 "NPR BG SIS VAT Post. Setup Map"
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG SIS VAT Posting Setup Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/bulgaria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR BG SIS VAT Post. Setup Map";

@@ -2,6 +2,7 @@ page 6059882 "NPR DE TSS List"
 {
     Extensible = False;
     Caption = 'DE Technical Security Systems';
+    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = List;
     SourceTable = "NPR DE TSS";
     UsageCategory = Administration;

@@ -2,6 +2,7 @@ page 6151288 "NPR BG SIS Return Reason Map"
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG SIS Return Reason Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/bulgaria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR BG SIS Return Reason Map";
