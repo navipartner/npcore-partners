@@ -6,9 +6,11 @@ report 6014435 "NPR Vendor/Item Category"
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/VendorItem Cat.rdlc';
     Caption = 'Vendor/Item Category';
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR32.0';
+    ObsoleteReason = 'Not being used anymore.';
 
     dataset
     {
@@ -596,10 +598,10 @@ report 6014435 "NPR Vendor/Item Category"
         // VendorPctoms: Decimal;
         SortType: Option antal,omsaetning,db;
         SortOrder: Option Stoerste,Mindste;
-        // ItemCategorySalesLCY: Decimal;
-        // ConsumptionAmount: Decimal;
-        // VaregrupperecSalesLCY: Decimal;
-        // VaregrupperecConsumptionAmount: Decimal;
-        // PurchasesLCY: Decimal;
+    // ItemCategorySalesLCY: Decimal;
+    // ConsumptionAmount: Decimal;
+    // VaregrupperecSalesLCY: Decimal;
+    // VaregrupperecConsumptionAmount: Decimal;
+    // PurchasesLCY: Decimal;
 }
 
