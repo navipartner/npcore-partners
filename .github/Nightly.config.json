@@ -6,8 +6,7 @@
     },
     {
       "name": "Insider_CLOUD",
-        "continueOnError": true,
-        "useCompareApp": true
+      "useCompareApp": true
     }
   ]
 }

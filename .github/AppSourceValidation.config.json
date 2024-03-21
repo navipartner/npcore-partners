@@ -5,8 +5,7 @@
   "containers": [
     {
       "name": "vLatest_CLOUD",
-      "useCompareApp": true,
-      "continueOnError": true
+      "useCompareApp": true
     }
   ],
   "runTests": false
