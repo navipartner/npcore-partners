@@ -3,6 +3,7 @@ page 6150770 "NPR SAF-T Cash Exports"
     Extensible = False;
     ApplicationArea = NPRNOFiscal;
     Caption = 'SAF-T Cash Register Exports';
+    ContextSensitiveHelpPage = 'docs/fiscalization/norway/how-to/setup/';
     CardPageId = "NPR SAF-T Cash Export Card";
     Editable = false;
     PageType = List;

@@ -2,6 +2,7 @@ page 6150715 "NPR RS POS Unit Mapping"
 {
     ApplicationArea = NPRRSFiscal;
     Caption = 'RS POS Unit Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR RS POS Unit Mapping";

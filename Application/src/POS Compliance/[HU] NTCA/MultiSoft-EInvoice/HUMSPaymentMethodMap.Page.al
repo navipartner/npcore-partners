@@ -2,6 +2,7 @@ page 6151364 "NPR HU MS Payment Method Map."
 {
     ApplicationArea = NPRHUMultiSoftEInv;
     Caption = 'HU Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/hungary/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR HU MS Payment Method Map.";

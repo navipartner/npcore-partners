@@ -2,6 +2,7 @@ page 6151317 "NPR IT POS Unit Mapping"
 {
     ApplicationArea = NPRITFiscal;
     Caption = 'IT POS Unit Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/italy/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR IT POS Unit Mapping";

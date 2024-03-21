@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'DE Connection Parameter Set';
+    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = Card;
     UsageCategory = None;
     SourceTable = "NPR DE Audit Setup";

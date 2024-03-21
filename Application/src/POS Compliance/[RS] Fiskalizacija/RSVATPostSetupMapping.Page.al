@@ -2,6 +2,7 @@ page 6150721 "NPR RS VAT Post. Setup Mapping"
 {
     ApplicationArea = NPRRSFiscal;
     Caption = 'RS VAT Posting Setup Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR RS VAT Post. Setup Mapping";

@@ -2,6 +2,7 @@ page 6150855 "NPR RS Payment Method Mapping"
 {
     ApplicationArea = NPRRSFiscal;
     Caption = 'RS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR RS Payment Method Mapping";
