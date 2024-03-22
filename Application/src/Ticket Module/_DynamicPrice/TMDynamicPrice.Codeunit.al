@@ -1,6 +1,75 @@
 codeunit 6014559 "NPR TM Dynamic Price"
 {
     Access = Internal;
+    internal procedure CalculateErpUnitPrice(
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        CustomerNo: Code[20];
+        ReferenceDate: Date;
+        Quantity: Integer;
+        var UnitPrice: Decimal;
+        var DiscountPct: Decimal;
+        var UnitPriceIncludesVat: Boolean;
+        var UnitPriceVatPercentage: Decimal)
+    var
+        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+    begin
+        Clear(AdmCapacityPriceBuffer);
+        AdmCapacityPriceBuffer.EntryNo := 1;
+        AdmCapacityPriceBuffer.ItemNumber := ItemNo;
+        AdmCapacityPriceBuffer.VariantCode := VariantCode;
+        AdmCapacityPriceBuffer.CustomerNo := CustomerNo;
+        AdmCapacityPriceBuffer.ReferenceDate := ReferenceDate;
+        AdmCapacityPriceBuffer.Quantity := Quantity;
+
+        CalculateErpPrice(AdmCapacityPriceBuffer);
+
+        UnitPrice := AdmCapacityPriceBuffer.UnitPrice;
+        DiscountPct := AdmCapacityPriceBuffer.DiscountPct;
+        UnitPriceIncludesVat := AdmCapacityPriceBuffer.UnitPriceIncludesVat;
+        UnitPriceVatPercentage := AdmCapacityPriceBuffer.UnitPriceVatPercentage;
+    end;
+
+    internal procedure CalculateErpPrice(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer") ValidErpPrice: Boolean
+    var
+        M2PriceService: Codeunit "NPR M2 POS Price WebService";
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        OriginalWorkDate: Date;
+    begin
+        TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
+        TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
+        TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
+        TempSalePOS.Insert();
+
+        TempSaleLinePOS."Sales Ticket No." := TempSalePOS."Sales Ticket No.";
+        TempSaleLinePOS."Line No." := AdmCapacityPriceBuffer.EntryNo;
+        TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
+        TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
+        TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
+        TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity;
+        TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
+        TempSaleLinePOS."Allow Line Discount" := true;
+        TempSaleLinePOS.Insert();
+
+        OriginalWorkDate := WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
+        ValidErpPrice := M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS);
+        if (ValidErpPrice) then begin
+            AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
+            AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
+            AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
+            AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
+            AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
+        end else begin
+            AdmCapacityPriceBuffer.UnitPrice := 0;
+            AdmCapacityPriceBuffer.DiscountPct := 0;
+            AdmCapacityPriceBuffer.TotalDiscountAmount := 0;
+            AdmCapacityPriceBuffer.UnitPriceIncludesVat := false;
+            AdmCapacityPriceBuffer.UnitPriceVatPercentage := 0;
+        end;
+        WorkDate(OriginalWorkDate);
+    end;
+
     procedure CalculateTicketTokenUnitPrice(Token: Text[100]; TokenLineNumber: Integer; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; ReferenceDate: Date; ReferenceTime: Time) TicketUnitPrice: Decimal
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -34,6 +103,65 @@ codeunit 6014559 "NPR TM Dynamic Price"
         end;
         exit(TicketUnitPrice);
     end;
+
+    internal procedure SetTicketAdmissionDynamicUnitPrice(
+        var ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        OriginalUnitPrice: Decimal; DiscountPct: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal;
+        ReferenceDate: Date; ReferenceTime: Time)
+    var
+        AdmScheduleEntryResponse: Record "NPR TM Admis. Schedule Entry";
+        PriceRule: Record "NPR TM Dynamic Price Rule";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        HavePriceRule: Boolean;
+        DynamicPrice, BasePrice, AddonPrice : Decimal;
+    begin
+
+
+        HavePriceRule := SelectPriceRule(AdmScheduleEntryResponse, ReferenceDate, ReferenceTime, PriceRule);
+        if (HavePriceRule) then
+            EvaluatePriceRule(PriceRule, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, false, BasePrice, AddonPrice);
+
+        if ((not ReservationRequest."Primary Request Line") and (ReservationRequest."Admission Inclusion" = ReservationRequest."Admission Inclusion"::REQUIRED)) then
+            OriginalUnitPrice := 0;
+
+        ReservationRequest.UnitAmountInclVat := 0;
+        ReservationRequest.UnitAmount := 0;
+        DynamicPrice := OriginalUnitPrice;
+
+        if (not HavePriceRule) then begin
+            GeneralLedgerSetup.Get();
+            PriceRule.RoundingPrecision := GeneralLedgerSetup."Inv. Rounding Precision (LCY)";
+            PriceRule.RoundingDirection := GeneralLedgerSetup."Inv. Rounding Type (LCY)";
+        end;
+
+        if (HavePriceRule) then begin
+            case (PriceRule.PricingOption) of
+                PriceRule.PricingOption::NA:
+                    DynamicPrice := OriginalUnitPrice;
+                PriceRule.PricingOption::FIXED:
+                    DynamicPrice := BasePrice;
+                PriceRule.PricingOption::RELATIVE:
+                    DynamicPrice := OriginalUnitPrice + AddonPrice;
+                PriceRule.PricingOption::PERCENT:
+                    DynamicPrice := OriginalUnitPrice + AddonPrice;
+            end;
+        end;
+
+        DynamicPrice -= DynamicPrice * DiscountPct / 100;
+
+        if (PriceIncludesVAT) then begin
+            ReservationRequest.UnitAmountInclVat := RoundAmount(DynamicPrice, PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+            ReservationRequest.UnitAmount := RoundAmount(RemoveVat(DynamicPrice, VatPercentage), PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+        end else begin
+            ReservationRequest.UnitAmount := RoundAmount(DynamicPrice, PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+            ReservationRequest.UnitAmountInclVat := RoundAmount(AddVat(DynamicPrice, VatPercentage), PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
+        end;
+
+        ReservationRequest.Amount := ReservationRequest.UnitAmount * ReservationRequest.Quantity;
+        ReservationRequest.AmountInclVat := ReservationRequest.UnitAmountInclVat * ReservationRequest.Quantity;
+
+    end;
+
 
     procedure CalculateTicketTokenUnitPrice(Token: Text[100]; OriginalUnitPrice: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal; ReferenceDate: Date; ReferenceTime: Time; var TempPriceRuleBuffer: Record "NPR TM Price Rule Buffer" temporary) TicketUnitPrice: Decimal
     var

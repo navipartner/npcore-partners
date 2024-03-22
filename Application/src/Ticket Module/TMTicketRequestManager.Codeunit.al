@@ -232,12 +232,8 @@
 
     procedure IssueTicketFromReservationToken(Token: Text[100]; FailWithError: Boolean; var ResponseMessage: Text) ResponseCode: Integer
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
     begin
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.FindSet();
 
         if (not FailWithError) then begin
             Commit();
@@ -246,31 +242,39 @@
             exit(0);
         end;
 
-        repeat
-            IssueTicketFromReservation(TicketReservationRequest);
-        until (TicketReservationRequest.Next() = 0);
-
+        DoIssueTicketFromReservationToken(Token);
         exit(0);
     end;
 
+    internal procedure DoIssueTicketFromReservationToken(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        AssignPrimaryReservationEntry(Token);
+        AssignListPrice(Token);
+
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindSet();
+        repeat
+            IssueTicketFromReservation(TicketReservationRequest);
+        until (TicketReservationRequest.Next() = 0);
+    end;
 
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
         TicketManager: Codeunit "NPR TM Ticket Request Manager";
-        AdmissionUnitPrice: Decimal;
         AdmissionAllowOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
 
         TicketManager.LockResources('IssueTicketFromReservation');
 
-        TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
-        if (TicketReservationRequest."Admission Created") then
-            exit;
+        // TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
 
         if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then begin
-            AssignPrimaryReservationEntry(TicketReservationRequest."Session Token ID");
-            _IssueNewTickets(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest.Quantity, TicketReservationRequest."Entry No.", AdmissionUnitPrice);
+            if (not TicketReservationRequest."Admission Created") then
+                _IssueNewTickets(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest.Quantity, TicketReservationRequest."Entry No.");
         end;
 
         if ((TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
@@ -280,32 +284,25 @@
             AdmissionAllowOverAllocationConfirmed := AdmissionAllowOverAllocationConfirmed::TERNARY_FALSE;
             if (Ticket.FindSet()) then begin
                 repeat
-                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionUnitPrice, AdmissionAllowOverAllocationConfirmed);
-
+                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionAllowOverAllocationConfirmed);
                 until (Ticket.Next() = 0);
 
-                if (AdmissionUnitPrice > 0) then begin
-
-                end;
             end;
         end;
 
     end;
 
-    local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer; AdditionCost: Decimal)
+    local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer)
     var
         Item: Record Item;
         TicketType: Record "NPR TM Ticket Type";
         TicketSetup: Record "NPR TM Ticket Setup";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        ReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
-        TicketManagement: Codeunit "NPR TM Ticket Management";
         NumberOfTickets: Integer;
         TicketQuantity: Integer;
         i: Integer;
         Window: Dialog;
-        AdditionalAdmissionCosts: Decimal;
         OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"];
         StartTime: DateTime;
         CheckMaxDuration: Boolean;
@@ -360,29 +357,16 @@
         ReservationRequest."Admission Created" := false;
         ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
         ReservationRequest."Expires Date Time" := CalculateNewExpireTime();
-
-        if (TicketSetup."Authorization Code Scheme" = '') then
-            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
-
-        ReservationRequest2.SetRange("Session Token ID", ReservationRequest."Session Token ID");
-        ReservationRequest2.SetFilter("Authorization Code", '<>%1', '');
-        if ReservationRequest2.FindFirst() then
-            ReservationRequest."Authorization Code" := ReservationRequest2."Authorization Code"
-        else
-            ReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(ReservationRequest."Authorization Code"));
         ReservationRequest.Modify();
 
         StartTime := CurrentDateTime();
         for i := 1 to Abs(NumberOfTickets) do begin
-            AdditionalAdmissionCosts := 0;
 
-            _IssueOneTicket(ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, AdditionalAdmissionCosts, OverAllocationConfirmed);
+            _IssueOneTicket(ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, OverAllocationConfirmed);
 
             if (GetShowProgressBar()) then
                 if (i mod 10 = 0) then
                     Window.Update(1, Round(i / NumberOfTickets * 10000, 1));
-
-            AdditionCost += AdditionalAdmissionCosts;
 
             // Check progress after some percentage of the max duration
             if ((CurrentClientType() = ClientType::SOAP) and (CheckMaxDuration)) then
@@ -391,7 +375,6 @@
                         Error(DurationExceeded);
                     CheckMaxDuration := false; // Only check once
                 end;
-
         end;
 
         if (GetShowProgressBar()) then
@@ -399,7 +382,87 @@
 
     end;
 
-    local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
+    internal procedure AssignListPrice(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Admission: Record "NPR TM Admission";
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        PriceCalculation: Codeunit "NPR TM Dynamic Price";
+        UnitPrice: Decimal;
+        DiscountPct: Decimal;
+        UnitPriceIncludesVat: Boolean;
+        UnitPriceVatPercentage: Decimal;
+        ReferenceDate: Date;
+        TicketPriceDict: Dictionary of [Integer, Dictionary of [Integer, Decimal]];
+        ExtLineReferenceNo: Integer;
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter(AmountSource, '=%1', TicketReservationRequest.AmountSource::BC);
+        if (TicketReservationRequest.FindSet()) then begin
+            repeat
+
+                ReferenceDate := Today();
+                AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+                AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmScheduleEntry.FindFirst()) then
+                    ReferenceDate := AdmScheduleEntry."Admission Start Date";
+
+                if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+                    PriceCalculation.CalculateErpUnitPrice(
+                        TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                        UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+                    PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, Today(), Time());
+                    TicketReservationRequest.Modify();
+                end;
+
+                if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+                    if (Admission.Get(TicketReservationRequest."Admission Code")) then begin
+                        PriceCalculation.CalculateErpUnitPrice(
+                            Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                            UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+                        PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, Today(), Time());
+                        TicketReservationRequest.Modify();
+                    end;
+                end;
+
+                if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
+                    AggregateTicketPriceDetails(TicketReservationRequest, TicketPriceDict);
+
+            until (TicketReservationRequest.Next() = 0);
+
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.SetCurrentKey("Session Token ID");
+            TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+
+            foreach ExtLineReferenceNo in TicketPriceDict.Keys() do begin
+                TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', ExtLineReferenceNo);
+                if (TicketReservationRequest.FindFirst()) then begin
+                    TicketReservationRequest.TicketUnitAmountExclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(1);
+                    TicketReservationRequest.TicketUnitAmountInclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(2);
+                    TicketReservationRequest.Modify();
+                end;
+            end;
+        end;
+    end;
+
+    local procedure AggregateTicketPriceDetails(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; TicketPriceDict: Dictionary of [Integer, Dictionary of [Integer, Decimal]])
+    var
+        TicketPriceDetails: Dictionary of [Integer, Decimal];
+    begin
+        if (not TicketPriceDict.ContainsKey(TicketReservationRequest."Ext. Line Reference No.")) then begin
+            TicketPriceDetails.Set(1, TicketReservationRequest.UnitAmount);
+            TicketPriceDetails.Set(2, TicketReservationRequest.UnitAmountInclVat);
+            TicketPriceDict.Set(TicketReservationRequest."Ext. Line Reference No.", TicketPriceDetails);
+        end else begin
+            TicketPriceDict.Get(TicketReservationRequest."Ext. Line Reference No.", TicketPriceDetails);
+            TicketPriceDetails.Set(1, (TicketPriceDetails.Get(1) + TicketReservationRequest.UnitAmount));
+            TicketPriceDetails.Set(2, (TicketPriceDetails.Get(2) + TicketReservationRequest.UnitAmountInclVat));
+        end;
+    end;
+
+    local procedure _IssueOneTicket(ItemNo: Code[20]; VariantCode: Code[10]; QuantityPerTicket: Integer; TicketType: Record "NPR TM Ticket Type"; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
     var
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
@@ -414,7 +477,7 @@
             FindTicketByToken(Ticket, ReservationRequest."Session Token ID", ReservationRequest."Admission Code", true, ReservationRequest."Ext. Line Reference No.");
         end;
 
-        _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, AdditionalAdmissionCosts, OverAllocationConfirmed);
+        _IssueAdmissionsAppendToTicket(Ticket, QuantityPerTicket, ReservationRequest, OverAllocationConfirmed);
 
         TicketManagement.GetTicketAccessEntryValidDateBoundary(Ticket, LowDate, HighDate);
         if (HighDate > Ticket."Valid To Date") then
@@ -422,10 +485,9 @@
 
     end;
 
-    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "NPR TM Ticket"; QuantityPerTicket: Integer; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var AdditionalAdmissionCosts: Decimal; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
+    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "NPR TM Ticket"; QuantityPerTicket: Integer; ReservationRequest: Record "NPR TM Ticket Reservation Req."; var OverAllocationConfirmed: Dictionary of [Code[20], Enum "NPR TM Ternary"])
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
-        AdmissionUnitPrice: Decimal;
         AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary";
     begin
         // Create Ticket Content
@@ -446,18 +508,14 @@
 
                 OverAllocationConfirmed.Get(TicketBom."Admission Code", AdmissionOverAllocationConfirmed);
 
-                AdmissionUnitPrice := 0;
-
-                _IssueOneAdmission(ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, AdmissionUnitPrice, AdmissionOverAllocationConfirmed);
-                AdditionalAdmissionCosts += AdmissionUnitPrice;
-
+                _IssueOneAdmission(ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, AdmissionOverAllocationConfirmed);
                 OverAllocationConfirmed.Set(TicketBom."Admission Code", AdmissionOverAllocationConfirmed);
 
             until (TicketBom.Next() = 0);
         end;
     end;
 
-    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionUnitPrice: Decimal; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
+    local procedure _IssueOneAdmission(SourceRequest: Record "NPR TM Ticket Reservation Req."; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; QuantityPerTicket: Integer; ValidateWaitinglistReference: Boolean; var AdmissionOverAllocationConfirmed: Enum "NPR TM Ternary")
     var
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -532,11 +590,6 @@
             ValidateWaitingListReferenceCode(WaitingListReferenceCode, Ticket, Admission."Admission Code", AdmissionSchEntry);
 
         TicketManagement.CreateAdmissionAccessEntry(Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, AdmissionOverAllocationConfirmed);
-
-        AdmissionUnitPrice := TicketBom."Admission Unit Price";
-        if ((TicketBom."Admission Inclusion" <> SourceRequest."Admission Inclusion") and (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::NOT_SELECTED)) then
-            AdmissionUnitPrice *= -1;
-
     end;
 
     local procedure ValidateWaitingListReferenceCode(WaitingListReferenceCode: Code[10]; Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry")
@@ -599,6 +652,7 @@
 
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
+
                 repeat
 
                     if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
@@ -2752,6 +2806,8 @@
         Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
         Ticket."Line No." := ReservationRequest."Line No.";
         Ticket."External Ticket No." := ReservationRequest.PreAssignedTicketNumber;
+        Ticket.AmountInclVAT := ReservationRequest.TicketUnitAmountInclVat;
+        Ticket.AmountExclVAT := ReservationRequest.TicketUnitAmountExclVat;
 
         if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
             Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
@@ -2760,7 +2816,6 @@
             Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
 
         TicketManagement.SetTicketProperties(Ticket, Today);
-
         Ticket.Insert(true);
     end;
 
@@ -2820,27 +2875,43 @@
             until Ticket.Next() = 0;
     end;
 
-    local procedure AssignPrimaryReservationEntry(Token: Text[100])
+    internal procedure AssignPrimaryReservationEntry(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        AuthorizationCode: Code[10];
         OldLineReference: Integer;
         PrimaryAssigned: Boolean;
+        PrimaryLineQuantity: integer;
     begin
         OldLineReference := Power(2, 31) - 1;
+
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (TicketSetup."Authorization Code Scheme" = '') then
+            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
+
+        AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(TicketReservationRequest."Authorization Code"));
 
         TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
+
                 TicketReservationRequest."Primary Request Line" := false;
                 if (TicketReservationRequest."Ext. Line Reference No." <> OldLineReference) then
                     PrimaryAssigned := false;
 
                 if ((TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) and not (PrimaryAssigned)) then begin
                     TicketReservationRequest."Primary Request Line" := true;
+                    PrimaryLineQuantity := TicketReservationRequest.Quantity;
                     PrimaryAssigned := true;
                 end;
 
+                TicketReservationRequest.Quantity := PrimaryLineQuantity;
+                TicketReservationRequest."Authorization Code" := AuthorizationCode;
                 TicketReservationRequest.Modify();
                 OldLineReference := TicketReservationRequest."Ext. Line Reference No.";
             until (TicketReservationRequest.Next() = 0);

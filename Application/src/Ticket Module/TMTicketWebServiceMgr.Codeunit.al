@@ -112,10 +112,14 @@
     begin
 
         //Import remaining BOM lines per line no
-        foreach Line in Lines do begin
+        foreach Line in Lines do
             AddRemainingReservationRequestEntries(Token, Line);
-            //
 
+        TicketRequestManager.AssignPrimaryReservationEntry(Token);
+        TicketRequestManager.AssignListPrice(Token);
+
+        // Process each line
+        foreach Line in Lines do begin
             TicketReservationRequest.SetCurrentKey("Session Token ID", "Admission Inclusion");
             TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
             TicketReservationRequest.SetRange("Ext. Line Reference No.", Line);
@@ -127,8 +131,8 @@
                         TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::REGISTERED;
                         TicketReservationRequest.Modify();
                     end else begin
-                        CreateResponse(TicketReservationRequest, TicketReservationResponse);
 
+                        CreateResponse(TicketReservationRequest, TicketReservationResponse);
                         if (ValidTicketRequest(TicketReservationRequest, TicketReservationResponse)) then begin
 
                             if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::WAITINGLIST) then begin
@@ -141,8 +145,8 @@
 
                 until ((TicketReservationRequest.Next() = 0));
             end;
-
         end;
+
         if (not TicketCreated) then
             TicketRequestManager.DeleteReservationRequest(Token, false);
     end;
@@ -809,6 +813,7 @@
     var
         TMTicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketManager: Codeunit "NPR TM Ticket Management";
         ExternalItemType: Integer;
         WaitingListOptInAddress: Text[100];
     begin
@@ -828,12 +833,13 @@
         TicketReservationRequest."External Member No." := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'member_number', false), 1, MaxStrLen(TicketReservationRequest."External Member No."));
         TicketReservationRequest."Admission Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(Element, 'admission_code', false), 1, MaxStrLen(TicketReservationRequest."Admission Code"));
 
-        if TMTicketAdmissionBOM.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code") then
-            TicketReservationRequest.Default := TMTicketAdmissionBOM.Default
-        else
-            TicketReservationRequest.Default := true;
+        if (TicketReservationRequest."Admission Code" = '') then
+            TicketReservationRequest."Admission Code" := TicketManager.GetDefaultAdmissionCode(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code");
 
-        if TMTicketAdmissionBOM."Admission Inclusion" <> TMTicketAdmissionBOM."Admission Inclusion"::REQUIRED then
+        TMTicketAdmissionBOM.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code");
+        TicketReservationRequest.Default := TMTicketAdmissionBOM.Default;
+
+        if (TMTicketAdmissionBOM."Admission Inclusion" <> TMTicketAdmissionBOM."Admission Inclusion"::REQUIRED) then
             TicketReservationRequest."Admission Inclusion" := TicketReservationRequest."Admission Inclusion"::SELECTED;
 
         if ((TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::SELECTED) and (TicketReservationRequest.Quantity = 0)) then
@@ -848,10 +854,12 @@
             TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
         end;
 
-        TicketReservationRequest.UnitAmount := GetDecimalAmount(Element, 'unit_amount');
-        TicketReservationRequest.UnitAmountInclVat := GetDecimalAmount(Element, 'unit_amount_incl_vat');
-        TicketReservationRequest.Amount := GetDecimalAmount(Element, 'amount');
-        TicketReservationRequest.AmountInclVat := GetDecimalAmount(Element, 'amount_incl_vat');
+        TicketReservationRequest.UnitAmount := Abs(GetDecimalAmount(Element, 'unit_amount'));
+        TicketReservationRequest.UnitAmountInclVat := Abs(GetDecimalAmount(Element, 'unit_amount_incl_vat'));
+        TicketReservationRequest.Amount := Abs(GetDecimalAmount(Element, 'amount'));
+        TicketReservationRequest.AmountInclVat := Abs(GetDecimalAmount(Element, 'amount_incl_vat'));
+        if (TicketReservationRequest.UnitAmount + TicketReservationRequest.UnitAmountInclVat + TicketReservationRequest.Amount + TicketReservationRequest.AmountInclVat > 0) then
+            TicketReservationRequest.AmountSource := TicketReservationRequest.AmountSource::API;
 
         TicketReservationRequest.Insert();
     end;

@@ -162,6 +162,17 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Member Card No. field';
                 }
+                field(AmountInclVat; Rec.AmountInclVat)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Amount Incl. Vat field';
+                }
+                field(AmountExclVat; Rec.AmountExclVat)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Amount Excl. Vat field';
+                    Visible = false;
+                }
                 field("No. Of Access"; Rec."No. Of Access")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

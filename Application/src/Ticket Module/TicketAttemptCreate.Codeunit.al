@@ -195,23 +195,14 @@
     local procedure DoIssueTicketFromReservationToken(Token: Text[100])
     var
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
-        TicketReservationRequest.SetCurrentKey("Session Token ID", Default);
-        TicketReservationRequest.SetAscending(Default, false);
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.FindSet();
-
-        repeat
-            TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
-        until (TicketReservationRequest.Next() = 0);
+        TicketRequest.DoIssueTicketFromReservationToken(Token);
     end;
 
-    local procedure DoIssueTicketFromReservation(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    local procedure DoIssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         TicketRequest: Codeunit "NPR TM Ticket Request Manager";
     begin
-        TicketRequest.LockResources('DoIssueTicketFromReservation');
         TicketRequest.IssueTicketFromReservation(TicketReservationRequest);
     end;
 

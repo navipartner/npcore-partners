@@ -119,7 +119,7 @@
         }
         field(52; Amount; Decimal)
         {
-            Caption = 'Amount';
+            Caption = 'Amount Excl. VAT';
             DataClassification = CustomerContent;
         }
         field(53; AmountInclVat; Decimal)
@@ -129,12 +129,29 @@
         }
         field(54; UnitAmount; Decimal)
         {
-            Caption = 'Unit Amount';
+            Caption = 'Unit Amount Excl. VAT';
             DataClassification = CustomerContent;
         }
         field(55; UnitAmountInclVat; Decimal)
         {
             Caption = 'Unit Amount Incl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(56; AmountSource; Option)
+        {
+            Caption = 'Amount Source';
+            DataClassification = CustomerContent;
+            OptionMembers = BC,API;
+            OptionCaption = 'From BC,From API';
+        }
+        field(57; TicketUnitAmountExclVat; Decimal)
+        {
+            Caption = 'Ticket Amount Excl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(58; TicketUnitAmountInclVat; Decimal)
+        {
+            Caption = 'Ticket Amount Incl. VAT';
             DataClassification = CustomerContent;
         }
         field(60; "Admission Description"; Text[50])
