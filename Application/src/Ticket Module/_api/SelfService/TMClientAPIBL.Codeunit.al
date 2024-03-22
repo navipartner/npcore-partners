@@ -689,6 +689,7 @@ codeunit 6151543 "NPR TM Client API BL"
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AdmissionSchedule: Record "NPR TM Admis. Schedule Entry";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
         ItemResolver: Integer;
         BomIndex: Integer;
     begin
@@ -732,14 +733,14 @@ codeunit 6151543 "NPR TM Client API BL"
 
             if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                 if (TicketBom.Default) then
-                    CalculateErpPrice(AdmCapacityPriceBuffer);
+                    TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
 
             if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
                 Admission.Get(TicketBom."Admission Code");
                 AdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
                 AdmCapacityPriceBuffer.VariantCode := '';
                 if (AdmCapacityPriceBuffer.ItemNumber <> '') then
-                    CalculateErpPrice(AdmCapacityPriceBuffer);
+                    TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
             end;
 
             JBuilder.WriteStartObject('');
@@ -1141,37 +1142,6 @@ codeunit 6151543 "NPR TM Client API BL"
         JObject.Get(JKey, JToken);
         if (not Evaluate(DateValue, JToken.AsValue().AsText(), 9)) then
             ValidationErrorList.Add(StrSubstNo('Date value %1 not in expected format (YYYY-MM-DD).', JToken.AsValue().AsText()));
-    end;
-
-    local procedure CalculateErpPrice(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer")
-    var
-        M2PriceService: Codeunit "NPR M2 POS Price WebService";
-        TempSalePOS: Record "NPR POS Sale" temporary;
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
-    begin
-        TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
-        TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
-        TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
-        TempSalePOS.Insert();
-
-        TempSaleLinePOS."Sales Ticket No." := TempSalePOS."Sales Ticket No.";
-        TempSaleLinePOS."Line No." := AdmCapacityPriceBuffer.EntryNo;
-        TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
-        TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
-        TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
-        TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity;
-        TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
-        TempSaleLinePOS."Allow Line Discount" := true;
-        TempSaleLinePOS.Insert();
-        WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
-        if (M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS)) then begin
-            AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
-            AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
-            AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
-            AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
-            AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
-        end;
-        WorkDate(Today());
     end;
 
 #pragma warning disable AA0139

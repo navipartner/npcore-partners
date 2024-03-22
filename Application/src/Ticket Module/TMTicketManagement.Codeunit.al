@@ -1945,7 +1945,7 @@
         exit(Admission."Default Schedule");
     end;
 
-    local procedure GetDefaultAdmissionCode(TicketNo: Code[20]): Code[20]
+    internal procedure GetDefaultAdmissionCode(TicketNo: Code[20]): Code[20]
     var
         Ticket: Record "NPR TM Ticket";
     begin
@@ -1954,7 +1954,7 @@
         exit(GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code"));
     end;
 
-    local procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
+    internal procedure GetDefaultAdmissionCode(ItemNo: Code[20]; VariantCode: Code[10]): Code[20]
     var
         TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
     begin

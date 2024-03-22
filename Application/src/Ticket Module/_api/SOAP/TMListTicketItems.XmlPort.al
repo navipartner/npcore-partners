@@ -544,6 +544,7 @@ xmlport 6060112 "NPR TM List Ticket Items"
     var
         TicketBom: Record "NPR TM Ticket Admission Bom";
         Admission: Record "NPR TM Admission";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
     begin
         _AdmCapacityPriceBuffer.Reset();
         _AdmCapacityPriceBuffer.DeleteAll();
@@ -564,14 +565,14 @@ xmlport 6060112 "NPR TM List Ticket Items"
 
                 if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                     if (TicketBom.Default) then
-                        CalculateErpPrice(_AdmCapacityPriceBuffer);
+                        TicketPrice.CalculateErpPrice(_AdmCapacityPriceBuffer);
 
                 if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
                     Admission.Get(TicketBom."Admission Code");
                     _AdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
                     _AdmCapacityPriceBuffer.VariantCode := '';
                     if (_AdmCapacityPriceBuffer.ItemNumber <> '') then
-                        CalculateErpPrice(_AdmCapacityPriceBuffer);
+                        TicketPrice.CalculateErpPrice(_AdmCapacityPriceBuffer);
                 end;
 
                 if (not _AdmCapacityPriceBuffer.Insert()) then
@@ -581,35 +582,5 @@ xmlport 6060112 "NPR TM List Ticket Items"
         end
     end;
 
-    local procedure CalculateErpPrice(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer")
-    var
-        M2PriceService: Codeunit "NPR M2 POS Price WebService";
-        TempSalePOS: Record "NPR POS Sale" temporary;
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
-    begin
-        TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
-        TempSalePOS."Customer No." := AdmCapacityPriceBuffer.CustomerNo;
-        TempSalePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
-        TempSalePOS.Insert();
-
-        TempSaleLinePOS."Sales Ticket No." := TempSalePOS."Sales Ticket No.";
-        TempSaleLinePOS."Line No." := AdmCapacityPriceBuffer.EntryNo;
-        TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
-        TempSaleLinePOS."No." := AdmCapacityPriceBuffer.ItemNumber;
-        TempSaleLinePOS."Variant Code" := AdmCapacityPriceBuffer.VariantCode;
-        TempSaleLinePOS.Quantity := AdmCapacityPriceBuffer.Quantity;
-        TempSaleLinePOS.Date := AdmCapacityPriceBuffer.ReferenceDate;
-        TempSaleLinePOS."Allow Line Discount" := true;
-        TempSaleLinePOS.Insert();
-        WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
-        if (M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS)) then begin
-            AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
-            AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
-            AdmCapacityPriceBuffer.TotalDiscountAmount := TempSaleLinePOS."Discount Amount";
-            AdmCapacityPriceBuffer.UnitPriceIncludesVat := TempSaleLinePOS."Price Includes VAT";
-            AdmCapacityPriceBuffer.UnitPriceVatPercentage := TempSaleLinePOS."VAT %";
-        end;
-        WorkDate(Today());
-    end;
 }
 
