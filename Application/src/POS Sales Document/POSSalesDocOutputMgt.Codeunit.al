@@ -269,7 +269,7 @@
 
     end;
 
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20)
     [EventSubscriber(ObjectType::Table, Database::"Report Selections", 'OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue', '', false, false)]
     local procedure OnEnqueueMailingJobOnBeforeRunJobQueueEnqueue(RecordIdToProcess: RecordID; ParameterString: Text; Description: Text; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     var
