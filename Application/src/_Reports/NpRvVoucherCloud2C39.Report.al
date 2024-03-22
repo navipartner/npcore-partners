@@ -1,4 +1,4 @@
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20)
 report 6014515 "NPR NpRv Voucher Cloud 2 C39"
 {
     Extensible = False;
