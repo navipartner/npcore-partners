@@ -14,6 +14,10 @@ on:
       - 'Performance Toolkit/**'
       - '.github/**'
 
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: powershell
