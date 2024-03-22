@@ -28,6 +28,16 @@ page 6151294 "NPR TM Ticket Card"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Ticket No. field';
                 }
+                field(AmountInclVat; Rec.AmountInclVat)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Amount Incl. VAT field';
+                }
+                field(AmountExclVat; Rec.AmountExclVat)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Amount Excl. VAT field';
+                }
             }
             group(Dates)
             {
@@ -47,6 +57,7 @@ page 6151294 "NPR TM Ticket Card"
                 group(ValidFrom)
                 {
                     Editable = true;
+                    Caption = 'Valid From';
                     field("Valid From Date"; Rec."Valid From Date")
                     {
                         ApplicationArea = NPRTicketAdvanced;
@@ -61,6 +72,7 @@ page 6151294 "NPR TM Ticket Card"
                 group(ValidTo)
                 {
                     Editable = true;
+                    Caption = 'Valid Until';
                     field("Valid To Date"; Rec."Valid To Date")
                     {
                         ApplicationArea = NPRTicketAdvanced;

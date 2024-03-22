@@ -156,6 +156,14 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                 ticket_price := Format(TicketPrice, 0, 9);
                             end;
                         }
+                        textattribute(ticket_quantity)
+                        {
+                            XmlName = 'quantity';
+                            trigger OnBeforePassVariable()
+                            begin
+                                ticket_quantity := Format(TicketQuantity, 0, 9);
+                            end;
+                        }
 
                         textelement(admissions)
                         {
@@ -226,10 +234,10 @@ xmlport 6060114 "NPR TM Ticket Reservation"
                                     }
                                     textattribute(admission_price)
                                     {
-                                        XmlName = 'admission_price';
+                                        XmlName = 'AdmissionUnitPrice';
                                         trigger OnBeforePassVariable()
                                         begin
-                                            admission_price := TempTicketAdmissionRequest."Notification Address";
+                                            admission_price := Format(TempTicketAdmissionRequest.UnitAmountInclVat, 0, 9);
                                         end;
                                     }
                                     textelement(admission_is)
@@ -325,9 +333,9 @@ xmlport 6060114 "NPR TM Ticket Reservation"
     }
 
     var
-        AdmissionPrice: Decimal;
         ExternalIdCount: Integer;
         TicketPrice: Decimal;
+        TicketQuantity: Integer;
         QtySum: Integer;
 
     internal procedure GetToken(): Text[100]
@@ -402,8 +410,6 @@ xmlport 6060114 "NPR TM Ticket Reservation"
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
-        DynamicPrice: Codeunit "NPR TM Dynamic Price";
-        BasePrice, AddonPrice : Decimal;
     begin
         TicketPrice := 0;
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -411,6 +417,9 @@ xmlport 6060114 "NPR TM Ticket Reservation"
         TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
         if (not TicketReservationRequest.FindFirst()) then
             exit;
+
+        TicketPrice := TicketReservationRequest.TicketUnitAmountInclVat;
+        TicketQuantity := TicketReservationRequest.Quantity;
 
         Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
         if (not Ticket.FindFirst()) then
@@ -428,11 +437,9 @@ xmlport 6060114 "NPR TM Ticket Reservation"
             if TempTicketAdmissionRequest."External Adm. Sch. Entry No." = 0 then
                 TempTicketAdmissionRequest."External Adm. Sch. Entry No." := FindExternalAdmissionScheduleEntryNo(Ticket."No.", TicketReservationRequest."Admission Code");
 
-            DynamicPrice.CalculateScheduleEntryPrice(TempTicketAdmissionRequest."Item No.", TempTicketAdmissionRequest."Variant Code", TempTicketAdmissionRequest."Admission Code", TempTicketAdmissionRequest."External Adm. Sch. Entry No.", Today(), Time(), BasePrice, AddonPrice);
-            AdmissionPrice := BasePrice + AddonPrice;
-            if TempTicketAdmissionRequest."Admission Inclusion" <> TempTicketAdmissionRequest."Admission Inclusion"::NOT_SELECTED then
-                TicketPrice := TicketPrice + AdmissionPrice;
-            TempTicketAdmissionRequest."Notification Address" := Format(AdmissionPrice, 0, 9);
+            //if TempTicketAdmissionRequest."Admission Inclusion" <> TempTicketAdmissionRequest."Admission Inclusion"::NOT_SELECTED then
+            //    TicketPrice += TempTicketAdmissionRequest.UnitAmountInclVat;
+
             TempTicketAdmissionRequest.Insert();
         until (TicketReservationRequest.Next() = 0);
     end;

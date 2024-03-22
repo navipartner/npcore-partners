@@ -105,7 +105,7 @@
         }
         field(63; "Sales Receipt No."; Code[20])
         {
-            Caption = 'POS Reciept No.';
+            Caption = 'POS Receipt No.';
             DataClassification = CustomerContent;
         }
         field(64; "Line No."; Integer)
@@ -154,6 +154,16 @@
         field(202; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
+            DataClassification = CustomerContent;
+        }
+        field(110; AmountInclVat; Decimal)
+        {
+            Caption = 'Amount Incl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(111; AmountExclVat; Decimal)
+        {
+            Caption = 'Amount Excl. VAT';
             DataClassification = CustomerContent;
         }
     }

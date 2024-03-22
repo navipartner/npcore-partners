@@ -308,8 +308,11 @@ xmlport 6060123 "NPR TM Ticket Server Req."
         Item: Record Item;
         ItemUnitPriceLbl: Label '%1 %2', Locked = true;
     begin
+        if (TmpTicket.AmountInclVat <> 0) then
+            exit(StrSubstNo(ItemUnitPriceLbl, Format(TmpTicket.AmountInclVat, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'), GeneralLedgerSetup."LCY Code"));
+
         Item.Get(TmpTicket."Item No.");
-        exit(StrSubstNo(ItemUnitPriceLbl, Item."Unit Price", GeneralLedgerSetup."LCY Code"));
+        exit(StrSubstNo(ItemUnitPriceLbl, Format(Item."Unit Price", 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'), GeneralLedgerSetup."LCY Code"));
     end;
 }
 

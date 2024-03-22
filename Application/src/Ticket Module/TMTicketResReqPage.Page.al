@@ -203,6 +203,30 @@
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the DIY Print Order At field';
                 }
+                group(Price)
+                {
+                    Caption = 'Calculated Price';
+                    field(UnitAmount; Rec.UnitAmount)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Unit Amount field';
+                    }
+                    field(UnitAmountInclVat; Rec.UnitAmountInclVat)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Unit Amount Incl. Vat field';
+                    }
+                    field(Amount; Rec.Amount)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Amount field';
+                    }
+                    field(AmountInclVat; Rec.AmountInclVat)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Amount Incl. Vat field';
+                    }
+                }
             }
             group(Attributes)
             {
