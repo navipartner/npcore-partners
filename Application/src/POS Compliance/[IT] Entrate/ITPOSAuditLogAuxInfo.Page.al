@@ -56,11 +56,6 @@ page 6151313 "NPR IT POS Audit Log Aux Info"
                     ApplicationArea = NPRITFiscal;
                     ToolTip = 'Specifies the value of the Receipt No. field.';
                 }
-                field("Payment Method"; Rec."Payment Method")
-                {
-                    ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method field.';
-                }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRITFiscal;
@@ -159,7 +154,7 @@ page 6151313 "NPR IT POS Audit Log Aux Info"
                         OStream: OutStream;
                     begin
                         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
-                        if Rec."Response Content".HasValue()  then begin
+                        if Rec."Response Content".HasValue() then begin
                             Rec."Response Content".ExportStream(OStream);
                             FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."Z Report No.", Rec."Receipt No.", Rec."Fiscal Printer Serial No."), true);
                         end;

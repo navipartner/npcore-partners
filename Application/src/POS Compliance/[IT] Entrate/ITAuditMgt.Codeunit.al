@@ -178,7 +178,6 @@ codeunit 6184647 "NPR IT Audit Mgt."
     local procedure InsertITPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
     var
         ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info";
-        POSRMALine: Record "NPR POS RMA Line";
     begin
         ITPOSAuditLogAuxInfo.Init();
         ITPOSAuditLogAuxInfo."Audit Entry Type" := ITPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
@@ -188,18 +187,7 @@ codeunit 6184647 "NPR IT Audit Mgt."
         ITPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
         ITPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
         ITPOSAuditLogAuxInfo.Amount := POSEntry."Amount Incl. Tax";
-
-        case true of
-            POSEntry."Amount Incl. Tax" > 0:
-                ITPOSAuditLogAuxInfo."Transaction Type" := ITPOSAuditLogAuxInfo."Transaction Type"::SALE;
-            POSEntry."Amount Incl. Tax" < 0:
-                begin
-                    ITPOSAuditLogAuxInfo."Transaction Type" := ITPOSAuditLogAuxInfo."Transaction Type"::REFUND;
-                    POSRMALine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                    if POSRMALine.FindSet() then
-                        ITPOSAuditLogAuxInfo."Refund Source Document No." := POSRMALine."Sales Ticket No.";
-                end;
-        end;
+        CheckForTransactionTypeOnPOSEntry(POSEntry, ITPOSAuditLogAuxInfo);
 
         ITPOSAuditLogAuxInfo.Insert();
     end;
@@ -356,6 +344,19 @@ codeunit 6184647 "NPR IT Audit Mgt."
         ITPOSUnitMapping.TestField("Fiscal Printer Serial No.");
     end;
 
+    local procedure CheckForTransactionTypeOnPOSEntry(POSEntry: Record "NPR POS Entry"; var ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info")
+    begin
+        case POSEntry."Amount Incl. Tax" > 0 of
+            true:
+                ITPOSAuditLogAuxInfo."Transaction Type" := ITPOSAuditLogAuxInfo."Transaction Type"::SALE;
+            false:
+                begin
+                    ITPOSAuditLogAuxInfo."Transaction Type" := ITPOSAuditLogAuxInfo."Transaction Type"::REFUND;
+                    SetRefundSourceDocumentNo(POSEntry, ITPOSAuditLogAuxInfo);
+                end;
+        end;
+    end;
+
     local procedure GetSourceDocumentNoFromAuditLog(Setup: Codeunit "NPR POS Setup"; SalesTicketNo: Code[20]): Code[20]
     var
         ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info";
@@ -398,6 +399,28 @@ codeunit 6184647 "NPR IT Audit Mgt."
                 exit(ITPOSAuditLogAuxInfo."Source Document No.");
             end;
         end;
+    end;
+
+    local procedure SetRefundSourceDocumentNo(POSEntry: Record "NPR POS Entry"; var ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info")
+    var
+        POSRMALine: Record "NPR POS RMA Line";
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        NpRvArchVoucherEntrySource: Record "NPR NpRv Arch. Voucher Entry";
+    begin
+        POSRMALine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if POSRMALine.FindFirst() then begin
+            ITPOSAuditLogAuxInfo."Refund Source Document No." := POSRMALine."Sales Ticket No.";
+            exit;
+        end;
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::Payment);
+        NpRvArchVoucherEntry.SetRange("Document No.", ITPOSAuditLogAuxInfo."Source Document No.");
+        if not NpRvArchVoucherEntry.FindFirst() then
+            exit;
+        NpRvArchVoucherEntrySource.SetRange("Entry Type", NpRvArchVoucherEntrySource."Entry Type"::"Issue Voucher");
+        NpRvArchVoucherEntrySource.SetRange("Arch. Voucher No.", NpRvArchVoucherEntry."Arch. Voucher No.");
+        if not NpRvArchVoucherEntrySource.FindFirst() then
+            exit;
+        ITPOSAuditLogAuxInfo."Refund Source Document No." := NpRvArchVoucherEntrySource."Document No.";
     end;
 
     local procedure CheckForLettersInText(Value: Text)

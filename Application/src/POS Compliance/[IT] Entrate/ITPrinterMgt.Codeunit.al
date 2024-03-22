@@ -337,7 +337,7 @@ codeunit 6184659 "NPR IT Printer Mgt."
         PrintRecLotteryCode(FiscalReceiptBody, ITPOSAuditLogAuxInfo);
 
         repeat
-            PrintRecTotal(FiscalReceiptBody, POSEntryPaymentLine);
+            PrintRecTotal(FiscalReceiptBody, POSEntryPaymentLine, false);
         until POSEntryPaymentLine.Next() = 0;
 
         FiscalReceiptBody.Add(FiscalReceiptEnd);
@@ -448,29 +448,30 @@ codeunit 6184659 "NPR IT Printer Mgt."
         FiscalReceiptElement.Add(PrintRecLotteryElement);
     end;
 
-    local procedure PrintRecTotal(var FiscalReceiptElement: XmlElement; POSEntryPaymentLine: Record "NPR POS Entry Payment Line")
+    local procedure PrintRecTotal(var FiscalReceiptElement: XmlElement; POSEntryPaymentLine: Record "NPR POS Entry Payment Line"; IsRefundVoucher: Boolean)
     var
         ITPOSPaymentMethodMapp: Record "NPR IT POS Paym. Method Mapp.";
         ITPOSPaymentMethodMappNotFoundErr: Label 'POS Payment Method Mapping has not been found for Payment Method Code: %1. Please add the correct record to %2', Comment = '%1 = Payment Method Code, %2 = Payment Method Mapping Table';
         PrintRecTotalElement: XmlElement;
     begin
-        if not IsPaymentLineVoucher(POSEntryPaymentLine) then begin
+        PrintRecTotalElement := XmlElement.Create('printRecTotal');
+        AddAttributeToElement(PrintRecTotalElement, 'operator', '1');
+        if (not IsPaymentLineVoucher(POSEntryPaymentLine)) then begin
             ITPOSPaymentMethodMapp.SetRange("Payment Method Code", POSEntryPaymentLine."POS Payment Method Code");
             ITPOSPaymentMethodMapp.SetRange("POS Unit No.", POSEntryPaymentLine."POS Unit No.");
             if not ITPOSPaymentMethodMapp.FindFirst() and GuiAllowed then
                 Error(ITPOSPaymentMethodMappNotFoundErr, POSEntryPaymentLine."POS Payment Method Code", ITPOSPaymentMethodMapp.TableCaption);
-            PrintRecTotalElement := XmlElement.Create('printRecTotal');
-            AddAttributeToElement(PrintRecTotalElement, 'operator', '1');
             AddAttributeToElement(PrintRecTotalElement, 'description', ITPOSPaymentMethodMapp."IT Payment Method Description");
-            AddAttributeToElement(PrintRecTotalElement, 'payment', FormatPriceAmount(Abs(POSEntryPaymentLine.Amount)));
+            AddAttributeToElement(PrintRecTotalElement, 'payment', FormatPriceAmount(Abs(POSEntryPaymentLine."Amount (LCY)")));
             AddAttributeToElement(PrintRecTotalElement, 'paymentType', Format(ITPOSPaymentMethodMapp."IT Payment Method".AsInteger()));
             AddAttributeToElement(PrintRecTotalElement, 'index', Format(ITPOSPaymentMethodMapp."IT Payment Method Index"));
         end else begin
-            PrintRecTotalElement := XmlElement.Create('printRecSubtotalAdjustment');
-            AddAttributeToElement(PrintRecTotalElement, 'operator', '1');
-            AddAttributeToElement(PrintRecTotalElement, 'adjustmentType', '1');
-            AddAttributeToElement(PrintRecTotalElement, 'description', ITPOSPaymentMethodMapp."IT Payment Method Description");
+            if IsRefundVoucher then
+                exit;
+            AddAttributeToElement(PrintRecTotalElement, 'description', POSEntryPaymentLine.Description);
             AddAttributeToElement(PrintRecTotalElement, 'amount', FormatPriceAmount(Abs(POSEntryPaymentLine."Amount (LCY)")));
+            AddAttributeToElement(PrintRecTotalElement, 'paymentType', '6'); // Multi-use voucher payment
+            AddAttributeToElement(PrintRecTotalElement, 'index', '1');
         end;
         AddAttributeToElement(PrintRecTotalElement, 'justification', '2');
         FiscalReceiptElement.Add(PrintRecTotalElement);
@@ -481,6 +482,8 @@ codeunit 6184659 "NPR IT Printer Mgt."
         POSEntry: Record "NPR POS Entry";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        RefundITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info";
+        NpRvArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
         Document: XmlDocument;
         FiscalReceiptBegin: XmlElement;
         FiscalReceiptBody: XmlElement;
@@ -488,6 +491,7 @@ codeunit 6184659 "NPR IT Printer Mgt."
         RefundMessage: XmlElement;
         SoapEnvelope: XmlElement;
         SoapEnvelopeBody: XmlElement;
+        IsRefundVoucher: Boolean;
     begin
         if not POSEntry.Get(ITPOSAuditLogAuxInfo."POS Entry No.") then
             exit;
@@ -497,8 +501,30 @@ codeunit 6184659 "NPR IT Printer Mgt."
         SoapEnvelope := CreateSoapEnvelope();
         SoapEnvelopeBody := SelectSoapEnvelopeBody(SoapEnvelope);
 
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.SetFilter(Quantity, '<0');
+        if ITPOSAuditLogAuxInfo."Refund Source Document No." = '' then
+            exit;
+        RefundITPOSAuditLogAuxInfo.SetLoadFields("Source Document No.", "Fiscal Printer Serial No.", "POS Unit No.", "POS Entry No.", "Z Report No.", "Receipt No.", "Entry Date");
+        RefundITPOSAuditLogAuxInfo.SetRange("Source Document No.", ITPOSAuditLogAuxInfo."Refund Source Document No.");
+        if not RefundITPOSAuditLogAuxInfo.FindFirst() then
+            exit;
+
+        NpRvArchVoucherEntry.SetRange("Entry Type", NpRvArchVoucherEntry."Entry Type"::"Issue Voucher");
+        NpRvArchVoucherEntry.SetRange("Document No.", RefundITPOSAuditLogAuxInfo."Source Document No.");
+        IsRefundVoucher := NpRvArchVoucherEntry.FindFirst();
+
+        case IsRefundVoucher of
+            true:
+                begin
+                    POSEntrySalesLine.SetRange("POS Entry No.", RefundITPOSAuditLogAuxInfo."POS Entry No.");
+                    POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Voucher);
+                    POSEntrySalesLine.SetFilter(Quantity, '>0');
+                end;
+            false:
+                begin
+                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                    POSEntrySalesLine.SetFilter(Quantity, '<0');
+                end;
+        end;
         if not POSEntrySalesLine.FindSet() then
             exit;
 
@@ -512,7 +538,7 @@ codeunit 6184659 "NPR IT Printer Mgt."
         FiscalReceiptEnd := XmlElement.Create('endFiscalReceipt');
 
         AddAttributeToElement(RefundMessage, 'operator', '1');
-        AddAttributeToElement(RefundMessage, 'message', FormatRefundReceiptMessage(ITPOSAuditLogAuxInfo));
+        AddAttributeToElement(RefundMessage, 'message', FormatRefundReceiptMessage(RefundITPOSAuditLogAuxInfo));
         AddAttributeToElement(RefundMessage, 'messageType', '4');
 
         AddAttributeToElement(FiscalReceiptBegin, 'operator', '1');
@@ -526,7 +552,7 @@ codeunit 6184659 "NPR IT Printer Mgt."
         until POSEntrySalesLine.Next() = 0;
 
         repeat
-            PrintRecTotal(FiscalReceiptBody, POSEntryPaymentLine);
+            PrintRecTotal(FiscalReceiptBody, POSEntryPaymentLine, IsRefundVoucher);
         until POSEntryPaymentLine.Next() = 0;
 
         FiscalReceiptBody.Add(FiscalReceiptEnd);
@@ -535,71 +561,7 @@ codeunit 6184659 "NPR IT Printer Mgt."
         Document.Add(SoapEnvelope);
 
         FormatXMLDocumentAsText(Document, RequestText);
-
         StoreITPOSAuditRequestContent(ITPOSAuditLogAuxInfo, RequestText);
-    end;
-
-    internal procedure CreatePrepaymentRefundRequestMessage(ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info") RequestText: Text
-    var
-        POSEntry: Record "NPR POS Entry";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        Document: XmlDocument;
-        FiscalReceiptBegin: XmlElement;
-        FiscalReceiptBody: XmlElement;
-        FiscalReceiptEnd: XmlElement;
-        RefundMessage: XmlElement;
-        SoapEnvelope: XmlElement;
-        SoapEnvelopeBody: XmlElement;
-    begin
-        if not POSEntry.Get(ITPOSAuditLogAuxInfo."POS Entry No.") then
-            exit;
-
-        Document := XmlDocument.Create('', '');
-
-        SoapEnvelope := CreateSoapEnvelope();
-        SoapEnvelopeBody := SelectSoapEnvelopeBody(SoapEnvelope);
-
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.SetRange("Exclude from Posting", false);
-        POSEntrySalesLine.SetFilter(Quantity, '>0');
-        POSEntrySalesLine.SetFilter(Type, '<>%1', POSEntrySalesLine.Type::Item);
-        if not POSEntrySalesLine.FindSet() then
-            exit;
-
-        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if not POSEntryPaymentLine.FindSet() then
-            exit;
-
-        FiscalReceiptBody := XmlElement.Create('printerFiscalReceipt');
-        RefundMessage := XmlElement.Create('printRecMessage');
-        FiscalReceiptBegin := XmlElement.Create('beginFiscalReceipt');
-        FiscalReceiptEnd := XmlElement.Create('endFiscalReceipt');
-
-        AddAttributeToElement(RefundMessage, 'operator', '1');
-        AddAttributeToElement(RefundMessage, 'message', FormatRefundReceiptMessage(ITPOSAuditLogAuxInfo));
-        AddAttributeToElement(RefundMessage, 'messageType', '4');
-
-        AddAttributeToElement(FiscalReceiptBegin, 'operator', '1');
-        AddAttributeToElement(FiscalReceiptEnd, 'operator', '1');
-
-        FiscalReceiptBody.Add(RefundMessage);
-        FiscalReceiptBody.Add(FiscalReceiptBegin);
-
-        repeat
-            PrintRecItem(FiscalReceiptBody, POSEntrySalesLine);
-        until POSEntrySalesLine.Next() = 0;
-
-        repeat
-            PrintRecTotal(FiscalReceiptBody, POSEntryPaymentLine);
-        until POSEntryPaymentLine.Next() = 0;
-
-        FiscalReceiptBody.Add(FiscalReceiptEnd);
-
-        SoapEnvelopeBody.Add(FiscalReceiptBody);
-        Document.Add(SoapEnvelope);
-
-        FormatXMLDocumentAsText(Document, RequestText);
     end;
 
     internal procedure CreateRequestsForPOSPaymentMethodMapping(ITPOSUnitMapping: Record "NPR IT POS Unit Mapping"; var Requests: JsonArray)
@@ -844,18 +806,10 @@ codeunit 6184659 "NPR IT Printer Mgt."
         Message(POSPaymentMethodsSuccessfullyUpdatedMsg, ITPOSPaymentMethodMapping.TableCaption, ITPOSPaymentMethodMapping.FieldCaption("IT Payment Method Description"));
     end;
 
-    local procedure FormatRefundReceiptMessage(ITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info"): Text
+    local procedure FormatRefundReceiptMessage(RefundITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info"): Text
     var
-        RefundITPOSAuditLogAuxInfo: Record "NPR IT POS Audit Log Aux Info";
         TextBuilder: TextBuilder;
     begin
-        if ITPOSAuditLogAuxInfo."Refund Source Document No." = '' then
-            exit;
-        RefundITPOSAuditLogAuxInfo.SetLoadFields("Source Document No.", "Fiscal Printer Serial No.", "POS Unit No.", "Z Report No.", "Receipt No.", "Entry Date");
-        RefundITPOSAuditLogAuxInfo.SetRange("Source Document No.", ITPOSAuditLogAuxInfo."Refund Source Document No.");
-        if not RefundITPOSAuditLogAuxInfo.FindFirst() then
-            exit;
-
         TextBuilder.Append('REFUND');
         TextBuilder.Append(' ');
         TextBuilder.Append(Format(RefundITPOSAuditLogAuxInfo."Z Report No.").PadLeft(4, '0'));
