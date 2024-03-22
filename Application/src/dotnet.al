@@ -1,4 +1,4 @@
-#if BC17 or BC18 or BC19 or BC20 or BC21
+#if BC17 or BC18 or BC19 or BC20
 dotnet
 {
     assembly("System.Xml")
@@ -901,15 +901,8 @@ dotnet
         {
         }
     }
-#endif
 
-#if BC17 or BC18 or BC19 or BC20
     assembly("Microsoft.Exchange.WebServices")
-#endif
-#if BC21
-    assembly("Microsoft.Exchange.WebServices.NETStandard")
-#endif
-#if BC17 or BC18 or BC19 or BC20 or BC21
     {
         Culture = 'neutral';
         PublicKeyToken = '31bf3856ad364e35';
@@ -994,8 +987,5 @@ dotnet
         {
         }
     }
-#endif
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
 }
 #endif

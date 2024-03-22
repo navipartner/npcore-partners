@@ -420,7 +420,7 @@
 
     local procedure InitClientDiagnostic(UserLoginType: Enum "NPR User Login Type")
     var
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20)
         AzureADUserManagement: Codeunit "Azure AD User Management";
         DelegatedUser: Boolean;
 #ENDIF
@@ -429,7 +429,7 @@
             exit;
 
         if ClientDiagnostic.Get(UserSecurityId(), UserLoginType) then begin
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20)
             DelegatedUser := AzureADUserManagement.IsUserDelegated(UserSecurityId());
             if ClientDiagnostic."Delegated User" <> DelegatedUser then begin
                 ClientDiagnostic."Delegated User" := DelegatedUser;
@@ -443,7 +443,7 @@
         ClientDiagnostic.Init();
         ClientDiagnostic."User Security ID" := UserSecurityId();
         ClientDiagnostic."User Login Type" := UserLoginType;
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+#IF NOT (BC17 or BC18 or BC19 or BC20)
         ClientDiagnostic."Delegated User" := DelegatedUser;
 #ENDIF
         if ClientDiagnostic.Insert() then
