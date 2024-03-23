@@ -13,6 +13,9 @@ on:
       - 'Performance Toolkit/**'
       - '.github/**'
 
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}'
+
 defaults:
   run:
     shell: powershell
