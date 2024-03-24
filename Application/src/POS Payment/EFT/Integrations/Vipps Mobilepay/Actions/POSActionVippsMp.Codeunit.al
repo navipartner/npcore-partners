@@ -106,6 +106,11 @@ codeunit 6184693 "NPR POS Action: Vipps Mp" implements "NPR IPOS Workflow"
             Enum::"NPR Vipps Mp Trx State"::WAITING_CUSTOMER:
                 begin
                     VippsMpUnitSetup.Get(POSUnitNo);
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+                    VippsMpWebhookMsg.LockTable();
+#ELSE
+                    VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
                     if (not VippsMpWebhookMgt.GetLastUserCheckin(VippsMpUnitSetup, HasResult, Token, VippsMpWebhookMsg)) then begin
                         VippsMpLog.Log(Enum::"NPR Vipps Mp Log Lvl"::Error, Context.GetInteger('EFTEntryNo'), Context.GetString('PaymentSetupCode'), 'Error: QR Scanned', GetLastErrorText());
                         VippsMpResponseHandler.AbortRequestBeforeTrxCreated(EFTTransactionRequest);
@@ -191,6 +196,11 @@ codeunit 6184693 "NPR POS Action: Vipps Mp" implements "NPR IPOS Workflow"
         WebhookContent: JsonObject;
     begin
         VippsMpUnitSetup.Get(POSUnitNo);
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        VippsMpWebhookMsg.LockTable();
+#ELSE
+        VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
         if (not VippsMpWebhookMgt.GetNextPaymentWebhook(VippsMpUnitSetup, Context.GetString('ReferenceNumberInput'), HasResult, WebhookContent, VippsMpWebhookMsg)) then begin
             VippsMpLog.Log(Enum::"NPR Vipps Mp Log Lvl"::Error, Context.GetInteger('EFTEntryNo'), Context.GetString('PaymentSetupCode'), 'Error: Wait Create Trx', GetLastErrorText());
             Response.Add('Error', True);
@@ -248,6 +258,11 @@ codeunit 6184693 "NPR POS Action: Vipps Mp" implements "NPR IPOS Workflow"
         HasResult: Boolean;
     begin
         VippsMpUnitSetup.Get(POSUnitNo);
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        VippsMpWebhookMsg.LockTable();
+#ELSE
+        VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
         if (not VippsMpWebhookMgt.GetNextPaymentWebhook(VippsMpUnitSetup, Context.GetString('ReferenceNumberInput'), HasResult, WebhookContent, VippsMpWebhookMsg)) then begin
             VippsMpLog.Log(Enum::"NPR Vipps Mp Log Lvl"::Error, Context.GetInteger('EFTEntryNo'), Context.GetString('PaymentSetupCode'), 'Error: Wait Customer Payment', GetLastErrorText());
             Response.Add('Error', True);
@@ -311,6 +326,11 @@ codeunit 6184693 "NPR POS Action: Vipps Mp" implements "NPR IPOS Workflow"
         HasResult: Boolean;
     begin
         VippsMpUnitSetup.Get(POSUnitNo);
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        VippsMpWebhookMsg.LockTable();
+#ELSE
+        VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
+#ENDIF
         if (not VippsMpWebhookMgt.GetNextPaymentWebhook(VippsMpUnitSetup, Context.GetString('ReferenceNumberInput'), HasResult, WebhookContent, VippsMpWebhookMsg)) then begin
             VippsMpLog.Log(Enum::"NPR Vipps Mp Log Lvl"::Error, Context.GetInteger('EFTEntryNo'), Context.GetString('PaymentSetupCode'), 'Error: Wait Capture Payment', GetLastErrorText());
             Response.Add('Error', True);
