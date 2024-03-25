@@ -258,7 +258,7 @@ codeunit 6184647 "NPR IT Audit Mgt."
         exit(true);
     end;
 
-    local procedure HandlerCode(): Text
+    internal procedure HandlerCode(): Text
     var
         HandlerCodeTxt: Label 'IT_ENTRATE', Locked = true, MaxLength = 20;
     begin

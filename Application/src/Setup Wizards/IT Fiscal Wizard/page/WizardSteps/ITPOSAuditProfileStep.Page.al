@@ -1,6 +1,6 @@
-page 6151346 "NPR CRO POS Audit Profile Step"
+page 6184545 "NPR IT POS Audit Profile Step"
 {
-    Caption = 'CRO POS Audit Profile Setup';
+    Caption = 'IT POS Audit Profile Setup';
     Extensible = false;
     PageType = ListPart;
     SourceTable = "NPR POS Audit Profile";
@@ -88,9 +88,24 @@ page 6151346 "NPR CRO POS Audit Profile Step"
             }
         }
     }
+    trigger OnDeleteRecord(): Boolean
+    begin
+        POSAuditProfile.SetRange(Code, Rec.Code);
+        if not POSAuditProfile.FindFirst() then
+            exit;
+        POSAuditProfile.Delete();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        POSAuditProfile.SetRange(Code, Rec.Code);
+        if not POSAuditProfile.FindFirst() then
+            exit;
+        POSAuditProfile.TransferFields(Rec);
+        POSAuditProfile.Modify();
+    end;
+
     internal procedure CopyRealToTemp()
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if POSAuditProfile.FindSet() then
             repeat
@@ -100,14 +115,12 @@ page 6151346 "NPR CRO POS Audit Profile Step"
             until POSAuditProfile.Next() = 0;
     end;
 
-    internal procedure CROPOSAuditProfileDataToCreate(): Boolean
+    internal procedure ITPOSAuditProfileDataToCreate(): Boolean
     begin
         exit(CheckIsDataSet());
     end;
 
     internal procedure CreatePOSAuditProfileData()
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if not Rec.FindFirst() then
             exit;
@@ -120,14 +133,17 @@ page 6151346 "NPR CRO POS Audit Profile Step"
 
     local procedure CheckIsDataSet(): Boolean
     var
-        CROAuditMgt: Codeunit "NPR CRO Audit Mgt.";
+        ITAuditMgt: Codeunit "NPR IT Audit Mgt.";
     begin
         if not Rec.FindSet() then
             exit;
         repeat
-            if (Rec."Audit Handler" = CROAuditMgt.HandlerCode())
-                and (Rec."Audit Log Enabled" = true) then
+            if ((Rec."Audit Handler" = ITAuditMgt.HandlerCode())
+                and (Rec."Audit Log Enabled" = true)) then
                 exit(true);
         until Rec.Next() = 0;
     end;
+
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
 }
