@@ -64,8 +64,9 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Posted Approval Entry" = rimd,
                   TableData "Posted Approval Comment Line" = rimd,
                   TableData "Workflow Step Instance Archive" = rimd,
-                  TableData "Workflow Step Argument Archive" = rimd;
-
+                  TableData "Workflow Step Argument Archive" = rimd,
+                  TableData "Warehouse Entry" = rimd,
+                  TableData "Warehouse Register" = rimd;
 
     trigger OnRun()
     var
