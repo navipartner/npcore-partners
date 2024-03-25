@@ -2,8 +2,7 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
 {
     ApplicationArea = NPRBGSISFiscal;
     Caption = 'BG POS SIS Audit Log Aux. Info';
-    // temporarily fix 
-    // Editable = false;
+    Editable = false;
     Extensible = false;
     PageType = List;
     SourceTable = "NPR BG SIS POS Audit Log Aux.";
@@ -19,22 +18,16 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Audit Entry Type.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Audit Entry No.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the POS Entry No. related to this record.';
 
                     trigger OnDrillDown()
@@ -55,71 +48,51 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Entry Date.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the POS store code from which the related record was created.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the POS unit number from which the related record was created.';
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the salesperson which created this record.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Source Document No.';
                 }
                 field("Amount Incl. Tax"; Rec."Amount Incl. Tax")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the total amount including taxes for the transaction.';
                 }
                 field("Grand Receipt No."; Rec."Grand Receipt No.")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Grand Receipt No. - receipt number.';
                 }
                 field("Receipt Timestamp"; Rec."Receipt Timestamp")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the time and date of the receipt creation in the format “ss,mm,hh;DD,MM,YY".';
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the Transaction Type.';
                 }
                 field("Extended Receipt"; Rec."Extended Receipt")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies whether the receipt from the related record is extended or not.';
                 }
                 field("Customer ID No. Type"; Rec."Customer ID No. Type")
@@ -155,8 +128,6 @@ page 6151316 "NPR BG SIS POS Audit Log Aux."
                 field("Extended Receipt Counter"; Rec."Extended Receipt Counter")
                 {
                     ApplicationArea = NPRBGSISFiscal;
-                    // temporarily fix 
-                    Editable = false;
                     ToolTip = 'Specifies the value of the Extended Receipt Counter field.';
                 }
             }
