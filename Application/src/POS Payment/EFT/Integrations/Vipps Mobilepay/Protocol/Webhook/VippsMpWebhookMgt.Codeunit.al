@@ -120,11 +120,6 @@ codeunit 6184714 "NPR Vipps Mp Webhook Mgt."
         Token: JsonToken;
     begin
         VippsMpStore.Get(UConfig."Merchant Serial Number");
-#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
-        VippsMpWebhookMsg.LockTable();
-#ELSE
-        VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
-#ENDIF
         VippsMpWebhookMsg.SetAutoCalcFields(Message);
         if (VippsMpWebhookMsg.Get(VippsMpStore."Webhook Reference", UConfig."Merchant Qr Id", VippsMpWebhookMsg."Event Type"::QrScan)) then begin
             if (not VippsMpWebhookMsg.Verified) then
@@ -152,11 +147,6 @@ codeunit 6184714 "NPR Vipps Mp Webhook Mgt."
         Token: JsonToken;
     begin
         VippsMpStore.Get(UConfig."Merchant Serial Number");
-#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
-        VippsMpWebhookMsg.LockTable();
-#ELSE
-        VippsMpWebhookMsg.ReadIsolation := IsolationLevel::ReadCommitted;
-#ENDIF
         VippsMpWebhookMsg.SetAutoCalcFields(Message);
         if (VippsMpWebhookMsg.Get(VippsMpStore."Webhook Reference", PaymentReference, VippsMpWebhookMsg."Event Type"::ePayment)) then begin
             if (not VippsMpWebhookMsg.Verified) then
