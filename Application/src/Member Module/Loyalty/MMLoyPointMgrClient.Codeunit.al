@@ -935,7 +935,7 @@
         if (TmpRegisterSaleLines.FindSet()) then
             repeat
                 XmlSalesLines += StrSubstNo(XmlSalesLinesLbl,
-                  TmpRegisterSaleLines.Type,
+                  Format(TmpRegisterSaleLines.Type, 0, 2),
                   TmpRegisterSaleLines."Item No.",
                   TmpRegisterSaleLines."Variant Code",
                   Format(TmpRegisterSaleLines.Quantity, 0, 9),
@@ -949,7 +949,7 @@
         if (TmpRegisterPaymentLines.FindSet()) then
             repeat
                 XmlPaymentLines += StrSubstNo(XmlPaymentLinesLbl,
-                  TmpRegisterPaymentLines.Type,
+                  Format(TmpRegisterPaymentLines.Type,0,2),
                   XmlSafe(TmpRegisterPaymentLines.Description),
                   TmpRegisterPaymentLines."Currency Code",
                   Format(TmpRegisterPaymentLines."Total Amount", 0, 9),
