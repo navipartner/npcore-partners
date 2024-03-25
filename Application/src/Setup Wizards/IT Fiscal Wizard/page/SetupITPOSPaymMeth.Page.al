@@ -1,6 +1,6 @@
-page 6184471 "NPR Setup SI POS Store"
+page 6184542 "NPR Setup IT POS Paym. Meth."
 {
-    Caption = 'Setup SI POS Store Mapping';
+    Caption = 'Setup IT POS Payment Method Mapping';
     Extensible = false;
     PageType = NavigatePage;
 
@@ -42,12 +42,12 @@ page 6184471 "NPR Setup SI POS Store"
                 Visible = IntroStepVisible;
                 group(Welcome)
                 {
-                    Caption = 'Welcome to POS Store Mapping Setup';
+                    Caption = 'Welcome to POS Payment Method Mapping Setup';
                     Visible = IntroStepVisible;
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'Systematically map each POS Store to its corresponding information, ensuring coherence in reporting and facilitating efficient reconciliation processes.';
+                        InstructionalText = 'Systematically map each POS Payment Method to its corresponding financial category, ensuring coherence in reporting and facilitating efficient reconciliation processes.';
                     }
                 }
                 group("Let's go!")
@@ -61,17 +61,18 @@ page 6184471 "NPR Setup SI POS Store"
                 }
             }
 
-            // SI Fiscal Setup
-            group(SetupPOSStoreStep)
+            // IT Fiscal Setup
+            group(SetupPOSPaymMethodsStep)
             {
-                Visible = SetupPOSStoreStepVisible;
-                group(POSStore)
+                Visible = SetupPOSPaymentMethodsStepVisible;
+                group(POSPaymentMethods)
                 {
+                    Caption = 'POS Payment setup';
                     ShowCaption = false;
                     Editable = true;
-                    part(SIPOSStoreSetupStep; "NPR SI POS Store Step")
+                    part(ITPaymentMethodsSetupStep; "NPR IT POS Paym. Method Step")
                     {
-                        Caption = 'Select a POS Store and input its additional information for store registration. You can use the action provided to register your POS Store to the Tax Authority. This ensures accurate reporting and reconciliation of transactions.';
+                        Caption = 'Select a POS Payment Method and choose its corresponding mapping. This ensures accurate reporting and reconciliation of transactions.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -89,13 +90,13 @@ page 6184471 "NPR Setup SI POS Store"
                 {
                     Caption = ' ';
                     InstructionalText = 'POS Payment Method Mapping Setup could not be completed. Please ensure that any POS Payment Method is mapped to its corresponding financial category before moving forward.';
-                    Visible = not SIPOSStoreDataToCreate;
+                    Visible = not ITPOSPaymMethDataToCreate;
                 }
                 group(AnyDataFilledInMsg)
                 {
                     Caption = '';
                     InstructionalText = 'To finish the setup, choose Finish.';
-                    Visible = SIPOSStoreDataToCreate;
+                    Visible = ITPOSPaymMethDataToCreate;
                 }
             }
         }
@@ -162,12 +163,12 @@ page 6184471 "NPR Setup SI POS Store"
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
         BackActionEnabled: Boolean;
-        SIPOSStoreDataToCreate: Boolean;
+        ITPOSPaymMethDataToCreate: Boolean;
         FinishActionEnabled: Boolean;
         FinishStepVisible: Boolean;
         IntroStepVisible: Boolean;
         NextActionEnabled: Boolean;
-        SetupPOSStoreStepVisible: Boolean;
+        SetupPOSPaymentMethodsStepVisible: Boolean;
         TopBannerVisible: Boolean;
         Step: Option Start,SetupPOSAuditProfileStep,Finish;
 
@@ -179,7 +180,7 @@ page 6184471 "NPR Setup SI POS Store"
             Step::Start:
                 ShowIntroStep();
             Step::SetupPOSAuditProfileStep:
-                ShowSetupPOSStoreStep();
+                ShowSetupPOSAuditProfileStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -200,10 +201,10 @@ page 6184471 "NPR Setup SI POS Store"
         IntroStepVisible := true;
     end;
 
-    local procedure ShowSetupPOSStoreStep()
+    local procedure ShowSetupPOSAuditProfileStep()
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CopyRealToTemp();
-        SetupPOSStoreStepVisible := true;
+        CurrPage.ITPaymentMethodsSetupStep.Page.CopyRealToTemp();
+        SetupPOSPaymentMethodsStepVisible := true;
     end;
 
     local procedure ShowFinishStep()
@@ -211,18 +212,18 @@ page 6184471 "NPR Setup SI POS Store"
         CheckIfDataFilledIn();
         FinishStepVisible := true;
         NextActionEnabled := false;
-        FinishActionEnabled := SIPOSStoreDataToCreate;
+        FinishActionEnabled := ITPOSPaymMethDataToCreate;
     end;
 
     local procedure CheckIfDataFilledIn()
     begin
-        SIPOSStoreDataToCreate := CurrPage.SIPOSStoreSetupStep.Page.SIPOSStoreMappingDataToCreate();
+        ITPOSPaymMethDataToCreate := CurrPage.ITPaymentMethodsSetupStep.Page.ITPOSPaymentMethodMappingDataToCreate();
     end;
 
     local procedure FinishAction();
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CreatePOSStoreMappingData();
-        OnAfterFinishStep(SIPOSStoreDataToCreate);
+        CurrPage.ITPaymentMethodsSetupStep.Page.CreatePOSPaymMethodMappingData();
+        OnAfterFinishStep(ITPOSPaymMethDataToCreate);
         CurrPage.Close();
     end;
 
@@ -233,7 +234,7 @@ page 6184471 "NPR Setup SI POS Store"
         NextActionEnabled := true;
 
         IntroStepVisible := false;
-        SetupPOSStoreStepVisible := false;
+        SetupPOSPaymentMethodsStepVisible := false;
         FinishStepVisible := false;
     end;
 

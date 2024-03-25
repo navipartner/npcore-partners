@@ -1,6 +1,6 @@
-page 6184471 "NPR Setup SI POS Store"
+page 6184537 "NPR Setup IT Fiscal"
 {
-    Caption = 'Setup SI POS Store Mapping';
+    Caption = 'Setup IT Fiscalization';
     Extensible = false;
     PageType = NavigatePage;
 
@@ -42,12 +42,12 @@ page 6184471 "NPR Setup SI POS Store"
                 Visible = IntroStepVisible;
                 group(Welcome)
                 {
-                    Caption = 'Welcome to POS Store Mapping Setup';
+                    Caption = 'Welcome to Italian Fiscalization Setup';
                     Visible = IntroStepVisible;
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'Systematically map each POS Store to its corresponding information, ensuring coherence in reporting and facilitating efficient reconciliation processes.';
+                        InstructionalText = 'This essential step ensures your business adheres to Italian fiscal regulations. Enable IT fiscalization for a comprehensive and compliant financial foundation.';
                     }
                 }
                 group("Let's go!")
@@ -61,21 +61,23 @@ page 6184471 "NPR Setup SI POS Store"
                 }
             }
 
-            // SI Fiscal Setup
-            group(SetupPOSStoreStep)
+            // IT Fiscal Setup
+            group(EnableFiscalStep)
             {
-                Visible = SetupPOSStoreStepVisible;
-                group(POSStore)
+                Visible = EnableFiscalStepVisible;
+                group(EnableITFiscal)
                 {
+                    Caption = 'Enable IT Fiscalization';
                     ShowCaption = false;
                     Editable = true;
-                    part(SIPOSStoreSetupStep; "NPR SI POS Store Step")
+                    part(ITEnableFiscalPage; "NPR IT Enable Fiscal Step")
                     {
-                        Caption = 'Select a POS Store and input its additional information for store registration. You can use the action provided to register your POS Store to the Tax Authority. This ensures accurate reporting and reconciliation of transactions.';
+                        Caption = 'Enabling IT Fiscalization in the setup is essential for the effective operation of fiscalization.';
                         ApplicationArea = NPRRetail;
                     }
                 }
             }
+
             // Finish Step
             group(Finish)
             {
@@ -88,14 +90,14 @@ page 6184471 "NPR Setup SI POS Store"
                 group(NotAllMandatoryDataFilledInMsg)
                 {
                     Caption = ' ';
-                    InstructionalText = 'POS Payment Method Mapping Setup could not be completed. Please ensure that any POS Payment Method is mapped to its corresponding financial category before moving forward.';
-                    Visible = not SIPOSStoreDataToCreate;
+                    InstructionalText = 'Unable to complete IT Fiscalization Setup. Please ensure you''ve enabled IT fiscalization.';
+                    Visible = not ITSetupDataToCreate;
                 }
                 group(AnyDataFilledInMsg)
                 {
                     Caption = '';
                     InstructionalText = 'To finish the setup, choose Finish.';
-                    Visible = SIPOSStoreDataToCreate;
+                    Visible = AnyDataToCreate;
                 }
             }
         }
@@ -161,15 +163,16 @@ page 6184471 "NPR Setup SI POS Store"
         MediaRepositoryStandard: Record "Media Repository";
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
+        AnyDataToCreate: Boolean;
         BackActionEnabled: Boolean;
-        SIPOSStoreDataToCreate: Boolean;
+        ITSetupDataToCreate: Boolean;
+        EnableFiscalStepVisible: Boolean;
         FinishActionEnabled: Boolean;
         FinishStepVisible: Boolean;
         IntroStepVisible: Boolean;
         NextActionEnabled: Boolean;
-        SetupPOSStoreStepVisible: Boolean;
         TopBannerVisible: Boolean;
-        Step: Option Start,SetupPOSAuditProfileStep,Finish;
+        Step: Option Start,EnableFiscalStep,Finish;
 
     local procedure EnableControls();
     begin
@@ -178,8 +181,8 @@ page 6184471 "NPR Setup SI POS Store"
         case Step of
             Step::Start:
                 ShowIntroStep();
-            Step::SetupPOSAuditProfileStep:
-                ShowSetupPOSStoreStep();
+            Step::EnableFiscalStep:
+                ShowEnableFiscalStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -200,10 +203,10 @@ page 6184471 "NPR Setup SI POS Store"
         IntroStepVisible := true;
     end;
 
-    local procedure ShowSetupPOSStoreStep()
+    local procedure ShowEnableFiscalStep()
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CopyRealToTemp();
-        SetupPOSStoreStepVisible := true;
+        CurrPage.ITEnableFiscalPage.Page.CopyRealToTemp();
+        EnableFiscalStepVisible := true;
     end;
 
     local procedure ShowFinishStep()
@@ -211,18 +214,18 @@ page 6184471 "NPR Setup SI POS Store"
         CheckIfDataFilledIn();
         FinishStepVisible := true;
         NextActionEnabled := false;
-        FinishActionEnabled := SIPOSStoreDataToCreate;
+        FinishActionEnabled := ITSetupDataToCreate;
     end;
 
     local procedure CheckIfDataFilledIn()
     begin
-        SIPOSStoreDataToCreate := CurrPage.SIPOSStoreSetupStep.Page.SIPOSStoreMappingDataToCreate();
+        ITSetupDataToCreate := CurrPage.ITEnableFiscalPage.Page.ITSetupToCreate();
     end;
 
     local procedure FinishAction();
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CreatePOSStoreMappingData();
-        OnAfterFinishStep(SIPOSStoreDataToCreate);
+        CurrPage.ITEnableFiscalPage.Page.CreateITFiscalEnableData();
+        OnAfterFinishStep(ITSetupDataToCreate);
         CurrPage.Close();
     end;
 
@@ -233,7 +236,7 @@ page 6184471 "NPR Setup SI POS Store"
         NextActionEnabled := true;
 
         IntroStepVisible := false;
-        SetupPOSStoreStepVisible := false;
+        EnableFiscalStepVisible := false;
         FinishStepVisible := false;
     end;
 

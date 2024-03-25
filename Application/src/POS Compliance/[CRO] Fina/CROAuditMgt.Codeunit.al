@@ -413,7 +413,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
-        POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         POSSession: Codeunit "NPR POS Session";
@@ -430,9 +429,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         if CROAuxSalespPurch."NPR CRO Salesperson OIB" = 0 then
             Error(MissingOIBErr);
-
-        POSUnit.GetProfile(POSAuditProfile);
-        POSAuditProfile.TestField("Do Not Print Receipt on Sale", true);
     end;
 
     local procedure CheckPaymentMethod(POSEntry: Record "NPR POS Entry"; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")

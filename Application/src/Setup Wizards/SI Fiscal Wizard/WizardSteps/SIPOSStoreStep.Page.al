@@ -1,7 +1,7 @@
 page 6184472 "NPR SI POS Store Step"
 {
     Extensible = False;
-    Caption = 'SI POS Payment Method Mapping';
+    Caption = 'SI POS POS Store Mapping';
     PageType = ListPart;
     SourceTable = "NPR SI POS Store Mapping";
     SourceTableTemporary = true;
@@ -77,12 +77,12 @@ page 6184472 "NPR SI POS Store Step"
         until SIPOSStoreMapping.Next() = 0;
     end;
 
-    internal procedure SIPOSPaymentMethodMappingDataToCreate(): Boolean
+    internal procedure SIPOSStoreMappingDataToCreate(): Boolean
     begin
         exit(CheckIsDataSet());
     end;
 
-    internal procedure CreatePOSPaymMethodMappingData()
+    internal procedure CreatePOSStoreMappingData()
     begin
         if not Rec.FindSet() then
             exit;

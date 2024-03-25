@@ -1,6 +1,6 @@
-page 6184471 "NPR Setup SI POS Store"
+page 6184544 "NPR Setup IT Audit Profile"
 {
-    Caption = 'Setup SI POS Store Mapping';
+    Caption = 'Setup IT POS Audit Profile';
     Extensible = false;
     PageType = NavigatePage;
 
@@ -42,12 +42,12 @@ page 6184471 "NPR Setup SI POS Store"
                 Visible = IntroStepVisible;
                 group(Welcome)
                 {
-                    Caption = 'Welcome to POS Store Mapping Setup';
+                    Caption = 'Welcome to POS Audit Profile Setup';
                     Visible = IntroStepVisible;
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'Systematically map each POS Store to its corresponding information, ensuring coherence in reporting and facilitating efficient reconciliation processes.';
+                        InstructionalText = 'Use this wizard to customize POS Audit settings to ensure adherence to regulatory requirements. Choose the IT_ENTRATE Audit Handler and enable Audit Logs for a thorough and secure audit process.';
                     }
                 }
                 group("Let's go!")
@@ -61,17 +61,17 @@ page 6184471 "NPR Setup SI POS Store"
                 }
             }
 
-            // SI Fiscal Setup
-            group(SetupPOSStoreStep)
+            // IT Fiscal Setup
+            group(SetupPOSAuditProfileStep)
             {
-                Visible = SetupPOSStoreStepVisible;
-                group(POSStore)
+                Visible = SetupPOSAuditProfileStepVisible;
+                group(ChooseAuditProfile)
                 {
                     ShowCaption = false;
                     Editable = true;
-                    part(SIPOSStoreSetupStep; "NPR SI POS Store Step")
+                    part(ITChooseAuditProfileStep; "NPR IT POS Audit Profile Step")
                     {
-                        Caption = 'Select a POS Store and input its additional information for store registration. You can use the action provided to register your POS Store to the Tax Authority. This ensures accurate reporting and reconciliation of transactions.';
+                        Caption = 'Select the IT_ENTRATE audit handler and enable the audit log for comprehensive transaction tracking.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -88,14 +88,14 @@ page 6184471 "NPR Setup SI POS Store"
                 group(NotAllMandatoryDataFilledInMsg)
                 {
                     Caption = ' ';
-                    InstructionalText = 'POS Payment Method Mapping Setup could not be completed. Please ensure that any POS Payment Method is mapped to its corresponding financial category before moving forward.';
-                    Visible = not SIPOSStoreDataToCreate;
+                    InstructionalText = 'Failed to complete POS Audit Profile Setup. Ensure you''ve chosen the IT_ENTRATE Audit Handler and enabled Audit Logs.';
+                    Visible = not ITPOSAuditDataToCreate;
                 }
                 group(AnyDataFilledInMsg)
                 {
                     Caption = '';
                     InstructionalText = 'To finish the setup, choose Finish.';
-                    Visible = SIPOSStoreDataToCreate;
+                    Visible = ITPOSAuditDataToCreate;
                 }
             }
         }
@@ -162,12 +162,12 @@ page 6184471 "NPR Setup SI POS Store"
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStandard: Record "Media Resources";
         BackActionEnabled: Boolean;
-        SIPOSStoreDataToCreate: Boolean;
+        ITPOSAuditDataToCreate: Boolean;
         FinishActionEnabled: Boolean;
         FinishStepVisible: Boolean;
         IntroStepVisible: Boolean;
         NextActionEnabled: Boolean;
-        SetupPOSStoreStepVisible: Boolean;
+        SetupPOSAuditProfileStepVisible: Boolean;
         TopBannerVisible: Boolean;
         Step: Option Start,SetupPOSAuditProfileStep,Finish;
 
@@ -179,7 +179,7 @@ page 6184471 "NPR Setup SI POS Store"
             Step::Start:
                 ShowIntroStep();
             Step::SetupPOSAuditProfileStep:
-                ShowSetupPOSStoreStep();
+                ShowSetupPOSAuditProfileStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -200,10 +200,10 @@ page 6184471 "NPR Setup SI POS Store"
         IntroStepVisible := true;
     end;
 
-    local procedure ShowSetupPOSStoreStep()
+    local procedure ShowSetupPOSAuditProfileStep()
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CopyRealToTemp();
-        SetupPOSStoreStepVisible := true;
+        CurrPage.ITChooseAuditProfileStep.Page.CopyRealToTemp();
+        SetupPOSAuditProfileStepVisible := true;
     end;
 
     local procedure ShowFinishStep()
@@ -211,18 +211,18 @@ page 6184471 "NPR Setup SI POS Store"
         CheckIfDataFilledIn();
         FinishStepVisible := true;
         NextActionEnabled := false;
-        FinishActionEnabled := SIPOSStoreDataToCreate;
+        FinishActionEnabled := ITPOSAuditDataToCreate;
     end;
 
     local procedure CheckIfDataFilledIn()
     begin
-        SIPOSStoreDataToCreate := CurrPage.SIPOSStoreSetupStep.Page.SIPOSStoreMappingDataToCreate();
+        ITPOSAuditDataToCreate := CurrPage.ITChooseAuditProfileStep.Page.ITPOSAuditProfileDataToCreate();
     end;
 
     local procedure FinishAction();
     begin
-        CurrPage.SIPOSStoreSetupStep.Page.CreatePOSStoreMappingData();
-        OnAfterFinishStep(SIPOSStoreDataToCreate);
+        CurrPage.ITChooseAuditProfileStep.Page.CreatePOSAuditProfileData();
+        OnAfterFinishStep(ITPOSAuditDataToCreate);
         CurrPage.Close();
     end;
 
@@ -233,7 +233,7 @@ page 6184471 "NPR Setup SI POS Store"
         NextActionEnabled := true;
 
         IntroStepVisible := false;
-        SetupPOSStoreStepVisible := false;
+        SetupPOSAuditProfileStepVisible := false;
         FinishStepVisible := false;
     end;
 

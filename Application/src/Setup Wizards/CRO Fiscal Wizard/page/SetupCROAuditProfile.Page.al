@@ -47,7 +47,7 @@ page 6151345 "NPR Setup CRO Audit Profile"
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'Use this wizard to customize POS Audit settings to ensure adherence to regulatory requirements. Choose the CRO_FINA Audit Handler, enable Audit Logs, and make precise adjustments such as ''Do Not Print Receipt on Sale'' for a thorough and secure audit process.';
+                        InstructionalText = 'Use this wizard to customize POS Audit settings to ensure adherence to regulatory requirements. Choose the CRO_FINA Audit Handler and enable Audit Logs.';
                     }
                 }
                 group("Let's go!")
@@ -72,7 +72,7 @@ page 6151345 "NPR Setup CRO Audit Profile"
                     Editable = true;
                     part(CROChooseAuditProfileStep; "NPR CRO POS Audit Profile Step")
                     {
-                        Caption = 'Select the CRO_FINA audit handler and enable the audit log for comprehensive transaction tracking. Additionally, choose to disable receipt printing on sale.';
+                        Caption = 'Select the CRO_FINA audit handler and enable the audit log for comprehensive transaction tracking.';
                         ApplicationArea = NPRRetail;
                     }
                 }
@@ -89,7 +89,7 @@ page 6151345 "NPR Setup CRO Audit Profile"
                 group(NotAllMandatoryDataFilledInMsg)
                 {
                     Caption = ' ';
-                    InstructionalText = 'Failed to complete POS Audit Profile Setup. Ensure you''ve chosen the CRO_FINA Audit Handler, enabled Audit Logs, and configured additional settings like ''Do Not Print Receipt on Sale'' as needed.';
+                    InstructionalText = 'Failed to complete POS Audit Profile Setup. Ensure you''ve chosen the CRO_FINA Audit Handler and enabled Audit Logs.';
                     Visible = not CROPOSAuditDataToCreate;
                 }
                 group(AnyDataFilledInMsg)
