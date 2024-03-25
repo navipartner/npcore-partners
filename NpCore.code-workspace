@@ -15,10 +15,6 @@
 		{
 			"name": "DOCUMENTATION",
 			"path": "./Documentation"
-		},
-		{
-			"name": "INTEGRATION TEST",
-			"path": "./IntegrationTest"
 		}
 	],
 	"settings": {

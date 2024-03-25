@@ -9,6 +9,7 @@ on:
       - 'main'
       - 'master'
     paths:
+      - 'CODEOWNERS'
       - 'Application/**'
       - 'Test/**'
       - 'Performance Toolkit/**'
