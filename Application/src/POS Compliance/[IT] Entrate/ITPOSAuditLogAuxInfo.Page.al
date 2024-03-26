@@ -19,67 +19,67 @@ page 6151313 "NPR IT POS Audit Log Aux Info"
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Entry Type related to this record.';
                 }
                 field("Audit Entry No."; Rec."Audit Entry No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry No. field.';
+                    ToolTip = 'Specifies the Entry No. related to this record.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+                    ToolTip = 'Specifies the POS Entry number related to this record.';
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the entry date value.';
+                    ToolTip = 'Specifies the entry date.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS unit number related to this record.';
                 }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document Number related to this record.';
                 }
                 field("Z Report No."; Rec."Z Report No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Z Report No. field.';
+                    ToolTip = 'Specifies the Z Report Number of this record.';
                 }
                 field("Receipt No."; Rec."Receipt No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Receipt No. field.';
+                    ToolTip = 'Specifies the Receipt Number of this record.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Amount field.';
+                    ToolTip = 'Specifies the Sales Amount of this transaction.';
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Transaction Type field.';
+                    ToolTip = 'Specifies the Transaction Type of this record.';
                 }
                 field("Receipt Fiscalized"; Rec."Receipt Fiscalized")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Receipt Fiscalized field.';
+                    ToolTip = 'Specifies if the transaction is fiscalized.';
                 }
                 field("Fiscal Printer Serial No."; Rec."Fiscal Printer Serial No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Fiscal Printer Serial No. field.';
+                    ToolTip = 'Specifies the Fiscal Printer Serial Number.';
                 }
                 field("Customer Lottery Code"; Rec."Customer Lottery Code")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Customer Lottery Code field.';
+                    ToolTip = 'Specifies the Customer Lottery Code relaed to this transaction record.';
                 }
             }
         }

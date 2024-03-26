@@ -37,7 +37,7 @@ page 6151317 "NPR IT POS Unit Mapping"
                 field("Fiscal Printer RT Type"; Rec."Fiscal Printer RT Type")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Fiscal Printer RT Type field.';
+                    ToolTip = 'Specifies the Fiscal Printer RT Type.';
                 }
                 field("Fiscal Printer Serial No."; Rec."Fiscal Printer Serial No.")
                 {
@@ -47,7 +47,7 @@ page 6151317 "NPR IT POS Unit Mapping"
                 field("Fiscal Printer Password"; Rec."Fiscal Printer Password")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Fiscal Printer Password field.';
+                    ToolTip = 'Specifies the Fiscal Printer Password.';
                 }
             }
         }

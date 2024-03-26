@@ -21,7 +21,7 @@ page 6151312 "NPR IT Fiscalization Setup"
                 field("Enable IT Fiscal"; Rec."Enable IT Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable IT Fiscalization field.';
+                    ToolTip = 'Specifies if the Italian Fiscalization is enabled.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable IT Fiscal" <> Rec."Enable IT Fiscal" then
