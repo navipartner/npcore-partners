@@ -7,10 +7,18 @@ codeunit 6060089 "NPR BG VISION Local. Subs"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Post Entries", 'OnAfterPostPOSEntry', '', false, false)]
     local procedure POSPostEntriesOnAfterPostPOSEntry(var POSEntry: Record "NPR POS Entry")
+    var
+        VATEntry: Record "VAT Entry";
     begin
         if not BGVISIONLocalisationMgt.GetLocalisationSetupEnabled() then
             exit;
+
         BGVISIONLocalisationMgt.ModifySalesProtocolTVB(POSEntry);
+
+        VATEntry.Reset();
+        VATEntry.SetRange("Document No.", POSEntry."Document No.");
+        VATEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        BGVISIONLocalisationMgt.ModifyVATSubjectTVB(VATEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR BG SIS Communication Mgt.", 'OnGetCustomerIdentificationNo', '', false, false)]
