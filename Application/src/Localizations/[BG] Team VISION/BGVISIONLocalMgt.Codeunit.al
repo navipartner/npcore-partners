@@ -39,6 +39,26 @@ codeunit 6060088 "NPR BG VISION Local. Mgt."
         until VATEntry.Next() = 0;
     end;
 
+    internal procedure ModifyVATSubjectTVB(var VATEntry: Record "VAT Entry")
+    var
+        RecRef: RecordRef;
+        FieldReference: FieldRef;
+        VATSubjectSalesLbl: Label 'ПРОДАЖБИ', Locked = true;
+    begin
+        if not VATEntry.FindSet() then
+            exit;
+        repeat
+            RecRef.Open(Database::"VAT Entry");
+            RecRef.Get(VATEntry.RecordId);
+            if not RecRef.FieldExist(26006508) then
+                exit;
+            FieldReference := RecRef.Field(26006508);
+            FieldReference.Value(VATSubjectSalesLbl);
+            RecRef.Modify();
+            RecRef.Close();
+        until VATEntry.Next() = 0;
+    end;
+
     internal procedure GetCustomerIdentificationNoTVB(Customer: Record Customer; var IdentificationNo: Text; var Handled: Boolean)
     var
         RecRef: RecordRef;
