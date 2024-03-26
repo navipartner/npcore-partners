@@ -18,27 +18,27 @@ page 6151319 "NPR IT POS Paym. Method Mapp."
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the POS Unit No. field.';
+                    ToolTip = 'Specifies the POS Unit No. for which the mapping is related to.';
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method Code field.';
+                    ToolTip = 'Specifies the Payment Method Code selected from the related POS Payment Method list.';
                 }
                 field("CRO Payment Method"; Rec."IT Payment Method")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the IT Payment Method field.';
+                    ToolTip = 'Specifies the applicable Payment Method related to the Fiscal Printer.';
                 }
                 field("IT Payment Method Index"; Rec."IT Payment Method Index")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the IT Payment Method Index field.';
+                    ToolTip = 'Specifies the IT Payment Method Index that is set in Fiscal Printer.';
                 }
                 field("IT Payment Method Description"; Rec."IT Payment Method Description")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the IT Payment Method Description field.';
+                    ToolTip = 'Specifies the Payment Method Description that is being pulled from the Fiscal Printer based on the set Payment Method Index. The description field will be filled after the Fiscal Printer is set.';
                 }
             }
         }

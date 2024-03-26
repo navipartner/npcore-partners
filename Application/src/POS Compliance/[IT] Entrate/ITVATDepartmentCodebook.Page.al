@@ -1,10 +1,10 @@
 page 6151331 "NPR IT VAT Department Codebook"
 {
-    ApplicationArea = NPRITFiscal;
     Caption = 'IT VAT Department Codebook';
     ContextSensitiveHelpPage = 'docs/fiscalization/italy/how-to/setup/';
     Extensible = false;
     PageType = List;
+    ApplicationArea = NPRITFiscal;
     UsageCategory = Administration;
     SourceTable = "NPR IT VAT Department Codebook";
     SourceTableView = sorting("POS Unit No.") order(ascending);
@@ -18,17 +18,17 @@ page 6151331 "NPR IT VAT Department Codebook"
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the POS Store Code field.';
+                    ToolTip = 'Specifies the POS Unit Code this VAT codes are related to.';
                 }
                 field("IT Printer VAT Department"; Rec."IT Printer VAT Department")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Printer VAT Department field.';
+                    ToolTip = 'Specifies the Printer VAT Department pulled out from Fiscal Printer.';
                 }
                 field("IT Printer VAT %"; Rec."IT Printer VAT %")
                 {
                     ApplicationArea = NPRITFiscal;
-                    ToolTip = 'Specifies the value of the Printer VAT % field.';
+                    ToolTip = 'Specifies the Printer VAT % related to the selected VAT Department.';
                 }
             }
         }
