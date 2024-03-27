@@ -661,7 +661,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
         exit(true);
     end;
 
-    local procedure HandlerCode(): Text[20]
+    internal procedure HandlerCode(): Text[20]
     var
         HandlerCodeTxt: Label 'DK_SKAT', Locked = true, MaxLength = 20;
     begin
