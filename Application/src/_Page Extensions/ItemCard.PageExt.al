@@ -68,7 +68,26 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ToolTip = 'Allow the user to specify a statistics group code for statistical reporting purposes.';
                 ApplicationArea = NPRRetail;
             }
+#if not BC17
+            field("NPR Purchasing Code"; Rec."NPR Purchasing Code")
+            {
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Purchasing Code, which is used by default, when selecting the item on sales orders.';
+            }
+#endif
         }
+
+#if not BC17
+        addafter("Safety Stock Quantity")
+        {
+            field("NPR Spfy Safety Stock Quantity"; Rec."NPR Spfy Safety Stock Quantity")
+            {
+                ApplicationArea = NPRShopify;
+                Visible = ShopifyIntegrationIsEnabled_Inventory;
+                ToolTip = 'Specifies the Shopify safety stock quantity. It helps limit stock shortages due to unforeseen events. If you want to set a different level of Shopify safety stock quantity for each item variant, you will need to create stockkeeping units in Business Central. Please note that if there is at least one stockkeeping unit for an item in Business Central, the value of the Shopify safety stock quantity specified on the Item Card will be ignored.';
+            }
+        }
+#endif
 
         addafter(AssemblyBOM)
         {
@@ -601,7 +620,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 
                 Caption = 'Extra Fields';
 
-                field("NPRAttrTextArray_01"; NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
@@ -614,7 +633,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 1, Rec."No.", NPRAttrTextArray[1]);
                     end;
                 }
-                field("NPRAttrTextArray_02"; NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
@@ -627,7 +646,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 2, Rec."No.", NPRAttrTextArray[2]);
                     end;
                 }
-                field("NPRAttrTextArray_03"; NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
@@ -640,7 +659,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 3, Rec."No.", NPRAttrTextArray[3]);
                     end;
                 }
-                field("NPRAttrTextArray_04"; NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
@@ -653,7 +672,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 4, Rec."No.", NPRAttrTextArray[4]);
                     end;
                 }
-                field("NPRAttrTextArray_05"; NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
@@ -666,7 +685,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 5, Rec."No.", NPRAttrTextArray[5]);
                     end;
                 }
-                field("NPRAttrTextArray_06"; NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
@@ -679,7 +698,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 6, Rec."No.", NPRAttrTextArray[6]);
                     end;
                 }
-                field("NPRAttrTextArray_07"; NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
@@ -692,7 +711,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 7, Rec."No.", NPRAttrTextArray[7]);
                     end;
                 }
-                field("NPRAttrTextArray_08"; NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
@@ -705,7 +724,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 8, Rec."No.", NPRAttrTextArray[8]);
                     end;
                 }
-                field("NPRAttrTextArray_09"; NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
@@ -718,7 +737,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         NPRAttrManagement.SetMasterDataAttributeValue(Database::Item, 9, Rec."No.", NPRAttrTextArray[9]);
                     end;
                 }
-                field("NPRAttrTextArray_10"; NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
@@ -761,7 +780,44 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         {
             Visible = false;
         }
+
+#if not BC17
+        addlast(Content)
+        {
+            group("NPR Shopify")
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled and not ShopifyStoreListGenerated;
+
+                field("NPR SetupShopifyIntegration"; SetupShopifyIntegrationLbl)
+                {
+                    ApplicationArea = NPRShopify;
+                    DrillDown = true;
+                    Editable = false;
+                    ShowCaption = false;
+                    Style = StrongAccent;
+                    StyleExpr = true;
+
+                    trigger OnDrillDown()
+                    var
+                        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+                    begin
+                        SpfyStoreLinkMgt.UpdateStoreItemLinks(Rec);
+                        NPR_UpdateShopifyStoreListGenerated();
+                    end;
+                }
+            }
+            part("NPR ShopifyStores"; "NPR Spfy Store-Item Links Subp")
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Shopify Integration';
+                Visible = ShopifyStoreListGenerated;
+                SubPageLink = Type = const(Item), "Item No." = field("No.");
+            }
+        }
+#endif
     }
+
     actions
     {
         modify(ItemsByLocation)
@@ -1295,9 +1351,24 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         ItemCostMgt: Codeunit ItemCostManagement;
         AverageCostACY: Decimal;
         Text6151400: Label 'Update Seo Link?';
+#if not BC17
+        ShopifyStoreListGenerated: Boolean;
+        ShopifyIntegrationIsEnabled: Boolean;
+        ShopifyIntegrationIsEnabled_Inventory: Boolean;
+        SetupShopifyIntegrationLbl: Label 'Setup Shopify Integration';
+#endif
 
     trigger OnOpenPage()
+#if not BC17
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
+        ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+#endif
+
         NPR_SetMagentoEnabled();
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetAutoOverwrite(true);
         NPRAttrManagement.GetAttributeVisibility(Database::Item, NPRAttrVisibleArray);
@@ -1352,6 +1423,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetItemNo(Rec."No.");
         CurrPage.NPRMagentoPictureDragDropAddin.Page.SetHidePicture(true);
         ItemCostMgt.CalculateAverageCost(Rec, AverageCostACY, AverageCostACY);
+#if not BC17
+        NPR_UpdateShopifyStoreListGenerated();
+#endif
     end;
 
     internal procedure NPR_SetMagentoEnabled()
@@ -1385,4 +1459,19 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
         Rec."NPR Seo Link" := Rec."NPR Magento Name";
         MagentoItemMgt.UpdateItemSeoLink(Rec);
     end;
+
+#if not BC17
+    local procedure NPR_UpdateShopifyStoreListGenerated()
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+    begin
+        if not ShopifyIntegrationIsEnabled then begin
+            ShopifyStoreListGenerated := false;
+            exit;
+        end;
+        SpfyStoreLinkMgt.FilterStoreItemLinks(Rec.RecordId(), SpfyStoreItemLink);
+        ShopifyStoreListGenerated := not SpfyStoreItemLink.IsEmpty();
+    end;
+#endif
 }

@@ -6,7 +6,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
             {
-
                 ToolTip = 'Specifies the name of the customer who will receive the products and be billed by default.';
                 ApplicationArea = NPRRetail;
             }
@@ -15,7 +14,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Ship-to Name 2"; Rec."Ship-to Name 2")
             {
-
                 ToolTip = 'Specifies the additional name that products on the sales document will be shipped to.';
                 ApplicationArea = NPRRetail;
             }
@@ -24,7 +22,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Bill-to Name 2"; Rec."Bill-to Name 2")
             {
-
                 ToolTip = 'Specifies the customer to whom you will send the sales invoice, when different from the customer that you are selling to.';
                 ApplicationArea = NPRRetail;
             }
@@ -67,7 +64,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Bill-to Company"; Rec."NPR Bill-to Company")
             {
-
                 ToolTip = 'Specifies the company that you will send the invoice to.';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
@@ -76,7 +72,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
             field("NPR Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
             {
-
                 ToolTip = 'Specifies the vendor number to whom you will send the sales invoice.';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
@@ -85,8 +80,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
-
                 ToolTip = 'Specifies the e-mail address of the customer contact you are sending the invoice to.';
+                ApplicationArea = NPRRetail;
+            }
+            field("NPR Bill-to Phone No."; Rec."NPR Bill-to Phone No.")
+            {
+                ToolTip = 'Specifies the phone number of the customer contact you are sending the invoice to.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -94,13 +93,11 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         {
             field("NPR Delivery Location"; Rec."NPR Delivery Location")
             {
-
                 ToolTip = 'Specifies where the items from the sales document are shipped to.';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Delivery Instructions"; Rec."NPR Delivery Instructions")
             {
-
                 ToolTip = 'Specifies the specific delivery instructions related to sales order.';
                 ApplicationArea = NPRRetail;
             }
@@ -114,7 +111,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             }
             field("NPR Kolli"; Rec."NPR Kolli")
             {
-
                 ToolTip = 'Specifies the number of packages';
                 ApplicationArea = NPRRetail;
             }
@@ -122,7 +118,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 ToolTip = 'Specifies the value of the Package Quantity field.';
                 ApplicationArea = NPRRetail;
-
             }
         }
         addafter("Salesperson Code")
@@ -282,6 +277,27 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the value of the Bank Prepayment Amount field.';
             }
         }
+#if not BC17
+        addafter("External Document No.")
+        {
+            field("NPR Spfy Order ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            {
+                Caption = 'Shopify Order ID';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify Order ID assigned to the document.';
+            }
+            field("NPR Shopify Store Code"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"))
+            {
+                Caption = 'Shopify Store Code';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify store the document has been created at.';
+            }
+        }
+#endif
 
         modify(Control1900316107)
         {
@@ -296,7 +312,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'POS Entry';
                 Image = Entry;
-
                 ToolTip = 'View the POS entry for this order.';
                 ApplicationArea = NPRRetail;
 
@@ -317,7 +332,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Retail Vouchers';
                     Image = Certificate;
-
                     ToolTip = 'View all vouchers for the selected customer.';
                     ApplicationArea = NPRRetail;
 
@@ -338,7 +352,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Image = Import;
                 Promoted = true;
                 PromotedOnly = true;
-
                 ToolTip = 'Start importing the file from the scanner.';
                 ApplicationArea = NPRRetail;
 
@@ -362,7 +375,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Select Recommended Item';
                 Image = SuggestLines;
-
                 ToolTip = 'Select the item that is marked as Recommended.';
                 ApplicationArea = NPRRetail;
             }
@@ -371,7 +383,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Caption = 'Insert Line with Item';
                 Image = CoupledOrderList;
                 ShortCutKey = 'Ctrl+I';
-
                 ToolTip = 'Enable inserting multiple items by searching through the item list.';
                 ApplicationArea = NPRRetail;
 
@@ -438,7 +449,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Issue Voucher';
                     Image = PostedPayableVoucher;
-
                     ToolTip = 'Enable viewing/editing the voucher list.';
                     ApplicationArea = NPRRetail;
 
@@ -470,7 +480,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             action("NPR Consignor Label")
             {
                 Caption = 'Consignor Label';
-
                 ToolTip = 'Print the Consignor Label.';
                 Image = Print;
                 ApplicationArea = NPRRetail;
@@ -486,7 +495,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
             {
                 Caption = 'Shipping Label';
                 Image = PrintCheck;
-
                 ToolTip = 'Create a Shipping Label with all necessary information.';
                 ApplicationArea = NPRRetail;
 
@@ -509,7 +517,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Send SMS';
                     Image = SendConfirmation;
-
                     ToolTip = 'Specifies whether a notification SMS should be sent to a responsible person. The messages are sent using SMS templates.';
                     ApplicationArea = NPRRetail;
                     trigger OnAction()
@@ -527,7 +534,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 {
                     Caption = 'Variety';
                     ShortCutKey = 'Ctrl+Alt+V';
-
                     ToolTip = 'View the variety matrix for the item used on the Purchase Order Line.';
                     Image = Edit;
                     ApplicationArea = NPRRetail;
@@ -585,7 +591,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
         RSSalesHeader: Record "NPR RS Sales Header";
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#endif
         AsyncEnabled: Boolean;
+#if not BC17
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 
     trigger OnAfterGetCurrRecord()
     begin
@@ -597,7 +609,13 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
     trigger OnOpenPage()
     var
         POSAsyncPostingMgt: Codeunit "NPR POS Async. Posting Mgt.";
+#if not BC17
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
         AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+#endif
     end;
 }

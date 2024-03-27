@@ -64,6 +64,14 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             InitValue = true;
+
+#if not BC17
+            trigger OnValidate()
+            begin
+                if "Allow Create Customers" then
+                    TestField("Shopify C&C Orders", false);
+            end;
+#endif
         }
         field(170; "Update Customers from S. Order"; Boolean)
         {
@@ -83,17 +91,55 @@
             DataClassification = CustomerContent;
             TableRelation = "Responsibility Center";
         }
+#if not BC17
+        field(200; "Spfy Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            TableRelation = Customer;
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if Rec."Spfy Customer No." = '' then
+                    Rec.TestField("Shopify C&C Orders", false);
+            end;
+        }
+        field(210; "Spfy Country/Region Code"; Code[10])
+        {
+            Caption = 'Country/Region Code';
+            TableRelation = "Country/Region";
+            DataClassification = CustomerContent;
+        }
+        field(220; "Shopify Source Name"; Text[30])
+        {
+            Caption = 'Shopify Source Name';
+            DataClassification = CustomerContent;
+        }
+        field(230; "Shopify Store Code"; Code[20])
+        {
+            Caption = 'Shopify Store Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Spfy Store".Code;
+        }
+        field(240; "Shopify C&C Orders"; Boolean)
+        {
+            Caption = 'Shopify Click && Collect Orders';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                Rec.TestField("Spfy Customer No.");
+                Rec.TestField("Allow Create Customers", false);
+            end;
+        }
+#endif
     }
 
     keys
     {
-        key(Key1; "Code")
-        {
-        }
-    }
-
-    fieldgroups
-    {
+        key(Key1; "Code") { }
+#if not BC17
+        key(ShopifyStoreSource; "Shopify Store Code", "Shopify Source Name") { }
+#endif
     }
 }
-

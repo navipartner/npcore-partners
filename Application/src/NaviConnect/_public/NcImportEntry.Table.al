@@ -141,6 +141,14 @@
             Caption = 'Batch Id';
             DataClassification = CustomerContent;
         }
+        field(200; "Store Code"; Code[20])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+#if not BC17
+            TableRelation = "NPR Spfy Store".Code;
+#endif
+        }
     }
 
     keys

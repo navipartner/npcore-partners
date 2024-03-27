@@ -328,6 +328,7 @@
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
         DataLogSubscriber: Record "NPR Data Log Subscriber";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         Updated: Boolean;
     begin
         DataLogSetup.InsertNewTable(DATABASE::"Item Ledger Entry", 1, 0, 0);
@@ -336,19 +337,14 @@
             DataLogSetup."Log Insertion" := DataLogSetup."Log Insertion"::Simple;
             Updated := true;
         end;
-        if DataLogSetup."Keep Log for" < DaysToDuration(2) then begin
-            DataLogSetup."Keep Log for" := DaysToDuration(2);
+        if DataLogSetup."Keep Log for" < JobQueueMgt.DaysToDuration(2) then begin
+            DataLogSetup."Keep Log for" := JobQueueMgt.DaysToDuration(2);
             Updated := true;
         end;
         if Updated then
             DataLogSetup.Modify(true);
 
         DataLogSubscriber.AddAsSubscriber(RaptorDataLogSubscriber(), DATABASE::"Item Ledger Entry");
-    end;
-
-    local procedure DaysToDuration(NoOfDays: Integer): BigInteger
-    begin
-        exit(NoOfDays * 86400000);
     end;
 
     procedure SelectTrackingServiceType(var TrackingServiceType: Text[30]): Boolean

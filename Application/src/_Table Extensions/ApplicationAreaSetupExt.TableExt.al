@@ -105,5 +105,12 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner HU MultiSoft EInv';
             DataClassification = CustomerContent;
         }
+#if not BC17
+        field(6060120; "NPR Shopify"; Boolean)
+        {
+            Caption = 'NaviPartner Shopify Integration';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 }

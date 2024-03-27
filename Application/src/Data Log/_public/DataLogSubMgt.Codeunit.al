@@ -127,11 +127,9 @@
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         TempDataLogSubscriber: Record "NPR Data Log Subscriber" temporary;
-        RecRef: RecordRef;
         MaxNoOfRecordsReached: Boolean;
     begin
-        RecRef.GetTable(TempDataLogRecord);
-        if not RecRef.IsTemporary() then
+        if not TempDataLogRecord.IsTemporary() then
             exit(false);
         TempDataLogRecord.Reset();
         TempDataLogRecord.DeleteAll();
@@ -147,11 +145,13 @@
             exit(false);
 
         repeat
-            TempDataLogSubscriber := DataLogSubscriber;
-            MaxNoOfRecordsReached := InsertNewTempRecords(TempDataLogSubscriber, MaxRecords, TempDataLogRecord);
-            if ModifySubscriber then begin
-                TempDataLogSubscriber."Last Date Modified" := CurrentDateTime();
-                TempDataLogSubscriber.Insert();
+            if DataLogSubscriber.IsEnabled() then begin
+                TempDataLogSubscriber := DataLogSubscriber;
+                MaxNoOfRecordsReached := InsertNewTempRecords(TempDataLogSubscriber, MaxRecords, TempDataLogRecord);
+                if ModifySubscriber then begin
+                    TempDataLogSubscriber."Last Date Modified" := CurrentDateTime();
+                    TempDataLogSubscriber.Insert();
+                end;
             end;
         until (DataLogSubscriber.Next() = 0) or MaxNoOfRecordsReached;
 
@@ -282,5 +282,9 @@
         until DataLogField.Next() = 0;
         exit(true);
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnCheckIfDataLogSubscriberIsEnabled(DataLogSubscriber: Record "NPR Data Log Subscriber"; var IsEnabled: Boolean)
+    begin
+    end;
+}

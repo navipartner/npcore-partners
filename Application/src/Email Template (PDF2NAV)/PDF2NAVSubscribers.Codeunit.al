@@ -8,6 +8,7 @@
     begin
         if Customer.Get(Rec."Bill-to Customer No.") then begin
             Rec."NPR Bill-to E-mail" := Customer."E-Mail";
+            Rec."NPR Bill-to Phone No." := Customer."Phone No.";
         end;
     end;
 }

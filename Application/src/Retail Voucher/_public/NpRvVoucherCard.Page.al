@@ -18,69 +18,65 @@
                     ShowCaption = false;
                     field("No."; Rec."No.")
                     {
-
                         ShowMandatory = true;
                         ToolTip = 'Specifies the number of the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Voucher Type"; Rec."Voucher Type")
                     {
-
                         ToolTip = 'Specifies the type of the voucher. Credit and gift vouchers are default, but additional ones can be defined as well.';
                         ApplicationArea = NPRRetail;
+#if not BC17
+
+                        trigger OnValidate()
+                        begin
+                            UpdateControls();
+                        end;
+#endif
                     }
                     field(Description; Rec.Description)
                     {
-
                         ToolTip = 'Specifies the description of the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Account No."; Rec."Account No.")
                     {
-
                         ShowMandatory = true;
                         ToolTip = 'Specifies the number of the account associated with the voucher.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue Register No."; Rec."Issue Register No.")
                     {
-
                         ToolTip = 'Specifies the value of the Issue Register No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue Document Type"; Rec."Issue Document Type")
                     {
-
                         ToolTip = 'Specifies the value of the Issue Document Type field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue Document No."; Rec."Issue Document No.")
                     {
-
                         ToolTip = 'Specifies the value of the Issue Document No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue External Document No."; Rec."Issue External Document No.")
                     {
-
                         ToolTip = 'Specifies the value of the Issue External Document No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Issue Partner Code"; Rec."Issue Partner Code")
                     {
-
                         ToolTip = 'Specifies the value of the Issue Partner Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Partner Clearing"; Rec."Partner Clearing")
                     {
-
                         ToolTip = 'Specifies the value of the Partner Clearing field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Allow Top-up"; Rec."Allow Top-up")
                     {
-
                         ToolTip = 'Specifies the value of the Allow Top-up field';
                         ApplicationArea = NPRRetail;
                     }
@@ -96,32 +92,27 @@
                     ShowCaption = false;
                     field("Issue Date"; Rec."Issue Date")
                     {
-
                         ToolTip = 'Specifies the value of the Issue Date field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Open; Rec.Open)
                     {
-
                         ToolTip = 'Specifies if the voucher is open or not.';
                         ApplicationArea = NPRRetail;
                     }
                     field("Initial Amount"; Rec."Initial Amount")
                     {
-
                         Editable = false;
                         ToolTip = 'Specifies the value of the Initial Amount field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Amount; Rec.Amount)
                     {
-
                         ToolTip = 'Specifies the value of the Amount field';
                         ApplicationArea = NPRRetail;
                     }
                     field("In-use Quantity"; Rec."In-use Quantity")
                     {
-
                         ToolTip = 'Specifies the value of the In-use Quantity field';
                         ApplicationArea = NPRRetail;
                     }
@@ -140,7 +131,6 @@
                     ShowCaption = false;
                     field("Send Voucher Module"; Rec."Send Voucher Module")
                     {
-
                         ToolTip = 'Specifies the value of the Send Voucher Module field';
                         ApplicationArea = NPRRetail;
                     }
@@ -150,7 +140,6 @@
                     ShowCaption = false;
                     field("Reference No."; Rec."Reference No.")
                     {
-
                         ToolTip = 'Specifies the value of the Reference No. field';
                         ApplicationArea = NPRRetail;
                     }
@@ -215,86 +204,72 @@
                     Caption = 'Contact';
                     field("Customer No."; Rec."Customer No.")
                     {
-
                         ToolTip = 'Specifies the value of the Customer No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Contact No."; Rec."Contact No.")
                     {
-
                         ToolTip = 'Specifies the value of the Contact No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Name; Rec.Name)
                     {
-
                         ToolTip = 'Specifies the value of the Name field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Name 2"; Rec."Name 2")
                     {
-
                         ToolTip = 'Specifies the value of the Name 2 field';
                         ApplicationArea = NPRRetail;
                     }
                     field(Address; Rec.Address)
                     {
-
                         ToolTip = 'Specifies the value of the Address field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Address 2"; Rec."Address 2")
                     {
-
                         ToolTip = 'Specifies the value of the Address 2 field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Post Code"; Rec."Post Code")
                     {
-
                         ToolTip = 'Specifies the value of the Post Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field(City; Rec.City)
                     {
-
                         ToolTip = 'Specifies the value of the City field';
                         ApplicationArea = NPRRetail;
                     }
                     field(County; Rec.County)
                     {
-
                         ToolTip = 'Specifies the value of the County field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Country/Region Code"; Rec."Country/Region Code")
                     {
-
                         ToolTip = 'Specifies the value of the Country/Region Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("E-mail"; Rec."E-mail")
                     {
-
                         ToolTip = 'Specifies the value of the E-mail field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Phone No."; Rec."Phone No.")
                     {
-
                         ToolTip = 'Specifies the value of the Phone No. field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Language Code"; Rec."Language Code")
                     {
-
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Language Code field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Voucher Message"; Rec."Voucher Message")
                     {
-
                         MultiLine = true;
                         ToolTip = 'Specifies the value of the Voucher Message field';
                         ApplicationArea = NPRRetail;
@@ -309,7 +284,6 @@
                     ShowCaption = false;
                     field("Validate Voucher Module"; Rec."Validate Voucher Module")
                     {
-
                         ToolTip = 'Specifies the value of the Validate Voucher Module field';
                         ApplicationArea = NPRRetail;
                     }
@@ -319,13 +293,11 @@
                     ShowCaption = false;
                     field("Starting Date"; Rec."Starting Date")
                     {
-
                         ToolTip = 'Specifies the value of the Starting Date field';
                         ApplicationArea = NPRRetail;
                     }
                     field("Ending Date"; Rec."Ending Date")
                     {
-
                         ToolTip = 'Specifies the value of the Ending Date field';
                         ApplicationArea = NPRRetail;
                     }
@@ -336,11 +308,40 @@
                 Caption = 'Apply Payment';
                 field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
-
                     ToolTip = 'Specifies whether the payment module application is DEFAULT or PARTIAL. DEFAULT implies that the retail voucher amount will be accepted in total when redeeming. PARTIAL implies the retail voucher amount is accepted partially when redeeming. The difference remains on the voucher and can be used later.';
                     ApplicationArea = NPRRetail;
                 }
             }
+#if not BC17
+            group(Shopify)
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled and VourcherTypeShopifyIntegrationIsEnabled;
+                field("Shopify Gift Card ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                {
+                    Caption = 'Shopify Gift Card ID';
+                    Editable = false;
+                    AssistEdit = true;
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the value of the Shopify Gift Card ID field.';
+
+                    trigger OnAssistEdit()
+                    var
+                        ChangeShopifyID: Page "NPR Spfy Change Assigned ID";
+                    begin
+                        SpfyRetailVoucherMgt.TestRequiredFields(Rec);
+                        CurrPage.SaveRecord();
+                        Commit();
+
+                        Clear(ChangeShopifyID);
+                        ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                        ChangeShopifyID.RunModal();
+
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+#endif
         }
     }
 
@@ -360,7 +361,6 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-
                     ToolTip = 'Executes the Send Voucher action';
                     ApplicationArea = NPRRetail;
 
@@ -374,7 +374,6 @@
             {
                 Caption = 'Reset Vouchers In-use';
                 Image = RefreshVoucher;
-
                 ToolTip = 'Executes the Reset Vouchers In-use action';
                 ApplicationArea = NPRRetail;
 
@@ -398,7 +397,6 @@
                 {
                     Caption = 'Archive Voucher';
                     Image = Post;
-
                     ToolTip = 'Executes the Archive Voucher action';
                     ApplicationArea = NPRRetail;
 
@@ -427,7 +425,6 @@
                 RunObject = Page "NPR NpRv Voucher Entries";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Ctrl+F7';
-
                 ToolTip = 'Executes the Voucher Entries action';
                 ApplicationArea = NPRRetail;
             }
@@ -438,7 +435,6 @@
                 RunObject = Page "NPR NpRv Sending Log";
                 RunPageLink = "Voucher No." = FIELD("No.");
                 ShortCutKey = 'Shift+Ctrl+F7';
-
                 ToolTip = 'Executes the Sending Log action';
                 ApplicationArea = NPRRetail;
             }
@@ -447,6 +443,24 @@
 
     var
         PrintUsingTemplate: Boolean;
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
+        ShopifyIntegrationIsEnabled: Boolean;
+        VourcherTypeShopifyIntegrationIsEnabled: Boolean;
+
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        VourcherTypeShopifyIntegrationIsEnabled := false;
+    end;
+#endif
 
     trigger OnAfterGetCurrRecord()
     begin
@@ -456,5 +470,8 @@
     local procedure UpdateControls()
     begin
         PrintUsingTemplate := Rec."Print Object Type" = Rec."Print Object Type"::Template;
+#if not BC17
+        VourcherTypeShopifyIntegrationIsEnabled := SpfyRetailVoucherMgt.IsShopifyIntegratedVoucherType(Rec."Voucher Type");
+#endif
     end;
 }

@@ -56,4 +56,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'HeyLoyalty', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR HeyLoyalty Feature";
     }
+#if not BC17
+    value(90; Shopify)
+    {
+        Caption = 'Shopify Integration', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Shopify Integr. Feature";
+    }
+#endif
 }

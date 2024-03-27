@@ -38,8 +38,12 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
         {
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")
             {
-
                 ToolTip = 'Specifies the e-mail address of the customer contact you are sending the invoice to.';
+                ApplicationArea = NPRRetail;
+            }
+            field("NPR Bill-to Phone No."; Rec."NPR Bill-to Phone No.")
+            {
+                ToolTip = 'Specifies the phone number of the customer contact you are sending the invoice to.';
                 ApplicationArea = NPRRetail;
             }
         }

@@ -261,6 +261,13 @@
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'We don''t need to store barcode image.';
         }
+#if not BC17
+        field(400; "Disabled at Shopify"; Boolean)
+        {
+            Caption = 'Disabled at Shopify';
+            DataClassification = CustomerContent;
+        }
+#endif
         field(1000; "Issue Date"; Date)
         {
             CalcFormula = Min("NPR NpRv Arch. Voucher Entry"."Posting Date" WHERE("Arch. Voucher No." = FIELD("No."),

@@ -26,9 +26,11 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                 Enabled = NoWhseEntrForPOSEnabled;
             }
         }
-#if not (BC17 or BC18 or BC19 or BC20)
+#if not BC17
         addlast(content)
         {
+#endif
+#if not (BC17 or BC18 or BC19 or BC20)
             group("NPR Magento")
             {
                 Caption = 'Magento';
@@ -39,8 +41,36 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                     ApplicationArea = NPRRetail;
                 }
             }
+#endif
+#if not BC17
+            group("NPR Shopify")
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled;
+
+                field("NPR Spfy Location ID"; SpfyStoreLinkMgt.GetFirstAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                {
+                    Caption = 'Shopify Location ID';
+                    Editable = false;
+                    AssistEdit = true;
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the Shopify ID assigned to the location.';
+
+                    trigger OnAssistEdit()
+                    begin
+                        Rec.TestField("Code");
+                        Rec.TestField("Use As In-Transit", false);
+                        CurrPage.SaveRecord();
+                        Commit();
+
+                        SpfyStoreLinkMgt.OpenStoreLinks(Rec.RecordId());
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
         }
 #endif
+
         modify("Bin Mandatory")
         {
             trigger OnAfterValidate()
@@ -59,8 +89,16 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
     trigger OnOpenPage()
     var
         RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+#if not BC17
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
         RetailLocalizationEnabled := RetailLocalizationMgt.IsRetailLocalizationEnabled();
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+        if not ShopifyIntegrationIsEnabled then
+            ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Click And Collect");
+#endif
     end;
 
     trigger OnAfterGetRecord()
@@ -79,6 +117,12 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
     end;
 
     var
+#if not BC17
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+#endif
         NoWhseEntrForPOSEnabled: Boolean;
         RetailLocalizationEnabled: Boolean;
+#if not BC17
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 }

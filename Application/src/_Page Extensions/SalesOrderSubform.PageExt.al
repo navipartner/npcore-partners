@@ -53,6 +53,19 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
                 ApplicationArea = NPRRetail;
             }
         }
+#if not BC17
+        addlast(Control1)
+        {
+            field("NPR Spfy Order Line ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            {
+                Caption = 'Shopify Order Line ID';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify Order Line ID assigned to the document line.';
+            }
+        }
+#endif
     }
     actions
     {
@@ -78,6 +91,15 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
         }
     }
 
+#if not BC17
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+    end;
+#endif
+
 #if BC17 or BC18
     trigger OnAfterGetCurrRecord()
     begin
@@ -91,9 +113,15 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
     begin
         TotalsCalculationForced := BindSubscription(VarietyTotals);
     end;
+#endif
 
     var
+#if BC17 or BC18
         VarietyTotals: Codeunit "NPR Variety Totals Calculation";
         TotalsCalculationForced: Boolean;
+#endif
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyIntegrationIsEnabled: Boolean;
 #endif
 }

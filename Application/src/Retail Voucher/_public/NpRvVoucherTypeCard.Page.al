@@ -330,6 +330,45 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+#if not BC17
+            group(Shopify)
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled;
+                field("Integrate with Shopify"; Rec."Integrate with Shopify")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies if retail vouchers of this type are integrated with Shopify.';
+                }
+                field(ShopifyStoreCode; ShopifyStoreCode)
+                {
+                    Caption = 'Shopify Store Code';
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the Shopify store retail vouchers of this type are integrated with.';
+                    TableRelation = "NPR Spfy Store";
+
+                    trigger OnValidate()
+                    var
+                        ShopifyStore: Record "NPR Spfy Store";
+                        xShopifyStoreCode: Code[20];
+                    begin
+                        Rec.TestField(Code);
+                        CurrPage.SaveRecord();
+
+                        xShopifyStoreCode := Rec.GetStoreCode();
+                        if ShopifyStoreCode = xShopifyStoreCode then
+                            exit;
+                        Rec.TestField("Integrate with Shopify", false);
+                        if ShopifyStoreCode <> '' then begin
+                            ShopifyStore.Code := ShopifyStoreCode;
+                            ShopifyStore.Find('=><');
+                            ShopifyStoreCode := ShopifyStore.Code;
+                        end;
+                        SpfyAssignedIDMgt.AssignShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code", ShopifyStoreCode, false);
+                    end;
+                }
+            }
+#endif
         }
     }
 
@@ -438,6 +477,15 @@
         }
     }
 
+#if not BC17
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
+    end;
+#endif
+
     trigger OnAfterGetCurrRecord()
     begin
         SetHasSetup();
@@ -447,6 +495,11 @@
         VoucherQtyClosed := LoadingTxt;
         VoucherQtyArchived := LoadingTxt;
         EnqueueFlowFieldsCalculationBackgroundTask();
+
+#if not BC17
+        if ShopifyIntegrationIsEnabled then
+            ShopifyStoreCode := Rec.GetStoreCode();
+#endif
     end;
 
     trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
@@ -456,7 +509,6 @@
         VoucherQtyArchived := GetFieldValueFromBackgroundTaskResultSet(Results, Format(Rec.FieldNo("Arch. Voucher Qty.")));
     end;
 
-
     var
         HasApplyPaymentSetup: Boolean;
         HasIssueVoucherSetup: Boolean;
@@ -465,6 +517,11 @@
         VoucherQtyOpen, VoucherQtyClosed, VoucherQtyArchived : Text;
         BackgroundTaskId: Integer;
         LoadingTxt: Label 'Loading...', Locked = true;
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyStoreCode: Code[20];
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 
     local procedure SetHasSetup()
     var

@@ -53,4 +53,11 @@ enum 6151416 "NPR PG Integrations" implements "NPR IPaymentGateway"
         Caption = 'Stripe';
         Implementation = "NPR IPaymentGateway" = "NPR PG Stripe Integration Mgt.";
     }
+#if not BC17
+    value(10; Shopify)
+    {
+        Caption = 'Shopify';
+        Implementation = "NPR IPaymentGateway" = "NPR Spfy Payment Gateway Hdlr";
+    }
+#endif
 }

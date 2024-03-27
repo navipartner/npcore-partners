@@ -9,12 +9,14 @@
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
         NcSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
         MaxRetry: Integer;
+        StoreCode: Code[20];
     begin
         JQParamStrMgt.Parse(Rec."Parameter String");
         FindTaskProcessorCode(Rec, JQParamStrMgt, NcTaskProcessor);
+        FindStoreCode(JQParamStrMgt, StoreCode);
 
         if JQParamStrMgt.ContainsParam(ParamResetRetryCount()) then begin
-            NcTaskMgt.TaskResetCount(NcTaskProcessor);
+            NcTaskMgt.TaskResetCount(NcTaskProcessor, StoreCode);
             Commit();
         end;
 
@@ -25,7 +27,7 @@
 
         if JQParamStrMgt.ContainsParam(ParamProcessTaskList()) then begin
             MaxRetry := FindMaxRetry(Rec, JQParamStrMgt);
-            NcSyncMgt.ProcessTasks(NcTaskProcessor, MaxRetry);
+            NcSyncMgt.ProcessTasks(NcTaskProcessor, StoreCode, MaxRetry);
         end;
     end;
 
@@ -55,6 +57,14 @@
 
         TaskProcessorCode := JQParamStrMgt.GetParamValueAsText(ParamProcessor());
         NcTaskProcessor.Get(UpperCase(TaskProcessorCode));
+    end;
+
+    local procedure FindStoreCode(JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt."; var StoreCode: Code[20])
+    begin
+        Clear(StoreCode);
+        if not JQParamStrMgt.ContainsParam(ParamStoreCode()) then
+            exit;
+        StoreCode := CopyStr(JQParamStrMgt.GetParamValueAsText(ParamStoreCode()), 1, MaxStrLen(StoreCode));
     end;
 
     local procedure FindMaxRetry(var JobQueueEntry: Record "Job Queue Entry"; JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.") MaxRetry: Integer
@@ -152,5 +162,10 @@
     internal procedure ParamResetRetryCount(): Text
     begin
         exit('reset_retry_count');
+    end;
+
+    internal procedure ParamStoreCode(): Text
+    begin
+        exit('store');
     end;
 }
