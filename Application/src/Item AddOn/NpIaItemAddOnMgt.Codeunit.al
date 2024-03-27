@@ -392,6 +392,15 @@
             exit(false);
         end;
 
+        if not InputLotNos(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
+            if CompulsoryAddOn then
+                RemoveBaseLine(POSSession, AppliesToLineNo);
+            LastErrorText := GetLastErrorText();
+            if LastErrorText <> '' then
+                Message(LastErrorText);
+            exit(false);
+        end;
+
         POSSession.GetSaleLine(POSSaleLine);
         TempItemAddOnLine.FindSet();
         repeat
@@ -459,6 +468,15 @@
             exit(false);
         end;
 
+        if not InputLotNos(SalePOS, AppliesToLineNo, TempItemAddOnLine) then begin
+            if CompulsoryAddOn then
+                RemoveBaseLine(POSSession, AppliesToLineNo);
+            LastErrorText := GetLastErrorText();
+            if LastErrorText <> '' then
+                Message(LastErrorText);
+            exit(false);
+        end;
+
         POSSession.GetSaleLine(POSSaleLine);
         if TempItemAddOnLine.FindSet() then begin
             repeat
@@ -515,6 +533,7 @@
             SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
             SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
             SaleLinePOS."Serial No." := ItemAddOnLine."Serial No.";
+            SaleLinePOS."Lot No." := ItemAddOnLine."Lot No.";
             SaleLinePOS.Indentation := BaseLineIndent + 1;
 
             POSSaleLine.SetUsePresetLineNo(true);
@@ -968,14 +987,14 @@
     var
         AddOnSaleLinePOS: Record "NPR POS Sale Line";
         TempItemAddOnSerialBuffer: Record "NPR NpIa Item AddOn Line" temporary;
-        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
         Item: Record Item;
         UseSpecificTracking: Boolean;
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
     begin
         if ItemAddOnLine.FindSet() then
             repeat
                 if (ItemAddOnLine."Item No." <> '') and (ItemAddOnLine.Quantity > 0) then
-                    if Item.Get(ItemAddOnLine."Item No.") and POSActionInsertItemB.ItemRequiresSerialNumberOnSale(Item, UseSpecificTracking) then begin
+                    if Item.Get(ItemAddOnLine."Item No.") and POSTrackingUtils.ItemRequiresSerialNumber(Item, UseSpecificTracking) then begin
                         TempItemAddOnSerialBuffer := ItemAddOnLine;
                         if FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, AddOnSaleLinePOS) then
                             if AddOnSaleLinePOS."Serial No." <> '' then
@@ -999,6 +1018,49 @@
                     ItemAddOnLine.Modify();
                 end;
             until TempItemAddOnSerialBuffer.Next() = 0;
+    end;
+
+    [TryFunction]
+    local procedure InputLotNos(SalePOS: Record "NPR POS Sale"; AppliesToLineNo: Integer; var ItemAddOnLine: Record "NPR NpIa Item AddOn Line")
+    var
+        AddOnSaleLinePOS: Record "NPR POS Sale Line";
+        TempItemAddOnLotBuffer: Record "NPR NpIa Item AddOn Line" temporary;
+        Item: Record Item;
+        UseSpecificTracking: Boolean;
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        UserInformationErrorWarning: text;
+    begin
+        if ItemAddOnLine.FindSet() then
+            repeat
+                if (ItemAddOnLine."Item No." <> '') and (ItemAddOnLine.Quantity > 0) then
+                    if Item.Get(ItemAddOnLine."Item No.") and POSTrackingUtils.ItemRequiresLotNo(Item, UseSpecificTracking) then begin
+                        TempItemAddOnLotBuffer := ItemAddOnLine;
+                        if FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, AddOnSaleLinePOS) then
+                            if AddOnSaleLinePOS."Lot No." <> '' then
+                                TempItemAddOnLotBuffer."Lot No." := AddOnSaleLinePOS."Lot No.";
+                        TempItemAddOnLotBuffer.Insert();
+                    end;
+            until ItemAddOnLine.Next() = 0;
+
+        if TempItemAddOnLotBuffer.IsEmpty() then
+            exit;
+
+        if Page.RunModal(Page::"NPR NpIa ItemAddOn Lot Nos.", TempItemAddOnLotBuffer) <> Action::LookupOK then
+            Error('');
+
+        if TempItemAddOnLotBuffer.FindSet() then
+            repeat
+                TempItemAddOnLotBuffer.TestField("Lot No.");
+                ItemAddOnLine.Get(TempItemAddOnLotBuffer."AddOn No.", TempItemAddOnLotBuffer."Line No.");
+                if ItemAddOnLine."Lot No." <> TempItemAddOnLotBuffer."Lot No." then
+                    if (not POSTrackingUtils.LotCanBeUsedByItem(TempItemAddOnLotBuffer."Item No.", TempItemAddOnLotBuffer."Variant Code", TempItemAddOnLotBuffer."Lot No.", UserInformationErrorWarning)) then begin
+                        if (TempItemAddOnLotBuffer."Lot No." <> '') and (UserInformationErrorWarning <> '') then
+                            Error(UserInformationErrorWarning)
+                    end else begin
+                        ItemAddOnLine."Lot No." := TempItemAddOnLotBuffer."Lot No.";
+                        ItemAddOnLine.Modify();
+                    end;
+            until TempItemAddOnLotBuffer.Next() = 0;
     end;
 
     local procedure ItemVariantIsRequired(ItemNo: Code[20]): Boolean

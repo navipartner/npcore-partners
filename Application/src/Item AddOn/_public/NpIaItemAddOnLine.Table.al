@@ -245,6 +245,11 @@
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
         }
+        field(240; "Lot No."; Code[50])
+        {
+            Caption = 'Lot No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

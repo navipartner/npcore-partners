@@ -65,7 +65,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SentryGetItemSpan.Finish();
     end;
 
-    procedure AddItemLine(ItemNo: Code[20]; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
+    procedure AddItemLine(ItemNo: Code[20]; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; InputLot: Text)
     var
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
@@ -75,15 +75,15 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     begin
         POSSession.GetFrontEnd(FrontEnd);
         Item.Get(ItemNo);
-        AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd);
+        AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, InputLot);
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; BenefitItem: Boolean; TotalDiscountCode: Code[20]; TotalDiscountStepAmount: Decimal; benefitListCode: Code[20])
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; BenefitItem: Boolean; TotalDiscountCode: Code[20]; TotalDiscountStepAmount: Decimal; benefitListCode: Code[20]; InputLot: Text)
     begin
-        AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, '', UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, BenefitItem, TotalDiscountCode, TotalDiscountStepAmount, benefitListCode);
+        AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, ItemQuantity, '', UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, BenefitItem, TotalDiscountCode, TotalDiscountStepAmount, benefitListCode, InputLot);
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasure: Code[10]; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; BenefitItem: Boolean; TotalDiscountCode: Code[20]; TotalDiscountStepAmount: Decimal; benefitListCode: Code[20])
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasure: Code[10]; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; BenefitItem: Boolean; TotalDiscountCode: Code[20]; TotalDiscountStepAmount: Decimal; benefitListCode: Code[20]; InputLot: Text)
     var
         Line: Record "NPR POS Sale Line";
         SaleLine: Codeunit "NPR POS Sale Line";
@@ -133,6 +133,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if InputSerial <> '' then
             Line.Validate("Serial No.", InputSerial);
 
+        if InputLot <> '' then
+            Line.Validate("Lot No.", InputLot);
+
         if CustomDescription <> '' then
             Line.Description := CopyStr(CustomDescription, 1, MaxStrLen(Line.Description));
 
@@ -170,14 +173,14 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         _SkipCalcDiscount := SkipCalcDiscount;
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; InputLot: Text)
     begin
-        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, '', UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '');
+        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, '', UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '', InputLot);
     end;
 
-    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasure: Code[10]; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
+    procedure AddItemLine(Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasure: Code[10]; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; InputLot: Text)
     begin
-        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitOfMeasure, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '');
+        AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitOfMeasure, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, false, '', 0, '', InputLot);
     end;
 
     procedure GetLineNo(): Integer;
@@ -298,7 +301,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             exit(false);
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then
             exit(false);
-        ItemTrackingCode.TestField("Lot Specific Tracking", false);
         UseSpecificTracking := ItemTrackingCode."SN Specific Tracking";
         exit(ItemTrackingCode."SN Sales Outbound Tracking");
     end;
@@ -469,7 +471,17 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS.Modify(true);
     end;
 
-    internal procedure GetItemAdditionalInformationRequirements(ItemNo: Code[20]; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean)
+    internal procedure AssignLotNo(var SaleLinePOS: Record "NPR POS Sale Line"; LotNoInput: Text[50]; POSStore: Record "NPR POS Store")
+    var
+        POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+    begin
+        POSTrackingUtils.ValidateLotNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", LotNoInput, POSStore);
+
+        SaleLinePOS.Validate("Lot No.", LotNoInput);
+        SaleLinePOS.Modify(true);
+    end;
+
+    internal procedure GetItemAdditionalInformationRequirements(ItemNo: Code[20]; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean; var RequiresLotNoInput: Boolean; var RequiresSpecificLotNo: Boolean)
     var
         Item: Record Item;
     begin
@@ -478,30 +490,33 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if not Item.Get(ItemNo) then
             Clear(Item);
 
-        GetItemAdditionalInformationRequirements(Item, RequiresSerialNoInput, RequiresSpecificSerialNo, requiresUnitPriceInput);
+        GetItemAdditionalInformationRequirements(Item, RequiresSerialNoInput, RequiresSpecificSerialNo, requiresUnitPriceInput, RequiresLotNoInput, RequiresSpecificLotNo);
     end;
 
-    internal procedure GetItemAdditionalInformationRequirements(var Item: Record Item; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean);
+    internal procedure GetItemAdditionalInformationRequirements(var Item: Record Item; var RequiresSerialNoInput: Boolean; var RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInput: Boolean; var RequiresLotNoInput: Boolean; var RequiresSpecificLotNo: Boolean);
     var
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
     begin
         RequiresUnitPriceInput := Item."NPR Group sale";
 
         if not (Item."Assembly BOM" and Item."NPR Explode BOM auto") then
-            RequiresSerialNoInput := POSTrackingUtils.ItemRequiresSerialNumber(Item, RequiresSpecificSerialNo);
+            POSTrackingUtils.ItemRequiresLotNoSerialNo(Item, RequiresSpecificSerialNo, RequiresSpecificLotNo, RequiresSerialNoInput, RequiresLotNoInput)
+
     end;
 
-    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean)
+    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean; var RequiresLotNoInputPrompt: Boolean; RequiresLotNoInput: Boolean; RequiresSpecificLotNo: Boolean)
     begin
         RequiresSerialNoInputPrompt := RequiresSerialNoInput and ((GetSerialNoFromList and not RequiresSpecificSerialNo) or not GetSerialNoFromList);
         RequiresUnitPriceInputPrompt := RequiresUnitPriceInput and not UsePresetUnitPrice;
-        ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt;
+        RequiresLotNoInputPrompt := RequiresLotNoInput or RequiresSpecificLotNo;
+        ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt or RequiresLotNoInputPrompt;
     end;
 
-    internal procedure CheckBOMComponentsNeedSerialNoInput(var Item: Record Item) RequiresSerialNoInput: Boolean;
+    internal procedure CheckBOMComponentsNeedLotNoSerialInput(var Item: Record Item; var RequiresLotNoInput: Boolean; var RequiresSerialNoInput: Boolean)
     var
         BOMComponent: Record "BOM Component";
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
+        RequiresSpecificLotNo: Boolean;
         RequiresSpecificlSerialNo: Boolean;
     begin
         if not Item."Assembly BOM" then
@@ -518,8 +533,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             exit;
 
         repeat
-            POSTrackingUtils.ItemRequiresSerialNumber(BOMComponent."No.", RequiresSerialNoInput, RequiresSpecificlSerialNo);
-        until (BOMComponent.Next() = 0) or RequiresSerialNoInput;
+            If Item.Get(BOMComponent."No.") then
+            POSTrackingUtils.ItemRequiresLotNoSerialNo(Item, RequiresSpecificlSerialNo, RequiresSpecificLotNo,RequiresSerialNoInput, RequiresLotNoInput);
+        until (BOMComponent.Next() = 0) or (RequiresLotNoInput and RequiresSerialNoInput);
 
     end;
 
@@ -557,7 +573,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             TempItemReference."Item No." := TempNPRTotalDiscBenItemBuffer."Item No.";
             TempItemReference."Variant Code" := TempNPRTotalDiscBenItemBuffer."Variant Code";
 
-            AddItemLine(Item, TempItemReference, ItemIdentifierType::ItemNo, TempNPRTotalDiscBenItemBuffer.Quantity, UnitPrice, '', '', '', POSSession, FrontEnd, true, TempNPRTotalDiscBenItemBuffer."Total Discount Code", TempNPRTotalDiscBenItemBuffer."Total Discount Step", TempNPRTotalDiscBenItemBuffer."Benefit List Code");
+            AddItemLine(Item, TempItemReference, ItemIdentifierType::ItemNo, TempNPRTotalDiscBenItemBuffer.Quantity, UnitPrice, '', '', '', POSSession, FrontEnd, true, TempNPRTotalDiscBenItemBuffer."Total Discount Code", TempNPRTotalDiscBenItemBuffer."Total Discount Step", TempNPRTotalDiscBenItemBuffer."Benefit List Code", '');
         until TempNPRTotalDiscBenItemBuffer.Next() = 0;
     end;
 }

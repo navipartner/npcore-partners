@@ -1133,7 +1133,8 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
                                          StrSubstNo('%1 / %2', ExternalTicketNumber, AdmissionCode), // CustomDescription2,
                                          '',
                                          POSSession,
-                                         FrontEnd);
+                                         FrontEnd,
+                                         '');
 
         if (LastLineNo = SaleLine.GetNextLineNo()) then
             Error('');

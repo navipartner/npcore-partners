@@ -33,7 +33,7 @@ codeunit 88103 "NPR BCPT Library - POS Mock"
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd, ''); // Insert step of item action
     end;
 
     procedure PayAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; PaymentMethod: Code[10]; Amount: Decimal; VoucherNo: Text; PostSaleImmediately: Boolean): Boolean

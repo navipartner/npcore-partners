@@ -16,7 +16,7 @@
         POSEntry.Modify();
         Commit();
 
-        if (not POSPostItemEntries.PostAssemblyOrders(POSEntry, false)) then
+        if (not POSPostItemEntries.PostAssemblyOrders(POSEntry, true)) then
             exit;
 
         POSPostItemEntries.Run(POSEntry);
