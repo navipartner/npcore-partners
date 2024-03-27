@@ -364,6 +364,7 @@
         POSEntrySalesLine."Item Category Code" := POSSaleLine."Item Category Code";
 
         POSEntrySalesLine."Serial No." := POSSaleLine."Serial No.";
+        POSEntrySalesLine."Lot No." := POSSaleLine."Lot No.";
         POSEntrySalesLine."Retail Serial No." := POSSaleLine."Serial No. not Created";
         POSEntrySalesLine."Return Reason Code" := POSSaleLine."Return Reason Code";
         POSEntrySalesLine."NPRE Seating Code" := POSSaleLine."NPRE Seating Code";

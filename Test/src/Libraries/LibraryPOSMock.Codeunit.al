@@ -105,7 +105,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', '', POSSession, FrontEnd, ''); // Insert step of item action
     end;
 
     procedure CreateItemLineWithSerialNo(POSSession: Codeunit "NPR POS Session"; ItemNo: Text; Quantity: Decimal; SerialNo: Text)
@@ -120,7 +120,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
         Item.Get(ItemNo);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', SerialNo, POSSession, FrontEnd); // Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, Quantity, 0, '', '', SerialNo, POSSession, FrontEnd, ''); // Insert step of item action
     end;
 
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; Quantity: Decimal)
@@ -131,7 +131,7 @@ codeunit 85003 "NPR Library - POS Mock"
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd); // Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, Quantity, 0, '', '', '', POSSession, FrontEnd, ''); // Insert step of item action
     end;
 
     procedure CreateItemLine(POSSession: Codeunit "NPR POS Session"; Item: Record Item; ItemReference: Record "Item Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitPrice: Decimal; CustomDescription: Text; CustomDescription2: Text; InputSerial: Text)
@@ -142,7 +142,7 @@ codeunit 85003 "NPR Library - POS Mock"
     begin
         POSSession.GetFrontEnd(FrontEnd, true);
         POSSession.GetSale(POSSale);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd); // Insert step of item action
+        POSActionInsertItem.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitPrice, CustomDescription, CustomDescription2, InputSerial, POSSession, FrontEnd, ''); // Insert step of item action
     end;
 
     procedure LookupItem(POSSession: Codeunit "NPR POS Session"; ItemView: Text; LocationFilterOption: Integer; var Item: Record Item)

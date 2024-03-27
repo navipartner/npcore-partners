@@ -599,6 +599,7 @@
         TotalItemAmountInclVat: Decimal;
         ErrReturnCashExceeded: Label 'Return cash exceeded. Create credit voucher instead.';
         ErrSerialNumberRequired: Label 'Serial Number must be supplied for Item %1 - %2';
+        ErrLotNoRequired: Label 'Lot No. must be supplied for Item %1 - %2';
         Level: Integer;
         ErrNoLines: Label 'Cannot end a sale with no lines';
     begin
@@ -685,6 +686,10 @@
                     if ItemTrackingSetup."Serial No. Info Required" then begin
                         SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
                         SerialNoInfo.TestField(Blocked, false);
+                    end;
+                    if ItemTrackingSetup."Lot No. Required" then begin
+                        if SaleLinePOS."Lot No." = '' then
+                            Error(ErrLotNoRequired, SaleLinePOS."No.", SaleLinePOS.Description);
                     end;
                 end else begin
                     if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then

@@ -186,9 +186,12 @@
 
         Item.SetRange("Variant Filter", TempSaleLinePOS."Variant Code");
         Item.SetRange("Location Filter", TempSaleLinePOS."Location Code");
-        if TempSaleLinePOS."Serial No." <> '' then
-            if SpecificItemTrackingExist(Item) then
+        if SpecificItemTrackingExist(Item) then begin
+            if TempSaleLinePOS."Serial No." <> '' then
                 Item.SetRange("Serial No. Filter", TempSaleLinePOS."Serial No.");
+            if TempSaleLinePOS."Lot No." <> '' then
+                Item.SetRange("Lot No. Filter", TempSaleLinePOS."Lot No.");
+        end;
         Item.CalcFields(Inventory);
         exit(Item.Inventory);
     end;
@@ -263,6 +266,8 @@
         if not ItemTrackingCode.Get(Item."Item Tracking Code") then
             exit(false);
         if ItemTrackingCode."SN Specific Tracking" then
+            exit(true);
+        if ItemTrackingCode."Lot Specific Tracking" then
             exit(true);
         exit(false);
     end;

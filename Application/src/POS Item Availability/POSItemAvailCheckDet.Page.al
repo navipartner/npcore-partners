@@ -35,6 +35,11 @@ page 6059852 "NPR POS Item Avail. Check Det."
                     ToolTip = 'Specifies the location Code the item is to be taken from.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Lot No."; Rec."Lot No.")
+                {
+                    ToolTip = 'Specifies a Lot No. of the item.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ToolTip = 'Specifies the unit of measure code all the quantities are calculated in.';

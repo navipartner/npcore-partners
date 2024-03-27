@@ -19,6 +19,7 @@
         OneDocPerSalesTicketErr: Label 'Only one sales document can be created per sales ticket';
         OrderType: Integer;
         Text000013: Label 'Serial number must be supplied for item %1 - %2';
+        Text000014: Label 'Lot No. must be supplied for item %1 - %2';
         TransferSalesPerson: Boolean;
         TransferPostingSetup: Boolean;
         TransferDimensions: Boolean;
@@ -472,6 +473,7 @@
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
+        LotNoInfo: Record "Lot No. Information";
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
 #ENDIF
@@ -520,7 +522,7 @@
                     TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
                     SalesLine.Modify();
                 end;
-                if SaleLinePOS."Serial No." <> '' then begin
+                if (SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '') then begin
                     ReservationEntry.SetCurrentKey("Entry No.", Positive);
                     ReservationEntry.SetRange(Positive, false);
                     if ReservationEntry.Find('+') then;
@@ -540,6 +542,8 @@
                     ReservationEntry."Source Ref. No." := SalesLine."Line No.";
                     ReservationEntry."Expected Receipt Date" := 0D;
                     ReservationEntry."Serial No." := SaleLinePOS."Serial No.";
+                    ReservationEntry."Lot No." := SaleLinePOS."Lot No.";
+                    ReservationEntry."Variant Code" := SaleLinePOS."Variant Code";
                     ReservationEntry."Qty. per Unit of Measure" := SalesLine.Quantity;
                     ReservationEntry.Quantity := -SalesLine.Quantity;
                     ReservationEntry."Qty. to Handle (Base)" := -SalesLine.Quantity;
@@ -562,6 +566,14 @@
                             SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
                             SerialNoInfo.TestField(Blocked, false);
                         end;
+                        if ItemTrackingSetup."Lot No. Required" then begin
+                            if SaleLinePOS."Lot No." = '' then
+                                Error(Text000014, SaleLinePOS."No.", SaleLinePOS.Description);
+                        end;
+                        if ItemTrackingSetup."Lot No. Info Required" then begin
+                            LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.");
+                            LotNoInfo.TestField(Blocked, false);
+                        end
                     end else begin
                         if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
                             SerialNoInfo.TestField(Blocked, false);

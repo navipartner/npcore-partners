@@ -167,7 +167,10 @@
         Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
 
         if (Line."Line Type" = Line."Line Type"::Item) and (Line."Variant Code" = '') then begin
-            Line."Variant Code" := FillVariantThroughLookUp(Line."No.", Rec."Location Code");
+            if Line."Lot No." <> '' then
+                Line."Variant Code" := FillVariantLotNoThroughLookUp(Line."No.", Rec."Location Code", Line."Lot No.")
+            else
+                Line."Variant Code" := FillVariantThroughLookUp(Line."No.", Rec."Location Code");
             Rec.SetSkipUpdateDependantQuantity(Line."Variant Code" <> '');
         end;
 
@@ -226,6 +229,9 @@
         if Line."Serial No." <> '' then
             Rec.Validate("Serial No.", Line."Serial No.");
         Rec.Validate("Serial No. not Created", Line."Serial No. not Created");
+
+        If Line."Lot No." <> '' then
+            Rec.Validate("Lot No.", Line."Lot No.");
 
         Rec."Benefit Item" := Line."Benefit Item";
         Rec."Total Discount Code" := Line."Total Discount Code";
@@ -552,6 +558,29 @@
         end;
     end;
 
+    procedure FillVariantLotNoThroughLookUp(ItemNo: Code[20]; LocationCode: Code[10]; LotNo: Code[50]): Code[10]
+    var
+        ItemVariantBuffer: Record "NPR Item Variant Buffer";
+        SentryScope: Codeunit "NPR Sentry Scope";
+        SentryActiveSpan: Codeunit "NPR Sentry Span";
+        SentryVariantLookupSpan: Codeunit "NPR Sentry Span";
+    begin
+        FillVariantLotNoBuffer(ItemNo, ItemVariantBuffer, LotNo);
+        if ItemVariantBuffer.IsEmpty() then
+            exit('');
+
+        if SentryScope.TryGetActiveSpan(SentryActiveSpan) then
+            SentryActiveSpan.StartChildSpan('bc.item_variant_lookup', 'bc.item_variant_lookup', SentryVariantLookupSpan);
+        ItemVariantBuffer.SetRange("Location Filter", LocationCode);
+        if Page.RunModal(Page::"NPR Item Variants Lookup", ItemVariantBuffer) = ACTION::LookupOK then begin
+            SentryVariantLookupSpan.Finish();
+            exit(ItemVariantBuffer.Code);
+        end else begin
+            Error(ITEM_REQUIRES_VARIANT, ItemNo);
+        end;
+    end;
+
+
     local procedure FillVariantBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer")
     var
         ItemVariantsQuery: Query "NPR Item Variants";
@@ -560,13 +589,47 @@
         ItemVariantsQuery.Open();
 
         while ItemVariantsQuery.Read() do begin
-            TempItemVariantBuffer.Init();
-            TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
-            TempItemVariantBuffer.Description := ItemVariantsQuery.Description;
-            TempItemVariantBuffer."Description 2" := ItemVariantsQuery.Description_2;
-            TempItemVariantBuffer."Item No." := ItemNo;
-            TempItemVariantBuffer.Insert();
+            TempItemVariantBuffer.SetRange(Code, ItemVariantsQuery.Code);
+            TempItemVariantBuffer.SetRange("Item No.", ItemNo);
+            if TempItemVariantBuffer.IsEmpty() then begin
+                TempItemVariantBuffer.Init();
+                TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
+                TempItemVariantBuffer.Description := ItemVariantsQuery.Description;
+                TempItemVariantBuffer."Description 2" := ItemVariantsQuery.Description_2;
+                TempItemVariantBuffer."Item No." := ItemNo;
+                TempItemVariantBuffer.Insert();
+            end;
         end;
+        TempItemVariantBuffer.Reset();
+        ItemVariantsQuery.Close();
+    end;
+
+    local procedure FillVariantLotNoBuffer(ItemNo: Code[20]; var TempItemVariantBuffer: Record "NPR Item Variant Buffer"; LotNo: Code[50])
+    var
+        ItemVariantsQuery: Query "NPR Item Variants";
+    begin
+        ItemVariantsQuery.SetRange(Item_No_, ItemNo);
+        ItemVariantsQuery.SetFilter(Open, '=%1', true);
+        ItemVariantsQuery.SetFilter(Lot_No_, '=%1', LotNo);
+        ItemVariantsQuery.SetFilter(Remaining_Quantity, '>%1', 0);
+        ItemVariantsQuery.Open();
+
+        TempItemVariantBuffer.Reset();
+        if not TempItemVariantBuffer.IsEmpty() then
+            TempItemVariantBuffer.DeleteAll();
+
+        while ItemVariantsQuery.Read() do begin
+            if not TempItemVariantBuffer.Get(ItemVariantsQuery.Code,ItemNo,ItemVariantsQuery.Lot_No_) then begin
+                TempItemVariantBuffer.Init();
+                TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
+                TempItemVariantBuffer.Description := ItemVariantsQuery.Description;
+                TempItemVariantBuffer."Description 2" := ItemVariantsQuery.Description_2;
+                TempItemVariantBuffer."Item No." := ItemNo;
+                TempItemVariantBuffer."Lot No." := ItemVariantsQuery.Lot_No_;
+                TempItemVariantBuffer.Insert();
+            end;
+        end;
+        TempItemVariantBuffer.Reset();
         ItemVariantsQuery.Close();
     end;
 

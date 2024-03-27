@@ -135,6 +135,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS."Currency Amount" := -POSSalesLine."Amount Excl. VAT";
         SaleLinePOS."Amount Including VAT" := -POSSalesLine."Amount Incl. VAT";
         SaleLinePOS."Serial No." := POSSalesLine."Serial No.";
+        SaleLinePOS."Lot No." := POSSalesLine."Lot No.";
         SaleLinePOS."Discount Type" := POSSalesLine."Discount Type";
         SaleLinePOS."Discount Code" := CopyStr(POSSalesLine."Discount Code", 1, MaxStrLen(SaleLinePOS."Discount Code"));
         SaleLinePOS."Gen. Bus. Posting Group" := POSSalesLine."Gen. Bus. Posting Group";

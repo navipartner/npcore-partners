@@ -88,6 +88,11 @@ table 6014636 "NPR POS Item Availability"
             DecimalPlaces = 0 : 5;
             DataClassification = CustomerContent;
         }
+        field(90; "Lot No."; Code[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Lot No.';
+        }
         field(1000; "Inventory Shortage"; Decimal)
         {
             Caption = 'Inventory Shortage';
