@@ -697,7 +697,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         exit(true);
     end;
 
-    local procedure HandlerCode(): Text[20]
+    internal procedure HandlerCode(): Text[20]
     var
         HandlerCodeTxt: Label 'NO_LOVDATA', Locked = true, MaxLength = 20;
     begin

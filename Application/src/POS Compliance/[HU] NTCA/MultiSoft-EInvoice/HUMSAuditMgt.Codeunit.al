@@ -76,7 +76,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         exit(true);
     end;
 
-    local procedure HandlerCode(): Text[20]
+    internal procedure HandlerCode(): Text[20]
     var
         HandlerCodeTxt: Label 'HU_MULTISOFTEINVOICE', Locked = true, MaxLength = 20;
     begin
