@@ -49,6 +49,11 @@ enum 6014604 "NPR Nc IL Lookup Handler" implements "NPR Nc Import List ILookup"
         Implementation = "NPR Nc Import List ILookup" = "NPR NpCs Lookup Sales Document";
     }
 
-
-
+#if not BC17
+    value(80; "Spfy Order Lookup")
+    {
+        Caption = 'Shopify Order - Lookup';
+        Implementation = "NPR Nc Import List ILookup" = "NPR Spfy Order Lookup";
+    }
+#endif
 }

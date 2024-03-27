@@ -12,6 +12,7 @@
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         JobTimeout: Duration;
         NotifProfileCodeOnError: Code[20];
+        StoreCode: Code[20];
         AutoRescheduleOnErrorDelaySec: Integer;
         AutoRescheduleOnError: Boolean;
         ShowAutoCreatedClause: Boolean;
@@ -36,6 +37,7 @@
         JobQueueDescription: Text;
         Handled: Boolean;
         JobQueueDescrLbl: Label '%1 Task List processing';
+        JobQueueDescrWithStoreLbl: Label '%1 (%2) Task List processing';
     begin
         if JobQueueCatagoryCode = '' then
             JobQueueCatagoryCode := NcSetupMgt.DefaultNCJQCategoryCode(NcSetupMgt.TaskListProcessingCodeunit());
@@ -51,13 +53,18 @@
 
         Clear(JQParamStrMgt);
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcTaskListProcessing.ParamProcessor(), TaskProcessorCode));
+        if StoreCode <> '' then begin
+            JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcTaskListProcessing.ParamStoreCode(), StoreCode));
+            JobQueueDescription := StrSubstNo(JobQueueDescrWithStoreLbl, TaskProcessorCode, StoreCode);
+            Clear(StoreCode);
+        end else
+            JobQueueDescription := StrSubstNo(JobQueueDescrLbl, TaskProcessorCode);
         if EnableTaskListUpdate then
             JQParamStrMgt.AddToParamDict(NcTaskListProcessing.ParamUpdateTaskList());
         JQParamStrMgt.AddToParamDict(NcTaskListProcessing.ParamProcessTaskList());
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcTaskListProcessing.ParamMaxRetry(), 3));
         OnScheduleNcTaskProcessing_OnAfterInitParameterList(TaskProcessorCode, JobQueueCatagoryCode, JQParamStrMgt);
 
-        JobQueueDescription := StrSubstNo(JobQueueDescrLbl, TaskProcessorCode);
         if ShowAutoCreatedClause then
             JobQueueDescription := StrSubstNo(GetAutoRecreateNoteTxt(), JobQueueDescription);
 
@@ -448,7 +455,7 @@
         exit(CurrentDateTime() + NoOfSeconds * 1000);
     end;
 
-    internal procedure DaysToDuration(NoOfDays: Integer): Duration
+    procedure DaysToDuration(NoOfDays: Integer): Duration
     begin
         exit(NoOfDays * 86400000);
     end;
@@ -915,6 +922,11 @@
     local procedure HasNeverBeenRunDT(): DateTime
     begin
         exit(CreateDateTime(DMY2Date(1, 1, 2000), 0T));
+    end;
+
+    internal procedure SetStoreCode(NewStoreCode: Code[20])
+    begin
+        StoreCode := NewStoreCode;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeCalcNextRunTimeForRecurringJob', '', true, false)]

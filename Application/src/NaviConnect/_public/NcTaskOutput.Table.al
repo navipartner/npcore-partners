@@ -48,6 +48,23 @@
             Caption = 'Response';
             DataClassification = CustomerContent;
         }
+        field(200; "Record ID"; RecordId)
+        {
+            Caption = 'Record ID';
+            DataClassification = CustomerContent;
+        }
+        field(210; Status; Option)
+        {
+            Caption = 'Status';
+            OptionMembers = " ",Success,Error;
+            OptionCaption = ' ,Success,Error';
+            DataClassification = CustomerContent;
+        }
+        field(220; "Error Message"; Text[250])
+        {
+            Caption = 'Error Message';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Task Exists"; Boolean)
         {
             CalcFormula = Exist("NPR Nc Task" WHERE("Entry No." = FIELD("Task Entry No.")));

@@ -8,7 +8,6 @@
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -17,111 +16,103 @@
             {
                 field("Document Table No."; Rec."Document Table No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Document Table No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-
                     ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Payment Type"; Rec."Payment Type")
                 {
-
                     ToolTip = 'Specifies the value of the Payment Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account Type"; Rec."Account Type")
                 {
-
                     ToolTip = 'Specifies the value of the Account Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Account No."; Rec."Account No.")
                 {
-
                     ToolTip = 'Specifies the value of the Account No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("No."; Rec."No.")
                 {
-
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Amount; Rec.Amount)
                 {
-
                     ToolTip = 'Specifies the value of the Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Adjust Amount"; Rec."Allow Adjust Amount")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Allow Adjust Amount field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
-
                     ToolTip = 'Specifies the value of the Posting Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field(Posted; Rec.Posted)
                 {
-
                     ToolTip = 'Specifies the value of the Posted field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("External Reference No."; Rec."External Reference No.")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the External Reference No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Date Captured"; Rec."Date Captured")
                 {
-
                     ToolTip = 'Specifies the value of the Date Captured field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Charge ID"; Rec."Charge ID")
                 {
-
                     ToolTip = 'Specifies the value of the Charge ID';
                     ApplicationArea = NPRRetail;
                 }
                 field("Transaction ID"; Rec."Transaction ID")
                 {
-
                     ToolTip = 'Specifies the value of the Transaction ID';
                     ApplicationArea = NPRRetail;
                 }
                 field("Date Refunded"; Rec."Date Refunded")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Date Refunded field';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Spfy Payment Transaction ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                {
+                    Caption = 'Shopify Transaction ID';
+                    Editable = false;
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies Shopify payment transaction ID.';
+                }
+#endif
             }
         }
         area(factboxes)
@@ -129,7 +120,6 @@
             systempart(Control50000; Notes)
             {
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
@@ -147,7 +137,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = CaptureEnabled;
-
                 ToolTip = 'Executes the Capture Payment action';
                 ApplicationArea = NPRRetail;
 
@@ -177,7 +166,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = RefundEnabled;
-
                 ToolTip = 'Executes the Refund Payment action';
                 ApplicationArea = NPRRetail;
 
@@ -207,7 +195,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 Visible = (Rec."Document Table No." = 112) AND (Rec."Account No." <> '') AND (NOT Rec.Posted);
-
                 ToolTip = 'Executes the Post Payment action';
                 ApplicationArea = NPRRetail;
 
@@ -270,7 +257,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Document Card action';
                 ApplicationArea = NPRRetail;
 
@@ -290,6 +276,9 @@
     end;
 
     var
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#endif
         CapturePaymentAgainQst: Label 'Payment has already been Captured\Capture Again?';
         CaptureEnabled: Boolean;
         RefundEnabled: Boolean;

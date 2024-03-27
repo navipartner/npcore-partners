@@ -150,7 +150,6 @@
             CalcFormula = count("Sales Header" where("Shipped Not Invoiced" = filter(true)));
             Editable = false;
         }
-
         field(107; "Failed imports"; Integer)
         {
             Caption = 'Failed imports in the import list';
@@ -191,6 +190,15 @@
             FieldClass = FlowField;
             CalcFormula = count("Purchase Header" where("Document Type" = filter(Order)));
         }
+#if not BC17
+        field(200; "Spfy CC Orders - Unproc."; Integer)
+        {
+            Caption = 'Unprocessed Shopify CC Orders';
+            FieldClass = FlowField;
+            CalcFormula = Count("NPR Spfy C&C Order" where(Status = const(Error)));
+            Editable = false;
+        }
+#endif
     }
 
     keys
@@ -207,4 +215,3 @@
         Rec.SetFilter("Import Type Filter", ImportType.GetActionableTypeFilter());
     end;
 }
-

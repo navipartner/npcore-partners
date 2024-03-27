@@ -16,25 +16,31 @@
             {
                 field(Name; Rec.Name)
                 {
-
                     ToolTip = 'Specifies the value of the Name field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Modified at"; Rec."Last Modified at")
                 {
-
                     ToolTip = 'Specifies the value of the Last Modified at field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Count"; Rec."Process Count")
                 {
-
                     ToolTip = 'Specifies the value of the Process Count field';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field("Spfy Status"; Rec.Status)
+                {
+                    ToolTip = 'Specifies the status of the task output entry.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("Spfy Error Message"; Rec."Error Message")
+                {
+                    ToolTip = 'Specifies the error message, if the task output entry execution failed.';
+                    ApplicationArea = NPRShopify;
+                }
                 field("Entry No."; Rec."Entry No.")
                 {
-
                     ToolTip = 'Specifies the value of the Entry No. field';
                     ApplicationArea = NPRNaviConnect;
                 }
@@ -47,7 +53,6 @@
                     ShowCaption = false;
                     field(" "; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -57,7 +62,6 @@
                     }
                     field(Control6151420; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -67,7 +71,6 @@
                     }
                     field(Control6151419; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -77,7 +80,6 @@
                     }
                     field(Control6151418; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -87,7 +89,6 @@
                     }
                     field(Control6151417; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -97,7 +98,6 @@
                     }
                     field(Control6151416; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -107,7 +107,6 @@
                     }
                     field(Control6151415; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -117,7 +116,6 @@
                     }
                     field(Control6151414; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -127,7 +125,6 @@
                     }
                     field(Control6151413; '')
                     {
-
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
@@ -141,7 +138,6 @@
                     ShowCaption = false;
                     field(Control6151409; '')
                     {
-
                         Caption = 'Response:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
@@ -150,7 +146,6 @@
                     }
                     field(ResponseText; ResponseText)
                     {
-
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
@@ -174,7 +169,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Output action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -229,4 +223,3 @@
         end;
     end;
 }
-

@@ -801,9 +801,9 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     begin
         if TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode() then
             exit;
+        Handled := true;
         if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
             exit;
-        Handled := true;
         if TempDataLogRecord.FindSet() then
             repeat
                 NewTasksInserted := ProcessDataLogRecord(TempDataLogRecord, false) or NewTasksInserted;

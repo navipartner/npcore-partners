@@ -9,10 +9,11 @@ codeunit 6151398 "NPR HL Data Log Subscr. Mgt."
         HLDataLogSubscrMgt.AddDataLogSetupEntity(IntegrationArea, TableId, LogInsertion, LogModification, LogDeletion, KeepLogFor);
     end;
 
+    [Obsolete('Use Codeunit::[NPR Job Queue Management].DaysToDuration(NoOfDays: Integer) instead', 'NPR32.0')]
     procedure DaysToDuration(NoOfDays: Integer): Duration
     var
-        HLDataLogSubscrMgt: Codeunit "NPR HL DLog Subscr. Mgt. Impl.";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
-        exit(HLDataLogSubscrMgt.DaysToDuration(NoOfDays));
+        exit(JobQueueMgt.DaysToDuration(NoOfDays));
     end;
 }

@@ -48,6 +48,13 @@
             Editable = false;
             FieldClass = FlowField;
         }
+#if not BC17
+        field(60; "Spfy Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            TableRelation = Customer;
+        }
+#endif
     }
 
     keys

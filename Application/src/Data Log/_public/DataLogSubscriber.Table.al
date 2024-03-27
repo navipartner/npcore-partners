@@ -115,5 +115,14 @@
         "Last Log Entry No." := 0;
         Insert();
     end;
-}
 
+    internal procedure IsEnabled(): Boolean
+    var
+        DataLogSubMgt: Codeunit "NPR Data Log Sub. Mgt.";
+        SubscriberEnabled: Boolean;
+    begin
+        SubscriberEnabled := true;
+        DataLogSubMgt.OnCheckIfDataLogSubscriberIsEnabled(Rec, SubscriberEnabled);
+        exit(SubscriberEnabled);
+    end;
+}

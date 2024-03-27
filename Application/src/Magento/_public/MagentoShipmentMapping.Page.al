@@ -6,7 +6,6 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
 
-
     layout
     {
         area(content)
@@ -15,7 +14,6 @@
             {
                 field("External Shipment Method Code"; Rec."External Shipment Method Code")
                 {
-
                     ToolTip = 'Specifies the value of the External Shipment Method Code field';
                     ApplicationArea = NPRRetail;
                 }
@@ -26,31 +24,33 @@
                 }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
-
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shipping Agent Code"; Rec."Shipping Agent Code")
                 {
-
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
                 {
-
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Spfy Location Code"; Rec."Spfy Location Code")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Shopify: specifies the location code, which will be used by default for imported Shopify orders. Alternatively, you can define location mapping for each e-commerce store.';
+                }
+#endif
                 field("Shipment Fee Type"; Rec."Shipment Fee Type")
                 {
-
                     ToolTip = 'Specifies the value of the Shipment Fee Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shipment Fee No."; Rec."Shipment Fee No.")
                 {
-
                     ToolTip = 'Specifies the value of the Shipment Fee No. field';
                     ApplicationArea = NPRRetail;
                 }

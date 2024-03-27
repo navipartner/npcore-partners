@@ -223,18 +223,20 @@
         exit(true);
     end;
 
-    internal procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; MaxRetry: Integer)
+    internal procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; StoreCode: Code[20]; MaxRetry: Integer)
     var
         Task: Record "NPR Nc Task";
         Task2: Record "NPR Nc Task";
     begin
+        SelectLatestVersion();
         if MaxRetry < 1 then
             MaxRetry := 1;
-
         SyncEndTime := CurrentDateTime() + GetMaxSyncDuration();
 
         Task.SetCurrentKey("Task Processor Code", Processed);
         Task.SetRange("Task Processor Code", TaskProcessor.Code);
+        if StoreCode <> '' then
+            Task.SetRange("Store Code", StoreCode);
         Task.SetRange(Processed, false);
         Task.SetFilter("Process Count", '<%1', MaxRetry);
         if Task.FindSet() then

@@ -2,6 +2,34 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 {
     layout
     {
+#if not BC17
+        addafter("No.")
+        {
+            field("NPR Spfy Customer ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            {
+                Caption = 'Shopify Customer ID';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                AssistEdit = true;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify ID assigned to the customer.';
+
+                trigger OnAssistEdit()
+                var
+                    ChangeShopifyID: Page "NPR Spfy Change Assigned ID";
+                begin
+                    CurrPage.SaveRecord();
+                    Commit();
+
+                    Clear(ChangeShopifyID);
+                    ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    ChangeShopifyID.RunModal();
+
+                    CurrPage.Update(false);
+                end;
+            }
+        }
+#endif
         addafter(AdjProfitPct)
         {
             field("NPR To Anonymize On"; Rec."NPR To Anonymize On")
@@ -251,6 +279,10 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
         ToAnonymizeEditable: Boolean;
         ITAuxCustomer: Record "NPR IT Aux Customer";
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 
     trigger OnAfterGetRecord()
     begin
@@ -267,7 +299,14 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
 
     trigger OnOpenPage()
+#if not BC17
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+#endif
 
         ToAnonymizeEditable := false;
 

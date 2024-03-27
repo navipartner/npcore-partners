@@ -60,6 +60,27 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
+#if not BC17
+        addafter("External Document No.")
+        {
+            field("NPR Spfy Order ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            {
+                Caption = 'Shopify Order ID';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify Oder ID assigned to the document.';
+            }
+            field("NPR Shopify Store Code"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"))
+            {
+                Caption = 'Shopify Store Code';
+                Editable = false;
+                Visible = ShopifyIntegrationIsEnabled;
+                ApplicationArea = NPRShopify;
+                ToolTip = 'Specifies the Shopify store the document has been created at.';
+            }
+        }
+#endif
     }
     actions
     {
@@ -137,13 +158,25 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#endif
         OIOUBLInstalled: Boolean;
+#if not BC17
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 
     trigger OnOpenPage()
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
+#if not BC17
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
         OIOUBLInstalled := OIOUBLSetup.IsOIOUBLInstalled();
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+#endif
     end;
 
     trigger OnAfterGetCurrRecord()
