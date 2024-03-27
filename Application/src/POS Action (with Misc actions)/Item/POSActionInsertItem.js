@@ -13,7 +13,7 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         if (context.desc2 === null) return;
     }
 
-    var { bomComponentLinesWithoutSerialNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows, ticketToken } = await workflow.respond("addSalesLine");
+    var { bomComponentLinesWithoutSerialLotNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt,requiresLotNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows,ticketToken } = await workflow.respond("addSalesLine");
 
     if (ticketToken) {
         let r = await popup.entertainment.scheduleSelection({ token: ticketToken });
@@ -35,12 +35,17 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
             context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
             if (context.serialNoInput === null) return;
         }
+        if (requiresLotNoInputPrompt) {
+            context.lotNoInput = await popup.input({ title: captions.itemTrackingLotNo_title, caption: captions.itemTrackingLot_lead })
+            if (context.lotNoInput === null) return;
+        }
 
         context.additionalInformationCollected = true;
-        var { bomComponentLinesWithoutSerialNo, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
+        var { bomComponentLinesWithoutSerialLotNo, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
+        
     }
 
-    await processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions);
+    await processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWithoutSerialLotNo, workflow, context, parameters, popup, captions);
 
     if (addItemAddOn) {
         await workflow.run('RUN_ITEM_ADDONS', { context: { baseLineNo: baseLineNo }, parameters: { SkipItemAvailabilityCheck: true } });
@@ -57,10 +62,11 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
     };
 }
 
-async function processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutSerialNo, workflow, context, parameters, popup, captions) {
-    if (!bomComponentLinesWithoutSerialNo) return
+async function processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWithoutSerialLotNo, workflow, context, parameters, popup, captions) {
+    if (!bomComponentLinesWithoutSerialLotNo) return
+    debugger;
 
-    for (var i = 0; i < bomComponentLinesWithoutSerialNo.length; i++) {
+    for (var i = 0; i < bomComponentLinesWithoutSerialLotNo.length; i++) {
 
         let continueExecution = true;
         let response;
@@ -69,29 +75,44 @@ async function processBomComponentLinesWithoutSerialNo(bomComponentLinesWithoutS
             continueExecution = false;
 
             context.serialNoInput = '';
-            context.bomComponentLineWithoutSerialNo = bomComponentLinesWithoutSerialNo[i];
-
-            if (parameters.SelectSerialNo && context.bomComponentLineWithoutSerialNo.requiresSpecificSerialNo) {
-                response = await workflow.respond("assignSerialNo");
-
-                if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
-                    if (await popup.confirm({ title: captions.serialNoError_title, caption: response.assignSerialNoSuccessErrorText })) continueExecution = true;
-                }
-            }
-            else {
-                context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, context.bomComponentLineWithoutSerialNo.description, context.bomComponentLineWithoutSerialNo.parentBOMDescription) })
-
-                if (context.serialNoInput) {
+            context.lotNoInput = '';
+            context.bomComponentLineWithoutSerialLotNo = bomComponentLinesWithoutSerialLotNo[i];
+            
+            if(context.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput){
+                if (parameters.SelectSerialNo && context.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo) {
                     response = await workflow.respond("assignSerialNo");
 
                     if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
                         if (await popup.confirm({ title: captions.serialNoError_title, caption: response.assignSerialNoSuccessErrorText })) continueExecution = true;
                     }
                 }
+                else {                
+                    context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, context.bomComponentLineWithoutSerialLotNo.description, context.bomComponentLineWithoutSerialLotNo.parentBOMDescription) })
+
+                    if (context.serialNoInput) {
+                        response = await workflow.respond("assignSerialNo");
+
+                        if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
+                            if (await popup.confirm({ title: captions.serialNoError_title, caption: response.assignSerialNoSuccessErrorText })) continueExecution = true;
+                        }
+                    }
+                }
+            }
+            if (context.bomComponentLineWithoutSerialLotNo.requiresLotNoInput) {
+                context.lotNoInput = await popup.input({ title: captions.ItemTrackingLot_TitleLbl, caption: format(captions.bomItemTrackingLot_Lead, context.bomComponentLineWithoutSerialLotNo.description, context.bomComponentLineWithoutSerialLotNo.parentBOMDescription) })
+
+                if (context.lotNoInput) {
+                    response = await workflow.respond("assignLotNo");
+
+                    if (!response.assignLotNoSuccess && response.assignLotNoSuccessErrorText) {
+                        if (await popup.confirm({ title: captions.lotNoError_title, caption: response.assignLotNoSuccessErrorText })) continueExecution = true;
+                    }
+                }
             }
         }
     }
 }
+
 
 function format(fmt, ...args) {
     if (!fmt.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/)) {

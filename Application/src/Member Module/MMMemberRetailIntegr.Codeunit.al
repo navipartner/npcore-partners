@@ -1065,7 +1065,7 @@
         JObject.Get('m', JToken);
         PreloadMemberInfoBuffer(PosSale."Sales Ticket No.", SaleLine.GetNextLineNo(), Item."No.", JToken.AsArray());
 
-        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, 1, 0, '', '', '', POSSession, FrontEnd);
+        POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType::ItemNo, 1, 0, '', '', '', POSSession, FrontEnd, '');
     end;
 
     internal procedure PreloadMemberInfoBuffer(SalesTicketNo: Code[20]; LineNo: Integer; ItemNo: Code[20]; Members: JsonArray)

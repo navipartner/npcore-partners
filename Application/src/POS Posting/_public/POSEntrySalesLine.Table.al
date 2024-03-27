@@ -575,7 +575,7 @@
             Caption = 'Serial No.';
             DataClassification = CustomerContent;
         }
-        field(6501; "Lot No."; Code[20])
+        field(6501; "Lot No."; Code[50])
         {
             Caption = 'Lot No.';
             DataClassification = CustomerContent;

@@ -91,6 +91,8 @@
             exit(true);
         if ItemTrackingCode."SN Sales Outbound Tracking" then
             exit(true);
+        if ItemTrackingCode."Lot Specific Tracking" then
+            exit(true);
         exit(false);
     end;
 
@@ -150,6 +152,7 @@
                 FromSaleLineToSaleLinePOS(SalesLine, SaleLinePOS);
 
                 SaleLinePOS."Serial No." := ReservationEntry."Serial No.";
+                SaleLinePOS."Lot No." := ReservationEntry."Lot No.";
                 POSSaleLine.InsertLineRaw(SaleLinePOS, false);
                 SaleLinePOS.SetSkipCalcDiscount(false);
 

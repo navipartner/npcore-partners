@@ -7,6 +7,7 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
         _SerialSelectionFromList: Boolean;
         _FunctionToExecute: Text;
         _SerialNoInput: Text[50];
+        _LotNoInput: Text[50];
         _POSStore: Record "NPR POS Store";
 
 
@@ -15,6 +16,8 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
         case UpperCase(_FunctionToExecute) of
             UpperCase('AssignSerialNo'):
                 AssingSerialNo();
+            UpperCase('AssignLotNo'):
+                AssignLotNo();
 
         end;
     end;
@@ -100,5 +103,30 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
 
     end;
     #endregion AssingSerialNo
+
+    #region AssignLotNo
+    local procedure AssignLotNo()
+    var
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+    begin
+        POSActionInsertItemB.AssignLotNo(_SaleLinePOS,
+                                            _LotNoInput,
+                                            _POSStore);
+
+    end;
+    #endregion AssignLot
+    #region SetLotNoInput
+    internal procedure SetLotNoInput(LotNoInput: Text[50])
+    begin
+        _LotNoInput := LotNoInput;
+    end;
+    #endregion SetLotNoInput
+
+    #region GetLotNoInput
+    internal procedure GetLotNoInput(var LotNoInput: Text[50])
+    begin
+        LotNoInput := _LotNoInput;
+    end;
+    #endregion GetLotNoInput
 
 }

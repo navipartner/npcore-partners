@@ -26,7 +26,8 @@
         {
             CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
                                                                   "Location Code" = FIELD("Location Filter"),
-                                                                  "Variant Code" = FIELD("Code")));
+                                                                  "Variant Code" = FIELD("Code"),
+                                                                  "Lot No." = FIELD("Lot No.")));
             Caption = 'Inventory';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -42,6 +43,19 @@
             Caption = 'Location Filter';
             FieldClass = FlowFilter;
             TableRelation = Location;
+        }
+        field(7; "Lot No."; Code[50])
+        {
+            Caption = 'Lot No.';
+            DataClassification = CustomerContent;
+        }
+    }
+    keys
+    {
+
+        key(Key1; Code, "Item No.", "Lot No.")
+        {
+
         }
     }
 }

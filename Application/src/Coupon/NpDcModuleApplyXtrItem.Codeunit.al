@@ -88,6 +88,7 @@
                                 0, // UnitPrice,
                                 '', // CustomDescription,
                                 '', // CustomDescription2,
+                                '',
                                 '');
 
         if (SaleLinePOSCouponApply.FindFirst()) then begin

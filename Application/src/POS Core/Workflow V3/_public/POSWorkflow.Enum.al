@@ -1011,6 +1011,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'IT_CASH_MGT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: IT FP Cash Mgt";
     }
+    value(207; "ASSIGN_LOT_NO")
+    {
+        Caption = 'ASSIGN_LOT_NO', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Set Lot No";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;

@@ -194,6 +194,9 @@
                 if ("Serial No." <> '') then
                     Validate("Serial No.", "Serial No.");
 
+                if ("Lot No." <> '') then
+                    Validate("Lot No.", "Lot No.");
+
                 case "Line Type" of
                     "Line Type"::"POS Payment", "Line Type"::"GL Payment", "Line Type"::Rounding, "Line Type"::"Issue Voucher", "Line Type"::"Customer Deposit":
                         begin
@@ -812,6 +815,15 @@
             Caption = 'Reason Code';
             DataClassification = CustomerContent;
             TableRelation = "Reason Code";
+        }
+        field(92; "Lot No."; Code[50])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Lot No.';
+            trigger OnValidate()
+            begin
+                LotNoValidate();
+            end;
         }
         field(100; "Unit Cost"; Decimal)
         {
@@ -2121,6 +2133,71 @@
         end;
     end;
 
+    procedure CalcILEQty(ItemNo: Code[20]; LotNo: Code[50]; VariantCode: Code[10])
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Lot No.");
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange(Open, true);
+        ItemLedgerEntry.SetRange(Positive, true);
+        ItemLedgerEntry.SetRange("Lot No.", LotNo);
+        ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
+        if not ItemLedgerEntry.IsEmpty() then begin
+            ItemLedgerEntry.CalcSums("Remaining Quantity");
+            TotalItemLedgerEntryQuantity := ItemLedgerEntry."Remaining Quantity";
+        end;
+    end;
+
+    local procedure CalcExistingPOSSaleLinesQty(CurrentLine: Record "NPR POS Sale Line"; var POSSaleLineQty: Decimal);
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.Reset();
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetRange("No.", CurrentLine."No.");
+        POSSaleLine.SetFilter("Variant Code", CurrentLine."Variant Code");
+        POSSaleLine.SetRange("Lot No.", CurrentLine."Lot No.");
+        POSSaleLine.SetFilter(SystemId, '<>%1', CurrentLine.SystemId);
+        POSSaleLine.CalcSums(Quantity);
+        POSSaleLineQty := POSSaleLine.Quantity;
+    end;
+
+    procedure CalcAuditRollQty(ItemNo: Code[20]; LotNo: Code[50]; VariantCode: Code[10])
+    var
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+        POSSale: Record "NPR POS Entry";
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        POSSalesLine.Reset();
+        POSSalesLine.SetRange("Item Entry No.", 0);
+        POSSalesLine.SetRange("No.", ItemNo);
+        POSSalesLine.SetRange("Lot No.", LotNo);
+        POSSalesLine.SetFilter("Variant Code", VariantCode);
+        POSSalesLine.SetLoadFields("POS Entry No.", "Item Entry No.", "Lot No.", Quantity, "No.", "Variant Code");
+        if POSSalesLine.FindSet(false) then
+            repeat
+                POSSale.SetLoadFields("Entry No.", "Sales Document Type", "Sales Document No.");
+                POSSale.Get(POSSalesLine."POS Entry No.");
+                if POSSale."Sales Document No." <> '' then begin
+                    ReservationEntry.Reset();
+                    ReservationEntry.SetCurrentKey("Serial No.", "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line");
+                    ReservationEntry.SetRange("Source Type", Database::"Sales Line");
+                    ReservationEntry.SetRange("Source Subtype", POSSale."Sales Document Type");
+                    ReservationEntry.SetRange("Source ID", POSSale."Sales Document No.");
+                    ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Surplus);
+                    ReservationEntry.SetRange("Lot No.", POSSalesLine."Lot No.");
+                    ReservationEntry.SetRange("Item No.", POSSalesLine."No.");
+                    ReservationEntry.SetFilter("Variant Code", POSSalesLine."Variant Code");
+                    if not ReservationEntry.IsEmpty then begin
+                        ReservationEntry.CalcSums(Quantity);
+                        TotalAuditRollQuantity += -ReservationEntry.Quantity;
+                    end;
+                end else
+                    TotalAuditRollQuantity += POSSalesLine.Quantity;
+            until POSSalesLine.Next() = 0;
+    end;
+
     procedure CheckSerialNoAuditRoll(ItemNo: Code[20]; SerialNo: Code[50]; Positive: Boolean)
     var
         Err001: Label '%2 %1 is already in stock but has not been posted yet';
@@ -2950,6 +3027,39 @@
                 TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - Quantity;
                 if TotalNonAppliedQuantity > 1 then
                     Error(Txt005, "Serial No.", FieldName("Serial No."));
+            end;
+        end;
+    end;
+
+    procedure LotNoValidate()
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+        Positive: Boolean;
+        Txt004: Label '%2 %1 is not in the stock!';
+        TotalNonAppliedQuantity: Decimal;
+        POSSaleLineQty: Decimal;
+    begin
+        if Rec."Lot No." = '' then
+            exit;
+
+        TotalAuditRollQuantity := 0;
+        TotalItemLedgerEntryQuantity := 0;
+        POSSaleLineQty := 0;
+        TestField(Quantity);
+
+        GetItem();
+        _Item.TestField("Item Tracking Code");
+        ItemTrackingCode.Get(_Item."Item Tracking Code");
+        Positive := (Quantity >= 0);
+
+        if ItemTrackingCode."Lot Specific Tracking" then begin
+            CalcILEQty("No.", "Lot No.", "Variant Code");
+            CalcAuditRollQty("No.", "Lot No.", "Variant Code");
+            CalcExistingPOSSaleLinesQty(Rec, POSSaleLineQty);
+            if Positive then begin
+                TotalNonAppliedQuantity := TotalItemLedgerEntryQuantity - TotalAuditRollQuantity - POSSaleLineQty - Quantity;
+                if (TotalNonAppliedQuantity < 0) then
+                    Error(Txt004, "Lot No.", FieldName("Lot No."));
             end;
         end;
     end;

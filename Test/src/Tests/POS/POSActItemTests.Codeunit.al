@@ -54,7 +54,8 @@ codeunit 85085 "NPR POS Act. Item Tests"
                                CustomDescription2,
                                InputSerial,
                                POSSession,
-                               FrontEnd);
+                               FrontEnd,
+                               '');
 
         POSSale.GetCurrentSale(SalePOS);
 

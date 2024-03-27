@@ -24,6 +24,26 @@
             column(Description_2; "Description 2")
             {
             }
+            dataitem(Item_Ledger_Entry; "Item Ledger Entry")
+            {
+                SqlJoinType = LeftOuterJoin;
+                DataItemLink = "Variant Code" = Item_Variant.Code,
+                                "Item No." = Item_Variant."Item No.";
+                //DataItemTableFilter = Open = filter(true), "Remaining Quantity" = filter(> 0);
+
+                column(Lot_No_; "Lot No.")
+                {
+
+                }
+                filter(Open; Open)
+                {
+
+                }
+                filter(Remaining_Quantity; "Remaining Quantity")
+                {
+
+                }
+            }
         }
     }
 }

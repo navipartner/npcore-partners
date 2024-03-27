@@ -36,7 +36,7 @@ codeunit 85140 "NPR POS Act. RunItemAddOnTests"
         // [Given] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
-        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, 1, 0, '', '', '', POSSession, FrontEnd);
+        POSActionInsertItem.AddItemLine(Item, ItemReference, 0, 1, 0, '', '', '', POSSession, FrontEnd, '');
         BaseLineNo := POSActionInsertItem.GetLineNo;
         ItemAddOnNo := CreateItemAddOnTypeQuantity(Item);
 

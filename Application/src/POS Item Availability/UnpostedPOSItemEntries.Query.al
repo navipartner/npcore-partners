@@ -19,6 +19,7 @@ query 6014407 "NPR Unposted POS Item Entries"
                 column(Item_No; "No.") { }
                 column(Variant_Code; "Variant Code") { }
                 column(Serial_No; "Serial No.") { }
+                column(Lot_No; "Lot No.") { }
                 column(Sum_Quantity_Base; "Quantity (Base)")
                 {
                     Method = Sum;

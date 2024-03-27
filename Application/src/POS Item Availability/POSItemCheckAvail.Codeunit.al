@@ -96,6 +96,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         PosItemAvailability.Init();
         PosItemAvailability."Item No." := SaleLinePOS."No.";
         PosItemAvailability."Variant Code" := SaleLinePOS."Variant Code";
+        PosItemAvailability."Lot No." := SaleLinePOS."Lot No.";
         PosItemAvailability."Location Code" := SaleLinePOS."Location Code";
         PosItemAvailability."Unit of Measure Code" := SaleLinePOS."Unit of Measure Code";
         PosItemAvailability."Qty. per Unit of Measure" := SaleLinePOS."Qty. per Unit of Measure";
@@ -124,10 +125,12 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         else
             Item.SetRange("Location Filter", SaleLinePOS."Location Code");
         Item.SetRange("Variant Filter", SaleLinePOS."Variant Code");
+        Item.SetFilter("Lot No. Filter", SaleLinePOS."Lot No.");
         Item.CalcFields(Inventory, "Qty. on Sales Order");
 
         UnpostedPosItemEntries.SetRange(Item_No, SaleLinePOS."No.");
         UnpostedPosItemEntries.SetRange(Variant_Code, SaleLinePOS."Variant Code");
+        UnpostedPosItemEntries.SetRange(Lot_No, SaleLinePOS."Lot No.");
         if AllOtherLocations then
             UnpostedPosItemEntries.SetFilter(Location_Code, '<>%1', SaleLinePOS."Location Code")
         else
@@ -146,6 +149,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("No.", SaleLinePOS."No.");
         SaleLinePOS.SetRange("Variant Code", SaleLinePOS."Variant Code");
+        SaleLinePOS.SetRange("Lot No.", SaleLinePOS."Lot No.");
         SaleLinePOS.SetRange("Location Code", SaleLinePOS."Location Code");
         SaleLinePOS.SetFilter("Quantity (Base)", '>%1', 0);
         SaleLinePOS.CalcSums("Quantity (Base)");
@@ -180,7 +184,7 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         Clear(PosInventoryProfile);
         if PosUnit."POS Inventory Profile" = '' then
             exit;
-        exit(PosInventoryProfile.Get(PosUnit."POS Inventory Profile")); 
+        exit(PosInventoryProfile.Get(PosUnit."POS Inventory Profile"));
     end;
 
     local procedure RaiseNotAvailableEvent(var PosItemAvailability: Record "NPR POS Item Availability"; var Scope: Record "NPR POS Sale Line"; PosInventoryProfile: Record "NPR POS Inventory Profile"; ShowCurrentLineQty: Boolean; AskConfirmation: Boolean) Confirmed: Boolean
@@ -191,6 +195,8 @@ codeunit 6059783 "NPR POS Item-Check Avail."
         Handled: Boolean;
         ConfirmLbl: Label ' Are you sure you want to continue?';
         ItemWithVariantLbl: Label '%1/%2', Comment = '%1 - Item No., %2 - Variant Code', Locked = true;
+        ItemWithVariantLotLbl: Label '%1/%2/%3', Comment = '%1 - Item No., %2 - Variant Code, %3 - Lot No.', Locked = true;
+        ItemWithLotLbl: Label '%1/%2', Comment = '%1 - Item No., %2 - Lot No.', Locked = true;
         NotificationMsg_MultipleItems: Label 'The available inventory for some of the items included in the sale is lower than the entered quantity at the location.';
         NotificationMsg_SingleItem: Label 'The available inventory for item %1 is lower than the entered quantity at this location.', Comment = '%1 - Item No.';
     begin
@@ -202,10 +208,16 @@ codeunit 6059783 "NPR POS Item-Check Avail."
 
         if PosItemAvailability.Count = 1 then begin
             PosItemAvailability.FindFirst();
-            if PosItemAvailability."Variant Code" <> '' then
-                ItemNoTxt := StrSubstNo(ItemWithVariantLbl, PosItemAvailability."Item No.", PosItemAvailability."Variant Code")
-            else
-                ItemNoTxt := PosItemAvailability."Item No.";
+            if PosItemAvailability."Variant Code" <> '' then begin
+                if PosItemAvailability."Lot No." <> '' then
+                    ItemNoTxt := StrSubstNo(ItemWithVariantLotLbl, PosItemAvailability."Item No.", PosItemAvailability."Variant Code", PosItemAvailability."Lot No.")
+                else
+                    ItemNoTxt := StrSubstNo(ItemWithVariantLbl, PosItemAvailability."Item No.", PosItemAvailability."Variant Code")
+            end else
+                if PosItemAvailability."Lot No." <> '' then
+                    ItemNoTxt := StrSubstNo(ItemWithLotLbl, PosItemAvailability."Item No.", PosItemAvailability."Lot No.")
+                else
+                    ItemNoTxt := PosItemAvailability."Item No.";
             HeadingTxt := StrSubstNo(NotificationMsg_SingleItem, ItemNoTxt);
         end else
             HeadingTxt := NotificationMsg_MultipleItems;
