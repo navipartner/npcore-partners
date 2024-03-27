@@ -17,27 +17,27 @@ page 6150715 "NPR RS POS Unit Mapping"
                 field("POS Unit Code"; Rec."POS Unit Code")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the POS Unit Code field.';
+                    ToolTip = 'Specifies the POS Unit Code for which mapping is set.';
                 }
                 field("POS Unit Name"; Rec."POS Unit Name")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the POS Unit Code field.';
+                    ToolTip = 'Specifies the POS Unit Code - Name for which mapping is set.';
                 }
                 field("RS Sandbox JID"; Rec."RS Sandbox JID")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Sandbox JID field.';
+                    ToolTip = 'Specifies the Sandbox JID for the selected POS Unit.';
                 }
                 field("RS Sandbox PIN"; Rec."RS Sandbox PIN")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Sandbox PIN field.';
+                    ToolTip = 'Specifies the Sandbox PIN for the selected POS Unit.';
                 }
                 field("RS Sandbox Token"; Rec."RS Sandbox Token")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Sandbox Token field.';
+                    ToolTip = 'Specifies the Sandbox Token for the selected POS Unit.';
                 }
             }
         }

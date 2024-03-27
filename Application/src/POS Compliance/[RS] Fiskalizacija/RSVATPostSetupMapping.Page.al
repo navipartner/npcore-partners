@@ -17,12 +17,12 @@ page 6150721 "NPR RS VAT Post. Setup Mapping"
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the VAT Bus. Posting Group field.';
+                    ToolTip = 'Specifies the VAT Bus. Posting Group. for which the mapping is set.';
                 }
                 field("VAT Prod. Posting Group"; Rec."VAT Prod. Posting Group")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the VAT Prod. Posting Group field.';
+                    ToolTip = 'Specifies the VAT Prod. Posting Group. for which the mapping is set.';
                 }
                 field("NPR RS Tax Category Name"; Rec."RS Tax Category Name")
                 {
@@ -30,7 +30,7 @@ page 6150721 "NPR RS VAT Post. Setup Mapping"
                     DrillDown = true;
                     Lookup = false;
                     ShowMandatory = true;
-                    ToolTip = 'Specifies the value of the NPR RS Tax Category Name field.';
+                    ToolTip = 'Specifies the RS Tax Category Name that is linked to Allowed Tax Rate that will be used for calculating the VAT amount for transactions related to selected combination of VAT Bus. and VAT Prod. Posting Groups.';
                     trigger OnDrillDown()
                     var
                         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
@@ -54,7 +54,7 @@ page 6150721 "NPR RS VAT Post. Setup Mapping"
                 field("NPR RS Tax Category Label"; Rec."RS Tax Category Label")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the RS Tax Category Label field.';
+                    ToolTip = 'Specifies the RS Tax Category Label. The given label will be shown on Fiscal Bills made from transactions that are related to the selected combination of VAT Bus. and VAT Prod. Posting Groups.';
                 }
             }
         }
