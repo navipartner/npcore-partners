@@ -17,12 +17,12 @@
                 field("Audit Entry Type"; Rec."Audit Entry Type")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Audit Entry Type field.';
+                    ToolTip = 'Specifies the Audit Entry Type.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the POS Entry record related to this record.';
+                    ToolTip = 'Specifies the Entry No. of the POS Entry record related to this record.';
                     trigger OnDrillDown()
                     var
                         POSEntry: Record "NPR POS Entry";
@@ -40,32 +40,32 @@
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Source Document No. field.';
+                    ToolTip = 'Specifies the Source Document No.';
                 }
                 field("POS Store Code"; Rec."POS Store Code")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the POS store code value.';
+                    ToolTip = 'Specifies the POS store code.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the POS unit number value.';
+                    ToolTip = 'Specifies the POS unit number.';
                 }
                 field("Entry Date"; Rec."Entry Date")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Entry Date field.';
+                    ToolTip = 'Specifies the Entry Date.';
                 }
                 field("RS Invoice Type"; Rec."RS Invoice Type")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Invoice Type field.';
+                    ToolTip = 'Specifies the Invoice Type.';
                 }
                 field("RS Transaction Type"; Rec."RS Transaction Type")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Transaction Type field.';
+                    ToolTip = 'Specifies the Transaction Type.';
                 }
                 field(SentFiscalToTax; SentFiscalToTax)
                 {

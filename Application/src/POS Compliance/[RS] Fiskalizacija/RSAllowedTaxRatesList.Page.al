@@ -19,37 +19,37 @@ page 6059906 "NPR RS Allowed Tax Rates List"
                 field("Valid From Date"; Rec."Valid From Date")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Valid From Date field.';
+                    ToolTip = 'Specifies the date from which the given Tax Rates are valid.';
                 }
                 field("Valid From Time"; Rec."Valid From Time")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Valid From Time field.';
+                    ToolTip = 'Specifies the time from which the given Tax Rates are valid.';
                 }
                 field("Group ID"; Rec."Group ID")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Group ID field.';
+                    ToolTip = 'Specifies the Group ID for the given Tax Rates.';
                 }
                 field("Tax Category Name"; Rec."Tax Category Name")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Tax Category Name field.';
+                    ToolTip = 'Specifies the Tax Category Name related to the given Tax Rates.';
                 }
                 field("Tax Category Type"; Rec."Tax Category Type")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Tax Category Type field.';
+                    ToolTip = 'Specifies the Tax Category Type of the related Tax Rates.';
                 }
                 field("Tax Category Rate"; Rec."Tax Category Rate")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Tax Category Rate field.';
+                    ToolTip = 'Specifies the Tax Rate of the related Tax Category.';
                 }
                 field("Tax Category Rate Label"; Rec."Tax Category Rate Label")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Tax Category Rate Label field.';
+                    ToolTip = 'Specifies the Label of the related Tax Rate Category.';
                 }
             }
         }
