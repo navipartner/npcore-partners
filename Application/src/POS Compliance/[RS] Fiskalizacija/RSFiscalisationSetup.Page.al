@@ -32,12 +32,12 @@ page 6150854 "NPR RS Fiscalisation Setup"
                 field("Allow Offline Use"; Rec."Allow Offline Use")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Allow Offline Use field.';
+                    ToolTip = 'When this switch is on, it is possible to work when offline.';
                 }
                 field(Training; Rec.Training)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Training field.';
+                    ToolTip = 'When this switch is on, receipts will be issued due the training process and will have a Trainig label on them.';
                 }
             }
             group(FiscalBillEMailing)
@@ -46,12 +46,12 @@ page 6150854 "NPR RS Fiscalisation Setup"
                 field("Report Mail Selection"; Rec."Report E-Mail Selection")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Report E-Mail Selection field.';
+                    ToolTip = 'Specifies the format of E-mailed Fiscal Bills.';
                 }
                 field("E-Mail Subject"; Rec."E-Mail Subject")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the E-Mail Subject field.';
+                    ToolTip = 'Specifies the subject of the E-Mailed Fiscal Bill.';
                 }
             }
             group(LPFRAccess)
@@ -60,7 +60,7 @@ page 6150854 "NPR RS Fiscalisation Setup"
                 field("Sandbox URL"; Rec."Sandbox URL")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Sandbox URL field.';
+                    ToolTip = 'Specifies the value of the Sandbox URL.';
                 }
             }
             group(SUFConfiguration)
@@ -70,42 +70,42 @@ page 6150854 "NPR RS Fiscalisation Setup"
                 field("Configuration URL"; Rec."Configuration URL")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Configuration URL field.';
+                    ToolTip = 'Specifies the Configuration URL.';
                 }
                 field("Organization Name"; Rec."Organization Name")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Organization Name field.';
+                    ToolTip = 'Specifies the Organization Name - name of the TAX Authority Institution.';
                 }
                 field("Server Time Zone"; Rec."Server Time Zone")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Server Time Zone field.';
+                    ToolTip = 'Specifies the Server Time Zone - time zone that server is using.';
                 }
                 field(Country; Rec.Country)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Country field.';
+                    ToolTip = 'Specifies the Country of the Tax Authority.';
                 }
                 field(City; Rec.City)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the City field.';
+                    ToolTip = 'Specifies the City of the Tax Authority.';
                 }
                 field(Street; Rec.Street)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Street field.';
+                    ToolTip = 'Specifies the Street of the Tax Authority.';
                 }
                 field("Environment Name"; Rec."Environment Name")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Environment Name field.';
+                    ToolTip = 'Specifies the Environment Name.';
                 }
                 field("NPT Server URL"; Rec."NPT Server URL")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the NPT Server URL field.';
+                    ToolTip = 'Specifies the NPT Server URL.';
                 }
                 group(Endpoints)
                 {
@@ -113,22 +113,22 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     field("TaxPayer Admin Portal URL"; Rec."TaxPayer Admin Portal URL")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the TaxPayer Admin Portal URL field.';
+                        ToolTip = 'Specifies the TaxPayer Admin Portal URL - URL of a Electronic Fiscalization Server.';
                     }
                     field("TaxCore API URL"; Rec."TaxCore API URL")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the TaxCore API URL field.';
+                        ToolTip = 'Specifies the TaxCore API URL.';
                     }
                     field("VSDC URL"; Rec."VSDC URL")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the VSDC URL field.';
+                        ToolTip = 'Specifies the VSDC URL.';
                     }
                     field("Root URL"; Rec."Root URL")
                     {
                         ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Root URL field.';
+                        ToolTip = 'Specifies the Root URL.';
                     }
                 }
             }
@@ -140,35 +140,35 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ApplicationArea = NPRRetail;
                     Caption = 'Vendor Name';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Vendor Name field.';
+                    ToolTip = 'Specifies the Certification Vendor Name.';
                 }
                 field(CertificationApp; CertificationApp)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Certified App Name';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certified App Name field.';
+                    ToolTip = 'Specifies the Certified App Name.';
                 }
                 field(CertificationIBNo; CertificationIBNo)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Certified IB Number';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certified IB Number field.';
+                    ToolTip = 'Specifies the Certified IB Number.';
                 }
                 field(CertificationVersion; CertificationVersion)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Certified Version';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certified Version field.';
+                    ToolTip = 'Specifies the Certified Version.';
                 }
                 field(CertificationDate; CertificationDate)
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Certification Date';
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Certification Date field.';
+                    ToolTip = 'Specifies the Certification Date.';
                 }
             }
         }

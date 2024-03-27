@@ -17,12 +17,12 @@ page 6150856 "NPR RS POS Paym. Meth. Mapping"
                 field("Payment Method Code"; Rec."POS Payment Method Code")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Payment Method Code field.';
+                    ToolTip = 'Specifies the Payment Method Code for which the mapping is set.';
                 }
                 field("RS Payment Method"; Rec."RS Payment Method")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the RS Payment Method field.';
+                    ToolTip = 'Specifies the RS Payment Method Mapping.';
                 }
             }
         }

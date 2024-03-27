@@ -30,48 +30,48 @@ page 6150853 "NPR RS Fiscal A.Info Privew FB"
                 field("SDC DateTime"; Rec."SDC DateTime")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the SDC DateTime field.';
+                    ToolTip = 'Specifies the SDC Date and Time - Date and Time of fiscalization.';
                 }
                 field("Invoice Counter"; Rec."Invoice Counter")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Invoice Counter field.';
+                    ToolTip = 'Specifies the Invoice Counter.';
                 }
                 field("Invoice Number"; Rec."Invoice Number")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Invoice Number field.';
+                    ToolTip = 'Specifies the Invoice Number.';
                 }
                 field(Mrc; Rec.Mrc)
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Mrc field.';
+                    ToolTip = 'Specifies the Mrc value.';
                 }
                 field("Requested By"; Rec."Requested By")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Requested By field.';
+                    ToolTip = 'Specifies the value of the Requested By user.';
                 }
                 field("Signed By"; Rec."Signed By")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Signed By field.';
+                    ToolTip = 'Specifies the value of the Signed By user.';
                 }
                 field("Total Amount"; Rec."Total Amount")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Total Amount field.';
+                    ToolTip = 'Specifies the value of the Total Amount of the transaction.';
                 }
                 field("Total Counter"; Rec."Total Counter")
                 {
                     ApplicationArea = NPRRSFiscal;
-                    ToolTip = 'Specifies the value of the Total Counter field.';
+                    ToolTip = 'Specifies the number of the Total Counter.';
                 }
                 field("Verification URL"; Rec."Verification URL")
                 {
                     ApplicationArea = NPRRSFiscal;
                     ExtendedDatatype = URL;
-                    ToolTip = 'Specifies the value of the Verification URL field.';
+                    ToolTip = 'Specifies the Verification URL.';
                 }
             }
         }

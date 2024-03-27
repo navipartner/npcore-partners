@@ -574,7 +574,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     internal procedure FillCertificationData(Certification: Dictionary of [Text, Text])
     var
         CertificationApp: Label 'NP Retail', Locked = true;
-        CertificationDate: Label '00.00.0000.', Locked = true;
+        CertificationDate: Label '24.10.2023.', Locked = true;
         CertificationIBNo: Label '1230', Locked = true;
         CertificationVendor: Label 'Navi Partner Copenhagen ApS', Locked = true;
         CertificationVersion: Label '1.0', Locked = true;
