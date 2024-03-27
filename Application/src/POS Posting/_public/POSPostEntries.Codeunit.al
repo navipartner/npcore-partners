@@ -1570,14 +1570,18 @@
             GenJournalLine.Comment := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Comment));
 
         if (POSPaymentMethod.Get(POSBalancingLine."POS Payment Method Code")) and (POSPaymentMethod."Currency Code" <> '') then
-            if (not POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then
+            if (not POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then begin
+                if POSPaymentMethod."Fixed Rate" = 0 then
+                    POSPaymentMethod."Fixed Rate" := 100;
                 PaymentMethodExchangeRate := 100 / POSPaymentMethod."Fixed Rate";
+            end;
 
         GenJournalLine."Currency Code" := POSBalancingLine."Currency Code";
-        if (GenJournalLine."Currency Code" <> '') and (POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then
-            GenJournalLine.Validate("Currency Code")
-        else
-            GenJournalLine.Validate("Currency Factor", PaymentMethodExchangeRate);
+        if GenJournalLine."Currency Code" <> '' then
+            if POSPaymentMethod."Use Stand. Exc. Rate for Bal." then
+                GenJournalLine.Validate("Currency Code")
+            else
+                GenJournalLine.Validate("Currency Factor", PaymentMethodExchangeRate);
 
         if PostingAmount <> 0 then
             GenJournalLine.Validate(Amount, PostingAmount);
