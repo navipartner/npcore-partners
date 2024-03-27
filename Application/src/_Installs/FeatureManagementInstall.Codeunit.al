@@ -35,7 +35,11 @@ codeunit 6151434 "NPR Feature Management Install"
         FeatureManagement: Interface "NPR Feature Management";
         Feature: Enum "NPR Feature";
     begin
+#if BC17
         ExistingFeature.SetRange(Feature, Feature::Retail, Feature::HeyLoyalty);
+#else
+        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::Shopify);
+#endif
         if ExistingFeature.FindSet() then
             repeat
                 TempExistingFeature := ExistingFeature;
@@ -52,6 +56,9 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"Membership Essential");
         AddFeature(Feature::"Membership Advanced");
         AddFeature(Feature::HeyLoyalty);
+#if not BC17
+        AddFeature(Feature::Shopify);
+#endif
 
         if ExistingFeature.FindSet() then
             repeat

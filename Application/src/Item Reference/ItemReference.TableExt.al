@@ -31,7 +31,7 @@ tableextension 6014440 "NPR Item Reference" extends "Item Reference"
 
     keys
     {
-        key(LabelBarcode; "NPR Label Barcode") { }
+        key("NPR LabelBarcode"; "NPR Label Barcode") { }
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;

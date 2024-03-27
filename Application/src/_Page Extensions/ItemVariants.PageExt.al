@@ -17,5 +17,54 @@ pageextension 6014458 "NPR Item Variants" extends "Item Variants"
 #ENDIF
             }
         }
+
+#if not BC17
+        addafter(Control1)
+        {
+            part("NPR ShopifyIDs"; "NPR Spfy Item Variant IDs Subp")
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Shopify Integration';
+                Visible = ShopifyStoreListGenerated;
+                SubPageLink = Type = const(Item), "Item No." = field("Item No."), "Variant Code" = const('');
+            }
+        }
+#endif
     }
+
+#if not BC17
+    var
+        ShopifyIntegrationIsEnabled: Boolean;
+        ShopifyStoreListGenerated: Boolean;
+
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items);
+        NPR_UpdateShopifyStoreListGenerated();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        CurrPage."NPR ShopifyIDs".Page.SetItemVariant(Rec);
+    end;
+
+    local procedure NPR_UpdateShopifyStoreListGenerated()
+    var
+        Item: Record Item;
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+    begin
+        ShopifyStoreListGenerated := false;
+        if not ShopifyIntegrationIsEnabled then
+            exit;
+        if Rec.GetFilter("Item No.") <> '' then
+            Item."No." := Rec.GetRangeMin("Item No.");
+        if Item."No." = '' then
+            exit;
+        SpfyStoreLinkMgt.FilterStoreItemLinks(Item.RecordId(), SpfyStoreItemLink);
+        ShopifyStoreListGenerated := not SpfyStoreItemLink.IsEmpty();
+    end;
+#endif
 }

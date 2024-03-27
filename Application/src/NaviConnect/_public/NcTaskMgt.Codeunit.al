@@ -687,12 +687,14 @@
         exit(RecordPosition);
     end;
 
-    internal procedure TaskResetCount(TaskProcessor: Record "NPR Nc Task Processor")
+    internal procedure TaskResetCount(TaskProcessor: Record "NPR Nc Task Processor"; StoreCode: Code[20])
     var
         NcTask: Record "NPR Nc Task";
     begin
         NcTask.SetCurrentKey("Task Processor Code", Processed);
         NcTask.SetRange("Task Processor Code", TaskProcessor.Code);
+        if StoreCode <> '' then
+            NcTask.SetRange("Store Code", StoreCode);
         NcTask.SetRange(Processed, false);
         NcTask.SetFilter("Process Count", '>%1', 0);
         NcTask.ModifyAll("Process Count", 0);

@@ -229,12 +229,11 @@ codeunit 6059993 "NPR HL Integration Mgt."
 
     procedure RegisterWebhookListeners()
     var
-        WebService: Record "Web Service Aggregate";
+        TenantWebService: Record "Tenant Web Service";
         WebServiceManagement: Codeunit "Web Service Management";
         ServiceNameTok: Label 'heyloyalty_services', Locked = true, MaxLength = 240;
     begin
-        //WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR HL HeyLoyalty Webservice", ServiceNameTok, true);
-        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Page, Page::"NPR API - HL Webhook Requests", ServiceNameTok, true);
+        WebServiceManagement.CreateTenantWebService(TenantWebService."Object Type"::Page, Page::"NPR API - HL Webhook Requests", ServiceNameTok, true);
     end;
 
     procedure EnableWebhookRequestRetentionPolicy()

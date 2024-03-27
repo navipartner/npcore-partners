@@ -107,5 +107,21 @@ enum 6014602 "NPR Nc IL Process Handler" implements "NPR Nc Import List IProcess
         Implementation = "NPR Nc Import List IProcess" = "NPR NpEc P.Invoice Imp. Create";
     }
 
-
+#if not BC17
+    value(150; "Spfy Order Create")
+    {
+        Caption = 'Shopify Order - Create';
+        Implementation = "NPR Nc Import List IProcess" = "NPR Spfy Create Order";
+    }
+    value(151; "Spfy Order Delete")
+    {
+        Caption = 'Shopify Order - Delete';
+        Implementation = "NPR Nc Import List IProcess" = "NPR Spfy Delete Order";
+    }
+    value(152; "Spfy Order Post")
+    {
+        Caption = 'Shopify Order - Post';
+        Implementation = "NPR Nc Import List IProcess" = "NPR Spfy Post Order";
+    }
+#endif
 }

@@ -37,10 +37,17 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Not used.';
         }
+        field(6014410; "NPR Bill-to Phone No."; Text[30])
+        {
+            Caption = 'Bill-to Phone No.';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = PhoneNo;
+        }
         field(6014414; "NPR Bill-to E-mail"; Text[80])
         {
             Caption = 'Bill-to E-mail';
             DataClassification = CustomerContent;
+            ExtendedDatatype = EMail;
         }
         field(6014415; "NPR Document Processing"; Option)
         {

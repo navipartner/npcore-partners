@@ -23,6 +23,18 @@
                     ToolTip = 'Specifies the name of the record.';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Spfy Shopify Store Code"; Rec."Shopify Store Code")
+                {
+                    ToolTip = 'Shopify: specifies the Shopify store code that represents this record.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("Spfy Source Name"; Rec."Shopify Source Name")
+                {
+                    ToolTip = 'Shopify: specifies the source name that is used by Shopify in incoming sales order json files to identify this record.';
+                    ApplicationArea = NPRShopify;
+                }
+#endif
                 field("Salesperson/Purchaser Code"; Rec."Salesperson/Purchaser Code")
                 {
                     ToolTip = 'Specifies the name of the salesperson who is assigned to the e-commerce store.';
@@ -43,6 +55,18 @@
                     ToolTip = 'Specifies the code for the second dimension, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Spfy Country/Region Code"; Rec."Spfy Country/Region Code")
+                {
+                    ToolTip = 'Shopify: specifies the default country/region code that the system should use for the imported Shopify sales orders if no information about the customer’s country/region code has been provided in the incoming order json file.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("Spfy NP-Spy Customer No."; Rec."Spfy Customer No.")
+                {
+                    ToolTip = 'Shopify: specifies the default (pre-defined) customer that will be used by default for imported Shopify orders if a specific customer can’t be found. Alternatively, you can set up pre-defined customers through the customer mapping.';
+                    ApplicationArea = NPRShopify;
+                }
+#endif
                 field("Customer Mapping"; Rec."Customer Mapping")
                 {
                     ToolTip = 'Specifies way for searching customer while creating or updating sales order.';
@@ -73,6 +97,13 @@
                     ToolTip = 'Specifies the value of the Release Order on Import field';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Shopify C&C Orders"; Rec."Shopify C&C Orders")
+                {
+                    ToolTip = 'Shopify: specifies whether this record is used to import Shopify Click&Collect orders.';
+                    ApplicationArea = NPRShopify;
+                }
+#endif
             }
         }
     }
@@ -90,6 +121,17 @@
                 ToolTip = 'View or edit customer mapping.';
                 ApplicationArea = NPRRetail;
             }
+#if not BC17
+            action("NPR Spfy LocationMapping")
+            {
+                Caption = 'Location Mapping';
+                ToolTip = 'Shopify: executes the Location Mapping action. You can set up rules to identify the location code, as well as the shipping agent and its service code, to be used for imported Shopify orders. Alternatively, you can pre-define a location code for each e-commerce store.';
+                Image = List;
+                RunObject = page "NPR Spfy Location Mapping";
+                RunPageLink = "Store Code" = field(Code);
+                ApplicationArea = NPRShopify;
+            }
+#endif
         }
     }
 }

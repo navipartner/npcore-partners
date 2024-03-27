@@ -123,6 +123,14 @@
             Description = 'NC1.13';
             Editable = false;
         }
+        field(210; "Store Code"; Code[20])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+#if not BC17
+            TableRelation = "NPR Spfy Store".Code;
+#endif
+        }
         field(6059906; "Task Processor Code"; Code[20])
         {
             Caption = 'Task Processor Code';

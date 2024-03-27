@@ -324,6 +324,36 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+#if not BC17
+            group(Shopify)
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled and VourcherTypeShopifyIntegrationIsEnabled;
+                field("NPR Spfy Gift Card ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                {
+                    Caption = 'Shopify Gift Card ID';
+                    Editable = false;
+                    AssistEdit = true;
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the value of the Shopify Gift Card ID field.';
+
+                    trigger OnAssistEdit()
+                    var
+                        ChangeShopifyID: Page "NPR Spfy Change Assigned ID";
+                    begin
+                        Clear(ChangeShopifyID);
+                        ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                        ChangeShopifyID.RunModal();
+                    end;
+                }
+                field("Disabled at Shopify"; Rec."Disabled at Shopify")
+                {
+                    Editable = false;
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies whether the voucher has already been marked as disabled at Shopify.';
+                }
+            }
+#endif
         }
     }
 
@@ -358,9 +388,25 @@
 
     var
         PrintUsingTemplate: Boolean;
+#if not BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
+        ShopifyIntegrationIsEnabled: Boolean;
+        VourcherTypeShopifyIntegrationIsEnabled: Boolean;
+
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
+    end;
+#endif
 
     trigger OnAfterGetCurrRecord()
     begin
+#if not BC17
+        VourcherTypeShopifyIntegrationIsEnabled := SpfyRetailVoucherMgt.IsShopifyIntegratedVoucherType(Rec."Voucher Type");
+#endif
         UpdateControls();
     end;
 

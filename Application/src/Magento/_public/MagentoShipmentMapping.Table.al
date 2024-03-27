@@ -54,6 +54,14 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
+#if not BC17
+        field(200; "Spfy Location Code"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Location Code';
+            TableRelation = Location where("Use As In-Transit" = const(false));
+        }
+#endif
     }
 
     keys

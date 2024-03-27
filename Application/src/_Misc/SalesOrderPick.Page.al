@@ -356,8 +356,12 @@
                 }
                 field("Bill-to E-mail"; Rec."NPR Bill-to E-mail")
                 {
-
                     ToolTip = 'Specifies the value of the NPR Bill-to E-mail field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("NPR Bill-to Phone No."; Rec."NPR Bill-to Phone No.")
+                {
+                    ToolTip = 'Specifies the phone number of the customer contact you are sending the invoice to.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")

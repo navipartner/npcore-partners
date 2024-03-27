@@ -819,6 +819,9 @@
         Voucher: Record "NPR NpRv Voucher";
     begin
         ArchVoucher.Get(ArchVoucherCode);
+#if not BC17
+        ArchVoucher.TestField("Disabled at Shopify", false);
+#endif
 
         Voucher.Init();
         Voucher.TransferFields(ArchVoucher);

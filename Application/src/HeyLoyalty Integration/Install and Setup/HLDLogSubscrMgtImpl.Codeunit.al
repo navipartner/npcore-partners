@@ -11,20 +11,21 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
     procedure CreateDataLogSetup(IntegrationArea: Enum "NPR HL Integration Area")
     var
         DataLogSetup: Record "NPR Data Log Setup (Table)";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         case IntegrationArea of
             IntegrationArea::Members:
                 begin
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR MM Member", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
+                        IntegrationArea, Database::"NPR MM Member", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR MM Membership", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
+                        IntegrationArea, Database::"NPR MM Membership", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR MM Membership Role", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
+                        IntegrationArea, Database::"NPR MM Membership Role", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR GDPR Consent Log", DataLogSetup."Log Insertion"::Detailed, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", DaysToDuration(7));
+                        IntegrationArea, Database::"NPR GDPR Consent Log", DataLogSetup."Log Insertion"::Detailed, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR HL Selected MCF Option", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, DaysToDuration(7));
+                        IntegrationArea, Database::"NPR HL Selected MCF Option", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                 end;
         end;
         HLIntegrationEvents.OnAfterCreateDataLogSetup(IntegrationArea);
@@ -73,11 +74,6 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
             end;
         if Format(DataLogSubscriber) <> Format(xDataLogSubscriber) then
             DataLogSubscriber.Modify(true);
-    end;
-
-    procedure DaysToDuration(NoOfDays: Integer): Duration
-    begin
-        exit(NoOfDays * 86400000);
     end;
 
     procedure GetSubscriberCode(TableId: Integer; DataProcessingCodeunitId: Integer): Code[30]

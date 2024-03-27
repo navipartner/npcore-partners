@@ -524,7 +524,6 @@ tableextension 6014427 "NPR Item" extends Item
                     MainItemVariationMgt.AddAsVariation(Rec, "NPR Main Item No.");
             end;
         }
-
         field(6151479; "NPR Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';
@@ -533,6 +532,49 @@ tableextension 6014427 "NPR Item" extends Item
             ObsoleteTag = 'NPR23.0';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+#if not BC17
+        field(6151550; "NPR Purchasing Code"; Code[10])
+        {
+            Caption = 'Purchasing Code';
+            DataClassification = CustomerContent;
+            TableRelation = Purchasing;
+        }
+        field(6151551; "NPR Spfy Safety Stock Quantity"; Decimal)
+        {
+            Caption = 'Shopify Safety Stock Quantity';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 5;
+            MinValue = 0;
+        }
+        field(6151552; "NPR Spfy Store Filter"; Code[20])
+        {
+            Caption = 'Shopify Store Filter';
+            FieldClass = FlowFilter;
+        }
+        field(6151553; "NPR Spfy Synced Item"; Boolean)
+        {
+            Caption = 'Shopify Item';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Spfy Store-Item Link" where(Type = const(Item),
+                                                                "Item No." = field("No."),
+                                                                "Variant Code" = const(''),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter"),
+                                                                "Synchronization Is Enabled" = const(true)));
+        }
+        field(6151554; "NPR Spfy Synced Item (Planned)"; Boolean)
+        {
+            Caption = 'Shopify Item (Planned)';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Spfy Store-Item Link" where(Type = const(Item),
+                                                                "Item No." = field("No."),
+                                                                "Variant Code" = const(''),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter"),
+                                                                "Synchronization Is Enabled" = const(false),
+                                                                "Sync. to this Store" = const(true)));
+        }
+#endif
     }
     keys
     {

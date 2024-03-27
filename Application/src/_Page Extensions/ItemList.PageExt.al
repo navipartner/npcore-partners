@@ -164,6 +164,18 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 ApplicationArea = NPRRetail;
             }
         }
+
+#if not BC17
+        addafter("Assembly BOM")
+        {
+            field("NPR Spfy Synced Item"; Rec."NPR Spfy Synced Item")
+            {
+                ApplicationArea = NPRShopify;
+                Visible = ShopifyIntegrationIsEnabled;
+                ToolTip = 'Specifies whether the item is integrated with Shopify.';
+            }
+        }
+#endif
     }
 
     actions
@@ -554,9 +566,15 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     trigger OnOpenPage()
     var
         NPRRetailInventorySetMgt: Codeunit "NPR RIS Retail Inv. Set Mgt.";
+#if not BC17
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
     begin
         RetailInventoryEnabled := NPRRetailInventorySetMgt.IsRetailInventoryEnabled();
         NPR_SetMagentoEnabled();
+#if not BC17
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
+#endif
     end;
 
     internal procedure NPR_SetMagentoEnabled()
@@ -606,4 +624,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
         Error_NoBarcodeMatch: Label 'No item found for value %1';
         Text001: Label 'Item No.';
         RetailInventoryEnabled: Boolean;
+#if not BC17
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
 }

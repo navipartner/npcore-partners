@@ -26,7 +26,6 @@
                     Caption = 'Filters';
                     field("COUNT"; Rec.Count)
                     {
-
                         Caption = 'Quantity';
                         Editable = false;
                         ToolTip = 'Specifies the value of the Quantity field';
@@ -34,7 +33,6 @@
                     }
                     field(TaskProcessorFilter; TaskProcessorFilter)
                     {
-
                         Caption = 'Task Processor';
                         TableRelation = "NPR Nc Task Processor";
                         ToolTip = 'Specifies the value of the Task Processor field';
@@ -47,7 +45,6 @@
                     }
                     field("Show Exported"; ShowProcessed)
                     {
-
                         Caption = 'Show Processed';
                         ToolTip = 'Specifies the value of the Show Processed field';
                         ApplicationArea = NPRNaviConnect;
@@ -63,7 +60,6 @@
                     ShowCaption = false;
                     field(Control6150656; '')
                     {
-
                         Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
@@ -72,7 +68,6 @@
                     }
                     field(ResponseText; ResponseText)
                     {
-
                         Editable = false;
                         MultiLine = true;
                         ShowCaption = false;
@@ -86,94 +81,86 @@
                 ShowCaption = false;
                 field("Task Processor Code"; Rec."Task Processor Code")
                 {
-
                     ToolTip = 'Specifies the value of the Task Processor Code field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field(Processed; Rec.Processed)
                 {
-
                     ToolTip = 'Specifies the value of the Processed field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Error"; Rec."Process Error")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Error field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Company Name"; Rec."Company Name")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Company Name field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field(Type; Rec.Type)
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Table No."; Rec."Table No.")
                 {
-
                     ToolTip = 'Specifies the value of the Table No. field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Table Name"; Rec."Table Name")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Table Name field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Record Value"; Rec."Record Value")
                 {
-
                     ToolTip = 'Specifies the value of the Record Value field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Record Position"; Rec."Record Position")
                 {
-
                     Editable = false;
                     Visible = false;
                     ToolTip = 'Specifies the value of the Record Position field';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field("Store Code"; Rec."Store Code")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the Shopify store code the task is created for.';
+                    ApplicationArea = NPRShopify;
+                }
                 field("Log Date"; Rec."Log Date")
                 {
-
                     Editable = false;
                     ToolTip = 'Specifies the value of the Log Date field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Checked1"; Rec."Last Processing Started at")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Started at field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Processing Completed at"; Rec."Last Processing Completed at")
                 {
-
                     ToolTip = 'Specifies the value of the Last Processing Completed at field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Processing Duration"; Rec."Last Processing Duration")
                 {
-
                     Visible = false;
                     ToolTip = 'Specifies the value of the Last Processing Duration (sec.) field';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Process Count"; Rec."Process Count")
                 {
-
                     ToolTip = 'Specifies the value of the Process Count field';
                     ApplicationArea = NPRNaviConnect;
                 }
@@ -194,7 +181,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F5';
-
                 ToolTip = 'Executes the Import new Tasks action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -212,7 +198,6 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ShortCutKey = 'Ctrl+F9';
-
                 ToolTip = 'Executes the Process Manually action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -226,7 +211,6 @@
                 Caption = 'Reschedule for Processing';
                 Image = UpdateXML;
                 ShortCutKey = 'F9';
-
                 ToolTip = 'Executes the Reschedule for Processing action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -244,7 +228,6 @@
                 Image = List;
                 RunObject = Page "NPR Nc Task Fields";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Fields action';
                 ApplicationArea = NPRNaviConnect;
             }
@@ -256,7 +239,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
-
                 ToolTip = 'Executes the Show Output action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -274,7 +256,6 @@
                 PromotedCategory = Category4;
                 PromotedIsBig = true;
                 ShortCutKey = 'Shift+F7';
-
                 ToolTip = 'Executes the Source Card action';
                 ApplicationArea = NPRNaviConnect;
 
@@ -294,7 +275,6 @@
                 PromotedIsBig = true;
                 RunObject = Page "NPR Nc Task Output List";
                 RunPageLink = "Task Entry No." = FIELD("Entry No.");
-
                 ToolTip = 'Executes the Output action';
                 ApplicationArea = NPRNaviConnect;
             }
@@ -457,4 +437,3 @@
         NcTaskMgt.RunSourceCard(Rec);
     end;
 }
-

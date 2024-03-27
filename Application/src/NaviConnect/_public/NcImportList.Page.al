@@ -26,6 +26,11 @@
                     ToolTip = 'Specifies the value of the Date field';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field("Store Code"; Rec."Store Code")
+                {
+                    ToolTip = 'Specifies the Shopify store code the import task is created from.';
+                    ApplicationArea = NPRShopify;
+                }
                 field("<Filter Import Type>"; Rec."Import Type")
                 {
 

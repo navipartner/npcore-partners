@@ -13,6 +13,9 @@ codeunit 6151349 "NPR Enable Application Areas"
         EnableNaviConnectApplicationAreas(TempApplicationAreaSetup);
         EnableMembershipApplicationAreas(TempApplicationAreaSetup);
         EnableHeyLoyaltyApplicationAreas(TempApplicationAreaSetup);
+#if not BC17
+        EnableShopifyApplicationAreas(TempApplicationAreaSetup);
+#endif
         EnableLocalizationApplicationAreas(TempApplicationAreaSetup);
         EnableFiscalisationApplicationAreas(TempApplicationAreaSetup);
     end;
@@ -45,6 +48,13 @@ codeunit 6151349 "NPR Enable Application Areas"
     begin
         TempApplicationAreaSetup."NPR HeyLoyalty" := IsFeatureEnabled(Feature::HeyLoyalty);
     end;
+
+#if not BC17
+    local procedure EnableShopifyApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR Shopify" := IsFeatureEnabled(Feature::Shopify);
+    end;
+#endif
 
     local procedure EnableLocalizationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
     begin

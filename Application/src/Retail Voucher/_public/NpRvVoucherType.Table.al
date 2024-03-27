@@ -164,6 +164,18 @@
             Caption = 'Ending Date';
             DataClassification = CustomerContent;
         }
+#if not BC17
+        field(240; "Integrate with Shopify"; Boolean)
+        {
+            Caption = 'Integrate with Shopify';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckStoreIsAssigned(true);
+            end;
+        }
+#endif
         field(300; "Voucher Message"; Text[250])
         {
             Caption = 'Voucher Message';
@@ -252,5 +264,27 @@
                 end;
         End;
     end;
-}
 
+#if not BC17
+    internal procedure GetStoreCode(): Code[20]
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        exit(CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, 20));
+    end;
+
+    internal procedure CheckStoreIsAssigned(WithError: Boolean): Boolean
+    var
+        StoreCodeMissingErr: Label 'You must assign a Shopify store to %1 %2.', Comment = '%1 - tablecaption, %2 - Code';
+    begin
+        if not "Integrate with Shopify" then
+            exit;
+        if GetStoreCode() = '' then begin
+            if WithError then
+                Error(StoreCodeMissingErr, TableCaption, Code);
+            exit(false);
+        end;
+        exit(true);
+    end;
+#endif
+}
