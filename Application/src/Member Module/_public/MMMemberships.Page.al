@@ -655,12 +655,15 @@
     local procedure AddToAlterationJournal()
     var
         Membership: Record "NPR MM Membership";
+        AlterationJnlPage: Page "NPR MM Members. Alteration Jnl";
     begin
         CurrPage.SetSelectionFilter(Membership);
         if Membership.FindSet() then begin
             repeat
                 MembershipManagement.AddToAlterationJournal(Membership);
             until Membership.Next() = 0;
+
+            AlterationJnlPage.Run();
         end;
     end;
 
