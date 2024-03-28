@@ -1,8 +1,9 @@
-page 6151116 "NPR VAT EV Entries"
+page 6184569 "NPR RS POPDV Records"
 {
     Extensible = false;
-    UsageCategory = None;
-    Caption = 'RS VAT EV Entries';
+    ApplicationArea = NPRRSLocal;
+    UsageCategory = Documents;
+    Caption = 'RS POPDV Records';
     DataCaptionExpression = PageCaptionTxt;
     PageType = Card;
     PromotedActionCategories = 'New,Process,Report,XML';
@@ -10,9 +11,6 @@ page 6151116 "NPR VAT EV Entries"
     InsertAllowed = false;
     ModifyAllowed = false;
     DeleteAllowed = false;
-    ObsoleteReason = 'Replaced by NPR POPDV Records';
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR33.0';
 
     layout
     {
@@ -3542,7 +3540,7 @@ page 6151116 "NPR VAT EV Entries"
                 exit
             else begin
                 CurrPage.Close();
-                Page.Run(Page::"NPR VAT EV Entries");
+                Page.Run(Page::"NPR RS POPDV Records");
                 exit;
             end;
         end;
