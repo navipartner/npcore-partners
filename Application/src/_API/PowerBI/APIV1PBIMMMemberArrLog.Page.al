@@ -56,6 +56,42 @@ page 6150795 "NPR APIV1 PBIMMMemberArrLog"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(entryNo; Rec."Entry No.")
+                {
+                    Caption = 'Entry No.', Locked = true;
+                }
+                field(eventType; Rec."Event Type")
+                {
+                    Caption = 'Event Type', Locked = true;
+                }
+                field(createdAt; Rec."Created At")
+                {
+                    Caption = 'Created At', Locked = true;
+                }
+                field(localTime; Rec."Local Time")
+                {
+                    Caption = 'Local Time', Locked = true;
+                }
+                field(admissionCode; Rec."Admission Code")
+                {
+                    Caption = 'Admission Code', Locked = true;
+                }
+                field(temporaryCard; Rec."Temporary Card")
+                {
+                    Caption = 'Temporary Card', Locked = true;
+                }
+                field(responseMessage; Rec."Response Message")
+                {
+                    Caption = 'Response Message', Locked = true;
+                }
+                field(responseCode; Rec."Response Code")
+                {
+                    Caption = 'Response Code', Locked = true;
+                }
+                field(responseRuleEntryNo; Rec."Response Rule Entry No.")
+                {
+                    Caption = 'Response Rule Entry No.', Locked = true;
+                }
             }
         }
     }

@@ -68,7 +68,66 @@ page 6059965 "NPR APIV1 PBITMAdmission"
                 {
                     Caption = 'Max Capacity Per Sch. Entry';
                 }
+                field(prebookIsRequired; Rec."Prebook Is Required")
+                {
+                    Caption = 'Prebook Is Required';
+                }
+                field(prebookFrom; Rec."Prebook From")
+                {
+                    Caption = 'Prebook From';
+                }
+                field(ticketholderNotificationType; Rec."Ticketholder Notification Type")
+                {
+                    Caption = 'Ticketholder Notification Type';
+                }
+                field(pOSScheduleSelectionDateF; Rec."POS Schedule Selection Date F.")
+                {
+                    Caption = 'POS Schedule Selection Date F.';
+                }
+
+                field(stakeholderEMailPhoneNo; Rec."Stakeholder (E-Mail/Phone No.)")
+                {
+                    Caption = 'Stakeholder (E-Mail/Phone No.)';
+                }
+                field(waitingListSetupCode; Rec."Waiting List Setup Code")
+                {
+                    Caption = 'Waiting List Setup Code';
+                }
+                field(ticketBaseCalendarCode; Rec."Ticket Base Calendar Code")
+                {
+                    Caption = 'Ticket Base Calendar Code';
+                }
+                field(eventArrivalFromTime; Rec."Event Arrival From Time")
+                {
+                    Caption = 'Event Arrival From Time';
+                }
+                field(eventArrivalUntilTime; Rec."Event Arrival Until Time")
+                {
+                    Caption = 'Event Arrival Until Time';
+                }
+                field(salesFromDateRel; Rec."Sales From Date (Rel.)")
+                {
+                    Caption = 'Sales From Date (Rel.)';
+                }
+                field(salesFromTime; Rec."Sales From Time")
+                {
+                    Caption = 'Sales From Time';
+                }
+                field(salesUntilDateRel; Rec."Sales Until Date (Rel.)")
+                {
+                    Caption = 'Sales Until Date (Rel.)';
+                }
+                field(salesUntilTime; Rec."Sales Until Time")
+                {
+                    Caption = 'Sales Until Time';
+                }
+                field(additionalExperienceItemNo; Rec."Additional Experience Item No.")
+                {
+                    Caption = 'Additional Experience Item No.';
+                }
+
             }
         }
     }
 }
+
