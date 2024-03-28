@@ -14,6 +14,7 @@ codeunit 6151370 "NPR SS Action: Start SelfServB"
         OpeningEntryNo: Integer;
         InactivePosUnitLbl: Label 'POS Unit %1 is inactive. It can not be used to complete the action', Comment = '%1-POS Unit code';
         BusyPOSUnitLbl: Label 'This unit is busy with another process right now. Please try again later. <br>Thank-you for your patience.';
+        OriginalLanguage: Integer;
     begin
         DATABASE.SelectLatestVersion();
         POSSession.GetSetup(POSSetup);
@@ -52,10 +53,13 @@ codeunit 6151370 "NPR SS Action: Start SelfServB"
 
         POSCreateEntry.InsertUnitLoginEntry(POSSetup.GetPOSUnitNo(), POSSetup.Salesperson());
 
+        OriginalLanguage := GlobalLanguage();
         if (Language.Get(LanguageCode)) then begin
             if (Language."Windows Language ID" > 0) then
                 GlobalLanguage(Language."Windows Language ID");
             POSUIManagement.InitializeCaptions();
+            if (OriginalLanguage <> 0) and (OriginalLanguage <> GlobalLanguage()) then
+                GlobalLanguage(OriginalLanguage);
         end;
 
         POSSession.StartTransaction();
