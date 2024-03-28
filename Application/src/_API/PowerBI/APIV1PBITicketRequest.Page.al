@@ -208,6 +208,18 @@ page 6151541 "NPR APIV1 PBITicketRequest"
                 {
                     Caption = 'Last Modified DateTime Filter', Locked = true;
                 }
+                field(amountsource; Rec.AmountSource)
+                {
+                    Caption = 'Amount Source', Locked = true;
+                }
+                field(ticketUnitAmountExclVat; Rec.TicketUnitAmountExclVat)
+                {
+                    Caption = 'TicketUnitAmountExclVat', Locked = true;
+                }
+                field(ticketUnitAmountInclVat; Rec.TicketUnitAmountInclVat)
+                {
+                    Caption = 'TicketUnitAmountInclVat', Locked = true;
+                }
             }
         }
     }

@@ -67,6 +67,22 @@ page 6059967 "NPR APIV1 PBITMDetTicketAccess"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(postingDate; Rec."Posting Date")
+                {
+                    Caption = 'Posting Date', Locked = true;
+                }
+                field(salesChannelNo; Rec."Sales Channel No.")
+                {
+                    Caption = 'Sales Channel No.', Locked = true;
+                }
+                field(scannerStationId; Rec."Scanner Station ID")
+                {
+                    Caption = 'Scanner Station ID', Locked = true;
+                }
+                field("userId"; Rec."User ID")
+                {
+                    Caption = 'User ID', Locked = true;
+                }
             }
         }
     }

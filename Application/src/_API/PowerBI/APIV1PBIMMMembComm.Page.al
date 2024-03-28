@@ -36,6 +36,7 @@ page 6150867 "NPR APIV1 PBIMMMembComm"
                 field(systemModifiedAt; Rec.SystemModifiedAt) { }
                 field(systemRowVersion; Rec.SystemRowVersion) { }
 #ENDIF
+                field(changedAt; Rec."Changed At") { }
             }
         }
     }
