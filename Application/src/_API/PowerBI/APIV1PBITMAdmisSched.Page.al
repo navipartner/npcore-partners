@@ -83,9 +83,84 @@ page 6150783 "NPR APIV1 PBITMAdmisSched"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(eventDuration; Rec."Event Duration")
+                {
+                    Caption = 'Last Modified Date Filter', Locked = true;
+                }
+                field(regenerateWith; Rec."Regenerate With")
+                {
+                    Caption = 'Regenerate With', Locked = true;
+                }
+                field(visibilityonWeb; Rec."Visibility On Web")
+                {
+                    Caption = 'Visibility On Web', Locked = true;
+                }
+                field(dynamicPriceProfileCode; Rec."Dynamic Price Profile Code")
+                {
+                    Caption = 'Dynamic Price Profile Code', Locked = true;
+                }
+                field(openReservations; Rec."Open Reservations")
+                {
+                    Caption = 'Open Reservations', Locked = true;
+                }
+                field(openAdmitted; Rec."Open Admitted")
+                {
+                    Caption = 'Open Admitted', Locked = true;
+                }
+                field(departed; Rec.Departed)
+                {
+                    Caption = 'Departed', Locked = true;
+                }
+                field(initialEntry; Rec."Initial Entry")
+                {
+                    Caption = 'Initial Entry', Locked = true;
+                }
+                field(initialEntryAll; Rec."Initial Entry (All)")
+                {
+                    Caption = 'Initial Entry (All)', Locked = true;
+                }
+                field(openReservationsAll; Rec."Open Reservations (All)")
+                {
+                    Caption = 'Open Reservations (All)', Locked = true;
+                }
+                field(salesChannelFilter; Rec."Sales Channel Filter")
+                {
+                    Caption = 'Sales Channel Filter', Locked = true;
+                }
+                field(eventArrivalFromTime; Rec."Event Arrival From Time")
+                {
+                    Caption = 'Event Arrival From Time', Locked = true;
+                }
+                field(eventArrivalUntilTime; Rec."Event Arrival Until Time")
+                {
+                    Caption = 'Event Arrival Until Time', Locked = true;
+                }
+                field(salesFromDate; Rec."Sales From Date")
+                {
+                    Caption = 'Sales From Date', Locked = true;
+                }
+                field(salesFromTime; Rec."Sales From Time")
+                {
+                    Caption = 'Sales From Time', Locked = true;
+                }
+                field(salesUntilDate; Rec."Sales Until Date")
+                {
+                    Caption = 'Sales Until Date', Locked = true;
+                }
+                field(salesUntilTime; Rec."Sales Until Time")
+                {
+                    Caption = 'Sales Until Time', Locked = true;
+                }
+                field(waitingListQueue; Rec."Waiting List Queue")
+                {
+                    Caption = 'Waiting List Queue', Locked = true;
+                }
+
             }
         }
     }
+
+
     var
         PowerBIUtils: Codeunit "NPR PowerBI Utils";
 }
