@@ -436,6 +436,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         FullAddress := ShippingProviderDocumentAddress1;
         if ShippingProviderDocumentAddress2 <> '' then
             FullAddress += ' ' + ShippingProviderDocumentAddress2;
+        FullAddress := DelChr(FullAddress, '=', '.');
 
         ShipmondoAddress1 := CopyStr(FullAddress, 1, 32);
         if StrLen(FullAddress) > 32 then
