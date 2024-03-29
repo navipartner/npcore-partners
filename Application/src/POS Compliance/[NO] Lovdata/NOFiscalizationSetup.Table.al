@@ -47,7 +47,6 @@ table 6060060 "NPR NO Fiscalization Setup"
             TableRelation = Employee;
         }
     }
-
     keys
     {
         key(PK; "Primary Key")
