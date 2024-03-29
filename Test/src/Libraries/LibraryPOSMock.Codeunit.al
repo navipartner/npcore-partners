@@ -162,12 +162,20 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
+        POSActionEndSale: Codeunit "NPR POS Action End Sale B";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        if not POSSale.TryEndSale(POSSession, false) then
-            exit(false);
+        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') of
+            true:
+                if not POSActionEndSale.EndSale(POSSale, POSSession, false, '', false, true) then
+                    exit(false);
+            false:
+                if not POSSale.TryEndSale(POSSession, false) then
+                    exit(false);
+        end;
 
         POSPost(SalePOS);
         exit(true);
@@ -182,8 +190,10 @@ codeunit 85003 "NPR Library - POS Mock"
     var
         POSActionPayment: Codeunit "NPR POS Action: Payment";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        POSActionEndSale: Codeunit "NPR POS Action End Sale B";
         POSSale: Codeunit "NPR POS Sale";
         SalePOS: Record "NPR POS Sale";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         FrontEnd: Codeunit "NPR POS Front End Management";
         Handled: Boolean;
         NewSalePOS: Record "NPR POS Sale";
@@ -200,7 +210,10 @@ codeunit 85003 "NPR Library - POS Mock"
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
-        POSActionPayment.TryEndSale(POSPaymentMethod, POSSession); //TryEndSale step of payment action        
+        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+            POSActionPayment.TryEndSale(POSPaymentMethod, POSSession) //TryEndSale step of payment action        
+        else
+            POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
@@ -362,6 +375,8 @@ codeunit 85003 "NPR Library - POS Mock"
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSActionEndSale: Codeunit "NPR POS Action End Sale B";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
@@ -383,8 +398,14 @@ codeunit 85003 "NPR Library - POS Mock"
             exit(false);
 
         POSSession.GetSale(POSSale);
-        if not POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
-            exit(false);
+        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') of
+            true:
+                if not POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true) then
+                    exit(false);
+            false:
+                if not POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
+                    exit(false);
+        end;
         exit(true);
     end;
 
