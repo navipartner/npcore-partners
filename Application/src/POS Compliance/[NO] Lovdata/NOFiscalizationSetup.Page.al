@@ -35,13 +35,13 @@ page 6151224 "NPR NO Fiscalization Setup"
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Signing Certificate Password field';
+                    ToolTip = 'Specifies the value of the Signing Certificate Password field.';
                 }
                 field("Signing Certificate Thumbprint"; Rec."Signing Certificate Thumbprint")
                 {
                     ApplicationArea = NPRRetail;
                     Editable = false;
-                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field';
+                    ToolTip = 'Specifies the value of the Signing Certificate Thumbprint field.';
                 }
             }
             group(SAFTCash)
@@ -55,6 +55,32 @@ page 6151224 "NPR NO Fiscalization Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the SAF-T Contact No. field.';
+                }
+            }
+            group(Certified)
+            {
+                Caption = 'Certified Cash Register System';
+
+                field("Certified Model"; CertificationModel)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Certification Model field.';
+                    Caption = 'Certification Model';
+                }
+                field("Certified Version"; CertificationVersion)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Certification Version field.';
+                    Caption = 'Certification Version';
+                }
+                field(Manufacturer; Manufacturer)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the value of the Manufacturer field.';
+                    Caption = 'Manufacturer';
                 }
             }
         }
@@ -72,7 +98,7 @@ page 6151224 "NPR NO Fiscalization Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
-                ToolTip = 'Executes the Upload Certificate action';
+                ToolTip = 'Executes the Upload Certificate action.';
 
                 trigger OnAction()
                 var
@@ -92,6 +118,11 @@ page 6151224 "NPR NO Fiscalization Setup"
         end;
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        InsertCertificatinDetails();
+    end;
+
     trigger OnClosePage()
     var
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
@@ -100,6 +131,20 @@ page 6151224 "NPR NO Fiscalization Setup"
             ApplicationAreaMgmtFacade.RefreshExperienceTierCurrentCompany();
     end;
 
+    local procedure InsertCertificatinDetails()
+    var
+        CertifiedModelLbl: Label 'NP Retail', Locked = true;
+        CertifiedVersionLbl: Label '2017', Locked = true;
+        ManufacturerLbl: Label 'NaviPartner', Locked = true;
+    begin
+        CertificationModel := CertifiedModelLbl;
+        CertificationVersion := CertifiedVersionLbl;
+        Manufacturer := ManufacturerLbl;
+    end;
+
     var
         EnabledValueChanged: Boolean;
+        CertificationModel: Text;
+        CertificationVersion: Text;
+        Manufacturer: Text;
 }
