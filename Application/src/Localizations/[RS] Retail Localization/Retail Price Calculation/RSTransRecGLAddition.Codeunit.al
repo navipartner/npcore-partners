@@ -15,12 +15,12 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if not CheckRetailLocation(TransferReceiptHeader) then
-            exit;
-
         FillTempTransferLines(TransferHeader);
 
         if not TempTransferLine.FindSet() then
+            exit;
+
+        if not CheckRetailLocation(TransferReceiptHeader) then
             exit;
 
         PostAdditionalRetailEntries(TransferReceiptHeader);
@@ -420,12 +420,16 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     local procedure CheckRetailLocation(TransferReceiptHeader: Record "Transfer Receipt Header"): Boolean
     var
         Location: Record Location;
-        Location2: Record Location;
+        LocationCheck: Boolean;
     begin
-        Location.Get(TransferReceiptHeader."Transfer-from Code");
-        Location2.Get(TransferReceiptHeader."Transfer-to Code");
-
-        exit((not Location."NPR Retail Location") and (Location2."NPR Retail Location"))
+        LocationCheck := false;
+        if Location.Get(TransferReceiptHeader."Transfer-from Code") then
+            if not Location."NPR Retail Location" then
+                LocationCheck := true;
+        if Location.Get(TransferReceiptHeader."Transfer-to Code") then
+            if Location."NPR Retail Location" then
+                LocationCheck := true;
+        exit(LocationCheck);
     end;
 
     local procedure FillTempTransferLines(TransferHeader: Record "Transfer Header")
@@ -446,7 +450,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     var
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
+        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
     begin
         PriceListHeader.SetLoadFields("Price Type", Status, "Starting Date", "Ending Date", "NPR Location Code", "Assign-to No.");
         PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
