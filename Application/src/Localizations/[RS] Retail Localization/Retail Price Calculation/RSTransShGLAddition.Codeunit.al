@@ -487,16 +487,12 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     local procedure CheckRetailLocation(TransferHeader: Record "Transfer Header"): Boolean
     var
         Location: Record Location;
-        LocationCheck: Boolean;
+        Location2: Record Location;
     begin
-        LocationCheck := false;
-        if Location.Get(TransferHeader."Transfer-from Code") then
-            if Location."NPR Retail Location" then
-                LocationCheck := true;
-        if Location.Get(TransferHeader."Transfer-to Code") then
-            if not Location."NPR Retail Location" then
-                LocationCheck := true;
-        exit(LocationCheck);
+        Location.Get(TransferHeader."Transfer-from Code");
+        Location2.Get(TransferHeader."Transfer-to Code");
+
+        exit((Location."NPR Retail Location") and (not Location2."NPR Retail Location"))
     end;
 
     local procedure FillRetailTransferLines(TransferHeader: Record "Transfer Header")
@@ -521,7 +517,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     var
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
+        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
     begin
         PriceListHeader.SetLoadFields("Price Type", Status, "Starting Date", "Ending Date", "NPR Location Code", "Assign-to No.");
         PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
