@@ -155,6 +155,14 @@ page 6150783 "NPR APIV1 PBITMAdmisSched"
                 {
                     Caption = 'Waiting List Queue', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
 
             }
         }
