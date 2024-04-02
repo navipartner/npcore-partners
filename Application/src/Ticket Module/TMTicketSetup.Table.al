@@ -306,6 +306,12 @@
             Caption = 'Use Front End Schedule UX';
             DataClassification = CustomerContent;
         }
+        field(380; ServiceTimeZoneNo; Integer)
+        {
+            Caption = 'Default Time Zone No.';
+            DataClassification = CustomerContent;
+            InitValue = 0;
+        }
         field(400; "Ticket Admission Web Url"; Text[250])
         {
             Caption = 'Ticket Admission Web Url';

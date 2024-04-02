@@ -344,19 +344,28 @@
         PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
     end;
 
+
+
     internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
+    var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
     begin
-        ValidateTicketForArrival(Ticket, AdmissionCode, -1, Today(), Time()); // Throws error on fail
+        if (AdmissionCode = '') then
+            AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
+
+        ValidateTicketForArrival(Ticket, AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)); // Throws error on fail
         exit(true);
     end;
 
-    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
+    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDateTime: DateTime)
     var
         Admission: Record "NPR TM Admission";
         TicketAccessEntryNo: Integer;
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
         AdmissionEntryNo: Integer;
+        EventDate: Date;
+        EventTime: Time;
     begin
 
         if (AdmissionCode = '') then
@@ -371,7 +380,7 @@
         ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, false);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
 
-        AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDate, EventTime);
+        AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDateTime);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
@@ -1232,6 +1241,7 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Ticket: Record "NPR TM Ticket";
         AdmissionScannerStation: Record "NPR MM Admis. Scanner Stations";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
         ProcessFlow: Option SALES,SCAN;
     begin
 
@@ -1250,7 +1260,10 @@
             RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, ScannerStationId, ProcessFlow::SCAN);
 
         end else begin
-            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, Today(), Time());
+            if (AdmissionCode = '') then
+                AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
+
+            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
         end;
 
         if (WithPrint) then
@@ -2121,7 +2134,8 @@
         end;
     end;
 
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time): Integer
+    //local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time; TimeZoneCode: Code[20]): Integer
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDateTime: DateTime): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -2136,13 +2150,13 @@
         FirstAdmission := (TicketAccessEntry."Access Date" = 0D);
 
         if (TicketAccessEntry."Access Date" = 0D) then begin
-            TicketAccessEntry."Access Date" := EventDate;
-            TicketAccessEntry."Access Time" := EventTime;
+            TicketAccessEntry."Access Date" := DT2Date(EventDateTime);
+            TicketAccessEntry."Access Time" := DT2Time(EventDateTime);
             TicketAccessEntry.Modify();
             if (DurationGroupCode <> '') then
-                SetDuration(TicketAccessEntryNo, TicketAdmissionSchEntryNo, DurationGroupCode, EventDate, EventTime);
+                SetDuration(TicketAccessEntryNo, TicketAdmissionSchEntryNo, DurationGroupCode, DT2Date(EventDateTime), DT2Time(EventDateTime));
 
-            DeferRevenue.ReadyToRecognize(TicketAccessEntryNo, EventDate);
+            DeferRevenue.ReadyToRecognize(TicketAccessEntryNo, DT2Date(EventDateTime));
         end;
 
         if (AdmissionScheduleEntry.Get(TicketAdmissionSchEntryNo)) then;
@@ -2155,7 +2169,10 @@
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry.Insert(true);
-        AdmittedTicketAccessEntry."Created Datetime" := CreateDateTime(EventDate, EventTime);
+        AdmittedTicketAccessEntry."Created Datetime" := EventDateTime;
+        AdmittedTicketAccessEntry.AdmittedDate := DT2Date(EventDateTime);
+        AdmittedTicketAccessEntry.AdmittedTime := DT2Time(EventDateTime);
+
         AdmittedTicketAccessEntry.Modify();
 
         OnDetailedTicketEvent(AdmittedTicketAccessEntry);

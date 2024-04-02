@@ -309,6 +309,80 @@
                         ToolTip = 'Specifies the value of the Use Front End Schedule UX field';
                     }
                 }
+
+                group(TimeZone)
+                {
+                    Caption = 'Time Zone';
+
+                    field(ServerDateTime; _UserDateTime)
+                    {
+                        Caption = 'User Date Time';
+                        ToolTip = 'Specifies the value of the Server Date Time with Server Time Zone applied.';
+                        ApplicationArea = NPRTicketAdvanced;
+                        Editable = false;
+                        Visible = false;
+                    }
+                    field(ServerDateTimeWithTimeZone; _ServerDateTimeWithTimeZone)
+                    {
+                        Caption = 'Server Date Time and Time Zone';
+                        ToolTip = 'Specifies the value of the Server Date Time without Time Zone applied.';
+                        ApplicationArea = NPRTicketAdvanced;
+                        Editable = false;
+                        Visible = false;
+                    }
+
+                    field(ServiceTimeZoneNo; Rec.ServiceTimeZoneNo)
+                    {
+                        ApplicationArea = NPRTicketAdvanced;
+                        Caption = 'Service Time Zone No.';
+                        ToolTip = 'Specifies the value of the default value for the Service Time Zone field';
+                        Visible = false;
+                        trigger OnValidate()
+                        begin
+                            DisplayTimeInTimeZone(Rec.ServiceTimeZoneNo);
+                        end;
+                    }
+                    field(ServiceTimeZone; _ServiceTimeZoneDescription)
+                    {
+                        Caption = 'Service Time Zone';
+                        ToolTip = 'Specifies the value of the Default Time Zone field';
+                        ApplicationArea = NPRTicketAdvanced;
+                        Editable = false;
+                        trigger OnAssistEdit()
+                        var
+                            TimeZone: Record "Time Zone";
+#if (BC17 or BC18)
+                            TimeZones: Page "Time Zones";
+#else
+                            TimeZones: Page "Time Zones Lookup";
+#endif                            
+                            PageAction: Action;
+                        begin
+                            TimeZones.LookupMode(true);
+                            PageAction := TimeZones.RunModal();
+                            if (not (PageAction = Action::LookupOK)) then
+                                exit;
+
+                            if (not CurrPage.Editable()) then
+                                exit;
+
+                            TimeZones.GetRecord(TimeZone);
+                            Rec.ServiceTimeZoneNo := TimeZone."No.";
+                            DisplayTimeInTimeZone(Rec.ServiceTimeZoneNo);
+
+                            CurrPage.Update(true);
+                        end;
+                    }
+
+                    field(LocalCurrentDateTime; _ServiceDateTime)
+                    {
+                        Caption = 'Service Date Time';
+                        ToolTip = 'Specifies the value for apparent local date time with the selected time zone applied.';
+                        ApplicationArea = NPRTicketAdvanced;
+                        Editable = false;
+                    }
+                }
+
             }
         }
     }
@@ -424,6 +498,19 @@
                         Message(StrSubstNo(OkMessage, TicketServiceName, TicketStatisticsName, TicketNotificationName));
                     end;
                 }
+                action(SetUserTimeZone)
+                {
+                    Caption = 'Reset Service Time Zone';
+                    ToolTip = 'Reset the service time zone to user-impersonation.';
+                    Image = Setup;
+                    ApplicationArea = NPRTicketAdvanced;
+
+                    trigger OnAction()
+                    begin
+                        Rec.ServiceTimeZoneNo := 0;
+                        CurrPage.Update(true);
+                    end;
+                }
 
                 group(AzureAAD)
                 {
@@ -497,11 +584,38 @@
     trigger OnOpenPage()
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
+
     begin
         HasAzureADConnection := (AzureADTenant.GetAadTenantId() <> '');
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        DisplayTimeInTimeZone(Rec.ServiceTimeZoneNo);
+    end;
+
+    local procedure DisplayTimeInTimeZone(TimeZoneNumber: Integer)
+    var
+        BCTimeZone: Record "Time Zone";
+        TypeHelper: Codeunit "Type Helper";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        UsersTimeZone: Label 'User-Impersonation';
+    begin
+        _UserDateTime := Format(CurrentDateTime(), 0, '<Year4>-<Month,2>-<Day,2> <Hours24,2>:<Minutes,2>:<Seconds,2>');
+        _ServerDateTimeWithTimeZone := TypeHelper.FormatDateTime(TypeHelper.GetCurrUTCDateTime(), 'yyyy-MM-dd HH:mm:ss zzz', '');
+
+        _ServiceTimeZoneDescription := UsersTimeZone;
+        if (BCTimeZone.Get(TimeZoneNumber)) then
+            _ServiceTimeZoneDescription := BCTimeZone."Display Name";
+
+        _ServiceDateTime := TimeHelper.GetLocalTimeForServiceAsText();
+    end;
+
     var
         HasAzureADConnection: Boolean;
+        _ServiceTimeZoneDescription: Text;
+        _ServiceDateTime: Text;
+        _UserDateTime: Text;
+        _ServerDateTimeWithTimeZone: Text;
 }
 

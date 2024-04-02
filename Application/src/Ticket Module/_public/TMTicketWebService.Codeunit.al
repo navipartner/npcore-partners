@@ -7,6 +7,18 @@
     var
         SETUP_MISSING: Label 'Setup is missing for %1';
 
+    procedure GetServiceDateAndTime(AdmissionCode: Code[20]; var ServiceDateTime: Text)
+    var
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+    begin
+        if (AdmissionCode = '') then
+            ServiceDateTime := TimeHelper.GetLocalTimeForServiceAsText();
+
+        if (AdmissionCode <> '') then
+            ServiceDateTime := TimeHelper.GetLocalTimeAtAdmissionAsText(AdmissionCode);
+
+    end;
+
     procedure ValidateTicketArrival(AdmissionCode: Code[20]; ExternalTicketNo: Text[50]; ScannerStationId: Code[10]; var MessageText: Text): Boolean
     var
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";

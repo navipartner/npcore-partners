@@ -606,8 +606,13 @@
                 if (ValidEntry) then begin
                     IsReEntry := CheckForReEntry(DetailAccessEntry, TicketAdmissionBOM."Revisit Condition (Statistics)");
 
-                    TicketAccessEntry."Access Date" := DT2Date(DetailAccessEntry."Created Datetime");
-                    TicketAccessEntry."Access Time" := DT2Time(DetailAccessEntry."Created Datetime");
+                    if (CreateDateTime(DetailAccessEntry.AdmittedDate, DetailAccessEntry.AdmittedTime) > CreateDateTime(0D, 0T)) then begin
+                        TicketAccessEntry."Access Date" := DetailAccessEntry.AdmittedDate;
+                        TicketAccessEntry."Access Time" := DetailAccessEntry.AdmittedTime;
+                    end else begin
+                        TicketAccessEntry."Access Date" := DT2Date(DetailAccessEntry."Created Datetime");
+                        TicketAccessEntry."Access Time" := DT2Time(DetailAccessEntry."Created Datetime");
+                    end;
                     TicketAccessEntry.Quantity := DetailAccessEntry.Quantity;
 
                     if (not AdHoc) then

@@ -81,6 +81,16 @@
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
         }
+        field(30; AdmittedDate; Date)
+        {
+            Caption = 'Admitted Date';
+            DataClassification = CustomerContent;
+        }
+        field(31; AdmittedTime; Time)
+        {
+            Caption = 'Admitted Time';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -112,13 +122,17 @@
 
     trigger OnInsert()
     begin
-        Rec."Created Datetime" := CurrentDateTime();
+        if (Rec."Created Datetime" = CreateDateTime(0D, 0T)) then
+            Rec."Created Datetime" := CurrentDateTime();
+
         Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
     end;
 
     trigger OnModify()
     begin
-        Rec."Created Datetime" := CurrentDateTime();
+        if (Rec."Created Datetime" = CreateDateTime(0D, 0T)) then
+            Rec."Created Datetime" := CurrentDateTime();
+
         Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
     end;
 
