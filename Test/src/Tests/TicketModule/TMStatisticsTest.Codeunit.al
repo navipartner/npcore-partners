@@ -41,17 +41,17 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
 
         TmpCreatedTickets.FindFirst();
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111100T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111200T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111200T);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121100T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121200T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121300T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121200T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121300T);
 
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
@@ -123,19 +123,19 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
 
         TmpCreatedTickets.FindFirst();
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111100T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111200T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 111200T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121100T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121200T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121300T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121200T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 121300T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
         // [Test]
@@ -204,28 +204,28 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
 
         TmpCreatedTickets.FindFirst();
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
         // [Test]
@@ -288,28 +288,28 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
 
         TmpCreatedTickets.FindFirst();
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
         // [Test]
@@ -373,28 +373,28 @@ codeunit 85113 "NPR TM Statistics Test"
 
         TmpCreatedTickets.FindFirst();
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
         // [Test]
@@ -463,28 +463,28 @@ codeunit 85113 "NPR TM Statistics Test"
 
         TmpCreatedTickets.FindFirst();
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
-        TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+        ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101100T);
         StatisticsMgt.BuildCompressedStatistics(Today(), false);
 
 
@@ -558,10 +558,10 @@ codeunit 85113 "NPR TM Statistics Test"
         TmpCreatedTickets.FindFirst();
 
         for N := 1 to AdmissionCount do
-            TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
+            ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+0D'), 101000T);
 
         for N := 1 to AdmissionCount do
-            TicketMgt.ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
+            ValidateTicketForArrival(TmpCreatedTickets, '', -1, CalcDate('<+1D'), 101000T);
 
         StatisticsMgt.BuildCompressedStatisticsAdHoc(CalcDate('<+0D>'), CalcDate('<+1D>'), TempTicketStatistics);
 
@@ -585,6 +585,14 @@ codeunit 85113 "NPR TM Statistics Test"
         Assert.AreEqual(1, TempTicketStatistics."Admission Count", 'Number of registered arrivals in statistics does not match actual number of arrivals for hour 10.');
         Assert.AreEqual(0, TempTicketStatistics."Admission Count (Neg)", 'Admission Count (Neg) must be zero unless ticket was revoked');
         Assert.AreEqual(AdmissionCount - 1, TempTicketStatistics."Admission Count (Re-Entry)", 'Re-Entry count must be zero when revisit policy is Never');
+    end;
+
+    [Normal]
+    local procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
+    var
+        TicketMgt: Codeunit "NPR TM Ticket Management";
+    begin
+        TicketMgt.ValidateTicketForArrival(Ticket, '', -1, CreateDateTime(EventDate, EventTime));
     end;
 
     [Normal]

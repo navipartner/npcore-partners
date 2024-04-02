@@ -75,6 +75,16 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Channel No. field';
                 }
+                field(AdmittedDate; Rec.AdmittedDate)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admitted Date field';
+                }
+                field(AdmittedTime; Rec.AdmittedTime)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Admitted Time field';
+                }
                 field("Created Datetime"; Rec."Created Datetime")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
@@ -84,6 +94,11 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the User ID field';
+                }
+                field(SystemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the System Created At field';
                 }
             }
         }

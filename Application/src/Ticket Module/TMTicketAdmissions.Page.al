@@ -166,6 +166,19 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
                 }
+                field(TimeZoneNo; Rec.TimeZoneNo)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Time Zone No. field.';
+                    Visible = false;
+                }
+                field(AdmissionTimeZone; _AdmissionTimeZoneDescription)
+                {
+                    Caption = 'Admission Time Zone';
+                    ToolTip = 'Specifies the value of the Admission Time Zone field';
+                    ApplicationArea = NPRTicketAdvanced;
+                    Editable = false;
+                }
                 field("eTicket Type Code"; Rec."eTicket Type Code")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
@@ -318,5 +331,25 @@
     var
         _CalendarManager: Codeunit "Calendar Management";
         _TMCalendarManager: Codeunit "NPR TMBaseCalendarManager";
+        _AdmissionTimeZoneDescription: Text;
+
+    trigger OnAfterGetRecord()
+    begin
+        DisplayTimeZoneName(Rec.TimeZoneNo);
+    end;
+
+    local procedure DisplayTimeZoneName(TimeZoneNumber: Integer)
+    var
+        TimeZone: Record "Time Zone";
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if (TimeZoneNumber = 0) then
+            if (TicketSetup.Get()) then
+                TimeZoneNumber := TicketSetup.ServiceTimeZoneNo;
+
+        _AdmissionTimeZoneDescription := 'User-Impersonation';
+        if (TimeZone.Get(TimeZoneNumber)) then
+            _AdmissionTimeZoneDescription := TimeZone."Display Name";
+    end;
 }
 
