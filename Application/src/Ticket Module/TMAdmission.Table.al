@@ -225,7 +225,13 @@
                 end;
             end;
         }
-
+        
+        field(380; TimeZoneNo; Integer)
+        {
+            Caption = 'Time Zone No.';
+            DataClassification = CustomerContent;
+            InitValue = 0;
+        }
     }
 
     keys

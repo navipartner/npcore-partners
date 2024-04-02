@@ -5,6 +5,7 @@ page 6150765 "NPR TM Admission Card"
     PageType = Card;
     SourceTable = "NPR TM Admission";
     UsageCategory = None;
+    PromotedActionCategories = 'New,Process,Report,Navigate';
 
     layout
     {
@@ -31,6 +32,37 @@ page 6150765 "NPR TM Admission Card"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Location Admission Code field';
+                }
+                field(AdmissionTimeZone; _AdmissionTimeZoneDescription)
+                {
+                    Caption = 'Admission Time Zone';
+                    ToolTip = 'Specifies the value of the Admission Time Zone field';
+                    ApplicationArea = NPRTicketAdvanced;
+                    Editable = false;
+                    trigger OnAssistEdit()
+                    var
+                        TimeZone: Record "Time Zone";
+#if BC17 or BC18
+                        TimeZones: Page "Time Zones";
+#else
+                        TimeZones: Page "Time Zones Lookup";
+#endif
+                        PageAction: Action;
+                    begin
+                        TimeZones.LookupMode(true);
+                        PageAction := TimeZones.RunModal();
+                        if (not (PageAction = Action::LookupOK)) then
+                            exit;
+
+                        if (not CurrPage.Editable()) then
+                            exit;
+
+                        TimeZones.GetRecord(TimeZone);
+                        Rec.TimeZoneNo := TimeZone."No.";
+                        DisplayTimeZoneName(Rec.TimeZoneNo);
+
+                        CurrPage.Update(true);
+                    end;
                 }
             }
             group(Capacity)
@@ -313,7 +345,19 @@ page 6150765 "NPR TM Admission Card"
                         TicketWaitingListMgr.ProcessAdmission(Rec, Today, true);
                 end;
             }
+            action(SetUserTimeZone)
+            {
+                Caption = 'Reset Admission Time Zone';
+                ToolTip = 'Reset the admission time zone to be same as the service time zone.';
+                Image = Setup;
+                ApplicationArea = NPRTicketAdvanced;
 
+                trigger OnAction()
+                begin
+                    Rec.TimeZoneNo := 0;
+                    CurrPage.Update(true);
+                end;
+            }
         }
         area(processing)
         {
@@ -357,11 +401,26 @@ page 6150765 "NPR TM Admission Card"
     trigger OnAfterGetRecord()
     begin
         _ManagedByAdmission := Rec."Capacity Limits By" = Rec."Capacity Limits By"::Admission;
+        DisplayTimeZoneName(Rec.TimeZoneNo);
     end;
 
     var
         _CalendarManager: Codeunit "Calendar Management";
         _TMCalendarManager: Codeunit "NPR TMBaseCalendarManager";
         _ManagedByAdmission: Boolean;
+        _AdmissionTimeZoneDescription: Text;
 
+    local procedure DisplayTimeZoneName(TimeZoneNo: Integer)
+    var
+        TimeZone: Record "Time Zone";
+        TicketSetup: Record "NPR TM Ticket Setup";
+    begin
+        if (TimeZoneNo = 0) then
+            if (TicketSetup.Get()) then
+                TimeZoneNo := TicketSetup.ServiceTimeZoneNo;
+
+        _AdmissionTimeZoneDescription := 'User-Impersonation';
+        if (TimeZone.Get(TimeZoneNo)) then
+            _AdmissionTimeZoneDescription := TimeZone."Display Name";
+    end;
 }
