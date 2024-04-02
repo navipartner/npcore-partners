@@ -35,6 +35,14 @@ page 6150867 "NPR APIV1 PBIMMMembComm"
 #IF NOT (BC17 or BC18 or BC19 or BC20)
                 field(systemModifiedAt; Rec.SystemModifiedAt) { }
                 field(systemRowVersion; Rec.SystemRowVersion) { }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
 #ENDIF
                 field(changedAt; Rec."Changed At") { }
             }

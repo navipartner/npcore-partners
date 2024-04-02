@@ -220,6 +220,18 @@ page 6151541 "NPR APIV1 PBITicketRequest"
                 {
                     Caption = 'TicketUnitAmountInclVat', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
+                field(systemModifiedBy; Rec.SystemModifiedBy)
+                {
+                    Caption = 'System Modified By', Locked = true;
+                }
             }
         }
     }
