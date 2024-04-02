@@ -125,6 +125,22 @@ page 6059965 "NPR APIV1 PBITMAdmission"
                 {
                     Caption = 'Additional Experience Item No.';
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
+                field(systemModifiedAt; Rec.SystemModifiedAt)
+                {
+                    Caption = 'System Modified At', Locked = true;
+                }
+                field(systemModifiedBy; Rec.SystemModifiedBy)
+                {
+                    Caption = 'System Modified By', Locked = true;
+                }
 
             }
         }
