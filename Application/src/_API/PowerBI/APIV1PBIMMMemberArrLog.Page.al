@@ -92,6 +92,14 @@ page 6150795 "NPR APIV1 PBIMMMemberArrLog"
                 {
                     Caption = 'Response Rule Entry No.', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
             }
         }
     }

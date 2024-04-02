@@ -83,6 +83,15 @@ page 6059967 "NPR APIV1 PBITMDetTicketAccess"
                 {
                     Caption = 'User ID', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
+                field(systemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    Caption = 'System Created By', Locked = true;
+                }
+
             }
         }
     }
