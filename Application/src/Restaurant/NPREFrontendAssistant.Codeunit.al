@@ -4,7 +4,7 @@
 
     var
         _JsonHelper: Codeunit "NPR Json Helper";
-        _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served";
+        _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving";
         _OrderIdTok: label 'orderId', Locked = true;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
@@ -190,6 +190,8 @@
                 RunKitchenAction(Context, _KitchenAction::"Resume");
             'KDS_SetServed':
                 RunKitchenAction(Context, _KitchenAction::"Set Served");
+            'KDS_RevokeServing':
+                RunKitchenAction(Context, _KitchenAction::"Revoke Serving");
             'KDS_SendOrderReadyNotifications':
                 CreateOrderReadyNotifications(Context);
         end;

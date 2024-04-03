@@ -816,6 +816,29 @@
             until ChildKitchenRequest.Next() = 0;
     end;
 
+    procedure RevokeServingForRequestLine(var KitchenRequest: Record "NPR NPRE Kitchen Request")
+    begin
+        RevokeServingForChildRequestLines(KitchenRequest);
+        KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::Served);
+        KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Ready for Serving";
+        KitchenRequest.Modify();
+
+        UpdateOrderStatus(KitchenRequest."Order ID");
+        ReopenSourceDocument(KitchenRequest);
+    end;
+
+    local procedure RevokeServingForChildRequestLines(KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        ChildKitchenRequest: Record "NPR NPRE Kitchen Request";
+    begin
+        ChildKitchenRequest.SetRange("Parent Request No.", KitchenRequest."Request No.");
+        ChildKitchenRequest.SetRange("Line Status", ChildKitchenRequest."Line Status"::Served);
+        if ChildKitchenRequest.FindSet(true) then
+            repeat
+                RevokeServingForRequestLine(ChildKitchenRequest);
+            until ChildKitchenRequest.Next() = 0;
+    end;
+
     local procedure CheckLineStatusesBeforeServing(var KitchenRequest: Record "NPR NPRE Kitchen Request")
     var
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
@@ -1050,6 +1073,25 @@
                 KitchReqSrcbyDoc.Source_Document_Type::"Waiter Pad":
                     if WaiterPad.Get(KitchReqSrcbyDoc.Source_Document_No_) then
                         WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
+            end;
+        KitchReqSrcbyDoc.Close();
+    end;
+
+    local procedure ReopenSourceDocument(KitchenRequest: Record "NPR NPRE Kitchen Request")
+    var
+        WaiterPad: Record "NPR NPRE Waiter Pad";
+        WaiterPadMgt: Codeunit "NPR NPRE Waiter Pad Mgt.";
+        KitchReqSrcbyDoc: Query "NPR NPRE Kitch.Req.Src. by Doc";
+    begin
+        KitchReqSrcbyDoc.SetRange(Request_No_, KitchenRequest."Request No.");
+        KitchReqSrcbyDoc.SetFilter(QuantityBase, '<>%1', 0);
+        if not KitchReqSrcbyDoc.Open() then
+            exit;
+        while KitchReqSrcbyDoc.Read() do
+            case KitchReqSrcbyDoc.Source_Document_Type of
+                KitchReqSrcbyDoc.Source_Document_Type::"Waiter Pad":
+                    if WaiterPad.Get(KitchReqSrcbyDoc.Source_Document_No_) then
+                        WaiterPadMgt.ReopenWaiterPad(WaiterPad);
             end;
         KitchReqSrcbyDoc.Close();
     end;

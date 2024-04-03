@@ -229,11 +229,11 @@
             WaiterPad."Close Reason" := CloseReason;
             WaiterPad.Modify();
 
-            CloseWaiterPadSeatings(WaiterPad);
+            CloseWaiterPadSeatings(WaiterPad, true);
         end else begin
             OK := WaiterPadSeatingsCanBeClosed(WaiterPad, SetupProxy, IsServed);
             if OK then
-                CloseWaiterPadSeatings(WaiterPad)
+                CloseWaiterPadSeatings(WaiterPad, true)
             else
                 if WaiterPadIsReadyForPayment(WaiterPad, SetupProxy, IsServed) then
                     SetWaiterPadStatusInPayment(WaiterPad, SetupProxy);
@@ -243,29 +243,46 @@
             OnAfterCloseWaiterPad(WaiterPad);
     end;
 
-    procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    procedure ReopenWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")
+    begin
+        if not WaiterPad.Closed then
+            exit;
+
+        WaiterPad."Close Date" := 0D;
+        WaiterPad."Close Time" := 0T;
+        WaiterPad.Closed := false;
+        WaiterPad."Close Reason" := WaiterPad."Close Reason"::Undefined;
+        WaiterPad.Modify();
+
+        CloseWaiterPadSeatings(WaiterPad, false);
+    end;
+
+    procedure CloseWaiterPadSeatings(var WaiterPad: Record "NPR NPRE Waiter Pad"; Close: Boolean)
     var
         SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink";
     begin
         SeatingWaiterPadLink.Reset();
         SeatingWaiterPadLink.SetRange("Waiter Pad No.", WaiterPad."No.");
-        SeatingWaiterPadLink.SetRange(Closed, false);
+        SeatingWaiterPadLink.SetRange(Closed, not Close);
         if SeatingWaiterPadLink.FindSet() then
             repeat
-                CloseWaiterPadSeatingLink(SeatingWaiterPadLink);
+                CloseWaiterPadSeatingLink(SeatingWaiterPadLink, Close);
             until SeatingWaiterPadLink.Next() = 0;
     end;
 
-    local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink")
+    local procedure CloseWaiterPadSeatingLink(SeatingWaiterPadLink: Record "NPR NPRE Seat.: WaiterPadLink"; Close: Boolean)
     var
         SeatingWaiterPadLink2: Record "NPR NPRE Seat.: WaiterPadLink";
         SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
     begin
         SeatingWaiterPadLink2 := SeatingWaiterPadLink;
-        SeatingWaiterPadLink2.Closed := true;
+        SeatingWaiterPadLink2.Closed := Close;
         SeatingWaiterPadLink2.Modify();
 
-        SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code");
+        if SeatingWaiterPadLink2.Closed then
+            SeatingMgt.TrySetSeatingIsCleared(SeatingWaiterPadLink2."Seating Code")
+        else
+            SeatingMgt.SetSeatingIsOccupied(SeatingWaiterPadLink2."Seating Code");
     end;
 
     local procedure CleanupWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad")

@@ -48,7 +48,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         Response.Add('errorAfterMinutes', RestaurantSetup."Delayed Ord. Threshold 2 (min)");
     end;
 
-    internal procedure RunKitchenAction(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; KitchenActionToRun: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served")
+    internal procedure RunKitchenAction(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; KitchenActionToRun: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving")
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenRequest: Record "NPR NPRE Kitchen Request";
@@ -79,8 +79,12 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
             KitchenRequest.SetRange("Production Restaurant Filter", RestaurantCode);
         end else
             KitchenRequest.SetRange("Restaurant Code", RestaurantCode);
-        if KitchenActionToRun = KitchenActionToRun::"Set Served" then
-            KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
+        case KitchenActionToRun of
+            KitchenActionToRun::"Set Served":
+                KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
+            KitchenActionToRun::"Revoke Serving":
+                KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::Served);
+        end;
 
         if KitchenRequest.FindSet(true) then
             repeat
@@ -113,6 +117,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
                     KitchenActionToRun::"Set Served":
                         KitchenOrderMgt.SetRequestLineAsServed(KitchenRequest);
+                    KitchenActionToRun::"Revoke Serving":
+                        KitchenOrderMgt.RevokeServingForRequestLine(KitchenRequest);
                 end;
             until KitchenRequest.Next() = 0;
     end;

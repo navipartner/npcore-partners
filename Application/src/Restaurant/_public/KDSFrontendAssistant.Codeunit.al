@@ -3,7 +3,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     Access = Public;
 
     var
-        _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served";
+        _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving";
 
     procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text) Response: Text
     var
@@ -73,6 +73,13 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, '', kitchenRequestId, orderId, _KitchenAction::"Set Served");
+    end;
+
+    procedure RevokeServing(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+    begin
+        KDSFrontendAssistImpl.RunKitchenAction(restaurantId, '', kitchenRequestId, orderId, _KitchenAction::"Revoke Serving");
     end;
 
     procedure CreateOrderReadyNotifications(orderId: BigInteger)
