@@ -246,13 +246,7 @@
         PermissionSets: List of [Code[20]];
         AppDisplayNameLbl: Label 'NaviPartner KDS', MaxLength = 50, Locked = true;
     begin
-        PermissionSets.Add('D365 BUS FULL ACCESS');
-#if BC17
-        PermissionSets.Add('NP RETAIL');
-#else
-        PermissionSets.Add('NPR NP RETAIL');
-#endif
-
+        PermissionSets.Add('NPR KDS WebService');
         AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, SecretDisplayName(), PermissionSets);
     end;
 
