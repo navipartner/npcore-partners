@@ -97,8 +97,10 @@
                     exit;
                 Modify();
                 KDSActivated := SetupProxy.KDSActivatedForAnyRestaurant();
-                if KDSActivated then
+                if KDSActivated then begin
                     KitchenOrderMgt.EnableKitchenOrderRetentionPolicy();
+                    KitchenOrderMgt.RegisterKDSWebservice();
+                end;
                 NotificationHandler.CreateNotificationJobQueues(KDSActivated);
             end;
         }
