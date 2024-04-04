@@ -143,7 +143,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
     begin
         POSLayout.Description := CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'caption', false), 1, MaxStrLen(POSLayout.Description));
         POSLayout."Template Name" := CopyStr(_JsonHelper.GetJText(POSLayoutJToken, 'template', false), 1, MaxStrLen(POSLayout."Template Name"));
-        POSLayout."Frontend Properties".CreateOutStream(OutStr);
+        POSLayout."Frontend Properties".CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.Write(_JsonHelper.GetJsonToken(POSLayoutJToken, 'blob').AsValue().AsText());
     end;
 
@@ -421,7 +421,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
         POSLayoutContentOut.Add('template', POSLayout."Template Name");
         if POSLayout."Frontend Properties".HasValue() then begin
             POSLayout.CalcFields("Frontend Properties");
-            POSLayout."Frontend Properties".CreateInStream(Instr);
+            POSLayout."Frontend Properties".CreateInStream(Instr, TextEncoding::UTF8);
             Instr.Read(PropertiesString);
             POSLayoutContentOut.Add('blob', PropertiesString);
         end else
