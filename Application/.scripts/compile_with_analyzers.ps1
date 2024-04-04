@@ -6,7 +6,7 @@ Write-Host "Compiling workspace at path:" $WorkspaceFolder
 
 #Sort to latest if multiple AL extensions installed in vscode
 $alExtensionFolder = (Get-ChildItem -Path "$($env:USERPROFILE)\.vscode\extensions\" -Filter "ms-dynamics-smb.al-*" -Directory | Sort-Object -Bottom 1)
-$compilerPath = (Join-Path -Path $alExtensionFolder.FullName -ChildPath "\bin\alc.exe");
+$compilerPath = (Join-Path -Path $alExtensionFolder.FullName -ChildPath "\bin\win32\alc.exe");
 
 Write-Host "Using compiler at path:" $compilerPath
 
