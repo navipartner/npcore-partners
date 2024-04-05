@@ -493,7 +493,7 @@
     begin
         POSEntry.Copy(POSEntryIn);
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
-        POSEntry.SetFilter(POSEntry."Post Entry Status", '<2');
+        POSEntry.SetRange(POSEntry."Post Entry Status", POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
 
         if POSEntry.FindSet() then
             repeat
@@ -702,7 +702,7 @@
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
         if (not GenJournalLine.FindSet()) then
-            exit(false);
+            exit(true);  //There are no general journal lines to post. The POS entry can be marked as posted
 
         repeat
             if (not TryCheckJournalLine(GenJournalLine)) then begin

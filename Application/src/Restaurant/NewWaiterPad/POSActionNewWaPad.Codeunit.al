@@ -133,19 +133,29 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
     var
         SalePOS: Record "NPR POS Sale";
         Seating: Record "NPR NPRE Seating";
+        SeatingMgt: Codeunit "NPR NPRE Seating Mgt.";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
         WaiterpadInfoConfig: JsonObject;
+        RestaurantCode: Code[20];
         AskForNumberOfGuests: Boolean;
         RequestCustomerName: Boolean;
         RequestCustomerPhone: Boolean;
         RequestCustomerEmail: Boolean;
     begin
+        RestaurantCode := POSSetup.RestaurantCode();
         POSSale.GetCurrentSale(SalePOS);
-        Context.SetContext('restaurantCode', POSSetup.RestaurantCode());
+        Context.SetContext('restaurantCode', RestaurantCode);
         if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
             Seating.Get(SalePOS."NPRE Pre-Set Seating Code");
             Context.SetContext('seatingCode', SalePOS."NPRE Pre-Set Seating Code");
-        end;
+        end else
+            if RestaurantCode <> '' then begin
+                Seating.SetFilter("Seating Location", SeatingMgt.RestaurantSeatingLocationFilter(RestaurantCode));
+                if Seating.Count() = 1 then begin
+                    Seating.FindFirst();
+                    Context.SetContext('seatingCode', Seating.Code);
+                end;
+            end;
 
         if Context.GetBooleanParameter('AskForNumberOfGuests', AskForNumberOfGuests) then;
         if Context.GetBooleanParameter('RequestCustomerName', RequestCustomerName) then;

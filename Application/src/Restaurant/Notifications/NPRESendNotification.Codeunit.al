@@ -189,7 +189,7 @@ codeunit 6184783 "NPR NPRE Send Notification"
         end;
         SmsMgt.PopulateSendList(Recipients, SMSTemplateHdr."Recipient Type", SMSTemplateHdr."Recipient Group", SendTo);
 
-        if Recipients.Count() > 1 then
+        if Recipients.Count() > 0 then
             exit(true);
 
         NotificationHandler.SetNotSent(NotificationEntry, StrSubstNo(_InvalidValueTxt, NotificationEntry.FieldCaption("Notification Address")));

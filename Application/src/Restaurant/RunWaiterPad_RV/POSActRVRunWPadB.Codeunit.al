@@ -18,6 +18,6 @@ codeunit 6151336 "NPR POSAct. RV Run W/PadB"
             if not Confirm(WPadIsOpenedInPOSSale, false) then
                 Error('');
 
-        WaiterPadPOSMgt.RunWaiterPadAction(WPadAction, WPadLinesToSend = WPadLinesToSend::All, ServingStepToRequest, WaiterPad, ResultMessageText);
+        WaiterPadPOSMgt.RunWaiterPadAction(WPadAction, WPadLinesToSend = WPadLinesToSend::All, ServingStepToRequest, false, WaiterPad, ResultMessageText);
     end;
 }
