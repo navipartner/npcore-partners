@@ -97,7 +97,7 @@ codeunit 6150676 "NPR POSAction: Run Wa. Action" implements "NPR IPOS Workflow"
 
                     FrontEnd.WorkflowResponse(
                         BusinessLogic.RunWaiterPadAction(
-                            WPadAction, WPadLinesToSend, ServingStepToRequest, ClearSaleOnFinish, Sale, SaleLine, NewWaiterPadNo, ResultMessageText, CleanupMessageText));
+                            WPadAction, WPadLinesToSend, ServingStepToRequest, ClearSaleOnFinish, SuppressDialogs, Sale, SaleLine, NewWaiterPadNo, ResultMessageText, CleanupMessageText));
 
                     IF WPadAction = WPadAction::"Merge Waiter Pad" then
                         Context.SetContext('NewWaiterPadNo', NewWaiterPadNo);

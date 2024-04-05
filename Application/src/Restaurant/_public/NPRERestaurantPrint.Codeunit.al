@@ -472,12 +472,17 @@
     var
         MessageText: Text;
     begin
-        MessageText := RequestRunServingStepToKitchen(WaiterPad, AutoSelectFlowStatus, FlowStatusCode);
+        MessageText := RequestRunServingStepToKitchen(WaiterPad, AutoSelectFlowStatus, FlowStatusCode, false);
         if MessageText <> '' then
             Message(MessageText);
     end;
 
     procedure RequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10]): Text
+    begin
+        exit(RequestRunServingStepToKitchen(WaiterPad, AutoSelectFlowStatus, FlowStatusCode, false));
+    end;
+
+    procedure RequestRunServingStepToKitchen(var WaiterPad: Record "NPR NPRE Waiter Pad"; AutoSelectFlowStatus: Boolean; FlowStatusCode: Code[10]; SuppressError: Boolean): Text
     var
         FlowStatus: Record "NPR NPRE Flow Status";
         ServingReqestedMsg: Label 'Serving of %1 requested for seating %2 (waiter pad %3).';
@@ -503,8 +508,11 @@
         SetWaiterPadMealFlowStatus(WaiterPad, FlowStatusCode);
 
         while not PrintWaiterPadToKitchen(WaiterPad, _PrintTemplate."Print Type"::"Serving Request", FlowStatusCode, false, not AutoSelectFlowStatus) and AutoSelectFlowStatus do begin
-            if FlowStatus.Next() = 0 then
-                Error(NoMoreMealGroupsLbl);
+            if FlowStatus.Next() = 0 then begin
+                if not SuppressError then
+                    Error(NoMoreMealGroupsLbl);
+                exit(NoMoreMealGroupsLbl);
+            end;
             FlowStatusCode := FlowStatus.Code;
             SetWaiterPadMealFlowStatus(WaiterPad, FlowStatusCode);
         end;
