@@ -781,15 +781,15 @@
         LineRelation.Insert();
     end;
 
-    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; WaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
+    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; SuppressError: Boolean; WaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
     var
         WaiterPad2: Record "NPR NPRE Waiter Pad";
     begin
         Clear(WaiterPad2);
-        RunWaiterPadAction(WPadAction, SendAllLines, ServingStepToRequest, WaiterPad, WaiterPad2, ResultMessageText);
+        RunWaiterPadAction(WPadAction, SendAllLines, ServingStepToRequest, SuppressError, WaiterPad, WaiterPad2, ResultMessageText);
     end;
 
-    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
+    procedure RunWaiterPadAction(WPadAction: Option "Print Pre-Receipt","Send Kitchen Order","Request Next Serving","Request Specific Serving","Merge Waiter Pad","Open Waiter Pad"; SendAllLines: Boolean; ServingStepToRequest: Code[10]; SuppressError: Boolean; WaiterPad: Record "NPR NPRE Waiter Pad"; var MergeToWaiterPad: Record "NPR NPRE Waiter Pad"; var ResultMessageText: Text)
     var
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
     begin
@@ -806,7 +806,7 @@
 
             WPadAction::"Request Next Serving":
                 begin
-                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '');
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, true, '', SuppressError);
                 end;
 
             WPadAction::"Request Specific Serving":
@@ -814,7 +814,7 @@
                     if ServingStepToRequest = '' then
                         if not LookupServingStep(ServingStepToRequest) then
                             Error('');
-                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest);
+                    ResultMessageText := RestaurantPrint.RequestRunServingStepToKitchen(WaiterPad, false, ServingStepToRequest, SuppressError);
                 end;
 
             WPadAction::"Merge Waiter Pad":
@@ -926,13 +926,16 @@
 
     procedure AddSaveToWPadAndRequestNextServingWorkflow(Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup"; var PreWorkflows: JsonObject)
     var
+        Item: Record Item;
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
         SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
         ServiceFlowProfile: Record "NPR NPRE Serv.Flow Profile";
         SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
         ActionParameters: JsonObject;
         CustomParameters: JsonObject;
         MainParameters: JsonObject;
+        ProducibleItemFound: Boolean;
     begin
         if RestaurantSetup.IsEmpty() then
             exit;
@@ -944,6 +947,22 @@
         SetupProxy.GetServiceFlowProfile(ServiceFlowProfile);
         If not ServiceFlowProfile."AutoSave to W/Pad on Sale End" then
             exit;
+
+        if SetupProxy.ServingStepDiscoveryMethod() = "NPR NPRE Serv.Step Discovery"::"Item Routing Profiles" then begin
+            ProducibleItemFound := false;
+            SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+            SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+            SaleLinePOS.SetFilter("No.", '<>%1', '');
+            SaleLinePOS.SetLoadFields("No.");
+            Item.SetLoadFields("NPR NPRE Item Routing Profile");
+            if SaleLinePOS.Find('-') then
+                repeat
+                    ProducibleItemFound := Item.Get(SaleLinePOS."No.") and (Item."NPR NPRE Item Routing Profile" <> '');
+                until ProducibleItemFound or (SaleLinePOS.Next() = 0);
+            if not ProducibleItemFound then
+                exit;
+        end;
 
         MainParameters.Add('LinesToSend', 0);  //New/Updated
         MainParameters.Add('WaiterPadAction', 2);  //Request Next Serving
