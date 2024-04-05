@@ -29,7 +29,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         else
             Url := Link;
 
-        ResponseText := SendShopifyRequest('GET', Url, NextLink);
+        ResponseText := SendShopifyRequest(NcTask, 'GET', Url, NextLink);
 
         Result.ReadFrom(ResponseText);
         Result.SelectToken('orders', Token);
