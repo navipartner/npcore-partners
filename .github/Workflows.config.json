@@ -108,5 +108,6 @@
     "useCompareAppVersion": "appsource",
     "appSourceProductName": "NP Retail",
     "NuGetFeed": "https://navipartner.pkgs.visualstudio.com/_packaging/NaviPartner.NavApps/nuget/v3/index.json",
-    "approvedReleaseActors": ["navipartner", "vhn", "gustavkauman", "slaven"]
+    "approvedReleaseActors": ["navipartner", "vhn", "gustavkauman", "slaven"],
+    "autoApprovePrActors": ["timpans", "slaven"]
 }
