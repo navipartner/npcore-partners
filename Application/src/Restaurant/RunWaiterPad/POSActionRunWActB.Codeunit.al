@@ -31,7 +31,7 @@ codeunit 6151335 "NPR POSAction: Run WAct-B"
         NewWaiterPadActionParams := ParamMgt.GetParametersAsJsonObject(ServiceFlowProfile.RecordId(), ServiceFlowProfile.FieldNo("New Waiter Pad Action"));
     end;
 
-    internal procedure RunWaiterPadAction(WPadAction: Option; WPadLinesToSend: Option "New/Updated",All; ServingStepToRequest: Code[10]; ClearSaleOnFinish: Boolean; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; var NewWaiterPadNo: Code[20]; var ResultMessageText: Text; var CleanupMessageText: Text) ConfirmSaleCleanup: Boolean
+    internal procedure RunWaiterPadAction(WPadAction: Option; WPadLinesToSend: Option "New/Updated",All; ServingStepToRequest: Code[10]; ClearSaleOnFinish: Boolean; SuppressError: Boolean; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; var NewWaiterPadNo: Code[20]; var ResultMessageText: Text; var CleanupMessageText: Text) ConfirmSaleCleanup: Boolean
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -57,7 +57,7 @@ codeunit 6151335 "NPR POSAction: Run WAct-B"
                     Error('');
                 SaleLine.DeleteWPadSupportedLinesOnly();
             end;
-            WaiterPadPOSMgt.RunWaiterPadAction(WPadAction, WPadLinesToSend = WPadLinesToSend::All, ServingStepToRequest, WaiterPad, WaiterPad2, ResultMessageText);
+            WaiterPadPOSMgt.RunWaiterPadAction(WPadAction, WPadLinesToSend = WPadLinesToSend::All, ServingStepToRequest, SuppressError, WaiterPad, WaiterPad2, ResultMessageText);
             IF WPadAction = _WPadAction::"Merge Waiter Pad" then
                 NewWaiterPadNo := WaiterPad2."No.";
         end;
