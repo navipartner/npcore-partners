@@ -11,6 +11,7 @@ on:
       - 'Application/**'
       - 'Test/**'
       - 'Performance Toolkit/**'
+      - 'IntegrationTest/**'
       - '.github/**'
 
 concurrency:
