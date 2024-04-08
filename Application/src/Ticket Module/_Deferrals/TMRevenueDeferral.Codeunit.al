@@ -57,6 +57,8 @@ codeunit 6184739 "NPR TM RevenueDeferral"
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetailedTicketEntry: Record "NPR TM Det. Ticket AccessEntry";
+        ScheduledEntry: Record "NPR TM Admis. Schedule Entry";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         if (DeferRevenueRequest.Status <> DeferRevenueRequest.Status::REGISTERED) then
@@ -77,7 +79,7 @@ codeunit 6184739 "NPR TM RevenueDeferral"
         if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
             exit;
 
-        if (not TicketBOM.Default) then // Defer full revenue only when default admission is admitted.
+        if (not TicketBOM.DeferRevenue) then
             exit;
 
         if (not TicketRequest.Get(Ticket."Ticket Reservation Entry No.")) then
@@ -93,6 +95,17 @@ codeunit 6184739 "NPR TM RevenueDeferral"
         DeferRevenueRequest.TicketValidUntil := Ticket."Valid To Date";
         DeferRevenueRequest.DeferRevenueProfileCode := TicketType.DeferRevenueProfileCode;
         DeferRevenueRequest.SalesDate := SalesDate;
+
+        DetailedTicketEntry.SetFilter("Ticket Access Entry No.", '=%1', DeferRevenueRequest.TicketAccessEntryNo);
+        DetailedTicketEntry.SetFilter(Type, '=%1', DetailedTicketEntry.Type::RESERVATION);
+        DetailedTicketEntry.SetFilter(Quantity, '>%1', 0);
+        if (DetailedTicketEntry.FindFirst()) then begin
+            ScheduledEntry.SetFilter("External Schedule Entry No.", '=%1', DetailedTicketEntry."External Adm. Sch. Entry No.");
+            ScheduledEntry.SetFilter(Cancelled, '=%1', false);
+            if (ScheduledEntry.FindFirst()) then
+                DeferRevenueRequest.TicketValidUntil := ScheduledEntry."Admission End Date";
+        end;
+
         exit(true);
     end;
 

@@ -37,6 +37,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the default admission when multiple admissions are created for the ticket. This is relevant if POS is configured to admit Default Admission upon sale.';
                 }
+                field(DeferRevenue; Rec.DeferRevenue)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies if the revenue should be deferred until this admission is admitted or ticket has expired.';
+                }
                 field("Ticket Schedule Selection"; Rec."Ticket Schedule Selection")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

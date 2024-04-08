@@ -33,6 +33,11 @@ page 6059885 "NPR TM Ticket BOM Part"
                     ToolTip = 'Specifies the default admission when multiple admissions are created for the ticket.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(DeferRevenue; Rec.DeferRevenue)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies if the revenue should be deferred until this admission is admitted or ticket has expired.';
+                }
                 field("Admission Entry Validation"; Rec."Admission Entry Validation")
                 {
                     ToolTip = 'Determines how many times the ticket can be validated when admitting entry.';

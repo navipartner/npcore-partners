@@ -244,6 +244,22 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Notification Profile";
         }
+        field(130; DeferRevenue; Boolean)
+        {
+            Caption = 'Defer Revenue';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                TicketBom: Record "NPR TM Ticket Admission BOM";
+                AlreadySet: Label 'Defer Revenue is already set for admission %1.';
+            begin
+                TicketBom.SetFilter("Item No.", '=%1', Rec."Item No.");
+                TicketBom.SetFilter("Admission Code", '<>%1', Rec."Admission Code");
+                TicketBom.SetFilter(DeferRevenue, '=%1', true);
+                if (TicketBom.FindFirst()) then
+                    Error(AlreadySet, "Admission Code");
+            end;
+        }
         field(150; "POS Sale May Exceed Capacity"; Boolean)
         {
             Caption = 'POS Sale May Exceed Capacity';

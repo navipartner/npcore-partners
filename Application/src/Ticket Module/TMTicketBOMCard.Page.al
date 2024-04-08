@@ -49,6 +49,11 @@ page 6059886 "NPR TM Ticket BOM Card"
                     ToolTip = 'Specifies the default admission when multiple admissions are created for the ticket.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(DeferRevenue; Rec.DeferRevenue)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies if the revenue should be deferred until this admission is admitted or ticket has expired.';
+                }
 
             }
             group(Policies)
