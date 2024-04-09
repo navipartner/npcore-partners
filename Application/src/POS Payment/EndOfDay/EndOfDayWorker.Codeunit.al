@@ -154,9 +154,9 @@ codeunit 6059860 "NPR End Of Day Worker"
         ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(POSUnitNo, SalespersonPurchaserCode);
         POSManagePOSUnit.ClosePOSUnitNo(POSUnitNo, ClosingEntryNo);
 
+        POSSession.ChangeViewLogin();
         if (BalanceEntryToPrint <> 0) then begin
             Commit();
-            POSSession.ChangeViewLogin();
             PrintEndOfDayReport(POSUnitNo, BalanceEntryToPrint);
         end;
 
