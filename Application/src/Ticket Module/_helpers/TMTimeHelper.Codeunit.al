@@ -3,7 +3,7 @@ codeunit 6184773 "NPR TM TimeHelper"
     Access = Internal;
 
     var
-        _UFormat: Label '<Year4>-<Month,2>-<Day,2> <Hours24,2>:<Minutes,2>:<Seconds,2>', Locked = true;
+        _UFormat: Label '<Year4>-<Month,2>-<Day,2>T<Hours24,2>:<Minutes,2>:<Seconds,2>', Locked = true;
         _UTCTimeZoneCode: Label '+00:00', Locked = true;
 
     #region Admission
