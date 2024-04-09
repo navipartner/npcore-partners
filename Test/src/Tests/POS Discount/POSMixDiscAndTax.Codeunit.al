@@ -24,8 +24,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
-
         Initialized: Boolean;
+        DayDirection: Option Today,Future,Past;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -5563,6 +5563,2186 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreEqual(POSSaleLine."Discount Amount", 0, 'Discount Amount not calculated according to scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInTheFutureApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item but with start date set in the future
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Starting date" := Today() + 2;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInTheFutureApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item but with start date set in the future
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount."Starting date" := Today() + 2;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInThePastApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item but with end date set in the past
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount."Ending date" := Today() - 2;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInThePastApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item but with end date set in the past
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Ending date" := Today() - 2;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInTheFutureSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item but with start date set in the future with specific time interval
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInTheFutureSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pedning mix discount to be applied on item but with start date set in the future with specific time interval
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInThePastSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item but with end date set in the past with specific time interval set
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInThePastSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item but with end date set in the past with specific time interval set
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item with specific time interval set
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = MixedDiscount.Code, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountSpecificTimeIntervalApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item with specific time interval set
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount.Modify(true);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInTheFutureSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item in the future with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInTheFutureSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item in the future with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInTheFutureSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item in the future with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInTheFutureSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item in the future with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInThePastSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item in the past with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountInThePastSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item in the past with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInThePastSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item in the past with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountInThePastSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount to be applied on item in the past with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = MixedDiscount.Code, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = MixedDiscount.Code, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountSpecificTimeIntervalSpecificDayApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountSpecificTimeIntervalSpecificDayTimeEmptyApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount to be applied on item with specific time interval set with specific day
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountWithCustomerDiscountGroupApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount with one customer discount group and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with same customer group that set on discount
+        Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = MixedDiscount.Code, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountWithCustomerDiscountGroupButCustomerNotAddedToSaleApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount with one customer discount group and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountWithCustomerDiscountGroupAndDifferentCustomerApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Enabled mix discount with one customer discount group and a customer that doesn't have the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CreateDiscountGroup();
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with different customer group that set on discount
+        Customer."Customer Disc. Group" := CreateDiscountGroup();
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountWithCustomerDiscountGroupsApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Active mix discount with mutliple customer discount groups and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode + '|' + CreateDiscountGroup();
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with same customer group that set on discount
+        Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = MixedDiscount.Code, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ActiveMixDiscountWithCustomerDiscountGroupsAndCustomerWithDifferentOneApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Enabled mix discount with multuiple customer discount groups and a customer that doesn't have the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode + '|' + CreateDiscountGroup();
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with different customer group that set on discount
+        Customer."Customer Disc. Group" := CreateDiscountGroup();
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountWithCustomerDiscountGroupApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount with one customer discount group and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with same customer group that set on discount
+        Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountWithCustomerDiscountGroupButCustomerNotAddedToSaleApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount with one customer discount group and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountWithCustomerDiscountGroupAndCustomerWithDifferentGroupApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomerDiscountGroupCode: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount with one customer discount group and a customer that has different discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomerDiscountGroupCode := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with different customer group that set on discount
+        Customer."Customer Disc. Group" := CreateDiscountGroup();
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountWithCustomerDiscountGroupsApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        CustomeDiscountGroup: Code[10];
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount with mutliple customer discount groups and a customer that has the same discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CustomeDiscountGroup := CreateDiscountGroup();
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount."Customer Disc. Group Filter" := CustomeDiscountGroup + '|' + CreateDiscountGroup();
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with same customer group that set on discount
+        Customer."Customer Disc. Group" := CustomeDiscountGroup;
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DisabledMixDiscountWithCustomerDiscountGroupsAndCustomerWithDifferentGroupApplication()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        MixedDiscount: Record "NPR Mixed Discount";
+        MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv.";
+        Customer: Record Customer;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        Qty: Decimal;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Pending mix discount with mutliple customer discount groups and a customer that has different discount group
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        CreateCustomer(Customer, false, true);
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Tax Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 20;
+        VATPostingSetup.Modify();
+        Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        Customer.Modify();
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price        
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] Discount with Customer Discount Group 
+        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        MixedDiscount.Status := MixedDiscount.Status::Pending;
+        MixedDiscount."Customer Disc. Group Filter" := CreateDiscountGroup() + '|' + CreateDiscountGroup();
+        MixedDiscount.Modify(true);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+
+        // [GIVEN] Customer with same customer group that set on discount
+        Customer."Customer Disc. Group" := CreateDiscountGroup();
+        Customer.Modify(true);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Customer applied to sale
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::" ", 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = '', 'Total Discount not applied according to scenario.');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
+    end;
 
     procedure InitializeData()
     var
@@ -5869,6 +8049,51 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         MixedDiscountLine.Insert();
     end;
 
+    local procedure CreateMixDiscountTimeInterval(MixedDiscount: Record "NPR Mixed Discount"; var MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv."; StartTime: Time; EndTime: Time)
+    begin
+        MixedDiscTimeInterv.Init();
+        MixedDiscTimeInterv."Mix Code" := MixedDiscount.Code;
+        MixedDiscTimeInterv."Line No." := 10000;
+        MixedDiscTimeInterv."Start Time" := StartTime;
+        MixedDiscTimeInterv."End Time" := EndTime;
+        MixedDiscTimeInterv."Period Type" := MixedDiscTimeInterv."Period Type"::"Every Day";
+        MixedDiscTimeInterv.Insert();
+    end;
+
+    local procedure GetDayAndSetToMixedDiscTimeInterval(var MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv."; DayDirection: Option Today,Future,Past)
+    var
+        DayInteger: Integer;
+        DaysOfWeek: Option Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday;
+    begin
+        MixedDiscTimeInterv."Period Type" := MixedDiscTimeInterv."Period Type"::Weekly;
+        DayInteger := Date2DWY(Today(), 1) - 1;
+        case DayDirection of
+            DayDirection::Future:
+                DayInteger := (DayInteger + 1) mod 7;
+            DayDirection::Past:
+                DayInteger := ((DayInteger + 6) mod 7);
+        end;
+
+        DaysOfWeek := DayInteger;
+        case DaysOfWeek of
+            DaysOfWeek::Monday:
+                MixedDiscTimeInterv.Monday := true;
+            DaysOfWeek::Tuesday:
+                MixedDiscTimeInterv.Tuesday := true;
+            DaysOfWeek::Wednesday:
+                MixedDiscTimeInterv.Wednesday := true;
+            DaysOfWeek::Thursday:
+                MixedDiscTimeInterv.Thursday := true;
+            DaysOfWeek::Friday:
+                MixedDiscTimeInterv.Friday := true;
+            DaysOfWeek::Saturday:
+                MixedDiscTimeInterv.Saturday := true;
+            DaysOfWeek::Sunday:
+                MixedDiscTimeInterv.Sunday := true;
+        end;
+        MixedDiscTimeInterv.Modify(true);
+    end;
+
     local procedure VerifyVATforGLEntry(POSEntry: Record "NPR POS Entry"; TaxArea: Record "Tax Area")
     var
         GLEntry: Record "G/L Entry";
@@ -5940,5 +8165,22 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         TaxPostingSetup."VAT Calculation Type" := TaxPostingSetup."VAT Calculation Type"::"Sales Tax";
         TaxPostingSetup."Tax Category" := 'E';
         TaxPostingSetup.Modify();
+    end;
+
+    local procedure CreateDiscountGroup(): Code[10];
+    var
+        CustomerDiscountGroup: Record "Customer Discount Group";
+        LibraryUtility: Codeunit "Library - Utility";
+        CustomerDiscountGroupCode: Code[10];
+        CustomerDiscountGroupDescriptionLbl: Label 'MixDiscAndTaxTests Description', Locked = true;
+    begin
+        CustomerDiscountGroupCode := LibraryUtility.GenerateRandomCode(CustomerDiscountGroup.FieldNo(Code), Database::"Customer Discount Group");
+        if (not CustomerDiscountGroup.Get(CustomerDiscountGroupCode)) then begin
+            CustomerDiscountGroup.Init();
+            CustomerDiscountGroup.Code := CustomerDiscountGroupCode;
+            CustomerDiscountGroup.Description := CustomerDiscountGroupDescriptionLbl;
+            CustomerDiscountGroup.Insert();
+        end;
+        exit(CustomerDiscountGroup.Code);
     end;
 }
