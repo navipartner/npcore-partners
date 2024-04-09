@@ -609,6 +609,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
                     begin
                         POSEntry2.SetRange("Entry Date", "POS Entry"."Entry Date");
                         POSEntry2.SetRange("System Entry", false);
+                        POSEntry2.SetFilter("POS Unit No.", "POS Entry".GetFilter("POS Unit No."));
                         POSEntry2.SetFilter("Entry Type", '%1|%2|%3|%4|%5',
                         POSEntry2."Entry Type"::"Credit Sale",
                         POSEntry2."Entry Type"::"Direct Sale",
