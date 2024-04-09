@@ -1101,4 +1101,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_MEMBER_LOYALTY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT MM Loyalty";
     }
+    value(6184834; DOCLX_CITY_CARD)
+    {
+        Caption = 'DOCLX_CITY_CARD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction DocLXCityCard";
+    }
 }
