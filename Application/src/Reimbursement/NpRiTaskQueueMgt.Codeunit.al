@@ -35,7 +35,7 @@
         NpRiReimbursement.SetFilter("Party Type", '<>%1', '');
         NpRiReimbursement.SetFilter("Party No.", '<>%1', '');
         NpRiReimbursement.SetFilter("Template Code", '<>%1', '');
-        if NpRiReimbursement.FindSet(true) then
+        if NpRiReimbursement.FindSet() then
             repeat
                 Clear(NpRiDataCollectionMgt);
                 if NpRiDataCollectionMgt.Run(NpRiReimbursement) then;
@@ -53,7 +53,7 @@
         NpRiReimbursement.SetFilter("Template Code", '<>%1', '');
         NpRiReimbursement.SetFilter("Reimbursement Date", '<>%1&>=%2', 0D, Today);
         NpRiReimbursement.SetFilter("Posting Date", '<>%1', 0D);
-        if NpRiReimbursement.FindSet(true) then
+        if NpRiReimbursement.FindSet() then
             repeat
                 Clear(NpRiReimbursementMgt);
                 if NpRiReimbursementMgt.Run(NpRiReimbursement) then;
