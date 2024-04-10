@@ -1,7 +1,7 @@
 page 6150762 "NPR Environment Information"
 {
     Caption = 'NP Retail Environment Information';
-    ContextSensitiveHelpPage = 'docs/gettingstarted/environments/';
+    ContextSensitiveHelpPage = 'docs/retail/gettingstarted/environments/';
     PageType = Card;
     SourceTable = "NPR Environment Information";
     ApplicationArea = NPRRetail;
