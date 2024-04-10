@@ -44,7 +44,6 @@ codeunit 6184837 "NPR POS Layout Upgrade"
     local procedure UpdatePOSLayoutEncoding()
     var
         POSLayout: Record "NPR POS Layout";
-        CurrInStream: InStream;
         CurrOutStream: OutStream;
         LayoutText: Text;
     begin
@@ -54,16 +53,19 @@ codeunit 6184837 "NPR POS Layout Upgrade"
 
         repeat
             if POSLayout."Frontend Properties".HasValue() then begin
-                Clear(CurrInStream);
-                Clear(CurrOutStream);
 
                 POSLayout.CalcFields("Frontend Properties");
-                POSLayout."Frontend Properties".CreateInStream(CurrInStream);
-                POSLayout."Frontend Properties".CreateOutStream(CurrOutStream, TextEncoding::UTF8);
+                Clear(LayoutText);
 
-                CurrInStream.Read(LayoutText);
-                CurrOutStream.Write(LayoutText);
-                POSLayout.Modify();
+                if not TryReadPOSLayoutBlobWithEncoding(POSLayout, LayoutText, TextEncoding::UTF8) then
+                    if TryReadPOSLayoutBlobWithEncoding(POSLayout, LayoutText, TextEncoding::Windows) then begin
+
+                        Clear(CurrOutStream);
+                        POSLayout."Frontend Properties".CreateOutStream(CurrOutStream, TextEncoding::UTF8);
+
+                        CurrOutStream.Write(LayoutText);
+                        POSLayout.Modify();
+                    end;
             end;
         until POSLayout.Next() = 0;
 
@@ -106,6 +108,15 @@ codeunit 6184837 "NPR POS Layout Upgrade"
         CurrentInstream: InStream;
     begin
         POSLayoutArchive."Frontend Properties".CreateInStream(CurrentInstream, Encoding);
+        CurrentInstream.Read(PropertiesString);
+    end;
+
+    [TryFunction]
+    local procedure TryReadPOSLayoutBlobWithEncoding(var POSLayout: Record "NPR POS Layout"; var PropertiesString: Text; Encoding: TextEncoding)
+    var
+        CurrentInstream: InStream;
+    begin
+        POSLayout."Frontend Properties".CreateInStream(CurrentInstream, Encoding);
         CurrentInstream.Read(PropertiesString);
     end;
 }
