@@ -2895,7 +2895,7 @@
 
         AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(TicketReservationRequest."Authorization Code"));
 
-        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationRequest.SetCurrentKey("Session Token ID", "Ext. Line Reference No.", "Admission Inclusion");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
