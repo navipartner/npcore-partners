@@ -907,7 +907,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteNumberProperty('unitPrice', DynamicCustomerPrice);
             JBuilder.WriteEndObject();
 
-            JBuilder.WriteNumberProperty('customerPriceInclDiscount', Format(TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection), 0, 9));
+            JBuilder.WriteNumberProperty('customerPriceInclDiscount', TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection));
             JBuilder.WriteEndObject();
 
         until (AdmissionScheduleEntry.Next() = 0);

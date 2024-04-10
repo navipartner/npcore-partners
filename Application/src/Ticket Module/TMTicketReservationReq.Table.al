@@ -278,7 +278,7 @@
         key(Key1; "Entry No.")
         {
         }
-        key(Key2; "Session Token ID", "Ext. Line Reference No.")
+        key(Key2; "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion")
         {
         }
         key(Key3; "Receipt No.", "Line No.")
