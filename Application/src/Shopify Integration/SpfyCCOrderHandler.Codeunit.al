@@ -350,10 +350,12 @@ codeunit 6184805 "NPR Spfy C&C Order Handler"
     var
         CCOrder: Record "NPR Spfy C&C Order";
         NpCsDocument: Record "NPR NpCs Document";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
         if Rec.IsTemporary() or not RunTrigger then
             exit;
-
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Click And Collect") then
+            exit;
         if Rec."Delivery Status" = Rec."Delivery Status"::Delivered then
             Rec.FieldError("Delivery Status");
 
