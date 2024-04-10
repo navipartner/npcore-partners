@@ -61,6 +61,9 @@ codeunit 6184576 "NPR SS InitializeSelfServiceBl"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         EFTTransactionRequest.SetFilter("Sales Ticket No.", '=%1', POSSaleRec."Sales Ticket No.");
+        EFTTransactionRequest.SetFilter(Successful, '=%1', true);
+        EFTTransactionRequest.SetFilter("External Result Known", '=%1', true);
+        EFTTransactionRequest.SetFilter("Result Amount", '<>%1', 0);
         exit(not (EFTTransactionRequest.IsEmpty()));
     end;
 
