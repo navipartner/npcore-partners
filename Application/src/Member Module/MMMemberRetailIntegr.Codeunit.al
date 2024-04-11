@@ -754,6 +754,21 @@
         exit(LookupOK);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Merg.Sml.LinesB", 'OnBeforeCollapseSaleLine', '', true, true)]
+    local procedure OnBeforeCollapseSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var CollapseSupported: Boolean)
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        if (not CollapseSupported) then
+            exit;
+
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        MemberInfoCapture.SetFilter("Line No.", '=%1', saleLinePOS."Line No.");
+        if (not MemberInfoCapture.IsEmpty()) then
+            CollapseSupported := false;
+    end;
+
     [EventSubscriber(ObjectType::"Codeunit", Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSSalesLine', '', true, true)]
     local procedure IssueMembersFromPosEntrySaleLine(POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
     var

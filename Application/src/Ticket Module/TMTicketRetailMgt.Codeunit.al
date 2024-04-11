@@ -489,6 +489,16 @@
             RevokeTicketSales(SaleLinePOS);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Merg.Sml.LinesB", 'OnBeforeCollapseSaleLine', '', true, true)]
+    local procedure OnBeforeCollapseSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var CollapseSupported: Boolean)
+    begin
+        if (not CollapseSupported) then
+            exit;
+
+        if (IsTicketSalesLine(SaleLinePOS)) then
+            CollapseSupported := false;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     var
