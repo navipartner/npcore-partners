@@ -1,16 +1,26 @@
 codeunit 6150697 "NPR POS Act:Prnt Post.Exch BL"
 {
     Access = Internal;
-    procedure OnActionPrintTmplPosted(Setup: codeunit "NPR POS Setup"; LastSale: Boolean; SingleLine: Boolean; TemplateCode: Code[20])
+    procedure OnActionPrintTmplPosted(Setup: codeunit "NPR POS Setup"; LastSale: Boolean; SingleLine: Boolean; TemplateCode: Code[20]; TransactionFilter: Option posunit,posstore,alltransactions)
     var
         POSEntry: Record "NPR POS Entry";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         RecordVar: Variant;
         NoSaleLinesErr: Label 'The sale selected has no lines';
+        POSStore: Record "NPR POS Store";
     begin
         POSEntry.FilterGroup(2);
-        POSEntry.SetRange("POS Unit No.", Setup.GetPOSUnitNo());
+        Setup.Initialize();
+        Case TransactionFilter of
+            TransactionFilter::posunit:
+                POSEntry.SetRange("POS Unit No.", Setup.GetPOSUnitNo());
+            TransactionFilter::posstore:
+                begin
+                    Setup.GetPOSStore(POSStore);
+                    POSEntry.SetRange("POS Store Code", POSStore.Code);
+                end;
+        End;
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         POSEntry.FilterGroup(0);
 
