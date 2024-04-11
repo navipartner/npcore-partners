@@ -19,7 +19,6 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         ThisShouldBeEmpty_SaleLinePOS: Record "NPR POS Sale Line";
         ExternalTicketNo: Text[30];
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         POSActionMemberManagement: Codeunit "NPR POS Action Member MgtWF3-B";
@@ -37,16 +36,11 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
             exit;
         end;
 
-
         // Guest and Automatic CheckIn
         PosUnitNo := POSSetup.GetPOSUnitNo();
+
         POSActionMemberManagement.GetMembershipFromCardNumberWithUI(InputMethod, ExternalMemberCardNo, Membership, MemberCard, true, ForeignCommunityCode);
-
         LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
-        Commit();
-
-        MemberRetailIntegration.POS_ValidateMemberCardNo(true, true, InputMethod, true, ExternalMemberCardNo);
-        MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
         Commit();
 
         if (ResponseCode <> 0) then
