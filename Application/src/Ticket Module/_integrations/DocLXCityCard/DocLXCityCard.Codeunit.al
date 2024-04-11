@@ -1,6 +1,7 @@
 codeunit 6184830 "NPR DocLXCityCard"
 {
     Access = Internal;
+
     var
         _ErrorJsonLabel: Label '{"state": {"code": %1, "message": "%2"}}', Locked = true;
         _ValidationFailed: Label 'Card validation failed %1:';
@@ -355,7 +356,7 @@ codeunit 6184830 "NPR DocLXCityCard"
     end;
 
     [TryFunction]
-    // [NonDebuggable]
+    [NonDebuggable]
     local procedure ValidateCard(CardNumber: Code[20]; CityCode: Code[10]; LocationId: Integer; var Result: JsonObject)
     var
         MessageBody: JsonObject;
@@ -380,7 +381,7 @@ codeunit 6184830 "NPR DocLXCityCard"
 
 
     [TryFunction]
-    // [NonDebuggable]
+    [NonDebuggable]
     local procedure RedeemCard(CardNumber: Code[20]; CityCode: Code[10]; LocationId: Integer; ValidationTimeUtc: Text[30]; PosUnitNo: Code[20]; var Result: JsonObject)
     var
         MessageBody: JsonObject;
@@ -409,12 +410,18 @@ codeunit 6184830 "NPR DocLXCityCard"
     var
         Result: JsonObject;
         State: JsonToken;
+        RequestInfo: JsonToken;
     begin
         Result := CheckServiceHealth(CityCode);
 
         if (Result.Get('state', State)) then begin
+            Result.Get('request', RequestInfo);
             StateCode := CopyStr(Get(State.AsObject(), 'code').AsCode(), 1, MaxStrLen(StateCode));
-            StateMessage := Get(State.AsObject(), 'message').AsText();
+            StateMessage := StrSubstNo('Response from: %1 via %2 was %3',
+                Get(RequestInfo.AsObject(), 'hostname').AsText(),
+                Get(RequestInfo.AsObject(), 'helloUrl').AsText(),
+                Get(State.AsObject(), 'message').AsText()
+            );
         end;
     end;
 
@@ -434,9 +441,13 @@ codeunit 6184830 "NPR DocLXCityCard"
         MessageBody.WriteTo(PayloadText);
 
         SendProxyRequest(HelloUrl, PayloadText, Result);
+
+        MessageBody.Add('helloUrl', HelloUrl);
+        Result.Add('request', MessageBody);
+
     end;
 
-    // [NonDebuggable]
+    [NonDebuggable]
     local procedure SendProxyRequest(ProxyUrl: Text; PayloadText: Text; var Result: JsonObject)
     var
         Client: HttpClient;
@@ -515,6 +526,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
+        // https://api.copenhagen.citycardsolutions.com/v1.1/article/mobileList/EN?passkey=80ca508e25d506f810440f58050d00a400b64e91e9bc1289ebc310fe161dd61e
         ArticleUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(ArticleRestEndpoint, CityName, EnvironmentName));
     end;
 
@@ -534,7 +546,10 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
+        // https://npdoclxcitycardapi.azurewebsites.net/api/hello?code=CK1D15x70aFgCG_ZoAx4jvSLfgMLHHkoMBFDtrYgBQcdAzFuWTfhpA==
         HelloUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardHelloUrl');
+
+        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardValidatePath := '/v1.1/coupon/validate/';
     end;
@@ -556,8 +571,10 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
+        // https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=VxwU2MIlZlULkvMF2ugheeM27BvARbJWXtscRdaEE2d6AzFuvIGYBQ==
         ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
 
+        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));
 
@@ -581,8 +598,10 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
+        // https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=VxwU2MIlZlULkvMF2ugheeM27BvARbJWXtscRdaEE2d6AzFuvIGYBQ==
         ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
 
+        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));
 
