@@ -1595,7 +1595,7 @@
     begin
         if Create then begin
             JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(), '', JobQueueDescriptionLbl, CurrentDateTime(), 15, '', JobQueueEntry);
+                JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(), '', JobQueueDescriptionLbl, CurrentDateTime(), 1, '', JobQueueEntry);
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
         end else begin
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
