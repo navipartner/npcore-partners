@@ -103,7 +103,11 @@
         "repoUser": "AzureDevOpsCI",
         "repoPassword": "glpat-BDeGifhMZcZ89LAT4qBw",
         "repoBranchName": "i10n_master",
-        "targetRepoBranchName": "master"
+        "targetRepoBranchName": "master",
+
+        "repo": "",
+        "pullBranch": "",
+        "pushBranch": ""
     },
     "useCompareAppVersion": "appsource",
     "appSourceProductName": "NP Retail",

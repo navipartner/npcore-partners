@@ -1,0 +1,26 @@
+name: 'Monthly Major Release'
+run-name: ${{ github.workflow }}
+
+on:
+  schedule:
+    - cron: "0 18 28 * *" # utc - mm HH DD MM DW
+
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  Run:
+    uses: navipartner/devops/.github/workflows/NewMajorRelease.yaml@main
+    secrets: inherit
