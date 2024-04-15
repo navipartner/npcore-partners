@@ -130,5 +130,64 @@
 
         exit(StepsInitiated);
     end;
+
+    internal procedure GetWorkflowStepSubscriberCodeunitsFilter(Include: Boolean) FilterExpression: Text
+    var
+        EventSubscription: Record "Event Subscription";
+        NPRetalAppNameLbl: Label 'NP Retail', Locked = true;
+    begin
+        EventSubscription.Reset();
+        EventSubscription.SetRange("Publisher Object Type", EventSubscription."Publisher Object Type"::Codeunit);
+        EventSubscription.SetRange("Publisher Object ID", Rec."Publisher Codeunit ID");
+        EventSubscription.SetRange("Published Function", Rec."Publisher Function");
+        EventSubscription.SetRange("Originating App Name", NPRetalAppNameLbl);
+        EventSubscription.SetCurrentKey("Subscriber Codeunit ID");
+
+        EventSubscription.SetLoadFields("Publisher Object Type", "Publisher Object ID", "Published Function", "Originating App Name", "Subscriber Codeunit ID");
+        if not EventSubscription.FindSet() then
+            exit;
+
+        repeat
+            if Include then
+                FilterExpression += '|'
+            else
+                FilterExpression += '&<>';
+
+            FilterExpression += Format(EventSubscription."Subscriber Codeunit ID");
+
+            EventSubscription.SetRange("Subscriber Codeunit ID", EventSubscription."Subscriber Codeunit ID");
+            EventSubscription.FindLast();
+            EventSubscription.SetRange("Subscriber Codeunit ID");
+        until EventSubscription.Next() = 0;
+
+        FilterExpression := CopyStr(FilterExpression, 2);
+    end;
+
+    local procedure FilterPOSScenarioStepsCount(var POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        POSSalesWorkflowStep.Reset();
+        POSSalesWorkflowStep.SetRange("Set Code", '');
+        POSSalesWorkflowStep.SetRange("Workflow Code", Rec.Code);
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
+            POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", GetWorkflowStepSubscriberCodeunitsFilter(false));
+    end;
+
+    internal procedure GetPOSScenarioStepsCount() NoOfWorkflowSteps: Integer
+    var
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        FilterPOSScenarioStepsCount(POSSalesWorkflowStep);
+        NoOfWorkflowSteps := POSSalesWorkflowStep.Count;
+    end;
+
+    internal procedure DrillDownPOSScenarioSteps()
+    var
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        FilterPOSScenarioStepsCount(POSSalesWorkflowStep);
+        Page.Run(0, POSSalesWorkflowStep);
+    end;
 }
 
