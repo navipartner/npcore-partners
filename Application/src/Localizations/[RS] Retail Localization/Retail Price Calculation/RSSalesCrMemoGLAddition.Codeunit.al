@@ -430,6 +430,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     local procedure InsertValueEntry(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ValueEntryIn: Record "Value Entry")
     var
         NewValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         CalculationValueEntryDescLbl: Label 'Calculation';
         RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
@@ -450,6 +451,8 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         NewValueEntry."Cost Posted to G/L" := NewValueEntry."Cost Amount (Actual)";
 
         NewValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
 
         InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
         InsertGLItemLedgerRelation(NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));
@@ -537,18 +540,36 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     local procedure CalculateCostPerUnitForAppliedInvoice(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+        StdValueEntry: Record "Value Entry";
         ValueEntry: Record "Value Entry";
     begin
         SalesInvoiceHeader.Get(SalesCrMemoHeader."Applies-to Doc. No.");
 
-        ValueEntry.SetLoadFields("Document No.", "Document Line No.", "Posting Date", "Location Code", "Item No.", "Cost per Unit");
+        ValueEntry.SetLoadFields("Document No.", "Document Line No.", "Posting Date", "Location Code", "Item No.", "Cost Amount (Actual)");
         ValueEntry.SetRange("Posting Date", SalesInvoiceHeader."Posting Date");
         ValueEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
         ValueEntry.SetRange("Item No.", TempSalesCrMemoLine."No.");
         ValueEntry.SetRange("Location Code", TempSalesCrMemoLine."Location Code");
-        ValueEntry.FindFirst();
 
-        exit(ValueEntry."Cost per Unit" * TempSalesCrMemoLine.Quantity);
+        StdValueEntry.SetLoadFields("Document No.", "Document Line No.", "Posting Date", "Location Code", "Item No.", "Cost Amount (Actual)");
+        StdValueEntry.SetRange("Posting Date", SalesInvoiceHeader."Posting Date");
+        StdValueEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+        StdValueEntry.SetRange("Item No.", TempSalesCrMemoLine."No.");
+        StdValueEntry.SetRange("Location Code", TempSalesCrMemoLine."Location Code");
+        if not ValueEntry.FindSet() then
+            exit;
+        repeat
+            if RSRetValueEntryMapp.Get(ValueEntry."Entry No.") then
+                StdValueEntry.SetFilter("Entry No.", '<>%1', RSRetValueEntryMapp."Entry No.");
+        until ValueEntry.Next() = 0;
+
+        StdValueEntry.CalcSums("Cost Amount (Actual)", "Invoiced Quantity");
+
+        if StdValueEntry."Cost Amount (Actual)" <> 0 then
+            exit(StdValueEntry."Cost Amount (Actual)" / Abs(StdValueEntry."Invoiced Quantity") * TempSalesCrMemoLine.Quantity)
+        else
+            exit(ValueEntry."Cost Amount (Actual)");
     end;
 
     local procedure FindVATBreakDown(): Decimal
