@@ -77,7 +77,7 @@
             exit(false);
         if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
             exit(false);
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
             exit(true);
 
         POSSession.GetSale(POSSale);
@@ -347,7 +347,7 @@
         if Subtotal >= 0 then begin
 
             if EndSale then
-                if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then begin
+                if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then begin
                     ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType));
                 end else begin
                     DoEndSale(POSSession, VoucherType);

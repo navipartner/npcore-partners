@@ -56,6 +56,18 @@
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the Workflow Steps field';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(WorkflowSteps; Rec.GetPOSScenarioStepsCount())
+                {
+
+                    ShowCaption = false;
+                    ToolTip = 'Specifies the value of the Workflow Steps field';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    begin
+                        Rec.DrillDownPOSScenarioSteps();
+                    end;
                 }
             }
         }

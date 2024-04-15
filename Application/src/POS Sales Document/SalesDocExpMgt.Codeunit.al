@@ -305,11 +305,9 @@
         if PrintProformaInv and (not Posted) then
             POSSalesDocumentOutputMgt.PrintNonPostedDocument(SalesHeader, type::Proforma);
 
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
-            InvokeOnAfterFinishCreditSale(SalePOS)
-        else
-            InvokeOnFinishCreditSaleWorkflow(SalePOS);
-
+        InvokeOnFinishCreditSaleWorkflow(SalePOS);
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
+            InvokeOnAfterFinishCreditSale(SalePOS);
 
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
         SalesDocExpMgtPublic.OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
@@ -1284,10 +1282,12 @@ then
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
+        POSSalesWorkflow: Record "NPR POS Sales Workflow";
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         CreditSalePostProcessing: Codeunit "NPR Credit Sale Post-Process";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSalesWorkflowStep.SetCurrentKey("Sequence No.");
         if POSUnit.Get(SalePOS."Register No.") and (POSUnit."POS Sales Workflow Set" <> '') and
@@ -1298,6 +1298,11 @@ then
             POSSalesWorkflowStep.SetRange("Set Code", '');
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishCreditSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
+
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
+            if POSSalesWorkflow.Get(OnFinishCreditSaleCode()) then
+                POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
+
         if not POSSalesWorkflowStep.FindSet() then
             exit;
 
