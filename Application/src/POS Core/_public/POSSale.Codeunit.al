@@ -1053,6 +1053,8 @@
         NPRPOSUnit: Record "NPR POS Unit";
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        POSSalesWorkflow: Record "NPR POS Sales Workflow";
         StartTime: DateTime;
     begin
         StartTime := CurrentDateTime;
@@ -1062,6 +1064,11 @@
             POSSalesWorkflowStep.SetRange("Set Code", POSSalesWorkflowSetEntry."Set Code");
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
+
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
+            if POSSalesWorkflow.Get(OnFinishSaleCode()) then
+                POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
+
         if not POSSalesWorkflowStep.FindSet() then
             exit;
 

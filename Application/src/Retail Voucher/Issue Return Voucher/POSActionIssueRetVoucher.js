@@ -1,7 +1,7 @@
 let main = async ({ workflow, parameters, popup, captions }) => {
     debugger;
     let amountInput;
-    const { posLifeCycleEventsWorkflowsEnabled } = await workflow.respond('validateRequest');
+    const { posLifeCycleEventsWorkflowsEnabled_v2 } = await workflow.respond('validateRequest');
 
     if (parameters.VoucherTypeCode) {
         workflow.context.voucherType = parameters.VoucherTypeCode
@@ -37,7 +37,7 @@ let main = async ({ workflow, parameters, popup, captions }) => {
         await workflow.respond("scanReference");
     }
     if (parameters.EndSale) {
-        if (posLifeCycleEventsWorkflowsEnabled) {
+        if (posLifeCycleEventsWorkflowsEnabled_v2) {
             await workflow.run('END_SALE', { parameters: {calledFromWorkflow: 'ISSUE_RETURN_VCHR_2', paymentNo: paymentNo } });
         } else {
             await workflow.respond("endSale");
