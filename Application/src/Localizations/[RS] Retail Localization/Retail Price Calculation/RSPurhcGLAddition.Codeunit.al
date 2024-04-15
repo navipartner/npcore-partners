@@ -242,6 +242,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
     local procedure InsertValueEntry(ValueEntryIn: Record "Value Entry"; GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GenJnlLine: Record "Gen. Journal Line")
     var
         NewValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         CalculationValueEntryDescLbl: Label 'Calculation';
         RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
@@ -257,6 +258,8 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             exit;
 
         NewValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
 
         InsertGLItemLedgerRelation(GenJnlPostLine, NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
         InsertGLItemLedgerRelation(GenJnlPostLine, NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));

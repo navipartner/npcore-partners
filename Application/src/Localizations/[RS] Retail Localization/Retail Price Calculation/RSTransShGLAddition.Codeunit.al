@@ -225,6 +225,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     local procedure InsertRetailValueEntry(TransferHeader: Record "Transfer Header"; var NewValueEntry: Record "Value Entry"): Boolean
     var
         BaseValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
         BaseValueEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.");
@@ -245,6 +246,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         NewValueEntry."Cost Amount (Actual)" := CalculateRSGLMarginAmount();
         NewValueEntry."Cost Posted to G/L" := NewValueEntry."Cost Amount (Actual)";
         NewValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
 
         InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
         InsertGLItemLedgerRelation(NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));
@@ -270,6 +273,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
     local procedure InsertTransitValueEntry(StdTransitValueEntry: Record "Value Entry"; TransferHeader: Record "Transfer Header"): Boolean
     var
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment;
     begin
         NewTransitValueEntry.Init();
@@ -288,6 +292,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         NewTransitValueEntry."Cost per Unit" := NewTransitValueEntry."Cost per Unit";
         NewTransitValueEntry.Description := CalculationValueEntryDescLbl;
         NewTransitValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewTransitValueEntry, true);
 
         CreateAdditionalGLEntries(TransferHeader, RSGLEntryType::TransitAdjustment);
 
