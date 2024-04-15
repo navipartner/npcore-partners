@@ -168,7 +168,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') of
+        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') of
             true:
                 if not POSActionEndSale.EndSale(POSSale, POSSession, false, '', false, true) then
                     exit(false);
@@ -210,7 +210,7 @@ codeunit 85003 "NPR Library - POS Mock"
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
-        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
             POSActionPayment.TryEndSale(POSPaymentMethod, POSSession) //TryEndSale step of payment action        
         else
             POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true);
@@ -398,7 +398,7 @@ codeunit 85003 "NPR Library - POS Mock"
             exit(false);
 
         POSSession.GetSale(POSSale);
-        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') of
+        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') of
             true:
                 if not POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true) then
                     exit(false);
