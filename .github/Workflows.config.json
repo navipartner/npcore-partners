@@ -99,15 +99,15 @@
     "rulesetFile": "main.ruleset.json",
     "analyzers": ["AppSourceCop", "UICop", "CodeCop"],
     "translations": {
-        "repoUrl": "https://gitlab.com/navipartner1/npcore/npcore-translations.git",
-        "repoUser": "AzureDevOpsCI",
-        "repoPassword": "glpat-BDeGifhMZcZ89LAT4qBw",
-        "repoBranchName": "i10n_master",
-        "targetRepoBranchName": "master",
+        "repoUrl": "",
+        "repoUser": "",
+        "repoPassword": "",
+        "repoBranchName": "",
+        "targetRepoBranchName": "",
 
-        "repo": "",
-        "pullBranch": "",
-        "pushBranch": ""
+        "repo": "navipartner/npcore-translations",
+        "pullBranch": "l10n_main",
+        "pushBranch": "main"
     },
     "useCompareAppVersion": "appsource",
     "appSourceProductName": "NP Retail",
