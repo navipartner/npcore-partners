@@ -92,7 +92,7 @@
         ResponseText: Text;
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
             exit;
 
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then

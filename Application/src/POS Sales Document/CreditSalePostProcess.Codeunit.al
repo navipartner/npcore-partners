@@ -4,20 +4,15 @@
     TableNo = "NPR POS Sale";
 
     trigger OnRun()
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then begin
-            case FunctionToRun of
-                FunctionToRun::"Invoke OnFinishCreditSale Subsribers":
-                    begin
-                        OnFinishCreditSale(POSSalesWorkflowStepGlobal, Rec);
-                    end;
-            end;
-        end else begin
-            POSOnCreditSale(Rec);
-
-            OnAfterFinishCreditSale(Rec);
+        case FunctionToRun of
+            FunctionToRun::"Invoke OnFinishCreditSale Subsribers":
+                OnFinishCreditSale(POSSalesWorkflowStepGlobal, Rec);
+            FunctionToRun::Default:
+                begin
+                    POSOnCreditSale(Rec);
+                    OnAfterFinishCreditSale(Rec);
+                end;
         end;
     end;
 

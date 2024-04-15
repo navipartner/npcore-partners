@@ -77,8 +77,28 @@
         }
     }
 
-    actions
-    {
-    }
+    trigger OnOpenPage()
+    begin
+        HideInternalSteps(Rec);
+    end;
+
+    local procedure HideInternalSteps(var POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
+    var
+        POSSalesWorkflow: Record "NPR POS Sales Workflow";
+        WorkflowStepSubscriberCodeunitsFilter: Text;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
+            exit;
+
+        if not POSSalesWorkflow.Get(POSSalesWorkflowStep."Workflow Code") then
+            exit;
+
+        WorkflowStepSubscriberCodeunitsFilter := POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false);
+        if WorkflowStepSubscriberCodeunitsFilter = '' then
+            exit;
+
+        POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", WorkflowStepSubscriberCodeunitsFilter);
+    end;
 }
 

@@ -31,7 +31,7 @@
             exit(false);
         if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
             exit(false);
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
             exit(true);
 
         POSSession.GetSale(POSSale);
@@ -62,7 +62,7 @@
                 Error(VoucherAmtErr, Format(POSSaleLine."Amount Including VAT"), Format((POSSaleLine."Amount Including VAT" + Subtotal)));
             Subtotal = 0:
                 if EndSale then
-                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled') then
+                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
                         ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType))
                     else begin
                         DoEndSale(POSSession, VoucherType);
