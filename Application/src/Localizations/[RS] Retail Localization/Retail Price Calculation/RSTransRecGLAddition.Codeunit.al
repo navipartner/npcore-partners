@@ -206,6 +206,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     local procedure PostRetailValueEntry(TransferReceiptHeader: Record "Transfer Receipt Header"; var NewValueEntry: Record "Value Entry")
     var
         BaseRetailValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         CalculationValueEntryDescLbl: Label 'Calculation';
         RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
@@ -229,6 +230,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         NewValueEntry."Cost per Unit" := BaseRetailValueEntry."Cost per Unit";
         NewValueEntry.Description := CalculationValueEntryDescLbl;
         NewValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
 
         InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
         InsertGLItemLedgerRelation(NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));

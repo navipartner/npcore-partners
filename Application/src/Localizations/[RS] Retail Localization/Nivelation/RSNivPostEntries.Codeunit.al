@@ -303,6 +303,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ItemJournalLine: Record "Item Journal Line";
         ItemLedgEntry: Record "Item Ledger Entry";
         ValueEntry: Record "Value Entry";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
         InitItemJnlLine(ItemJournalLine, PostedNivelationHeader, PostedNivelationLine);
 
@@ -315,6 +316,8 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ValueEntry.Modify();
 
         InsertGLItemLedgerRelation(PostedNivelationLine, ValueEntry);
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(ValueEntry, false);
 
         ItemJournalLine.Delete();
     end;
