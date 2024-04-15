@@ -220,6 +220,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
 
     local procedure InsertTransitValueEntry(var StdTransitValueEntry: Record "Value Entry"; TransferShipmentHeader: Record "Transfer Shipment Header"; TransferShipmentLine: Record "Transfer Shipment Line"): Boolean
     var
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment;
         CalculationValueEntryDescLbl: Label 'Calculation';
     begin
@@ -240,6 +241,8 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         NewTransitValueEntry."Cost per Unit" := NewTransitValueEntry."Cost per Unit";
         NewTransitValueEntry.Description := CalculationValueEntryDescLbl;
         NewTransitValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewTransitValueEntry, true);
 
         CreateAdditionalGLEntries(TransferShipmentHeader, TransferShipmentLine, RSGLEntryType::TransitAdjustment);
 

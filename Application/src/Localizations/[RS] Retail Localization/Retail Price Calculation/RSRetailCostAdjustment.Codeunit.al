@@ -32,4 +32,21 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
             if ItemJournalLine."Location Code" = LocationFilter then
                 IsHandled := true;
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 OR BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::ItemCostManagement, OnAfterSetFilters, '', false, false)]
+    local procedure ItemCostManagement_OnAfterSetFilters(var ValueEntry: Record "Value Entry"; var Item: Record Item)
+    var
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+        RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+    begin
+        if not RetailLocalizationMgt.IsRetailLocalizationEnabled() then
+            exit;
+
+        if not RSRetValueEntryMapp.Get(ValueEntry."Entry No.") then
+            exit;
+
+        ValueEntry.SetFilter("Entry No.", '<>%1', RSRetValueEntryMapp."Entry No.");
+    end;
+#endif
 }
