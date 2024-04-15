@@ -169,6 +169,8 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         ShipmondoEvents.OnBeforeEndShipmentBuild(PakkelabelsShipment, Output);
 
         Output += '}';
+
+        ShipmondoEvents.OnAfterShipmentBuild(PakkelabelsShipment, Output);
     end;
 
     local procedure BuildSender(PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;

@@ -7,4 +7,10 @@ codeunit 6184795 "NPR Shipmondo Events"
     begin
 
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterShipmentBuild(var PakkelabelsShipment: Record "NPR Shipping Provider Document"; var Output: Text)
+    begin
+
+    end;
 }
