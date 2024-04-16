@@ -59,7 +59,7 @@ table 6059796 "NPR POS Layout Archive"
             exit;
 
         CalcFields("Frontend Properties");
-        "Frontend Properties".CreateInStream(InStream);
+        "Frontend Properties".CreateInStream(InStream, TextEncoding::UTF8);
         InStream.Read(Text);
     end;
 
@@ -68,7 +68,7 @@ table 6059796 "NPR POS Layout Archive"
         OutStream: OutStream;
     begin
         Clear("Frontend Properties");
-        "Frontend Properties".CreateOutStream(OutStream);
+        "Frontend Properties".CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.Write(Text);
     end;
 
