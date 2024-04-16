@@ -56,6 +56,10 @@ page 6150780 "NPR APIV1 PBISalesHeader"
                 {
                     Caption = 'Dimension Set ID', Locked = true;
                 }
+                field(noOfArchivedVersions; Rec."No. of Archived Versions")
+                {
+                    Caption = 'No. of Archived Versions', Locked = true;
+                }
             }
         }
     }
