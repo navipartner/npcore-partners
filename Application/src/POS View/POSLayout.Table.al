@@ -65,7 +65,7 @@ table 6059793 "NPR POS Layout"
 
         if ReadFromDB then
             CalcFields("Frontend Properties");
-        "Frontend Properties".CreateInStream(InStream);
+        "Frontend Properties".CreateInStream(InStream, TExtEncoding::UTF8);
         InStream.Read(Text);
     end;
 
@@ -74,7 +74,7 @@ table 6059793 "NPR POS Layout"
         OutStream: OutStream;
     begin
         Clear("Frontend Properties");
-        "Frontend Properties".CreateOutStream(OutStream);
+        "Frontend Properties".CreateOutStream(OutStream, Textencoding::UTF8);
         OutStream.Write(Text);
     end;
 
