@@ -147,7 +147,6 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
     procedure SendRequest(Context: Codeunit "NPR POS JSON Helper"; var POSAction: Record "NPR POS Action"; SetupCode: code[20]; EventCode: Code[20]; EanBoxValue: Text; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management") Request: JsonObject
     var
         EanBoxSetupEvent: Record "NPR Ean Box Setup Event";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         EanBoxEventHandler: Codeunit "NPR POS Input Box Evt Handler";
         WorkflowVersion: Integer;
         WorkflowInvocationParameters: JsonObject;
@@ -157,9 +156,8 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
         EanBoxEventHandler.SetEanParametersToPOSAction(EanBoxValue, POSAction, EanBoxSetupEvent);
         POSAction.GetWorkflowInvocationContext(WorkflowInvocationParameters, WorkflowInvocationContext);
 
-        if FeatureFlagsManagement.IsEnabled('textEnterFastItem') then
-            if UseSimpleInsert(Context, POSAction, Setup, FrontEnd, WorkflowInvocationParameters, Request) then
-                exit;
+        if UseSimpleInsert(Context, POSAction, Setup, FrontEnd, WorkflowInvocationParameters, Request) then
+            exit;
 
         WorkflowVersion := GetWorkflowVersion(POSAction);
         Request := InitRequest(WorkflowVersion, POSAction.Code);
