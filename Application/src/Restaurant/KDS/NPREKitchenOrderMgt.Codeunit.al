@@ -61,26 +61,28 @@
         FindKitchenRequestsForSourceDoc(KitchenRequest, KitchenReqSourceParam);
         HandleQtyChange(KitchenRequest, KitchenRequestParam, KitchenReqSourceParam);
 
-        if KitchenRequest.FindSet() then
+        if KitchenRequest.IsEmpty() then
+            exit(false);
+        KitchenRequest.FindSet(RequestType = RequestType::"Serving Request");
+        repeat
+            KitchenRequest2 := KitchenRequest;
+            if RequestType = RequestType::"Serving Request" then begin
+                KitchenRequest2."Serving Requested Date-Time" := SentDateTime;
+                if KitchenRequest2."Line Status" = KitchenRequest2."Line Status"::Planned then
+                    KitchenRequest2."Line Status" := KitchenRequest2."Line Status"::"Serving Requested";
+                UpdateRequestLineStatus(KitchenRequest2);
+                KitchenRequest2.Modify();
+            end;
+
+            TempKitchenStationBuffer.FindSet();
             repeat
-                KitchenRequest2 := KitchenRequest;
-                if RequestType = RequestType::"Serving Request" then begin
-                    KitchenRequest2."Serving Requested Date-Time" := SentDateTime;
-                    if KitchenRequest2."Line Status" = KitchenRequest2."Line Status"::Planned then
-                        KitchenRequest2."Line Status" := KitchenRequest2."Line Status"::"Serving Requested";
-                    UpdateRequestLineStatus(KitchenRequest2);
-                    KitchenRequest2.Modify();
-                end;
+                KitchenStation.Get(TempKitchenStationBuffer."Production Restaurant Code", TempKitchenStationBuffer."Kitchen Station");
+                CreateKitchenStationRequest(KitchenRequest2, KitchenStation, TempKitchenStationBuffer."Production Step");
+            until TempKitchenStationBuffer.Next() = 0;
 
-                TempKitchenStationBuffer.FindSet();
-                repeat
-                    KitchenStation.Get(TempKitchenStationBuffer."Production Restaurant Code", TempKitchenStationBuffer."Kitchen Station");
-                    CreateKitchenStationRequest(KitchenRequest2, KitchenStation, TempKitchenStationBuffer."Production Step");
-                until TempKitchenStationBuffer.Next() = 0;
-
-                if not TouchedKitchenOrderList.Contains(KitchenRequest2."Order ID") then
-                    TouchedKitchenOrderList.Add(KitchenRequest2."Order ID");
-            until KitchenRequest.Next() = 0;
+            if not TouchedKitchenOrderList.Contains(KitchenRequest2."Order ID") then
+                TouchedKitchenOrderList.Add(KitchenRequest2."Order ID");
+        until KitchenRequest.Next() = 0;
 
         foreach TouchedKitchenOrderID in TouchedKitchenOrderList do
             UpdateOrderStatus(TouchedKitchenOrderID);
