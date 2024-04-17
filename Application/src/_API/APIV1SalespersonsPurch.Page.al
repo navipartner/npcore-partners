@@ -72,7 +72,12 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
                 {
                     Caption = 'Image', Locked = true;
                 }
-
+#IF NOT (BC17 or BC18 or BC19)
+                field(blocked; Rec.Blocked)
+                {
+                    Caption = 'Blocked', Locked = true;
+                }
+#ENDIF
                 field(nprRegisterPassword; Rec."NPR Register Password")
                 {
                     Caption = 'Register Password', Locked = true;
@@ -93,11 +98,15 @@ page 6014636 "NPR APIV1 - Salespersons/Purch"
                     Caption = 'Hide Register Imbalance', Locked = true;
                 }
 
+                field(nprPosUnitGroup; Rec."NPR POS Unit Group")
+                {
+                    Caption = 'POS Unit Group', Locked = true;
+                }
+
                 field(lastModifiedAt; Rec.SystemModifiedAt)
                 {
                     Caption = 'SystemModifiedAt', Locked = true;
                 }
-
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'Replication Counter', Locked = true;
