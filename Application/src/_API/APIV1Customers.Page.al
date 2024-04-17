@@ -657,6 +657,20 @@ page 6014507 "NPR APIV1 - Customers"
                     Caption = 'Contact Graph Id', Locked = true;
                 }
 
+#IF NOT (BC17 or BC18)
+                field(eoriNumber; Rec."EORI Number")
+                {
+                    Caption = 'EORI Number', Locked = true;
+                }
+#ENDIF
+
+#IF NOT (BC17 or BC18 or BC19)
+
+                field(intrastatPartnerType; Rec."Intrastat Partner Type")
+                {
+                    Caption = 'Intrastat Partner Type', Locked = true;
+                }
+#ENDIF
                 field(nprAnonymized; Rec."NPR Anonymized")
                 {
                     Caption = 'NPR Anonymized', Locked = true;
