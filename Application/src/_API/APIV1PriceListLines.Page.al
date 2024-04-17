@@ -154,6 +154,32 @@ page 6014545 "NPR API V1 - Price List Lines"
                 {
                     Caption = 'Line Amount', Locked = true;
                 }
+#IF NOT (BC17 or BC18 or BC19)
+                field(sourceGroup; Rec."Source Group")
+                {
+                    Caption = 'Source Group', Locked = true;
+                }
+                field(productNo; Rec."Product No.")
+                {
+                    Caption = 'Product No.', Locked = true;
+                }
+                field(assignToNo; Rec."Assign-to No.")
+                {
+                    Caption = 'Assign-to No.', Locked = true;
+                }
+                field(assignToParentNo; Rec."Assign-to Parent No.")
+                {
+                    Caption = 'Assign-to Parent No.', Locked = true;
+                }
+                field(variantCodeLookup; Rec."Variant Code Lookup")
+                {
+                    Caption = 'Variant Code Lookup', Locked = true;
+                }
+                field(unitOfMeasureCodeLookup; Rec."Unit of Measure Code Lookup")
+                {
+                    Caption = 'Unit of Measure Code Lookup', Locked = true;
+                }
+#ENDIF
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date', Locked = true;

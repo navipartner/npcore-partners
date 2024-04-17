@@ -67,11 +67,19 @@ page 6014525 "NPR API V1 - Item Reference"
                 {
                     Caption = 'NPR Label Barcode', Locked = true;
                 }
+
+                field(nprDiscontinuedBarcode; Rec."NPR Discontinued Barcode")
+                {
+                    Caption = 'Discontinued Barcode', Locked = true;
+                }
+                field(nprDiscontinuedReason; Rec."NPR Discontinued Reason")
+                {
+                    Caption = 'Discontinued Reason', Locked = true;
+                }
                 field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'lastModifiedDateTime', Locked = true;
                 }
-
                 field(replicationCounter; Rec."NPR Replication Counter")
                 {
                     Caption = 'replicationCounter', Locked = true;

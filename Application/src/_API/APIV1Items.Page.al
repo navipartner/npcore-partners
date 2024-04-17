@@ -803,7 +803,12 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Common Item No.', Locked = true;
                 }
-
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+                field(variantMandatoryIfExists; Rec."Variant Mandatory if Exists")
+                {
+                    Caption = 'Variant Mandatory if Exists', Locked = true;
+                }
+#ENDIF
                 field(nprExplodeBomAuto; Rec."NPR Explode BOM auto")
                 {
                     Caption = 'Explode BOM auto', Locked = true;
@@ -1009,7 +1014,16 @@ page 6014501 "NPR APIV1 - Items"
                 {
                     Caption = 'Main Item No.', Locked = true;
                 }
-
+#IF NOT BC17
+                field(nprPurchasingCode; Rec."NPR Purchasing Code")
+                {
+                    Caption = 'Purchasing Code', Locked = true;
+                }
+                field(nprSpfySafetyStockQuantity; Rec."NPR Spfy Safety Stock Quantity")
+                {
+                    Caption = 'Spfy Safety Stock Quantity', Locked = true;
+                }
+#ENDIF
                 part(baseUnitOfMeasure; "NPR APIV1 - Units of Measure")
                 {
 
