@@ -67,7 +67,7 @@
         end;
     end;
 
-    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
+    procedure MoveSaleFromPOSToWaiterPad(var SalePOS: Record "NPR POS Sale"; var WaiterPad: Record "NPR NPRE Waiter Pad"; CleanupSale: Boolean) SaleCleanupSuccessful: Boolean
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempLineRelation: Record "Line Number Buffer" temporary;
