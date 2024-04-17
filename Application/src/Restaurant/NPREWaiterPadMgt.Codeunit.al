@@ -457,6 +457,7 @@
 
         WaiterPadLine.SetRange("Waiter Pad No.", WaiterPad."No.");
         WaiterPadLine.SetFilter("Line Type", '<>%1', WaiterPadLine."Line Type"::Comment);
+        WaiterPadLine.SetFilter("Quantity (Base)", '>%1', 0);
         if WaiterPadLine.IsEmpty() then
             exit(true);
 
