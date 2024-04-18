@@ -105,7 +105,7 @@
             else
                 DiscountAmount := DiscountAmountExcludingVAT;
 
-            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
                 SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
                 SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
             end;

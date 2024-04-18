@@ -125,7 +125,7 @@
             SaleLinePOSCoupon2.SetRange("Sales Ticket No.", SaleLinePOSCoupon."Sales Ticket No.");
             SaleLinePOSCoupon2.SetRange(Type, SaleLinePOSCoupon2.Type::Discount);
             SaleLinePOSCoupon2.SetRange("Coupon No.", SaleLinePOSCoupon."Coupon No.");
-            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
                 SaleLinePOSCoupon2.SetRange("Applies-to Sale Line No.", SaleLinePOSCoupon."Sale Line No.");
                 SaleLinePOSCoupon2.SetRange("Applies-to Coupon Line No.", SaleLinePOSCoupon."Line No.");
                 SaleLinePOSCoupon2.CalcSums("Discount Amount", "Discount Amount Excluding VAT", "Discount Amount Including VAT");
@@ -198,7 +198,7 @@
         repeat
             DiscountType := SaleLinePOS."Discount Type";
 
-            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+            if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
                 SaleLinePOS.CalcFields("Coupon Disc. Amount Excl. VAT", "Coupon Disc. Amount Incl. VAT");
 
                 SaleLinePOS."Discount %" := 0;
@@ -206,6 +206,9 @@
                     SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Disc. Amount Incl. VAT"
                 else
                     SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Disc. Amount Excl. VAT";
+
+                if SaleLinePOS."Discount Amount" < 0 then
+                    SaleLinePOS."Discount Amount" := 0;
 
                 if SaleLinePOS."Discount Amount" > (SaleLinePOS."Unit Price" * SaleLinePOS.Quantity) then
                     SaleLinePOS."Discount %" := 100;
@@ -226,7 +229,7 @@
         SaleLinePOSCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOSCoupon.SetRange("Sale Date", SalePOS.Date);
         SaleLinePOSCoupon.ModifyAll("Discount Amount", 0);
-        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
             SaleLinePOSCoupon.ModifyAll("Discount Amount Including VAT", 0);
             SaleLinePOSCoupon.ModifyAll("Discount Amount Excluding VAT", 0);
         end;
@@ -769,7 +772,7 @@
         SaleLinePOSCoupon."Coupon No." := Coupon."No.";
         SaleLinePOSCoupon.Description := Coupon.Description;
         SaleLinePOSCoupon."Discount Amount" := GetAmountPerQty(Coupon);
-        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then
             if SaleLinePOS."Price Includes VAT" then begin
                 SaleLinePOSCoupon."Discount Amount Including VAT" := SaleLinePOSCoupon."Discount Amount";
                 SaleLinePOSCoupon."Discount Amount Excluding VAT" := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(SaleLinePOSCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
@@ -913,7 +916,7 @@
         CouponEntry."Coupon Type" := Coupon."Coupon Type";
         CouponEntry.Quantity := -Quantity;
         CouponEntry."Remaining Quantity" := -Quantity;
-        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then
             CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount Including VAT"
         else
             CouponEntry."Amount per Qty." := SaleLinePOSCoupon."Discount Amount";
