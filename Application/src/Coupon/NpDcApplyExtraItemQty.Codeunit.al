@@ -51,7 +51,7 @@
                 SaleLineOut.OnAfterDeletePOSSaleLine(SaleLinePOS);
                 exit;
             end;
-            UnitPriceIncludingVAT := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS);
+            UnitPriceIncludingVAT := NPRPOSSaleTaxCalc.UnitPriceInclTax(SaleLinePOS);
             DiscountAmountIncludingVAT := CalcDiscountAmount(SaleLinePOS, SaleLinePOSCoupon, ExtraItemQty);
             if DiscountAmountIncludingVAT > UnitPriceIncludingVAT * ExtraItemQty then
                 DiscountAmountIncludingVAT := UnitPriceIncludingVAT * ExtraItemQty;
