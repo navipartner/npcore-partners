@@ -36,7 +36,7 @@
     begin
         StartTime := CurrentDateTime;
 
-        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix') then begin
+        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
             CouponMgt.RemoveDiscount(SalePOS);
 
             SetupTempSalesLines(SalePOS, TempSaleLinePOS);
