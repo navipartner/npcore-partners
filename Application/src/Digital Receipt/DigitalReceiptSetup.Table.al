@@ -26,6 +26,7 @@ table 6059853 "NPR Digital Receipt Setup"
         {
             Caption = 'Api Secret';
             DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
 
             trigger OnValidate()
             begin
