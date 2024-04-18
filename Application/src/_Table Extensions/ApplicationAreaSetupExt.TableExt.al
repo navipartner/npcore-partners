@@ -112,7 +112,12 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             DataClassification = CustomerContent;
         }
 #endif
-        field(6060121; "NPR AT Fiscal"; Boolean)
+        field(6060121; "NPR SE CleanCash"; Boolean)
+        {
+            Caption = 'NaviPartner SE CleanCash';
+            DataClassification = CustomerContent;
+        }
+        field(6014400; "NPR AT Fiscal"; Boolean)
         {
             Caption = 'NaviPartner AT Fiscalization';
             DataClassification = CustomerContent;
