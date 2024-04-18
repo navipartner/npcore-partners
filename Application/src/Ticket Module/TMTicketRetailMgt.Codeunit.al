@@ -475,6 +475,10 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
 
     begin
+        SaleLinePOS.SetRecFilter();
+        if (not SaleLinePOS.FindFirst()) then
+            exit;
+
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
