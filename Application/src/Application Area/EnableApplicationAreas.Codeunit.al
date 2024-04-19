@@ -74,6 +74,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR HU MultiSoft EInv" := IsHUMultiSoftEInvEnabled();
         TempApplicationAreaSetup."NPR SE CleanCash" := IsSEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR AT Fiscal" := IsATFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR ES Fiscal" := IsESFiscalizationEnabled();
     end;
 
     local procedure IsFeatureEnabled(FeatureToCheck: Enum "NPR Feature"): Boolean
@@ -202,6 +203,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(ATFiscalizationSetup."AT Fiscal Enabled");
+    end;
+
+    local procedure IsESFiscalizationEnabled(): Boolean
+    var
+        ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
+    begin
+        if not ESFiscalizationSetup.Get() then
+            exit(false);
+
+        exit(ESFiscalizationSetup."ES Fiscal Enabled");
     end;
 
     internal procedure IsNPRRetailApplicationAreaEnabled(): Boolean
