@@ -6303,6 +6303,9 @@ End Function
         <Field Name="POSEntry2_Qty">
           <DataField>POSEntry2_Qty</DataField>
         </Field>
+        <Field Name="POSEntry2_QtyFormat">
+          <DataField>POSEntry2_QtyFormat</DataField>
+        </Field>
         <Field Name="POSEntry2_AmtInclTax">
           <DataField>POSEntry2_AmtInclTax</DataField>
         </Field>
