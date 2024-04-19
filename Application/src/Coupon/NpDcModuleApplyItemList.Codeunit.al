@@ -11,6 +11,7 @@
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
         TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary;
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         DiscountAmt: Decimal;
         RemainingDiscountAmt: Decimal;
         RemainingQty: Decimal;
@@ -61,15 +62,22 @@
         Coupon.Get(SaleLinePOSCoupon."Coupon No.");
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
             repeat
-                ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+                if FeatureFlagsManagement.IsEnabled('couponItemListApplicationReordering') then
+                    ApplyDiscountItemListPercent(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty)
+                else
+                    ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
             until TempNpDcCouponListItem.Next() = 0;
             exit;
         end;
         repeat
-            ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+            if FeatureFlagsManagement.IsEnabled('couponItemListApplicationReordering') then
+                ApplyDiscountItemList(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty)
+            else
+                ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
         until (TempNpDcCouponListItem.Next() = 0) or (DiscountAmt <= 0);
     end;
 
+    [Obsolete('Use ApplyDiscountItemList instead', 'NPR33.0')]
     local procedure ApplyDiscountListItem(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -89,6 +97,26 @@
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
+    local procedure ApplyDiscountItemList(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
+    var
+        CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer";
+        AppliedListItemDiscAmt: Decimal;
+        AppliedQty: Decimal;
+    begin
+        if DiscountAmt <= 0 then
+            exit;
+
+        AppliedListItemDiscAmt := 0;
+
+        if not GetSalesLinesCouponApplication(SaleLinePOSCoupon, NpDcCouponListItem, CouponSalesLineApplicationOrderBuffer) then
+            exit;
+
+        repeat
+            ApplyDiscountSaleLine(SaleLinePOSCoupon, NpDcCouponListItem, CouponSalesLineApplicationOrderBuffer, AppliedListItemDiscAmt, RemainingDiscountAmt, AppliedQty, RemainingQty);
+        until (CouponSalesLineApplicationOrderBuffer.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
+    end;
+
+    [Obsolete('Use ApplyDiscountItemListPercent instead', 'NPR33.0')]
     local procedure ApplyDiscountListItemPct(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -159,6 +187,76 @@
         until (SaleLinePOS.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
+    local procedure ApplyDiscountItemListPercent(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        AppliedQty: Decimal;
+        DiscountAmt: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
+        QtyToApply: Integer;
+        LineNo: Integer;
+    begin
+        if not GetSalesLinesCouponApplication(SaleLinePOSCoupon, NpDcCouponListItem, CouponSalesLineApplicationOrderBuffer) then
+            exit;
+
+        if DiscountPct > 100 then
+            DiscountPct := 100;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        repeat
+            QtyToApply := CouponSalesLineApplicationOrderBuffer.Quantity;
+
+            if (NpDcCouponListItem."Max. Quantity" > 0) and (AppliedQty + QtyToApply > NpDcCouponListItem."Max. Quantity") then
+                QtyToApply := NpDcCouponListItem."Max. Quantity" - AppliedQty;
+
+            if (QtyToApply > RemainingQty) and (RemainingQty >= 0) then
+                QtyToApply := RemainingQty;
+
+            CouponSalesLineApplicationOrderBuffer."Amount Including VAT" := (CouponSalesLineApplicationOrderBuffer."Amount Including VAT" / CouponSalesLineApplicationOrderBuffer.Quantity) * QtyToApply;
+            DiscountAmountIncludingVAT := CouponSalesLineApplicationOrderBuffer."Amount Including VAT" * (DiscountPct / 100);
+            if (NpDcCouponListItem."Max. Discount Amount" > 0) and (DiscountAmountIncludingVAT > NpDcCouponListItem."Max. Discount Amount") then
+                DiscountAmountIncludingVAT := NpDcCouponListItem."Max. Discount Amount";
+
+            DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT, CouponSalesLineApplicationOrderBuffer."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+            if CouponSalesLineApplicationOrderBuffer."Price Includes VAT" then
+                DiscountAmt := DiscountAmountIncludingVAT
+            else
+                DiscountAmt := DiscountAmountExcludingVAT;
+
+            if DiscountAmt > 0 then begin
+                LineNo := GetNextCouponSalesLineNoFromCouponPriorityBuffer(CouponSalesLineApplicationOrderBuffer);
+                SaleLinePOSCouponApply.Init();
+                SaleLinePOSCouponApply."Register No." := CouponSalesLineApplicationOrderBuffer."Register No.";
+                SaleLinePOSCouponApply."Sales Ticket No." := CouponSalesLineApplicationOrderBuffer."Sales Ticket No.";
+                SaleLinePOSCouponApply."Sale Date" := CouponSalesLineApplicationOrderBuffer.Date;
+                SaleLinePOSCouponApply."Sale Line No." := CouponSalesLineApplicationOrderBuffer."Line No.";
+                SaleLinePOSCouponApply."Line No." := LineNo;
+                SaleLinePOSCouponApply.Type := SaleLinePOSCouponApply.Type::Discount;
+                SaleLinePOSCouponApply."Applies-to Sale Line No." := SaleLinePOSCoupon."Sale Line No.";
+                SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
+                SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
+                SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
+                SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
+                SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
+                SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+                SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
+                SaleLinePOSCouponApply.Insert(true);
+
+                RemainingDiscountAmt -= DiscountAmountIncludingVAT;
+                AppliedQty += QtyToApply;
+                RemainingQty -= QtyToApply;
+            end;
+        until (CouponSalesLineApplicationOrderBuffer.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
+    end;
+
+    [Obsolete('Use ApplyDiscountSaleLinePOS instead', 'NPR33.0')]
     local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; AppliedQty: Decimal; var RemainingQty: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -221,6 +319,67 @@
         RemainingQty -= QtyToApply;
     end;
 
+    local procedure ApplyDiscountSaleLine(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; AppliedQty: Decimal; var RemainingQty: Decimal)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        LineNo: Integer;
+        LineDiscountAmt: Decimal;
+        DiscountAmountIncludingVAT: Decimal;
+        DiscountAmountExcludingVAT: Decimal;
+        QtyToApply: Integer;
+    begin
+        QtyToApply := CouponSalesLineApplicationOrderBuffer.Quantity;
+        if (NpDcCouponListItem."Max. Quantity" > 0) and (AppliedQty + QtyToApply > NpDcCouponListItem."Max. Quantity") then
+            QtyToApply := NpDcCouponListItem."Max. Quantity" - AppliedQty;
+        if (QtyToApply > RemainingQty) and (RemainingQty >= 0) then
+            QtyToApply := RemainingQty;
+
+        DiscountAmountIncludingVAT := CouponSalesLineApplicationOrderBuffer."Amount Including VAT" - CalcAppliedDiscountWithVATFromCouponPriorityBuffer(CouponSalesLineApplicationOrderBuffer);
+        if DiscountAmountIncludingVAT > RemainingDiscountAmt then
+            DiscountAmountIncludingVAT := RemainingDiscountAmt;
+        if (NpDcCouponListItem."Max. Discount Amount" > 0) and (DiscountAmountIncludingVAT + AppliedListItemDiscAmt > NpDcCouponListItem."Max. Discount Amount") then
+            DiscountAmountIncludingVAT := NpDcCouponListItem."Max. Discount Amount" - AppliedListItemDiscAmt;
+        if DiscountAmountIncludingVAT > CouponSalesLineApplicationOrderBuffer."Amount Including VAT" then
+            DiscountAmountIncludingVAT := CouponSalesLineApplicationOrderBuffer."Amount Including VAT";
+        if DiscountAmountIncludingVAT <= 0 then
+            exit;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountExcludingVAT := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(DiscountAmountIncludingVAT, CouponSalesLineApplicationOrderBuffer."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        if CouponSalesLineApplicationOrderBuffer."Price Includes VAT" then
+            LineDiscountAmt := DiscountAmountIncludingVAT
+        else
+            LineDiscountAmt := DiscountAmountExcludingVAT;
+
+        LineNo := GetNextCouponSalesLineNoFromCouponPriorityBuffer(CouponSalesLineApplicationOrderBuffer);
+        SaleLinePOSCouponApply.Init();
+        SaleLinePOSCouponApply."Register No." := CouponSalesLineApplicationOrderBuffer."Register No.";
+        SaleLinePOSCouponApply."Sales Ticket No." := CouponSalesLineApplicationOrderBuffer."Sales Ticket No.";
+        SaleLinePOSCouponApply."Sale Date" := CouponSalesLineApplicationOrderBuffer.Date;
+        SaleLinePOSCouponApply."Sale Line No." := CouponSalesLineApplicationOrderBuffer."Line No.";
+        SaleLinePOSCouponApply."Line No." := LineNo;
+        SaleLinePOSCouponApply.Type := SaleLinePOSCouponApply.Type::Discount;
+        SaleLinePOSCouponApply."Applies-to Sale Line No." := SaleLinePOSCoupon."Sale Line No.";
+        SaleLinePOSCouponApply."Applies-to Coupon Line No." := SaleLinePOSCoupon."Line No.";
+        SaleLinePOSCouponApply."Coupon Type" := SaleLinePOSCoupon."Coupon Type";
+        SaleLinePOSCouponApply."Coupon No." := SaleLinePOSCoupon."Coupon No.";
+        SaleLinePOSCouponApply.Description := SaleLinePOSCoupon.Description;
+        SaleLinePOSCouponApply."Discount Amount" := LineDiscountAmt;
+        SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
+        SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
+        SaleLinePOSCouponApply.Insert(true);
+
+        AppliedListItemDiscAmt += DiscountAmountIncludingVAT;
+        RemainingDiscountAmt -= DiscountAmountIncludingVAT;
+        RemainingQty -= QtyToApply;
+    end;
+
+    [Obsolete('Use CalcAppliedDiscountWithVATFromCouponPriorityBuffer instead', 'NPR33.0')]
     local procedure CalcAppliedDiscount(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
@@ -235,6 +394,23 @@
 
         SaleLinePOSCouponApply.CalcSums("Discount Amount Including VAT");
         exit(SaleLinePOSCouponApply."Discount Amount Including VAT");
+    end;
+
+    local procedure CalcAppliedDiscountWithVATFromCouponPriorityBuffer(CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer") AppliedDiscountAmountIncludingVAT: Decimal
+    var
+        SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        SaleLinePOSCouponApply.Reset();
+        SaleLinePOSCouponApply.SetRange("Register No.", CouponSalesLineApplicationOrderBuffer."Register No.");
+        SaleLinePOSCouponApply.SetRange("Sales Ticket No.", CouponSalesLineApplicationOrderBuffer."Sales Ticket No.");
+        SaleLinePOSCouponApply.SetRange("Sale Date", CouponSalesLineApplicationOrderBuffer.Date);
+        SaleLinePOSCouponApply.SetRange("Sale Line No.", CouponSalesLineApplicationOrderBuffer."Line No.");
+        SaleLinePOSCouponApply.SetRange(Type, SaleLinePOSCouponApply.Type::Discount);
+        if SaleLinePOSCouponApply.IsEmpty then
+            exit;
+
+        SaleLinePOSCouponApply.CalcSums("Discount Amount Including VAT");
+        AppliedDiscountAmountIncludingVAT := SaleLinePOSCouponApply."Discount Amount Including VAT";
     end;
 
     local procedure CalcAppliedDiscountTotal(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"): Decimal
@@ -466,7 +642,90 @@
                 end;
         end;
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
-        exit(SaleLinePOS.FindFirst());
+        SaleLinePOS.SetFilter("Amount Including VAT", '>0');
+        exit(not SaleLinePOS.IsEmpty());
+    end;
+
+    local procedure GetSalesLinesCouponApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer") Found: Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        CouponApplicationBufferData: Record "NPR Coupon Line Appl Buffer";
+        LineBufferWithCalculatedAmounts: Record "NPR Coupon Line Appl Buffer";
+        LineAmountBuffer: Record "NPR Coupon Line Appl Buffer";
+        EntryNo: Integer;
+        RemainingAmountIncludingVAT: Decimal;
+        RemainingAmount: Decimal;
+    begin
+        CouponSalesLineApplicationOrderBuffer.Reset();
+        if not CouponSalesLineApplicationOrderBuffer.IsEmpty then
+            CouponSalesLineApplicationOrderBuffer.DeleteAll();
+
+        if not FindSaleLinePOSItems(SaleLinePOSCoupon, NpDcCouponListItem, SaleLinePOS) then
+            exit;
+
+        SaleLinePOS.SetAutoCalcFields("Coupon Disc. Amount Incl. VAT", "Coupon Disc. Amount Excl. VAT");
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line Type", "Benefit Item", "No.", Quantity, "Amount Including VAT", Amount, Quantity, "No.", "VAT %", "Line No.");
+        if not SaleLinePOS.FindSet() then
+            exit;
+
+        repeat
+            RemainingAmountIncludingVAT := SaleLinePOS."Amount Including VAT" - SaleLinePOS."Coupon Disc. Amount Incl. VAT";
+            if RemainingAmountIncludingVAT > 0 then begin
+                EntryNo += 1;
+                RemainingAmount := SaleLinePOS.Amount - SaleLinePOS."Coupon Disc. Amount Excl. VAT";
+
+                //Saving the data to the buffer
+                CouponApplicationBufferData.Init();
+                CouponApplicationBufferData."Entry No." := EntryNo;
+                CouponApplicationBufferData.CopyInformationFromSaleLine(SaleLinePOS);
+                CouponApplicationBufferData.Insert();
+
+                //Populating the data with updated amount in buffer
+                LineBufferWithCalculatedAmounts.Init();
+                LineBufferWithCalculatedAmounts."Entry No." := EntryNo;
+                LineBufferWithCalculatedAmounts.CopyInformationFromSaleLine(SaleLinePOS);
+                LineBufferWithCalculatedAmounts."Amount Including VAT" := RemainingAmountIncludingVAT;
+                LineBufferWithCalculatedAmounts."Amount Excluding VAT" := RemainingAmount;
+                LineBufferWithCalculatedAmounts.Insert();
+
+                //Creating a buffer with total amount
+                LineAmountBuffer.Reset();
+                LineAmountBuffer.SetRange("Amount Including VAT", LineBufferWithCalculatedAmounts."Amount Including VAT");
+                if LineAmountBuffer.IsEmpty then begin
+                    LineAmountBuffer.Init();
+                    LineAmountBuffer := LineBufferWithCalculatedAmounts;
+                    LineAmountBuffer.Insert();
+                end;
+            end;
+        until SaleLinePOS.Next() = 0;
+
+        //Ordering the lines in the right order
+        EntryNo := 0;
+
+        LineAmountBuffer.Reset();
+        LineAmountBuffer.SetCurrentKey("Amount Including VAT");
+        LineAmountBuffer.Ascending(false);
+        if not LineAmountBuffer.FindSet() then
+            exit;
+
+        repeat
+            LineBufferWithCalculatedAmounts.Reset();
+            LineBufferWithCalculatedAmounts.SetCurrentKey("Amount Including VAT", "Line No.");
+            LineBufferWithCalculatedAmounts.SetRange("Amount Including VAT", LineAmountBuffer."Amount Including VAT");
+            if LineBufferWithCalculatedAmounts.FindSet() then
+                repeat
+                    EntryNo += 1;
+                    CouponApplicationBufferData.Get(LineBufferWithCalculatedAmounts."Entry No.");
+
+                    CouponSalesLineApplicationOrderBuffer.Init();
+                    CouponSalesLineApplicationOrderBuffer := CouponApplicationBufferData;
+                    CouponSalesLineApplicationOrderBuffer."Entry No." := EntryNo;
+                    CouponSalesLineApplicationOrderBuffer.Insert();
+                until LineBufferWithCalculatedAmounts.Next() = 0;
+
+        until LineAmountBuffer.Next() = 0;
+
+        Found := CouponSalesLineApplicationOrderBuffer.FindSet();
     end;
 
     local procedure FindSaleLinePOSCouponApply(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon"): Boolean
@@ -483,6 +742,7 @@
         exit(SaleLinePOSCouponApply.FindFirst());
     end;
 
+    [Obsolete('Use GetNextCouponSalesLineNoFromCouponPriorityBuffer instead', 'NPR33.0')]
     local procedure GetNextLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -494,6 +754,23 @@
         if SaleLinePOSCoupon.FindLast() then;
 
         exit(SaleLinePOSCoupon."Line No." + 10000);
+    end;
+
+    local procedure GetNextCouponSalesLineNoFromCouponPriorityBuffer(CouponSalesLineApplicationOrderBuffer: Record "NPR Coupon Line Appl Buffer") LineNo: Integer
+    var
+        SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        SaleLinePOSCoupon.Reset();
+        SaleLinePOSCoupon.SetRange("Register No.", CouponSalesLineApplicationOrderBuffer."Register No.");
+        SaleLinePOSCoupon.SetRange("Sales Ticket No.", CouponSalesLineApplicationOrderBuffer."Sales Ticket No.");
+        SaleLinePOSCoupon.SetRange("Sale Date", CouponSalesLineApplicationOrderBuffer.Date);
+        SaleLinePOSCoupon.SetRange("Sale Line No.", CouponSalesLineApplicationOrderBuffer."Line No.");
+
+        SaleLinePOSCoupon.SetLoadFields("Register No.", "Sales Ticket No.", "Sale Date", "Sale Line No.", "Line No.");
+        if not SaleLinePOSCoupon.FindLast() then
+            exit;
+
+        LineNo := SaleLinePOSCoupon."Line No." + 10000;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR NpDc Coupon Type", 'OnBeforeDeleteEvent', '', true, true)]
