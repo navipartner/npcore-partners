@@ -290,6 +290,7 @@
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(MixedDiscountLine."No.", MixedDiscountLine."Variant Code", MixedDiscountLine."Cross-Reference No.");
                 RetailJnlLine.SetDiscountType(2, MixedDiscountLine.Code, MixedDiscountLine."Unit price", MixedDiscountLine.Quantity, MixedDiscountLine."Unit price incl. VAT");
+                OnAfterSetDiscountTypeMixDiscount(MixedDiscountLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until MixedDiscountLine.Next() = 0;
         RetailJnlLine.CloseGUI();
@@ -729,6 +730,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRetJnlLineInsertFromPurchRcptLine(PurchRcptLine: Record "Purch. Rcpt. Line"; var RetailJnlLine: Record "NPR Retail Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetDiscountTypeMixDiscount(var MixedDiscountLine: Record "NPR Mixed Discount Line"; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 }
