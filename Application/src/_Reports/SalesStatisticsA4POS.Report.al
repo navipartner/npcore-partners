@@ -894,7 +894,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
         ItemSoldQty: Integer;
         ItemReturnQty: Integer;
         SalesTicket: Integer;
-        SalesPersonSalesCount: Integer;
+        SalesPersonSalesCount: Decimal;
         SumOfDirectSalesTicket: Integer;
         DirectItemReturnsLineCount: Integer;
         DirectItemSalesLineCount: Integer;
