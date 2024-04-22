@@ -42,6 +42,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -55,6 +58,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -72,6 +78,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -85,6 +94,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -102,6 +114,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -115,6 +130,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -132,6 +150,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -145,6 +166,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -162,6 +186,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -175,6 +202,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -192,6 +222,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -205,6 +238,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -222,6 +258,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -237,6 +276,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -250,6 +292,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -268,6 +313,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -281,6 +329,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -299,6 +350,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -314,6 +368,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -327,6 +384,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -345,6 +405,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -360,6 +423,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -373,6 +439,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -391,6 +460,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -404,6 +476,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -421,6 +496,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -434,6 +512,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -451,6 +532,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -464,6 +548,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -481,6 +568,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -494,6 +584,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -511,6 +604,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -524,6 +620,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -541,6 +640,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -554,6 +656,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -571,6 +676,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -584,6 +692,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -601,6 +712,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -614,6 +728,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -631,6 +748,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -644,6 +764,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -661,6 +784,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -674,6 +800,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -691,6 +820,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -704,6 +836,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -721,6 +856,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -734,6 +872,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -751,6 +892,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -764,6 +908,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -781,6 +928,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -794,6 +944,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -811,6 +964,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -824,6 +980,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -841,6 +1000,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -854,6 +1016,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -871,6 +1036,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -884,6 +1052,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -901,6 +1072,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -914,6 +1088,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -931,6 +1108,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -944,6 +1124,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -961,6 +1144,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -974,6 +1160,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -991,6 +1180,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1004,6 +1196,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1021,6 +1216,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1034,6 +1232,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1051,6 +1252,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1064,6 +1268,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1081,6 +1288,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1094,6 +1304,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1111,6 +1324,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1124,6 +1340,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1141,6 +1360,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1154,6 +1376,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1171,6 +1396,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1184,6 +1412,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1201,6 +1432,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1214,6 +1448,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1231,6 +1468,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1244,6 +1484,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1261,6 +1504,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1274,6 +1520,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1291,6 +1540,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1304,6 +1556,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1321,6 +1576,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1334,6 +1592,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1351,6 +1612,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1364,6 +1628,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1381,6 +1648,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1394,6 +1664,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1411,6 +1684,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1424,6 +1700,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1443,6 +1722,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1456,6 +1738,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1473,6 +1758,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1486,6 +1774,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1503,6 +1794,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1516,6 +1810,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1533,6 +1830,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1546,6 +1846,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1563,6 +1866,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1576,6 +1882,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1593,6 +1902,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1606,6 +1918,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1623,6 +1938,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1636,6 +1954,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1653,6 +1974,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1666,6 +1990,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1683,6 +2010,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1696,6 +2026,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1713,6 +2046,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1726,6 +2062,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1743,6 +2082,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1756,6 +2098,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1773,6 +2118,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1786,6 +2134,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1803,6 +2154,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1816,6 +2170,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1833,6 +2190,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1846,6 +2206,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1863,6 +2226,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1876,6 +2242,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1893,6 +2262,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1906,6 +2278,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1923,6 +2298,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1936,6 +2314,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1953,6 +2334,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1966,6 +2350,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -1983,6 +2370,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -1996,6 +2386,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2013,6 +2406,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2026,6 +2422,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2043,6 +2442,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2056,6 +2458,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2073,6 +2478,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2086,6 +2494,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2103,6 +2514,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2116,6 +2530,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2133,6 +2550,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2146,6 +2566,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2163,6 +2586,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2176,6 +2602,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2193,6 +2622,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2206,6 +2638,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2223,6 +2658,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2236,6 +2674,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2253,6 +2694,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2266,6 +2710,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2283,6 +2730,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2296,6 +2746,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2313,6 +2766,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2326,6 +2782,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2343,6 +2802,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2356,6 +2818,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2373,6 +2838,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2386,6 +2854,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2403,6 +2874,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2416,6 +2890,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2433,6 +2910,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2446,6 +2926,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2463,6 +2946,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2476,6 +2962,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2493,6 +2982,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2506,6 +2998,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2523,6 +3018,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2536,6 +3034,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2553,6 +3054,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2566,6 +3070,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2583,6 +3090,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2596,6 +3106,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2613,6 +3126,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2626,6 +3142,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2643,6 +3162,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2656,6 +3178,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2673,6 +3198,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2686,6 +3214,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2703,6 +3234,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2716,6 +3250,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2733,6 +3270,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2746,6 +3286,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2763,6 +3306,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2776,6 +3322,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2793,6 +3342,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2806,6 +3358,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2823,6 +3378,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2835,6 +3393,9 @@
         AuxGLAcc: Record "NPR Aux. G/L Account";
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if not AuxGLAcc.Get(Rec."No.") then begin
@@ -2852,6 +3413,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if not AuxGLAcc.Get(Rec."No.") then begin
             AuxGLAcc."No." := Rec."No.";
             AuxGLAcc.Insert();
@@ -2865,6 +3429,9 @@
         AuxGLAcc: Record "NPR Aux. G/L Account";
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if not AuxGLAcc.Get(xRec."No.") then begin
@@ -2882,6 +3449,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2895,6 +3465,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2912,6 +3485,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2925,6 +3501,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2942,6 +3521,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2955,6 +3537,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
@@ -2972,6 +3557,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -2987,6 +3575,9 @@
         if Rec.IsTemporary() then
             exit;
 
+        if CompanyName() <> Rec.CurrentCompany() then
+            exit;
+
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
             UpdateReplicationCounter(RecRef, Rec.FieldNo("NPR Replication Counter"));
             RecRef.SetTable(Rec);
@@ -3000,6 +3591,9 @@
         RecRef: RecordRef;
     begin
         if Rec.IsTemporary() then
+            exit;
+
+        if CompanyName() <> Rec.CurrentCompany() then
             exit;
 
         if DataTypeMgmt.GetRecordRef(Rec, RecRef) then begin
