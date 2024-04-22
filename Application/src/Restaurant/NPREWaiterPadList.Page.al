@@ -86,6 +86,18 @@
                     ToolTip = 'Specifies a reason or process context for the waiter pad closure.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Customer E-Mail"; Rec."Customer E-Mail")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the e-mail address of the customer, who is the main guest of the waiter pad.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Customer Phone No."; Rec."Customer Phone No.")
+                {
+                    Visible = false;
+                    ToolTip = 'Specifies the phone number of the customer, who is the main guest of the waiter pad.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
