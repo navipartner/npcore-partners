@@ -2,7 +2,6 @@
 {
     Extensible = False;
     Caption = 'Kitchen Order Card';
-    DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
     SourceTable = "NPR NPRE Kitchen Order";
@@ -91,4 +90,16 @@
             }
         }
     }
+
+    trigger OnDeleteRecord(): Boolean
+    var
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        LinkedRequestsError: Label 'Cannot delete the order as there are kitchen requests associated with it.';
+    begin
+        KitchenRequest.SetRange("Order ID", Rec."Order ID");
+        if not KitchenRequest.IsEmpty() then begin
+            Error(LinkedRequestsError);
+        end;
+    end;
+
 }
