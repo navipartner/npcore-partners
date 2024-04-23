@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Kitchen Station Selection Setup';
+    ContextSensitiveHelpPage = 'docs/restaurant/explanation/kitchen/';
     DataCaptionExpression = '';
     DelayedInsert = true;
     PageType = List;

@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Seating Locations';
-    ContextSensitiveHelpPage = 'docs/entertainment/restaurant/explanation/seating_layout/';
+    ContextSensitiveHelpPage = 'docs/restaurant/explanation/seating_layout/';
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,Layout';
     SourceTable = "NPR NPRE Seating Location";

@@ -2,6 +2,7 @@
 {
     Extensible = True;
     Caption = 'Members';
+    ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
     AdditionalSearchTerms = 'Member List';
     CardPageID = "NPR MM Member Card";
     DataCaptionExpression = Rec."External Member No.";

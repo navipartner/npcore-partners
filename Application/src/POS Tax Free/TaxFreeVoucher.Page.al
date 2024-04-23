@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Tax Free Voucher';
+    ContextSensitiveHelpPage = 'docs/retail/taxfree/intro/';
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
