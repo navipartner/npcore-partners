@@ -4,7 +4,7 @@
     // NPR5.46/MMV /20181008 CASE 290734 Created object
 
     Caption = 'EFT Setup';
-    ContextSensitiveHelpPage = 'docs/retail/eft/how-to/eft_ops/';
+    ContextSensitiveHelpPage = 'docs/providers/intro/';
     DelayedInsert = true;
     LinksAllowed = false;
     PageType = List;

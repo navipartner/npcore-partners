@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Rest. Service Flow Profiles';
+    ContextSensitiveHelpPage = 'docs/restaurant/reference/service_flow/';
     CardPageID = "NPR NPRE Serv. Flow Prof. Card";
     Editable = false;
     PageType = List;

@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Restaurants';
+    ContextSensitiveHelpPage = 'docs/restaurant/intro/';
     CardPageID = "NPR NPRE Restaurant Card";
     Editable = false;
     PageType = List;

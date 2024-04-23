@@ -1,6 +1,7 @@
 ﻿page 6150679 "NPR NPRE Flow Statuses"
 {
     Caption = 'Flow Statuses';
+    ContextSensitiveHelpPage = 'docs/restaurant/explanation/restaurant_flow/';
     DataCaptionExpression = GetDataCaptionExpr();
     DelayedInsert = true;
     PageType = List;

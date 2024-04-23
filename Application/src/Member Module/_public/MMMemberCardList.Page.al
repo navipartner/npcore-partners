@@ -1,6 +1,7 @@
 ﻿page 6060130 "NPR MM Member Card List"
 {
     Caption = 'Member Cards';
+    ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
     AdditionalSearchTerms = ' Member Card List';
     DeleteAllowed = false;
     InsertAllowed = false;

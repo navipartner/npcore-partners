@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'W. Pad Line Send Log Entries';
+    ContextSensitiveHelpPage = 'docs/restaurant/intro/';
     Editable = false;
     PageType = List;
     SourceTable = "NPR NPRE W.Pad Prnt LogEntry";
