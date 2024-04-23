@@ -7,7 +7,7 @@ page 6059982 "NPR POS Entry Sales & Payments"
     SourceTableView = sorting("POS Entry No.") order(descending);
     SourceTableTemporary = true;
     Caption = 'POS Entry Sales and Payments';
-    ContextSensitiveHelpPage = 'docs/retail/pos_academy/pos_entry/accounting_entries/';
+    ContextSensitiveHelpPage = 'docs/retail/posting_setup/explanation/accounting_entries/';
     Extensible = False;
     Editable = false;
 

@@ -3,6 +3,7 @@
     Extensible = true;
 
     Caption = 'Memberships';
+    ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
     CardPageID = "NPR MM Membership Card";
     DataCaptionExpression = Rec."External Membership No.";
     InsertAllowed = false;

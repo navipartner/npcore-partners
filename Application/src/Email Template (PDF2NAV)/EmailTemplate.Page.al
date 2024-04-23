@@ -3,6 +3,7 @@
     Extensible = false;
     UsageCategory = None;
     Caption = 'E-mail Template';
+    ContextSensitiveHelpPage = 'docs/retail/vouchers/how-to/email_templates/';
     SourceTable = "NPR E-mail Template Header";
     PopulateAllFields = true;
 

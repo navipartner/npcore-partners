@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Global POS Sales Entries';
+    ContextSensitiveHelpPage = 'docs/retail/pos_profiles/how-to/global_profile/global_profile/';
     Editable = false;
     PageType = List;
     SourceTable = "NPR NpGp POS Sales Entry";

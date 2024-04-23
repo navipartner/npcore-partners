@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Restaurant Setup';
+    ContextSensitiveHelpPage = 'docs/restaurant/reference/setup/';
     PageType = Card;
     SourceTable = "NPR NPRE Restaurant Setup";
     UsageCategory = Administration;

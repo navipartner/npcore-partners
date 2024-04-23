@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Seating List';
-    ContextSensitiveHelpPage = 'docs/entertainment/restaurant/explanation/seating_layout/';
+    ContextSensitiveHelpPage = 'docs/restaurant/explanation/seating_layout/';
     CardPageID = "NPR NPRE Seating";
     Editable = false;
     PageType = List;

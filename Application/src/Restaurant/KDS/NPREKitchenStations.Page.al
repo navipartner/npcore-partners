@@ -2,6 +2,7 @@
 {
     Extensible = False;
     Caption = 'Restaurant Kitchen Stations';
+    ContextSensitiveHelpPage = 'docs/restaurant/explanation/kitchen/';
     CardPageID = "NPR NPRE Kitchen Station Card";
     Editable = false;
     PageType = List;
