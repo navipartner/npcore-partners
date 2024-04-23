@@ -34,7 +34,6 @@
     local procedure InitCaseSystemCallback(TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary)
     var
         Company: Record Company;
-        NPREnvironmentInfo: Record "NPR Environment Information";
         EnvironmentInformation: Codeunit "Environment Information";
         SessionId: Integer;
     begin
@@ -50,10 +49,6 @@
         if Company.Get(CompanyName()) then
             if Company."Evaluation Company" then
                 exit;
-
-        if NPREnvironmentInfo.IsEmpty then
-            exit;
-
 
         if StartSession(SessionId, Codeunit::"NPR Invoke CaseSystem Login", CompanyName, TempClientDiagnostic) then;
     end;
