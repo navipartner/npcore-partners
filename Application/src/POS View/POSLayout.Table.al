@@ -57,16 +57,28 @@ table 6059793 "NPR POS Layout"
     end;
 
     procedure GetLayot(ReadFromDB: Boolean) Text: Text
-    var
-        InStream: InStream;
     begin
         if not "Frontend Properties".HasValue() then
             exit;
 
         if ReadFromDB then
             CalcFields("Frontend Properties");
-        "Frontend Properties".CreateInStream(InStream, TExtEncoding::UTF8);
-        InStream.Read(Text);
+
+        if not TryReadPOSLayoutBlobWithEncoding(Rec, Text, TextEncoding::UTF8) then begin
+            Clear(Text);
+
+            if not TryReadPOSLayoutBlobWithEncoding(Rec, Text, TextEncoding::Windows) then
+                Clear(Text);
+        end;
+    end;
+
+    [TryFunction]
+    local procedure TryReadPOSLayoutBlobWithEncoding(var POSLayout: Record "NPR POS Layout"; var PropertiesString: Text; Encoding: TextEncoding)
+    var
+        CurrentInstream: InStream;
+    begin
+        POSLayout."Frontend Properties".CreateInStream(CurrentInstream, Encoding);
+        CurrentInstream.Read(PropertiesString);
     end;
 
     procedure SetLayout(Text: Text)
