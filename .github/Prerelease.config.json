@@ -2,38 +2,38 @@
   "runTests": false,
   "containers": [
     {
-        "name": "Auto"
+      "name": "Auto"
     },
     {
-        "name": "BC1700"
+      "name": "BC1700"
     },
     {
-        "name": "BC1704"
+      "name": "BC1704"
     },
     {
-        "name": "BC1711"
+      "name": "BC1711"
     },
     {
-        "name": "BC1804"
+      "name": "BC1804"
     },
     {
-        "name": "BC1906"
+      "name": "BC1906"
     },
     {
-        "name": "BC2103_CLOUD"
+      "name": "BC2103_CLOUD"
     },
     {
-        "name": "BC2304_CLOUD"
+      "name": "BC2304_CLOUD"
     },
     {
-        "name": "vPrevious_CLOUD"
+      "name": "vPrevious_CLOUD"
     },
     {
-        "name": "vLatest_CLOUD"
+      "name": "vLatest_CLOUD"
     },
     {
-        "name": "Insider_CLOUD",
-        "continueOnError": true
+      "name": "Insider_CLOUD",
+      "continueOnError": true
     }
   ]
 }
