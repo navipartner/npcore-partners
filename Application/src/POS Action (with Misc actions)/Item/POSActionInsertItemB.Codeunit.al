@@ -485,7 +485,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     var
         Item: Record Item;
     begin
-        Item.SetLoadFields("NPR Group sale", "Assembly BOM", "NPR Explode BOM auto");
+        Item.SetLoadFields("No.", "NPR Group sale", "Assembly BOM", "NPR Explode BOM auto", "Item Tracking Code");
         Item.SetAutoCalcFields("Assembly BOM");
         if not Item.Get(ItemNo) then
             Clear(Item);
@@ -512,9 +512,10 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt or RequiresLotNoInputPrompt;
     end;
 
-    internal procedure CheckBOMComponentsNeedLotNoSerialInput(var Item: Record Item; var RequiresLotNoInput: Boolean; var RequiresSerialNoInput: Boolean)
+    internal procedure CheckBOMComponentsNeedLotNoSerialInput(Item: Record Item; var RequiresLotNoInput: Boolean; var RequiresSerialNoInput: Boolean)
     var
         BOMComponent: Record "BOM Component";
+        BOMComponentITem: Record Item;
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
         RequiresSpecificLotNo: Boolean;
         RequiresSpecificlSerialNo: Boolean;
@@ -533,8 +534,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             exit;
 
         repeat
-            If Item.Get(BOMComponent."No.") then
-            POSTrackingUtils.ItemRequiresLotNoSerialNo(Item, RequiresSpecificlSerialNo, RequiresSpecificLotNo,RequiresSerialNoInput, RequiresLotNoInput);
+            BOMComponentITem.SetLoadFields("Item Tracking Code", "No.");
+            If BOMComponentITem.Get(BOMComponent."No.") then
+                POSTrackingUtils.ItemRequiresLotNoSerialNo(BOMComponentITem, RequiresSpecificlSerialNo, RequiresSpecificLotNo, RequiresSerialNoInput, RequiresLotNoInput);
         until (BOMComponent.Next() = 0) or (RequiresLotNoInput and RequiresSerialNoInput);
 
     end;
