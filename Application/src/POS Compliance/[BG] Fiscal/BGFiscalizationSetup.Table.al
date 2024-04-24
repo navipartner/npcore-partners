@@ -15,7 +15,7 @@ table 6060085 "NPR BG Fiscalization Setup"
         }
         field(2; "Enable BG Fiscal"; Boolean)
         {
-            Caption = 'Enable BG Fiscalisation';
+            Caption = 'Enable BG Fiscalization';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteTag = 'NPR28.0';
@@ -23,7 +23,7 @@ table 6060085 "NPR BG Fiscalization Setup"
         }
         field(10; "BG SIS Fiscal Enabled"; Boolean)
         {
-            Caption = 'BG SIS Fiscalisation Enabled';
+            Caption = 'BG SIS Fiscalization Enabled';
             DataClassification = CustomerContent;
         }
         field(15; "BG SIS Print EFT Information"; Boolean)

@@ -33,7 +33,7 @@ page 6059911 "NPR RS Fiscal App. Area Setup"
                 field("NPR RS Fiscal"; Rec."NPR RS Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the NPR RS Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the NPR RS Fiscalization field.';
                 }
             }
         }

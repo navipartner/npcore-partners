@@ -7,7 +7,7 @@ codeunit 85065 "NPR Library RS Fiscal"
         NoSeriesLine: Record "No. Series Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSStore: Record "NPR POS Store";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
@@ -73,13 +73,13 @@ codeunit 85065 "NPR Library RS Fiscal"
             end;
         until PaymentMethod.Next() = 0;
 
-        RSFiscalisationSetup.DeleteAll();
-        RSFiscalisationSetup.Init();
-        RSFiscalisationSetup."Enable RS Fiscal" := true;
-        RSFiscalisationSetup."Report E-Mail Selection" := RSFiscalisationSetup."Report E-Mail Selection"::Both;
-        RSFiscalisationSetup."Sandbox URL" := 'http://devesdc.sandbox.suf.purs.gov.rs:8888';
-        RSFiscalisationSetup."Configuration URL" := 'https://api.sandbox.suf.purs.gov.rs/';
-        RSFiscalisationSetup.Insert();
+        RSFiscalizationSetup.DeleteAll();
+        RSFiscalizationSetup.Init();
+        RSFiscalizationSetup."Enable RS Fiscal" := true;
+        RSFiscalizationSetup."Report E-Mail Selection" := RSFiscalizationSetup."Report E-Mail Selection"::Both;
+        RSFiscalizationSetup."Sandbox URL" := 'http://devesdc.sandbox.suf.purs.gov.rs:8888';
+        RSFiscalizationSetup."Configuration URL" := 'https://api.sandbox.suf.purs.gov.rs/';
+        RSFiscalizationSetup.Insert();
 
         BindSubscription(LibraryRSFiscal);
         RSTaxCommunicationMgt.PullAndFillSUFConfiguration();

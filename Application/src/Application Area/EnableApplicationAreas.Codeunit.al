@@ -17,7 +17,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         EnableShopifyApplicationAreas(TempApplicationAreaSetup);
 #endif
         EnableLocalizationApplicationAreas(TempApplicationAreaSetup);
-        EnableFiscalisationApplicationAreas(TempApplicationAreaSetup);
+        EnableFiscalizationApplicationAreas(TempApplicationAreaSetup);
     end;
 
     local procedure EnableRetailApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -62,15 +62,15 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR RS R Local" := IsRSRLocalizationEnabled();
     end;
 
-    local procedure EnableFiscalisationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    local procedure EnableFiscalizationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
     begin
-        TempApplicationAreaSetup."NPR RS Fiscal" := IsRSFiscalisationEnabled();
-        TempApplicationAreaSetup."NPR NO Fiscal" := IsNOFiscalisationEnabled();
-        TempApplicationAreaSetup."NPR SI Fiscal" := IsSIFiscalisationEnabled();
+        TempApplicationAreaSetup."NPR RS Fiscal" := IsRSFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR NO Fiscal" := IsNOFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR SI Fiscal" := IsSIFiscalizationEnabled();
         TempApplicationAreaSetup."NPR CRO Fiscal" := IsCROFiscalizationEnabled();
         TempApplicationAreaSetup."NPR BG SIS Fiscal" := IsBGSISFiscalizationEnabled();
         TempApplicationAreaSetup."NPR IT Fiscal" := IsITFiscalizationEnabled();
-        TempApplicationAreaSetup."NPR DK Fiscal" := IsDKFiscalisationEnabled();
+        TempApplicationAreaSetup."NPR DK Fiscal" := IsDKFiscalizationnEnabled();
         TempApplicationAreaSetup."NPR HU MultiSoft EInv" := IsHUMultiSoftEInvEnabled();
         TempApplicationAreaSetup."NPR SE CleanCash" := IsSEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR AT Fiscal" := IsATFiscalizationEnabled();
@@ -105,54 +105,54 @@ codeunit 6151349 "NPR Enable Application Areas"
         exit(RSRLocalizationSetup."Enable RS Retail Localization");
     end;
 
-    local procedure IsRSFiscalisationEnabled(): Boolean
+    local procedure IsRSFiscalizationEnabled(): Boolean
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
     begin
-        if not RSFiscalisationSetup.Get() then
+        if not RSFiscalizationSetup.Get() then
             exit(false);
 
-        exit(RSFiscalisationSetup."Enable RS Fiscal");
+        exit(RSFiscalizationSetup."Enable RS Fiscal");
     end;
 
-    local procedure IsNOFiscalisationEnabled(): Boolean
+    local procedure IsNOFiscalizationEnabled(): Boolean
     var
-        NOFiscalisationSetup: Record "NPR NO Fiscalization Setup";
+        NOFiscalizationSetup: Record "NPR NO Fiscalization Setup";
     begin
-        if not NOFiscalisationSetup.Get() then
+        if not NOFiscalizationSetup.Get() then
             exit(false);
 
-        exit(NOFiscalisationSetup."Enable NO Fiscal");
+        exit(NOFiscalizationSetup."Enable NO Fiscal");
     end;
 
-    local procedure IsDKFiscalisationEnabled(): Boolean
+    local procedure IsDKFiscalizationnEnabled(): Boolean
     var
-        DKFiscalisationSetup: Record "NPR DK Fiscalization Setup";
+        DKFiscalizationSetup: Record "NPR DK Fiscalization Setup";
     begin
-        if not DKFiscalisationSetup.Get() then
+        if not DKFiscalizationSetup.Get() then
             exit(false);
 
-        exit(DKFiscalisationSetup."Enable DK Fiscal");
+        exit(DKFiscalizationSetup."Enable DK Fiscal");
     end;
 
     local procedure IsHUMultiSoftEInvEnabled(): Boolean
     var
-        HUMSFiscalisationSetup: Record "NPR HU MS Fiscalization Setup";
+        HUMSFiscalizationSetup: Record "NPR HU MS Fiscalization Setup";
     begin
-        if not HUMSFiscalisationSetup.Get() then
+        if not HUMSFiscalizationSetup.Get() then
             exit(false);
 
-        exit(HUMSFiscalisationSetup."Enable HU Fiscal");
+        exit(HUMSFiscalizationSetup."Enable HU Fiscal");
     end;
 
-    local procedure IsSIFiscalisationEnabled(): Boolean
+    local procedure IsSIFiscalizationEnabled(): Boolean
     var
-        SIFiscalisationSetup: Record "NPR SI Fiscalization Setup";
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
     begin
-        if not SIFiscalisationSetup.Get() then
+        if not SIFiscalizationSetup.Get() then
             exit(false);
 
-        exit(SIFiscalisationSetup."Enable SI Fiscal");
+        exit(SIFiscalizationSetup."Enable SI Fiscal");
     end;
 
     local procedure IsCROFiscalizationEnabled(): Boolean

@@ -18,7 +18,7 @@ page 6151480 "NPR BG SIS Enable Fiscal Step"
                 field("BG SIS Fiscal Enabled"; Rec."BG SIS Fiscal Enabled")
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Fiscalisation Enabled';
+                    Caption = 'Fiscalization Enabled';
                     ToolTip = 'Specifies whether SIS fiscal integration is enabled.';
                 }
             }

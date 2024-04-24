@@ -18,7 +18,7 @@ page 6151393 "NPR RS Enable Fiscal Step"
                 field("Enable RS Fiscal"; Rec."Enable RS Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable RS Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable RS Fiscalization field.';
                 }
                 field("Allow Offline Use"; Rec."Allow Offline Use")
                 {
