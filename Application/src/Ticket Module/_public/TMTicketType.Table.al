@@ -138,6 +138,12 @@
             TableRelation = Item;
             DataClassification = CustomerContent;
         }
+        field(71; CouponProfileCode; Code[20])
+        {
+            Caption = 'Coupon Profile Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM CouponProfile";
+        }
         field(80; "RP Template Code"; Code[20])
         {
             Caption = 'RP Template Code';
