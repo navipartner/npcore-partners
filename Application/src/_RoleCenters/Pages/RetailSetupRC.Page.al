@@ -419,6 +419,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the item worksheet Templates';
                     ApplicationArea = NPRRetail;
                 }
+                action("POS Sales Document Setup")
+                {
+                    Caption = 'POS Sales Document Setup';
+                    RunObject = page "NPR POS Sales Document Setup";
+
+                    ToolTip = 'View or edit the POS Sales Document Setup';
+                    ApplicationArea = NPRRetail;
+                }
                 action("Job Queue")
                 {
                     Caption = 'Job Queue';
