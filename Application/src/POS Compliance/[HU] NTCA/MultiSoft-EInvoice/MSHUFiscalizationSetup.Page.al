@@ -1,7 +1,7 @@
 page 6151363 "NPR MS HU Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'HU MultiSoft Fiscalisation Setup';
+    Caption = 'HU MultiSoft Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/hungary/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
@@ -21,7 +21,7 @@ page 6151363 "NPR MS HU Fiscalization Setup"
                 field("Enable HU Fiscal"; Rec."Enable HU Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable HU Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable HU Fiscalization field.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable HU Fiscal" <> Rec."Enable HU Fiscal" then

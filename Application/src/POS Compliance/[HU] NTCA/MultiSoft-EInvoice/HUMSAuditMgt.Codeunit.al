@@ -85,9 +85,9 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        HUFiscalisationSetup: Page "NPR MS HU Fiscalization Setup";
+        HUFiscalizationSetup: Page "NPR MS HU Fiscalization Setup";
     begin
-        HUFiscalisationSetup.RunModal();
+        HUFiscalizationSetup.RunModal();
     end;
 
     local procedure GetLinkedSalesDocument(var POSEntry: Record "NPR POS Entry"; var POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link"): Boolean

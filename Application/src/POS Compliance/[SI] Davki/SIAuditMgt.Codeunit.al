@@ -248,9 +248,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        SIFiscalisationSetup: Page "NPR SI Fiscalization Setup";
+        SIFiscalizationSetup: Page "NPR SI Fiscalization Setup";
     begin
-        SIFiscalisationSetup.RunModal();
+        SIFiscalizationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")

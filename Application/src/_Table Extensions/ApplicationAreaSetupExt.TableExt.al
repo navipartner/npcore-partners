@@ -59,7 +59,7 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
         }
         field(6060111; "NPR RS Fiscal"; Boolean)
         {
-            Caption = 'NaviPartner RS Fiscalisation';
+            Caption = 'NaviPartner RS Fiscalization';
             DataClassification = CustomerContent;
         }
         field(6060112; "NPR CRO Fiscal"; Boolean)
@@ -69,17 +69,17 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
         }
         field(6060113; "NPR NO Fiscal"; Boolean)
         {
-            Caption = 'NaviPartner NO Fiscalisation';
+            Caption = 'NaviPartner NO Fiscalization';
             DataClassification = CustomerContent;
         }
         field(6060114; "NPR SI Fiscal"; Boolean)
         {
-            Caption = 'NaviPartner SI Fiscalisation';
+            Caption = 'NaviPartner SI Fiscalization';
             DataClassification = CustomerContent;
         }
         field(6060115; "NPR BG Fiscal"; Boolean)
         {
-            Caption = 'NaviPartner BG Fiscalisation';
+            Caption = 'NaviPartner BG Fiscalization';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteTag = 'NPR28.0';
@@ -87,7 +87,7 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
         }
         field(6060116; "NPR BG SIS Fiscal"; Boolean)
         {
-            Caption = 'NaviPartner BG SIS Fiscalisation';
+            Caption = 'NaviPartner BG SIS Fiscalization';
             DataClassification = CustomerContent;
         }
         field(6060117; "NPR IT Fiscal"; Boolean)

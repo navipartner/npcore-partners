@@ -15,7 +15,7 @@ table 6150760 "NPR HU MS Fiscalization Setup"
         }
         field(2; "Enable HU Fiscal"; Boolean)
         {
-            Caption = 'Enable HU Fiscalisation';
+            Caption = 'Enable HU Fiscalization';
             DataClassification = CustomerContent;
         }
     }

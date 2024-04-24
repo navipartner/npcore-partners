@@ -44,12 +44,12 @@ codeunit 6059934 "NPR RS Fiscal E-Mail Mgt."
     local procedure CreateAndSendEmailMessage(var TempEmailItem: Record "Email Item" temporary; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; RecipientEmail: Text): Text
     var
         EmailAccount: Record "Email Account";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         EmailScenarios: Codeunit "Email Scenario";
         ErrorMessage: Text;
     begin
         InitializeEmailItem(TempEmailItem);
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
 
         if not EmailScenarios.GetEmailAccount(Enum::"Email Scenario"::Default, EmailAccount) then
             exit(_EmailAccountNotFoundErr);
@@ -67,8 +67,8 @@ codeunit 6059934 "NPR RS Fiscal E-Mail Mgt."
         TempEmailItem.Modify();
 
         TempEmailItem.SetBodyText(StrSubstNo(_EMailBodyLbl, StrSubstNo(_LinkedTextHtmlLbl, RSPOSAuditLogAuxInfo."Verification URL", _LinkedText)));
-        if RSFiscalisationSetup."E-Mail Subject" <> '' then
-            TempEmailItem.Subject := RSFiscalisationSetup."E-Mail Subject"
+        if RSFiscalizationSetup."E-Mail Subject" <> '' then
+            TempEmailItem.Subject := RSFiscalizationSetup."E-Mail Subject"
         else
             TempEmailItem.Subject := _EMailSubjectLbl;
 
@@ -88,20 +88,20 @@ codeunit 6059934 "NPR RS Fiscal E-Mail Mgt."
     #region Attachment creation
     local procedure CreateAttachments(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Text
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RecRef: RecordRef;
         ErrorMessage: Text;
         FiscalBillA4v1Filename: Text;
         FiscalBillA4v2Filename: Text;
     begin
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         RecRef.GetTable(RSPOSAuditLogAuxInfo);
         RecRef.SetRecFilter();
 
         FiscalBillA4v1Filename := StrSubstNo(_AttachmentFileName1, RSPOSAuditLogAuxInfo."Invoice Counter");
         FiscalBillA4v2Filename := StrSubstNo(_AttachmentFileName2, RSPOSAuditLogAuxInfo."Invoice Counter");
 
-        case RSFiscalisationSetup."Report E-Mail Selection" of
+        case RSFiscalizationSetup."Report E-Mail Selection" of
             "NPR RS Report E-Mail Selection"::"Fiscal Bill A4":
                 ErrorMessage := CreateAttachment(Report::"NPR RS Fiscal Bill A4 v1", FiscalBillA4v1Filename, RSPOSAuditLogAuxInfo);
             "NPR RS Report E-Mail Selection"::"Thermal printing receipt":

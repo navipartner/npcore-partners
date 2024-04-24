@@ -15,7 +15,7 @@ table 6060058 "NPR CRO Fiscalization Setup"
         }
         field(2; "Enable CRO Fiscal"; Boolean)
         {
-            Caption = 'Enable CRO Fiscalisation';
+            Caption = 'Enable CRO Fiscalization';
             DataClassification = CustomerContent;
         }
         field(3; "Signing Certificate"; BLOB)

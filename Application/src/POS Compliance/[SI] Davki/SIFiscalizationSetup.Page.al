@@ -1,7 +1,7 @@
 page 6150767 "NPR SI Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'SI Tax Fiscalisation Setup';
+    Caption = 'SI Tax Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/slovenia/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;

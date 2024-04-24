@@ -5,7 +5,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     #region COMMUNICATION REQUESTS with Tax Authority
     internal procedure CreateNormalSale(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         IsHandled: Boolean;
@@ -20,16 +20,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             exit;
         StartTime := CurrentDateTime;
         VerifyPIN(RSPOSAuditLogAuxInfo."POS Unit No.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalSale(RSPOSAuditLogAuxInfo, false));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -48,7 +48,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     internal procedure CreateNormalSale(SalesInvoiceNo: Code[20])
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         IsHandled: Boolean;
@@ -65,7 +65,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         StartTime := CurrentDateTime;
         RSAuxSalesInvHeader.Get(SalesInvoiceNo);
         VerifyPIN(RSAuxSalesInvHeader."NPR RS POS Unit");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         SalesInvoiceHeader.Get(SalesInvoiceNo);
         CreatePrepaymentRefund(SalesInvoiceHeader);
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalSale(SalesInvoiceHeader, false));
@@ -73,10 +73,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -96,7 +96,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     var
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         IsHandled: Boolean;
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
@@ -115,16 +115,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             exit;
         StartTime := CurrentDateTime;
         VerifyPIN(RSPOSAuditLogAuxInfo."POS Unit No.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalAdvanceSale(RSPOSAuditLogAuxInfo, SalesInvoiceHeader, SalesHeader, false));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -143,7 +143,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     internal procedure CreatePrepaymentRefund(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         // IsHandled: Boolean;
@@ -160,7 +160,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         StartTime := CurrentDateTime;
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvoiceHeader);
         VerifyPIN(RSAuxSalesInvHeader."NPR RS POS Unit");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         RSPOSAuditLogAuxInfoReferent.SetRange("RS Invoice Type", RSPOSAuditLogAuxInfoReferent."RS Invoice Type"::ADVANCE);
         RSPOSAuditLogAuxInfoReferent.SetRange("RS Transaction Type", RSPOSAuditLogAuxInfoReferent."RS Transaction Type"::SALE);
         RSPOSAuditLogAuxInfoReferent.SetRange("Prepayment Order No.", SalesInvoiceHeader."Order No.");
@@ -171,10 +171,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -193,7 +193,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     internal procedure CreateProformaSale(var SalesHeader: Record "Sales Header")
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         IsHandled: Boolean;
@@ -210,16 +210,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         StartTime := CurrentDateTime;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         VerifyPIN(RSAuxSalesHeader."NPR RS POS Unit");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalSale(SalesHeader, false));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesHeader."NPR RS POS Unit");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -238,7 +238,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateNormalRefund(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         IsHandled: Boolean;
@@ -253,16 +253,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             exit;
         StartTime := CurrentDateTime;
         VerifyPIN(RSPOSAuditLogAuxInfo."POS Unit No.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalRefund(RSPOSAuditLogAuxInfo));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -281,7 +281,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     internal procedure CreateNormalRefund(SalesCrMemoNo: Code[20])
     var
         RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
@@ -301,16 +301,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if RSAuxSalesCrMemoHeader."NPR RS Refund Reference" = '' then
             exit;
         VerifyPIN(RSAuxSalesCrMemoHeader."NPR RS POS Unit");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalRefund(SalesCrMemoHeader, false));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesCrMemoHeader."NPR RS POS Unit");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -329,7 +329,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     internal procedure CreateProformaRefund(var SalesHeader: Record "Sales Header"; ModifySalesHeader: Boolean)
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         IsHandled: Boolean;
@@ -346,16 +346,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         StartTime := CurrentDateTime;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         VerifyPIN(RSAuxSalesHeader."NPR RS POS Unit");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalRefund(SalesHeader));
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesHeader."NPR RS POS Unit");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -375,7 +375,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure CreateCopyFiscalReceipt(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesHeader: Record "Sales Header";
@@ -392,8 +392,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             exit;
         StartTime := CurrentDateTime;
         VerifyPIN(RSPOSAuditLogAuxInfo."POS Unit No.");
-        RSFiscalisationSetup.Get();
-        if RSFiscalisationSetup.Training then
+        RSFiscalizationSetup.Get();
+        if RSFiscalizationSetup.Training then
             exit;
         case RSPOSAuditLogAuxInfo."Audit Entry Type" of
             RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry":
@@ -417,10 +417,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -434,7 +434,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure VerifyPIN(POSUnitNo: Code[10]): Text
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         RSPinStatusResponse: Enum "NPR RS Pin Status Response";
         IsHandled: Boolean;
@@ -444,16 +444,16 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         ResponseText: Text;
         Url: Text;
     begin
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         RSPOSUnitMapping.Get(POSUnitNo);
         Content.WriteFrom('"' + Format(RSPOSUnitMapping."RS Sandbox PIN") + '"');
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        if RSFiscalisationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin'
+        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin'
         else
-            Url := RSFiscalisationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin';
+            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -471,19 +471,19 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure PullAndFillSUFConfiguration(): Text
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         IsHandled: Boolean;
         ResponseText: Text;
         Url: Text;
     begin
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
 
-        if RSFiscalisationSetup."Configuration URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Configuration URL" + GetApiVersionUrl() + 'configuration'
+        if RSFiscalizationSetup."Configuration URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Configuration URL" + GetApiVersionUrl() + 'configuration'
         else
-            Url := RSFiscalisationSetup."Configuration URL" + '/' + GetApiVersionUrl() + 'configuration';
+            Url := RSFiscalizationSetup."Configuration URL" + '/' + GetApiVersionUrl() + 'configuration';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('GET');
@@ -500,19 +500,19 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     internal procedure PullAndFillAllowedTaxRates(): Text
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         IsHandled: Boolean;
         ResponseText: Text;
         Url: Text;
     begin
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
 
-        if RSFiscalisationSetup."Configuration URL".EndsWith('/') then
-            Url := RSFiscalisationSetup."Configuration URL" + GetApiVersionUrl() + 'tax-rates'
+        if RSFiscalizationSetup."Configuration URL".EndsWith('/') then
+            Url := RSFiscalizationSetup."Configuration URL" + GetApiVersionUrl() + 'tax-rates'
         else
-            Url := RSFiscalisationSetup."Configuration URL" + '/' + GetApiVersionUrl() + 'tax-rates';
+            Url := RSFiscalizationSetup."Configuration URL" + '/' + GetApiVersionUrl() + 'tax-rates';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('GET');
@@ -537,7 +537,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
@@ -556,11 +556,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
         if RSPOSAuditLogAuxInfo."Additional Customer Field" <> '' then
             JObjectHeader.Add('buyerCostCenterId', RSPOSAuditLogAuxInfo."Additional Customer Field");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Invoice Type"));
@@ -638,7 +638,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
@@ -658,11 +658,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Customer Ident.");
         if RSAuxSalesHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::PROFORMA));
@@ -671,13 +671,13 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         else
             JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::SALE));
         Clear(JObjectLines);
-        if not (RSFiscalisationSetup.Training) and not IsCopy then
+        if not (RSFiscalizationSetup.Training) and not IsCopy then
             JObjectLines.Add('amount', Format(0.00, 12, '<Precision,2:2><Integer Thousand><Decimals><Comma,,>'))
         else begin
             SalesHeader.CalcFields("Amount Including VAT");
             JObjectLines.Add('amount', SalesHeader."Amount Including VAT")
         end;
-        if not IsCopy and not RSFiscalisationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
+        if not IsCopy and not RSFiscalizationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
             if RSPaymentMethodMapping.Get(SalesHeader."Payment Method Code") then
                 JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
             else
@@ -734,7 +734,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
@@ -756,11 +756,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesInvHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesInvHeader."NPR RS Customer Ident.");
         if RSAuxSalesInvHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesInvHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesInvHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::NORMAL));
@@ -839,7 +839,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
         SalesInvoiceLine: Record "Sales Invoice Line";
@@ -859,11 +859,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesInvHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesInvHeader."NPR RS Customer Ident.");
         if RSAuxSalesInvHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesInvHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesInvHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::ADVANCE));
@@ -940,7 +940,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         POSEntry: Record "NPR POS Entry";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
@@ -964,11 +964,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Customer Ident.");
         if RSAuxSalesHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::ADVANCE));
@@ -1052,7 +1052,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
@@ -1073,8 +1073,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
         if RSPOSAuditLogAuxInfo."Additional Customer Field" <> '' then
             JObjectHeader.Add('buyerCostCenterId', RSPOSAuditLogAuxInfo."Additional Customer Field");
-        RSFiscalisationSetup.Get();
-        if RSFiscalisationSetup.Training then
+        RSFiscalizationSetup.Get();
+        if RSFiscalizationSetup.Training then
             JObjectHeader.Add('invoiceType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING))
         else
             JObjectHeader.Add('invoiceType', GetEnumValueName(RSPOSAuditLogAuxInfo."RS Invoice Type"));
@@ -1156,7 +1156,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
@@ -1176,8 +1176,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Customer Ident.");
         if RSAuxSalesHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
-        if RSFiscalisationSetup.Training then
+        RSFiscalizationSetup.Get();
+        if RSFiscalizationSetup.Training then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
         else
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::PROFORMA));
@@ -1185,7 +1185,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Clear(JObjectLines);
         SalesHeader.CalcFields("Amount Including VAT");
         JObjectLines.Add('amount', '0,00');
-        if not RSFiscalisationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
+        if not RSFiscalizationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
             if RSPaymentMethodMapping.Get(SalesHeader."Payment Method Code") then
                 JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
             else
@@ -1242,7 +1242,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Item: Record Item;
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
         RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
         RSVATPostSetupMapping: Record "NPR RS VAT Post. Setup Mapping";
@@ -1262,11 +1262,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('buyerId', Format(RSAuxSalesCrMemoHeader."NPR RS Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesCrMemoHeader."NPR RS Customer Ident.");
         if RSAuxSalesCrMemoHeader."NPR RS Add. Cust. Ident." <> '' then
             JObjectHeader.Add('buyerCostCenterId', Format(RSAuxSalesCrMemoHeader."NPR RS Add. Cust. Ident. Type".AsInteger()) + ':' + RSAuxSalesCrMemoHeader."NPR RS Add. Cust. Ident.");
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         if IsCopy then
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::COPY))
         else
-            if RSFiscalisationSetup.Training then
+            if RSFiscalizationSetup.Training then
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::TRAINING))
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::NORMAL));
@@ -1494,7 +1494,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         SalesLine: Record "Sales Line";
         JsonHeader: JsonObject;
@@ -1516,8 +1516,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxInfo."Email-To" := SalesHeader."Sell-to E-Mail";
         POSUnit.Get(RSAuxSalesHeader."NPR RS POS Unit");
         RSPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
-        RSFiscalisationSetup.Get();
-        case RSFiscalisationSetup.Training of
+        RSFiscalizationSetup.Get();
+        case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
@@ -1645,7 +1645,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         SalesInvoiceLine: Record "Sales Invoice Line";
@@ -1666,8 +1666,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxInfo."Email-To" := SalesInvoiceHeader."Sell-to E-Mail";
         POSUnit.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
         RSPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
-        RSFiscalisationSetup.Get();
-        case RSFiscalisationSetup.Training of
+        RSFiscalizationSetup.Get();
+        case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
@@ -1795,7 +1795,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
         RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
@@ -1816,8 +1816,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxInfo."Email-To" := SalesCrMemoHeader."Sell-to E-Mail";
         POSUnit.Get(RSAuxSalesCrMemoHeader."NPR RS POS Unit");
         RSPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
-        RSFiscalisationSetup.Get();
-        case RSFiscalisationSetup.Training of
+        RSFiscalizationSetup.Get();
+        case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
@@ -2054,7 +2054,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     local procedure FillSUFConfigurationSetup(ResponseText: Text)
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         JsonHeader: JsonObject;
         JsonHeader2: JsonObject;
         JsonTok: JsonToken;
@@ -2063,57 +2063,57 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if not JsonHeader.ReadFrom(ResponseText) then
             Error(JSONReadErr);
 
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
 #pragma warning disable AA0139
 
         JsonHeader.Get('organizationName', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."Organization Name" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."Organization Name" := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('serverTimeZone', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."Server Time Zone" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."Server Time Zone" := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('street', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup.Street := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup.Street := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('city', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup.City := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup.City := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('country', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup.Country := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup.Country := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('environmentName', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."Environment Name" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."Environment Name" := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('ntpServer', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."NPT Server URL" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."NPT Server URL" := DelChr(TempResult, '=', '"');
 
         JsonHeader.Get('endpoints', JsonTok);
         JsonHeader2 := JsonTok.AsObject();
 
         JsonHeader2.SelectToken('taxpayerAdminPortal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."TaxPayer Admin Portal URL" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."TaxPayer Admin Portal URL" := DelChr(TempResult, '=', '"');
 
         JsonHeader2.SelectToken('taxCoreApi', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."TaxCore API URL" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."TaxCore API URL" := DelChr(TempResult, '=', '"');
 
         JsonHeader2.SelectToken('vsdc', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."VSDC URL" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."VSDC URL" := DelChr(TempResult, '=', '"');
 
         JsonHeader2.SelectToken('taxpayerAdminPortal', JsonTok);
         JsonTok.WriteTo(TempResult);
-        RSFiscalisationSetup."Root URL" := DelChr(TempResult, '=', '"');
+        RSFiscalizationSetup."Root URL" := DelChr(TempResult, '=', '"');
 #pragma warning restore
-        RSFiscalisationSetup.Modify();
+        RSFiscalizationSetup.Modify();
     end;
 
     local procedure FillAllowedTaxRates(ResponseText: Text; Silent: Boolean)
@@ -2227,22 +2227,22 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     local procedure ClearSUFConfigurationSetup()
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         APIPullError: Label 'Error pulling configuration from SandBox API. Check URL or availability of API.';
     begin
-        RSFiscalisationSetup.Get();
-        Clear(RSFiscalisationSetup."Organization Name");
-        Clear(RSFiscalisationSetup."Server Time Zone");
-        Clear(RSFiscalisationSetup.Street);
-        Clear(RSFiscalisationSetup.City);
-        Clear(RSFiscalisationSetup.Country);
-        Clear(RSFiscalisationSetup."Environment Name");
-        Clear(RSFiscalisationSetup."NPT Server URL");
-        Clear(RSFiscalisationSetup."TaxPayer Admin Portal URL");
-        Clear(RSFiscalisationSetup."TaxCore API URL");
-        Clear(RSFiscalisationSetup."VSDC URL");
-        Clear(RSFiscalisationSetup."Root URL");
-        RSFiscalisationSetup.Modify();
+        RSFiscalizationSetup.Get();
+        Clear(RSFiscalizationSetup."Organization Name");
+        Clear(RSFiscalizationSetup."Server Time Zone");
+        Clear(RSFiscalizationSetup.Street);
+        Clear(RSFiscalizationSetup.City);
+        Clear(RSFiscalizationSetup.Country);
+        Clear(RSFiscalizationSetup."Environment Name");
+        Clear(RSFiscalizationSetup."NPT Server URL");
+        Clear(RSFiscalizationSetup."TaxPayer Admin Portal URL");
+        Clear(RSFiscalizationSetup."TaxCore API URL");
+        Clear(RSFiscalizationSetup."VSDC URL");
+        Clear(RSFiscalizationSetup."Root URL");
+        RSFiscalizationSetup.Modify();
         Message(APIPullError);
     end;
 
@@ -2273,7 +2273,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     #region Misc - For Http Requests
     local procedure SendHttpRequest(var RequestMessage: HttpRequestMessage; var ResponseText: Text; SkipErrorMessage: Boolean): Boolean
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         IsResponseSuccess: Boolean;
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
@@ -2287,9 +2287,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             else
                 Error(GetLastErrorText);
 
-        RSFiscalisationSetup.Get();
+        RSFiscalizationSetup.Get();
         IsResponseSuccess := ResponseMessage.IsSuccessStatusCode();
-        if (not IsResponseSuccess) and (not RSFiscalisationSetup."Allow Offline Use") and (not SkipErrorMessage) and GuiAllowed then begin
+        if (not IsResponseSuccess) and (not RSFiscalizationSetup."Allow Offline Use") and (not SkipErrorMessage) and GuiAllowed then begin
             ErrorText := Format(ResponseMessage.HttpStatusCode(), 0, 9) + ': ' + ResponseMessage.ReasonPhrase;
             if ResponseMessage.Content.ReadAs(ResponseText) then
                 ErrorText += ':\' + ResponseText;

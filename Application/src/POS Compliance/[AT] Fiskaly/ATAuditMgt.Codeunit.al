@@ -109,9 +109,9 @@ codeunit 6184848 "NPR AT Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        ATFiscalisationSetup: Page "NPR AT Fiscalization Setup";
+        ATFiscalizationSetup: Page "NPR AT Fiscalization Setup";
     begin
-        ATFiscalisationSetup.RunModal();
+        ATFiscalizationSetup.RunModal();
     end;
     #endregion
 

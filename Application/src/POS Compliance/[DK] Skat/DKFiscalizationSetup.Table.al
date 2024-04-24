@@ -15,7 +15,7 @@ table 6150746 "NPR DK Fiscalization Setup"
         }
         field(2; "Enable DK Fiscal"; Boolean)
         {
-            Caption = 'Enable DK Fiscalisation';
+            Caption = 'Enable DK Fiscalization';
             DataClassification = CustomerContent;
         }
         field(10; "Signing Certificate"; Blob)

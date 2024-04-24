@@ -323,9 +323,9 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        BGFiscalisationSetup: Page "NPR BG Fiscalization Setup";
+        BGFiscalizationSetup: Page "NPR BG Fiscalization Setup";
     begin
-        BGFiscalisationSetup.RunModal();
+        BGFiscalizationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")

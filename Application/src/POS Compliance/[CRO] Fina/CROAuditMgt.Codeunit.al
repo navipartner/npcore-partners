@@ -279,9 +279,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        CROFiscalisationSetup: Page "NPR CRO Fiscalization Setup";
+        CROFiscalizationSetup: Page "NPR CRO Fiscalization Setup";
     begin
-        CROFiscalisationSetup.RunModal();
+        CROFiscalizationSetup.RunModal();
     end;
 
     #endregion

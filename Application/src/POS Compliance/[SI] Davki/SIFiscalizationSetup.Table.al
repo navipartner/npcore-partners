@@ -15,7 +15,7 @@ table 6059835 "NPR SI Fiscalization Setup"
         }
         field(2; "Enable SI Fiscal"; Boolean)
         {
-            Caption = 'Enable SI Fiscalisation';
+            Caption = 'Enable SI Fiscalization';
             DataClassification = CustomerContent;
         }
         field(3; "Receipt No. Series"; Code[20])

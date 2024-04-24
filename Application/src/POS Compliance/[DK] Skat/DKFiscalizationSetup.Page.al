@@ -1,7 +1,7 @@
 page 6151325 "NPR DK Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'DK Fiscalisation Setup';
+    Caption = 'DK Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/denmark/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
@@ -21,7 +21,7 @@ page 6151325 "NPR DK Fiscalization Setup"
                 field("Enable DK Fiscal"; Rec."Enable DK Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable DK Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable DK Fiscalization field.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable DK Fiscal" <> Rec."Enable DK Fiscal" then

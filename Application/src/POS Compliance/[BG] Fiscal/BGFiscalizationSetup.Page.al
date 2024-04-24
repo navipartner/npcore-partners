@@ -1,7 +1,7 @@
 page 6151269 "NPR BG Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'BG Fiscalisation Setup';
+    Caption = 'BG Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/bulgaria/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
