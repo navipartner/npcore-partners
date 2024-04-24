@@ -445,6 +445,20 @@
         exit(1);
 
     end;
+
+    procedure ExchangeTicketForCoupon(ExternalTicketNo: Code[30]; CouponAlias: Code[20]; var CouponReferenceNo: Text[50]; var ReasonCode: Text; var ReasonText: Text) Success: Boolean
+    var
+        TicketToCoupon: Codeunit "NPR TM TicketToCoupon";
+        ReasonNumber: Integer;
+    begin
+        CouponReferenceNo := '';
+        ReasonCode := '';
+        ReasonText := '';
+
+        Success := TicketToCoupon.ExchangeTicketForCoupon(ExternalTicketNo, CouponAlias, CouponReferenceNo, ReasonNumber, ReasonText);
+        ReasonCode := Format(ReasonNumber, 0, 9);
+    end;
+
 #pragma warning disable AA0245 
     procedure OfflineTicketValidation(var OfflineTicketValidation: XmlPort "NPR TM Offline Ticket Valid.") Success: Boolean
     var

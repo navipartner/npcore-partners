@@ -222,6 +222,7 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
+                    Scope = Repeater;
 
                     trigger OnAction()
                     begin
@@ -238,7 +239,8 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     PromotedCategory = Process;
-                    scope = Repeater;
+                    Scope = Repeater;
+
                     trigger OnAction()
                     begin
                         ToggleTicketBlock();
@@ -254,7 +256,8 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     PromotedCategory = Process;
-                    scope = Repeater;
+                    Scope = Repeater;
+
                     trigger OnAction()
                     begin
                         RevokeTicket();
@@ -270,7 +273,8 @@
                     PromotedOnly = true;
                     PromotedIsBig = true;
                     PromotedCategory = Process;
-                    scope = Repeater;
+                    Scope = Repeater;
+
                     trigger OnAction()
                     begin
                         ChangeTicketReservation(Rec);
@@ -286,7 +290,8 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Process;
-                    scope = Repeater;
+                    Scope = Repeater;
+
                     trigger OnAction()
                     begin
                         ChangeTicketHolder();
@@ -307,9 +312,10 @@
                     PromotedOnly = true;
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
+                    Scope = Repeater;
+
                     RunObject = Page "NPR TM Ticket AccessEntry List";
                     RunPageLink = "Ticket No." = field("No.");
-                    Scope = Repeater;
                 }
                 Action("Ticket Request")
                 {
@@ -336,6 +342,7 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
+                    Scope = Repeater;
 
                     trigger OnAction()
                     var
@@ -353,18 +360,34 @@
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
+                    Scope = Repeater;
+
                     RunObject = Page "NPR TM Ticket Notif. Entry";
                     RunPageLink = "Ticket No." = field("No.");
                 }
+                Action("ViewTicketCoupons")
+                {
+                    ToolTip = 'Navigate to ticket related coupons.';
+                    ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                    Caption = 'View Ticket Coupons';
+                    Image = Voucher;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
+
+                    RunObject = Page "NPR TM TicketCoupons";
+                    RunPageLink = TicketNo = field("No.");
+                }
                 Action(Navigate)
                 {
+                    ToolTip = 'Finds the web invoice or POS Sale.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Find Sales Transaction';
                     Image = Navigate;
                     Promoted = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
-                    ToolTip = 'Finds the web invoice or POS Sale.';
                     Scope = Repeater;
 
                     trigger OnAction()
@@ -391,8 +414,8 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
-
                 Scope = Repeater;
+
                 trigger OnAction()
                 var
                     Ticket: Record "NPR TM Ticket";
@@ -421,6 +444,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
+
                 RunObject = Report "NPR Issued Tickets";
             }
             Action(Statistics)
@@ -432,6 +456,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
+
                 RunObject = Page "NPR TM Ticket Acc. Stat. Mtrx";
             }
             Action(Forecast)
@@ -443,6 +468,7 @@
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = "Report";
+
                 RunObject = Page "NPR TM Admis. Forecast Matrix";
             }
             Action(TicketAccessInformation)
@@ -451,6 +477,7 @@
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Caption = 'Ticket Access Information';
                 Image = Calendar;
+
                 trigger OnAction()
                 begin
                     TicketManagement.ShowTicketAccess(Rec);
@@ -514,8 +541,15 @@
                 if (not Ticket2.Blocked) then
                     TicketRequestManager.OnAfterUnblockTicketPublisher(Ticket."No.");
 
+                if (Rec.IsTemporary()) then begin
+                    Rec.Get(Ticket2."No.");
+                    Rec.Copy(Ticket2);
+                    Rec.Modify();
+                end;
+
             until (Ticket.Next() = 0);
         end;
+
     end;
 
     local procedure RevokeTicket()

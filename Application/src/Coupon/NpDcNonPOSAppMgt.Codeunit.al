@@ -42,6 +42,10 @@
         TempSaleLinePOSIn.Copy(TempSaleLinePOS_, true);
     end;
 
+    // **
+    // Note: There is a commit in ScanCoupons for the insert extra items implementation.
+    // Make sure roll back will undo the changes done to persistent tables
+    [CommitBehavior(CommitBehavior::Ignore)]
     local procedure ApplyDiscount_OnRun()
     var
         SalePOS: Record "NPR POS Sale";
@@ -90,56 +94,39 @@
         TempSalePOS.FindFirst();
         InsertSalePOS(SalePOS);
 
-        TempSaleLinePOS.FindSet();
-        repeat
-            InsertSaleLinePOS(SalePOS, TempSaleLinePOS);
-        until TempSaleLinePOS.Next() = 0;
+        if (TempSaleLinePOS.FindSet()) then
+            repeat
+                InsertSaleLinePOS(SalePOS, TempSaleLinePOS);
+            until TempSaleLinePOS.Next() = 0;
     end;
 
-    local procedure InsertSalePOS(var SalePOS: Record "NPR POS Sale")
+    local procedure InsertSalePOS(var POSSale: Record "NPR POS Sale")
     var
-        POSStore: Record "NPR POS Store";
-        POSUnit: Record "NPR POS Unit";
-        Setup: Record "NPR POS Setup";
+        SalePos: Codeunit "NPR POS Sale";
+        PosSession: Codeunit "NPR POS Session";
         UserSetup: Record "User Setup";
-        SalesTicketNo: Code[20];
-        DummyCodeTxt: Label '-_-', Locked = true, MaxLength = 10;
+        POSUnit: Record "NPR POS Unit";
     begin
-        if not POSStore.Get(DummyCodeTxt) then begin
-            POSStore.Init();
-            POSStore.Code := DummyCodeTxt;
-            POSStore.Insert();
-        end;
-
-        if not POSUnit.Get(DummyCodeTxt) then begin
-            POSUnit.Init();
-            POSUnit."No." := DummyCodeTxt;
-            POSUnit.Insert();
-        end;
-        if not Setup.Get(POSUnit."POS Named Actions Profile") then begin
-            Setup.FindFirst();
-            POSUnit."POS Named Actions Profile" := Setup."Primary Key";
-        end;
-        POSUnit."POS Store Code" := POSStore.Code;
-        POSUnit.Modify();
-
-        if not UserSetup.Get(UserId) then begin
+        if (not UserSetup.Get(UserId)) then begin
             UserSetup.Init();
             UserSetup."User ID" := CopyStr(UserId, 1, MaxStrLen(UserSetup."User ID"));
             UserSetup.Insert();
         end;
-        UserSetup."NPR POS Unit No." := POSUnit."No.";
-        UserSetup.Modify();
+        if (UserSetup."NPR POS Unit No." = '') then begin
+            POSUnit.SetFilter(Status, '=%1', POSUnit.Status::OPEN);
+            if (not POSUnit.FindFirst()) then
+                Error('No open POS unit found for user %1', UserId);
+            UserSetup."NPR POS Unit No." := POSUnit."No.";
+            UserSetup.Modify();
+        end;
 
-        SalesTicketNo := CopyStr(DelChr(Format(CurrentDateTime, 0, 9), '=', ' -:.ZT'), 1, MaxStrLen(SalesTicketNo));
-        while SalePOS.Get(POSUnit."No.", '-' + SalesTicketNo) do
-            SalesTicketNo := IncStr(SalesTicketNo);
+        POSSession.ConstructFromWebserviceSession(true, '', '');
+        PosSession.StartPOSSession();
+        PosSession.StartTransaction();
 
-        SalePOS.Init();
-        SalePOS."Register No." := POSUnit."No.";
-        SalePOS."Sales Ticket No." := CopyStr('-' + SalesTicketNo, 1, MaxStrLen(SalePOS."Sales Ticket No."));
-        SalePOS.Date := Today();
-        SalePOS.Insert();
+        PosSession.GetSale(SalePOS);
+        SalePos.GetCurrentSale(POSSale);
+
     end;
 
     local procedure InsertSaleLinePOS(SalePOS: Record "NPR POS Sale"; TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
