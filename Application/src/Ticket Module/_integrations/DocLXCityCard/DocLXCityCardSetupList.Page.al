@@ -28,6 +28,11 @@ page 6184579 "NPR DocLXCityCardSetupList"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Environment field.';
                 }
+                field(Default; Rec.Default)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Default field.';
+                }
             }
         }
     }

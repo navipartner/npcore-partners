@@ -46,9 +46,10 @@ codeunit 6184834 "NPR POSAction DocLXCityCard" implements "NPR IPOS Workflow"
         CityCard: Codeunit "NPR DocLXCityCard";
         CardNumber: Code[20];
         LocationCode, CityCode : Code[10];
+        LogEntryNo: Integer;
     begin
         GetParameters(Context, CardNumber, CityCode, LocationCode);
-        exit(CityCard.ValidateCityCard(CardNumber, CityCode, LocationCode, PosUnitNo));
+        exit(CityCard.ValidateCityCard(CardNumber, CityCode, LocationCode, PosUnitNo, LogEntryNo));
     end;
 
     local procedure DoRedeem(Context: Codeunit "NPR POS JSON Helper"): JsonObject
@@ -56,9 +57,10 @@ codeunit 6184834 "NPR POSAction DocLXCityCard" implements "NPR IPOS Workflow"
         CityCard: Codeunit "NPR DocLXCityCard";
         CardNumber: Code[20];
         LocationCode, CityCode : Code[10];
+        LogEntryNo: Integer;
     begin
         GetParameters(Context, CardNumber, CityCode, LocationCode);
-        exit(CityCard.RedeemCityCard(CardNumber, CityCode, LocationCode));
+        exit(CityCard.RedeemCityCard(CardNumber, CityCode, LocationCode, LogEntryNo));
     end;
 
     local procedure DoAcquireCoupon(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject
@@ -67,11 +69,12 @@ codeunit 6184834 "NPR POSAction DocLXCityCard" implements "NPR IPOS Workflow"
         PosSale: Record "NPR POS Sale";
         CardNumber: Code[20];
         LocationCode, CityCode : Code[10];
+        LogEntryNo: Integer;
     begin
         GetParameters(Context, CardNumber, CityCode, LocationCode);
         Sale.GetCurrentSale(PosSale);
 
-        exit(CityCard.AcquireCoupon(CardNumber, CityCode, LocationCode, PosSale."Sales Ticket No."));
+        exit(CityCard.AcquireCoupon(CardNumber, CityCode, LocationCode, PosSale."Sales Ticket No.", LogEntryNo));
     end;
 
     local procedure DoCheckReservation(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
