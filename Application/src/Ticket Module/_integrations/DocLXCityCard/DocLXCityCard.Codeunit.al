@@ -6,12 +6,11 @@ codeunit 6184830 "NPR DocLXCityCard"
         _ErrorJsonLabel: Label '{"state": {"code": %1, "message": "%2"}}', Locked = true;
         _ValidationFailed: Label 'Card validation failed %1:';
 
-    internal procedure ValidateCityCard(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; PosUnitNo: Code[10]) Result: JsonObject
+    internal procedure ValidateCityCard(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; PosUnitNo: Code[10]; var EntryNo: Integer) Result: JsonObject
     var
         CityCardLocation: Record "NPR DocLXCityCardLocation";
-
-        EntryNo: Integer;
     begin
+        EntryNo := -1;
         if (not ValidateSetup(CardNumber, CityCode, LocationCode, Result)) then
             exit;
 
@@ -27,12 +26,13 @@ codeunit 6184830 "NPR DocLXCityCard"
 
     end;
 
-    internal procedure RedeemCityCard(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]) Result: JsonObject
+    internal procedure RedeemCityCard(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; var EntryNo: Integer) Result: JsonObject
     var
         CityCardLocation: Record "NPR DocLXCityCardLocation";
         LogEntry: Record "NPR DocLXCityCardHistory";
         NotFound: Label 'Card validation entry not found for card: %1';
     begin
+        EntryNo := -1;
         if (not ValidateSetup(CardNumber, CityCode, LocationCode, Result)) then
             exit;
 
@@ -50,6 +50,7 @@ codeunit 6184830 "NPR DocLXCityCard"
             exit;
         end;
 
+        EntryNo := LogEntry.EntryNo;
         if (RedeemCard(CardNumber, CityCode, CityCardLocation.CityCardLocationId, LogEntry.ValidatedAtDateTimeUtc, LogEntry.POSUnitNo, Result)) then begin
             UpdateLogRedemption(LogEntry.EntryNo, Result);
         end else begin
@@ -59,7 +60,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         Commit();
     end;
 
-    internal procedure AcquireCoupon(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; SalesDocumentNo: Code[20]) Result: JsonObject
+    internal procedure AcquireCoupon(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; SalesDocumentNo: Code[20]; var EntryNo: Integer) Result: JsonObject
     var
         CityCardLocation: Record "NPR DocLXCityCardLocation";
         LogEntry: Record "NPR DocLXCityCardHistory";
@@ -71,6 +72,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         CouponTypeNotFound: Label 'Coupon type not found for city: %1, location %2, article %3';
         GeneralError: Label 'There was a problem when redeeming the city card %1';
     begin
+        EntryNo := -1;
         if (not ValidateSetup(CardNumber, CityCode, LocationCode, Result)) then
             exit;
 
@@ -86,10 +88,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         // Create a new coupon
         LogEntry.SetFilter(CouponResultCode, '=%1', '');
         if (LogEntry.FindLast()) then begin
+            EntryNo := LogEntry.EntryNo;
             CouponType := CityCardLocation.CouponType;
             if (CityCardLocation.CouponSelection = CityCardLocation.CouponSelection::ITEM) then begin
                 if (not CityCardItems.Get(CityCode, LocationCode, LogEntry.ArticleId)) then begin
                     Result.ReadFrom(StrSubstNo(_ErrorJsonLabel, 5300, StrSubstNo(ArticleNotFound, LogEntry.ArticleId, CityCode)));
+                    UpdateLogCoupon(LogEntry.EntryNo, Result);
                     exit;
                 end;
                 CouponType := CityCardItems.CouponType;
@@ -97,12 +101,14 @@ codeunit 6184830 "NPR DocLXCityCard"
 
             if (CouponType = '') then begin
                 Result.ReadFrom(StrSubstNo(_ErrorJsonLabel, 5301, StrSubstNo(CouponTypeNotFound, CityCode, LocationCode, LogEntry.ArticleId)));
+                UpdateLogCoupon(LogEntry.EntryNo, Result);
                 exit;
             end;
 
             // Create a new coupon
             IssueCoupon(CouponType, CouponNo, CouponReferenceNo, LogEntry.ValidTimeSpan);
             Result.ReadFrom(StrSubstNo('{"state": {"code": 200, "message": "Coupon acquired"}, "coupon": {"type": "%1", "no": "%2", "reference_no": "%3", "sales_document_no": "%4"}}', CityCardLocation.CouponType, CouponNo, CouponReferenceNo, SalesDocumentNo));
+
             UpdateLogCoupon(LogEntry.EntryNo, Result);
             exit;
         end;
@@ -120,6 +126,7 @@ codeunit 6184830 "NPR DocLXCityCard"
             LogEntry.SetFilter(ValidationResultCode, '=%1', '523'); // City Card already redeemed
             LogEntry.SetFilter(CouponResultCode, '=%1', '');
             if (LogEntry.FindLast()) then begin
+                EntryNo := LogEntry.EntryNo;
                 UpdateLogCoupon(LogEntry.EntryNo, Result);
                 exit
             end;
@@ -131,10 +138,12 @@ codeunit 6184830 "NPR DocLXCityCard"
         LogEntry.SetFilter(CityCode, '=%1', CityCode);
         LogEntry.SetFilter(LocationCode, '=%1', LocationCode);
         if (not LogEntry.FindLast()) then begin
+            EntryNo := -1;
             Result.ReadFrom(StrSubstNo(_ErrorJsonLabel, 5302, StrSubstNo(GeneralError, CardNumber)));
             exit;
         end;
 
+        EntryNo := LogEntry.EntryNo;
         if (LogEntry.ValidationResultCode <> '200') then begin
             Result.ReadFrom(StrSubstNo(_ErrorJsonLabel, 5303, StrSubstNo(GeneralError, CardNumber)));
             UpdateLogCoupon(LogEntry.EntryNo, Result);
@@ -169,6 +178,33 @@ codeunit 6184830 "NPR DocLXCityCard"
         CouponReferenceNo := Coupon."Reference No.";
     end;
 
+    internal procedure GetDefaultCityCode(LocationCode: Code[10]): Code[10]
+    var
+        CityCardSetup: Record "NPR DocLXCityCardSetup";
+        CityCardLocation: Record "NPR DocLXCityCardLocation";
+    begin
+        if (CityCardSetup.Count() = 0) then
+            error('City Card setup not found');
+
+        if (CityCardSetup.Count() = 1) then begin
+            CityCardSetup.FindFirst();
+            exit(CityCardSetup.Code);
+        end;
+
+        CityCardSetup.SetFilter(Default, '=%1', true);
+        if (CityCardSetup.Count() = 1) then begin
+            CityCardSetup.FindFirst();
+            exit(CityCardSetup.Code);
+        end;
+
+        CityCardLocation.SetFilter("Code", '=%1', LocationCode);
+        if (CityCardLocation.Count() = 1) then begin
+            CityCardLocation.FindFirst();
+            exit(CityCardLocation.CityCode);
+        end;
+
+        error('Multiple City Card setups found');
+    end;
 
     local procedure ValidateSetup(CardNumber: Code[20]; CityCode: Code[10]; LocationCode: Code[10]; var Result: JsonObject): Boolean
     var
@@ -347,7 +383,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         end;
     end;
 
-    local procedure Get(Obj: JsonObject; KeyName: Text): JsonValue
+    internal procedure Get(Obj: JsonObject; KeyName: Text): JsonValue
     var
         JToken: JsonToken;
     begin

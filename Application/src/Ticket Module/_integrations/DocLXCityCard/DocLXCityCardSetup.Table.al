@@ -26,6 +26,25 @@ table 6150821 "NPR DocLXCityCardSetup"
             OptionCaption = 'Demo,Production';
             OptionMembers = DEMO,PRODUCTION;
         }
+
+        field(30; Default; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Default';
+
+            trigger OnValidate()
+            var
+                Setup: Record "NPR DocLXCityCardSetup";
+                MultipleDefaultSetups: Label 'Only one setup can be default.';
+            begin
+                if (Default) then begin
+                    Setup.SetFilter("Code", '<>%1', Code);
+                    Setup.SetFilter(Default, '=%1', true);
+                    if (not Setup.IsEmpty) then
+                        Error(MultipleDefaultSetups);
+                end;
+            end;
+        }
     }
 
     keys
