@@ -2321,6 +2321,7 @@
                         if not SaleLinePOS.Insert(true) then
                             SaleLinePOS.Modify(true);
                         SaleLinePOS."No." := BOMComponent."No.";
+                        SaleLinePOS."Variant Code" := BOMComponent."Variant Code";
                         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
                         SaleLinePOS.Validate("No.");
                         SaleLinePOS.Quantity := LineQuantity;

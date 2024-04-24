@@ -214,7 +214,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
     end;
 
-    procedure ItemRequiresLotNoSerialNo(var Item: Record Item; var UseSpecificSerialNoTracking: Boolean; var UseSpecificLotNoTracking: Boolean; var RequiresSerialNo: Boolean; var RequiresLotNo: Boolean)
+    procedure ItemRequiresLotNoSerialNo(Item: Record Item; var UseSpecificSerialNoTracking: Boolean; var UseSpecificLotNoTracking: Boolean; var RequiresSerialNo: Boolean; var RequiresLotNo: Boolean)
     var
         ItemTrackingCode: Record "Item Tracking Code";
     begin

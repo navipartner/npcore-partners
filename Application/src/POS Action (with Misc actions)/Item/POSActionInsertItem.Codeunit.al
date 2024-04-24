@@ -351,7 +351,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             RequiresSerialNoInput := false;
             RequiresLotNoInput := false;
 
-            if Item.get(BOMComponentLines."No.") then
+            Item.SetLoadFields("No.", "Item Tracking Code");
+            if Item.Get(BOMComponentLines."No.") then
                 POSTrackingUtils.ItemRequiresLotNoSerialNo(Item, RequiresSpecificSerialNo, RequiresSpecificLotNo, RequiresSerialNoInput, RequiresLotNoInput);
 
 
