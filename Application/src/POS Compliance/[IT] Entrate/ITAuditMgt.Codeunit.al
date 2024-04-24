@@ -267,9 +267,9 @@ codeunit 6184647 "NPR IT Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        ITFiscalisationSetup: Page "NPR IT Fiscalization Setup";
+        ITFiscalizationSetup: Page "NPR IT Fiscalization Setup";
     begin
-        ITFiscalisationSetup.RunModal();
+        ITFiscalizationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")

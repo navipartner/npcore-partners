@@ -1,7 +1,7 @@
 table 6059861 "NPR RS Fiscalisation Setup"
 {
     Access = Internal;
-    Caption = 'RS Fiscalisation Setup';
+    Caption = 'RS Fiscalization Setup';
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR RS Fiscalisation Setup";
     LookupPageId = "NPR RS Fiscalisation Setup";
@@ -15,7 +15,7 @@ table 6059861 "NPR RS Fiscalisation Setup"
         }
         field(3; "Enable RS Fiscal"; Boolean)
         {
-            Caption = 'Enable RS Fiscalisation';
+            Caption = 'Enable RS Fiscalization';
             DataClassification = CustomerContent;
 
             trigger OnValidate()

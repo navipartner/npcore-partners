@@ -706,9 +706,9 @@ codeunit 6151548 "NPR NO Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        NOFiscalisationSetup: Page "NPR NO Fiscalization Setup";
+        NOFiscalizationSetup: Page "NPR NO Fiscalization Setup";
     begin
-        NOFiscalisationSetup.RunModal();
+        NOFiscalizationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")

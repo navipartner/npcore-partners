@@ -670,9 +670,9 @@ codeunit 6184669 "NPR DK Audit Mgt."
 
     local procedure OnActionShowSetup()
     var
-        DKFiscalisationSetup: Page "NPR DK Fiscalization Setup";
+        DKFiscalizationSetup: Page "NPR DK Fiscalization Setup";
     begin
-        DKFiscalisationSetup.RunModal();
+        DKFiscalizationSetup.RunModal();
     end;
 
     local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")

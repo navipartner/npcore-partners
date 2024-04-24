@@ -15,7 +15,7 @@ table 6060060 "NPR NO Fiscalization Setup"
         }
         field(2; "Enable NO Fiscal"; Boolean)
         {
-            Caption = 'Enable NO Fiscalisation';
+            Caption = 'Enable NO Fiscalization';
             DataClassification = CustomerContent;
         }
         field(10; "Signing Certificate"; Blob)

@@ -1,7 +1,7 @@
 page 6151224 "NPR NO Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'NO Tax Fiscalisation Setup';
+    Caption = 'NO Tax Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/norway/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
@@ -21,7 +21,7 @@ page 6151224 "NPR NO Fiscalization Setup"
                 field("Enable NO Fiscal"; Rec."Enable NO Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable NO Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable NO Fiscalization field.';
                     trigger OnValidate()
                     begin
                         if xRec."Enable NO Fiscal" <> Rec."Enable NO Fiscal" then

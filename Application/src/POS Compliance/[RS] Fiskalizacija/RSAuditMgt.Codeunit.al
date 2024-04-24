@@ -473,7 +473,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     #region Job Queue
     procedure AddRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Enable: Boolean; Silent: Boolean) Success: Boolean
     var
-        OpenJobQueueQst: Label 'A job queue entry to automate fiscalisation tasks has been created.\\Do you want to open the Job Queue Entry Setup page now?';
+        OpenJobQueueQst: Label 'A job queue entry to automate fiscalization tasks has been created.\\Do you want to open the Job Queue Entry Setup page now?';
     begin
         Success := InitRSAuditBackgroundJobQueue(JobQueueEntry, Enable);
         if Success and not Silent then begin
@@ -554,9 +554,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
     #region Procedures - Helper functions
     local procedure OnActionShowSetup()
     var
-        RSFiscalisationSetup: Page "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Page "NPR RS Fiscalisation Setup";
     begin
-        RSFiscalisationSetup.RunModal();
+        RSFiscalizationSetup.RunModal();
     end;
 
     procedure HandlerCode(): Text
@@ -604,13 +604,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
     internal procedure IsRSFiscalActive(): Boolean
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
     begin
-        if not RSFiscalisationSetup.Get() then begin
-            RSFiscalisationSetup.Init();
-            RSFiscalisationSetup.Insert();
+        if not RSFiscalizationSetup.Get() then begin
+            RSFiscalizationSetup.Init();
+            RSFiscalizationSetup.Insert();
         end;
-        exit(RSFiscalisationSetup."Enable RS Fiscal");
+        exit(RSFiscalizationSetup."Enable RS Fiscal");
     end;
 
     internal procedure CheckIfVATPostingSetupHasEntries(VATPostingSetup: Record "VAT Posting Setup"): Boolean
@@ -669,13 +669,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
     #region Procedures - Validations
     local procedure VerifyPINCodeWithError(POSStoreNo: Code[10])
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
         TaxPINSuccessCode: Label '0100 - SUCCESS', Locked = true;
         VerifyPinResultTxt: Text;
     begin
-        RSFiscalisationSetup.Get();
-        if RSFiscalisationSetup."Allow Offline Use" then
+        RSFiscalizationSetup.Get();
+        if RSFiscalizationSetup."Allow Offline Use" then
             exit;
         VerifyPinResultTxt := RSTaxCommunicationMgt.VerifyPIN(POSStoreNo);
         if VerifyPinResultTxt <> TaxPINSuccessCode then
@@ -706,11 +706,11 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSStore: Record "NPR POS Store";
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
     begin
-        RSFiscalisationSetup.Get();
-        RSFiscalisationSetup.TestField("Sandbox URL");
+        RSFiscalizationSetup.Get();
+        RSFiscalizationSetup.TestField("Sandbox URL");
         RSPOSUnitMapping.Get(POSUnit."No.");
         RSPOSUnitMapping.TestField("RS Sandbox Token");
         RSPOSUnitMapping.TestField("RS Sandbox JID");
@@ -890,7 +890,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     local procedure InsertRSPOSAuditLogAuxInfoFromPOSEntry(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
     var
         Customer: Record Customer;
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         CustomerVATRegNoRSLabel: Label '10:', Locked = true;
     begin
@@ -904,8 +904,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo."Source Document Type" := POSEntry."Sales Document Type";
         RSPOSAuditLogAuxInfo."POS Entry Type" := POSEntry."Entry Type";
         RSPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
-        RSFiscalisationSetup.Get();
-        case RSFiscalisationSetup.Training of
+        RSFiscalizationSetup.Get();
+        case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
@@ -928,7 +928,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     local procedure InsertRSPOSAuditLogAuxInfoFromSalesInvHeader(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         Customer: Record Customer;
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         POSUnit: Record "NPR POS Unit";
         CustomerVATRegNoRSLabel: Label '10:', Locked = true;
@@ -946,8 +946,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo."Entry Date" := SalesInvoiceHeader."Posting Date";
         RSPOSAuditLogAuxInfo."POS Entry Type" := RSPOSAuditLogAuxInfo."POS Entry Type"::"Direct Sale";
         RSPOSAuditLogAuxInfo."Prepayment Order No." := SalesInvoiceHeader."Prepayment Order No.";
-        RSFiscalisationSetup.Get();
-        case RSFiscalisationSetup.Training of
+        RSFiscalizationSetup.Get();
+        case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
@@ -986,13 +986,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
     local procedure GetPOSEntryNoFromInvoiceCounter(SalesTicketNo: Code[20]): Code[20]
     var
-        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         NormalSalesFixedAffixLbl: Label 'ПП', Locked = true;
         TraningSalesFixedAffixLbl: Label 'ОП', Locked = true;
     begin
-        RSFiscalisationSetup.Get();
-        if RSFiscalisationSetup.Training then
+        RSFiscalizationSetup.Get();
+        if RSFiscalizationSetup.Training then
             RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + TraningSalesFixedAffixLbl)
         else
             RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + NormalSalesFixedAffixLbl);

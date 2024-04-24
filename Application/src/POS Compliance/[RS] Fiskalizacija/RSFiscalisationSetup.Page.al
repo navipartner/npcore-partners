@@ -1,7 +1,7 @@
 page 6150854 "NPR RS Fiscalisation Setup"
 {
     ApplicationArea = NPRRetail;
-    Caption = 'RS Tax Fiscalisation Setup';
+    Caption = 'RS Tax Fiscalization Setup';
     ContextSensitiveHelpPage = 'docs/fiscalization/serbia/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
@@ -21,7 +21,7 @@ page 6150854 "NPR RS Fiscalisation Setup"
                 field("Enable RS Fiscal"; Rec."Enable RS Fiscal")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable RS Fiscalisation field.';
+                    ToolTip = 'Specifies the value of the Enable RS Fiscalization field.';
 
                     trigger OnValidate()
                     begin
