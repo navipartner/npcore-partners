@@ -110,6 +110,11 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the Membership Sales Item No. This is used only for selling Tickets as "Gift Memberships" where customers exchange them to a specific membership product, within the ticket valid to period. ';
                 }
+                field(CouponProfileCode; Rec."CouponProfileCode")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Coupon Profile Code field.';
+                }
                 field("DIY Print Layout Code"; Rec."DIY Print Layout Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

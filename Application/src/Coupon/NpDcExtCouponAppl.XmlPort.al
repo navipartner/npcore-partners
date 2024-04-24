@@ -30,6 +30,7 @@ xmlport 6151590 "NPR NpDc Ext. Coupon Appl."
                     {
                         XmlName = 'pos_sales_line';
                         UseTemporary = true;
+                        MinOccurs = Zero;
                         fieldattribute(line_no; TempSaleLinePOSReq."Line No.")
                         {
                         }

@@ -270,19 +270,25 @@
         TMAdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
 
-        if (UserId = 'TSA') then exit;
+        if (Rec."External Schedule Entry No." = 0) then
+            exit;
 
-        //-TM1.24 [289293]
+        CalcFields(Rec."Open Reservations", Rec."Open Admitted", Rec.Departed, Rec."Initial Entry");
+        if ((Rec."Initial Entry" <> 0) or
+            (Rec."Open Reservations" <> 0) or
+            (Rec."Open Admitted" <> 0) or
+            (Rec.Departed <> 0)) then
+            Error(DELETE_NOT_ALLOWED_1, "Entry No.");
+
+        if (Rec."Admission Code" = '') then
+            exit;
+
+        if (Rec."Schedule Code" = '') then
+            exit;
+
         if (not Cancelled) then
             Error(DELETE_NOT_ALLOWED_2, "Entry No.", TMAdmissionScheduleLines.TableCaption, "Admission Code", "Schedule Code");
 
-        CalcFields("Open Reservations", "Open Admitted", Departed, "Initial Entry");
-        if (("Initial Entry" <> 0) or
-            ("Open Reservations" <> 0) or
-            ("Open Admitted" <> 0) or
-            (Departed <> 0)) then
-            Error(DELETE_NOT_ALLOWED_1, "Entry No.");
-        //+TM1.24 [289293]
     end;
 
     var
