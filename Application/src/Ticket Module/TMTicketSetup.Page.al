@@ -480,7 +480,7 @@
                     Caption = 'Publish Ticketing WebServices';
                     ToolTip = 'Creates and publishes the ticketing web services.';
                     Image = Setup;
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
                     trigger OnAction()
                     var
@@ -489,13 +489,14 @@
                         TicketServiceName: Label 'ticket_services', Locked = true;
                         TicketStatisticsName: Label 'ticket_statistics', Locked = true;
                         TicketNotificationName: Label 'NPR_TicketNotifications', Locked = true;
-                        OkMessage: Label 'Services published: [%1, %2, %3]';
+                        CityCardServiceName: Label 'NPR_DocLxCityCard', Locked = true;
+                        OkMessage: Label 'Services published: [%1, %2, %3, %4]';
                     begin
                         WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Codeunit", Codeunit::"NPR TM Ticket WebService", TicketServiceName, true);
                         WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Codeunit", Codeunit::"NPR TM Statistics WebService", TicketStatisticsName, true);
                         WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Page", Page::"NPR APIV1 - TM Notifications", TicketNotificationName, true);
 
-                        Message(StrSubstNo(OkMessage, TicketServiceName, TicketStatisticsName, TicketNotificationName));
+                        Message(StrSubstNo(OkMessage, TicketServiceName, TicketStatisticsName, TicketNotificationName, CityCardServiceName));
                     end;
                 }
                 action(SetUserTimeZone)

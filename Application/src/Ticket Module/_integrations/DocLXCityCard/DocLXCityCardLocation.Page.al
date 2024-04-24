@@ -127,7 +127,24 @@ page 6184580 "NPR DocLXCityCardLocation"
                     Message('Service returned code: %1 - %2', StateCode, StateMessage)
                 end;
             }
+            action(PublishedWebService)
+            {
+                Caption = 'Publish WebServices';
+                ToolTip = 'Creates and publishes the DocLX City Card web services.';
+                Image = Setup;
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
 
+                trigger OnAction()
+                var
+                    WebServiceMgt: Codeunit "Web Service Management";
+                    WebServiceObjectType: Option ,,,,,"Codeunit",,,"Page","Query",,,,,,,,,,;
+                    CityCardServiceName: Label 'NPR_DocLxCityCard', Locked = true;
+                    OkMessage: Label 'Services published: [%1]';
+                begin
+                    WebServiceMgt.CreateTenantWebService(WebServiceObjectType::"Codeunit", Codeunit::"NPR DocLxCityCardWebServices", CityCardServiceName, true);
+                    Message(StrSubstNo(OkMessage, CityCardServiceName));
+                end;
+            }
 
         }
     }
