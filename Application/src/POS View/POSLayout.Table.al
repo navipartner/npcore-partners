@@ -67,7 +67,7 @@ table 6059793 "NPR POS Layout"
         if not TryReadPOSLayoutBlobWithEncoding(Rec, Text, TextEncoding::UTF8) then begin
             Clear(Text);
 
-            if not TryReadPOSLayoutBlobWithEncoding(Rec, Text, TextEncoding::Windows) then
+            if not TryReadPOSLayoutBlobWithEncoding(Rec, Text, TextEncoding::MSDos) then
                 Clear(Text);
         end;
     end;

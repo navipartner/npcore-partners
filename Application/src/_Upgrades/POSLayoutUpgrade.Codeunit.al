@@ -58,7 +58,7 @@ codeunit 6184837 "NPR POS Layout Upgrade"
                 Clear(LayoutText);
 
                 if not TryReadPOSLayoutBlobWithEncoding(POSLayout, LayoutText, TextEncoding::UTF8) then
-                    if TryReadPOSLayoutBlobWithEncoding(POSLayout, LayoutText, TextEncoding::Windows) then begin
+                    if TryReadPOSLayoutBlobWithEncoding(POSLayout, LayoutText, TextEncoding::MSDos) then begin
 
                         Clear(CurrOutStream);
                         POSLayout."Frontend Properties".CreateOutStream(CurrOutStream, TextEncoding::UTF8);
@@ -89,7 +89,7 @@ codeunit 6184837 "NPR POS Layout Upgrade"
                 Clear(LayoutText);
 
                 if not TryReadBlobWithEncoding(POSLayoutArchive, LayoutText, TextEncoding::UTF8) then
-                    if TryReadBlobWithEncoding(POSLayoutArchive, LayoutText, TextEncoding::Windows) then begin
+                    if TryReadBlobWithEncoding(POSLayoutArchive, LayoutText, TextEncoding::MSDos) then begin
 
                         Clear(CurrOutStream);
                         POSLayoutArchive."Frontend Properties".CreateOutStream(CurrOutStream, TextEncoding::UTF8);
