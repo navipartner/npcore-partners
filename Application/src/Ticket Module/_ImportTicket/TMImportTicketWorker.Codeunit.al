@@ -150,7 +150,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
             TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::NOT_SELECTED;
 
         TicketRequest."Admission Description" := Admission.Description;
-        TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
+        TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", Admission."Default Schedule", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
         TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
         TicketRequest.Insert();
 
@@ -183,9 +183,10 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketImport.Insert();
     end;
 
-    local procedure GetAdmissionTimeSlot(AdmissionCode: Code[20]; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
+    local procedure GetAdmissionTimeSlot(AdmissionCode: Code[20]; DefaultSchedule: Option; ExpectedVisitDate: Date; ExpectedVisitTime: Time): Integer
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
         NoTimeSlot: Label 'Admission Code %1 has no available time slots for expected visit date %2.';
         TimeDifference, MinTimeDifference : Integer;
         EntryNo: Integer;
@@ -215,7 +216,8 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         end;
 
         if (EntryNo = 0) then
-            Error(NoTimeSlot, AdmissionCode, ExpectedVisitDate); // blow up if expected visit date does not have a valid time slot for that entire date
+            if (DefaultSchedule in [Admission."Default Schedule"::TODAY, Admission."Default Schedule"::SCHEDULE_ENTRY]) then
+                Error(NoTimeSlot, AdmissionCode, ExpectedVisitDate); // blow up if expected visit date does not have a valid time slot for that entire date
 
         ScheduleEntry.Get(EntryNo);
         exit(ScheduleEntry."External Schedule Entry No.");
