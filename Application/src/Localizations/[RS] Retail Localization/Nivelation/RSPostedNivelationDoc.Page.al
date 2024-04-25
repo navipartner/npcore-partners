@@ -55,7 +55,8 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                 field("Referring Document Code"; Rec."Referring Document Code")
                 {
                     ApplicationArea = NPRRSRLocal;
-                    ToolTip = 'Specifies the Referring Document number related to the posted Nivelation.';
+                    ToolTip = 'Specifies the value of the Referring Document Code field.';
+                    Editable = false;
                 }
                 field("UserID"; UserId())
                 {
@@ -81,6 +82,22 @@ page 6151096 "NPR RS Posted Nivelation Doc"
     {
         area(Navigation)
         {
+            action("NPR Nivelation")
+            {
+                Caption = 'Print Nivelation';
+                ToolTip = 'Runs a Nivelation report.';
+                ApplicationArea = NPRRSRLocal;
+                Image = Print;
+
+                trigger OnAction()
+                var
+                    Nivelation: Record "NPR RS Posted Nivelation Hdr";
+                begin
+                    Nivelation.SetRange("Posting Date", Rec."Posting Date");
+                    Nivelation.SetRange("No.", Rec."No.");
+                    Report.RunModal(Report::"NPR RS Nivelation Document", true, false, Nivelation);
+                end;
+            }
             action(Navigate)
             {
                 ApplicationArea = NPRRSRLocal;
@@ -97,6 +114,7 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                     Rec.Navigate();
                 end;
             }
+
             action("Open Related Document")
             {
                 ApplicationArea = NPRRSRLocal;
@@ -111,9 +129,9 @@ page 6151096 "NPR RS Posted Nivelation Doc"
                 trigger OnAction()
                 var
                     POSEntry: Record "NPR POS Entry";
+                    SalesPriceList: Record "Price List Header";
                     PostedSalesCrMemo: Record "Sales Cr.Memo Header";
                     PostedSalesInvoice: Record "Sales Invoice Header";
-                    SalesPriceList: Record "Price List Header";
                 begin
                     case Rec."Source Type" of
                         Rec."Source Type"::"POS Entry":
