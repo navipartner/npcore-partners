@@ -22,7 +22,6 @@ report 6014465 "NPR Book Of Incoming Invoices"
             column(Company_Address; _CompanyAddress) { }
             column(Global_PeriodFilterTxtLbl; StrSubstNo(_PeriodFilterTxtLbl, Format(_StartDate, 0, 1), Format(_EndDate, 0, 1))) { }
             column(VATReportMapping_Code; Code) { }
-
             dataitem(RSVATEntry; "NPR RS VAT Entry")
             {
                 DataItemLink = "VAT Report Mapping" = field(Code);
@@ -36,12 +35,10 @@ report 6014465 "NPR Book Of Incoming Invoices"
                 column(RSVATEntry_PostingDate; Format("Posting Date", 0, 1)) { }
                 column(RSVATEntry_VATRegistrationNo; "VAT Registration No.") { }
                 column(RSVATEntry_PayTo; "Bill-to/Pay-to No.") { }
-                column(RSVATEntry_PayToDetails; _PayToDetails) { }
-
+                column(RSVATEntry_PayToDetails; _PaytoDetails) { }
                 column(RSVATEntry_Amount; Abs(Amount)) { }
                 column(RSVATEntry_Base; Abs(Base)) { }
                 column(RSVATEntry_TotalVATFee; _BaseVal + Amount) { }
-
                 column(AmtsArr_9; _AmountsArray[1]) { }
                 column(AmtsArr_10; _AmountsArray[2]) { }
                 column(AmtsArr_11; _AmountsArray[3]) { }
@@ -92,7 +89,6 @@ report 6014465 "NPR Book Of Incoming Invoices"
                     _OrdinalNo := _GlobalIndex;
                     _GlobalIndex += 1;
                 end;
-
             }
             trigger OnAfterGetRecord()
             begin
@@ -119,7 +115,7 @@ report 6014465 "NPR Book Of Incoming Invoices"
     {
         layout
         {
-            area(content)
+            area(Content)
             {
                 group(Options)
                 {
@@ -208,21 +204,21 @@ report 6014465 "NPR Book Of Incoming Invoices"
 
         case VATReportMapping."Book of Inc. Inv. Amount" of
             VATReportMapping."Book of Inc. Inv. Amount"::"9":
-                AmtsArr[1] := RSVATEntry.Amount;
+                AmtsArr[1] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"10":
-                AmtsArr[2] := RSVATEntry.Amount;
+                AmtsArr[2] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"11":
-                AmtsArr[3] := RSVATEntry.Amount;
+                AmtsArr[3] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"12":
-                AmtsArr[4] := RSVATEntry.Amount;
+                AmtsArr[4] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"13":
-                AmtsArr[5] := RSVATEntry.Amount;
+                AmtsArr[5] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"14":
-                AmtsArr[6] := RSVATEntry.Amount;
+                AmtsArr[6] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
             VATReportMapping."Book of Inc. Inv. Amount"::"15":
-                AmtsArr[7] := RSVATEntry.Amount;
-            VATReportMapping."Book of Inc. Inv. Base"::"16":
-                AmtsArr[8] := RSVATEntry.Base;
+                AmtsArr[7] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
+            VATReportMapping."Book of Inc. Inv. Amount"::"16":
+                AmtsArr[8] := RSVATEntry.Amount + RSVATEntry."Unrealized Amount" + RSVATEntry."Non-Deductible VAT Amount";
         end;
 
         if RSVATEntry.Base <> 0 then
@@ -232,21 +228,21 @@ report 6014465 "NPR Book Of Incoming Invoices"
 
         case VATReportMapping."Book of Inc. Inv. Base" of
             VATReportMapping."Book of Inc. Inv. Base"::"9":
-                AmtsArr[1] := BaseVal;
+                AmtsArr[1] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"10":
-                AmtsArr[2] := BaseVal;
+                AmtsArr[2] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"11":
-                AmtsArr[3] := BaseVal;
+                AmtsArr[3] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"12":
-                AmtsArr[4] := BaseVal;
+                AmtsArr[4] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"13":
-                AmtsArr[5] := BaseVal;
+                AmtsArr[5] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"14":
-                AmtsArr[6] := BaseVal;
+                AmtsArr[6] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"15":
-                AmtsArr[7] := BaseVal;
+                AmtsArr[7] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
             VATReportMapping."Book of Inc. Inv. Base"::"16":
-                AmtsArr[8] := BaseVal;
+                AmtsArr[8] := BaseVal + RSVATEntry."Non-Deductible VAT Base";
         end;
     end;
 
@@ -258,12 +254,12 @@ report 6014465 "NPR Book Of Incoming Invoices"
 
     var
         _CompanyInformation: Record "Company Information";
-        _StartDate, _EndDate : Date;
+        _EndDate, _StartDate : Date;
         _AmountsArray: array[8] of Decimal;
-        _TotalColumn8, _TotalColumn9, _TotalColumn10, _TotalColumn11, _TotalColumn12, _TotalColumn13, _TotalColumn14, _TotalColumn15, _TotalColumn16, _BaseVal : Decimal;
+        _BaseVal, _TotalColumn8, _TotalColumn9, _TotalColumn10, _TotalColumn11, _TotalColumn12, _TotalColumn13, _TotalColumn14, _TotalColumn15, _TotalColumn16 : Decimal;
         _GlobalIndex, _OrdinalNo : Integer;
-        _PaytoDetails, _CompanyAddress : Text;
         _BothDateFieldsRequiredLbl: Label 'Both date fields must to be populated.';
         _PeriodFilterTxtLbl: Label '%1-%2', Comment = '%1 - Specifies StartDate value, %2 - Specifies EndDate value';
         _StartDateHigherLbl: Label 'Start Date cannot be higher than End Date';
+        _CompanyAddress, _PaytoDetails : Text;
 }

@@ -26,7 +26,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(21; "Purchase Payment Amount"; Integer)
@@ -36,7 +36,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(22; "Purchase Invoice Base"; Integer)
@@ -46,7 +46,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(23; "Purchase Invoice Amount"; Integer)
@@ -56,7 +56,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(24; "Purchase Cr. Memo Base"; Integer)
@@ -66,7 +66,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(25; "Purchase Cr. Memo Amount"; Integer)
@@ -76,7 +76,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(30; "Sales Payment Base"; Integer)
@@ -86,7 +86,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(31; "Sales Payment Amount"; Integer)
@@ -96,7 +96,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(32; "Sales Invoice Base"; Integer)
@@ -106,7 +106,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(33; "Sales Invoice Amount"; Integer)
@@ -116,7 +116,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(34; "Sales Cr. Memo Base"; Integer)
@@ -126,7 +126,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(35; "Sales Cr. Memo Amount"; Integer)
@@ -136,7 +136,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(36; "Book of Inc. Inv. Base"; Enum "NPR Book Of I/O Inv. Mapping")
@@ -166,7 +166,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(41; "Non-Deductable Amount"; Integer)
@@ -176,7 +176,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(42; "Deductable Amount"; Integer)
@@ -186,7 +186,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(43; "Prep. Purchase Invoice Base"; Integer)
@@ -196,7 +196,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(44; "Prep. Purchase Invoice Amount"; Integer)
@@ -206,7 +206,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(45; "Prep. Sales Invoice Base"; Integer)
@@ -216,7 +216,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(46; "Prep. Sales Invoice Amount"; Integer)
@@ -226,7 +226,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(50; "Prep. Purchase Cr. Memo Base"; Integer)
@@ -236,7 +236,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(51; "Prep. Purchase Cr. Memo Amount"; Integer)
@@ -246,7 +246,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(52; "Prep. Sales Cr. Memo Base"; Integer)
@@ -256,7 +256,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(53; "Prep. Sales Cr. Memo Amount"; Integer)
@@ -266,7 +266,7 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
         field(6014401; "VAT Base Full VAT"; Integer)
@@ -276,7 +276,17 @@ table 6060017 "NPR VAT Report Mapping"
 #if BC17 or BC18 or BC19 or BC20 or BC21
             TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
 #else
-            TableRelation = field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
+#endif
+        }
+        field(6014402; "VAT Base Purchase Full VAT"; Integer)
+        {
+            Caption = 'VAT Base Purchase Full VAT';
+            DataClassification = CustomerContent;
+#if BC17 or BC18 or BC19 or BC20 or BC21
+            TableRelation = field."No." where(TableNo = const(6060018), Type = const(Decimal));
+#else
+            TableRelation = Field."No." where(TableNo = const(Database::"NPR VAT EV Entry"), Type = const(Decimal));
 #endif
         }
     }
