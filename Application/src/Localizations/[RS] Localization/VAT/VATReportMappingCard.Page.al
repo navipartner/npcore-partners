@@ -63,11 +63,14 @@ page 6151117 "NPR VAT Report Mapping Card"
                         LookupField(Rec."Non-Deductable Base");
                     end;
                 }
-                field(DummyCaptionLbl; DummyCaptionLbl)
+                field("VAT Base Purchase Full VAT"; Rec."VAT Base Purchase Full VAT")
                 {
                     ApplicationArea = NPRRSLocal;
-                    Editable = false;
-                    ShowCaption = false;
+                    ToolTip = 'Specifies the field where the Full VAT Base should be written in the report.';
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        LookupField(Rec."VAT Base Purchase Full VAT");
+                    end;
                 }
                 field("Prep. Purchase Invoice Base"; Rec."Prep. Purchase Invoice Base")
                 {
