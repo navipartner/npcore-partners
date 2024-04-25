@@ -1468,7 +1468,7 @@ codeunit 6060147 "NPR MM NPR Membership"
                                 Evaluate(Blocked, BlockedText, 9);
 
                             TmpMemberInfoCapture."Entry No." := TmpMemberInfoCapture.Count() + 1;
-                            if (ExpiryDate >= Today()) and (not Blocked) then
+                            if ((ExpiryDate >= Today()) or (ExpiryDate = 0D)) and (not Blocked) then
                                 TmpMemberInfoCapture.Insert();
                         end;
                     end;
