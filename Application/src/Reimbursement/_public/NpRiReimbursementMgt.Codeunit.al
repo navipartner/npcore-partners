@@ -4,8 +4,12 @@
     TableNo = "NPR NpRi Reimbursement";
 
     trigger OnRun()
+    var
+        NpRiReimbursement: Record "NPR NpRi Reimbursement";
     begin
-        RunReimbursement(Rec);
+        NpRiReimbursement.Copy(Rec);
+        NpRiReimbursement.SetRecFilter();
+        RunReimbursements(NpRiReimbursement);
     end;
 
     var
