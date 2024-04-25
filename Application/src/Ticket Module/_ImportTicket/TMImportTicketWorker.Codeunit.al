@@ -27,11 +27,20 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
 
     internal procedure Import();
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         Token: Text[100];
         TokenLine: Integer;
+        AuthorizationCode: Code[10];
         ResponseMessage: Text;
         RequestSuccess: Boolean;
     begin
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (TicketSetup."Authorization Code Scheme" = '') then
+            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
+
         _TempTicketImport.Reset();
         if (not _TempTicketImport.FindSet()) then
             Error('Import buffer is empty.');
@@ -45,22 +54,20 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
             TokenLine := 1;
 
             Archive(Token, _TempTicketImport);
+            AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(AuthorizationCode));
             repeat
                 Archive(Token, TokenLine, _TempTicketImportLine);
-                RequestSuccess := CreateTicketRequest(_TempTicketImportLine, ResponseMessage);
+                CreateTicketRequest(_TempTicketImportLine, AuthorizationCode);
                 TokenLine += 1;
-            until (_TempTicketImportLine.Next() = 0) or (not RequestSuccess);
+            until (_TempTicketImportLine.Next() = 0);
 
+        until (_TempTicketImport.Next() = 0);
+
+        _TempTicketImport.FindSet();
+        repeat
+            RequestSuccess := ConfirmTicketRequest(_TempTicketImport.TicketRequestToken, _TempTicketImport, ResponseMessage);
         until (_TempTicketImport.Next() = 0) or (not RequestSuccess);
 
-        if (RequestSuccess) then begin
-            _TempTicketImport.FindSet();
-            repeat
-                RequestSuccess := ConfirmTicketRequest(_TempTicketImport.TicketRequestToken, _TempTicketImport, ResponseMessage);
-            until (_TempTicketImport.Next() = 0) or (not RequestSuccess);
-        end;
-
-        // CreateTicketRequest performs a codeunit.run when attempting ticket create. Batch needs to be cleaned-up
         if (not RequestSuccess) then
             Error(ResponseMessage);
 
@@ -104,15 +111,13 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         Success := TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage);
     end;
 
-    local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; var ResponseMessage: Text) Success: Boolean
+    local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; AuthorizationCode: Code[10])
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         Admission: Record "NPR TM Admission";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        ExternalId: List of [Integer];
         ResolvingTable: Integer;
-        ResponseCode: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
     begin
         TicketRequest.Init();
@@ -122,6 +127,8 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."Request Status Date Time" := CurrentDateTime;
         TicketRequest."Created Date Time" := CurrentDateTime();
         TicketRequest."Ext. Line Reference No." := TempTicketImportLine.TicketRequestTokenLine;
+        TicketRequest."Primary Request Line" := true;
+        TicketRequest."Authorization Code" := AuthorizationCode;
 
         TicketRequest."External Item Code" := TempTicketImportLine.ItemReferenceNumber;
         TicketRequest."External Order No." := TempTicketImportLine.OrderId;
@@ -154,10 +161,8 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
         TicketRequest.Insert();
 
-        ExternalId.Add(TicketRequest."Ext. Line Reference No.");
+        TicketRequestManager.IssueTicketFromReservation(TicketRequest);
 
-        ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(TicketRequest."Session Token ID", true, ResponseMessage);
-        Success := ResponseCode = 0;
     end;
 
     local procedure Archive(Token: Text[100]; TokenLine: Integer; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)
