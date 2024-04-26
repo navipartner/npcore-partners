@@ -216,6 +216,7 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         lbl_Submit: Label 'Submit';
         lbl_Clear: Label 'Clear';
         lbl_PhoneNo: Label 'Phone Number';
+        lbl_SignHere: Label 'Sign here';
     begin
         Lbls.Add('Total', lbl_Total);
         Lbls.Add('PaymentTotal', lbl_PayTotal);
@@ -226,6 +227,7 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         Lbls.Add('Submit', lbl_Submit);
         Lbls.Add('Clear', lbl_Clear);
         Lbls.Add('PhoneNo', lbl_PhoneNo);
+        Lbls.Add('SignHere', lbl_SignHere);
         exit(Lbls);
     end;
 
