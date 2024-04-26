@@ -5,107 +5,107 @@
 /.github/ @navipartner/pipelines
 /CODEOWNERS @navipartner/dev-management
 
-_ControlAddIns/Dragonglass/ @navipartner/frontend
-_ControlAddIns/HardwareConnector/ @navipartner/hardware
-_ControlAddIns/NPCamera/ @navipartner/hardware
-Accessories/ @navipartner/isv-1
-Attributes/ @navipartner/isv-1
-Azure\ AD\ Application\ Management/ @navipartner/isv-1
-Azure\ Function\ Management/ @navipartner/hardware
-BTwentyFour\ Service/ @navipartner/isv-2
-Case\ System\ Phone\ Home/ @navipartner/isv-2
-Click\ &\ Collect/ @navipartner/isv-2
-Consignor/ @navipartner/isv-1
-Coupon/ @navipartner/isv-1
-Customer\ Phone\ Lookup/ @navipartner/isv-1
-Data\ Log/ @navipartner/isv-2
-Data\ Package/ @navipartner/isv-2
-Digital\ Receipt/ @navipartner/isv-1
-Dimensions/ @navipartner/isv-2
-Ecommerce/ @navipartner/isv-2
-Email\ Template\ (PDF2NAV)/ @navipartner/isv-1
-Environment/ @navipartner/isv-1
-Event\ Module/ @navipartner/attractions
-Exchange\ Label/ @navipartner/isv-2
-External\ POS\ Sale/ @navipartner/isv-2
-Feature\ Flags/ @navipartner/isv-1
-Feature\ Management/ @navipartner/isv-1
-File\ Transfer/ @navipartner/hardware
-GDPR/ @navipartner/attractions
-Global\ POS\ Sales/ @navipartner/isv-2
-Group\ Codes/ @navipartner/isv-1
-Hardware\ Connector/ @navipartner/hardware
-HeyLoyalty\ Integration/ @navipartner/isv-2
-Intercompany/ @navipartner/isv-1
-Inventory\ Cost\ Adjmt/ @navipartner/isv-2
-Item\ AddOn/ @navipartner/isv-1
-Item\ Catalog/ @navipartner/isv-1
-Item\ Category/ @navipartner/isv-1
-Item\ Hierarchy/ @navipartner/isv-1
-Item\ Reference/ @navipartner/isv-1
-Item\ Status/ @navipartner/isv-2
-Item\ Worksheet/ @navipartner/isv-1
-Job\ Queue/ @navipartner/isv-2
-Key\ Vault/ @navipartner/dev-management
-Localizations/ @navipartner/compliance
-MPOS/ @navipartner/hardware
-Magento/ @navipartner/isv-2
-Magento\ 2/ @navipartner/isv-2
-Main\ Item\ Variations/ @navipartner/isv-2
-Member\ Module/ @navipartner/attractions
-NaviConnect/ @navipartner/isv-2
-NaviDocs/ @navipartner/isv-2
-NpXml/ @navipartner/isv-2
-OIOUBL/ @navipartner/isv-2
-Package/ @navipartner/isv-1
-Pacsoft/ @navipartner/isv-1
-POS\ Action\ (with\ Misc\ actions)/ @navipartner/isv-1
-POS\ Background\ Tasks/ @navipartner/isv-1
-POS\ Compliance/ @navipartner/compliance
-POS\ Core/ @navipartner/isv-1
-POS\ Customer\ Input/ @navipartner/hardware
-POS\ Cross\ Reference/ @navipartner/isv-2
-POS\ Data\ Source/ @navipartner/isv-1
-POS\ Discount/ @navipartner/isv-1
-POS\ Display/ @navipartner/hardware
-POS\ Info/ @navipartner/isv-2
-POS\ Input\ Box/ @navipartner/isv-1
-POS\ Item\ Availability/ @navipartner/isv-2
-POS\ Payment/ @navipartner/isv-1
-POS\ Payment/EFT/ @navipartner/hardware
-POS\ Payment\ Bin/ @navipartner/isv-2
-POS\ Payment\ Denomination/ @navipartner/isv-2
-POS\ Posting/ @navipartner/isv-2
-POS\ Quote/ @navipartner/isv-2
-POS\ RMA/ @navipartner/isv-2
-POS\ Resume\ Sale/ @navipartner/isv-2
-POS\ Sales\ Document/ @navipartner/isv-2
-POS\ Scenarios/ @navipartner/isv-1
-POS\ Security/ @navipartner/isv-1
-POS\ Service/ @navipartner/isv-2
-POS\ Setup/ @navipartner/isv-2
-POS\ Statistics/ @navipartner/isv-2
-POS\ Store/ @navipartner/isv-2
-POS\ Tax\ Calculation/ @navipartner/isv-2
-POS\ Tax\ Free/ @navipartner/isv-2
-POS\ Unit/ @navipartner/isv-2
-PrintNode/ @navipartner/hardware
-Raptor/ @navipartner/isv-2
-Reimbursement/ @navipartner/isv-2
-Replication/ @navipartner/isv-1
-Restaurant/ @navipartner/isv-2
-Retail\ Item\ Journal/ @navipartner/isv-2
-Retail\ Journal/ @navipartner/isv-2
-Retail\ Price/ @navipartner/isv-1
-Retail\ Print/ @navipartner/hardware
-Retail\ Voucher/ @navipartner/isv-1
-Retention\ Policy/ @navipartner/isv-2
-Sales\ Price/ @navipartner/isv-1
-Self\ Service/ @navipartner/hardware @navipartner/isv-1
-Sentry/ @navipartner/dev-management
-Setup\ Wizards/ @navipartner/isv-2
-Shopify\ Integration/ @navipartner/isv-2
-Smart\ Email/ @navipartner/isv-1
-Statistics\ and\ Overview/ @navipartner/isv-2
-Ticket\ Module/ @navipartner/attractions
-Variety/ @navipartner/isv-1
+/Application/src/_ControlAddIns/Dragonglass/ @navipartner/frontend
+/Application/src/_ControlAddIns/HardwareConnector/ @navipartner/hardware
+/Application/src/_ControlAddIns/NPCamera/ @navipartner/hardware
+/Application/src/Accessories/ @navipartner/isv-1
+/Application/src/Attributes/ @navipartner/isv-1
+/Application/src/Azure\ AD\ Application\ Management/ @navipartner/isv-1
+/Application/src/Azure\ Function\ Management/ @navipartner/hardware
+/Application/src/BTwentyFour\ Service/ @navipartner/isv-2
+/Application/src/Case\ System\ Phone\ Home/ @navipartner/isv-2
+/Application/src/Click\ &\ Collect/ @navipartner/isv-2
+/Application/src/Consignor/ @navipartner/isv-1
+/Application/src/Coupon/ @navipartner/isv-1
+/Application/src/Customer\ Phone\ Lookup/ @navipartner/isv-1
+/Application/src/Data\ Log/ @navipartner/isv-2
+/Application/src/Data\ Package/ @navipartner/isv-2
+/Application/src/Digital\ Receipt/ @navipartner/isv-1
+/Application/src/Dimensions/ @navipartner/isv-2
+/Application/src/Ecommerce/ @navipartner/isv-2
+/Application/src/Email\ Template\ (PDF2NAV)/ @navipartner/isv-1
+/Application/src/Environment/ @navipartner/isv-1
+/Application/src/Event\ Module/ @navipartner/attractions
+/Application/src/Exchange\ Label/ @navipartner/isv-2
+/Application/src/External\ POS\ Sale/ @navipartner/isv-2
+/Application/src/Feature\ Flags/ @navipartner/isv-1
+/Application/src/Feature\ Management/ @navipartner/isv-1
+/Application/src/File\ Transfer/ @navipartner/hardware
+/Application/src/GDPR/ @navipartner/attractions
+/Application/src/Global\ POS\ Sales/ @navipartner/isv-2
+/Application/src/Group\ Codes/ @navipartner/isv-1
+/Application/src/Hardware\ Connector/ @navipartner/hardware
+/Application/src/HeyLoyalty\ Integration/ @navipartner/isv-2
+/Application/src/Intercompany/ @navipartner/isv-1
+/Application/src/Inventory\ Cost\ Adjmt/ @navipartner/isv-2
+/Application/src/Item\ AddOn/ @navipartner/isv-1
+/Application/src/Item\ Catalog/ @navipartner/isv-1
+/Application/src/Item\ Category/ @navipartner/isv-1
+/Application/src/Item\ Hierarchy/ @navipartner/isv-1
+/Application/src/Item\ Reference/ @navipartner/isv-1
+/Application/src/Item\ Status/ @navipartner/isv-2
+/Application/src/Item\ Worksheet/ @navipartner/isv-1
+/Application/src/Job\ Queue/ @navipartner/isv-2
+/Application/src/Key\ Vault/ @navipartner/dev-management
+/Application/src/Localizations/ @navipartner/compliance
+/Application/src/MPOS/ @navipartner/hardware
+/Application/src/Magento/ @navipartner/isv-2
+/Application/src/Magento\ 2/ @navipartner/isv-2
+/Application/src/Main\ Item\ Variations/ @navipartner/isv-2
+/Application/src/Member\ Module/ @navipartner/attractions
+/Application/src/NaviConnect/ @navipartner/isv-2
+/Application/src/NaviDocs/ @navipartner/isv-2
+/Application/src/NpXml/ @navipartner/isv-2
+/Application/src/OIOUBL/ @navipartner/isv-2
+/Application/src/Package/ @navipartner/isv-1
+/Application/src/Pacsoft/ @navipartner/isv-1
+/Application/src/POS\ Action\ (with\ Misc\ actions)/ @navipartner/isv-1
+/Application/src/POS\ Background\ Tasks/ @navipartner/isv-1
+/Application/src/POS\ Compliance/ @navipartner/compliance
+/Application/src/POS\ Core/ @navipartner/isv-1
+/Application/src/POS\ Customer\ Input/ @navipartner/hardware
+/Application/src/POS\ Cross\ Reference/ @navipartner/isv-2
+/Application/src/POS\ Data\ Source/ @navipartner/isv-1
+/Application/src/POS\ Discount/ @navipartner/isv-1
+/Application/src/POS\ Display/ @navipartner/hardware
+/Application/src/POS\ Info/ @navipartner/isv-2
+/Application/src/POS\ Input\ Box/ @navipartner/isv-1
+/Application/src/POS\ Item\ Availability/ @navipartner/isv-2
+/Application/src/POS\ Payment/ @navipartner/isv-1
+/Application/src/POS\ Payment/EFT/ @navipartner/hardware
+/Application/src/POS\ Payment\ Bin/ @navipartner/isv-2
+/Application/src/POS\ Payment\ Denomination/ @navipartner/isv-2
+/Application/src/POS\ Posting/ @navipartner/isv-2
+/Application/src/POS\ Quote/ @navipartner/isv-2
+/Application/src/POS\ RMA/ @navipartner/isv-2
+/Application/src/POS\ Resume\ Sale/ @navipartner/isv-2
+/Application/src/POS\ Sales\ Document/ @navipartner/isv-2
+/Application/src/POS\ Scenarios/ @navipartner/isv-1
+/Application/src/POS\ Security/ @navipartner/isv-1
+/Application/src/POS\ Service/ @navipartner/isv-2
+/Application/src/POS\ Setup/ @navipartner/isv-2
+/Application/src/POS\ Statistics/ @navipartner/isv-2
+/Application/src/POS\ Store/ @navipartner/isv-2
+/Application/src/POS\ Tax\ Calculation/ @navipartner/isv-2
+/Application/src/POS\ Tax\ Free/ @navipartner/isv-2
+/Application/src/POS\ Unit/ @navipartner/isv-2
+/Application/src/PrintNode/ @navipartner/hardware
+/Application/src/Raptor/ @navipartner/isv-2
+/Application/src/Reimbursement/ @navipartner/isv-2
+/Application/src/Replication/ @navipartner/isv-1
+/Application/src/Restaurant/ @navipartner/isv-2
+/Application/src/Retail\ Item\ Journal/ @navipartner/isv-2
+/Application/src/Retail\ Journal/ @navipartner/isv-2
+/Application/src/Retail\ Price/ @navipartner/isv-1
+/Application/src/Retail\ Print/ @navipartner/hardware
+/Application/src/Retail\ Voucher/ @navipartner/isv-1
+/Application/src/Retention\ Policy/ @navipartner/isv-2
+/Application/src/Sales\ Price/ @navipartner/isv-1
+/Application/src/Self\ Service/ @navipartner/hardware @navipartner/isv-1
+/Application/src/Sentry/ @navipartner/dev-management
+/Application/src/Setup\ Wizards/ @navipartner/isv-2
+/Application/src/Shopify\ Integration/ @navipartner/isv-2
+/Application/src/Smart\ Email/ @navipartner/isv-1
+/Application/src/Statistics\ and\ Overview/ @navipartner/isv-2
+/Application/src/Ticket\ Module/ @navipartner/attractions
+/Application/src/Variety/ @navipartner/isv-1
