@@ -75,6 +75,17 @@ codeunit 6184873 "NPR DocLxCityCardWebServices"
                                 CityCardLog.Get(LogEntryNo);
                                 TempCityCardResponse.TransferFields(CityCardLog, true);
                             end;
+                        '523':  // already redeemed for a single entry location, get the previous coupon we issued and re-attempt to redeem, will fail if the coupon is already used
+                            begin
+                                Result := CityCard.AcquireCoupon(TempCityCardRequest.CardNumber, TempCityCardRequest.CityCode, TempCityCardRequest.LocationCode, TempCityCardRequest.SalesDocumentNo, LogEntryNo);
+                                CityCardLog.Get(LogEntryNo);
+                                TempCityCardResponse.TransferFields(CityCardLog, true);
+                                if (Result.Get('state', State)) then begin
+                                    TempCityCardResponse.RedemptionResultCode := CopyStr(CityCard.Get(State.AsObject(), 'code').AsCode(), 1, MaxStrLen(TempCityCardResponse.RedemptionResultCode));
+                                    TempCityCardResponse.RedemptionResultMessage := CopyStr(CityCard.Get(State.AsObject(), 'message').AsText(), 1, MaxStrLen(TempCityCardResponse.RedemptionResultMessage));
+                                end;
+                            end;
+
                         else begin
                             TempCityCardResponse.TransferFields(CityCardLog, true);
                             TempCityCardResponse.RedemptionResultCode := CityCardLog.ValidationResultCode;
