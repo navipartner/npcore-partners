@@ -28,14 +28,32 @@ page 6059888 "NPR TM Ticket Item List"
                     Caption = 'Variant Code';
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
                 }
-
+                field(_AdmissionCount; _AdmissionCount)
+                {
+                    Caption = 'Admission Count';
+                    ToolTip = 'Specifies the value of the Admission Count field.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Editable = false;
+                }
                 field(Description; Rec.Description)
                 {
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of Item Description field.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    trigger OnDrillDown()
+                    var
+                        TicketItemCard: Page "NPR TM Ticket Item Card";
+                        ItemVariant: Record "Item Variant";
+                    begin
+
+                        ItemVariant.SetFilter("Item No.", '=%1', Rec."Item No.");
+                        ItemVariant.SetFilter("Code", '=%1', Rec."Code");
+                        TicketItemCard.SetTableView(ItemVariant);
+                        TicketItemCard.Run();
+                    end;
                 }
                 field("TM Ticket Type"; _Item."NPR Ticket Type")
                 {
@@ -46,6 +64,7 @@ page 6059888 "NPR TM Ticket Item List"
                 {
                     ToolTip = 'Specifies the value of the Ticket Types Category field.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
                 }
             }
         }
@@ -74,6 +93,7 @@ page 6059888 "NPR TM Ticket Item List"
             }
             action(Edit)
             {
+                Caption = 'Edit';
                 ToolTip = 'This action will open the Ticket Item Card.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 Scope = Repeater;
@@ -85,6 +105,7 @@ page 6059888 "NPR TM Ticket Item List"
                 RunPageLink = "Item No." = field("Item No."), "Code" = field("Code");
                 Image = Item;
             }
+
         }
         area(Processing)
         {
@@ -188,6 +209,7 @@ page 6059888 "NPR TM Ticket Item List"
         _TicketType: Record "NPR TM Ticket Type";
         _TicketPaymentType: Option DIRECT,PREPAID,POSTPAID;
         _TicketTypeCodeFilter: Text;
+        _AdmissionCount: Integer;
 
     trigger OnOpenPage()
     begin
@@ -198,11 +220,16 @@ page 6059888 "NPR TM Ticket Item List"
     end;
 
     trigger OnAfterGetRecord()
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
     begin
         Clear(_Item);
         Clear(_TicketType);
         if (_Item.Get(Rec."Item No.")) then
             if (_TicketType.Get(_Item."NPR Ticket Type")) then;
+
+        TicketBom.SetFilter("Item No.", '=%1', Rec."Item No.");
+        _AdmissionCount := TicketBom.Count();
     end;
 
     procedure SetTicketTypeFilter(TicketTypeCodeFilter: text)
