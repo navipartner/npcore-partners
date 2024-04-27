@@ -157,7 +157,8 @@
              'KDS_SetOnHold',
              'KDS_Resume',
              'KDS_SetServed',
-             'KDS_SendOrderReadyNotifications']
+             'KDS_SendOrderReadyNotifications',
+             'KDS_RevokeServing']
         then
             Handled := true;
 
