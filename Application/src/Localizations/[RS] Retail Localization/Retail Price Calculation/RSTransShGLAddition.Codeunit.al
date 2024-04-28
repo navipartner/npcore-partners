@@ -10,6 +10,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Shipment", 'OnBeforeCopyTransLines', '', false, false)]
     local procedure AddTransferGLEntries(TransferHeader: Record "Transfer Header")
     var
+        NewRetailValueEntry: Record "Value Entry";
+        TempTransitValueEntry: Record "Value Entry" temporary;
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment;
     begin
@@ -29,20 +31,30 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         repeat
             FindPriceListLine(TransferHeader."Transfer-from Code");
 
-            CalculateStandardVECostAmount(TransferHeader);
+            InsertRetailValueEntry(NewRetailValueEntry, TransferHeader);
 
-            CreateAdditionalGLEntries(TransferHeader, RSGLEntryType::VAT);
-            CreateAdditionalGLEntries(TransferHeader, RSGLEntryType::MarginNoVAT);
+            if NewRetailValueEntry."Entry No." <> 0 then begin
+                CreateAdditionalGLEntries(TransferHeader, NewRetailValueEntry, RSGLEntryType::VAT);
+                CreateAdditionalGLEntries(TransferHeader, NewRetailValueEntry, RSGLEntryType::MarginNoVAT);
 
-            PostRetailValueEntry(TransferHeader);
-            PostTransitValueEntry(TransferHeader);
+                InsertGLItemLedgerRelation(NewRetailValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
+                InsertGLItemLedgerRelation(NewRetailValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::MarginNoVAT));
+            end;
+
+            PostTransitValueEntry(TempTransitValueEntry, TransferHeader);
+            if TempTransitValueEntry.FindSet() then
+                repeat
+                    InsertTempToValueEntry(NewRetailValueEntry, TempTransitValueEntry);
+                    CreateAdditionalGLEntries(TransferHeader, NewRetailValueEntry, RSGLEntryType::TransitAdjustment);
+                    InsertGLItemLedgerRelation(NewRetailValueEntry, GetInventoryAccountFromInvPostingSetup(NewRetailValueEntry."Location Code"));
+                until TempTransitValueEntry.Next() = 0;
         until TempTransferLine.Next() = 0;
     end;
     #endregion
 
     #region GL Entry Posting
 
-    local procedure CreateAdditionalGLEntries(TransferHeader: Record "Transfer Header"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment)
+    local procedure CreateAdditionalGLEntries(TransferHeader: Record "Transfer Header"; CalculationValueEntry: Record "Value Entry"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment)
     var
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
@@ -60,10 +72,10 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
-        if RSGLEntryType in [RSGLEntryType::Margin, RSGLEntryType::TransitAdjustment] then
-            GenJournalLine.Validate("Credit Amount", CalculateRSAmount(RSGLEntryType))
-        else
-            GenJournalLine.Validate("Debit Amount", CalculateRSAmount(RSGLEntryType));
+
+        CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, RSGLEntryType);
+
+        SetGlobalDimensionCodes(GenJournalLine, CalculationValueEntry);
 
         GenJnlCheckLine.RunCheck(GenJournalLine);
         InitAmounts(GenJournalLine);
@@ -119,7 +131,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         GenJnlLineVATLbl: Label 'G/L Calculation VAT';
     begin
         ValueEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.");
-        ValueEntry.SetLoadFields("Item No.", "Order No.", "Order Line No.", "Item No.", "Location Code", "Document No.");
+        ValueEntry.SetLoadFields("Document No.");
         ValueEntry.SetRange("Order No.", TransferHeader."No.");
         ValueEntry.SetRange("Location Code", TransferHeader."Transfer-from Code");
         ValueEntry.SetRange("Item No.", TempTransferLine."Item No.");
@@ -139,6 +151,12 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
                 GenJournalLine.Description := GenJnlLineTransitLbl;
         end;
         GenJournalLine."VAT Reporting Date" := Today();
+    end;
+
+    local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
+    begin
+        GenJournalLine."Shortcut Dimension 1 Code" := CalculationValueEntry."Global Dimension 1 Code";
+        GenJournalLine."Shortcut Dimension 2 Code" := CalculationValueEntry."Global Dimension 2 Code";
     end;
 
     local procedure PostGLAcc(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry")
@@ -207,97 +225,107 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     #endregion
 
     #region Additional Item Ledger and Value Entry Posting
-
-    local procedure PostRetailValueEntry(TransferHeader: Record "Transfer Header")
+    local procedure InsertRetailValueEntry(var NewValueEntry: Record "Value Entry"; TransferHeader: Record "Transfer Header")
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        NewValueEntry: Record "Value Entry";
-    begin
-        if not InsertRetailValueEntry(TransferHeader, NewValueEntry) then
-            exit;
-
-        if not ItemLedgerEntry.Get(NewValueEntry."Item Ledger Entry No.") then
-            exit;
-
-        ItemLedgerEntry.CalcFields("Cost Amount (Actual)");
-    end;
-
-    local procedure InsertRetailValueEntry(TransferHeader: Record "Transfer Header"; var NewValueEntry: Record "Value Entry"): Boolean
-    var
-        BaseValueEntry: Record "Value Entry";
+        StdValueEntry: Record "Value Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
-        BaseValueEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.");
-        BaseValueEntry.SetLoadFields("Item No.", "Order No.", "Order Line No.", "Item No.", "Location Code", "Document No.", "Cost Amount (Actual)");
-        BaseValueEntry.SetRange("Order No.", TransferHeader."No.");
-        BaseValueEntry.SetRange("Location Code", TransferHeader."Transfer-from Code");
-        BaseValueEntry.SetRange("Item No.", TempTransferLine."Item No.");
-        BaseValueEntry.SetRange("Order Line No.", TempTransferLine."Line No.");
-        if not BaseValueEntry.FindFirst() then
+        StdValueEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.");
+        StdValueEntry.SetRange("Order No.", TransferHeader."No.");
+        StdValueEntry.SetRange("Location Code", TransferHeader."Transfer-from Code");
+        StdValueEntry.SetRange("Item No.", TempTransferLine."Item No.");
+        StdValueEntry.SetRange("Order Line No.", TempTransferLine."Line No.");
+        if not StdValueEntry.FindFirst() then
             exit;
-        if Abs(PriceListLine."Unit Price" * TempTransferLine.Quantity) = Abs(BaseValueEntry."Cost Amount (Actual)") then
-            exit(false);
+
+        if PriceListLine."Unit Price" = StdValueEntry."Cost per Unit" then
+            exit;
+
         NewValueEntry.Init();
-        NewValueEntry.Copy(BaseValueEntry);
+        NewValueEntry.Copy(StdValueEntry);
         NewValueEntry."Entry No." := NewValueEntry.GetLastEntryNo() + 1;
+
         ResetValueEntryAmounts(NewValueEntry);
+
         NewValueEntry.Description := CalculationValueEntryDescLbl;
-        NewValueEntry."Cost Amount (Actual)" := CalculateRSGLMarginAmount();
+        NewValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit";
+        NewValueEntry."Cost Amount (Actual)" := NewValueEntry."Cost per Unit" * StdValueEntry."Invoiced Quantity";
         NewValueEntry."Cost Posted to G/L" := NewValueEntry."Cost Amount (Actual)";
         NewValueEntry.Insert();
 
-        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
-
-        InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
-        InsertGLItemLedgerRelation(NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));
-        InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::MarginNoVAT));
-        exit(true);
+        RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(NewValueEntry);
     end;
 
-    local procedure PostTransitValueEntry(TransferHeader: Record "Transfer Header")
+    local procedure PostTransitValueEntry(var TempTransitValueEntry: Record "Value Entry" temporary; TransferHeader: Record "Transfer Header"): Boolean
     var
-        StandardTransitValueEntry: Record "Value Entry";
+        StdItemLedgEntry: Record "Item Ledger Entry";
+        StdTransitValueEntry: Record "Value Entry";
+        NewTransitValueEntry: Record "Value Entry";
     begin
         if TransferHeader."In-Transit Code" = '' then
             exit;
-        StandardTransitValueEntry.SetRange("Document Type", StandardTransitValueEntry."Document Type"::"Transfer Shipment");
-        StandardTransitValueEntry.SetRange("Order No.", TransferHeader."No.");
-        StandardTransitValueEntry.SetRange("Location Code", TransferHeader."In-Transit Code");
-        StandardTransitValueEntry.SetRange("Item No.", TempTransferLine."Item No.");
-        if not StandardTransitValueEntry.FindFirst() then
+
+        StdItemLedgEntry.SetRange("Document Type", StdItemLedgEntry."Document Type"::"Transfer Shipment");
+        StdItemLedgEntry.SetRange("Order No.", TransferHeader."No.");
+        StdItemLedgEntry.SetRange("Location Code", TransferHeader."In-Transit Code");
+        StdItemLedgEntry.SetRange("Item No.", TempTransferLine."Item No.");
+        if not StdItemLedgEntry.FindSet() then
             exit;
 
-        InsertTransitValueEntry(StandardTransitValueEntry, TransferHeader);
+        repeat
+            StdTransitValueEntry.SetRange("Item Ledger Entry No.", StdItemLedgEntry."Entry No.");
+            if StdTransitValueEntry.FindSet() then
+                InsertTransitValueEntry(NewTransitValueEntry, TempTransitValueEntry, StdTransitValueEntry);
+        until StdItemLedgEntry.Next() = 0;
     end;
 
-    local procedure InsertTransitValueEntry(StdTransitValueEntry: Record "Value Entry"; TransferHeader: Record "Transfer Header"): Boolean
+    local procedure InsertTransitValueEntry(var NewTransitValueEntry: Record "Value Entry"; var TempTransitValueEntry: Record "Value Entry" temporary; StdTransitValueEntry: Record "Value Entry")
     var
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment;
+        SumOfCostPerUnit: Decimal;
+        SumOfInvQty: Integer;
     begin
+        repeat
+            SumOfCostPerUnit += StdTransitValueEntry."Cost per Unit";
+            SumOfInvQty += StdTransitValueEntry."Invoiced Quantity";
+        until StdTransitValueEntry.Next() = 0;
+
+        if PriceListLine."Unit Price" = SumOfCostPerUnit then
+            exit;
+
         NewTransitValueEntry.Init();
         NewTransitValueEntry.Copy(StdTransitValueEntry);
         NewTransitValueEntry."Entry No." := NewTransitValueEntry.GetLastEntryNo() + 1;
+
         ResetValueEntryAmounts(NewTransitValueEntry);
+
+        NewTransitValueEntry."Cost per Unit" := Abs(PriceListLine."Unit Price" - SumOfCostPerUnit);
+
         if (StdTransitValueEntry."Cost Amount (Actual)" > 0) then
-            NewTransitValueEntry."Cost Amount (Actual)" := -(Abs(StdTransitValueEntry."Cost Amount (Actual)") - Abs(CalculateAppliedValueEntryCostNewQty()))
+            NewTransitValueEntry."Cost Amount (Actual)" := -(NewTransitValueEntry."Cost per Unit" * SumOfInvQty)
         else
-            NewTransitValueEntry."Cost Amount (Actual)" := Abs(StdTransitValueEntry."Cost Amount (Actual)") - Abs(CalculateAppliedValueEntryCostNewQty());
+            NewTransitValueEntry."Cost Amount (Actual)" := Abs(NewTransitValueEntry."Cost per Unit" * SumOfInvQty);
 
         if NewTransitValueEntry."Cost Amount (Actual)" = 0 then
             exit;
 
         NewTransitValueEntry."Cost Posted to G/L" := NewTransitValueEntry."Cost Amount (Actual)";
-        NewTransitValueEntry."Cost per Unit" := NewTransitValueEntry."Cost per Unit";
+        NewTransitValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfCostPerUnit;
         NewTransitValueEntry.Description := CalculationValueEntryDescLbl;
         NewTransitValueEntry.Insert();
 
-        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewTransitValueEntry, true);
+        TempTransitValueEntry.Init();
+        TempTransitValueEntry.Copy(NewTransitValueEntry);
+        TempTransitValueEntry.Insert();
 
-        CreateAdditionalGLEntries(TransferHeader, RSGLEntryType::TransitAdjustment);
+        RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(NewTransitValueEntry);
+    end;
 
-        InsertGLItemLedgerRelation(NewTransitValueEntry, GetInventoryAccountFromInvPostingSetup(NewTransitValueEntry."Location Code"));
+    local procedure InsertTempToValueEntry(NewValueEntry: Record "Value Entry"; TempValueEntry: Record "Value Entry" temporary)
+    begin
+        NewValueEntry.Init();
+        NewValueEntry.Copy(TempValueEntry);
+        NewValueEntry.Insert();
     end;
 
     local procedure InsertGLItemLedgerRelation(ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
@@ -307,17 +335,21 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         GLRegister: Record "G/L Register";
     begin
         GenJnlPostLine.GetGLReg(GLRegister);
-        GLItemLedgerRelation.Init();
-        GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
-        GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
-
-        GLEntry.SetLoadFields("Entry No.", "G/L Account No.", "Document No.", Amount);
+        GLEntry.SetLoadFields("Entry No.");
         GLEntry.SetRange("G/L Account No.", GLAccountNo);
         GLEntry.SetRange("Document No.", ValueEntry."Document No.");
-        if not GLEntry.FindFirst() then
+        if not GLEntry.FindSet() then
             exit;
-        GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
-        GLItemLedgerRelation.Insert(true);
+        repeat
+            if not GLItemLedgerRelation.Get(GLEntry."Entry No.", ValueEntry."Entry No.") then begin
+                GLItemLedgerRelation.Init();
+                GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
+                GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
+
+                GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
+                GLItemLedgerRelation.Insert(true);
+            end;
+        until GLEntry.Next() = 0;
     end;
 
     #endregion
@@ -346,74 +378,23 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         end;
     end;
 
-    local procedure CalculateRSAmount(RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment): Decimal
+    local procedure CalculateRSGLEntryAmounts(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,TransitAdjustment)
     begin
         case RSGLEntryType of
             RSGLEntryType::VAT:
-                exit(CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Debit Amount", CalculateRSGLVATAmount());
             RSGLEntryType::Margin:
-                exit(CalculateRSGLMarginAmount());
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)");
             RSGLEntryType::MarginNoVAT:
-                exit(CalculateRSGLMarginNoVATAmount());
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
             RSGLEntryType::TransitAdjustment:
-                exit(CalculateRSGLEntryTransitAdjAmount());
+                GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Amount (Actual)"));
         end;
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
         exit((PriceListLine."Unit Price" * TempTransferLine.Quantity) * CalculateVATBreakDown());
-    end;
-
-    local procedure CalculateRSGLMarginAmount(): Decimal
-    var
-    begin
-        exit((PriceListLine."Unit Price" * TempTransferLine.Quantity) - Abs(ValueEntryStd."Cost Amount (Actual)"));
-    end;
-
-    local procedure CalculateRSGLMarginNoVATAmount(): Decimal
-    begin
-        exit((PriceListLine."Unit Price" * TempTransferLine.Quantity) - CalculateAppliedToValueEntryCostPerUnit() - CalculateRSGLVATAmount());
-    end;
-
-    local procedure CalculateRSGLEntryTransitAdjAmount(): Decimal
-    begin
-        exit(Abs(NewTransitValueEntry."Cost Amount (Actual)"));
-    end;
-
-    local procedure CalculateAppliedToValueEntryCostPerUnit(): Decimal
-    var
-        AppliedToItemLedgerEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-    begin
-        AppliedToItemLedgerEntry.Get(TempTransferLine."Appl.-to Item Entry");
-        ValueEntry.SetLoadFields("Entry Type", "Item Ledger Entry No.", "Item No.", "Location Code", "Cost per Unit");
-        ValueEntry.SetRange("Item Ledger Entry Type", AppliedToItemLedgerEntry."Entry Type");
-        ValueEntry.SetRange("Location Code", AppliedToItemLedgerEntry."Location Code");
-        ValueEntry.SetRange("Item Ledger Entry No.", AppliedToItemLedgerEntry."Entry No.");
-        ValueEntry.SetRange("Item No.", TempTransferLine."Item No.");
-        if not ValueEntry.FindFirst() then
-            exit;
-        exit(ValueEntry."Cost per Unit" * TempTransferLine.Quantity);
-    end;
-
-    local procedure CalculateStandardVECostAmount(TransferHeader: Record "Transfer Header")
-    begin
-        ValueEntryStd.SetCurrentKey("Order Type", "Order No.", "Order Line No.");
-        ValueEntryStd.SetLoadFields("Item No.", "Order No.", "Order Line No.", "Item No.", "Location Code", "Document No.", "Cost Amount (Actual)");
-        ValueEntryStd.SetRange("Order No.", TransferHeader."No.");
-        ValueEntryStd.SetRange("Location Code", TransferHeader."Transfer-from Code");
-        ValueEntryStd.SetRange("Item No.", TempTransferLine."Item No.");
-        ValueEntryStd.SetRange("Order Line No.", TempTransferLine."Line No.");
-        ValueEntryStd.CalcSums("Cost Amount (Actual)");
-    end;
-
-    local procedure CalculateAppliedValueEntryCostNewQty(): Decimal
-    var
-        ValueEntry: Record "Value Entry";
-    begin
-        ValueEntry.FindFirstValueEntryByItemLedgerEntryNo(TempTransferLine."Appl.-to Item Entry");
-        exit(ValueEntry."Cost per Unit" * TempTransferLine.Quantity);
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
@@ -525,7 +506,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
         PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
     begin
-        PriceListHeader.SetLoadFields("Price Type", Status, "Starting Date", "Ending Date", "NPR Location Code", "Assign-to No.");
+        PriceListHeader.SetLoadFields(Code);
         PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
 
@@ -540,7 +521,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     var
         PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
     begin
-        PriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price", "VAT Bus. Posting Gr. (Price)");
+        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
         PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
         PriceListLine.SetRange("Asset No.", TempTransferLine."Item No.");
         if not PriceListLine.FindFirst() then
@@ -585,8 +566,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempTransferLine: Record "Transfer Line" temporary;
-        NewTransitValueEntry: Record "Value Entry";
-        ValueEntryStd: Record "Value Entry";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         JobLine: Boolean;
         AddCurrencyCode: Code[10];

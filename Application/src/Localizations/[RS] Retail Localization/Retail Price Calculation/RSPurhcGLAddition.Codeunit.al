@@ -10,9 +10,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnRunOnAfterPostInvoice', '', false, false)]
     local procedure AddGLEntries(var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PurchaseHeader: Record "Purchase Header"; PurchInvHeader: Record "Purch. Inv. Header")
     var
-        GenJournalLine: Record "Gen. Journal Line";
+        NewValueEntry: Record "Value Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        RSGLEntryType: Option VAT,Margin,MarginNoVAT;
+        RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT;
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
@@ -27,11 +27,17 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
             repeat
                 FindPriceListLine();
-                CreateAdditionalGLEntries(GenJnlPostLine, GenJournalLine, RSGLEntryType::Margin);
-                CreateAdditionalGLEntries(GenJnlPostLine, GenJournalLine, RSGLEntryType::VAT);
-                CreateAdditionalGLEntries(GenJnlPostLine, GenJournalLine, RSGLEntryType::MarginNoVAT);
+                InsertRetailValueEntry(NewValueEntry, PurchInvHeader);
 
-                InsertRetailValueEntry(GenJnlPostLine, GenJournalLine, PurchInvHeader);
+                if NewValueEntry."Entry No." <> 0 then begin
+                    CreateAdditionalGLEntries(GenJnlPostLine, NewValueEntry, RSGLEntryType::Margin);
+                    CreateAdditionalGLEntries(GenJnlPostLine, NewValueEntry, RSGLEntryType::VAT);
+                    CreateAdditionalGLEntries(GenJnlPostLine, NewValueEntry, RSGLEntryType::MarginNoVAT);
+
+                    InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
+                    InsertGLItemLedgerRelation(NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));
+                    InsertGLItemLedgerRelation(NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::MarginNoVAT));
+                end
             until TempPurchLine.Next() = 0;
 
             TempPurchLine.DeleteAll();
@@ -46,8 +52,8 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             if not TempItemChargeAssignment.FindSet() then
                 exit;
             repeat
-                CreateAdditionalGLEntries(GenJnlPostLine, GenJournalLine, RSGLEntryType::Margin);
-                CreateAdditionalGLEntries(GenJnlPostLine, GenJournalLine, RSGLEntryType::MarginNoVAT);
+                CreateAdditionalGLEntries(GenJnlPostLine, NewValueEntry, RSGLEntryType::IChMargin);
+                CreateAdditionalGLEntries(GenJnlPostLine, NewValueEntry, RSGLEntryType::IChMarginNoVAT);
             until TempItemChargeAssignment.Next() = 0;
         until TempPurchLine.Next() = 0;
     end;
@@ -55,8 +61,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     #region GL Entry Posting
 
-    local procedure CreateAdditionalGLEntries(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    local procedure CreateAdditionalGLEntries(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; CalculationValueEntry: Record "Value Entry"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT)
     var
+        GenJournalLine: Record "Gen. Journal Line";
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
         GLSetup: Record "General Ledger Setup";
@@ -75,20 +82,12 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
         case TempPurchLine.Type of
             "Purchase Line Type"::Item:
-                if RSGLEntryType in [RSGLEntryType::Margin] then
-                    GenJournalLine.Validate("Debit Amount", CalculateRSAmount(GenJournalLine, RSGLEntryType))
-                else
-                    GenJournalLine.Validate("Credit Amount", CalculateRSAmount(GenJournalLine, RSGLEntryType));
+                CalculatePurchLineItemTypeAmounts(GenJournalLine, CalculationValueEntry, RSGLEntryType);
             "Purchase Line Type"::"Charge (Item)":
-                if RSGLEntryType in [RSGLEntryType::Margin] then begin
-                    GenJournalLine.Validate("Debit Amount", -CalculateRSAmount(GenJournalLine, RSGLEntryType));
-                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
-                end
-                else begin
-                    GenJournalLine.Validate("Credit Amount", -CalculateRSAmount(GenJournalLine, RSGLEntryType));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                end;
+                CalculatePurchLineItemChTypeAmounts(GenJournalLine, RSGLEntryType);
         end;
+
+        SetGlobalDimensionCodes(GenJournalLine, CalculationValueEntry);
 
         GenJnlCheckLine.RunCheck(GenJournalLine);
         InitAmounts(GenJournalLine);
@@ -100,7 +99,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
                     GenJournalLine."Bill-to/Pay-to No." := GenJournalLine."Bal. Account No.";
             end;
 
-        if (TempPurchLine.Type in ["Purchase Line Type"::"Charge (Item)"]) and (RSGLEntryType in [RSGLEntryType::Margin]) then begin
+        if (TempPurchLine.Type in ["Purchase Line Type"::"Charge (Item)"]) and (RSGLEntryType in [RSGLEntryType::IChMargin]) then begin
             GenJournalLine."Debit Amount" := -Abs(GenJournalLine.Amount);
             GenJournalLine."Credit Amount" := 0;
         end;
@@ -140,7 +139,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         end;
     end;
 
-    local procedure InitGenLineFromLastGLEntry(var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT)
+    local procedure InitGenLineFromLastGLEntry(var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT)
     var
         GLEntry: Record "G/L Entry";
         GenJnlLineMarginLbl: Label 'G/L Calculation Margin';
@@ -154,9 +153,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         GenJournalLine."External Document No." := GLEntry."External Document No.";
         GenJournalLine."Posting Date" := GLEntry."Posting Date";
         case RSGLEntryType of
-            RSGLEntryType::Margin:
+            RSGLEntryType::Margin, RSGLEntryType::IChMargin:
                 GenJournalLine.Description := GenJnlLineMarginLbl;
-            RSGLEntryType::MarginNoVAT:
+            RSGLEntryType::MarginNoVAT, RSGLEntryType::IChMarginNoVAT:
                 GenJournalLine.Description := GenJnlLineMarginNoVATLbl;
             RSGLEntryType::VAT:
                 GenJournalLine.Description := GenJnlLineVATLbl;
@@ -166,6 +165,12 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         GenJournalLine."Gen. Posting Type" := GLEntry."Gen. Posting Type";
         GenJournalLine."Document Date" := GLEntry."Posting Date";
         GenJournalLine."Due Date" := GLEntry."Posting Date";
+    end;
+
+    local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
+    begin
+        GenJournalLine."Shortcut Dimension 1 Code" := CalculationValueEntry."Global Dimension 1 Code";
+        GenJournalLine."Shortcut Dimension 2 Code" := CalculationValueEntry."Global Dimension 2 Code";
     end;
 
     local procedure PostGLAcc(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry")
@@ -226,32 +231,31 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     #region Additional Item Ledger and Value Entry Posting
 
-    local procedure InsertRetailValueEntry(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GenJnlLine: Record "Gen. Journal Line"; PurchInvHeader: Record "Purch. Inv. Header")
+    local procedure InsertRetailValueEntry(var NewValueEntry: Record "Value Entry"; PurchInvHeader: Record "Purch. Inv. Header")
     var
-        ValueEntry: Record "Value Entry";
+        StdValueEntry: Record "Value Entry";
     begin
-        ValueEntry.SetRange("Location Code", TempPurchLine."Location Code");
-        ValueEntry.SetRange("Document No.", PurchInvHeader."No.");
-        ValueEntry.SetRange("Item No.", TempPurchLine."No.");
-        if not ValueEntry.FindFirst() then
+        StdValueEntry.SetRange("Location Code", TempPurchLine."Location Code");
+        StdValueEntry.SetRange("Document No.", PurchInvHeader."No.");
+        StdValueEntry.SetRange("Item No.", TempPurchLine."No.");
+        if not StdValueEntry.FindFirst() then
             exit;
 
-        InsertValueEntry(ValueEntry, GenJnlPostLine, GenJnlLine)
+        InsertValueEntry(NewValueEntry, StdValueEntry);
     end;
 
-    local procedure InsertValueEntry(ValueEntryIn: Record "Value Entry"; GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GenJnlLine: Record "Gen. Journal Line")
+    local procedure InsertValueEntry(var NewValueEntry: Record "Value Entry"; ValueEntryIn: Record "Value Entry")
     var
-        NewValueEntry: Record "Value Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         CalculationValueEntryDescLbl: Label 'Calculation';
-        RSGLEntryType: Option VAT,Margin,MarginNoVAT;
     begin
         NewValueEntry.Init();
         NewValueEntry.Copy(ValueEntryIn);
         NewValueEntry."Entry No." := ValueEntryIn.GetLastEntryNo() + 1;
         ResetValueEntryAmounts(NewValueEntry);
-        NewValueEntry."Cost Amount (Actual)" := CalculateRSGLMarginAmount(GenJnlLine);
+        NewValueEntry."Cost Amount (Actual)" := PriceListLine."Unit Price" * TempPurchLine.Quantity - ValueEntryIn."Cost Amount (Actual)";
         NewValueEntry."Cost Posted to G/L" := NewValueEntry."Cost Amount (Actual)";
+        NewValueEntry."Cost per Unit" := PriceListLine."Unit Price" - ValueEntryIn."Cost per Unit";
         NewValueEntry.Description := CalculationValueEntryDescLbl;
 
         if (NewValueEntry."Cost Amount (Actual)" = 0) then
@@ -259,37 +263,67 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
         NewValueEntry.Insert();
 
-        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(NewValueEntry, true);
-
-        InsertGLItemLedgerRelation(GenJnlPostLine, NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::VAT));
-        InsertGLItemLedgerRelation(GenJnlPostLine, NewValueEntry, GetInventoryAccountFromInvPostingSetup(NewValueEntry."Location Code"));
-        InsertGLItemLedgerRelation(GenJnlPostLine, NewValueEntry, GetRSAccountNoFromSetup(RSGLEntryType::MarginNoVAT));
+        RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(NewValueEntry);
     end;
 
-    local procedure InsertGLItemLedgerRelation(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
+    local procedure InsertGLItemLedgerRelation(ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
     var
         GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
+        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         GenJnlPostLine.GetGLReg(GLRegister);
-        GLItemLedgerRelation.Init();
-        GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
-        GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
-
-        GLEntry.SetLoadFields("Entry No.", "G/L Account No.", "Document No.");
+        GLEntry.SetLoadFields("Entry No.");
         GLEntry.SetRange("G/L Account No.", GLAccountNo);
         GLEntry.SetRange("Document No.", ValueEntry."Document No.");
-        if not GLEntry.FindFirst() then
+        if not GLEntry.FindSet() then
             exit;
-        GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
-        GLItemLedgerRelation.Insert(true);
+        repeat
+            if not GLItemLedgerRelation.Get(GLEntry."Entry No.", ValueEntry."Entry No.") then begin
+                GLItemLedgerRelation.Init();
+                GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
+                GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
+
+                GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
+                GLItemLedgerRelation.Insert(true);
+            end;
+        until GLEntry.Next() = 0;
     end;
 
     #endregion
 
     #region Retail Price Calculation
-    local procedure GetRSAccountNoFromSetup(RSGLEntryType: Option VAT,Margin,MarginNoVAT): Code[20]
+
+    local procedure CalculatePurchLineItemTypeAmounts(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT)
+    begin
+        case RSGLEntryType of
+            RSGLEntryType::Margin:
+                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Amount (Actual)");
+            RSGLEntryType::MarginNoVAT:
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
+            RSGLEntryType::VAT:
+                GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount());
+        end;
+    end;
+
+    local procedure CalculatePurchLineItemChTypeAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT)
+    begin
+        case RSGLEntryType of
+            RSGLEntryType::IChMargin:
+                begin
+                    GenJournalLine.Validate("Debit Amount", -Abs(TempItemChargeAssignment."Amount to Assign"));
+                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
+                end;
+            RSGLEntryType::IChMarginNoVAT:
+                begin
+                    GenJournalLine.Validate("Credit Amount", -Abs(TempItemChargeAssignment."Amount to Assign"));
+                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
+                end;
+        end;
+    end;
+
+    local procedure GetRSAccountNoFromSetup(RSGLEntryType: Option VAT,Margin,MarginNoVAT,IChMargin,IChMarginNoVAT): Code[20]
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
@@ -300,9 +334,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
                     LocalizationSetup.TestField("RS Calc. VAT GL Account");
                     exit(LocalizationSetup."RS Calc. VAT GL Account");
                 end;
-            RSGLEntryType::Margin:
+            RSGLEntryType::Margin, RSGLEntryType::IChMargin:
                 exit(GetInventoryAccountFromInvPostingSetup(TempPurchLine."Location Code"));
-            RSGLEntryType::MarginNoVAT:
+            RSGLEntryType::MarginNoVAT, RSGLEntryType::IChMarginNoVAT:
                 begin
                     LocalizationSetup.TestField("RS Calc. Margin GL Account");
                     exit(LocalizationSetup."RS Calc. Margin GL Account");
@@ -310,69 +344,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         end;
     end;
 
-    local procedure CalculateRSAmount(GenJnlLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT): Decimal
-    begin
-        case RSGLEntryType of
-            RSGLEntryType::VAT:
-                exit(CalculateRSGLVATAmount());
-            RSGLEntryType::Margin:
-                exit(CalculateRSGLMarginAmount(GenJnlLine));
-            RSGLEntryType::MarginNoVAT:
-                exit(CalculateRSGLMarginNoVATAmount(GenJnlLine));
-        end;
-    end;
-
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
         exit((PriceListLine."Unit Price" * TempPurchLine.Quantity) * CalculateVATBreakDown());
-    end;
-
-    local procedure CalculateRSGLMarginAmount(GenJnlLine: Record "Gen. Journal Line"): Decimal
-    var
-        ValueEntryCostAmount: Decimal;
-    begin
-        case TempPurchLine.Type of
-            "Purchase Line Type"::Item:
-                begin
-                    CalculateValueEntryCostAmount(GenJnlLine, ValueEntryCostAmount);
-                    exit((PriceListLine."Unit Price" * TempPurchLine.Quantity) - ValueEntryCostAmount);
-                end;
-            "Purchase Line Type"::"Charge (Item)":
-                exit(Abs(TempItemChargeAssignment."Amount to Assign"));
-        end;
-    end;
-
-    local procedure CalculateRSGLMarginNoVATAmount(GenJnlLine: Record "Gen. Journal Line"): Decimal
-    var
-        TotalPriceCalc: Decimal;
-        ValueEntryCostAmount: Decimal;
-    begin
-        case TempPurchLine.Type of
-            "Purchase Line Type"::Item:
-                begin
-                    TotalPriceCalc := PriceListLine."Unit Price" * TempPurchLine.Quantity;
-                    CalculateValueEntryCostAmount(GenJnlLine, ValueEntryCostAmount);
-                    exit(TotalPriceCalc - ValueEntryCostAmount - (TotalPriceCalc * CalculateVATBreakDown()));
-                end;
-            "Purchase Line Type"::"Charge (Item)":
-                exit(Abs(TempItemChargeAssignment."Amount to Assign"));
-        end;
-    end;
-
-    local procedure CalculateValueEntryCostAmount(GenJnlLine: Record "Gen. Journal Line"; var CostAmountActual: Decimal)
-    var
-        ValueEntry: Record "Value Entry";
-    begin
-        ValueEntry.SetCurrentKey("Document No.", "Document Line No.", "Document Type");
-        ValueEntry.SetLoadFields("Item No.", "Document No.", "Location Code", "Document Line No.", "Cost Amount (Actual)");
-        ValueEntry.SetRange("Item No.", TempPurchLine."No.");
-        ValueEntry.SetRange("Document No.", GenJnlLine."Document No.");
-        ValueEntry.SetRange("Location Code", TempPurchLine."Location Code");
-        ValueEntry.SetRange("Document Line No.", TempPurchLine."Line No.");
-        if not ValueEntry.FindFirst() then
-            exit;
-        ValueEntry.CalcSums("Cost Amount (Actual)");
-        CostAmountActual := Abs(ValueEntry."Cost Amount (Actual)");
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
@@ -550,7 +524,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
     begin
-        PriceListHeader.SetLoadFields("Price Type", Status, "Starting Date", "Ending Date", "NPR Location Code", "Assign-to No.");
+        PriceListHeader.SetLoadFields(Code);
         PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
         PriceListHeader.SetRange("Assign-to No.", PurchaseHeader."Sell-to Customer No.");
@@ -570,7 +544,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         if not PriceListHeader.FindFirst() then
             Error(PriceListNotFoundErr, TempPurchLine."Location Code");
 
-        PriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price", "VAT Bus. Posting Gr. (Price)");
+        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
         PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
         PriceListLine.SetRange("Asset No.", TempPurchLine."No.");
         if not PriceListLine.FindFirst() then

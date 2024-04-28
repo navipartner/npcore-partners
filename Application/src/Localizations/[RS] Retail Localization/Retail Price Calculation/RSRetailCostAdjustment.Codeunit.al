@@ -33,20 +33,60 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
                 IsHandled := true;
     end;
 
-#if not (BC17 or BC18 or BC19 or BC20 OR BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
+#if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::ItemCostManagement, OnAfterSetFilters, '', false, false)]
     local procedure ItemCostManagement_OnAfterSetFilters(var ValueEntry: Record "Value Entry"; var Item: Record Item)
     var
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
         RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+        ValueEntryFilter: Text;
+        TextBuilder: TextBuilder;
     begin
         if not RetailLocalizationMgt.IsRetailLocalizationEnabled() then
             exit;
 
-        if not RSRetValueEntryMapp.Get(ValueEntry."Entry No.") then
+        if not RSRetValueEntryMapp.FindSet() then
             exit;
 
-        ValueEntry.SetFilter("Entry No.", '<>%1', RSRetValueEntryMapp."Entry No.");
+        SetInitalFilterToTBuilder(TextBuilder, ValueEntry);
+
+        repeat
+            AppendEntryNoFilterToTBuilder(TextBuilder, RSRetValueEntryMapp."Entry No.");
+        until RSRetValueEntryMapp.Next() = 0;
+
+        FormatRetailValueEntryFilter(ValueEntryFilter, TextBuilder);
+
+        ValueEntry.SetFilter("Entry No.", StrSubstNo('<>%1', ValueEntryFilter));
     end;
+
+    #region RS Retail Cost Adjustment Helper Procedures
+
+    local procedure SetInitalFilterToTBuilder(var TextBuilder: TextBuilder; ValueEntry: Record "Value Entry")
+    var
+        ValueEntryFilter: Text;
+    begin
+        ValueEntryFilter := ValueEntry.GetFilter("Entry No.");
+        ValueEntryFilter := ValueEntryFilter.Replace(',', '|');
+        if ValueEntryFilter <> '' then
+            TextBuilder.Append(ValueEntryFilter);
+    end;
+
+    local procedure AppendEntryNoFilterToTBuilder(var TextBuilder: TextBuilder; EntryNo: Integer)
+    begin
+        case (TextBuilder.Length <> 0) of
+            true:
+                TextBuilder.Append('|' + Format(EntryNo));
+            false:
+                TextBuilder.Append(Format(EntryNo));
+        end;
+    end;
+
+    local procedure FormatRetailValueEntryFilter(var ValueEntryFilter: Text; TextBuilder: TextBuilder)
+    begin
+        ValueEntryFilter := TextBuilder.ToText();
+        if ValueEntryFilter.EndsWith('|') then
+            ValueEntryFilter := ValueEntryFilter.Remove(StrLen(ValueEntryFilter) - 1, 1);
+    end;
+    #endregion RS Retail Cost Adjustment Helper Procedures
 #endif
 }
