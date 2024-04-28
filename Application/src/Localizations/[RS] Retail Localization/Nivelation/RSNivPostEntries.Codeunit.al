@@ -317,7 +317,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
 
         InsertGLItemLedgerRelation(PostedNivelationLine, ValueEntry);
 
-        RSRLocalizationMgt.InsertRetailValueEntryMappingEntry(ValueEntry, false);
+        RSRLocalizationMgt.InsertNivelationValueEntryMappingEntry(ValueEntry);
 
         ItemJournalLine.Delete();
     end;

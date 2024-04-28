@@ -73,7 +73,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
 
     #region RS Retail Value Entry Mapping Mgt.
 
-    internal procedure InsertRetailValueEntryMappingEntry(ValueEntry: Record "Value Entry"; IsCalculation: Boolean)
+    internal procedure InsertRetailCalculationValueEntryMappingEntry(ValueEntry: Record "Value Entry")
     var
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
     begin
@@ -85,12 +85,39 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
         RSRetValueEntryMapp."Item Ledger Entry No." := ValueEntry."Item Ledger Entry No.";
         RSRetValueEntryMapp."Location Code" := ValueEntry."Location Code";
-        case IsCalculation of
-            true:
-                RSRetValueEntryMapp."Retail Calculation" := true;
-            false:
-                RSRetValueEntryMapp."Nivelation" := true;
-        end;
+        RSRetValueEntryMapp."Retail Calculation" := true;
+        RSRetValueEntryMapp.Insert();
+    end;
+
+    internal procedure InsertNivelationValueEntryMappingEntry(ValueEntry: Record "Value Entry")
+    var
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+    begin
+        RSRetValueEntryMapp.Init();
+        RSRetValueEntryMapp."Entry Type" := ValueEntry."Entry Type";
+        RSRetValueEntryMapp."Entry No." := ValueEntry."Entry No.";
+        RSRetValueEntryMapp."Document Type" := ValueEntry."Document Type";
+        RSRetValueEntryMapp."Document No." := ValueEntry."Document No.";
+        RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
+        RSRetValueEntryMapp."Item Ledger Entry No." := ValueEntry."Item Ledger Entry No.";
+        RSRetValueEntryMapp."Location Code" := ValueEntry."Location Code";
+        RSRetValueEntryMapp.Nivelation := true;
+        RSRetValueEntryMapp.Insert();
+    end;
+
+    internal procedure InsertCOGSCorrectionValueEntryMappingEntry(ValueEntry: Record "Value Entry")
+    var
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+    begin
+        RSRetValueEntryMapp.Init();
+        RSRetValueEntryMapp."Entry Type" := ValueEntry."Entry Type";
+        RSRetValueEntryMapp."Entry No." := ValueEntry."Entry No.";
+        RSRetValueEntryMapp."Document Type" := ValueEntry."Document Type";
+        RSRetValueEntryMapp."Document No." := ValueEntry."Document No.";
+        RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
+        RSRetValueEntryMapp."Item Ledger Entry No." := ValueEntry."Item Ledger Entry No.";
+        RSRetValueEntryMapp."Location Code" := ValueEntry."Location Code";
+        RSRetValueEntryMapp."COGS Correction" := true;
         RSRetValueEntryMapp.Insert();
     end;
 
