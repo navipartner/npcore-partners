@@ -831,11 +831,11 @@
 
     local procedure CreateAuthorizationSection(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary) XmlText: Text
     var
-        Xml1Lbl: Label '<PosCompanyName>%1</PosCompanyName>', Locked = true;
-        Xml2Lbl: Label '<PosStoreCode>%1</PosStoreCode>', Locked = true;
-        Xml3Lbl: Label '<PosUnitCode>%1</PosUnitCode>', Locked = true;
+        Xml1Lbl: Label '<PosCompanyName><![CDATA[%1]]></PosCompanyName>', Locked = true;
+        Xml2Lbl: Label '<PosStoreCode><![CDATA[%1]]></PosStoreCode>', Locked = true;
+        Xml3Lbl: Label '<PosUnitCode><![CDATA[%1]]></PosUnitCode>', Locked = true;
         Xml4Lbl: Label '<Token>%1</Token>', Locked = true;
-        Xml5Lbl: Label '<ClientCardNumber>%1</ClientCardNumber>', Locked = true;
+        Xml5Lbl: Label '<ClientCardNumber><![CDATA[%1]]></ClientCardNumber>', Locked = true;
         Xml6Lbl: Label '<ReceiptNumber>%1</ReceiptNumber>', Locked = true;
         Xml7Lbl: Label '<TransactionId>%1</TransactionId>', Locked = true;
         Xml8Lbl: Label '<Date>%1</Date>', Locked = true;
@@ -949,7 +949,7 @@
         if (TmpRegisterPaymentLines.FindSet()) then
             repeat
                 XmlPaymentLines += StrSubstNo(XmlPaymentLinesLbl,
-                  Format(TmpRegisterPaymentLines.Type,0,2),
+                  Format(TmpRegisterPaymentLines.Type, 0, 2),
                   XmlSafe(TmpRegisterPaymentLines.Description),
                   TmpRegisterPaymentLines."Currency Code",
                   Format(TmpRegisterPaymentLines."Total Amount", 0, 9),
