@@ -322,7 +322,6 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         Clear(NextLink);
 
         if NcTask."Data Output".HasValue then begin
-            NcTask.CalcFields("Data Output");
             NcTask."Data Output".CreateInStream(InStr);
             Content.WriteFrom(InStr);
 
@@ -547,6 +546,24 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                     [ShopifySetup."Allowed Payment Statuses"::Paid, ShopifySetup."Allowed Payment Statuses"::Both]);
         end;
         exit(false);
+    end;
+
+    procedure ProcessCancelledOrders(): Boolean
+    begin
+        ShopifySetup.GetRecordOnce(false);
+        exit(ShopifySetup."Delete on Cancellation");
+    end;
+
+    procedure ProcessFinishedOrders(): Boolean
+    begin
+        ShopifySetup.GetRecordOnce(false);
+        exit(ShopifySetup."Post on Completion");
+    end;
+
+    procedure CreatePmtLinesOnOrderImport(): Boolean
+    begin
+        ShopifySetup.GetRecordOnce(false);
+        exit(ShopifySetup."Get Payment Lines From Shopify" = ShopifySetup."Get Payment Lines From Shopify"::ON_ORDER_IMPORT);
     end;
 
     procedure IsSendNegativeInventory(): Boolean
