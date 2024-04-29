@@ -120,19 +120,38 @@ page 6184553 "NPR Spfy Integration Setup"
                         Enabled = SalesOrderIntegrationIsEnabled;
                         Importance = Additional;
                     }
-                    field("Send Order Fulfillments"; Rec."Send Order Fulfillments")
+                    field("Get Payment Lines From Shopify"; Rec."Get Payment Lines From Shopify")
                     {
-                        ToolTip = 'Specifies whether order fulfillment requests are to be sent from BC to Shopify. Order fulfillment requests are sent for sales orders posted as shipped';
+                        ToolTip = 'Specifies when the system should retrieve order payment information from Shopify and create sales order payment lines in BC. This can be when the order is first imported or just before the payment capture requests are sent to Shopify.';
                         ApplicationArea = NPRShopify;
                         Enabled = SalesOrderIntegrationIsEnabled;
-                        Visible = false;
+                        Importance = Additional;
+                    }
+                    field("Post on Completion"; Rec."Post on Completion")
+                    {
+                        ToolTip = 'Specifies whether the system should automatically post the sales order in BC when the associated Shopify order is marked as closed in Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = SalesOrderIntegrationIsEnabled;
+                        Importance = Additional;
+                    }
+                    field("Delete on Cancellation"; Rec."Delete on Cancellation")
+                    {
+                        ToolTip = 'Specifies whether the system should automatically delete the sales order in BC when the associated Shopify order is cancelled in Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = SalesOrderIntegrationIsEnabled;
+                        Importance = Additional;
+                    }
+                    field("Send Order Fulfillments"; Rec."Send Order Fulfillments")
+                    {
+                        ToolTip = 'Specifies whether order fulfillment requests are to be sent from BC to Shopify. Order fulfillment requests are sent for sales orders posted as shipped.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = SalesOrderIntegrationIsEnabled;
                     }
                     field("Send Payment Capture Requests"; Rec."Send Payment Capture Requests")
                     {
-                        ToolTip = 'Specifies whether payment capture requests are to be sent from BC to Shopify. Payment capture requests are sent for sales orders posted as invoiced';
+                        ToolTip = 'Specifies whether payment capture requests are to be sent from BC to Shopify. Payment capture requests are sent for sales orders posted as invoiced.';
                         ApplicationArea = NPRShopify;
                         Enabled = SalesOrderIntegrationIsEnabled;
-                        Visible = false;
                     }
                     field("Send Close Order Requets"; Rec."Send Close Order Requets")
                     {
