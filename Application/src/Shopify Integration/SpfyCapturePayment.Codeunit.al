@@ -13,13 +13,12 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     trigger OnRun()
     var
         Success: Boolean;
-        YourRef: Text[35];
     begin
         Rec.TestField("Table No.", Rec."Record ID".TableNo);
         case Rec."Table No." of
             Database::"Sales Invoice Header":
                 begin
-                    Success := UpdatePmtLinesAndScheduleCapture(Rec, YourRef, true, false);
+                    Success := UpdatePmtLinesAndScheduleCapture(Rec, true, false);
                     Rec.Modify();
                     Commit();
                     if not Success then
@@ -29,17 +28,17 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                 begin
                     case Rec.Type of
                         Rec.type::Insert:
-                            CaptureShopifyPayment(Rec);
+                            CaptureShopifyPayment(Rec, true);
                         Rec.type::Delete:
-                            RefundShopifyPayment(Rec);
+                            RefundShopifyPayment(Rec, true);
                     end;
                 end;
         end;
     end;
 
-    local procedure CaptureShopifyPayment(var NcTask: Record "NPR Nc Task")
+    internal procedure CaptureShopifyPayment(var NcTask: Record "NPR Nc Task"; SaveToDb: Boolean)
     var
-        SalesInvPmtLine: Record "NPR Magento Payment Line";
+        PaymentLine: Record "NPR Magento Payment Line";
         RecRef: RecordRef;
         Success: Boolean;
     begin
@@ -51,24 +50,26 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if PrepareShopifyTransactionRequest(NcTask, 0) then
             Success := SpfyIntegrationMgt.SendTransactionRequest(NcTask);
 
-        if Success then begin
-            RecRef.Get(NcTask."Record ID");
-            RecRef.SetTable(SalesInvPmtLine);
-            if SalesInvPmtLine.Find() then begin
-                SalesInvPmtLine."Date Captured" := Today;
-                SalesInvPmtLine.Modify();
+        if SaveToDb then begin
+            if Success then begin
+                RecRef.Get(NcTask."Record ID");
+                RecRef.SetTable(PaymentLine);
+                if PaymentLine.Find() then begin
+                    PaymentLine."Date Captured" := Today;
+                    PaymentLine.Modify();
+                end;
             end;
+            NcTask.Modify();
+            Commit();
         end;
 
-        NcTask.Modify();
-        Commit();
         if not Success then
             Error(GetLastErrorText);
     end;
 
-    local procedure RefundShopifyPayment(var NcTask: Record "NPR Nc Task")
+    internal procedure RefundShopifyPayment(var NcTask: Record "NPR Nc Task"; SaveToDb: Boolean)
     var
-        SalesInvPmtLine: Record "NPR Magento Payment Line";
+        PaymentLine: Record "NPR Magento Payment Line";
         RecRef: RecordRef;
         Success: Boolean;
     begin
@@ -80,17 +81,19 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if PrepareShopifyTransactionRequest(NcTask, 1) then
             Success := SpfyIntegrationMgt.SendTransactionRequest(NcTask);
 
-        if Success then begin
-            RecRef.Get(NcTask."Record ID");
-            RecRef.SetTable(SalesInvPmtLine);
-            if SalesInvPmtLine.Find() then begin
-                SalesInvPmtLine."Date Refunded" := Today;
-                SalesInvPmtLine.Modify();
+        if SaveToDb then begin
+            if Success then begin
+                RecRef.Get(NcTask."Record ID");
+                RecRef.SetTable(PaymentLine);
+                if PaymentLine.Find() then begin
+                    PaymentLine."Date Refunded" := Today;
+                    PaymentLine.Modify();
+                end;
             end;
+            NcTask.Modify();
+            Commit();
         end;
 
-        NcTask.Modify();
-        Commit();
         if not Success then
             Error(GetLastErrorText);
     end;
@@ -98,7 +101,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     [TryFunction]
     local procedure PrepareShopifyTransactionRequest(var NcTask: Record "NPR Nc Task"; RequestType: Option Capture,Refund)
     var
-        SalesInvPmtLine: Record "NPR Magento Payment Line";
+        PaymentLine: Record "NPR Magento Payment Line";
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
@@ -112,24 +115,24 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'PrepareCaptureRequest'));
 
         RecRef.Get(NcTask."Record ID");
-        RecRef.SetTable(SalesInvPmtLine);
-        if not IsShopifyPaymentLine(SalesInvPmtLine) then
-            Error(IsNotShopifyPmtLineErr, SalesInvPmtLine.RecordId());
-        TransactionID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvPmtLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        RecRef.SetTable(PaymentLine);
+        if not IsShopifyPaymentLine(PaymentLine) then
+            Error(IsNotShopifyPmtLineErr, PaymentLine.RecordId());
+        TransactionID := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if TransactionID = '' then
-            Error(IsNotShopifyPmtLineErr, SalesInvPmtLine.RecordId());
+            Error(IsNotShopifyPmtLineErr, PaymentLine.RecordId());
         case RequestType of
             RequestType::Capture:
-                SalesInvPmtLine.TestField("Date Captured", 0D);
+                PaymentLine.TestField("Date Captured", 0D);
             RequestType::Refund:
-                SalesInvPmtLine.TestField("Date Refunded", 0D);
+                PaymentLine.TestField("Date Refunded", 0D);
         end;
-        SalesInvPmtLine.TestField("Payment Gateway Code");
-        if not SpfyPaymentGateway.Get(SalesInvPmtLine."Payment Gateway Code") then
+        PaymentLine.TestField("Payment Gateway Code");
+        if not SpfyPaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             SpfyPaymentGateway.Init();
 
         JChildObject.Add('currency', SpfyPaymentGateway."Currency Code");
-        JChildObject.Add('amount', SalesInvPmtLine.Amount);
+        JChildObject.Add('amount', PaymentLine.Amount);
         JChildObject.Add('kind', Format(RequestType, 0, 1));
         JChildObject.Add('parent_id', TransactionID);
         JObject.Add('transaction', JChildObject);
@@ -137,7 +140,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         JObject.WriteTo(OutStr);
     end;
 
-    local procedure UpdatePmtLinesAndScheduleCapture(var NcTask: Record "NPR Nc Task"; var YourRef: text[35]; ScheduleCapture: Boolean; StopOnRequestError: Boolean) Success: Boolean
+    internal procedure UpdatePmtLinesAndScheduleCapture(var NcTask: Record "NPR Nc Task"; ScheduleCapture: Boolean; StopOnRequestError: Boolean) Success: Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
@@ -229,10 +232,6 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                                 InitCreditCardPaymentLine(JToken, NcTask."Store Code", PaymentLineParam, PaymentLine);
                                 PaymentLine."No." := ShopifyTransactionID;
                                 PaymentLine.Insert(true);
-
-#pragma warning disable AA0139
-                                YourRef := JsonHelper.GetJText(JToken, 'receipt.payment_id', MaxStrLen(SalesHeader."Your Reference"), false);
-#pragma warning restore AA0139
                             end;
                             SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionID, false);
 
@@ -330,13 +329,13 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         exit(true);
     end;
 
-    local procedure SchedulePmtLineProcessing(ShopifyStoreCode: Code[20]; SalesInvPmtLine: Record "NPR Magento Payment Line"; OrderID: Text[30]; TaskType: Option)
+    local procedure SchedulePmtLineProcessing(ShopifyStoreCode: Code[20]; PaymentLine: Record "NPR Magento Payment Line"; OrderID: Text[30]; TaskType: Option)
     var
         NcTask: Record "NPR Nc Task";
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
         RecRef: RecordRef;
     begin
-        RecRef.GetTable(SalesInvPmtLine);
+        RecRef.GetTable(PaymentLine);
         SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, OrderID, TaskType, NcTask);
     end;
 
@@ -373,29 +372,6 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             exit(false);
         exit(PaymentGateway."Enable Capture" and (PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Shopify));
     end;
-
-    /*
-    local procedure CompletelyInvoiced(PaymentLine: Record "NPR Magento Payment Line"): Boolean
-    var
-        SalesHeader: Record "Sales Header";
-        SalesInvHeader: Record "Sales Invoice Header";
-    begin
-        case PaymentLine."Document Table No." of
-            Database::"Sales Invoice Header":
-                begin
-                    SalesInvHeader.Get(PaymentLine."Document No.");
-                    if SalesInvHeader."Order No." = '' then
-                        exit(true);
-                    if not SalesHeader.Get(SalesHeader."Document Type"::Order, SalesInvHeader."Order No.") then
-                        exit(true);
-                    SalesHeader.CalcFields("Shipped Not Invoiced", "Completely Shipped");
-                    exit(not SalesHeader."Shipped Not Invoiced" and SalesHeader."Completely Shipped");
-                end;
-        end;
-
-        exit(true);
-    end;
-    */
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', true, false)]
     local procedure ScheduleCaptureShopifyPayment(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")

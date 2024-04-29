@@ -10,10 +10,14 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShopifyStore: Record "NPR Spfy Store";
         OrderStatus: Option Open,Closed,Cancelled;
         StartedAt: DateTime;
+        CancelledOrderProcessingEnabled: Boolean;
+        ClosedOrderProcessingEnabled: Boolean;
         IntegrationIsNotEnabledErr: Label 'Sales Order integration is not enabled. Please enable it in Shopify Integration Setup, or disable this Job Queue Entry.';
     begin
         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders") then
             Error(IntegrationIsNotEnabledErr);
+        CancelledOrderProcessingEnabled := SpfyIntegrationMgt.ProcessCancelledOrders();
+        ClosedOrderProcessingEnabled := SpfyIntegrationMgt.ProcessFinishedOrders();
 
         ShopifyStore.SetRange(Enabled, true);
         if ShopifyStore.FindSet() then
@@ -22,8 +26,10 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 StartedAt := RoundDateTime(CurrentDateTime(), 1000, '<');
 
                 DownloadOrders(ShopifyStore, OrderStatus::Open);
-                DownloadOrders(ShopifyStore, OrderStatus::Cancelled);
-                DownloadOrders(ShopifyStore, OrderStatus::Closed);
+                if CancelledOrderProcessingEnabled then
+                    DownloadOrders(ShopifyStore, OrderStatus::Cancelled);
+                if ClosedOrderProcessingEnabled then
+                    DownloadOrders(ShopifyStore, OrderStatus::Closed);
 
                 ShopifyStore."Last Orders Imported At" := StartedAt;
                 ShopifyStore.Modify();
@@ -500,6 +506,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SetSellToCustomer(NpEcStore, Order, SalesHeader);
         SetShipToCustomer(NpEcStore, Order, SalesHeader);
         SalesHeader."External Document No." := CopyStr(ShopifyStoreCode + '-' + OrderNo, 1, MaxStrLen(SalesHeader."External Document No."));
+        SalesHeader."NPR External Order No." := CopyStr(SalesHeader."External Document No.", 1, MaxStrLen(SalesHeader."NPR External Order No."));
         SalesHeader."Prices Including VAT" := true;
         SalesHeader.Validate("Currency Code", GetCurrCode(Order));
 
@@ -527,7 +534,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         IF NpEcStore."Global Dimension 2 Code" <> '' then
             SalesHeader.Validate("Shortcut Dimension 2 Code", NpEcStore."Global Dimension 2 Code");
 
-        SetAdditionalFields(Order, SalesHeader);
         InsertComments(Order, SalesHeader);
         SpfyIntegrationEvents.OnUpdateSalesHeader(Order, SalesHeader);
         SalesHeader.Modify(true);
@@ -769,6 +775,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 #pragma warning restore AA0139
             SalesHeader.Validate("Sell-to Country/Region Code", GetCountryCode(NpEcStore, BillingAddress, 'country_code', false));
         end;
+        if SalesHeader."Sell-to Contact" = '' then
+            SalesHeader."Sell-to Contact" := SalesHeader."Sell-to Customer Name";
 
         SalesHeader."Bill-to Name" := SalesHeader."Sell-to Customer Name";
         SalesHeader."Bill-to Name 2" := SalesHeader."Sell-to Customer Name 2";
@@ -1030,81 +1038,24 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     procedure InsertPaymentLines(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header")
     var
+        NcTask: Record "NPR Nc Task";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
         Handled: Boolean;
     begin
-        SpfyIntegrationEvents.OnInsertPaymentLines(SalesHeader, Handled);
-    end;
-
-    internal procedure InsertPaymentLineRetailVoucher(SalesHeader: Record "Sales Header"; var PaymentLineTemp: Record "NPR Magento Payment Line")
-    var
-        NpRvVoucher: Record "NPR NpRv Voucher";
-        NpRvSalesLine: Record "NPR NpRv Sales Line";
-        PaymentLine: Record "NPR Magento Payment Line";
-        SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
-        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
-        LineNo: Integer;
-    begin
-        PaymentLineTemp.SetFilter(Description, '<>%1', '');
-        if not PaymentLineTemp.FindFirst() then
-            exit;
-
-        repeat
-            SpfyRetailVoucherMgt.GetVoucherNo(CopyStr(PaymentLineTemp.Description, 1, 30), NpRvVoucher);
-
-            NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
-            NpRvSalesLine.SetRange("External Document No.", SalesHeader."NPR External Order No.");
-            NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
-            NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
-            NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
-            if not NpRvSalesLine.FindFirst() then begin
-                NpRvSalesLine.Init();
-                NpRvSalesLine.Id := CreateGuid();
-                NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
-                NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
-                NpRvSalesLine."Document Type" := SalesHeader."Document Type";
-                NpRvSalesLine."Document No." := SalesHeader."No.";
-                NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
-                NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
-                NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
-                NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
-                NpRvSalesLine.Description := NpRvVoucher.Description;
-                NpRvSalesLine.Insert(true);
+        SpfyIntegrationEvents.OnBeforeInsertPaymentLines(ShopifyStoreCode, Order, SalesHeader, Handled);
+        if not Handled then
+            if SpfyIntegrationMgt.CreatePmtLinesOnOrderImport() then begin
+                Clear(NcTask);
+                NcTask."Record ID" := SalesHeader.RecordId();
+                NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
+                NcTask."Store Code" := ShopifyStoreCode;
+                SpfyCapturePayment.UpdatePmtLinesAndScheduleCapture(NcTask, false, false);
             end;
 
-            LineNo += 10000;
-            PaymentLine.Init();
-            PaymentLine."Document Table No." := DATABASE::"Sales Header";
-            PaymentLine."Document Type" := SalesHeader."Document Type";
-            PaymentLine."Document No." := SalesHeader."No.";
-            PaymentLine."Line No." := LineNo;
-            PaymentLine."Payment Type" := PaymentLine."Payment Type"::Voucher;
-            PaymentLine.Description := NpRvVoucher.Description;
-            PaymentLine."Account No." := NpRvVoucher."Account No.";
-            PaymentLine."No." := NpRvVoucher."Reference No.";
-            PaymentLine."Posting Date" := SalesHeader."Posting Date";
-            PaymentLine."Source Table No." := DATABASE::"NPR NpRv Voucher";
-            PaymentLine."Source No." := NpRvVoucher."No.";
-            PaymentLine."External Reference No." := SalesHeader."NPR External Order No.";
-            PaymentLine.Amount := PaymentLineTemp.Amount;
-            PaymentLine.Insert();
-
-            NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
-            NpRvSalesLine."Document Type" := SalesHeader."Document Type"::Order;
-            NpRvSalesLine."Document No." := SalesHeader."No.";
-            NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
-            NpRvSalesLine.Modify(true);
-
-            NpRvSalesDocMgt.ApplyPayment(SalesHeader, NpRvSalesLine);
-        until PaymentLineTemp.Next() = 0;
-    end;
-
-    local procedure SetAdditionalFields(Order: JsonToken; var SalesHeader: Record "Sales Header")
-    var
-        BillingAddress: JsonToken;
-    begin
-        SalesHeader."NPR External Order No." := CopyStr(SalesHeader."External Document No.", 1, MaxStrLen(SalesHeader."NPR External Order No."));
-        SalesHeader."Sell-to Contact" := SalesHeader."Sell-to Customer Name";
-        Order.SelectToken('billing_address', BillingAddress);
+        Handled := false;
+        SpfyIntegrationEvents.OnInsertPaymentLines(SalesHeader, Handled);
+        SpfyIntegrationEvents.OnAfterInsertPaymentLines(ShopifyStoreCode, Order, SalesHeader, Handled);
     end;
 
     local procedure CalcLineDiscountAmount(OrderLine: JsonToken; SalesLine: Record "Sales Line") LineDiscountAmount: Decimal

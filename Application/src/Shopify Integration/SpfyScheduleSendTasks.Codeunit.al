@@ -119,7 +119,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask."Task Processor Code" := GetShopifyTaskProcessorCode();
         NcTask.Type := TaskType;
         NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
-        NcTask."Table No." := RecRef.Number;
+        NcTask."Table No." := RecRef.Number();
         NcTask."Table Name" := CopyStr(RecRef.Name(), 1, MaxStrLen(NcTask."Table Name"));
         NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
         NcTask."Record ID" := RecRef.RecordId();

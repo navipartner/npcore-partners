@@ -119,11 +119,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     TempNcTask."Store Code" := NcTask."Store Code";
                     TempNcTask."Data Output" := NcTaskOutput.Data;
                     TempNcTask."Record Value" := CopyStr(NcTaskOutput.Name, 1, MaxStrLen(TempNcTask."Record Value"));
-                    TempNcTask.Insert();
                     if SpfyIntegrationMgt.SendInvetoryItemUpdateRequest(TempNcTask, ShopifyInventoryItemID) then
                         NcTaskOutput.Status := NcTaskOutput.Status::Success;
                     NcTaskOutput.Response := TempNcTask.Response;
-                    TempNcTask.Delete();
                 end;
                 if NcTaskOutput.Status = NcTaskOutput.Status::Success then
                     Success := true
@@ -763,7 +761,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
         TempNcTask."Data Output".CreateOutStream(OStream);
         RequestJson.WriteTo(OStream);
-        TempNcTask.Insert();
 
         ClearLastError();
         Success := SpfyIntegrationMgt.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
@@ -785,12 +782,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 if SkuFilterString <> '' then begin
                     Clear(RequestJson);
                     RequestJson.Add('query', '{ products(first: 1, query: "' + SkuFilterString + '") { edges { node { id title }}}}');
-                    TempNcTask.Delete();
-                    TempNcTask.Init();
+                    Clear(TempNcTask);
                     TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
                     TempNcTask."Data Output".CreateOutStream(OStream);
                     RequestJson.WriteTo(OStream);
-                    TempNcTask.Insert();
 
                     ClearLastError();
                     Success := SpfyIntegrationMgt.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);

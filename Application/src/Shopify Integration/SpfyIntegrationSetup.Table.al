@@ -112,6 +112,25 @@ table 6150807 "NPR Spfy Integration Setup"
                 OrderMgt.SetupJobQueues();
             end;
         }
+        field(61; "Post on Completion"; Boolean)
+        {
+            Caption = 'Post on Completion';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(62; "Delete on Cancellation"; Boolean)
+        {
+            Caption = 'Delete on Cancellation';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(65; "Get Payment Lines From Shopify"; Option)
+        {
+            Caption = 'Get Payment Lines From Shopify';
+            DataClassification = CustomerContent;
+            OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
+            OptionCaption = 'Before Capture,On Order Import';
+        }
         field(70; "Send Order Fulfillments"; Boolean)
         {
             Caption = 'Send Order Fulfillments';
