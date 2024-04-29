@@ -39,7 +39,18 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeInsertPaymentLines(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+    end;
+
+    [Obsolete('Use event OnAfterInsertPaymentLines instead', 'NPR33.0')]
+    [IntegrationEvent(false, false)]
     internal procedure OnInsertPaymentLines(var SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInsertPaymentLines(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin
     end;
 
