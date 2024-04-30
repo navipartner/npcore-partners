@@ -364,8 +364,6 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
         AdmissionEntryNo: Integer;
-        EventDate: Date;
-        EventTime: Time;
     begin
 
         if (AdmissionCode = '') then
@@ -378,14 +376,14 @@
             RaiseError(StrSubstNo(INVALID_ADMISSION_CODE, Ticket."External Ticket No.", AdmissionCode), INVALID_ADMISSION_CODE_NO);
 
         ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, false);
-        ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime);
+        ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDateTime);
 
         AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDateTime);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
         ValidateTicketConstraintsExceeded(TicketAccessEntryNo);
-        ValidateAdmissionDurationExceeded(TicketAccessEntryNo, EventDate, EventTime);
+        ValidateAdmissionDurationExceeded(TicketAccessEntryNo, EventDateTime);
 
         AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
         if (TicketBom."POS Sale May Exceed Capacity") then
@@ -1571,16 +1569,16 @@
         end;
     end;
 
-    local procedure ValidateScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time)
+    local procedure ValidateScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; ReferenceTime: DateTime)
     var
         ReasonText: Text;
         ReasonCode: Text;
     begin
-        if (not (CheckScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDate, EventTime, ReasonText, ReasonCode))) then
+        if (not (CheckScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, ReferenceTime, ReasonText, ReasonCode))) then
             RaiseError(ReasonText, ReasonCode);
     end;
 
-    local procedure CheckScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; EventDate: Date; EventTime: Time; var ReasonText: Text; var ReasonCode: Text): Boolean
+    local procedure CheckScheduleReference(TicketAccessEntryNo: Integer; AdmissionCode: Code[20]; var AdmissionScheduleEntryNo: Integer; ReferenceTime: DateTime; var ReasonText: Text; var ReasonCode: Text): Boolean
     var
         Admission: Record "NPR TM Admission";
         AdmissionSchEntry: Record "NPR TM Admis. Schedule Entry";
@@ -1588,13 +1586,11 @@
         ReservationAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        ReferenceTime: DateTime;
         AdmissionStartTime: DateTime;
         AdmissionEndTime: DateTime;
         DurationUntilTime: DateTime;
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
     begin
-        ReferenceTime := CreateDateTime(EventDate, EventTime);
 
         // Requirements, should be checked elsewhere
         TicketAccessEntry.Get(TicketAccessEntryNo);
@@ -1691,7 +1687,7 @@
                 // Get the current admission schedule
                 AdmissionScheduleEntryNo := GetCurrentScheduleEntry(Ticket, AdmissionCode, true);
                 if (not AdmissionSchEntry.Get(AdmissionScheduleEntryNo)) then begin
-                    ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate);
+                    ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, ReferenceTime);
                     ReasonCode := ADM_NOT_OPEN_NO2;
                     exit(false);
                 end;
@@ -1699,7 +1695,7 @@
         end;
 
         if (AdmissionSchEntry."Admission Is" <> AdmissionSchEntry."Admission Is"::Open) then begin
-            ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, EventDate);
+            ReasonText := StrSubstNo(ADM_NOT_OPEN, AdmissionCode, ReferenceTime);
             ReasonCode := ADM_NOT_OPEN_NO;
             exit(false);
         end;
@@ -3113,15 +3109,15 @@
         exit(true);
     end;
 
-    local procedure ValidateAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDate: Date; EventTime: Time)
+    local procedure ValidateAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDateTime: DateTime)
     var
         ErrorMessage: Text;
     begin
-        if (CheckAdmissionDurationExceeded(TicketAccessEntryNo, EventDate, EventTime, ErrorMessage)) then
+        if (CheckAdmissionDurationExceeded(TicketAccessEntryNo, EventDateTime, ErrorMessage)) then
             RaiseError(ErrorMessage, DURATION_EXCEEDED_NO);
     end;
 
-    local procedure CheckAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDate: Date; EventTime: Time; var ErrorMessage: Text): Boolean
+    local procedure CheckAdmissionDurationExceeded(TicketAccessEntryNo: Integer; EventDateTime: DateTime; var ErrorMessage: Text): Boolean
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DurationLimitDateTime: DateTime;
@@ -3132,7 +3128,7 @@
         if (DurationLimitDateTime = CreateDateTime(0D, 0T)) then
             exit(false);
 
-        if (CreateDateTime(EventDate, EventTime) > DurationLimitDateTime) then begin
+        if (EventDateTime > DurationLimitDateTime) then begin
             ErrorMessage := StrSubstNo(DURATION_EXCEEDED, TicketAccessEntry."Admission Code", DurationLimitDateTime);
             exit(true);
         end;
