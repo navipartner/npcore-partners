@@ -136,6 +136,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DimPopupEvery'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PrintCreditVoucherOnSale'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'EmailReceiptOnSale'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PrintReceiptOnSale'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
@@ -515,7 +516,9 @@
                     'PrintCreditVoucherOnSale':
                         exit('NPR-PrintCreditVoucherOnSale-20231204');
                     'EmailReceiptOnSale':
-                        exit('NPR-EmailReceiptOnSale-20231204');
+                        exit('NPR-EmailReceiptOnSale-20240430');
+                    'PrintReceiptOnSale':
+                        exit('NPR-PrintReceiptOnSale-20240430');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of
