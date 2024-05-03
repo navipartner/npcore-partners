@@ -12,7 +12,7 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
 
 
     [Test]
-    [HandlerFunctions('PageHandler_MemberInfoCapture')]
+    [HandlerFunctions('PageHandler_MemberInfoCapture,PageHandler_SelectMM')]
 
     procedure CreateMember()
     var
@@ -21,6 +21,7 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
         MembershipSalesSetupItemNumber: Code[20];
         POSActCreateMemberB: Codeunit "NPR POS Action Create Member B";
         SalePOS: Record "NPR POS Sale";
+        SelectMembershipPage: Page "NPR MM Create Membership";
     begin
         //[GIVEN] given
         LibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore);
@@ -33,6 +34,10 @@ codeunit 85119 "NPR POS Act.CreateMember Tests"
         Assert.IsTrue(SalePOS.Name = InfoCapture."First Name" + ' ' + InfoCapture."Middle Name" + ' ' + InfoCapture."Last Name", 'Name inserted');
         Assert.IsTrue(SalePOS.Address = InfoCapture.Address, 'Address inserted');
         Assert.IsTrue(SalePOS."Post Code" = InfoCapture."Post Code Code", 'Post Code inserted.');
+
+        // The SelectMembershipPage is only opened if there are more than 1 membership sales items (empty vs developer environment)
+        // it is not part of the test, but the test fails if the page handler is not invoked.
+        SelectMembershipPage.RunModal();
     end;
 
     [ModalPageHandler]

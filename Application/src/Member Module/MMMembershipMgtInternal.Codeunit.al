@@ -4190,6 +4190,7 @@
         Member.Gender := MemberInfoCapture.Gender;
         Member.Birthday := MemberInfoCapture.Birthday;
         Member."E-Mail News Letter" := MemberInfoCapture."News Letter";
+        Member.PreferredLanguageCode := MemberInfoCapture.PreferredLanguageCode;
 
         Member."Notification Method" := MemberInfoCapture."Notification Method";
 

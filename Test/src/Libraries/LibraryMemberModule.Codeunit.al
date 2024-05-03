@@ -985,8 +985,14 @@ codeunit 85014 "NPR Library - Member Module"
     procedure SetupCommunity_Simple(): Code[20]
     var
         MemberCommunity: Record "NPR MM Member Community";
-
+        Language: Record "NPR MM Language";
     begin
+
+        Language.LanguageCode := 'DAN';
+        if (Language.Insert()) then;
+
+        Language.LanguageCode := 'ENU';
+        if (Language.Insert()) then;
 
         exit(CreateCommunitySetup(GenerateCode20(),
             MemberCommunity."External No. Search Order"::CARDNO,
@@ -1059,6 +1065,7 @@ codeunit 85014 "NPR Library - Member Module"
         InfoCapture.Birthday := CalcDate('<-50Y+7D>', Today());
         InfoCapture."News Letter" := InfoCapture."News Letter"::YES;
         InfoCapture."Notification Method" := InfoCapture."Notification Method"::EMAIL;
+        InfoCapture.PreferredLanguageCode := 'ENU';
     end;
 
 }

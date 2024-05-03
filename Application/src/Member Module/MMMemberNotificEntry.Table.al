@@ -222,6 +222,11 @@
             Caption = 'Country';
             DataClassification = CustomerContent;
         }
+        field(135; PreferredLanguageCode; Code[10])
+        {
+            Caption = 'Preferred Language';
+            DataClassification = CustomerContent;
+        }
         field(140; Birthday; Date)
         {
             Caption = 'Birthday';

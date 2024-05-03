@@ -78,6 +78,11 @@
                     ToolTip = 'Specifies the value of the Member Default Country Code field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(MemberDefaultLanguageCode; Rec.MemberDefaultLanguageCode)
+                {
+                    ToolTip = 'Specifies the value of the Member Default Language Code field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Create Renewal Notifications"; Rec."Create Renewal Notifications")
                 {
 
@@ -196,6 +201,15 @@
                 RunObject = Page "NPR MM Membership Notific.";
 
                 ToolTip = 'Executes the Notifications action';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
+            action(LanguageSetup)
+            {
+                Caption = 'Language Setup';
+                Image = Language;
+                RunObject = Page "NPR MM Languages";
+
+                ToolTip = 'Executes the Language Setup action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             action("Foreign Membership Setup")

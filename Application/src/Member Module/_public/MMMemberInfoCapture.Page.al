@@ -504,6 +504,12 @@
                     ToolTip = 'Specifies the value of the News Letter field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(PreferredLanguage; Rec.PreferredLanguageCode)
+                {
+                    Importance = Additional;
+                    ToolTip = 'Specifies the value of the Preferred Language field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("GDPR Approval"; Rec."GDPR Approval")
                 {
 
@@ -1314,6 +1320,9 @@
 
                 if (Rec."Country Code" = '') then
                     Rec."Country Code" := MemberCommunity.MemberDefaultCountryCode;
+
+                if (Rec.PreferredLanguageCode = '') then
+                    Rec.PreferredLanguageCode := MemberCommunity.MemberDefaultLanguageCode;
 
                 _ShowNewCardSection := (MembershipSetup."Loyalty Card" = MembershipSetup."Loyalty Card"::YES);
 

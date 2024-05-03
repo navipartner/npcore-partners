@@ -199,6 +199,12 @@
                     HLMemberMgt.CheckAndConfirmHLResubscription(Rec);
             end;
         }
+        field(65; PreferredLanguageCode; Code[10])
+        {
+            Caption = 'Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Language";
+        }
         field(85; "Created Datetime"; DateTime)
         {
             Caption = 'Created Datetime';

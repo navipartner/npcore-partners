@@ -90,6 +90,13 @@
             TableRelation = "Country/Region";
             ValidateTableRelation = true;
         }
+        field(41; MemberDefaultLanguageCode; Code[10])
+        {
+            Caption = 'Member Default Language Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Language";
+            ValidateTableRelation = true;
+        }
         field(60; "Create Renewal Notifications"; Boolean)
         {
             Caption = 'Create Renewal Notifications';

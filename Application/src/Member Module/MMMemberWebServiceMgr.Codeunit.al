@@ -1125,6 +1125,7 @@
 
     local procedure GetXmlMembershipMemberInfo(MemberRequest: XmlElement; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     var
+        Language: Record "NPR MM Language";
         GenderText: Text[30];
         CrmText: Text[30];
         GdprText: Text[30];
@@ -1202,6 +1203,12 @@
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::NO;
             else
                 MemberInfoCapture."News Letter" := MemberInfoCapture."News Letter"::NOT_SPECIFIED;
+        end;
+
+        MemberInfoCapture.PreferredLanguageCode := GetXmlText10(MemberRequest, 'preferred_language', false);
+        if (MemberInfoCapture.PreferredLanguageCode <> '') then begin
+            if (not Language.Get(MemberInfoCapture.PreferredLanguageCode)) then
+                MemberInfoCapture.PreferredLanguageCode := '';
         end;
 
         MemberInfoCapture."User Logon ID" := UpperCase(GetXmlText80(MemberRequest, 'username', false));
@@ -1425,6 +1432,11 @@
         WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR MM Member WebService", 'member_services', true);
     end;
 #pragma warning disable AA0139
+    local procedure GetXmlText10(Element: XmlElement; NodePath: Text; Required: Boolean): Text[10]
+    begin
+        exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 10, Required));
+    end;
+
     local procedure GetXmlText20(Element: XmlElement; NodePath: Text; Required: Boolean): Text[20]
     begin
         exit(NpXmlDomMgt.GetXmlText(Element, NodePath, 20, Required));
