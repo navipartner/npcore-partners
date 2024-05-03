@@ -8,11 +8,11 @@ codeunit 6184762 "NPR Print RetJnl HTTP Label"
 
     trigger OnRun()
     var
-        This: Codeunit "NPR Print RetJnl HTTP Label";
+        _this: Codeunit "NPR Print RetJnl HTTP Label";
         LabelManagement: Codeunit "NPR Label Management";
     begin
-        BindSubscription(This);
-        This.SetPrintJobId(Rec."Print Job ID");
+        BindSubscription(_this);
+        _this.SetPrintJobId(Rec."Print Job ID");
         LabelManagement.PrintRetailJournal(Rec, Enum::"NPR Report Selection Type"::"Price Label".AsInteger());
     end;
 
