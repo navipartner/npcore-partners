@@ -87,6 +87,46 @@ codeunit 85016 "NPR MM API Smoke Test"
         CreateMembership();
         MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
 
+        // [TEST]
+        ApiStatus := MemberApiLibrary.AddMembershipMember(_LastMembership, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+
+        _LastMember.Get(MemberEntryNo);
+        Assert.AreEqual(MemberInfoCapture.PreferredLanguageCode, _LastMember.PreferredLanguageCode, 'The preferred language code is not set to ENU.');
+        Assert.AreEqual(MemberInfoCapture."First Name", _LastMember."First Name", 'The first name is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture."Middle Name", _LastMember."Middle Name", 'The middle name is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture."Last Name", _LastMember."Last Name", 'The last name is not set correctly.');
+        Assert.AreEqual(LowerCase(MemberInfoCapture."E-Mail Address"), _LastMember."E-Mail Address", 'The email address is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture."Phone No.", _LastMember."Phone No.", 'The phone number is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture.Birthday, _LastMember.Birthday, 'The birth date is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture.City, _LastMember.City, 'The city is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture.Country, _LastMember.Country, 'The country is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture."Post Code Code", _LastMember."Post Code Code", 'The postal code is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture.PreferredLanguageCode, _LastMember.PreferredLanguageCode, 'The preferred language code is not set correctly.');
+        Assert.AreEqual(MemberInfoCapture.Gender, _LastMember.Gender, 'The gender is not set correctly.');
+
+        _LastMemberCard.SetFilter("Membership Entry No.", '=%1', _LastMembership."Entry No.");
+        _LastMemberCard.SetFilter("Member Entry No.", '=%1', _LastMember."Entry No.");
+        _LastMemberCard.FindFirst();
+
+    end;
+
+    procedure AddMembershipMemberWorker()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberEntryNo: Integer;
+    begin
+
+        Initialize();
+        CreateMembership();
+        MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
+
         if (_AddMemberWithFirstName <> '') then
             MemberInfoCapture."First Name" := _AddMemberWithFirstName;
 
@@ -115,7 +155,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
@@ -152,7 +192,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 
@@ -218,7 +258,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ClearLastError();
@@ -248,7 +288,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ClearLastError();
@@ -281,7 +321,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
         MemberInfoCapture."External Member No" := _LastMember."External Member No.";
@@ -327,7 +367,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST]
         if (_LastMember.Image.HasValue()) then
@@ -357,7 +397,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ApiStatus := MemberApiLibrary.MemberValidationAPI(_LastMember."External Member No.", ScannerStation);
@@ -379,7 +419,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ApiStatus := MemberApiLibrary.MembershipValidationAPI(_LastMembership."External Membership No.", ScannerStation);
@@ -401,7 +441,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ApiStatus := MemberApiLibrary.MemberEmailExistsAPI(_LastMember."E-Mail Address");
@@ -429,7 +469,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         // [TEST 1]
         ApiStatus := MemberApiLibrary.MemberCardNumberValidationAPI(_LastMemberCard."External Card No.", ScannerStation);
@@ -457,7 +497,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         Item.Get(ItemNo);
@@ -490,7 +530,7 @@ codeunit 85016 "NPR MM API Smoke Test"
     begin
         Initialize();
         CreateMembership();
-        AddMembershipMember();
+        AddMembershipMemberWorker();
 
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         MembershipSetup.Get(_LastMembership."Membership Code");
@@ -529,7 +569,7 @@ codeunit 85016 "NPR MM API Smoke Test"
         // Create X membership with 1 member and 1 additional card
         for i := 1 to 10 do begin
             CreateMembership();
-            AddMembershipMember();
+            AddMembershipMemberWorker();
             ApiStatus := MemberApiLibrary.AddMemberCard(_LastMembership."External Membership No.", _LastMember."External Member No.", MemberCardEntryNo, ResponseMessage);
             Assert.IsTrue(ApiStatus, ResponseMessage);
         end;

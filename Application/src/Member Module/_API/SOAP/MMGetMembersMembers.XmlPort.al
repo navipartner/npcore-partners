@@ -113,6 +113,10 @@ xmlport 6060130 "NPR MM Get Members. Members"
                         fieldelement(newsletter; TempMemberInfoResponse."News Letter")
                         {
                         }
+                        fieldelement(preferred_language; TempMemberInfoResponse.PreferredLanguageCode)
+                        {
+                            XmlName = 'preferred_language';
+                        }
                         fieldelement(phoneno; TempMemberInfoResponse."Phone No.")
                         {
                         }
