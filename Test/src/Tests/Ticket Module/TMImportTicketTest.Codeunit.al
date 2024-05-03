@@ -598,6 +598,8 @@ codeunit 85174 "NPR TM ImportTicketTest"
         repeat
             Ticket.SetFilter("External Ticket No.", '=%1', TicketImportLine.PreAssignedTicketNumber);
             Ticket.FindFirst();
+            Assert.AreEqual(TicketImportLine.Amount, Ticket.AmountExclVat, Ticket.FieldCaption(AmountExclVat));
+            Assert.AreEqual(TicketImportLine.AmountInclVat, Ticket.AmountInclVat, Ticket.FieldCaption(AmountInclVat));
 
             TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
             Assert.AreEqual(TicketImportLine.TicketRequestToken, TicketRequest."Session Token ID", TicketRequest.FieldCaption("Session Token ID"));
