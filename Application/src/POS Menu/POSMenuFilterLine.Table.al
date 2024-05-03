@@ -155,18 +155,18 @@
 
     trigger OnInsert()
     var
-        This: Record "NPR POS Menu Filter Line";
+        _this: Record "NPR POS Menu Filter Line";
     begin
         if Rec."Line No." <> 0 then exit;
-        This.Reset();
-        This.SetRange("Object Type", "Object Type");
-        This.SetRange("Object Id", "Object Id");
-        This.SetRange("Filter Code", "Filter Code");
-        if This.IsEmpty then begin
+        _this.Reset();
+        _this.SetRange("Object Type", "Object Type");
+        _this.SetRange("Object Id", "Object Id");
+        _this.SetRange("Filter Code", "Filter Code");
+        if _this.IsEmpty then begin
             "Line No." := 10000;
         end else begin
-            This.FindLast();
-            "Line No." := This."Line No." + 10000;
+            _this.FindLast();
+            "Line No." := _this."Line No." + 10000;
         end;
     end;
 
