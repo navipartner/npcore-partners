@@ -268,6 +268,7 @@
         MemberNotificationEntry.City := Member.City;
         MemberNotificationEntry."Country Code" := Member."Country Code";
         MemberNotificationEntry.Country := Member.Country;
+        MemberNotificationEntry.PreferredLanguageCode := Member.PreferredLanguageCode;
         MemberNotificationEntry.Birthday := Member.Birthday;
         MemberNotificationEntry."Phone No." := Member."Phone No.";
 

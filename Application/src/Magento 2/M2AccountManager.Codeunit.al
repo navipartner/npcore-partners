@@ -1344,6 +1344,7 @@
         MemberInfoCapture.Gender := Member.Gender;
         MemberInfoCapture.Birthday := Member.Birthday;
         MemberInfoCapture."News Letter" := Member."E-Mail News Letter";
+        MemberInfoCapture.PreferredLanguageCode := Member.PreferredLanguageCode;
         MemberInfoCapture."Notification Method" := Member."Notification Method";
         MemberInfoCapture."Store Code" := CopyStr(Member."Store Code", 1, MaxStrLen(MemberInfoCapture."Store Code"));
     end;

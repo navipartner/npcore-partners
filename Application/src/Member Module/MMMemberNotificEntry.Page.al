@@ -138,6 +138,11 @@
                     ToolTip = 'Specifies the value of the Country field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(PreferredLanguage; Rec.PreferredLanguageCode)
+                {
+                    ToolTip = 'Specifies the value of the Preferred Language field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field(Birthday; Rec.Birthday)
                 {
 

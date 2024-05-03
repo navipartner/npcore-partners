@@ -169,6 +169,12 @@
             OptionCaption = ' ,Yes,No';
             OptionMembers = NOT_SPECIFIED,YES,NO;
         }
+        field(65; PreferredLanguageCode; Code[10])
+        {
+            Caption = 'Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Language";
+        }
         field(95; Description; Text[100])
         {
             Caption = 'Description';

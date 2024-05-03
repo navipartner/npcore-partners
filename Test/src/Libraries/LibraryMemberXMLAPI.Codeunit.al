@@ -165,6 +165,7 @@ codeunit 85015 "NPR Library - Member XML API"
 
         Request.Add(AddElement('notificationmethod', Format(MemberInfoCapture."Notification Method", 0, 9), NameSpace));
         Request.Add(AddElement('preassigned_contact_number', MemberInfoCapture."Contact No.", NameSpace));
+        Request.Add(AddElement('preferred_language', MemberInfoCapture.PreferredLanguageCode, NameSpace));
 
         AddMember := XmlElement.Create('addmember', NameSpace);
         AddMember.Add(Request);

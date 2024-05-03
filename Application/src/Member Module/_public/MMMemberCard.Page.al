@@ -137,6 +137,11 @@
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(PreferredLanguage; Rec.PreferredLanguageCode)
+                {
+                    ToolTip = 'Specifies the value of the Preferred Language field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Notification Method"; Rec."Notification Method")
                 {
 

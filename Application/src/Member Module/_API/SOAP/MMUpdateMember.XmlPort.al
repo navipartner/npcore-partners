@@ -102,6 +102,11 @@ xmlport 6060131 "NPR MM Update Member"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
+                    fieldelement(preferred_language; tmpMemberInfoCapture.PreferredLanguageCode)
+                    {
+                        MinOccurs = Zero;
+                        XmlName = 'preferred_language';
+                    }
                 }
                 tableelement(tmpmember; "NPR MM Member")
                 {
