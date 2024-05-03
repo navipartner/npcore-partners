@@ -924,7 +924,7 @@
         exit(1);
     end;
 
-    procedure AddSaveToWPadAndRequestNextServingWorkflow(Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup"; var PreWorkflows: JsonObject)
+    procedure AddSaveToWPadAndRequestNextServingWorkflow(Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup"; var PreWorkflows: JsonObject; var Context: Codeunit "NPR POS JSON Helper")
     var
         Item: Record Item;
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
@@ -936,6 +936,9 @@
         CustomParameters: JsonObject;
         MainParameters: JsonObject;
         ProducibleItemFound: Boolean;
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSession: Codeunit "NPR POS Session";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         if RestaurantSetup.IsEmpty() then
             exit;
@@ -953,6 +956,7 @@
             SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
             SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
+            SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             SaleLinePOS.SetFilter("No.", '<>%1', '');
             SaleLinePOS.SetLoadFields("No.");
             Item.SetLoadFields("NPR NPRE Item Routing Profile");
@@ -962,6 +966,12 @@
                 until ProducibleItemFound or (SaleLinePOS.Next() = 0);
             if not ProducibleItemFound then
                 exit;
+
+            POSSession.GetPaymentLine(POSPaymentLine);
+            POSPaymentMethod.Get(Context.GetStringParameter('paymentNo'));
+            if POSPaymentline.CalculateRemainingPaymentSuggestionInCurrentSale(POSPaymentMethod) <> 0 then
+                exit;
+
         end;
 
         MainParameters.Add('LinesToSend', 0);  //New/Updated

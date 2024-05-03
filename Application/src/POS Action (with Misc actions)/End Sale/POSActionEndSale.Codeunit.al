@@ -85,7 +85,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         EndSaleEvents: Codeunit "NPR End Sale Events";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
     begin
-        WaiterPadPOSMgt.AddSaveToWPadAndRequestNextServingWorkflow(Sale, Setup, PreWorkflows);
+        WaiterPadPOSMgt.AddSaveToWPadAndRequestNextServingWorkflow(Sale, Setup, PreWorkflows, Context);
         EndSaleEvents.OnAddPreWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, PreWorkflows);
     end;
 
