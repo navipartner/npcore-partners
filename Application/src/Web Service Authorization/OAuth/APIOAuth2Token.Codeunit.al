@@ -22,7 +22,11 @@ codeunit 6184552 "NPR API OAuth2 Token"
         if JsonObj.SelectToken('expires_in', JsonTok) then
             Lifetime := CurrentDateTime + (JsonTok.AsValue().AsInteger() * 1000);
 
+        if AccessToken.ContainsKey(Token) then
+            AccessToken.Remove(Token);
         AccessToken.Add(Token, Lifetime);
+        if ClientToken.ContainsKey(ClientId) then
+            ClientToken.Remove(ClientId);
         ClientToken.Add(ClientId, Token);
     end;
 
