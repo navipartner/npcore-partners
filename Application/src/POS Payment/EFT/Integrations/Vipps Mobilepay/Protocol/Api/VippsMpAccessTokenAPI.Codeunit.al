@@ -28,19 +28,18 @@ codeunit 6184709 "NPR Vipps Mp AccessToken API"
     end;
 
     [TryFunction]
-    [NonDebuggable]
     internal procedure GetAccessToken(VippsMpStore: Record "NPR Vipps Mp Store"; var AccessToken: Text; var ExpiresAt: DateTime)
     var
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
         Partner_client_id: Text;
         Partner_client_secret: Text;
         Partner_client_sub: Text;
     begin
         if (VippsMpStore."Partner API Enabled") then begin
             if (VippsMpStore.Sandbox) then Error('Can''t use Partner keys in Sandbox mode.');
-            Partner_client_id := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientId');
-            Partner_client_secret := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientSecret');
-            Partner_client_sub := AzureKeyVaultMgt.GetAzureKeyVaultSecret('VippsMpPartnerClientSubscribtionKey');
+            Partner_client_id := VippsMpUtil.VippsPartnerClientId();
+            Partner_client_secret := VippsMpUtil.VippsPartnerClientSecret();
+            Partner_client_sub := VippsMpUtil.VippsPartnerSubkey();
             GetAccessToken(VippsMpStore."Merchant Serial Number", Partner_client_id, Partner_client_secret, Partner_client_sub, False, AccessToken, ExpiresAt);
         end else begin
             GetAccessToken(VippsMpStore."Merchant Serial Number", VippsMpStore."Client Id", VippsMpStore."Client Secret", VippsMpStore."Client Sub. Key", VippsMpStore.Sandbox, AccessToken, ExpiresAt);
@@ -74,11 +73,11 @@ codeunit 6184709 "NPR Vipps Mp AccessToken API"
             exit;
         end;
         VippsMpUtil.InitHttpClient(Http, Sandbox);
-        Http.DefaultRequestHeaders().Add('client_id', ClientId);
-        Http.DefaultRequestHeaders().Add('client_secret', ClientSecret);
-        Http.DefaultRequestHeaders().Add('Ocp-Apim-Subscription-Key', SubscriptionKey);
-        Http.DefaultRequestHeaders().Add('Merchant-Serial-Number', Msn);
-        Http.Post('/accesstoken/get', HttpContent, HttpResponse);
+        Http.DefaultRequestHeaders().Add(VippsMpUtil.HeaderNameClientId(), ClientId);
+        Http.DefaultRequestHeaders().Add(VippsMpUtil.HeaderNameClientSecret(), ClientSecret);
+        Http.DefaultRequestHeaders().Add(VippsMpUtil.HeaderNameClientSubKey(), SubscriptionKey);
+        Http.DefaultRequestHeaders().Add(VippsMpUtil.HeaderNameMerchantSerialNo(), Msn);
+        Http.Post('accesstoken/get', HttpContent, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
