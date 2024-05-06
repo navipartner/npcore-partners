@@ -27,12 +27,13 @@ codeunit 6184715 "NPR Vipps Mp QR API"
     begin
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
         QueryString := 'QrImageFormat=PNG&QrImageSize=500';
-        Http.Get(StrSubstNo('/qr/v1/merchant-callback?%1', QueryString), HttpResponse);
+        Http.Get(StrSubstNo('qr/v1/merchant-callback?%1', QueryString), HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             JsonResponse.ReadFrom(HttpResponseTxt);
         end else begin
-            Response.ReadFrom(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(Response, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;
@@ -50,12 +51,13 @@ codeunit 6184715 "NPR Vipps Mp QR API"
     begin
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
         QueryString := 'QrImageFormat=PNG&QrImageSize=500';
-        Http.Get(StrSubstNo('/qr/v1/merchant-callback/%1?%2', MerchantQrId, QueryString), HttpResponse);
+        Http.Get(StrSubstNo('qr/v1/merchant-callback/%1?%2', MerchantQrId, QueryString), HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             JsonResponse.ReadFrom(HttpResponseTxt);
         end else begin
-            JsonResponse.ReadFrom(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;
@@ -82,9 +84,11 @@ codeunit 6184715 "NPR Vipps Mp QR API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Put(StrSubstNo('/qr/v1/merchant-callback/%1', MerchantQrId), HttpContent, HttpResponse);
+        Http.Put(StrSubstNo('qr/v1/merchant-callback/%1', MerchantQrId), HttpContent, HttpResponse);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
-            JsonResponse.ReadFrom(HttpResponseTxt);
+            HttpResponse.Content.ReadAs(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;
@@ -101,9 +105,11 @@ codeunit 6184715 "NPR Vipps Mp QR API"
         HttpResponseTxt: Text;
     begin
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
-        Http.Delete(StrSubstNo('/qr/v1/merchant-callback/%1', MerchantQrId), HttpResponse);
+        Http.Delete(StrSubstNo('qr/v1/merchant-callback/%1', MerchantQrId), HttpResponse);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
-            JsonResponse.ReadFrom(HttpResponseTxt);
+            HttpResponse.Content.ReadAs(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;
@@ -130,9 +136,11 @@ codeunit 6184715 "NPR Vipps Mp QR API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Put(StrSubstNo('/qr/v1/merchant-callback/mobilepay/%1', BeaconId), HttpContent, HttpResponse);
+        Http.Put(StrSubstNo('qr/v1/merchant-callback/mobilepay/%1', BeaconId), HttpContent, HttpResponse);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
-            JsonResponse.ReadFrom(HttpResponseTxt);
+            HttpResponse.Content.ReadAs(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;

@@ -92,9 +92,19 @@ page 6151498 "NPR Vipps Mp Store"
         Json: JsonObject;
         tok: JsonToken;
     begin
-        if (Rec.Sandbox) then
-            exit;
-        VippsMpMgtAPI.GetSalesUnitDetailsMsn(Rec, Json);
+        if (Rec."Partner API Enabled") then begin
+            if (Rec."Merchant Serial Number" = '') then
+                exit;
+            VippsMpMgtAPI.GetSalesUnitDetailsPartner(Rec."Merchant Serial Number", Json)
+        end else begin
+            if ((Rec."Merchant Serial Number" = '')
+            or (Rec."Client Id" = '')
+            or (Rec."Client Secret" = '')
+            or (Rec."Client Sub. Key" = '')
+            or (Rec.Sandbox)) then
+                exit;
+            VippsMpMgtAPI.GetSalesUnitDetailsMsn(Rec, Json);
+        end;
         Json.Get('name', tok);
 #pragma warning disable AA0139
         Rec."Store Name" := tok.AsValue().AsText();
