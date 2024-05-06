@@ -12,6 +12,7 @@ table 6150771 "NPR Vipps Mp QrCallback"
         {
             Caption = 'Merchant QR Id';
             DataClassification = CustomerContent;
+            NotBlank = true;
         }
         field(2; "Merchant Serial Number"; Text[10])
         {

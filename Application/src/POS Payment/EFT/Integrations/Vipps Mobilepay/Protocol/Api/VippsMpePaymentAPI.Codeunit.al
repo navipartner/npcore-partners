@@ -81,7 +81,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         HttpResponseTxt: Text;
     begin
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
-        Http.Get(StrSubstNo('/epayment/v1/payments/%1', PaymentReference), HttpResponse);
+        Http.Get(StrSubstNo('epayment/v1/payments/%1', PaymentReference), HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
@@ -110,7 +110,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Post('/epayment/v1/payments', HttpContent, HttpResponse);
+        Http.Post('epayment/v1/payments', HttpContent, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
@@ -139,7 +139,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Post(StrSubstNo('/epayment/v1/payments/%1/capture', PaymentReference), HttpContent, HttpResponse);
+        Http.Post(StrSubstNo('epayment/v1/payments/%1/capture', PaymentReference), HttpContent, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
@@ -165,7 +165,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Post(StrSubstNo('/epayment/v1/payments/%1/cancel', PaymentReference), HttpContent, HttpResponse);
+        Http.Post(StrSubstNo('epayment/v1/payments/%1/cancel', PaymentReference), HttpContent, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
@@ -194,7 +194,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
-        Http.Post(StrSubstNo('/epayment/v1/payments/%1/refund', PaymentReference), HttpContent, HttpResponse);
+        Http.Post(StrSubstNo('epayment/v1/payments/%1/refund', PaymentReference), HttpContent, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             Response.ReadFrom(HttpResponseTxt);
