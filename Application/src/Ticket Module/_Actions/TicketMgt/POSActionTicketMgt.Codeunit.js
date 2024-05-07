@@ -26,7 +26,8 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     actionSettings.FunctionId = functionId;
     actionSettings.DefaultTicketNumber = parameters.DefaultTicketNumber;
     await workflow.respond("ConfigureWorkflow", actionSettings);
-    
+    debugger;
+
     let ticketNumber; 
     if (context.ShowTicketDialog) {
         if (inputMethod === "Standard") {
@@ -59,6 +60,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             ticketNumber = mposResult.Result.ID;
         }
     }
+
     actionSettings.TicketNumber = ticketNumber;
     await workflow.respond("RefineWorkflow", actionSettings);
     let ticketQuantity;
@@ -79,19 +81,36 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         if (ticketReference === null) // cancel returns null
             return;
     }
-    debugger;
-    if (context.ShowScheduleSelectionDialog) {
-        let r = await popup.entertainment.scheduleSelection({ token: context.TicketToken });
+    if (context.UseFrontEndUx) {
+
+        const scheduleSelection = await workflow.run('TM_SCHEDULE_SELECT', {
+            context: {
+                TicketToken: context.TicketToken,
+                EditTicketHolder: functionId === 3
+            }
+        })
+
+        if (scheduleSelection.cancel) {
+            toast.warning ('Schedule not updated', {title: windowTitle});
+            return;
+        }
+        if(context.VerboseMessage !== ""){ 
+            //toast.success (context.VerboseMessage, {title: windowTitle});
+        }
+
 
     } else {
         actionSettings.TicketQuantity = ticketQuantity;
         actionSettings.TicketReference = ticketReference;
         await workflow.respond("DoAction", actionSettings);
+
+        if (context.Verbose) { 
+            await popup.message ({
+                caption: context.VerboseMessage, 
+                title: windowTitle});
+        }
     }
 
-    if (context.Verbose) { 
-        await popup.message ({
-            caption: context.VerboseMessage, 
-            title: windowTitle});
-    }
-};
+
+}
+

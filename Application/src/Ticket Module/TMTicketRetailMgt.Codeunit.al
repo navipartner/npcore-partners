@@ -275,6 +275,7 @@
                 if (TicketReservationRequest2.FindLast()) then begin
                     TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
                     TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
+                    TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
                     TicketReservationRequest.Modify();
                 end;
             until (TicketReservationRequest.Next() = 0);
@@ -708,7 +709,8 @@
             if (ResponseCode = 0) then begin
                 Commit();
 
-                AcquireTicketParticipant(Token, ExternalMemberNo, false);
+                if (not TicketRetailManager.UseFrontEndScheduleUX()) then
+                    AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
                 if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
                     SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
@@ -748,7 +750,9 @@
         if (ResponseCode = 0) then begin
             Commit();
 
-            AcquireTicketParticipant(Token, ExternalMemberNo, false);
+            if (not TicketRetailManager.UseFrontEndScheduleUX()) then
+                AcquireTicketParticipant(Token, ExternalMemberNo, false);
+
             Commit();
 
             POSSession.GetFrontEnd(FrontEnd);
