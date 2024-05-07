@@ -941,7 +941,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnRefresh(var SalePOS: Record "NPR POS Sale")
+    procedure OnRefresh(var SalePOS: Record "NPR POS Sale")
     begin
     end;
     #endregion
