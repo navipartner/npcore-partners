@@ -166,6 +166,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Sales Until Time field';
                 }
+                field(CategoryCode; Rec.Category)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Category Code field.';
+                }
                 field(TimeZoneNo; Rec.TimeZoneNo)
                 {
                     ApplicationArea = NPRTicketAdvanced;

@@ -25,8 +25,9 @@
         }
         field(17; Category; Code[20])
         {
-            Caption = 'Category';
+            Caption = 'Category Code';
             DataClassification = CustomerContent;
+            TableRelation = "NPR TM Category";
         }
         field(20; "Print Ticket"; Boolean)
         {

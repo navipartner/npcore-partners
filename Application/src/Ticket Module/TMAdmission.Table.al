@@ -153,6 +153,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR TM Waiting List Setup";
         }
+        field(85; Category; Code[20])
+        {
+            Caption = 'Category Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR TM Category";
+        }
         field(100; "Admission Base Calendar Code"; Code[10])
         {
             Caption = 'Admission Base Calendar Code';
@@ -225,7 +231,7 @@
                 end;
             end;
         }
-        
+
         field(380; TimeZoneNo; Integer)
         {
             Caption = 'Time Zone No.';

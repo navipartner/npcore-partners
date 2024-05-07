@@ -33,6 +33,11 @@ page 6150765 "NPR TM Admission Card"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Location Admission Code field';
                 }
+                field(CategoryCode; Rec.Category)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Category Code field.';
+                }
                 field(AdmissionTimeZone; _AdmissionTimeZoneDescription)
                 {
                     Caption = 'Admission Time Zone';

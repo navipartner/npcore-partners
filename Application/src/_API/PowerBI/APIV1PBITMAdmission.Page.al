@@ -141,6 +141,10 @@ page 6059965 "NPR APIV1 PBITMAdmission"
                 {
                     Caption = 'System Modified By', Locked = true;
                 }
+                field(categoryCode; Rec.Category)
+                {
+                    Caption = 'Category Code';
+                }
 
             }
         }
