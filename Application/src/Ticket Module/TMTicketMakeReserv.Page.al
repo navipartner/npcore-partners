@@ -308,11 +308,24 @@
             {
                 ShowCaption = false;
                 Visible = gShowDeliverTo;
+
+                field(gTicketHolderName; gTicketHolderName)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Ticket Holder Name';
+                    ToolTip = 'Specifies the value of the Ticket Holder Name field';
+                }
+            }
+            group(Control6014407)
+            {
+                ShowCaption = false;
+                Visible = gShowDeliverTo;
+
                 field(gDeliverTicketTo; gDeliverTicketTo)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Caption = 'Deliver eTicket To';
-                    ToolTip = 'Specifies the value of the Deliver eTicket To field';
+                    Caption = 'Deliver Ticket To';
+                    ToolTip = 'Specifies the value of the Deliver Ticket To field';
                 }
             }
             group(Control6014400)
@@ -445,6 +458,7 @@
         NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
         gConfirmStatusText: Text;
         gDeliverTicketTo: Text[100];
+        gTicketHolderName: Text[100];
         _UnitPrice: Text;
 
     local procedure ChangeQuantity(NewQuantity: Integer)
@@ -603,6 +617,7 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             gDeliverTicketTo := TicketReservationRequest."Notification Address";
+            gTicketHolderName := TicketReservationRequest."TicketHolderName";
 
             repeat
                 Rec.TransferFields(TicketReservationRequest, true);
@@ -680,13 +695,14 @@
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
     begin
 
-        if (gDeliverTicketTo <> '') then begin
+        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
 
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := gTicketHolderName;
                 if (StrPos(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -773,12 +789,13 @@
         NewTicketRequestEntryNo: Integer;
     begin
 
-        if (gDeliverTicketTo <> '') then begin
+        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := gTicketHolderName;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -845,12 +862,13 @@
         SalesTicketNo: Code[20];
     begin
 
-        if (gDeliverTicketTo <> '') then begin
+        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := gTicketHolderName;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else

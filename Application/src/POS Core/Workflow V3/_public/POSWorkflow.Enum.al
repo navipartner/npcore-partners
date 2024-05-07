@@ -1106,4 +1106,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'DOCLX_CITY_CARD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction DocLXCityCard";
     }
+    value(6184879; TM_SCHEDULE_SELECT)
+    {
+        Caption = 'TM_SCHEDULE_SELECT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction TMScheduleSelect";
+    }
 }

@@ -193,6 +193,73 @@
 
     end;
 
+    internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Option NA,EMAIL,SMS; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
+    var
+        Ticket: Record "NPR TM Ticket";
+        Admission: Record "NPR TM Admission";
+        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Member: Record "NPR MM Member";
+    begin
+
+
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (not TicketReservationRequest.FindSet()) then
+            exit(RequireParticipantInformation::NOT_REQUIRED);
+
+        repeat
+            if (TicketReservationRequest."Primary Request Line") then begin
+                SuggestNotificationAddress := TicketReservationRequest."Notification Address";
+                SuggestTicketHolderName := TicketReservationRequest.TicketHolderName;
+                AdmissionCode := Admission."Admission Code";
+
+                if (GetMember(Ticket."External Member Card No.", Member)) then begin
+                    SuggestTicketHolderName := Member."Display Name";
+                    case (Member."Notification Method") of
+                        Member."Notification Method"::EMAIL:
+                            begin
+                                SuggestNotificationAddress := Member."E-Mail Address";
+                                SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                            end;
+                        Member."Notification Method"::SMS:
+                            begin
+                                SuggestNotificationAddress := Member."Phone No.";
+                                SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+                            end;
+                    end;
+                end;
+            end;
+
+            Admission.Get(TicketReservationRequest."Admission Code");
+            if (RequireParticipantInformation < Admission."Ticketholder Notification Type") then begin
+                RequireParticipantInformation := Admission."Ticketholder Notification Type";
+                AdmissionCode := Admission."Admission Code";
+            end;
+
+            if (TicketAdmissionBOM.Get(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code")) then begin
+                if ((TicketAdmissionBOM."Publish As eTicket") or
+                    (TicketAdmissionBOM."Notification Profile Code" <> '')) then begin
+                    AdmissionCode := TicketAdmissionBOM."Admission Code";
+                    SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+                    if (SuggestNotificationAddress = '') then
+                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                end;
+
+                if (TicketAdmissionBOM."Publish Ticket URL" = TicketAdmissionBOM."Publish Ticket URL"::SEND) then begin
+                    AdmissionCode := TicketAdmissionBOM."Admission Code";
+                    SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                    if (SuggestNotificationAddress = '') then
+                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                end;
+
+            end;
+
+        until (TicketReservationRequest.Next() = 0);
+
+
+
+    end;
+
     procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
     begin
 
@@ -213,100 +280,18 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketParticipant: Page "NPR TM Acquire Participant";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketNo: Code[20];
-        Ticket: Record "NPR TM Ticket";
-        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        Admission: Record "NPR TM Admission";
-        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
-        Member: Record "NPR MM Member";
-        RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
-        AdmissionCode: Code[20];
+        TicketHolderInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
         AttributeManagement: Codeunit "NPR Attribute Management";
+        AdmissionCode: Code[20];
     begin
-
-        if (not (TicketRequestManager.GetTokenTicket(Token, TicketNo))) then
+        if (TicketRetailManager.UseFrontEndScheduleUX()) then
             exit(false);
 
-        if (not Ticket.Get(TicketNo)) then
-            exit(false);
-
-        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        if (not TicketAccessEntry.FindSet()) then
-            exit(false);
-
-        RequireParticipantInformation := RequireParticipantInformation::NOT_REQUIRED;
-        repeat
-            Admission.Get(TicketAccessEntry."Admission Code");
-            if (RequireParticipantInformation < Admission."Ticketholder Notification Type") then begin
-                RequireParticipantInformation := Admission."Ticketholder Notification Type";
-                AdmissionCode := Admission."Admission Code";
-            end;
-        until (TicketAccessEntry.Next() = 0);
-
-        // Check if eTicket
-        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then begin
-            TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
-            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
-            TicketAdmissionBOM.SetFilter("Publish As eTicket", '=%1', true);
-            if (TicketAdmissionBOM.FindFirst()) then begin
-                AdmissionCode := TicketAdmissionBOM."Admission Code";
-                SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-                if (SuggestNotificationAddress = '') then
-                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
-            end;
-
-            TicketAdmissionBOM.Reset();
-            TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
-            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
-            TicketAdmissionBOM.SetFilter("Publish Ticket URL", '=%1', TicketAdmissionBOM."Publish Ticket URL"::SEND);
-            if (TicketAdmissionBOM.FindFirst()) then begin
-                AdmissionCode := TicketAdmissionBOM."Admission Code";
-                SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-                if (SuggestNotificationAddress = '') then
-                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
-            end;
-        end;
-
-        // check if notify participant 
-        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then begin
-            TicketAdmissionBOM.Reset();
-            TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
-            TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
-            TicketAdmissionBOM.SetFilter("Notification Profile Code", '<>%1', '');
-            if (TicketAdmissionBOM.FindFirst()) then begin
-                AdmissionCode := TicketAdmissionBOM."Admission Code";
-                SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-                if (SuggestNotificationAddress = '') then
-                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
-            end;
-        end;
-
+        TicketHolderInformation := RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
         if (not ForceDialog) then
-            if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
+            if (TicketHolderInformation = TicketHolderInformation::NOT_REQUIRED) then
                 exit(false);
-
-        if (AdmissionCode = '') then
-            AdmissionCode := Admission."Admission Code";
-
-        // Note, External Member Card No. might not be assigned at this point in time.
-        if (Ticket."External Member Card No." <> '') then begin
-            if (GetMember(Ticket."External Member Card No.", Member)) then begin
-                SuggestTicketHolderName := Member."Display Name";
-                case (Member."Notification Method") of
-                    Member."Notification Method"::EMAIL:
-                        begin
-                            SuggestNotificationAddress := Member."E-Mail Address";
-                            SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-                        end;
-                    Member."Notification Method"::SMS:
-                        begin
-                            SuggestNotificationAddress := Member."Phone No.";
-                            SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-                        end;
-                end;
-            end;
-        end;
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.FilterGroup(2);

@@ -59,6 +59,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('ReferencePrompt', ReferencePrompt);
     end;
 
+
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case Step of
@@ -80,7 +81,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         Context.SetContext('ShowTicketDialog', ShowTicketNumberDialogForFunction(Context, SaleLineRec));
         Context.SetContext('ShowTicketQtyDialog', ShowTicketQtyDialogForFunction(Context));
         Context.SetContext('ShowReferenceDialog', ShowReferenceDialogForFunction(Context));
-        Context.SetContext('ShowScheduleSelectionDialog', ShowScheduleSelectionDialogForFunction(Context))
+        Context.SetContext('UseFrontEndUx', ShowScheduleSelectionDialogForFunction(Context));
     end;
 
     local procedure ShowScheduleSelectionDialogForFunction(Context: Codeunit "NPR POS JSON Helper"): boolean
@@ -181,7 +182,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
 
         if (FunctionId = 3) then begin
             if (TicketRequestManager.GetTicketToken(ExternalTicketNumber, TicketToken)) then begin
-                Context.SetContext('ShowScheduleSelectionDialog', TicketRetailManager.UseFrontEndScheduleUX());
+                Context.SetContext('UseFrontEndUx', TicketRetailManager.UseFrontEndScheduleUX());
                 Context.SetContext('TicketToken', TicketToken);
             end;
         end;
@@ -190,6 +191,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
         Context.SetContext('TicketMaxQty', TicketMaxQty);
         Context.SetContext('ShowTicketQtyDialog', ShowQtyDialog);
+
     end;
 
     local procedure GetGroupTicketQuantity(Context: Codeunit "NPR POS JSON Helper"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
@@ -254,7 +256,6 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         Context.GetInteger('FunctionId', FunctionId);
         DefaultTicketNumber := Context.GetStringParameter('DefaultTicketNumber');
         AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
-
         WithTicketPrint := Context.GetBooleanParameter('PrintTicketOnArrival');
 
         if (ShowReferenceDialogForFunction(Context)) then
@@ -345,7 +346,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTicketMgt.Codeunit.js### 
-'let main=async({workflow:n,context:e,popup:i,parameters:u,captions:r})=>{var f=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],T=["Standard","MPOS NFC Scan"];let d=Number(u.Function),k=Number(u.InputMethod),s=T[k],t={};windowTitle=r.TicketTitle.substitute(f[d].toString()),t.FunctionId=d,t.DefaultTicketNumber=u.DefaultTicketNumber,await n.respond("ConfigureWorkflow",t);let a;if(e.ShowTicketDialog){if(s==="Standard"){if(a=await i.input({caption:r.TicketPrompt,title:windowTitle}),!a)return}else if(s==="MPOS NFC Scan"){var o=await n.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!o.IsSuccessful){i.error(o.ErrorMessage,"mPOS NFC Error");return}if(!o.Result.ID)return;a=o.Result.ID}}t.TicketNumber=a,await n.respond("RefineWorkflow",t);let l;if(e.ShowTicketQtyDialog&&(l=await i.numpad({caption:r.TicketQtyPrompt.substitute(e.TicketMaxQty),title:windowTitle}),l===null))return;let c;if(!(e.ShowReferenceDialog&&(c=await i.input({caption:r.ReferencePrompt,title:windowTitle}),c===null))){debugger;if(e.ShowScheduleSelectionDialog){let w=await i.entertainment.scheduleSelection({token:e.TicketToken})}else t.TicketQuantity=l,t.TicketReference=c,await n.respond("DoAction",t);e.Verbose&&await i.message({caption:e.VerboseMessage,title:windowTitle})}};'
+'let main=async({workflow:i,context:e,popup:n,parameters:u,captions:r})=>{var T=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],f=["Standard","MPOS NFC Scan"];let c=Number(u.Function),k=Number(u.InputMethod),s=f[k],t={};windowTitle=r.TicketTitle.substitute(T[c].toString()),t.FunctionId=c,t.DefaultTicketNumber=u.DefaultTicketNumber,await i.respond("ConfigureWorkflow",t);debugger;let a;if(e.ShowTicketDialog){if(s==="Standard"){if(a=await n.input({caption:r.TicketPrompt,title:windowTitle}),!a)return}else if(s==="MPOS NFC Scan"){var o=await i.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!o.IsSuccessful){n.error(o.ErrorMessage,"mPOS NFC Error");return}if(!o.Result.ID)return;a=o.Result.ID}}t.TicketNumber=a,await i.respond("RefineWorkflow",t);let l;if(e.ShowTicketQtyDialog&&(l=await n.numpad({caption:r.TicketQtyPrompt.substitute(e.TicketMaxQty),title:windowTitle}),l===null))return;let d;if(!(e.ShowReferenceDialog&&(d=await n.input({caption:r.ReferencePrompt,title:windowTitle}),d===null)))if(e.UseFrontEndUx){if((await i.run("TM_SCHEDULE_SELECT",{context:{TicketToken:e.TicketToken,EditTicketHolder:c===3}})).cancel){toast.warning("Schedule not updated",{title:windowTitle});return}e.VerboseMessage}else t.TicketQuantity=l,t.TicketReference=d,await i.respond("DoAction",t),e.Verbose&&await n.message({caption:e.VerboseMessage,title:windowTitle})};'
         )
     end;
     //WORKFLOW 3 END
