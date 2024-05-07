@@ -27,4 +27,11 @@ codeunit 6060026 "NPR NpRv ModValidGlobal Public"
     begin
         NpRvModueValidGlobal.ThrowGlobalVoucherWSError(ResponseReasonPhrase, ResponseText);
     end;
+    
+    procedure PostVoucherPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        NpRvVoucherMgt.PostPayment(NpRvSalesLine);
+    end;
 }
