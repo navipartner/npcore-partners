@@ -200,21 +200,32 @@
                         OnValidateReplaceExternalCardNumber();
                     end;
                 }
-
-                field(MembershipCode; Rec."Membership Code")
+                group(ReplaceCardInfo)
                 {
-                    Editable = false;
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Shows the membership code associated with the card bing replaced.';
-                    Caption = 'Membership Code';
-                }
+                    field(MembershipCode; Rec."Membership Code")
+                    {
+                        Editable = false;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        ToolTip = 'Shows the membership code associated with the card bing replaced.';
+                        Caption = 'Membership Code';
+                    }
 
-                field(ValidUntil; _MembershipValidUntilDate)
-                {
-                    Editable = false;
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Show when the membership expires.';
-                    Caption = 'Membership Valid Until';
+                    field(ValidUntil; _MembershipValidUntilDate)
+                    {
+                        Editable = false;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        ToolTip = 'Show when the membership expires.';
+                        Caption = 'Membership Valid Until';
+                    }
+                    field(BlockInfo; _BlockDetails)
+                    {
+                        Editable = false;
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        ToolTip = 'Shows if the card is blocked.';
+                        Caption = 'Blocked';
+                        Style = Attention;
+                        StyleExpr = (_BlockDetails <> '');
+                    }
                 }
             }
             group(Cardholder)
@@ -1003,6 +1014,7 @@
         _PreSelectedCustomerContact: Boolean;
         _PosUnitNo: Code[10];
         _MembershipValidUntilDate: Date;
+        _BlockDetails: Text;
 
     local procedure CheckEmail()
     var
@@ -1784,7 +1796,10 @@
         MemberCard: Record "NPR MM Member Card";
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
+        BLOCKED_CARD: Label 'Card blocked: %1';
     begin
+        Clear(Rec.Blocked);
+        Clear(_BlockDetails);
         if (rec."Replace External Card No." = '') then begin
             Clear(Rec."Valid Until");
             Clear(Rec."Membership Code");
@@ -1796,6 +1811,11 @@
         MemberCard.FindFirst();
         Member.Get(MemberCard."Member Entry No.");
         Membership.Get(MemberCard."Membership Entry No.");
+
+        if (MemberCard.Blocked) then begin
+            _BlockDetails := StrSubstNo(BLOCKED_CARD, MemberCard."Blocked At");
+            Rec.Blocked := true;
+        end;
 
         SetMemberDetails(Member."External Member No.");
         MembershipManagement.GetMembershipMaxValidUntilDate(Membership."Entry No.", _MembershipValidUntilDate);
