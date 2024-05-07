@@ -185,6 +185,7 @@
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then begin
                         MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
                         MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                        MemberInfoCapture.Modify();
                         if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
                             MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
                     end;
@@ -194,6 +195,7 @@
                             RemoteCardAdd(MemberInfoCapture, MembershipSalesSetup);
                         end else begin
                             MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
+                            MemberInfoCapture.Modify();
                             if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
                                 MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
                         end;
