@@ -1,6 +1,5 @@
 codeunit 6150960 "NPR RP Line Print"
 {
-    SingleInstance = true;
     Access = Public;
 
     var
