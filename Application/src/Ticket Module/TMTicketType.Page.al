@@ -148,7 +148,31 @@
     {
         area(processing)
         {
-
+            action(BatchAddTicketsToDeferral)
+            {
+                ToolTip = 'Add all Tickets for ticket type to Deferral from a specific date.';
+                ApplicationArea = NPRTicketAdvanced;
+                Caption = 'Batch Add Tickets to Deferral';
+                Image = PostBatch;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Scope = Repeater;
+                Ellipsis = true;
+                //RunObject = report "NPR TM DeferBatchAddTicket";
+                trigger OnAction()
+                var
+                    AddToDeferral: Report "NPR TM DeferBatchAddTicket";
+                    TicketType: Record "NPR TM Ticket Type";
+                begin
+                    Rec.TestField("Defer Revenue");
+                    TicketType.Get(Rec.Code);
+                    TicketType.SetRecFilter();
+                    AddToDeferral.SetTableView(TicketType);
+                    AddToDeferral.Run();
+                end;
+            }
         }
         area(navigation)
         {

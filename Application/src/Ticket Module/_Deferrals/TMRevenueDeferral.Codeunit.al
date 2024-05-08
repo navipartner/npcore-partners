@@ -38,7 +38,55 @@ codeunit 6184739 "NPR TM RevenueDeferral"
             until (TempGenJournalLine.Next() = 0);
     end;
 
-    internal procedure CreateDeferRevenueRequest(TicketAccessEntryNo: Integer; EventDate: Date)
+    internal procedure AddAllTicketsToDeferral(TicketTypeCode: Code[20]; FromTicketIssuedDate: Date) TicketCount: Integer
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        StatusMessage: Label 'Evaluating %1 tickets for %2 to be added to deferral: %3(%) completed.', MaxLength = 80;
+        Window: Dialog;
+        MaxCount: Integer;
+        CurrentCount: Integer;
+        HaveWindow: Boolean;
+        PctComplete: Integer;
+    begin
+        // Get all tickets of the specified type issued after the specified date
+        // and create a deferral request for each of them
+        Ticket.SetFilter("Ticket Type Code", '=%1', TicketTypeCode);
+        Ticket.SetFilter("Document Date", '>=%1', FromTicketIssuedDate);
+        if (not Ticket.FindSet(true)) then
+            exit;
+
+        PctComplete := 0;
+        MaxCount := Ticket.Count();
+        if (GuiAllowed()) then begin
+            if (MaxCount > 100) then begin
+                Window.Open('#1#########################################################################################################################');
+                HaveWindow := true;
+            end;
+        end;
+
+        repeat
+            TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+            if (TicketAccessEntry.FindSet()) then
+                repeat
+                    if (CreateDeferRevenueRequest(TicketAccessEntry."Entry No.", Ticket."Document Date")) then
+                        TicketCount += 1;
+                until (TicketAccessEntry.Next() = 0);
+
+            CurrentCount += 1;
+            if (CurrentCount mod 100 = 0) then begin
+                PctComplete := Round(100 * CurrentCount / MaxCount, 1);
+                if (HaveWindow) then
+                    Window.Update(1, StrSubstNo(StatusMessage, MaxCount, TicketTypeCode, Format(PctComplete, 0, 9)));
+            end;
+        until (Ticket.Next() = 0);
+
+        if (HaveWindow) then
+            Window.Close();
+    end;
+
+    internal procedure CreateDeferRevenueRequest(TicketAccessEntryNo: Integer;
+EventDate: Date) ValidRequest: Boolean
     var
         DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
     begin
@@ -47,7 +95,8 @@ codeunit 6184739 "NPR TM RevenueDeferral"
 
         DeferRevenueRequest.TicketAccessEntryNo := TicketAccessEntryNo;
         DeferRevenueRequest.Status := DeferRevenueRequest.Status::REGISTERED;
-        if (InitializeRevenueRequest(DeferRevenueRequest, EventDate)) then
+        ValidRequest := InitializeRevenueRequest(DeferRevenueRequest, EventDate);
+        if (ValidRequest) then
             DeferRevenueRequest.Insert();
     end;
 

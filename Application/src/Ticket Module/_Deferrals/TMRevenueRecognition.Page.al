@@ -254,6 +254,47 @@ page 6151476 "NPR TM RevenueRecognition"
                     CurrPage.Update(false);
                 end;
             }
+
+            action(DeleteRegistered)
+            {
+                Caption = 'Delete Registered';
+                ToolTip = 'This action will delete deferral request in status Registered.';
+                ApplicationArea = NPRTicketAdvanced;
+                Image = Delete;
+
+                trigger OnAction()
+                var
+                    DeferRevenue: Record "NPR TM DeferRevenueRequest";
+                    ConfirmMessage: Label 'Are you sure you want to delete all deferral requests with status Registered?';
+                begin
+                    if (not Confirm(ConfirmMessage, false)) then
+                        exit;
+
+                    DeferRevenue.SetCurrentKey("Status");
+                    DeferRevenue.SetFilter("Status", '=%1', DeferRevenue.Status::REGISTERED);
+                    DeferRevenue.DeleteAll();
+                end;
+            }
+            action(DeleteUnresolved)
+            {
+                Caption = 'Delete Unresolved';
+                ToolTip = 'This action will delete deferral request in status Unresolved.';
+                ApplicationArea = NPRTicketAdvanced;
+                Image = Delete;
+
+                trigger OnAction()
+                var
+                    DeferRevenue: Record "NPR TM DeferRevenueRequest";
+                    ConfirmMessage: Label 'Are you sure you want to delete all deferral requests with status Unresolved?';
+                begin
+                    if (not Confirm(ConfirmMessage, false)) then
+                        exit;
+
+                    DeferRevenue.SetCurrentKey("Status");
+                    DeferRevenue.SetFilter("Status", '=%1', DeferRevenue.Status::UNRESOLVED);
+                    DeferRevenue.DeleteAll();
+                end;
+            }
         }
         area(Navigation)
         {
