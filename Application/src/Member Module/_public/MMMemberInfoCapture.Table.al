@@ -245,6 +245,11 @@
             Caption = 'Contact No.';
             DataClassification = CustomerContent;
         }
+        field(190; AcceptDuplicate; Boolean)
+        {
+            Caption = 'Accept Duplicate';
+            DataClassification = CustomerContent;
+        }
         field(200; "User Logon ID"; Code[80])
         {
             Caption = 'User Logon ID';

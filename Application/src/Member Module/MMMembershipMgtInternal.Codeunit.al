@@ -10,7 +10,7 @@
         LOGIN_ID_EXIST: Label 'The selected member logon id [%1] is already in use.\\Member %2.';
         LOGIN_ID_BLANK: Label 'The %1 can''t be blank when the setting for %2 is %3.';
         MEMBER_EXIST: Label 'Member ID [%1] is already in use.';
-        MEMBER_REUSE: Label 'Member ID [%1] is already in use.\Do you want reuse member %2.';
+
         MEMBER_BLOCKED: Label 'Member ID [%1] is blocked. Block date is %2.';
         MEMBER_ROLE_BLOCKED: Label 'Member ID [%1] has no active role in membership [%2].';
         MEMBER_CARD_EXIST: Label 'Member Card ID [%1] is already in use. To reuse this card number, block the current card first.';
@@ -958,7 +958,7 @@
         exit(CardEntryNo <> 0);
     end;
 
-    internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
+    internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
@@ -966,6 +966,7 @@
         RequireFieldOrField: Label 'Either %1 or %2 is required.';
         RequireFieldAndField: Label 'Both %1 and %2 are required.';
         MemberFound: Boolean;
+        MEMBER_REUSE: Label 'Member with unique ID [%1] with name: %2 is already in use.\Do you want to create duplicate member?';
     begin
 
         if (not Community.Get(CommunityCode)) then
@@ -977,6 +978,10 @@
                 exit(0);
             exit(Member."Entry No.");
         end;
+
+        Member.FilterGroup(240);
+        Member.SetFilter(Blocked, '=%1', false);
+        Member.FilterGroup(0);
 
         case Community."Member Unique Identity" of
             Community."Member Unique Identity"::NONE:
@@ -1010,16 +1015,24 @@
                 begin
                     if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." = '')) then
                         Error(RequireFieldOrField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
-                    Member.FilterGroup(-1);
-                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
-                    Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
-                    Member.FilterGroup(0);
+
+                    if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." = '')) then
+                        Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+
+                    if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '')) then
+                        Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+
+                    if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '')) then begin
+                        Member.FilterGroup(-1);
+                        Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                        Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
+                    end;
+
                 end;
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
 
-        Member.SetFilter(Blocked, '=%1', false);
         MemberFound := Member.FindFirst();
 
         if (MemberFound) then begin
@@ -1032,9 +1045,17 @@
                 Community."Create Member UI Violation"::Error:
                     Error(MEMBER_EXIST, Member.GetFilters());
                 Community."Create Member UI Violation"::Confirm:
-                    if (GuiAllowed()) then
-                        if (not Confirm(MEMBER_REUSE, true, Member.GetFilters(), Member."First Name")) then
-                            Error(ABORTED);
+                    begin
+                        if (MemberInfoCapture.AcceptDuplicate) then
+                            exit(0);
+
+                        if (GuiAllowed()) then
+                            if (not Confirm(MEMBER_REUSE, false, Member.GetFilters(), Member."Display Name")) then
+                                Error(ABORTED);
+
+                        MemberInfoCapture.AcceptDuplicate := true;
+                        exit(0);
+                    end;
                 Community."Create Member UI Violation"::REUSE:
                     ;
                 else
@@ -4794,13 +4815,17 @@
     local procedure LogonIdExists(CommunityCode: Code[20]; LogonId: Code[80]): Boolean
     var
         MembershipRole: Record "NPR MM Membership Role";
+        MemberCommunity: Record "NPR MM Member Community";
     begin
 
         if (LogonId = '') then
             exit(false);
 
-        MembershipRole.SetCurrentKey("Community Code", "User Logon ID");
+        MemberCommunity.Get(CommunityCode);
+        if (MemberCommunity."Member Logon Credentials" = MemberCommunity."Member Logon Credentials"::NA) then
+            exit(false);
 
+        MembershipRole.SetCurrentKey("Community Code", "User Logon ID");
         MembershipRole.SetFilter("Community Code", '=%1', CommunityCode);
         MembershipRole.SetFilter("User Logon ID", '=%1', LogonId);
         MembershipRole.SetFilter(Blocked, '=%1', false);

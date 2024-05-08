@@ -294,6 +294,10 @@
                     ShowMandatory = _PhoneNoMandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        CheckPhone();
+                    end;
                 }
                 field("Social Security No."; Rec."Social Security No.")
                 {
@@ -963,7 +967,6 @@
     end;
 
     var
-        EMAIL_EXISTS: Label '%1 is already in use by member [%2] %3.\\If you are certain that the existing member should be blocked from the existing membership and re-registered with the new membership, press Yes.';
         MISSING_REQUIRED_FIELDS: Label 'All fields do not have valid values.\\ The following fields needs attention: %1';
         EMAIL_INVALID_CONFIRM: Label 'The %1 seems invalid, do you want to correct it?';
         _EmailMandatory: Boolean;
@@ -1016,15 +1019,51 @@
         _MembershipValidUntilDate: Date;
         _BlockDetails: Text;
 
+    local procedure CheckPhone()
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MemberCommunity: Record "NPR MM Member Community";
+    begin
+        if (xRec.AcceptDuplicate and Rec.AcceptDuplicate) then
+            Rec.AcceptDuplicate := false;
+
+        if (Rec."Phone No." = '') then
+            exit;
+
+        if (Rec."Item No." <> '') then begin
+            MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
+            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
+            if (MembershipSalesSetup.FindFirst()) then begin
+                MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+                MemberCommunity.Get(MembershipSetup."Community Code");
+
+                if (MemberCommunity."Member Unique Identity" in [MemberCommunity."Member Unique Identity"::PHONENO,
+                                                                 MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE]) then
+                    MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
+
+                if (MemberCommunity."Member Unique Identity" in [MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE]) then
+                    if (Rec."E-Mail Address" <> '') then
+                        MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
+
+                if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE) then
+                    _EmailMandatory := (Rec."Phone No." = '');
+            end;
+        end;
+    end;
+
     local procedure CheckEmail()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
-        Member: Record "NPR MM Member";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         ValidEmail: Boolean;
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberCommunity: Record "NPR MM Member Community";
     begin
+        if (xRec.AcceptDuplicate and Rec.AcceptDuplicate) then
+            Rec.AcceptDuplicate := false;
+
         if (Rec."E-Mail Address" = '') then
             exit;
 
@@ -1041,19 +1080,16 @@
                 MembershipSetup.Get(MembershipSalesSetup."Membership Code");
                 MemberCommunity.Get(MembershipSetup."Community Code");
 
-                if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL) then begin
+                if (MemberCommunity."Member Unique Identity" in [MemberCommunity."Member Unique Identity"::EMAIL,
+                                                                 MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE]) then
+                    MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
 
-                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(Rec."E-Mail Address"));
-                    Member.SetFilter(Blocked, '=%1', false);
-                    if (Member.FindFirst()) then begin
-                        if (Confirm(EMAIL_EXISTS, false, Member."E-Mail Address", Member."External Member No.", Member."Display Name")) then begin
-                            MembershipManagement.BlockMember(MembershipManagement.GetMembershipFromExtMemberNo(Member."External Member No."), Member."Entry No.", true);
-                        end else begin
-                            Error(INVALID_VALUE, Rec.FieldCaption("E-Mail Address"));
-                        end;
-                    end;
+                if (MemberCommunity."Member Unique Identity" in [MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE]) then
+                    if (Rec."Phone No." <> '') then
+                        MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
 
-                end;
+                if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE) then
+                    _PhoneNoMandatory := (Rec."E-Mail Address" = '');
             end;
         end;
     end;
@@ -1253,6 +1289,16 @@
                         _PhoneNoMandatory := true;
                     MemberCommunity."Member Unique Identity"::SSN:
                         _SSNMandatory := true;
+                    MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE:
+                        begin
+                            _EmailMandatory := true;
+                            _PhoneNoMandatory := true;
+                        end;
+                    MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE:
+                        begin
+                            _EmailMandatory := true;
+                            _PhoneNoMandatory := true;
+                        end;
                 end;
 
                 ExternalCardNoMandatory := (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::EXTERNAL);
