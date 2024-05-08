@@ -1,0 +1,27 @@
+name: 'Auto-Approve PR'
+run-name: ${{ github.workflow }}
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.event.comment.id }}'
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  AutoApprove:
+    if: ${{ github.event.issue.pull_request }}
+    uses: navipartner/devops/.github/workflows/AutoApprovePr.yaml@main
+    secrets: inherit
