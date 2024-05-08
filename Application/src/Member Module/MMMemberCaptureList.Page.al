@@ -33,6 +33,17 @@
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the First Name field';
+                    trigger OnDrillDown()
+                    var
+                        CardPage: Page "NPR MM Member Info Capture";
+                        CardRecord: Record "NPR MM Member Info Capture";
+                    begin
+                        CardRecord.Copy(Rec);
+                        CardRecord.SetRecFilter();
+                        CardPage.SetTableView(CardRecord);
+                        CardPage.RunModal();
+                    end;
+
                 }
                 field(R_LastName; Rec."Last Name")
                 {
