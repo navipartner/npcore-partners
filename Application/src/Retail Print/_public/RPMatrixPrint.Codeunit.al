@@ -1,6 +1,5 @@
 codeunit 6060039 "NPR RP Matrix Print"
 {
-    SingleInstance = true;
     Access = Public;
 
     var
