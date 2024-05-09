@@ -1,13 +1,15 @@
 page 6184529 "NPR HU EInvoice Local. Setup"
 {
-    ApplicationArea = NPRRetail;
     Caption = 'HU E-Invoice Localisation Setup';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;
     PageType = Card;
-    UsageCategory = Administration;
     SourceTable = "NPR HU EInvoice Local. Setup";
+    UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = 'NPR34.0';
+    ObsoleteReason = 'Merged and replaced with page "NPR MS HU Fiscalization Setup".';
     layout
     {
         area(Content)

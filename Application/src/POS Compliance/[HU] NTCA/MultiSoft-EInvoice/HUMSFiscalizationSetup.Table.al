@@ -1,7 +1,7 @@
 table 6150760 "NPR HU MS Fiscalization Setup"
 {
     Access = Internal;
-    Caption = 'HU Fiscalization Setup';
+    Caption = 'HU MultiSoft/NaviPartner EInvoice Setup';
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR MS HU Fiscalization Setup";
     LookupPageId = "NPR MS HU Fiscalization Setup";
@@ -15,7 +15,7 @@ table 6150760 "NPR HU MS Fiscalization Setup"
         }
         field(2; "Enable HU Fiscal"; Boolean)
         {
-            Caption = 'Enable HU Fiscalization';
+            Caption = 'Enable EInvoice Adjustments';
             DataClassification = CustomerContent;
         }
     }
