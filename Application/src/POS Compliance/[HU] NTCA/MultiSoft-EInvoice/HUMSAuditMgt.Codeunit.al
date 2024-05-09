@@ -27,6 +27,43 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         ModifySalesHaderPaymentMethod(HUMSPaymentMethodMap, POSEntrySalesDocLink);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
+    local procedure SalesDocExpMgtCreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+        if not IsHUAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        SalesHeaderOnBeforeSalesHeaderModify(SalesHeader, SalePOS);
+    end;
+
+    internal procedure SalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; SalePOS: Record "NPR POS Sale")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        RecRef: RecordRef;
+        FieldReference: FieldRef;
+    begin
+        SalesHeader.Modify(true);
+        SaleLinePOS.SetLoadFields("Imported from Invoice No.");
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Imported from Invoice No.", '<>%1', '');
+
+        if SaleLinePOS.FindFirst() then begin
+            RecRef.Open(Database::"Sales Header");
+            RecRef.Get(SalesHeader.RecordId);
+            if not RecRef.FieldExist(42014082) then
+                exit;
+            FieldReference := RecRef.Field(42014082);
+            FieldReference.Value(SaleLinePOS."Imported from Invoice No.");
+            RecRef.Modify();
+            RecRef.Close();
+            SalesHeader.Find();
+        end;
+    end;
+
     local procedure GetPOSEntryFromSalesTicketNo(SalesTicketNo: Code[20]; var POSEntry: Record "NPR POS Entry"; EntryType: Integer): Boolean
     begin
         POSEntry.SetFilter("Document No.", '=%1', SalesTicketNo);
