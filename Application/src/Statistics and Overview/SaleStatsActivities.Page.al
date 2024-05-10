@@ -10,7 +10,11 @@
     {
         area(content)
         {
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(SalesChart; BusinessChart)
+#ELSE
             usercontrol(SalesChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 
@@ -484,7 +488,11 @@
                 Itt += 1;
             until (Date.Next() = 0) or (Itt = ColumnCount);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Rec.UpdateChart(CurrPage.SalesChart);
+#ELSE
         Rec.Update(CurrPage.SalesChart);
+#ENDIF
     end;
 
     local procedure Calc()
