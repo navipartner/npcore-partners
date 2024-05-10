@@ -68,5 +68,20 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnCalculateFulfillmentQuantity(RecID: RecordId; SpfyOrderLineId: Text[30]; var FulfillmentQty: Decimal; var FulfillMaxAvailableQty: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterInitCreditCardPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; PaymentMapping: Record "NPR Magento Payment Mapping"; ShopifyTransactionJToken: JsonToken)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterAddGiftCardPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; ShopifyTransactionJToken: JsonToken)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnModifyPaymentLineAfterCapture(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
+    begin
+    end;
 }
 #endif
