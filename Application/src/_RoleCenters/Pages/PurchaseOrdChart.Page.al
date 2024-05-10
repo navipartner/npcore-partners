@@ -19,10 +19,13 @@
                 ToolTip = 'Specifies the status of the chart.';
                 ApplicationArea = NPRRetail;
             }
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(BusinessChart; BusinessChart)
+#ELSE
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
