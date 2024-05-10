@@ -95,7 +95,7 @@
         Text006: Label 'Document not Found';
         ErrorDuringOperationErr: Label 'An error occurred during the payment operation. Error message:\\%1', Comment = '%1 = error message';
 
-    internal procedure SetProcessingOptions(PaymentEventTypeIn: Option " ",Capture,Refund,Cancel)
+    procedure SetProcessingOptions(PaymentEventTypeIn: Option " ",Capture,Refund,Cancel)
     begin
         _PaymentEventType := PaymentEventTypeIn;
     end;

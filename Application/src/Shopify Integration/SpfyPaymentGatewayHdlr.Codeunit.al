@@ -79,6 +79,7 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
         PaymentLine.GetBySystemId(Request."Payment Line System Id");
         NcTask."Store Code" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
+        NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
         NcTask."Table No." := Database::"NPR Magento Payment Line";
         NcTask."Record ID" := PaymentLine.RecordId();
     end;
