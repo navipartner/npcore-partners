@@ -64,13 +64,15 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         NPRNpRvVoucher: Record "NPR NpRv Voucher";
         NPRNpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NPRPOSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
-        ReferenceNo: Text;
-        VoucherType: Text;
+        ReferenceNo: Text[50];
+        VoucherType: Text[20];
         SuggestedAmount: Decimal;
         VoucherListEnabled: Boolean;
     begin
+#pragma warning disable AA0139
         if Context.GetString('VoucherRefNo', ReferenceNo) then;
         if Context.GetString('voucherType', VoucherType) then;
+#pragma warning restore AA0139
         if Context.GetBooleanParameter('EnableVoucherList', VoucherListEnabled) then;
 
 
@@ -340,7 +342,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     var
         Voucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
-        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        TryFindPartnerVoucher: Codeunit "NPR Try Find Partner Voucher";
         EanBoxTxt: Text[50];
     begin
         if EanBoxSetupEvent."Event Code" <> VoucherPaymentActionCode() then
@@ -355,11 +357,16 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
             exit;
         end;
 
+        NpRvVoucherType.SetLoadFields("Code");
         if NpRvVoucherType.FindSet() then
             repeat
-                if NpRvVoucherMgt.FindPartnerVoucher(NpRvVoucherType.Code, EanBoxTxt, Voucher) then begin
-                    InScope := true;
-                    exit;
+                Clear(TryFindPartnerVoucher);
+                TryFindPartnerVoucher.SetReferenceNo(EanBoxTxt);
+                TryFindPartnerVoucher.SetVoucherType(NpRvVoucherType.Code);
+                if TryFindPartnerVoucher.Run() then begin
+                    TryFindPartnerVoucher.GetResult(Voucher, InScope);
+                    if InScope then
+                        exit;
                 end;
             until NpRvVoucherType.Next() = 0;
     end;
