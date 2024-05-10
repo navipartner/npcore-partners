@@ -50,7 +50,11 @@ page 6150737 "NPR Chart Wrapper"
                     end;
                 }
             }
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(chart; BusinessChart)
+#ELSE
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 
@@ -270,7 +274,11 @@ page 6150737 "NPR Chart Wrapper"
     local procedure Initialize()
     begin
         BusChartBuf.Initialize();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         RetailChartMgt.InitializeChartDefinition(SelectedChartDefinition, UserId());
         UpdateChart();
     end;
@@ -303,7 +311,11 @@ page 6150737 "NPR Chart Wrapper"
             exit;
 
         RetailChartMgt.UpdateChart(SelectedChartDefinition, BusChartBuf, Period, PeriodType, Results);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         DateRange := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
 
         ChartDataTrackerMgt.UpsertTrackerTable(SelectedChartDefinition."Code Unit ID", Period, PeriodType, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date", ChartType, RetailChartMgt.IsChartTypeUsed(SelectedChartDefinition), Results);
@@ -328,7 +340,11 @@ page 6150737 "NPR Chart Wrapper"
     begin
         ChartDataTrackerMgt.GetResultsFromTable(ChartDataUpdateTracker, Results);
         RetailChartMgt.UpdateChart(SelectedChartDefinition, BusChartBuf, Period, PeriodType, Results);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         DateRange := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }

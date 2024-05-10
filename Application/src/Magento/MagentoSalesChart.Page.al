@@ -20,7 +20,11 @@
                 ToolTip = 'Specifies the value of the StatusText field';
                 ApplicationArea = NPRRetail;
             }
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(chart; BusinessChart)
+#ELSE
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 
@@ -164,7 +168,11 @@
             exit;
 
         ChartMgt.TurnOver_Revenue(BusChartBuf, Period, PeriodType);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         StatusText := StrSubstNo(FromToLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }
