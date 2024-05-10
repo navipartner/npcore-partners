@@ -18,7 +18,11 @@
                 ToolTip = 'Specifies the value of the Status Text field';
                 ApplicationArea = NPRRetail;
             }
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(BusinessChart; BusinessChart)
+#ELSE
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 
@@ -343,7 +347,11 @@
         if not IsChartAddInReady then
             exit;
         MembershipBurndownMgt.UpdateData(Rec);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Rec.UpdateChart(CurrPage.BusinessChart);
+#ELSE
         Rec.Update(CurrPage.BusinessChart);
+#ENDIF
         UpdateStatus();
         NeedsUpdate := false;
     end;

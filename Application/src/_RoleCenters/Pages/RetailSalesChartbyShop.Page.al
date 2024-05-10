@@ -36,7 +36,12 @@
                     UpdateChart();
                 end;
             }
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            usercontrol(chart; BusinessChart)
+#ELSE
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 
@@ -184,7 +189,11 @@
     local procedure Initialize()
     begin
         BusChartBuf.Initialize();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         UpdateChart();
     end;
 
@@ -218,7 +227,11 @@
 
         ChartMgt.TurnOver_RevenuebyDim(BusChartBuf, Period, PeriodType, Results);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         StatusText := StrSubstNo(FromToDateLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
 
         ChartDataTrackerMgt.UpsertTrackerTable(Codeunit::"NPR Retail Chart by Shop BT", Period, PeriodType, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date", ChartType, true, Results);
@@ -239,7 +252,11 @@
         ChartDataTrackerMgt.GetResultsFromTable(ChartDataUpdateTracker, Results);
 
         ChartMgt.TurnOver_RevenuebyDim(BusChartBuf, Period, PeriodType, Results);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BusChartBuf.UpdateChart(CurrPage.chart);
+#ELSE
         BusChartBuf.Update(CurrPage.chart);
+#ENDIF
         StatusText := StrSubstNo(FromToDateLbl, BusChartBuf."Period Filter Start Date", BusChartBuf."Period Filter End Date");
     end;
 }
