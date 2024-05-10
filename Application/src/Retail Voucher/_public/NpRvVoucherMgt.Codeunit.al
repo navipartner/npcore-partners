@@ -1481,13 +1481,28 @@
         VoucherType := Voucher."Voucher Type";
     end;
 
-    internal procedure GetVoucher(VoucherNumber: Text; VoucherType: Text; SelectFromList: Boolean; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
+    internal procedure GetVoucher(VoucherNumber: Text[50]; VoucherType: Text[20]; SelectFromList: Boolean; var Voucher: Record "NPR NpRv Voucher") Found: Boolean
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        TryFindPartnerVoucher: Codeunit "NPR Try Find Partner Voucher";
     begin
+        NpRvVoucherType.Reset();
+        NpRvVoucherType.SetFilter(Code, VoucherType);
+        NpRvVoucherType.SetLoadFields("Code");
+        if NpRvVoucherType.FindSet() then
+            repeat
+                Clear(TryFindPartnerVoucher);
+                TryFindPartnerVoucher.SetReferenceNo(VoucherNumber);
+                TryFindPartnerVoucher.SetVoucherType(NpRvVoucherType.Code);
+                if TryFindPartnerVoucher.Run() then;
+            until NpRvVoucherType.Next() = 0;
+
         Voucher.Reset();
         Voucher.SetCurrentKey("Reference No.");
         Voucher.SetRange(Open, true);
         Voucher.SetFilter("Voucher Type", VoucherType);
         Voucher.SetFilter("Reference No.", VoucherNumber);
+
         if SelectFromList and (VoucherNumber = '') then begin
             Found := Page.RunModal(0, Voucher) = Action::LookupOK;
             exit;
