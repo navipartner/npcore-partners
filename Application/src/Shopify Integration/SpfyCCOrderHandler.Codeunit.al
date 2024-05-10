@@ -218,7 +218,7 @@ codeunit 6184805 "NPR Spfy C&C Order Handler"
         OrderLinesJToken: JsonToken;
         ShopifySku: Text;
         NoOrderLinesErr: Label 'System could not find order lines to process. Please check if at least one item has been included into the order, and information about ordered items is in correct format (json array).';
-        UnknownSkuErr: Label 'Unkown SKU: %1';
+        UnknownSkuErr: Label 'Unknown SKU: %1';
     begin
         if not TempOrderLines.IsTemporary() then
             FunctionCallOnNonTempVarErr('ParseOrderLines()');

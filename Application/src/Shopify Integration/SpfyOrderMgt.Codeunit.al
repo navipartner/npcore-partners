@@ -935,7 +935,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OrderLineID: Text[30];
         Sku: Text;
         Handled: Boolean;
-        UnknownIdErr: Label 'Unkown %1: %2%3';
+        UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
         OrderLineID := GetOrderID(OrderLine);
         if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
