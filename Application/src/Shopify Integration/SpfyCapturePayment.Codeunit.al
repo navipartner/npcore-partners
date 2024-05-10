@@ -9,6 +9,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentMapping: Record "NPR Magento Payment Mapping";
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
 
     trigger OnRun()
     var
@@ -56,6 +57,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                 RecRef.SetTable(PaymentLine);
                 if PaymentLine.Find() then begin
                     PaymentLine."Date Captured" := Today;
+                    SpfyIntegrationEvents.OnModifyPaymentLineAfterCapture(PaymentLine, NcTask);
                     PaymentLine.Modify();
                 end;
             end;
@@ -179,7 +181,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             else
                 SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'UpdatePmtLinesAndScheduleCapture'));
         end;
-        PaymentLineParam."Document Table No." := RecRef.Number;
+        PaymentLineParam."Document Table No." := RecRef.Number();
 
         PaymentLine := PaymentLineParam;
         PaymentLine.SetRecFilter();
@@ -266,6 +268,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine.Amount := JsonHelper.GetJDecimal(ShopifyTransactionJToken, 'amount', true);
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := ShopifyPaymentGateway(JsonHelper.GetJText(ShopifyTransactionJToken, 'currency', false));
+        SpfyIntegrationEvents.OnAfterInitCreditCardPaymentLine(PaymentLine, PaymentMapping, ShopifyTransactionJToken);
     end;
 
     local procedure AddGiftCardPaymentLine(ShopifyTransactionJToken: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -325,6 +328,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
         NpRvSalesLine.Modify(true);
+
+        SpfyIntegrationEvents.OnAfterAddGiftCardPaymentLine(PaymentLine, NpRvSalesLine, ShopifyTransactionJToken);
 
         exit(true);
     end;
