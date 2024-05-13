@@ -1065,9 +1065,8 @@
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
 
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            if POSSalesWorkflow.Get(OnFinishSaleCode()) then
-                POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
+        if POSSalesWorkflow.Get(OnFinishSaleCode()) then
+            POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
 
         if not POSSalesWorkflowStep.FindSet() then
             exit;

@@ -213,7 +213,6 @@
         Post: Boolean;
         Posted: Boolean;
         Type: Option Proforma,Draft;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
@@ -306,8 +305,7 @@
             POSSalesDocumentOutputMgt.PrintNonPostedDocument(SalesHeader, type::Proforma);
 
         InvokeOnFinishCreditSaleWorkflow(SalePOS);
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            InvokeOnAfterFinishCreditSale(SalePOS);
+        InvokeOnAfterFinishCreditSale(SalePOS);
 
         OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
         SalesDocExpMgtPublic.OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
@@ -1299,9 +1297,8 @@ then
         POSSalesWorkflowStep.SetRange("Workflow Code", OnFinishCreditSaleCode());
         POSSalesWorkflowStep.SetRange(Enabled, true);
 
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            if POSSalesWorkflow.Get(OnFinishCreditSaleCode()) then
-                POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
+        if POSSalesWorkflow.Get(OnFinishCreditSaleCode()) then
+            POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", POSSalesWorkflow.GetWorkflowStepSubscriberCodeunitsFilter(false));
 
         if not POSSalesWorkflowStep.FindSet() then
             exit;

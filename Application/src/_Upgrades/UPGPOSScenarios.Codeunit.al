@@ -13,7 +13,12 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         ShowReturnAmountDialog();
         PrintCreditVoucherOnSale();
         EmailReceiptOnSale();
-        PrintReceiptOnSale();
+        UpgradeAuditProfile();
+        DeliverCollectDocument();
+        UpgradeMemberProfile();
+        UpgradeLoyaltyProfile();
+        UpgradeTicketProfile();
+        DeleteFinishSaleWorkflowSteps();
 
         //AFTER_LOGIN scenario
         SelectRequiredParam();
@@ -32,6 +37,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         //FINISH_CREDIT_SALE scenario
         DimPopupEvery();
         EjectPaymentBinOnCreditSale();
+        DeleteFinishCreditSaleWorkflowSteps();
 
     end;
 
@@ -56,6 +62,48 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         end;
     end;
 
+    local procedure DeleteFinishSaleWorkflowSteps()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'DeleteFinishSaleWorkflowSteps');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeleteFinishSaleWorkflowSteps')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR CleanCash Wrapper", 'CreateCleanCashOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR POS Payment Bin Eject Mgt.", 'EjectPaymentBin');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR POS Sales Print Mgt.", 'PrintReceiptOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR MM Loyalty Point Mgt.", 'PointAssignmentOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR Tax Free Handler Mgt.", 'IssueTaxFreeVoucherOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR E-mail Doc. Mgt.", 'EmailReceiptOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR MM Member Retail Integr.", 'PrintMembershipsOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR MM Member Notification", 'SendMemberNotificationOnSales');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR TM Ticket Management", 'PrintTicketsOnSale');
+        DeletePOSWorkflowStepFinishSale(Codeunit::"NPR NpCs POSSession Mgt.", 'DeliverCollectDocument');
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeleteFinishSaleWorkflowSteps'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure DeleteFinishCreditSaleWorkflowSteps()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'DeleteFinishCreditSaleWorkflowSteps');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeleteFinishCreditSaleWorkflowSteps')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        DeletePOSWorkflowStepFinishCreditSale(Codeunit::"NPR POS Payment Bin Eject Mgt.", 'EjectPaymentBinOnCreditSale');
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeleteFinishCreditSaleWorkflowSteps'));
+        LogMessageStopwatch.LogFinish();
+    end;
 
     local procedure ShowReturnAmountDialog()
     var
@@ -92,6 +140,11 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     local procedure DeletePOSWorkflowStepFinishSale(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
     begin
         DeletePOSWorkflowStep('FINISH_SALE', SubscriberCodeunitID, SubscriberFunction);
+    end;
+
+    local procedure DeletePOSWorkflowStepFinishCreditSale(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
+    begin
+        DeletePOSWorkflowStep('FINISH_CREDIT_SALE', SubscriberCodeunitID, SubscriberFunction);
     end;
 
     local procedure DeletePOSWorkflowStepPaymentView(SubscriberCodeunitID: Integer; SubscriberFunction: Text[80])
@@ -392,38 +445,296 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
     end;
 
-    local procedure PrintReceiptOnSale()
+    local procedure UpgradeAuditProfile()
     var
+        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
+        AuditProfileUpgradeBuff: Record "NPR Audit Profile Upgrade Buff";
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        POSAuditProfile: Record "NPR POS Audit Profile";
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
-        POSUnit: Record "NPR POS Unit";
     begin
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'PrintReceiptOnSale');
-        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PrintReceiptOnSale')) then begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeAuditProfile');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeAuditProfile')) then begin
             LogMessageStopwatch.LogFinish();
             exit;
         end;
 
-        POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
-        POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR POS Sales Print Mgt.");
-        POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintReceiptOnSale');
-        POSSalesWorkflowStep.SetRange(Enabled, false);
-        If POSSalesWorkflowStep.FindSet(false) then
-            repeat
-                POSUnit.SetFilter("POS Sales Workflow Set", POSSalesWorkflowStep."Set Code");
-                if POSUnit.FindSet(false) then
-                    repeat
-                        POSAuditProfile.SetFilter(Code, POSUnit."POS Audit Profile");
-                        if POSAuditProfile.FindFirst() then
-                            if not POSAuditProfile."Do Not Print Receipt on Sale" then begin
-                                POSAuditProfile."Do Not Print Receipt on Sale" := true;
-                                POSAuditProfile.Modify();
-                            end;
-                    until POSUnit.Next() = 0;
-            until POSSalesWorkflowStep.Next() = 0;
+        CreateAuditProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
+        CreateAuditProfileUpgradeBuff(POSScenarioUpgradeBuff, AuditProfileUpgradeBuff);
+        ProcessAuditProfileUpgradeBuff(AuditProfileUpgradeBuff);
 
-        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'PrintReceiptOnSale'));
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeAuditProfile'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeMemberProfile()
+    var
+        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
+        NPRMemberProfileUpgBuff: Record "NPR Member Profile Upg Buff";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeMemberProfile');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeMemberProfile')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        CreateMemberProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
+        CreateMemberProfileUpgradeBuff(POSScenarioUpgradeBuff, NPRMemberProfileUpgBuff);
+        ProcessMemberProfileUpgradeBuff(NPRMemberProfileUpgBuff);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeMemberProfile'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure CreateMemberProfileUpgradeBuff(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff"; var NPRMemberProfileUpgBuff: Record "NPR Member Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSMemberProfile: Record "NPR MM POS Member Profile";
+        NewPOSMemberProfile: Record "NPR MM POS Member Profile";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Sales Workflow Set", POSScenarioUpgradeBuff.Code);
+            POSUnit.SetLoadFields("No.", "POS Sales Workflow Set", "POS Member Profile");
+            if POSUnit.FindSet() then
+                repeat
+                    POSMemberProfile.Reset();
+                    POSMemberProfile.SetRange("Print Membership On Sale", POSScenarioUpgradeBuff."Print Membership On Sale");
+                    POSMemberProfile.SetRange("Send Notification On Sale", POSScenarioUpgradeBuff."Send Notification On Sale");
+                    POSMemberProfile.SetRange(Code, POSUnit."POS Member Profile");
+                    if POSMemberProfile.IsEmpty then
+                        if not NPRMemberProfileUpgBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Member Profile") then begin
+                            NewPOSMemberProfile.Init();
+                            NewPOSMemberProfile.Code := GetPOSMemberProfileUpgradeCode();
+                            NewPOSMemberProfile."Print Membership On Sale" := POSScenarioUpgradeBuff."Print Membership On Sale";
+                            NewPOSMemberProfile."Send Notification On Sale" := POSScenarioUpgradeBuff."Send Notification On Sale";
+                            NewPOSMemberProfile.Insert();
+
+                            NPRMemberProfileUpgBuff.Init();
+                            NPRMemberProfileUpgBuff."POS New Member Profile Code" := NewPOSMemberProfile.Code;
+                            NPRMemberProfileUpgBuff."POS Member Profile Code" := POSUnit."POS Member Profile";
+                            NPRMemberProfileUpgBuff."Workflow Set Code" := POSScenarioUpgradeBuff.Code;
+                            NPRMemberProfileUpgBuff.Insert();
+                        end;
+                until POSUnit.Next() = 0;
+        until POSScenarioUpgradeBuff.Next() = 0;
+
+    end;
+
+    local procedure ProcessMemberProfileUpgradeBuff(var NPRMemberProfileUpgBuff: Record "NPR Member Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        NPRMemberProfileUpgBuff.Reset();
+        if not NPRMemberProfileUpgBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Member Profile", NPRMemberProfileUpgBuff."POS Member Profile Code");
+            POSUnit.SetRange("POS Sales Workflow Set", NPRMemberProfileUpgBuff."Workflow Set Code");
+            if not POSUnit.IsEmpty then
+                POSUnit.ModifyAll("POS Member Profile", NPRMemberProfileUpgBuff."POS New Member Profile Code");
+        until NPRMemberProfileUpgBuff.Next() = 0;
+    end;
+
+    local procedure CreateMemberProfilePOSScenarioUpgradeBuffer(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.IsEmpty then
+            POSScenarioUpgradeBuff.DeleteAll();
+
+        POSUnit.Reset();
+        POSUnit.SetCurrentKey("POS Sales Workflow Set");
+        POSUnit.SetLoadFields("No.", "POS Sales Workflow Set");
+        if not POSUnit.FindSet() then
+            exit;
+
+        repeat
+            if not POSScenarioUpgradeBuff.Get(POSUnit."POS Sales Workflow Set") then begin
+                POSScenarioUpgradeBuff.Init();
+                POSScenarioUpgradeBuff.Code := POSUnit."POS Sales Workflow Set";
+                POSScenarioUpgradeBuff.Insert();
+            end;
+
+            POSSalesWorkflowStep.Reset();
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Member Retail Integr.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintMembershipsOnSale');
+            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Print Membership On Sale" := false
+            else
+                POSScenarioUpgradeBuff."Print Membership On Sale" := POSSalesWorkflowStep.Enabled;
+
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Member Notification");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'SendMemberNotificationOnSales');
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Send Notification On Sale" := false
+            else
+                POSScenarioUpgradeBuff."Send Notification On Sale" := POSSalesWorkflowStep.Enabled;
+
+            POSScenarioUpgradeBuff.Modify();
+
+            POSUnit.SetRange("POS Sales Workflow Set", POSUnit."POS Sales Workflow Set");
+            POSUnit.FindLast();
+            POSUnit.SetRange("POS Sales Workflow Set");
+        until POSUnit.Next() = 0;
+    end;
+
+    local procedure CreateAuditProfilePOSScenarioUpgradeBuffer(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.IsEmpty then
+            POSScenarioUpgradeBuff.DeleteAll();
+
+        POSUnit.Reset();
+        POSUnit.SetCurrentKey("POS Sales Workflow Set");
+        POSUnit.SetLoadFields("No.", "POS Sales Workflow Set");
+        if not POSUnit.FindSet() then
+            exit;
+
+        repeat
+            if not POSScenarioUpgradeBuff.Get(POSUnit."POS Sales Workflow Set") then begin
+                POSScenarioUpgradeBuff.Init();
+                POSScenarioUpgradeBuff.Code := POSUnit."POS Sales Workflow Set";
+                POSScenarioUpgradeBuff.Insert();
+            end;
+
+            POSSalesWorkflowStep.Reset();
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR POS Sales Print Mgt.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintReceiptOnSale');
+            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Do Not Print Receipt on Sale" := true
+            else
+                POSScenarioUpgradeBuff."Do Not Print Receipt on Sale" := not POSSalesWorkflowStep.Enabled;
+
+
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR POS Payment Bin Eject Mgt.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'EjectPaymentBin');
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Bin Eject After Sale" := false
+            else
+                POSScenarioUpgradeBuff."Bin Eject After Sale" := POSSalesWorkflowStep.Enabled;
+
+            POSScenarioUpgradeBuff.Modify();
+
+            POSUnit.SetRange("POS Sales Workflow Set", POSUnit."POS Sales Workflow Set");
+            POSUnit.FindLast();
+            POSUnit.SetRange("POS Sales Workflow Set");
+        until POSUnit.Next() = 0;
+    end;
+
+    local procedure CreateAuditProfileUpgradeBuff(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff"; var AuditProfileUpgradeBuff: Record "NPR Audit Profile Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        NewPOSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        AuditProfileUpgradeBuff.Reset();
+        if not AuditProfileUpgradeBuff.IsEmpty then
+            AuditProfileUpgradeBuff.DeleteAll();
+
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Sales Workflow Set", POSScenarioUpgradeBuff.Code);
+            POSUnit.SetLoadFields("No.", "POS Sales Workflow Set", "POS Audit Profile");
+            if POSUnit.FindSet() then
+                repeat
+                    if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+                        if (POSAuditProfile."Do Not Print Receipt on Sale" <> POSScenarioUpgradeBuff."Do Not Print Receipt on Sale") or
+                           (POSAuditProfile."Bin Eject After Sale" <> POSScenarioUpgradeBuff."Bin Eject After Sale") then
+                            if not AuditProfileUpgradeBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Audit Profile") then begin
+                                NewPOSAuditProfile := POSAuditProfile;
+                                NewPOSAuditProfile."Bin Eject After Sale" := POSScenarioUpgradeBuff."Bin Eject After Sale";
+                                NewPOSAuditProfile."Do Not Print Receipt on Sale" := POSScenarioUpgradeBuff."Do Not Print Receipt on Sale";
+                                NewPOSAuditProfile.Code := GetAuditProfileUpgradeCode();
+                                NewPOSAuditProfile.Insert();
+
+                                AuditProfileUpgradeBuff.Init();
+                                AuditProfileUpgradeBuff."Workflow Set Code" := POSUnit."POS Sales Workflow Set";
+                                AuditProfileUpgradeBuff."POS Audit Profile Code" := POSUnit."POS Audit Profile";
+                                AuditProfileUpgradeBuff."POS New Audit Profile Code" := NewPOSAuditProfile.Code;
+                                AuditProfileUpgradeBuff.Insert();
+                            end;
+                until POSUnit.Next() = 0;
+        until POSScenarioUpgradeBuff.Next() = 0;
+
+    end;
+
+    local procedure ProcessAuditProfileUpgradeBuff(var AuditProfileUpgradeBuff: Record "NPR Audit Profile Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        AuditProfileUpgradeBuff.Reset();
+        if not AuditProfileUpgradeBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Audit Profile", AuditProfileUpgradeBuff."POS Audit Profile Code");
+            POSUnit.SetRange("POS Sales Workflow Set", AuditProfileUpgradeBuff."Workflow Set Code");
+            if not POSUnit.IsEmpty then
+                POSUnit.ModifyAll("POS Audit Profile", AuditProfileUpgradeBuff."POS New Audit Profile Code");
+        until AuditProfileUpgradeBuff.Next() = 0;
+    end;
+
+    local procedure DeliverCollectDocument()
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        NPRPOSSalesDocumentSetup: Record "NPR POS Sales Document Setup";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'DeliverCollectDocument');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeliverCollectDocument')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        POSUnit.Reset();
+        POSUnit.SetLoadFields("No.", "POS Sales Workflow Set");
+        if POSUnit.FindSet() then
+            repeat
+                POSSalesWorkflowStep.Reset();
+                POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+                POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR NpCs POSSession Mgt.");
+                POSSalesWorkflowStep.SetRange("Subscriber Function", 'DeliverCollectDocument');
+                POSSalesWorkflowStep.SetRange(Enabled, true);
+                POSSalesWorkflowStep.SetRange("Set Code", POSUnit."POS Sales Workflow Set");
+                if not POSSalesWorkflowStep.IsEmpty then begin
+                    if not NPRPOSSalesDocumentSetup.Get() then begin
+                        NPRPOSSalesDocumentSetup.Init();
+                        NPRPOSSalesDocumentSetup."Deliver Collect Document" := true;
+                        NPRPOSSalesDocumentSetup.Insert();
+                    end else begin
+                        if not NPRPOSSalesDocumentSetup."Deliver Collect Document" then begin
+                            NPRPOSSalesDocumentSetup."Deliver Collect Document" := true;
+                            NPRPOSSalesDocumentSetup.Modify();
+                        end;
+                    end;
+                    POSUnit.FindLast();
+                end;
+            until POSUnit.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'DeliverCollectDocument'));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -451,4 +762,278 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure UpgradeLoyaltyProfile()
+    var
+        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
+        LoyaltyProfileUpgBuff: Record "NPR Loyalty Profile Upg Buff";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeLoyaltyProfile');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeLoyaltyProfile')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        CreateLoyaltyProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
+        CreateLoyaltyProfileUpgradeBuff(POSScenarioUpgradeBuff, LoyaltyProfileUpgBuff);
+        ProcessLoyaltyProfileUpgradeBuff(LoyaltyProfileUpgBuff);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeLoyaltyProfile'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure CreateLoyaltyProfilePOSScenarioUpgradeBuffer(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.IsEmpty then
+            POSScenarioUpgradeBuff.DeleteAll();
+
+        POSUnit.Reset();
+        POSUnit.SetCurrentKey("POS Sales Workflow Set");
+        POSUnit.SetLoadFields("No.", "POS Sales Workflow Set");
+        if not POSUnit.FindSet() then
+            exit;
+
+        repeat
+            if not POSScenarioUpgradeBuff.Get(POSUnit."POS Sales Workflow Set") then begin
+                POSScenarioUpgradeBuff.Init();
+                POSScenarioUpgradeBuff.Code := POSUnit."POS Sales Workflow Set";
+                POSScenarioUpgradeBuff.Insert();
+            end;
+
+            POSSalesWorkflowStep.Reset();
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Loyalty Point Mgt.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'PointAssignmentOnSale');
+            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Assign Loyalty On Sale" := false
+            else
+                POSScenarioUpgradeBuff."Assign Loyalty On Sale" := POSSalesWorkflowStep.Enabled;
+
+
+            POSScenarioUpgradeBuff.Modify();
+
+            POSUnit.SetRange("POS Sales Workflow Set", POSUnit."POS Sales Workflow Set");
+            POSUnit.FindLast();
+            POSUnit.SetRange("POS Sales Workflow Set");
+        until POSUnit.Next() = 0;
+    end;
+
+    local procedure CreateLoyaltyProfileUpgradeBuff(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff"; var LoyaltyProfileUpgBuff: Record "NPR Loyalty Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+        NewPOSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Sales Workflow Set", POSScenarioUpgradeBuff.Code);
+            POSUnit.SetLoadFields("No.", "POS Sales Workflow Set", "POS Loyalty Profile");
+            if POSUnit.FindSet() then
+                repeat
+                    POSLoyaltyProfile.Reset();
+                    POSLoyaltyProfile.SetRange("Assign Loyalty On Sale", POSScenarioUpgradeBuff."Assign Loyalty On Sale");
+                    POSLoyaltyProfile.SetRange(Code, POSUnit."POS Loyalty Profile");
+                    if POSLoyaltyProfile.IsEmpty then
+                        if not LoyaltyProfileUpgBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Loyalty Profile") then begin
+                            NewPOSLoyaltyProfile.Init();
+                            NewPOSLoyaltyProfile.Code := GetPOSLoyaltyProfileUpgradeCode();
+                            NewPOSLoyaltyProfile."Assign Loyalty On Sale" := POSScenarioUpgradeBuff."Assign Loyalty On Sale";
+                            NewPOSLoyaltyProfile.Insert();
+
+                            LoyaltyProfileUpgBuff.Init();
+                            LoyaltyProfileUpgBuff."POS New Loyalty Profile Code" := NewPOSLoyaltyProfile.Code;
+                            LoyaltyProfileUpgBuff."POS Loyalty Profile Code" := POSUnit."POS Loyalty Profile";
+                            LoyaltyProfileUpgBuff."Workflow Set Code" := POSScenarioUpgradeBuff.Code;
+                            LoyaltyProfileUpgBuff.Insert();
+                        end;
+                until POSUnit.Next() = 0;
+        until POSScenarioUpgradeBuff.Next() = 0;
+
+    end;
+
+    local procedure ProcessLoyaltyProfileUpgradeBuff(var NPRLoyaltyProfileUpgBuff: Record "NPR Loyalty Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        NPRLoyaltyProfileUpgBuff.Reset();
+        if not NPRLoyaltyProfileUpgBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Loyalty Profile", NPRLoyaltyProfileUpgBuff."POS Loyalty Profile Code");
+            POSUnit.SetRange("POS Sales Workflow Set", NPRLoyaltyProfileUpgBuff."Workflow Set Code");
+            if not POSUnit.IsEmpty then
+                POSUnit.ModifyAll("POS Loyalty Profile", NPRLoyaltyProfileUpgBuff."POS New Loyalty Profile Code");
+        until NPRLoyaltyProfileUpgBuff.Next() = 0;
+    end;
+
+    local procedure UpgradeTicketProfile()
+    var
+        POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff";
+        TicketProfileUpgBuff: Record "NPR Ticket Profile Upg Buff";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'UpgradeTicketProfile');
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeTicketProfile')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        CreateTicketProfilePOSScenarioUpgradeBuffer(POSScenarioUpgradeBuff);
+        CreateTicketProfileUpgradeBuff(POSScenarioUpgradeBuff, TicketProfileUpgBuff);
+        ProcessTicketProfileUpgradeBuff(TicketProfileUpgBuff);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeTicketProfile'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure CreateTicketProfilePOSScenarioUpgradeBuffer(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.IsEmpty then
+            POSScenarioUpgradeBuff.DeleteAll();
+
+        POSUnit.Reset();
+        POSUnit.SetCurrentKey("POS Sales Workflow Set");
+        POSUnit.SetLoadFields("No.", "POS Sales Workflow Set");
+        if not POSUnit.FindSet() then
+            exit;
+
+        repeat
+            if not POSScenarioUpgradeBuff.Get(POSUnit."POS Sales Workflow Set") then begin
+                POSScenarioUpgradeBuff.Init();
+                POSScenarioUpgradeBuff.Code := POSUnit."POS Sales Workflow Set";
+                POSScenarioUpgradeBuff.Insert();
+            end;
+
+            POSSalesWorkflowStep.Reset();
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR TM Ticket Management");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintTicketsOnSale');
+            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
+            if not POSSalesWorkflowStep.FindFirst() then
+                POSScenarioUpgradeBuff."Print Ticket On Sale" := false
+            else
+                POSScenarioUpgradeBuff."Print Ticket On Sale" := POSSalesWorkflowStep.Enabled;
+
+
+            POSScenarioUpgradeBuff.Modify();
+
+            POSUnit.SetRange("POS Sales Workflow Set", POSUnit."POS Sales Workflow Set");
+            POSUnit.FindLast();
+            POSUnit.SetRange("POS Sales Workflow Set");
+        until POSUnit.Next() = 0;
+    end;
+
+    local procedure CreateTicketProfileUpgradeBuff(var POSScenarioUpgradeBuff: Record "NPR POS Scenario Upgrade Buff"; var TicketProfileUpgBuff: Record "NPR Ticket Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSTicketProfile: Record "NPR TM POS Ticket Profile";
+        NewPOSTicketProfile: Record "NPR TM POS Ticket Profile";
+    begin
+        POSScenarioUpgradeBuff.Reset();
+        if not POSScenarioUpgradeBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Sales Workflow Set", POSScenarioUpgradeBuff.Code);
+            POSUnit.SetLoadFields("No.", "POS Sales Workflow Set", "POS Ticket Profile");
+            if POSUnit.FindSet() then
+                repeat
+                    POSTicketProfile.Reset();
+                    POSTicketProfile.SetRange("Print Ticket On Sale", POSScenarioUpgradeBuff."Print Ticket On Sale");
+                    POSTicketProfile.SetRange(Code, POSUnit."POS Ticket Profile");
+                    if POSTicketProfile.IsEmpty then
+                        if not TicketProfileUpgBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Ticket Profile") then begin
+                            NewPOSTicketProfile.Init();
+                            NewPOSTicketProfile.Code := GetPOSTicketProfileUpgradeCode();
+                            NewPOSTicketProfile."Print Ticket On Sale" := POSScenarioUpgradeBuff."Print Ticket On Sale";
+                            NewPOSTicketProfile.Insert();
+
+                            TicketProfileUpgBuff.Init();
+                            TicketProfileUpgBuff."POS New Ticket Profile Code" := NewPOSTicketProfile.Code;
+                            TicketProfileUpgBuff."POS Ticket Profile Code" := POSUnit."POS Ticket Profile";
+                            TicketProfileUpgBuff."Workflow Set Code" := POSScenarioUpgradeBuff.Code;
+                            TicketProfileUpgBuff.Insert();
+                        end;
+                until POSUnit.Next() = 0;
+        until POSScenarioUpgradeBuff.Next() = 0;
+    end;
+
+    local procedure ProcessTicketProfileUpgradeBuff(var NPRTicketProfileUpgBuff: Record "NPR Ticket Profile Upg Buff")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        NPRTicketProfileUpgBuff.Reset();
+        if not NPRTicketProfileUpgBuff.FindSet() then
+            exit;
+
+        repeat
+            POSUnit.Reset();
+            POSUnit.SetRange("POS Ticket Profile", NPRTicketProfileUpgBuff."POS Ticket Profile Code");
+            POSUnit.SetRange("POS Sales Workflow Set", NPRTicketProfileUpgBuff."Workflow Set Code");
+            if not POSUnit.IsEmpty then
+                POSUnit.ModifyAll("POS Ticket Profile", NPRTicketProfileUpgBuff."POS New Ticket Profile Code");
+        until NPRTicketProfileUpgBuff.Next() = 0;
+    end;
+
+    local procedure GetAuditProfileUpgradeCode() AuditProfileUpgradeCode: Code[20];
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        InitialValueCodeLbl: Label 'UPG_0000000000000001';
+    begin
+        AuditProfileUpgradeCode := InitialValueCodeLbl;
+
+        while POSAuditProfile.Get(AuditProfileUpgradeCode) do
+            AuditProfileUpgradeCode := IncStr(AuditProfileUpgradeCode);
+    end;
+
+    local procedure GetPOSMemberProfileUpgradeCode() MemberProfileUpgradeCode: Code[20];
+    var
+        POSMemberProfile: Record "NPR MM POS Member Profile";
+        InitialValueCodeLbl: Label 'UPG_0000000000000001';
+    begin
+        MemberProfileUpgradeCode := InitialValueCodeLbl;
+
+        while POSMemberProfile.Get(MemberProfileUpgradeCode) do
+            MemberProfileUpgradeCode := IncStr(MemberProfileUpgradeCode);
+    end;
+
+    local procedure GetPOSLoyaltyProfileUpgradeCode() LoyaltyProfileUpgradeCode: Code[20];
+    var
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+        InitialValueCodeLbl: Label 'UPG_0000000000000001';
+    begin
+        LoyaltyProfileUpgradeCode := InitialValueCodeLbl;
+
+        while POSLoyaltyProfile.Get(LoyaltyProfileUpgradeCode) do
+            LoyaltyProfileUpgradeCode := IncStr(LoyaltyProfileUpgradeCode);
+    end;
+
+    local procedure GetPOSTicketProfileUpgradeCode() TicketProfileUpgradeCode: Code[20];
+    var
+        POSTicketProfile: Record "NPR TM POS Ticket Profile";
+        InitialValueCodeLbl: Label 'UPG_0000000000000001';
+    begin
+        TicketProfileUpgradeCode := InitialValueCodeLbl;
+
+        while POSTicketProfile.Get(TicketProfileUpgradeCode) do
+            TicketProfileUpgradeCode := IncStr(TicketProfileUpgradeCode);
+    end;
 }

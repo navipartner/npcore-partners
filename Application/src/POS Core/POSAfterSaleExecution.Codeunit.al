@@ -2,8 +2,6 @@
 {
     Access = Internal;
     trigger OnRun()
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         case OnRunType of
             // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
@@ -13,8 +11,7 @@
             OnRunType::RunAfterEndSale:
                 begin
                     PosSaleCodeunit.InvokeOnFinishSaleWorkflow(Rec);
-                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-                        PosSaleCodeunit.InvokeOnFinishSaleWorkflows(Rec);
+                    PosSaleCodeunit.InvokeOnFinishSaleWorkflows(Rec);
                     Commit();
                     PosSaleCodeunit.OnAfterEndSale(OnRunXRec);
                     Commit();

@@ -147,6 +147,12 @@
             Caption = 'Bin Eject After Credit Sale';
             DataClassification = CustomerContent;
         }
+        field(150; "Bin Eject After Sale"; Boolean)
+        {
+            Caption = 'Bin Eject After Sale';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

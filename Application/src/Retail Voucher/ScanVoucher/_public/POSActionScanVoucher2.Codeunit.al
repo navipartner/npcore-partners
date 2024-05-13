@@ -128,7 +128,6 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     var
         ReferenceNo: Text;
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         ActionContext: JsonObject;
         VoucherTypeCode: Code[20];
         SelectedAmount: Decimal;
@@ -138,7 +137,6 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         POSActionScanActionB.ProcessPayment(VoucherTypeCode, ReferenceNo, SelectedAmount, Sale, PaymentLine, SaleLine, EndSalePar, ActionContext);
 
         Response.Add('tryEndSale', HandleWorkflowResponse(Response, ActionContext));
-        Response.Add('posLifeCycleEventsWorkflowsEnabled_v2', FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2'));
         exit(Response);
 
     end;
@@ -215,22 +213,16 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
 
     internal procedure HandleWorkflowResponse(var Response: JsonObject; ActionContextIn: JsonObject): Boolean
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Jtoken: JsonToken;
         Jobj: JsonObject;
     begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then begin
-            ActionContextIn.Get('paymentNo', Jtoken);
-            Response.Add('paymentNo', Jtoken.AsValue().AsText());
 
-            if ActionContextIn.Get('stopEndSaleExecution', Jtoken) then
-                if Jtoken.AsValue().AsBoolean() then
-                    exit;
-        end else begin
-            Response.Add('endSaleWithoutPosting', false);
-            if ActionContextIn.Get('endSaleWithoutPosting', Jtoken) then
-                response.Replace('endSaleWithoutPosting', Jtoken.AsValue().AsBoolean());
-        end;
+        ActionContextIn.Get('paymentNo', Jtoken);
+        Response.Add('paymentNo', Jtoken.AsValue().AsText());
+
+        if ActionContextIn.Get('stopEndSaleExecution', Jtoken) then
+            if Jtoken.AsValue().AsBoolean() then
+                exit;
 
         if not ActionContextIn.Get('name', Jtoken) then
             exit(true);
@@ -303,7 +295,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:t,popup:c,context:l,captions:o})=>{debugger;let r,a={tryEndSale:!1,legacy:!1};if(t.VoucherTypeCode)e.context.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return a;if(t.ReferenceNo?r=t.ReferenceNo:r=await c.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),r===null)return a;const{selectedVoucherReferenceNo:s,askForAmount:h,suggestedAmount:i,paymentDescription:p,amountPrompt:m,voucherType:y}=await e.respond("calculateVoucherInformation",{VoucherRefNo:r});if(e.context.voucherType=y,!e.context.voucherType||(r=s,!r))return a;let u=i;if(h)for(var f=!0;f;){if(u=i,i>0&&(u=await c.numpad({title:p,caption:m,value:i}),u===null))return a;f=u>i,f&&await c.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,u,i))}let n=await e.respond("prepareRequest",{VoucherRefNo:r,selectedAmount:u});return n.tryEndSale?t.EndSale&&(n.posLifeCycleEventsWorkflowsEnabled_v2?await e.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:n.paymentNo}}):n.endSaleWithoutPosting||await e.respond("endSale")):n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):n.workflowName&&await e.run(n.workflowName,{parameters:n.parameters}),a};function strSubstNo(e,...t){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(c,l,o)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,r=>r[0]);if(o>=t.length)throw new Error("argument index is out of range in format");return t[o]})}'
+'let main=async({workflow:e,parameters:r,popup:c,context:l,captions:o})=>{debugger;let t,a={tryEndSale:!1,legacy:!1};if(r.VoucherTypeCode)e.context.voucherType=r.VoucherTypeCode;else if(r.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return a;if(r.ReferenceNo?t=r.ReferenceNo:t=await c.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),t===null)return a;const{selectedVoucherReferenceNo:s,askForAmount:h,suggestedAmount:i,paymentDescription:m,amountPrompt:p,voucherType:y}=await e.respond("calculateVoucherInformation",{VoucherRefNo:t});if(e.context.voucherType=y,!e.context.voucherType||(t=s,!t))return a;let u=i;if(h)for(var f=!0;f;){if(u=i,i>0&&(u=await c.numpad({title:m,caption:p,value:i}),u===null))return a;f=u>i,f&&await c.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,u,i))}let n=await e.respond("prepareRequest",{VoucherRefNo:t,selectedAmount:u});return n.tryEndSale?r.EndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:n.paymentNo}}):n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):n.workflowName&&await e.run(n.workflowName,{parameters:n.parameters}),a};function strSubstNo(e,...r){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(c,l,o)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,t=>t[0]);if(o>=r.length)throw new Error("argument index is out of range in format");return r[o]})}'
         );
     end;
 
