@@ -246,7 +246,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     var
         StdValueEntry: Record "Value Entry";
         SumOfStdCostPerUnit: Decimal;
-        SumOfStdInvQty: Integer;
+        SumOfStdInvQty: Decimal;
         CalculationValueEntryDescLbl: Label 'Calculation';
     begin
         StdValueEntry.SetCurrentKey("Item Ledger Entry No.", "Entry Type");
@@ -310,7 +310,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         SumOfStdCostPerUnit: Decimal;
-        SumOfStdInvQty: Integer;
+        SumOfStdInvQty: Decimal;
         SumOfApplCostPerUnit: Decimal;
         CalculationValueEntryDescLbl: Label 'Calculation';
     begin

@@ -248,11 +248,11 @@ table 6060000 "NPR RS Nivelation Lines"
                     if not PriceListHeader.Get(NivelationHeader."Price List Code") then
                         exit;
                     if not VATSetup.Get(PriceListHeader."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                        Error(VATSetupNotFoundErr, VATSetup.TableCaption(), VATSetup.FieldCaption("VAT Bus. Posting Group"), PriceListHeader."VAT Bus. Posting Gr. (Price)", VATSetup.FieldCaption("VAT Prod. Posting Group"), "VAT Bus. Posting Gr. (Price)");
+                        Error(VATSetupNotFoundErr, VATSetup.TableCaption(), PriceListHeader.FieldCaption("VAT Bus. Posting Gr. (Price)"), PriceListHeader."VAT Bus. Posting Gr. (Price)", Item.FieldCaption("VAT Prod. Posting Group"), Item."VAT Prod. Posting Group");
                 end;
             "NPR RS Nivelation Type"::"Promotions & Discounts":
                 if not VATSetup.Get("VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                    Error(VATSetupNotFoundErr, VATSetup.TableCaption(), VATSetup.FieldCaption("VAT Bus. Posting Group"), "VAT Bus. Posting Gr. (Price)", VATSetup.FieldCaption("VAT Prod. Posting Group"), "VAT Bus. Posting Gr. (Price)");
+                    Error(VATSetupNotFoundErr, VATSetup.TableCaption(), FieldCaption("VAT Bus. Posting Gr. (Price)"), "VAT Bus. Posting Gr. (Price)", Item.FieldCaption("VAT Prod. Posting Group"), Item."VAT Prod. Posting Group");
         end;
         "VAT %" := VATSetup."VAT %";
     end;
