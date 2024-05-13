@@ -85,13 +85,13 @@ codeunit 6151363 "NPR RS POS GL Addition"
                 NivelationLines."Line No." := LineNo;
                 NivelationLines."Document No." := NivelationHeader."No.";
                 NivelationLines."Location Code" := TempNivelationSalesLines."Location Code";
+                NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
                 NivelationLines.Validate("Item No.", TempNivelationSalesLines."No.");
                 NivelationLines.Quantity := TempNivelationSalesLines.Quantity;
                 FindPriceListLine(TempNivelationSalesLines."Location Code", TempNivelationSalesLines."No.");
                 NivelationLines."Old Price" := PriceListLine."Unit Price";
-                NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
                 NivelationLines."Posting Date" := POSEntry."Posting Date";
-                NivelationLines."New Price" := Abs(TempNivelationSalesLines."Unit Price") - Abs(TempNivelationSalesLines."Line Discount Amount Incl. VAT");
+                NivelationLines.Validate("New Price", Abs(TempNivelationSalesLines."Unit Price") - Abs(TempNivelationSalesLines."Line Discount Amount Incl. VAT"));
                 if VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", TempNivelationSalesLines."VAT Prod. Posting Group") then
                     NivelationLines."VAT %" := VATSetup."VAT %";
                 NivelationLines.Insert(true);
@@ -438,7 +438,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         StdItemLedgerEntry: Record "Item Ledger Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         SumOfAppliedCostAmounts: Decimal;
-        SumOfQty: Integer;
+        SumOfQty: Decimal;
     begin
         if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
             exit;
@@ -482,7 +482,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ReturnValueEntry: Record "Value Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         SumOfAppliedCostAmounts: Decimal;
-        SumOfQty: Integer;
+        SumOfQty: Decimal;
     begin
         ReturnValueEntry.SetRange("Location Code", TempPOSEntrySalesLines."Location Code");
         ReturnValueEntry.SetRange("Document No.", ReturnDocumentNo);
@@ -891,11 +891,11 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ValueEntry."Item Ledger Entry Quantity" := 0;
     end;
 
-    local procedure FindAppliedItemLedgerEntryCostSum(var SumOfCostAmounts: Decimal; var SumOfQty: Integer; StdItemLedgerEntry: Record "Item Ledger Entry")
+    local procedure FindAppliedItemLedgerEntryCostSum(var SumOfCostAmounts: Decimal; var SumOfQty: Decimal; StdItemLedgerEntry: Record "Item Ledger Entry")
     var
         TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ShowAppliedEntries: Codeunit "Show Applied Entries";
-        SumOfQtyPerEntry: Integer;
+        SumOfQtyPerEntry: Decimal;
         SumOfCostPerUnit: Decimal;
     begin
         ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
@@ -912,7 +912,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         until TempApplicationItemLedgerEntry.Next() = 0;
     end;
 
-    local procedure GetApplicationValueEntryCost(var SumOfCostPerUnit: Decimal; var SumOfQty: Integer; TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    local procedure GetApplicationValueEntryCost(var SumOfCostPerUnit: Decimal; var SumOfQty: Decimal; TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary)
     var
         ValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
