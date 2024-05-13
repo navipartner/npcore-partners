@@ -195,7 +195,12 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
         LocalizationSetup.Get();
-        ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Transfer Report Ord.", 0D, true);
+        case CurrReport.Preview() of
+            true:
+                ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Transfer Report Ord.", 0D, false);
+            false:
+                ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Transfer Report Ord.", 0D, true);
+        end;
     end;
 
     local procedure Calculation()
