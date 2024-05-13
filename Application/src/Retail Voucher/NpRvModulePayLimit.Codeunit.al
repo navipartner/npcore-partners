@@ -7,11 +7,9 @@
 
     local procedure DoEndSale(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"): Boolean
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
-        POSSale: Codeunit "NPR POS Sale";
         POSSetup: Codeunit "NPR POS Setup";
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
@@ -31,17 +29,13 @@
             exit(false);
         if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, false) <> 0 then
             exit(false);
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit(true);
 
-        POSSession.GetSale(POSSale);
-        exit(POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod));
+        exit(true);
     end;
 
     #region V3
     procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var ActionContext: JsonObject)
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSSaleLine: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -62,12 +56,7 @@
                 Error(VoucherAmtErr, Format(POSSaleLine."Amount Including VAT"), Format((POSSaleLine."Amount Including VAT" + Subtotal)));
             Subtotal = 0:
                 if EndSale then
-                    if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-                        ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType))
-                    else begin
-                        DoEndSale(POSSession, VoucherType);
-                        ActionContext.Add('endSaleWithoutPosting', true);
-                    end;
+                    ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType))
         end;
 
     end;

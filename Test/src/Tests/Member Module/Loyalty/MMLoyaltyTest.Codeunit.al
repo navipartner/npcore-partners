@@ -508,6 +508,7 @@ codeunit 85107 "NPR MM Loyalty Test"
     var
         LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
     begin
 
         if (_IsMembershipInitialized) then begin
@@ -517,6 +518,13 @@ codeunit 85107 "NPR MM Loyalty Test"
         end;
 
         _LoyaltySetup.Get(LibraryLoyalty.CreateScenario_AsYouGoLoyalty());
+
+        POSLoyaltyProfile.Get(_POSUnit."POS Loyalty Profile");
+        if not POSLoyaltyProfile."Assign Loyalty On Sale" then begin
+            POSLoyaltyProfile."Assign Loyalty On Sale" := true;
+            POSLoyaltyProfile.Modify();
+        end;
+
         _IsMembershipInitialized := true;
     end;
 

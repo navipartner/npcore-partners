@@ -976,29 +976,21 @@
         exit(CODEUNIT::"NPR MM Member Retail Integr.");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure PrintMembershipsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        POSEntry: Record "NPR POS Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-        if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintMembershipsOnSale') then
-            exit;
-
-        PrintMemberships(SalePOS);
-
-    end;
-
     procedure PrintMemberships(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSMemberProfile: Record "NPR MM POS Member Profile";
     begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not POSUnit.GetProfile(POSMemberProfile) then
+            exit;
+
+        if not POSMemberProfile."Print Membership On Sale" then
+            exit;
+
         POSEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
         if (POSEntry.isempty()) then
             exit;
