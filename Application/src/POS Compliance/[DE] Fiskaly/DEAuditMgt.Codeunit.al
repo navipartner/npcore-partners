@@ -463,7 +463,7 @@
         end;
 
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
-        if not DEFiskalyCommunication.SendRequest_signDE_V2(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
+        if not DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
