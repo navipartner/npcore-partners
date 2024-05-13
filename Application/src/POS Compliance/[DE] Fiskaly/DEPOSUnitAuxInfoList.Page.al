@@ -167,7 +167,7 @@
                     RequestJson.Add('model', Rec."Cash Register Model");
                     RequestJson.Add('base_currency_code', GeneralLedgerSetup."LCY Code");
 
-                    if not DEFiskalyCommunication.SendRequest_signDE_V2(RequestJson, ResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_registers/%1', Format(Rec.SystemId, 0, 4))) then
+                    if not DEFiskalyCommunication.SendRequest_DSFinV_K(RequestJson, ResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_registers/%1', Format(Rec.SystemId, 0, 4))) then
                         Error(GetLastErrorText());
 
                     Rec."Cash Register Created" := true;
