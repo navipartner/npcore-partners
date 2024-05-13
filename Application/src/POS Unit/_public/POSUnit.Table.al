@@ -339,6 +339,25 @@
             Caption = 'POS Receipt Profile';
             TableRelation = "NPR POS Receipt Profile";
         }
+        field(690; "POS Member Profile"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Member Profile';
+            TableRelation = "NPR MM POS Member Profile";
+        }
+        field(700; "POS Loyalty Profile"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Loyalty Profile';
+            TableRelation = "NPR MM POS Loyalty Profile";
+        }
+
+        field(710; "POS Ticket Profile"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'POS Ticket Profile';
+            TableRelation = "NPR TM POS Ticket Profile";
+        }
         field(5058; "Open Register Password"; Code[20])
         {
             Caption = 'Open POS Unit Password';
@@ -415,6 +434,30 @@
         if "POS End of Day Profile" = '' then
             exit;
         exit(POSEoDProfile.Get("POS End of Day Profile"));
+    end;
+
+    internal procedure GetProfile(var POSMemberProfile: Record "NPR MM POS Member Profile"): Boolean
+    begin
+        Clear(POSMemberProfile);
+        if "POS Member Profile" = '' then
+            exit;
+        exit(POSMemberProfile.Get("POS Member Profile"));
+    end;
+
+    internal procedure GetProfile(var POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile"): Boolean
+    begin
+        Clear(POSLoyaltyProfile);
+        if "POS Loyalty Profile" = '' then
+            exit;
+        exit(POSLoyaltyProfile.Get("POS Loyalty Profile"));
+    end;
+
+    internal procedure GetProfile(var POSTicketProfile: Record "NPR TM POS Ticket Profile"): Boolean
+    begin
+        Clear(POSTicketProfile);
+        if "POS Ticket Profile" = '' then
+            exit;
+        exit(POSTicketProfile.Get("POS Ticket Profile"));
     end;
 
     internal procedure GetCurrentPOSUnit(): Code[10]

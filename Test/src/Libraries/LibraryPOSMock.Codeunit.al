@@ -168,14 +168,8 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
-        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') of
-            true:
-                if not POSActionEndSale.EndSale(POSSale, POSSession, false, '', false, true) then
-                    exit(false);
-            false:
-                if not POSSale.TryEndSale(POSSession, false) then
-                    exit(false);
-        end;
+        if not POSActionEndSale.EndSale(POSSale, POSSession, false, '', false, true) then
+            exit(false);
 
         POSPost(SalePOS);
         exit(true);
@@ -210,10 +204,7 @@ codeunit 85003 "NPR Library - POS Mock"
         if VoucherNo <> '' then
             IssueReturnVoucherFromPaymentMethod(POSSession, VoucherNo);
 
-        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            POSActionPayment.TryEndSale(POSPaymentMethod, POSSession) //TryEndSale step of payment action        
-        else
-            POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true);
+        POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(NewSalePOS);
@@ -398,14 +389,9 @@ codeunit 85003 "NPR Library - POS Mock"
             exit(false);
 
         POSSession.GetSale(POSSale);
-        case FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') of
-            true:
-                if not POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true) then
-                    exit(false);
-            false:
-                if not POSSale.TryEndDirectSaleWithBalancing(POSSession, POSPaymentMethod, ReturnPOSPaymentMethod) then
-                    exit(false);
-        end;
+        if not POSActionEndSale.EndSale(POSSale, POSSession, true, POSPaymentMethod.Code, true, true) then
+            exit(false);
+
         exit(true);
     end;
 

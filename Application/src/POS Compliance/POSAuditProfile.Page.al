@@ -71,6 +71,20 @@
                     ToolTip = 'Allow the sale to be finalized with the amount zero.';
                     ApplicationArea = NPRRetail;
                 }
+
+                field("Require Item Return Reason"; Rec."Require Item Return Reason")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Prompts for return reason when returning items in POS';
+                }
+                field(AllowSalesAndReturnInSameTrans; Rec.AllowSalesAndReturnInSameTrans)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
+                }
+            }
+            group(Printing)
+            {
                 field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
                     ToolTip = 'Allow receipts to be printed even when the sale is canceled.';
@@ -91,21 +105,20 @@
                     ToolTip = 'Specifies the value of the Do Not Print EFT Receipt on Sale field.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Require Item Return Reason"; Rec."Require Item Return Reason")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Prompts for return reason when returning items in POS';
-                }
-                field(AllowSalesAndReturnInSameTrans; Rec.AllowSalesAndReturnInSameTrans)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
-                }
+            }
+            group(Bin)
+            {
                 field("Bin Eject After Credit Sale"; Rec."Bin Eject After Credit Sale")
                 {
-                    ToolTip = 'Specifies the Bin Eject After Credit Sale';
+                    ToolTip = 'Specifies if the bin is going to be ejected after a credit pos sale.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Bin Eject After Sale"; Rec."Bin Eject After Sale")
+                {
+                    ToolTip = 'Specifies if the bin is going to be ejected after a pos sale.';
+                    ApplicationArea = NPRRetail;
+                }
+
             }
         }
     }

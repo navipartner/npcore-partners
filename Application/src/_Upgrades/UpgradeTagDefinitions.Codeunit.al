@@ -136,7 +136,13 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DimPopupEvery'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PrintCreditVoucherOnSale'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'EmailReceiptOnSale'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'PrintReceiptOnSale'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpgradeAuditProfile'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DeliverCollectDocument'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpgradeMemberProfile'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpgradeLoyaltyProfile'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpgradeTicketProfile'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DeleteFinishSaleWorkflowSteps'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DeleteFinishCreditSaleWorkflowSteps'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pos Entry Dims", '20230515'));
@@ -517,8 +523,20 @@
                         exit('NPR-PrintCreditVoucherOnSale-20231204');
                     'EmailReceiptOnSale':
                         exit('NPR-EmailReceiptOnSale-20240430');
-                    'PrintReceiptOnSale':
-                        exit('NPR-PrintReceiptOnSale-20240430');
+                    'UpgradeAuditProfile':
+                        exit('NPR-UpgradeAuditProfile-20240507');
+                    'DeliverCollectDocument':
+                        exit('NPR-DeliverCollectDocument-20240507');
+                    'UpgradeMemberProfile':
+                        exit('NPR-UpgradeMemberProfile-20240507');
+                    'UpgradeLoyaltyProfile':
+                        exit('NPR-UpgradeLoyaltyProfile-20240507');
+                    'UpgradeTicketProfile':
+                        exit('NPR-UpgradeTicketProfile-20240507');
+                    'DeleteFinishSaleWorkflowSteps':
+                        exit('NPR-DeleteFinishSaleWorkflowSteps-20240507');
+                    'DeleteFinishCreditSaleWorkflowSteps':
+                        exit('NPR-DeleteFinishCreditSaleWorkflowSteps-20240507');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of

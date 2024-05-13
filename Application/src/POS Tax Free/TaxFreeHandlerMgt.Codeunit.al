@@ -582,22 +582,6 @@
         exit(CODEUNIT::"NPR Tax Free Handler Mgt.");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure IssueTaxFreeVoucherOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'IssueTaxFreeVoucherOnSale' then
-            exit;
-
-        IssueTaxFreeVoucher(SalePOS);
-    end;
-
     procedure IssueTaxFreeVoucher(SalePOS: Record "NPR POS Sale")
     var
         POSEntry: Record "NPR POS Entry";

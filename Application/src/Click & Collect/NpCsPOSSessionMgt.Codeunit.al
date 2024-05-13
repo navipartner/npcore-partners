@@ -63,24 +63,6 @@
     end;
 
     [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure DeliverCollectDocument(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        NpCsDocument: Record "NPR NpCs Document";
-        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'DeliverCollectDocument' then
-            exit;
-
-        DeliverCollectDoc(SalePOS);
-    end;
-
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -107,7 +89,14 @@
     var
         NpCsDocument: Record "NPR NpCs Document";
         NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+        POSSalesDocumentSetup: Record "NPR POS Sales Document Setup";
     begin
+        if not POSSalesDocumentSetup.Get() then
+            exit;
+
+        if not POSSalesDocumentSetup."Deliver Collect Document" then
+            exit;
+
         NpCsDocument.SetCurrentKey("Delivery Document Type", "Delivery Document No.");
         NpCsDocument.SetRange("Delivery Document Type", NpCsDocument."Delivery Document Type"::"POS Entry");
         NpCsDocument.SetRange("Delivery Document No.", SalePOS."Sales Ticket No.");

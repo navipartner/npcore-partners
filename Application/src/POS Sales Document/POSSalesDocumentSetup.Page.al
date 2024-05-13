@@ -31,6 +31,11 @@ page 6151289 "NPR POS Sales Document Setup"
                     AboutText = 'Enable if POS Final invoices or credit memos should be sent or printed immediately after the POS sale ends. System will reserve and assign Posting No. before execution of Job Queue.';
 #endif
                 }
+                field("Deliver Collect Document"; Rec."Deliver Collect Document")
+                {
+                    ToolTip = 'Specifies if the click and collect orders are going to be delivered after the end of the pos sale and if a collect in store document is going to be printed.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

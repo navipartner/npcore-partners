@@ -1500,22 +1500,6 @@
         Session.LogMessage('NPR_MemberNotification', FailReason, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-        if (POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales') then
-            exit;
-
-        SendMemberNotification();
-    end;
-
     procedure SendMemberNotification()
     begin
         if (not SendInlineNotifications()) then
