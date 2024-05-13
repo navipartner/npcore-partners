@@ -15,8 +15,8 @@
     [TryFunction]
     local procedure TrySendDocument(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info")
     var
-        DETSS: Record "NPR DE TSS";
         POSUnitAux: Record "NPR DE POS Unit Aux. Info";
+        DETSS: Record "NPR DE TSS";
     begin
         DeAuditAux.TestField("Transaction ID");
         DeAuditAux.TestField("Client ID");
@@ -57,8 +57,8 @@
         ConnectionParameters: Record "NPR DE Audit Setup";
         DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
         ResponseJson: JsonToken;
-        Url: Text;
         TrxUploadErr: Label 'Error while trying to send a transaction to Fiskaly.\%1';
+        Url: Text;
     begin
         ConnectionParameters.GetSetup(DeAuditAux);
         Url := StrSubstNo('/tss/%1/tx/%2?tx_revision=%3', Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4), DeAuditAux."Latest Revision" + 1);
@@ -72,8 +72,8 @@
     var
         ConnectionParameters: Record "NPR DE Audit Setup";
         RequestBody: JsonObject;
-        Url: Text;
         TxGetErr: Label 'Error while trying to get a transaction from Fiskaly.\%1';
+        Url: Text;
     begin
         ConnectionParameters.GetSetup(DeAuditAux);
         Url := StrSubstNo('/tss/%1/tx/%2', Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4));
@@ -248,8 +248,8 @@
     var
         TypeHelper: Codeunit "Type Helper";
         JToken: JsonToken;
-        Description: Text[100];
         State: Text;
+        Description: Text[100];
     begin
         if DETSS."Connection Parameter Set Code" = '' then
             DETSS."Connection Parameter Set Code" := ConnectionParameters."Primary Key";
@@ -353,10 +353,9 @@
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PATCH', StrSubstNo('/tss/%1/client/%2', Format(DETSS.SystemId, 0, 4), Format(PosUnitAuxDE.SystemId, 0, 4))) then
             Error(ClientUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
         UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE, ResponseJson);
-        if PosUnitAuxDE.IsTemporary() then begin
+        if PosUnitAuxDE.IsTemporary() then
             if PosUnitAuxDE2.Get(PosUnitAuxDE."POS Unit No.") then
                 UpdateDeTssClientWithDataFromFiskaly(PosUnitAuxDE2, ResponseJson);
-        end;
 
         TSS_LogoutAdmin(DETSS, ConnectionParameters);
     end;
@@ -540,56 +539,45 @@
     [TryFunction]
     local procedure SendRequest_signDE_V2(RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"; RestMethod: Text; UrlFunction: Text; IsAuthenticationTokenRefreshRequest: Boolean)
     var
+        Client: HttpClient;
+        Headers: HttpHeaders;
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
-        Client: HttpClient;
-        Content: HttpContent;
-        Headers: HttpHeaders;
-        RequestBodyTxt: Text;
+        BearerToken: Label 'Bearer %1', Comment = '%1 - JWT Token Value', Locked = true;
+        NotSuccessStatusCodeErr: Label '%1: %2\%3', Comment = '%1 - Http Status Code, %2 - Reason Code, %3 - Http Response Text', Locked = true;
         ResponseTxt: Text;
-        BearerToken: Label 'Bearer %1', Locked = true;
     begin
         Clear(ResponseJsonOut);
         CheckHttpClientRequestsAllowed();
 
-        if UpperCase(RestMethod) <> 'GET' then begin
-            RequestBodyJsonIn.WriteTo(RequestBodyTxt);
-            Content.WriteFrom(RequestBodyTxt);
-
-            Content.GetHeaders(Headers);
-            if Headers.Contains('Content-Type') then
-                Headers.Remove('Content-Type');
-            Headers.Add('Content-Type', 'application/json');
-            HttpWebRequest.Content(Content);
-        end;
+        if UpperCase(RestMethod) <> 'GET' then
+            AddRequestBodyAndHeadersToRequest(RequestBodyJsonIn, HttpWebRequest, Headers);
 
         ConnectionParameters.TestField("Api URL");
         HttpWebRequest.SetRequestUri(ConnectionParameters."Api URL" + UrlFunction);
-        HttpWebRequest.Method := RestMethod;
-        HttpWebRequest.GetHeaders(Headers);
-        Headers.Add('Accept', 'application/json');
-        Headers.Add('User-Agent', 'Dynamics 365');
+        SetHttpHeaders(RestMethod, HttpWebRequest, Headers);
+
         if not IsAuthenticationTokenRefreshRequest then
-            Headers.Add('Authorization', StrSubstNo(BearerToken, GetJwtToken(ConnectionParameters)));
+            Headers.Add('Authorization', StrSubstNo(BearerToken, Get_signDE_V2_JwtToken(ConnectionParameters)));
 
         Client.Send(HttpWebRequest, HttpWebResponse);
         if not HttpWebResponse.Content.ReadAs(ResponseTxt) then
             ResponseTxt := '';
 
         if not HttpWebResponse.IsSuccessStatusCode then
-            Error('%1: %2\%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
+            Error(NotSuccessStatusCodeErr, HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
 
         ResponseJsonOut.ReadFrom(ResponseTxt);
     end;
 
-    local procedure GetJwtToken(ConnectionParameters: Record "NPR DE Audit Setup"): Text
+    local procedure Get_signDE_V2_JwtToken(ConnectionParameters: Record "NPR DE Audit Setup"): Text
     var
         FiskalyJWT: Codeunit "NPR FiskalyJWT";
         RefreshTokenJson: JsonObject;
         JWTResponseJson: JsonToken;
+        AccessTokenRefreshErr: Label 'Error while trying to get authentication token from the server.\%1', Comment = '%1 - Last Error Text';
         AccessToken: Text;
         RefreshToken: Text;
-        AccessTokenRefreshErr: Label 'Error while trying to get authentication token from the server.\%1';
     begin
         if FiskalyJWT.GetToken(ConnectionParameters.SystemId, AccessToken, RefreshToken) then
             exit(AccessToken);
@@ -601,27 +589,124 @@
             RefreshTokenJson.Add('api_secret', DESecretMgt.GetSecretKey(ConnectionParameters.ApiSecretLbl()));
         end;
         ClearLastError();
-        if RefreshJwtToken(RefreshTokenJson, JWTResponseJson, ConnectionParameters) then begin
+        if Refresh_signDE_V2_JwtToken(RefreshTokenJson, JWTResponseJson, ConnectionParameters) then begin
             FiskalyJWT.SetJWT(ConnectionParameters.SystemId, JWTResponseJson, AccessToken);
             exit(AccessToken);
         end else
             Error(AccessTokenRefreshErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
     end;
 
-    local procedure RefreshJwtToken(RefreshTokenJson: JsonObject; var JWTResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"): Boolean
+    local procedure Refresh_signDE_V2_JwtToken(RefreshTokenJson: JsonObject; var JWTResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"): Boolean
     begin
         exit(SendRequest_signDE_V2(RefreshTokenJson, JWTResponseJson, ConnectionParameters, 'POST', '/auth', true));
     end;
+    #endregion
 
+    #region DSFinV-K API request handling
+    internal procedure SendRequest_DSFinV_K(RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"; RestMethod: Text; UrlFunction: Text): Boolean
+    begin
+        exit(SendRequest_DSFinV_K(RequestBodyJsonIn, ResponseJsonOut, ConnectionParameters, RestMethod, UrlFunction, false));
+    end;
+
+    [TryFunction]
+    local procedure SendRequest_DSFinV_K(RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"; RestMethod: Text; UrlFunction: Text; IsAuthenticationTokenRefreshRequest: Boolean)
+    var
+        Client: HttpClient;
+        Headers: HttpHeaders;
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        BearerToken: Label 'Bearer %1', Comment = '%1 - JWT Token Value', Locked = true;
+        NotSuccessStatusCodeErr: Label '%1: %2\%3', Comment = '%1 - Http Status Code, %2 - Reason Code, %3 - Http Response Text', Locked = true;
+        ResponseTxt: Text;
+    begin
+        Clear(ResponseJsonOut);
+        CheckHttpClientRequestsAllowed();
+
+        if UpperCase(RestMethod) <> 'GET' then
+            AddRequestBodyAndHeadersToRequest(RequestBodyJsonIn, HttpWebRequest, Headers);
+
+        ConnectionParameters.TestField("DSFINVK Api URL");
+        HttpWebRequest.SetRequestUri(ConnectionParameters."DSFINVK Api URL" + UrlFunction);
+        SetHttpHeaders(RestMethod, HttpWebRequest, Headers);
+
+        if not IsAuthenticationTokenRefreshRequest then
+            Headers.Add('Authorization', StrSubstNo(BearerToken, Get_DSFinV_K_JwtToken(ConnectionParameters)));
+
+        Client.Send(HttpWebRequest, HttpWebResponse);
+        if not HttpWebResponse.Content.ReadAs(ResponseTxt) then
+            ResponseTxt := '';
+
+        if not HttpWebResponse.IsSuccessStatusCode then
+            Error(NotSuccessStatusCodeErr, HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, ResponseTxt);
+
+        ResponseJsonOut.ReadFrom(ResponseTxt);
+    end;
+
+    local procedure Get_DSFinV_K_JwtToken(ConnectionParameters: Record "NPR DE Audit Setup"): Text
+    var
+        FiskalyJWT: Codeunit "NPR FiskalyJWT";
+        RefreshTokenJson: JsonObject;
+        JWTResponseJson: JsonToken;
+        AccessTokenRefreshErr: Label 'Error while trying to get authentication token from the server.\%1', Comment = '%1 - Last Error Text';
+        AccessToken: Text;
+        RefreshToken: Text;
+    begin
+        if FiskalyJWT.GetToken(ConnectionParameters.SystemId, AccessToken, RefreshToken) then
+            exit(AccessToken);
+
+        if RefreshToken <> '' then
+            RefreshTokenJson.Add('refresh_token', RefreshToken)
+        else begin
+            RefreshTokenJson.Add('api_key', DESecretMgt.GetSecretKey(ConnectionParameters.ApiKeyLbl()));
+            RefreshTokenJson.Add('api_secret', DESecretMgt.GetSecretKey(ConnectionParameters.ApiSecretLbl()));
+        end;
+        ClearLastError();
+        if Refresh_DSFinV_K_JwtToken(RefreshTokenJson, JWTResponseJson, ConnectionParameters) then begin
+            FiskalyJWT.SetJWT(ConnectionParameters.SystemId, JWTResponseJson, AccessToken);
+            exit(AccessToken);
+        end else
+            Error(AccessTokenRefreshErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
+    end;
+
+    local procedure Refresh_DSFinV_K_JwtToken(RefreshTokenJson: JsonObject; var JWTResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"): Boolean
+    begin
+        exit(SendRequest_DSFinV_K(RefreshTokenJson, JWTResponseJson, ConnectionParameters, 'POST', '/auth', true));
+    end;
+    #endregion
+
+    #region API Request Handling
     local procedure CheckHttpClientRequestsAllowed()
     var
-        EnvironmentInfo: Codeunit "Environment Information";
         NavAppSetting: Record "NAV App Setting";
+        EnvironmentInfo: Codeunit "Environment Information";
         HttpRequrestsAreNotAllowedErr: Label 'Http requests are blocked by default in sandbox environments. In order to proceed, you must allow HttpClient requests for NP Retail extension.';
     begin
         if EnvironmentInfo.IsSandbox() then
             if not (NavAppSetting.Get('992c2309-cca4-43cb-9e41-911f482ec088') and NavAppSetting."Allow HttpClient Requests") then
                 Error(HttpRequrestsAreNotAllowedErr);
+    end;
+
+    local procedure AddRequestBodyAndHeadersToRequest(var RequestBodyJsonIn: JsonObject; var HttpWebRequest: HttpRequestMessage; var Headers: HttpHeaders)
+    var
+        Content: HttpContent;
+        RequestBodyTxt: Text;
+    begin
+        RequestBodyJsonIn.WriteTo(RequestBodyTxt);
+        Content.WriteFrom(RequestBodyTxt);
+
+        Content.GetHeaders(Headers);
+        if Headers.Contains('Content-Type') then
+            Headers.Remove('Content-Type');
+        Headers.Add('Content-Type', 'application/json');
+        HttpWebRequest.Content(Content);
+    end;
+
+    local procedure SetHttpHeaders(RestMethod: Text; var HttpWebRequest: HttpRequestMessage; var Headers: HttpHeaders)
+    begin
+        HttpWebRequest.Method := RestMethod;
+        HttpWebRequest.GetHeaders(Headers);
+        Headers.Add('Accept', 'application/json');
+        Headers.Add('User-Agent', 'Dynamics 365');
     end;
     #endregion
 
