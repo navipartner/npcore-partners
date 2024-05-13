@@ -17,6 +17,8 @@ codeunit 6150621 "NPR POS Action: Change Bin-B"
 
         WhseItemTrackingSetup."Serial No." := SaleLinePOS."Serial No.";
         NewBinCode := WMSMgt.BinContentLookUp(SaleLinePOS."Location Code", SaleLinePOS."No.", SaleLinePOS."Variant Code", '', WhseItemTrackingSetup, SaleLinePOS."Bin Code");
+        if NewBinCode = '' then
+            exit;
 
         if SaleLinePOS."Bin Code" = NewBinCode then
             exit;
