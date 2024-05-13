@@ -6,7 +6,6 @@ codeunit 85106 "NPR Library MemberLoyalty"
         ItemLoyalty: Record "NPR MM Loy. Item Point Setup";
         MembershipSalesItem: Record "NPR MM Members. Sales Setup";
         MembershipSetup: Record "NPR MM Membership Setup";
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         MembershipLibrary: Codeunit "NPR Library - Member Module";
         SalesItemNo: Code[20];
     begin
@@ -19,16 +18,6 @@ codeunit 85106 "NPR Library MemberLoyalty"
 
         ItemLoyalty.SetFilter(Code, '=%1', LoyaltySetup.Code);
         ItemLoyalty.DeleteAll();
-
-        POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", '=%1', Codeunit::"NPR MM Loyalty Point Mgt.");
-        POSSalesWorkflowStep.SetFilter("Subscriber Function", '=%1', 'PointAssignmentOnSale');
-        if (not POSSalesWorkflowStep.FindFirst()) then begin
-            // TODO - Insert step
-            Error('POSSalesWorkflowStep "PointAssignmentOnSale" is not configured.');
-        end;
-
-        POSSalesWorkflowStep.Enabled := true;
-        POSSalesWorkflowStep.Modify();
 
         exit(LoyaltySetup.Code);
     end;

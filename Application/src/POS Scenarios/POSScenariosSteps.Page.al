@@ -86,11 +86,7 @@
     var
         POSSalesWorkflow: Record "NPR POS Sales Workflow";
         WorkflowStepSubscriberCodeunitsFilter: Text;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-
         if not POSSalesWorkflow.Get(POSSalesWorkflowStep."Workflow Code") then
             exit;
 

@@ -22,8 +22,8 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterInsertValueEntry', '', true, true)]
     local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
     var
-        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
         POSunit: Record "NPR POS Unit";
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
     begin
 
         if (ValueEntry."Document Type" = ValueEntry."Document Type"::" ") then begin
@@ -31,11 +31,11 @@
             if (not POSunit.Get(CopyStr(ItemJournalLine."NPR Register Number", 1, 10))) then
                 Clear(POSUnit);
 
-            POSSalesWorkflowStep.SetFilter("Set Code", '=%1', POSunit."POS Sales Workflow Set");
-            POSSalesWorkflowStep.SetFilter("Subscriber Function", '=%1', PointAssignmentStepName());
-            if (POSSalesWorkflowStep.FindFirst()) then
-                if (POSSalesWorkflowStep.Enabled) then
-                    exit; // Handled by OnFinishSale workflow
+            if not POSUnit.GetProfile(POSLoyaltyProfile) then
+                exit;
+
+            if POSLoyaltyProfile."Assign Loyalty On Sale" then
+                exit; // Handled by OnFinishSale workflow
 
         end;
 
@@ -201,32 +201,22 @@
         Rec.Enabled := false;
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure PointAssignmentOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) then
-            exit;
-
-        if (POSSalesWorkflowStep."Subscriber Function" <> PointAssignmentStepName()) then
-            exit;
-
-        LoyPointAssignmentOnSale(SalePOS);
-
-    end;
-
     procedure LoyPointAssignmentOnSale(SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSUnit: Record "NPR POS Unit";
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
     begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not POSUnit.GetProfile(POSLoyaltyProfile) then
+            exit;
+
+        if not POSLoyaltyProfile."Assign Loyalty On Sale" then
+            exit;
+
         // Calculate points and assign.
         PosEntry.SetFilter("Document No.", SalePOS."Sales Ticket No.");
         if (PosEntry.FindFirst()) then begin

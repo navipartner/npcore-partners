@@ -33,6 +33,11 @@ table 6150632 "NPR POS Sales Document Setup"
                     Rec.TestField("Post with Job Queue", true);
             end;
         }
+        field(21; "Deliver Collect Document"; Boolean)
+        {
+            Caption = 'Deliver Collect Document';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -12,6 +12,9 @@ codeunit 85002 "NPR Library - POS Master Data"
         POSStore: Record "NPR POS Store";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSAuditProfile: Record "NPR POS Audit Profile";
+        POSMemberProfile: Record "NPR MM POS Member Profile";
+        POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+        POSTicketProfile: Record "NPR TM POS Ticket Profile";
         POSPaymentBin: record "NPR POS Payment Bin";
         LibraryUtility: Codeunit "Library - Utility";
         POSManagePOSUnit: Codeunit "NPR POS Manage POS Unit";
@@ -32,7 +35,12 @@ codeunit 85002 "NPR Library - POS Master Data"
             POSUnit."POS Audit Profile" := POSAuditProfile.Code;
             CreatePOSBin(POSPaymentBin);
             POSUnit."Default POS Payment Bin" := POSPaymentBin."No.";
-
+            CreatePOSMemberProfile(POSMemberProfile);
+            POSUnit."POS Member Profile" := POSMemberProfile.Code;
+            CreatePOSLoyaltyProfile(POSLoyaltyProfile);
+            POSUnit."POS Loyalty Profile" := POSLoyaltyProfile.Code;
+            CreatePOSTicketProfile(POSTicketProfile);
+            POSUnit."POS Ticket Profile" := POSTicketProfile.Code;
             POSUnit.Insert(true);
         end;
 
@@ -269,8 +277,77 @@ codeunit 85002 "NPR Library - POS Master Data"
         NoSeriesLine.FindFirst();
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
         NoSeriesLine.Modify();
+        POSAuditProfile."Bin Eject After Sale" := true;
         POSAuditProfile."Sales Ticket No. Series" := NoSeries.Code;
         POSAuditProfile.Insert();
+    end;
+
+    procedure CreatePOSTicketProfile(var POSTicketProfile: Record "NPR TM POS Ticket Profile")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryNoSeries: Codeunit "NPR Library - No. Series";
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+    begin
+        POSTicketProfile.Init();
+        POSTicketProfile.Validate(
+          Code,
+          CopyStr(
+            LibraryUtility.GenerateRandomCode(POSTicketProfile.FieldNo(Code), DATABASE::"NPR TM POS Ticket Profile"), 1,
+            LibraryUtility.GetFieldLength(DATABASE::"NPR TM POS Ticket Profile", POSTicketProfile.FieldNo(Code))));
+
+        LibraryNoSeries.GenerateNoSeries('', NoSeries);
+        NoSeriesLine.SetRange("Series Code", NoSeries.Code);
+        NoSeriesLine.FindFirst();
+        NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+        NoSeriesLine.Modify();
+        POSTicketProfile."Print Ticket On Sale" := true;
+        POSTicketProfile.Insert();
+    end;
+
+    procedure CreatePOSMemberProfile(var POSMemberProfile: Record "NPR MM POS Member Profile")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryNoSeries: Codeunit "NPR Library - No. Series";
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+    begin
+        POSMemberProfile.Init();
+        POSMemberProfile.Validate(
+          Code,
+          CopyStr(
+            LibraryUtility.GenerateRandomCode(POSMemberProfile.FieldNo(Code), DATABASE::"NPR MM POS Member Profile"), 1,
+            LibraryUtility.GetFieldLength(DATABASE::"NPR MM POS Member Profile", POSMemberProfile.FieldNo(Code))));
+
+        LibraryNoSeries.GenerateNoSeries('', NoSeries);
+        NoSeriesLine.SetRange("Series Code", NoSeries.Code);
+        NoSeriesLine.FindFirst();
+        NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+        NoSeriesLine.Modify();
+        POSMemberProfile.Insert();
+    end;
+
+    procedure CreatePOSLoyaltyProfile(var POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryNoSeries: Codeunit "NPR Library - No. Series";
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+    begin
+        POSLoyaltyProfile.Init();
+        POSLoyaltyProfile.Validate(
+          Code,
+          CopyStr(
+            LibraryUtility.GenerateRandomCode(POSLoyaltyProfile.FieldNo(Code), DATABASE::"NPR MM POS Loyalty Profile"), 1,
+            LibraryUtility.GetFieldLength(DATABASE::"NPR MM POS Loyalty Profile", POSLoyaltyProfile.FieldNo(Code))));
+
+        LibraryNoSeries.GenerateNoSeries('', NoSeries);
+        NoSeriesLine.SetRange("Series Code", NoSeries.Code);
+        NoSeriesLine.FindFirst();
+        NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+        NoSeriesLine.Modify();
+        POSLoyaltyProfile."Assign Loyalty On Sale" := true;
+        POSLoyaltyProfile.Insert();
     end;
 
     procedure CreateGeneralPostingSetupForSaleItem(GenBusPostGrp: Code[10]; GenProdPostGrp: Code[10]; LocationCode: Code[20]; InvPostingGroup: Code[10])

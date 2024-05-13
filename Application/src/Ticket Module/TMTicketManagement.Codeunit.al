@@ -328,24 +328,6 @@
         exit(Codeunit::"NPR TM Ticket Management");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure PrintTicketsOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrentCodeunitId()) then
-            exit;
-        if (POSSalesWorkflowStep."Subscriber Function" <> 'PrintTicketsOnSale') then
-            exit;
-
-        PrintTicketFromSalesTicketNo(SalePOS."Sales Ticket No.");
-    end;
-
-
-
     internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
     var
         TimeHelper: Codeunit "NPR TM TimeHelper";
