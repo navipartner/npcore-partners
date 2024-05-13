@@ -102,18 +102,22 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
     local procedure CheckIfNivelationNeeded(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
-        case SalesInvoiceHeader."Prices Including VAT" of
-            true:
-                if TempSalesInvoiceLine."Line Amount" = (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) then
+        case true of
+            ((SalesInvoiceHeader."Prices Including VAT") and (PriceListLine."Price Includes VAT")) or ((not SalesInvoiceHeader."Prices Including VAT") and (not PriceListLine."Price Includes VAT")):
+                if (TempSalesInvoiceLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") = PriceListLine."Unit Price" then
                     exit;
-            false:
-                if (Round(TempSalesInvoiceLine."Line Amount" * (1 + TempSalesInvoiceLine."VAT %" / 100), 1, '=') / TempSalesInvoiceLine.Quantity) = PriceListLine."Unit Price" then
+            (SalesInvoiceHeader."Prices Including VAT") and (not PriceListLine."Price Includes VAT"):
+                if (Round((TempSalesInvoiceLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount" - (TempSalesInvoiceLine."Unit Price" * (100 * TempSalesInvoiceLine."VAT %") / (100 + TempSalesInvoiceLine."VAT %") / 100)))) = Round(PriceListLine."Unit Price") then
+                    exit;
+            (not SalesInvoiceHeader."Prices Including VAT") and (PriceListLine."Price Includes VAT"):
+                if Round(TempSalesInvoiceLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") = Round((PriceListLine."Unit Price" - (PriceListLine."Unit Price" * ((100 * TempSalesInvoiceLine."VAT %") / (100 + TempSalesInvoiceLine."VAT %") / 100)))) then
                     exit;
         end;
         TempNivSalesInvLines.Init();
         TempNivSalesInvLines.Copy(TempSalesInvoiceLine);
         TempNivSalesInvLines.Insert();
     end;
+
     #endregion
 
     #region GL Entry Posting
@@ -469,7 +473,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         StdItemLedgerEntry: Record "Item Ledger Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         SumOfAppliedCostAmounts: Decimal;
-        SumOfQty: Integer;
+        SumOfQty: Decimal;
         CorrectionEntryDescLbl: Label 'COGS Correction';
     begin
         if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
@@ -725,7 +729,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         if not PriceListHeader.FindFirst() then
             Error(PriceListNotFoundErr, LocationCode);
 
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
+        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)", "Price Includes VAT");
         PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
         PriceListLine.SetRange("Asset No.", ItemNo);
         if not PriceListLine.FindFirst() then
@@ -782,11 +786,11 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         exit(GenPostingSetup."COGS Account");
     end;
 
-    local procedure GetApplicationItemLedgEntryCost(var SumOfCostAmounts: Decimal; var SumOfQty: Integer; StdItemLedgerEntry: Record "Item Ledger Entry")
+    local procedure GetApplicationItemLedgEntryCost(var SumOfCostAmounts: Decimal; var SumOfQty: Decimal; StdItemLedgerEntry: Record "Item Ledger Entry")
     var
         TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ShowAppliedEntries: Codeunit "Show Applied Entries";
-        SumOfQtyPerEntry: Integer;
+        SumOfQtyPerEntry: Decimal;
         SumOfCostPerUnit: Decimal;
     begin
         ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
@@ -803,7 +807,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         until TempApplicationItemLedgerEntry.Next() = 0;
     end;
 
-    local procedure GetApplicationValueEntryCost(var SumOfCostPerUnit: Decimal; var SumOfQty: Integer; TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    local procedure GetApplicationValueEntryCost(var SumOfCostPerUnit: Decimal; var SumOfQty: Decimal; TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary)
     var
         ValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";

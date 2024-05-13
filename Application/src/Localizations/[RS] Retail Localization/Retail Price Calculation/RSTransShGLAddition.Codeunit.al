@@ -283,7 +283,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     var
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         SumOfCostPerUnit: Decimal;
-        SumOfInvQty: Integer;
+        SumOfInvQty: Decimal;
     begin
         repeat
             SumOfCostPerUnit += StdTransitValueEntry."Cost per Unit";
