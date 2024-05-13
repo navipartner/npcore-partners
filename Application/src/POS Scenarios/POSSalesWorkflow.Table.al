@@ -164,14 +164,11 @@
     end;
 
     local procedure FilterPOSScenarioStepsCount(var POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSalesWorkflowStep.Reset();
         POSSalesWorkflowStep.SetRange("Set Code", '');
         POSSalesWorkflowStep.SetRange("Workflow Code", Rec.Code);
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", GetWorkflowStepSubscriberCodeunitsFilter(false));
+        POSSalesWorkflowStep.SetFilter("Subscriber Codeunit ID", GetWorkflowStepSubscriberCodeunitsFilter(false));
     end;
 
     internal procedure GetPOSScenarioStepsCount() NoOfWorkflowSteps: Integer

@@ -171,6 +171,21 @@
                     ToolTip = 'Specifies POS Receipt Profile on this POS Unit.';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Member Profile"; Rec."POS Member Profile")
+                {
+                    ToolTip = 'Configure member specific settings on the pos unit.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("POS Loyalty Profile"; Rec."POS Loyalty Profile")
+                {
+                    ToolTip = 'Configure loyalty specific settings on the pos unit.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("POS Ticket Profile"; Rec."POS Ticket Profile")
+                {
+                    ToolTip = 'Configure ticket specific settings on the pos unit.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

@@ -82,27 +82,6 @@
         CleanCashXCCSP.StoreReceipt(PosEntry);
     end;
 
-
-    // The methods subscribes to event posted during end of sale
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure CreateCleanCashOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        PosEntry: Record "NPR POS Entry";
-        ResponseText: Text;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'CreateCleanCashOnSale' then
-            exit;
-
-        CreateCleanCashOnPOSSale(SalePOS);
-    end;
-
     procedure CreateCleanCashOnPOSSale(SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";

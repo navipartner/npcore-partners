@@ -422,24 +422,6 @@
         exit(Codeunit::"NPR E-mail Doc. Mgt.");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnFinishSale', '', true, true)]
-    local procedure EmailReceiptOnSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if FeatureFlagsManagement.IsEnabled('posLifeCycleEventsWorkflowsEnabled_v2') then
-            exit;
-        if not POSSalesWorkflowStep.Enabled then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-            exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'EmailReceiptOnSale' then
-            exit;
-
-        SendEmailReceipt(SalePOS);
-    end;
-
     procedure SendEmailReceiptOnSale(SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
