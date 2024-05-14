@@ -108,7 +108,7 @@
         exit(SendEmailTemplate(RecRef, EmailTemplateHeader, CopyStr(RecipientEmail, 1, 250), Silent));
     end;
 
-    internal procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
+    procedure SendEmailTemplate(var RecRef: RecordRef; var EmailTemplateHeader: Record "NPR E-mail Template Header"; RecipientEmail: Text[250]; Silent: Boolean) ErrorMessage: Text
     var
         Filename: Text;
     begin
