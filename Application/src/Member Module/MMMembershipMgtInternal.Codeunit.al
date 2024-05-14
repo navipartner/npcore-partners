@@ -3732,6 +3732,7 @@
         if (Community."Membership to Cust. Rel.") then begin
             if (Membership."Customer No." = '') then begin
 
+                MembershipEvents.OnBeforeAssignCustomerNo(MemberInfoCapture);
                 if (MemberInfoCapture."Customer No." <> '') then begin
                     if (not ValidateUseCustomerNo(MemberInfoCapture."Customer No.")) then
                         Error('The Customer Number %1 can not be assigned to membership.', MemberInfoCapture."Customer No.");
@@ -3793,6 +3794,7 @@
         ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
         RecRef.SetTable(Customer);
 
+        MembershipEvents.OnAfterCustomerCreate(Customer);
         Customer.Modify(true);
 
         if (ContTemplateCode <> '') and ConfigTemplateHeader.Get(ContTemplateCode) then begin
@@ -3802,9 +3804,12 @@
                 RecRef.GetTable(Contact);
                 ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
                 RecRef.SetTable(Contact);
+
+                MembershipEvents.OnAfterContactCreate(Customer, Contact);
                 Contact.Modify(true);
             end;
         end;
+
 
         exit(Customer."No.");
     end;
