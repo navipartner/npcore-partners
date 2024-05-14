@@ -17,6 +17,21 @@
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeAssignCustomerNo(var MemberInfoCapture: Record "NPR MM Member Info Capture");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterCustomerCreate(var Customer: Record Customer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterContactCreate(Customer: Record Customer; var Contact: Record Contact)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterMembershipCreateEvent(Membership: Record "NPR MM Membership")
     begin
     end;
