@@ -403,6 +403,9 @@
         PaymentLine2: Record "NPR Magento Payment Line";
         NoSeriesLine: Record "No. Series Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#IF NOT BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#ENDIF
         OutstandingAmt: Decimal;
         RefundAmt: Decimal;
         TotalAmountInclVAT: Decimal;
@@ -442,6 +445,9 @@
                 PaymentLine2."Document No." := DocNo;
                 PaymentLine2."Posting Date" := SalesHeader."Posting Date";
                 PaymentLine2.Insert();
+#IF NOT BC17
+                SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), PaymentLine2.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+#ENDIF
 
                 OutstandingAmt := TotalAmountInclVAT - RefundAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt) then begin
@@ -479,6 +485,9 @@
         PaymentLine2: Record "NPR Magento Payment Line";
         NoSeriesLine: Record "No. Series Line";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#IF NOT BC17
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#ENDIF
         OutstandingAmt: Decimal;
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
@@ -517,6 +526,9 @@
                 PaymentLine2."Document No." := DocNo;
                 PaymentLine2."Posting Date" := SalesHeader."Posting Date";
                 PaymentLine2.Insert();
+#IF NOT BC17
+                SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), PaymentLine2.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+#ENDIF
 
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt) then begin
