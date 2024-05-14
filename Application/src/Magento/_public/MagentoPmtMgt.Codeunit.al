@@ -76,6 +76,7 @@
                     PaymentLine."Date Refunded" := Today();
             end;
 
+        OnAfterProcessingPaymentLine(PaymentLine, _PaymentEventType, Response);
         if (PrevRec <> Format(PaymentLine)) then
             PaymentLine.Modify(true);
 
@@ -918,6 +919,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostMagentoPayment(SalesInvHeader: Record "Sales Invoice Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterProcessingPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option " ",Capture,Refund,Cancel; Response: Record "NPR PG Payment Response")
     begin
     end;
 }
