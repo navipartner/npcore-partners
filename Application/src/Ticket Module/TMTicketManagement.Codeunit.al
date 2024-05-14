@@ -2147,7 +2147,7 @@
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry.Insert(true);
-        AdmittedTicketAccessEntry."Created Datetime" := EventDateTime;
+        AdmittedTicketAccessEntry."Created Datetime" := CurrentDateTime();
         AdmittedTicketAccessEntry.AdmittedDate := DT2Date(EventDateTime);
         AdmittedTicketAccessEntry.AdmittedTime := DT2Time(EventDateTime);
 
