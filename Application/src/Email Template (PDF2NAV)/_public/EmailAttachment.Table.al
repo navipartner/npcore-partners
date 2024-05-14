@@ -1,6 +1,5 @@
 ﻿table 6014458 "NPR E-mail Attachment"
 {
-    Access = Internal;
     Caption = 'E-mail Attachment';
     DataClassification = CustomerContent;
 

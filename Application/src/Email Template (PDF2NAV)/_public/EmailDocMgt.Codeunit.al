@@ -4,7 +4,7 @@
         EmailMgt: Codeunit "NPR E-mail Management";
         EMailSalesReceiptLbl: Label 'E-mail Sales Receipt';
 
-    internal procedure RunEmailLog(RecVariant: Variant)
+    procedure RunEmailLog(RecVariant: Variant)
     var
         RecRef: RecordRef;
     begin
