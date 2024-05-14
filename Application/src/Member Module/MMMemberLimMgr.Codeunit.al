@@ -65,6 +65,7 @@
     var
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         DoReuseLogEntry: Boolean;
+        TimeHelper: Codeunit "NPR TM TimeHelper";
     begin
 
         DoReuseLogEntry := (ReUseLogEntryNo > 0);
@@ -80,8 +81,8 @@
 
         MemberArrivalLogEntry."Event Type" := MemberArrivalLogEntry."Event Type"::ARRIVAL;
         MemberArrivalLogEntry."Created At" := CurrentDateTime();
-        MemberArrivalLogEntry."Local Date" := Today();
-        MemberArrivalLogEntry."Local Time" := Time; // TIME from webclient and webservice are different
+        MemberArrivalLogEntry."Local Date" := DT2Date(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
+        MemberArrivalLogEntry."Local Time" := DT2Time(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)); // Time() from webclient and webservice are different
 
         MemberArrivalLogEntry."External Membership No." := ExternalMemberShipNo;
         MemberArrivalLogEntry."External Member No." := ExternalMemberNo;

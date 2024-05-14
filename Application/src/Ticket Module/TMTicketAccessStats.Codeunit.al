@@ -898,7 +898,10 @@
         DetTicketAccessEntry2.SetFilter("Entry No.", '<%1', DetTicketAccessEntry."Entry No.");
 
         if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::DAILY_NONINITIAL) then
-            DetTicketAccessEntry2.SetFilter("Created Datetime", '%1..%2', CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 0T), CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 235959.999T));
+            if (DetTicketAccessEntry.AdmittedDate = 0D) then
+                DetTicketAccessEntry2.SetFilter("Created Datetime", '%1..%2', CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 0T), CreateDateTime(DT2Date(DetTicketAccessEntry."Created Datetime"), 235959.999T))
+            else
+                DetTicketAccessEntry2.SetFilter(AdmittedDate, '=%1', DetTicketAccessEntry.AdmittedDate);
 
         exit(not DetTicketAccessEntry2.IsEmpty());
     end;

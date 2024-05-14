@@ -114,6 +114,9 @@
         key(Key6; Type, "Created Datetime")
         {
         }
+        key(Key7; AdmittedDate, AdmittedTime)
+        {
+        }
     }
 
     fieldgroups
