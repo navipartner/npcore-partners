@@ -33,7 +33,7 @@ codeunit 6184721 "NPR Vipps Mp Mgt. API"
         HttpResponse: HttpResponseMessage;
         HttpResponseTxt: Text;
     begin
-        Http.Get(StrSubstNo('/management/v1/merchants/%1/%2', Scheme, "Business Id"), HttpResponse);
+        Http.Get(StrSubstNo('management/v1/merchants/%1/%2', Scheme, "Business Id"), HttpResponse);
         if (not HttpResponse.IsSuccessStatusCode()) then
             Error('GetSalesUnits failed with: %1 - %2', HttpResponse.HttpStatusCode(), HttpResponse.ReasonPhrase());
         HttpResponse.Content.ReadAs(HttpResponseTxt);
@@ -69,7 +69,7 @@ codeunit 6184721 "NPR Vipps Mp Mgt. API"
         JsonResp: JsonObject;
         VippsMpResponseHandler: Codeunit "NPR Vipps Mp Response Handler";
     begin
-        Http.Get(StrSubstNo('/management/v1/merchants/%1/%2/sales-units', Scheme, "Business Id"), HttpResponse);
+        Http.Get(StrSubstNo('management/v1/merchants/%1/%2/sales-units', Scheme, "Business Id"), HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             JsonResponse.ReadFrom(HttpResponseTxt);
@@ -110,7 +110,7 @@ codeunit 6184721 "NPR Vipps Mp Mgt. API"
         HttpResponseTxt: Text;
         JsonResp: JsonObject;
     begin
-        Http.Get(StrSubstNo('/management/v1/sales-units/%1', Msn), HttpResponse);
+        Http.Get(StrSubstNo('management/v1/sales-units/%1', Msn), HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
         if (HttpResponse.IsSuccessStatusCode()) then begin
             JsonResponse.ReadFrom(HttpResponseTxt);

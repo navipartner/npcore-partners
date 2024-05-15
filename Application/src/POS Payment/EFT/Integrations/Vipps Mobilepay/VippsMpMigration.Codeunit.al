@@ -12,9 +12,9 @@ codeunit 6184763 "NPR Vipps Mp Migration"
         VippsMpStore: Record "NPR Vipps Mp Store";
         VippsMpWebhook: Record "NPR Vipps Mp Webhook";
         VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
-        VippsMpWebhookSetup: Codeunit "NPR Vipps Mp Webhook Setup";
-        VippsMpQrMgt: Codeunit "NPR Vipps Mp Qr Mgt.";
-        Deleted: Integer;
+        VippsMpWebhookAPI: Codeunit "NPR Vipps Mp Webhook API";
+        VippsMpQRAPI: Codeunit "NPR Vipps Mp QR API";
+    //Deleted: Integer;
     begin
         POSPostingSetup.SetFilter("POS Payment Method Code", 'VIPPS MP*');
         POSPostingSetup.DeleteAll();
@@ -25,13 +25,23 @@ codeunit 6184763 "NPR Vipps Mp Migration"
         VippsMpPaymentSetup.DeleteAll();
         VippsMpUnitSetup.DeleteAll();
         while VippsMpWebhook.Next() <> 0 do begin
+            Clear(VippsMpStore);
             VippsMpStore.SetFilter("Webhook Reference", VippsMpWebhook."Webhook Reference");
-            VippsMpStore.FindFirst();
-            VippsMpWebhookSetup.SynchronizeWebhooks(VippsMpStore, Deleted);
-            VippsMpWebhookSetup.DeleteWebhook(VippsMpStore, VippsMpWebhook);
+            if (VippsMpStore.FindFirst()) then begin
+                if (VippsMpWebhookAPI.DeleteWebhook(VippsMpWebhook."Webhook Id", VippsMpStore)) then begin
+
+                end;
+            end;
+            VippsMpWebhook.Delete();
         end;
         while VippsMpQrCallback.Next() <> 0 do begin
-            VippsMpQrMgt.RemoveQrBarcode(VippsMpQrCallback);
+            Clear(VippsMpStore);
+            if (VippsMpStore.Get(VippsMpQrCallback."Merchant Serial Number")) then begin
+                if (not VippsMpQRAPI.DeleteCallbackQr(VippsMpStore, VippsMpQrCallback."Merchant Qr Id")) then begin
+
+                end;
+            end;
+            VippsMpQrCallback.Delete();
         end;
         //BeforeDelete Use for clear
         VippsMpStore.DeleteAll();
@@ -39,124 +49,89 @@ codeunit 6184763 "NPR Vipps Mp Migration"
 
     procedure MigrateMobilepaytoVipps()
     var
-        NewEFTSetup: Record "NPR EFT Setup";
         CurrentEFTSetup: Record "NPR EFT Setup";
-        MobilePayV10PaymentSetup: Record "NPR MobilePayV10 Payment Setup";
         VippsMpUnitSetup: Record "NPR Vipps Mp Unit Setup";
-        MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
         VippsMpStore: Record "NPR Vipps Mp Store";
-        VippsMpWebhook: Record "NPR Vipps Mp Webhook";
-        VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
-        POSUnit: Record "NPR POS Unit";
-        VippsMpWebhookSetup: Codeunit "NPR Vipps Mp Webhook Setup";
-        VippsMpQrMgt: Codeunit "NPR Vipps Mp Qr Mgt.";
-        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
-        EnvironmentInformation: Codeunit "Environment Information";
-        MobilePayV10Integration: Codeunit "NPR MobilePayV10 Integration";
-        tempMobilePayStores: Record "NPR MobilePayV10 Store" temporary;
         EftSetupMapOldToNew: Dictionary of [Code[10], Code[10]];
         PayTypePos: Code[10];
         PaymentTypePosNo: Text;
+        MobilpeyaSetupErr: Text;
         I: Integer;
-        Token: JsonToken;
-        Token2: JsonToken;
         StoreIdToMsnMapning: JsonObject;
     begin
-        GetMapningsDictionary(StoreIdToMsnMapning);
         //Get all Mobilepay setups
         CurrentEFTSetup.SetRange("EFT Integration Type", 'MOBILEPAY_V10');
+        if (CurrentEFTSetup.Count() = 0) then begin
+            Message('No Mobilepay V10 integrations found.');
+            exit;
+        end;
+        if (not ValidateMobilepayV10Setup(MobilpeyaSetupErr)) then begin
+            Message(MobilpeyaSetupErr);
+            exit;
+        end;
+        GetMapningsDictionary(StoreIdToMsnMapning);
+
         //Explicit empty string, so names will be: "VIPPS MP", "VIPPS MP1"...
         PaymentTypePosNo := '';
-        //For each EFT Setup Using Mobilepay V10:
+        //Create Names for payment methods.
         while CurrentEFTSetup.Next() <> 0 do begin
             if (not EftSetupMapOldToNew.ContainsKey(CurrentEFTSetup."Payment Type POS")) then begin
-                //Add so we can reference this EFT Setup for other records.
                 EftSetupMapOldToNew.Add(CurrentEFTSetup."Payment Type POS", 'VIPPS MP' + PaymentTypePosNo);
-                //Create duplicate "POS Posting Setup" and duplicate "POS Payment Method"
-                PaymentTypePosDuplicate(CurrentEFTSetup."Payment Type POS", 'VIPPS MP' + PaymentTypePosNo);
-                PosPostingDuplicate(CurrentEFTSetup."Payment Type POS", 'VIPPS MP' + PaymentTypePosNo);
-                VippsMpPaymentSetupDuplicate(CurrentEFTSetup."Payment Type POS", 'VIPPS MP' + PaymentTypePosNo);
-                //Handles the case where customers have more complex setup.
                 I := I + 1;
                 PaymentTypePosNo := Format(I);
             end;
-            //Create EFT Setup Equivalent
-            EftSetupMapOldToNew.Get(CurrentEFTSetup."Payment Type POS", PayTypePos);
-            NewEFTSetup.Init();
-            NewEFTSetup."Payment Type POS" := PayTypePos;
-            NewEFTSetup."POS Unit No." := CurrentEFTSetup."POS Unit No.";
-            NewEFTSetup."EFT Integration Type" := 'VIPPS_MOBILEPAY';
-            NewEFTSetup.Insert();
-
-            //PrepareMapInfo
-            MobilePayV10UnitSetup.Get(NewEFTSetup."POS Unit No.");
-            if (tempMobilePayStores.Count() = 0) then
-                MobilePayV10Integration.GetMobilePayStores(CurrentEFTSetup, tempMobilePayStores);
-            tempMobilePayStores.Get(MobilePayV10UnitSetup."Store ID");
-            MobilePayV10PaymentSetup.Get(CurrentEFTSetup."Payment Type POS");
-            StoreIdToMsnMapning.Get(MobilePayV10UnitSetup."Store ID", Token);
-            Token.AsObject().Get('MSN', Token2);
-
-            //Create Store If not already created
-            if (not VippsMpStore.Get(Token2.AsValue().AsText())) then begin
-                VippsMpStore.Init();
-#pragma warning disable AA0139
-                VippsMpStore."Merchant Serial Number" := Token2.AsValue().AsText();
-#pragma warning restore AA0139
-                VippsMpStore."Partner API Enabled" := MobilePayV10PaymentSetup.Environment = MobilePayV10PaymentSetup.Environment::Production;
-                VippsMpStore.Sandbox := MobilePayV10PaymentSetup.Environment = MobilePayV10PaymentSetup.Environment::Sandbox;
-                VippsMpStore."Store Name" := tempMobilePayStores."Store Name";
-                //Used for testing purpose:
-                if (VippsMpStore.Sandbox) then begin
-#pragma warning disable AA0139
-                    if (Token.AsObject().Contains('client_id')) then begin
-                        Token.AsObject().Get('client_id', Token2);
-                        VippsMpStore."Client Id" := Token2.AsValue().AsText();
-                        Token.AsObject().Get('client_secret', Token2);
-                        VippsMpStore."Client Secret" := Token2.AsValue().AsText();
-                        Token.AsObject().Get('subscription_key', Token2);
-                        VippsMpStore."Client Sub. Key" := Token2.AsValue().AsText();
-                    end;
-#pragma warning restore AA0139
-                end;
-                VippsMpStore.Insert();
-            end;
-            //Create Merchante Webhook if not exist
-            if (VippsMpStore."Webhook Reference" = '') then begin
-                VippsMpWebhook.Init();
-                VippsMpWebhook."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
-#pragma warning disable AA0139
-                VippsMpWebhook."Webhook Reference" := VippsMpUtil.RemoveCurlyBraces(CreateGuid());
-                if (EnvironmentInformation.IsOnPrem()) then begin
-                    VippsMpWebhook."OnPrem AF Credential Id" := SafeUrlName(VippsMpStore."Store Name", VippsMpStore."Merchant Serial Number");
-                    VippsMpWebhook."OnPrem AF Credential Key" := VippsMpUtil.RemoveCurlyBraces(CreateGuid());
-#pragma warning restore AA0139
-                end;
-                VippsMpWebhook.Insert();
-                VippsMpWebhookSetup.CreateWebhook(VippsMpStore, VippsMpWebhook);
-                VippsMpStore."Webhook Reference" := VippsMpWebhook."Webhook Reference";
-                VippsMpStore.Modify();
-            end;
-
-            POSUnit.Get(NewEFTSetup."POS Unit No.");
-            //Create Merchant QR
-            if (not VippsMpQrCallback.Get(MobilePayV10UnitSetup."Beacon ID")) then begin
-                VippsMpQrCallback.Init();
-                VippsMpQrCallback."Merchant Qr Id" := MobilePayV10UnitSetup."Beacon ID";
-                VippsMpQrCallback."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
-                VippsMpQrCallback."Location Description" := POSUnit.Name;
-                VippsMpQrCallback.Insert();
-                //CREATE QR in Vipps
-                VippsMpQrMgt.CreateUpdateMobilepayQr(VippsMpQrCallback);
-            end;
-
-            //Create Unit Config
-            VippsMpUnitSetup.Init();
-            VippsMpUnitSetup."POS Unit No." := NewEFTSetup."POS Unit No.";
-            VippsMpUnitSetup."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
-            VippsMpUnitSetup."Merchant Qr Id" := VippsMpQrCallback."Merchant Qr Id";
-            VippsMpUnitSetup.Insert();
         end;
+        //Create duplicate records using Payment Type Pos.
+        foreach PayTypePos in EftSetupMapOldToNew.Keys() do begin
+            PaymentTypePosDuplicate(PayTypePos, EftSetupMapOldToNew.Get(PayTypePos));
+            PosPostingDuplicate(PayTypePos, EftSetupMapOldToNew.Get(PayTypePos));
+            VippsMpPaymentSetupDuplicate(PayTypePos, EftSetupMapOldToNew.Get(PayTypePos));
+        end;
+        //Create EFT Records
+        CurrentEFTSetup.Reset();
+        Clear(CurrentEFTSetup);
+        CurrentEFTSetup.SetRange("EFT Integration Type", 'MOBILEPAY_V10');
+        while CurrentEFTSetup.Next() <> 0 do begin
+            CreateEftSetup(EftSetupMapOldToNew.Get(CurrentEFTSetup."Payment Type POS"), CurrentEFTSetup."POS Unit No.");
+            CreateVippsUnitSetup(CurrentEFTSetup, StoreIdToMsnMapning);
+        end;
+        //Create Webhook
+        VippsMpStore.Reset();
+        while VippsMpStore.Next() <> 0 do begin
+            CreateWebhook(VippsMpStore);
+        end;
+        //Create Static QRs
+        VippsMpUnitSetup.Reset();
+        while VippsMpUnitSetup.Next() <> 0 do begin
+            CreateQr(VippsMpUnitSetup);
+        end;
+    end;
+
+    local procedure ValidateMobilepayV10Setup(var MobilpeyaSetupErr: Text): Boolean
+    var
+        SetupErrLbl: Label 'Mobilepay_V10 setup error, please correct or delete affected EFT Setups:\';
+        MpPaySetupLbl: Label '- Mobilepay_V10 payment parameters missing for Payment Method: %1.\';
+        MpUnitSetupLbl: Label '- Mobilepay_V10 unit parameters missing for pos unit: %1.\';
+        MpUnitSetupParameterLbl: Label '- Mobilepay_V10 unit parameter ''%1'' missing for pos unit: %2.\';
+        EFTSetup: Record "NPR EFT Setup";
+        MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        MobilePayV10PaymentSetup: Record "NPR MobilePayV10 Payment Setup";
+    begin
+        MobilpeyaSetupErr := SetupErrLbl;
+        EFTSetup.SetRange("EFT Integration Type", 'MOBILEPAY_V10');
+        while (EFTSetup.Next() <> 0) do begin
+            if (not MobilePayV10PaymentSetup.Get(EFTSetup."Payment Type POS")) then
+                MobilpeyaSetupErr += StrSubstNo(MpPaySetupLbl, EFTSetup."Payment Type POS");
+            if (not MobilePayV10UnitSetup.Get(EFTSetup."POS Unit No.")) then begin
+                MobilpeyaSetupErr += StrSubstNo(MpUnitSetupLbl, EFTSetup."POS Unit No.");
+            end else begin
+                if (MobilePayV10UnitSetup."Store ID" = '') then
+                    MobilpeyaSetupErr += StrSubstNo(MpUnitSetupParameterLbl, 'Store Id', EFTSetup."POS Unit No.");
+                if (MobilePayV10UnitSetup."Beacon ID" = '') then
+                    MobilpeyaSetupErr += StrSubstNo(MpUnitSetupParameterLbl, 'Beacon Id', EFTSetup."POS Unit No.");
+            end;
+        end;
+        exit(MobilpeyaSetupErr = SetupErrLbl);
     end;
 
     local procedure SafeUrlName(StoreName: Text; Msn: Text): Text
@@ -202,15 +177,29 @@ codeunit 6184763 "NPR Vipps Mp Migration"
         OrgPayMethod: Record "NPR POS Payment Method";
         PayMethod: Record "NPR POS Payment Method";
     begin
+        if (not PayMethod.Get(NewPayTypePos)) then begin
+            OrgPayMethod.SetFilter(Code, OrgPayTypePos);
+            OrgPayMethod.FindFirst();
+            PayMethod.TransferFields(OrgPayMethod);
+            PayMethod.Init();
+            PayMethod.TransferFields(OrgPayMethod);
+            PayMethod.Code := NewPayTypePos;
+            PayMethod.Description := 'Vipps Mobilepay';
+            PayMethod.Insert();
+        end;
+    end;
 
-        OrgPayMethod.SetFilter(Code, OrgPayTypePos);
-        OrgPayMethod.FindFirst();
-        PayMethod.TransferFields(OrgPayMethod);
-        PayMethod.Init();
-        PayMethod.TransferFields(OrgPayMethod);
-        PayMethod.Code := NewPayTypePos;
-        PayMethod.Description := 'Vipps Mobilepay';
-        PayMethod.Insert();
+    local procedure CreateEftSetup(NewPayTypePos: Code[10]; POSUnitNo: Code[10])
+    var
+        EFTSetup: Record "NPR EFT Setup";
+    begin
+        if (not EFTSetup.Get(NewPayTypePos, POSUnitNo)) then begin
+            EFTSetup.Init();
+            EFTSetup."Payment Type POS" := NewPayTypePos;
+            EFTSetup."POS Unit No." := POSUnitNo;
+            EFTSetup."EFT Integration Type" := 'VIPPS_MOBILEPAY';
+            EFTSetup.Insert();
+        end;
     end;
 
     local procedure PosPostingDuplicate(OrgPayTypePos: Code[10]; NewPayTypePos: Code[10])
@@ -220,10 +209,12 @@ codeunit 6184763 "NPR Vipps Mp Migration"
     begin
         OrgPosPosting.SetFilter("POS Payment Method Code", OrgPayTypePos);
         while OrgPosPosting.Next() <> 0 do begin
-            PosPosting.Init();
-            PosPosting.TransferFields(OrgPosPosting);
-            PosPosting."POS Payment Method Code" := NewPayTypePos;
-            PosPosting.Insert();
+            if (not PosPosting.Get(OrgPosPosting."POS Store Code", NewPayTypePos, OrgPosPosting."POS Payment Bin Code")) then begin
+                PosPosting.Init();
+                PosPosting.TransferFields(OrgPosPosting);
+                PosPosting."POS Payment Method Code" := NewPayTypePos;
+                PosPosting.Insert();
+            end;
         end;
     end;
 
@@ -234,14 +225,234 @@ codeunit 6184763 "NPR Vipps Mp Migration"
     begin
         //Create Payment Config
         MobilePayV10PaymentSetup.Get(OrgPayTypePos);
-        VippsMpPaymentSetup.Init();
-        VippsMpPaymentSetup."Payment Type POS" := NewPayTypePos;
-        if (MobilePayV10PaymentSetup."Log Level" = MobilePayV10PaymentSetup."Log Level"::All) then
-            VippsMpPaymentSetup."Log Level" := VippsMpPaymentSetup."Log Level"::All;
-        if (MobilePayV10PaymentSetup."Log Level" = MobilePayV10PaymentSetup."Log Level"::Errors) then
-            VippsMpPaymentSetup."Log Level" := VippsMpPaymentSetup."Log Level"::Error;
-        VippsMpPaymentSetup.Insert();
+        if (not VippsMpPaymentSetup.Get(NewPayTypePos)) then begin
+            VippsMpPaymentSetup.Init();
+            VippsMpPaymentSetup."Payment Type POS" := NewPayTypePos;
+            if (MobilePayV10PaymentSetup."Log Level" = MobilePayV10PaymentSetup."Log Level"::All) then
+                VippsMpPaymentSetup."Log Level" := VippsMpPaymentSetup."Log Level"::All;
+            if (MobilePayV10PaymentSetup."Log Level" = MobilePayV10PaymentSetup."Log Level"::Errors) then
+                VippsMpPaymentSetup."Log Level" := VippsMpPaymentSetup."Log Level"::Error;
+            VippsMpPaymentSetup.Insert();
+        end;
     end;
 
+    local procedure CreateVippsUnitSetup(CurrentEFTSetup: Record "NPR EFT Setup"; StoreIdToMsnMapning: JsonObject)
+    var
+        MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        MobilePayV10PaymentSetup: Record "NPR MobilePayV10 Payment Setup";
+        VippsMpUnitSetup: Record "NPR Vipps Mp Unit Setup";
+        VippsMpStore: Record "NPR Vipps Mp Store";
+        CurrentMsn: Text;
+        NoMapningLbl: Label 'The mobilepay store id %1 used with pos unit %2 did not correspond to any known vipps mobilepay msn.';
+        UnitSetupExistLbl: Label 'An existing Vipps Mobilepay Unit setup was found for pos unit %1, do you wan''t to re-use existing setup?';
+        MsnEmptyLbl: Label 'There was no value associated with the merchant serial number. skipping setup for pos unit %1';
+        Token: JsonToken;
+        Token2: JsonToken;
+    begin
+        if (VippsMpUnitSetup.Get(CurrentEFTSetup."POS Unit No.")) then begin
+            if (Confirm(StrSubstNo(UnitSetupExistLbl, CurrentEFTSetup."POS Unit No."))) then begin
+                exit;
+            end else begin
+                VippsMpUnitSetup.Delete();
+                VippsMpUnitSetup.Reset();
+            end;
+        end;
+        MobilePayV10UnitSetup.Get(CurrentEFTSetup."POS Unit No.");
+        MobilePayV10PaymentSetup.Get(CurrentEFTSetup."Payment Type POS");
+        if (not StoreIdToMsnMapning.Get(MobilePayV10UnitSetup."Store ID", Token)) then begin
+            Message(StrSubstNo(NoMapningLbl, MobilePayV10UnitSetup."Store ID", MobilePayV10UnitSetup."POS Unit No."));
+            exit;
+        end;
+        if (not Token.AsObject().Get('MSN', Token2)) then begin
+            Message(StrSubstNo(NoMapningLbl, MobilePayV10UnitSetup."Store ID", MobilePayV10UnitSetup."POS Unit No."));
+            exit;
+        end;
+        //Create the Unit Setup.
+        VippsMpUnitSetup.Init();
+        VippsMpUnitSetup."POS Unit No." := CurrentEFTSetup."POS Unit No.";
+        VippsMpUnitSetup.Insert();
 
+        //Create the Store
+        CurrentMsn := Token2.AsValue().AsText();
+        if (CurrentMsn = '') then begin
+            Message(StrSubstNo(MsnEmptyLbl, CurrentEFTSetup."POS Unit No."));
+            exit;
+        end;
+        if (not VippsMpStore.Get(CurrentMsn)) then begin
+            VippsMpStore.Init();
+#pragma warning disable AA0139
+            VippsMpStore."Merchant Serial Number" := CurrentMsn;
+#pragma warning restore AA0139
+            VippsMpStore."Partner API Enabled" := MobilePayV10PaymentSetup.Environment = MobilePayV10PaymentSetup.Environment::Production;
+            VippsMpStore.Sandbox := MobilePayV10PaymentSetup.Environment = MobilePayV10PaymentSetup.Environment::Sandbox;
+            //Used for testing purpose:
+            if (VippsMpStore.Sandbox) then begin
+#pragma warning disable AA0139
+                if (Token.AsObject().Contains('client_id')) then begin
+                    Token.AsObject().Get('client_id', Token2);
+                    VippsMpStore."Client Id" := Token2.AsValue().AsText();
+                    Token.AsObject().Get('client_secret', Token2);
+                    VippsMpStore."Client Secret" := Token2.AsValue().AsText();
+                    Token.AsObject().Get('subscription_key', Token2);
+                    VippsMpStore."Client Sub. Key" := Token2.AsValue().AsText();
+                end;
+#pragma warning restore AA0139
+            end;
+            VippsMpStore.Insert();
+        end;
+        VippsMpUnitSetup."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
+        VippsMpUnitSetup.Modify();
+    end;
+
+    local procedure CreateWebhook(VippsMpStore: Record "NPR Vipps Mp Store")
+    var
+        VippsMpWebhook: Record "NPR Vipps Mp Webhook";
+        VippsMpWebhookAPI: Codeunit "NPR Vipps Mp Webhook API";
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
+        EnvironmentInformation: Codeunit "Environment Information";
+        VippsMpWebhookSetup: Codeunit "NPR Vipps Mp Webhook Setup";
+        WebhookObj: JsonObject;
+        WebhookToBeDeleted: List of [Text];
+        Token: JsonToken;
+        Token2: JsonToken;
+        Token3: JsonToken;
+        WebhookId: Text;
+        Retry: Boolean;
+        LookupFailLbl: Label 'Could not fetch the webhooks from Vipps Mobilepay. Do you want to retry?. Error: %1';
+        SkippLbl: Label 'Skipping webhook setup for Msn %1';
+    begin
+        Retry := true;
+        while Retry do begin
+            if (not VippsMpWebhookAPI.GetAllRegisteredWebhooks(VippsMpStore, WebhookObj)) then begin
+                Retry := Confirm(StrSubstNo(LookupFailLbl, GetLastErrorText()));
+                if (not Retry) then begin
+                    Message(StrSubstNo(SkippLbl, VippsMpStore."Merchant Serial Number"));
+                    exit;
+                end;
+            end else begin
+                break;
+            end;
+        end;
+        if (not WebhookObj.Get('webhooks', Token)) then begin
+            Message('Unexpected Error (webhook fetch): Api did not respond with proper value. ' + StrSubstNo(SkippLbl, VippsMpStore."Merchant Serial Number"));
+            exit;
+        end;
+        //Identify invalid webhooks and clean up.
+        foreach Token2 in Token.AsArray() do begin
+            if (Token2.AsObject().Get('id', Token3)) then begin
+                WebhookId := Token3.AsValue().AsText();
+                VippsMpWebhook.Reset();
+                VippsMpWebhook.SetRange("Webhook Id", WebhookId);
+                if (VippsMpWebhook.FindFirst()) then begin
+                    if (VippsMpWebhook."Webhook Secret" = '') then
+                        WebhookToBeDeleted.Add(WebhookId);
+                end else begin
+                    WebhookToBeDeleted.Add(WebhookId);
+                end;
+            end;
+        end;
+        foreach WebhookId in WebhookToBeDeleted do begin
+            VippsMpWebhookAPI.DeleteWebhook(WebhookId, VippsMpStore);
+        end;
+        VippsMpWebhook.Reset();
+        if (not VippsMpWebhook.Get(VippsMpStore."Webhook Reference")) then begin
+            VippsMpStore."Webhook Reference" := '';
+        end;
+        if (VippsMpStore."Webhook Reference" = '') then begin
+            VippsMpWebhook.Reset();
+            VippsMpWebhook.SetRange("Merchant Serial Number", VippsMpStore."Merchant Serial Number");
+            if (VippsMpWebhook.FindFirst()) then begin
+                VippsMpStore."Webhook Reference" := VippsMpWebhook."Webhook Reference";
+            end else begin
+                VippsMpWebhook.Init();
+                VippsMpWebhook."Merchant Serial Number" := VippsMpStore."Merchant Serial Number";
+#pragma warning disable AA0139
+                VippsMpWebhook."Webhook Reference" := VippsMpUtil.RemoveCurlyBraces(CreateGuid());
+                if (EnvironmentInformation.IsOnPrem()) then begin
+                    VippsMpWebhook."OnPrem AF Credential Id" := SafeUrlName(VippsMpStore."Store Name", VippsMpStore."Merchant Serial Number");
+                    VippsMpWebhook."OnPrem AF Credential Key" := VippsMpUtil.RemoveCurlyBraces(CreateGuid());
+#pragma warning restore AA0139
+                end;
+                VippsMpWebhook.Insert();
+            end;
+            VippsMpWebhookSetup.CreateWebhook(VippsMpStore, VippsMpWebhook);
+            VippsMpStore."Webhook Reference" := VippsMpWebhook."Webhook Reference";
+            VippsMpStore.Modify();
+        end;
+    end;
+
+    local procedure CreateQr(VippsMpUnitSetup: Record "NPR Vipps Mp Unit Setup")
+    var
+        POSUnit: Record "NPR POS Unit";
+        VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
+        MobilePayV10UnitSetup: Record "NPR MobilePayV10 Unit Setup";
+        VippsMpQRAPI: Codeunit "NPR Vipps Mp QR API";
+        VippsMpStore: Record "NPR Vipps Mp Store";
+        Retry: Boolean;
+        JsonResponse: JsonObject;
+        Token: JsonToken;
+        QrExistLbl: Label 'The Unit setup for pos unit %1 already contains a definition for qr, do you wan''t to re-use this?';
+        RetryErrLbl: Label 'The operation of %1 failed. Do you wan''t to retry the operation?';
+        SkippLbl: Label 'Skipping qr setup for pos unit %1';
+    begin
+        if (VippsMpUnitSetup."Merchant Qr Id" <> '') then begin
+            if (Confirm(QrExistLbl)) then begin
+                Message(StrSubstNo(SkippLbl, VippsMpUnitSetup."POS Unit No."));
+                exit;
+            end else begin
+                VippsMpUnitSetup."Merchant Qr Id" := '';
+                VippsMpUnitSetup.Modify();
+            end;
+        end;
+        POSUnit.Get(VippsMpUnitSetup."POS Unit No.");
+        MobilePayV10UnitSetup.Get(VippsMpUnitSetup."POS Unit No.");
+        //Create Merchant QR
+        if (not VippsMpQrCallback.Get(MobilePayV10UnitSetup."Beacon ID")) then begin
+            VippsMpQrCallback.Init();
+            VippsMpQrCallback."Merchant Qr Id" := MobilePayV10UnitSetup."Beacon ID";
+            VippsMpQrCallback."Merchant Serial Number" := VippsMpUnitSetup."Merchant Serial Number";
+            VippsMpQrCallback."Location Description" := POSUnit.Name;
+            VippsMpQrCallback.Insert();
+            VippsMpUnitSetup."Merchant Qr Id" := VippsMpQrCallback."Merchant Qr Id";
+            VippsMpUnitSetup.Modify();
+            //CREATE QR in Vipps
+            if (not VippsMpStore.Get(VippsMpUnitSetup."Merchant Serial Number")) then begin
+                Message('No Vipps store configured for this unit setup. ' + StrSubstNo(SkippLbl, VippsMpUnitSetup."POS Unit No."));
+                exit;
+            end;
+            Retry := True;
+            while Retry do begin
+                if (VippsMpQRAPI.CreateORUpdateMobilepayQr(VippsMpStore, VippsMpQrCallback."Merchant Qr Id", VippsMpQrCallback."Location Description")) then begin
+                    break;
+                end else begin
+                    Retry := Confirm(StrSubstNo(RetryErrLbl, 'creating qr'));
+                    if (not Retry) then begin
+                        Message(StrSubstNo(SkippLbl, VippsMpUnitSetup."POS Unit No."));
+                        exit;
+                    end;
+                end;
+            end;
+            Retry := True;
+            while Retry do begin
+                if (VippsMpQRAPI.GetMerchantCallBackQrInfo(VippsMpStore, VippsMpQrCallback."Merchant Qr Id", JsonResponse)) then begin
+                    break;
+                end else begin
+                    Retry := Confirm(StrSubstNo(RetryErrLbl, 'fetching qr data'));
+                    if (not Retry) then begin
+                        Message(StrSubstNo(SkippLbl, VippsMpUnitSetup."POS Unit No."));
+                        exit;
+                    end;
+                end;
+            end;
+            if (not JsonResponse.Get('qrContent', Token)) then begin
+                Message('Unexpected result: ' + GetLastErrorText() + '. ' + StrSubstNo(SkippLbl, VippsMpUnitSetup."POS Unit No."));
+                exit;
+            end;
+#pragma warning disable AA0139
+            VippsMpQrCallback."Qr Content" := Token.AsValue().AsText();
+#pragma warning restore AA0139
+            VippsMpQrCallback.Modify();
+        end;
+        VippsMpUnitSetup."Merchant Qr Id" := VippsMpQrCallback."Merchant Qr Id";
+    end;
 }
