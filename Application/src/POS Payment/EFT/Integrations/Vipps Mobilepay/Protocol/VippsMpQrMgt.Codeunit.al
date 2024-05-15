@@ -57,11 +57,11 @@ codeunit 6184740 "NPR Vipps Mp Qr Mgt."
         if (not VippsMpStore.Get(VippsMpQr."Merchant Serial Number")) then
             VippsMpStore.Get(VippsMpSetupState.GetCurrentMsn());
         if (not VippsMpQrAPI.DeleteCallbackQr(VippsMpStore, VippsMpQr."Merchant Qr Id")) then
-            Error(LblDeleteErr, GetLastErrorText());
+            Message(LblDeleteErr, GetLastErrorText());
         VippsMpQr.Delete();
     end;
 
-    internal procedure SynchronizeQrBarcodes()
+    internal procedure RefreshQrBarcodes()
     var
         VippsMpStore: Record "NPR Vipps Mp Store";
         VippsMpQrCallback: Record "NPR Vipps Mp QrCallback";
@@ -70,25 +70,36 @@ codeunit 6184740 "NPR Vipps Mp Qr Mgt."
         token: JsonToken;
         token2: JsonToken;
         FilterTxt: Text;
+        lblNoDataFetched: Label 'Could not fetch merchant qr codes for msn %1';
     begin
         while VippsMpStore.Next() <> 0 do begin
-            if (not VippsMpQrAPI.GetAllMerchantCallBackQrInfo(VippsMpStore, JsonResponse)) then
-                Error('');
-            foreach token in JsonResponse do begin
-                token.AsObject().Get('merchantQrId', token2);
-                FilterTxt += '<>' + token2.AsValue().AsText() + '&';
-                if (not VippsMpQrCallback.Get(token2.AsValue().AsText())) then begin
-                    VippsMpQrCallback.Init();
+            if (not VippsMpQrAPI.GetAllMerchantCallBackQrInfo(VippsMpStore, JsonResponse)) then begin
+                Message(StrSubstNo(lblNoDataFetched, VippsMpStore."Merchant Serial Number"));
+            end else begin
+                foreach token in JsonResponse do begin
+                    token.AsObject().Get('merchantQrId', token2);
+                    FilterTxt += '<>' + token2.AsValue().AsText() + '&';
+                    if (not VippsMpQrCallback.Get(token2.AsValue().AsText())) then begin
+                        VippsMpQrCallback.Init();
 #pragma warning disable AA0139
-                    VippsMpQrCallback."Merchant Qr Id" := token2.AsValue().AsText();
-                    token.AsObject().Get('locationDescription', token2);
-                    VippsMpQrCallback."Location Description" := token2.AsValue().AsText();
-                    token.AsObject().Get('qrContent', token2);
-                    VippsMpQrCallback."Qr Content" := token2.AsValue().AsText();
-                    token.AsObject().Get('merchantSerialNumber', token2);
-                    VippsMpQrCallback."Merchant Serial Number" := token2.AsValue().AsText();
+                        VippsMpQrCallback."Merchant Qr Id" := token2.AsValue().AsText();
+                        token.AsObject().Get('locationDescription', token2);
+                        VippsMpQrCallback."Location Description" := token2.AsValue().AsText();
+                        token.AsObject().Get('qrContent', token2);
+                        VippsMpQrCallback."Qr Content" := token2.AsValue().AsText();
+                        token.AsObject().Get('merchantSerialNumber', token2);
+                        VippsMpQrCallback."Merchant Serial Number" := token2.AsValue().AsText();
 #pragma warning restore AA0139
-                    VippsMpQrCallback.Insert();
+                        VippsMpQrCallback.Insert();
+                    end else begin
+#pragma warning disable AA0139
+                        token.AsObject().Get('locationDescription', token2);
+                        VippsMpQrCallback."Location Description" := token2.AsValue().AsText();
+                        token.AsObject().Get('qrContent', token2);
+                        VippsMpQrCallback."Qr Content" := token2.AsValue().AsText();
+                        VippsMpQrCallback.Modify();
+#pragma warning restore AA0139
+                    end;
                 end;
             end;
         end;
@@ -120,7 +131,6 @@ codeunit 6184740 "NPR Vipps Mp Qr Mgt."
 
     internal procedure CreateUpdateMobilepayQrUI(var VippsMpQrCallback: Record "NPR Vipps Mp QrCallback")
     begin
-
         if (Page.RunModal(PAGE::"NPR Vipps Mp QrCallback", VippsMpQrCallback) = Action::LookupCancel) then
             exit;
         CreateUpdateMobilepayQr(VippsMpQrCallback);
