@@ -10,7 +10,9 @@ codeunit 6184764 "NPR UPG POSMenu Actions v3"
     trigger OnUpgradePerCompany()
     begin
         UpgradePOSMenu_MMMembermgmt();
+        UpgradePOSMenu_MMMembermgmt_1();
         UpgradePOSMenu_MMMembermgmt2();
+        UpgradePOSMenu_MMMembermgmt2_1();
         UpgradePOSMenu_ScanVoucher();
         UpgradePOSMenu_IssueReturnVoucher();
         UpgradePOSMenu_PayinPayout();
@@ -44,6 +46,32 @@ codeunit 6184764 "NPR UPG POSMenu Actions v3"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure UpgradePOSMenu_MMMembermgmt_1()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        POSMenuButton: Record "NPR POS Menu Button";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POSMenu Actions v3', 'MM_MEMBERMGT-1');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'MM_MEMBERMGT-1')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+        POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
+        POSMenuButton.SetRange("Action Code", 'MM_MEMBERMGT-1');
+        if not POSMenuButton.FindSet(true) then
+            exit;
+
+        repeat
+            POSMenuButton."Action Code" := Format(Enum::"NPR POS Workflow"::MM_MEMBERMGMT_WF3);
+            POSMenuButton.Modify(true);
+            POSMenuButton.RefreshParameters();
+        until POSMenuButton.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'MM_MEMBERMGT-1'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     local procedure UpgradePOSMenu_MMMembermgmt2()
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
@@ -67,6 +95,32 @@ codeunit 6184764 "NPR UPG POSMenu Actions v3"
         until POSMenuButton.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'MM_MEMBERMGMT_WF2'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradePOSMenu_MMMembermgmt2_1()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        POSMenuButton: Record "NPR POS Menu Button";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POSMenu Actions v3', 'MM_MEMBERMGMT_WF2-1');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'MM_MEMBERMGMT_WF2-1')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+        POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
+        POSMenuButton.SetRange("Action Code", 'MM_MEMBERMGMT_WF2-1');
+        if not POSMenuButton.FindSet(true) then
+            exit;
+
+        repeat
+            POSMenuButton."Action Code" := Format(Enum::"NPR POS Workflow"::MM_MEMBERMGMT_WF3);
+            POSMenuButton.Modify(true);
+            POSMenuButton.RefreshParameters();
+        until POSMenuButton.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'MM_MEMBERMGMT_WF2-1'));
         LogMessageStopwatch.LogFinish();
     end;
 
