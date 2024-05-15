@@ -659,12 +659,15 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             if POSUnit.FindSet() then
                 repeat
                     if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-                        if (POSAuditProfile."Do Not Print Receipt on Sale" <> POSScenarioUpgradeBuff."Do Not Print Receipt on Sale") or
+                        if ((not POSAuditProfile."Do Not Print Receipt on Sale") and (POSAuditProfile."Do Not Print Receipt on Sale" <> POSScenarioUpgradeBuff."Do Not Print Receipt on Sale")) or
                            (POSAuditProfile."Bin Eject After Sale" <> POSScenarioUpgradeBuff."Bin Eject After Sale") then
                             if not AuditProfileUpgradeBuff.Get(POSUnit."POS Sales Workflow Set", POSUnit."POS Audit Profile") then begin
                                 NewPOSAuditProfile := POSAuditProfile;
                                 NewPOSAuditProfile."Bin Eject After Sale" := POSScenarioUpgradeBuff."Bin Eject After Sale";
-                                NewPOSAuditProfile."Do Not Print Receipt on Sale" := POSScenarioUpgradeBuff."Do Not Print Receipt on Sale";
+
+                                if (not NewPOSAuditProfile."Do Not Print Receipt on Sale") and (NewPOSAuditProfile."Do Not Print Receipt on Sale" <> POSScenarioUpgradeBuff."Do Not Print Receipt on Sale") then
+                                    NewPOSAuditProfile."Do Not Print Receipt on Sale" := POSScenarioUpgradeBuff."Do Not Print Receipt on Sale";
+
                                 NewPOSAuditProfile.Code := GetAuditProfileUpgradeCode();
                                 NewPOSAuditProfile.Insert();
 
