@@ -545,6 +545,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSSalesWFSetEntry: Record "NPR POS Sales WF Set Entry";
     begin
         POSScenarioUpgradeBuff.Reset();
         if not POSScenarioUpgradeBuff.IsEmpty then
@@ -567,7 +568,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
             POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Member Retail Integr.");
             POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintMembershipsOnSale');
-            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetRange("Set Code", '');
+            if (POSScenarioUpgradeBuff.Code <> '') and POSSalesWFSetEntry.Get(POSScenarioUpgradeBuff.Code, 'FINISH_SALE') then
+                POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
             POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
             if not POSSalesWorkflowStep.FindFirst() then
                 POSScenarioUpgradeBuff."Print Membership On Sale" := false
@@ -593,6 +596,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSSalesWFSetEntry: Record "NPR POS Sales WF Set Entry";
     begin
         POSScenarioUpgradeBuff.Reset();
         if not POSScenarioUpgradeBuff.IsEmpty then
@@ -615,7 +619,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
             POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR POS Sales Print Mgt.");
             POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintReceiptOnSale');
-            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetRange("Set Code", '');
+            if (POSScenarioUpgradeBuff.Code <> '') and POSSalesWFSetEntry.Get(POSScenarioUpgradeBuff.Code, 'FINISH_SALE') then
+                POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
             POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
             if not POSSalesWorkflowStep.FindFirst() then
                 POSScenarioUpgradeBuff."Do Not Print Receipt on Sale" := true
@@ -789,6 +795,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSSalesWFSetEntry: Record "NPR POS Sales WF Set Entry";
     begin
         POSScenarioUpgradeBuff.Reset();
         if not POSScenarioUpgradeBuff.IsEmpty then
@@ -811,7 +818,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
             POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR MM Loyalty Point Mgt.");
             POSSalesWorkflowStep.SetRange("Subscriber Function", 'PointAssignmentOnSale');
-            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetRange("Set Code", '');
+            if (POSScenarioUpgradeBuff.Code <> '') and POSSalesWFSetEntry.Get(POSScenarioUpgradeBuff.Code, 'FINISH_SALE') then
+                POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
             POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
             if not POSSalesWorkflowStep.FindFirst() then
                 POSScenarioUpgradeBuff."Assign Loyalty On Sale" := false
@@ -905,6 +914,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
     var
         POSUnit: Record "NPR POS Unit";
         POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        POSSalesWFSetEntry: Record "NPR POS Sales WF Set Entry";
     begin
         POSScenarioUpgradeBuff.Reset();
         if not POSScenarioUpgradeBuff.IsEmpty then
@@ -927,7 +937,9 @@ codeunit 6150945 "NPR UPG POS Scenarios"
             POSSalesWorkflowStep.SetRange("Workflow Code", 'FINISH_SALE');
             POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", CODEUNIT::"NPR TM Ticket Management");
             POSSalesWorkflowStep.SetRange("Subscriber Function", 'PrintTicketsOnSale');
-            POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
+            POSSalesWorkflowStep.SetRange("Set Code", '');
+            if (POSScenarioUpgradeBuff.Code <> '') and POSSalesWFSetEntry.Get(POSScenarioUpgradeBuff.Code, 'FINISH_SALE') then
+                POSSalesWorkflowStep.SetRange("Set Code", POSScenarioUpgradeBuff.Code);
             POSSalesWorkflowStep.SetLoadFields("Workflow Code", "Subscriber Codeunit ID", "Subscriber Function", Enabled, "Set Code");
             if not POSSalesWorkflowStep.FindFirst() then
                 POSScenarioUpgradeBuff."Print Ticket On Sale" := false
