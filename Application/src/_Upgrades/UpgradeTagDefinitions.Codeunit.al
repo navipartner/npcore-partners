@@ -184,6 +184,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BG Vision", 'UpdateBGVisionVatSubject'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Layout Upgrade", 'UpgradePOSLayoutEncoding'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Layout Upgrade", 'UpgradeArchivedPOSLayoutEncoding'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT-1'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2-1'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -659,8 +661,12 @@
                 case UpgradeStep of
                     'MM_MEMBERMGT':
                         exit('NPR-MM_MEMBERMGT-20241602');
+                    'MM_MEMBERMGT-1':
+                        exit('NPR-MM_MEMBERMGT-20240515');
                     'MM_MEMBERMGMT_WF2':
                         exit('NPR-MM_MEMBERMGMT_WF2-20241602');
+                    'MM_MEMBERMGMT_WF2-1':
+                        exit('NPR-MM_MEMBERMGMT_WF2-20240515');
                     'ISSUE_RETURN_VOUCHER':
                         exit('NPR-ISSUE_RETURN_VOUCHER-20241602');
                     'PAYIN_PAYOUT':

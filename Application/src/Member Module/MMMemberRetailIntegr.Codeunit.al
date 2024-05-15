@@ -1150,6 +1150,106 @@
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
+    local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        if (SaleLinePOS.IsTemporary) then
+            exit;
+
+        DeletePreemptiveMembership(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
+        DeleteMemberInfoCapture(SaleLinePOS);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
+    local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MembershipAttemptCreate: Codeunit "NPR Membership Attempt Create";
+        ReasonText: Text;
+        QTY_CANT_CHANGE: Label 'Changing quantity for membership sales is not possible.';
+    begin
+
+        if (SaleLinePOS.IsTemporary) then
+            exit;
+
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+        if (MemberInfoCapture.FindFirst()) then begin
+            if (SaleLinePOS."No." = MemberInfoCapture."Item No.") then begin
+                if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then;
+
+                if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER) then
+                    Error(QTY_CANT_CHANGE);
+
+                TempMemberInfoCapture.TransferFields(MemberInfoCapture, true);
+                TempMemberInfoCapture.Quantity := NewQuantity;
+                TempMemberInfoCapture.Insert();
+
+                MembershipAttemptCreate.SetAttemptCreateMembershipForcedRollback();
+                if (not MembershipAttemptCreate.Run(TempMemberInfoCapture)) then
+                    if (not MembershipAttemptCreate.WasSuccessful(ReasonText)) then
+                        Error(ReasonText);
+
+            end;
+        end;
+
+    end;
+
+    local procedure DeleteMemberInfoCapture(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        MemberInfoCapture.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+        if (MemberInfoCapture.IsEmpty()) then
+            exit;
+
+        MemberInfoCapture.DeleteAll();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: LoadPOSSvSl B", 'OnAfterLoadFromQuote', '', true, true)]
+    local procedure OnBeforeLoadSavedSaleSubscriber(POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var SalePOS: Record "NPR POS Sale")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberInfoCapture2: Record "NPR MM Member Info Capture";
+        POSSalesInfo: Record "NPR MM POS Sales Info";
+        OriginalSalesTicketNo: Code[20];
+        NewSalesTicketNo: Code[20];
+    begin
+        OriginalSalesTicketNo := POSQuoteEntry."Sales Ticket No.";
+        NewSalesTicketNo := SalePOS."Sales Ticket No.";
+
+        MemberInfoCapture.SetCurrentKey("Receipt No.");
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', OriginalSalesTicketNo);
+        if (MemberInfoCapture.FindSet()) then begin
+            repeat
+                MemberInfoCapture2.Get(MemberInfoCapture."Entry No.");
+                MemberInfoCapture2."Receipt No." := NewSalesTicketNo;
+                MemberInfoCapture2.Modify();
+            until (MemberInfoCapture.Next() = 0);
+        end;
+
+        if (POSSalesInfo.Get(POSSalesInfo."Association Type"::HEADER, OriginalSalesTicketNo, 0)) then begin
+            POSSalesInfo."Receipt No." := NewSalesTicketNo;
+            if (not POSSalesInfo.Insert()) then;
+        end;
+
+        POSSalesInfo.SetFilter("Association Type", '=%1', POSSalesInfo."Association Type"::LINE);
+        POSSalesInfo.SetFilter("Receipt No.", '=%1', OriginalSalesTicketNo);
+        if (POSSalesInfo.FindSet()) then begin
+            repeat
+                POSSalesInfo."Receipt No." := NewSalesTicketNo;
+                if (not POSSalesInfo.Insert()) then;
+            until (POSSalesInfo.Next() = 0);
+        end;
+
+    end;
+
+
 }
 
 
