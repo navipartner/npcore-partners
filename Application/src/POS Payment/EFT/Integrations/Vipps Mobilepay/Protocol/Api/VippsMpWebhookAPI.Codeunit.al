@@ -2,6 +2,9 @@ codeunit 6184723 "NPR Vipps Mp Webhook API"
 {
     Access = Internal;
 
+    var
+        NoMsnErrLbl: Label 'There was not specified a Merchant Serial Number, can''t %1 without one.';
+
     [TryFunction]
     internal procedure GetAllRegisteredWebhooks(VippsMpStore: Record "NPR Vipps Mp Store"; JsonResponse: JsonObject)
     var
@@ -10,11 +13,15 @@ codeunit 6184723 "NPR Vipps Mp Webhook API"
         Http: HttpClient;
         HttpResponse: HttpResponseMessage;
         HttpResponseTxt: Text;
+        NoMsnErrGetLbl: Label 'fetch registered webhooks';
     begin
+        if (VippsMpStore."Merchant Serial Number" = '') then
+            Error(NoMsnErrLbl, NoMsnErrGetLbl);
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
-        Http.Get('/webhooks/v1/webhooks', HttpResponse);
+        Http.Get('webhooks/v1/webhooks', HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
-        JsonResponse.ReadFrom(HttpResponseTxt);
+        if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+            Error(HttpResponseTxt);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
@@ -36,7 +43,10 @@ codeunit 6184723 "NPR Vipps Mp Webhook API"
         Headers: HttpHeaders;
         HttpResponse: HttpResponseMessage;
         Uri: Codeunit Uri;
+        NoMsnErrGetLbl: Label 'register webhook';
     begin
+        if (VippsMpStore."Merchant Serial Number" = '') then
+            Error(NoMsnErrLbl, NoMsnErrGetLbl);
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
         Uri.Init(Url);
         Json.Add('url', Uri.GetAbsoluteUri());
@@ -49,9 +59,10 @@ codeunit 6184723 "NPR Vipps Mp Webhook API"
         Content.GetHeaders(Headers);
         Headers.Clear();
         Headers.Add('Content-Type', 'application/json');
-        Http.Post('/webhooks/v1/webhooks', Content, HttpResponse);
+        Http.Post('webhooks/v1/webhooks', Content, HttpResponse);
         HttpResponse.Content.ReadAs(HttpResponseTxt);
-        JsonResponse.ReadFrom(HttpResponseTxt);
+        if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+            Error(HttpResponseTxt);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
@@ -67,12 +78,16 @@ codeunit 6184723 "NPR Vipps Mp Webhook API"
         HttpResponse: HttpResponseMessage;
         HttpResponseTxt: Text;
         JsonResponse: JsonObject;
+        NoMsnErrGetLbl: Label 'delete webhook';
     begin
+        if (VippsMpStore."Merchant Serial Number" = '') then
+            Error(NoMsnErrLbl, NoMsnErrGetLbl);
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True);
-        Http.Delete(StrSubstNo('/webhooks/v1/webhooks/%1', Id), HttpResponse);
+        Http.Delete(StrSubstNo('webhooks/v1/webhooks/%1', Id), HttpResponse);
         if (not HttpResponse.IsSuccessStatusCode()) then begin
             HttpResponse.Content.ReadAs(HttpResponseTxt);
-            JsonResponse.ReadFrom(HttpResponseTxt);
+            if (not JsonResponse.ReadFrom(HttpResponseTxt)) then
+                Error(HttpResponseTxt);
             VippsMpResponseHandler.HttpErrorResponseMessage(JsonResponse, HttpResponseTxt);
             Error(HttpResponseTxt);
         end;

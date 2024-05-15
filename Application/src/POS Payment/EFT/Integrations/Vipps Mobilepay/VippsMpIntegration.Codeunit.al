@@ -169,10 +169,14 @@ codeunit 6184692 "NPR Vipps Mp Integration"
 
     local procedure GetPaymentTypeParameters(EFTSetup: Record "NPR EFT Setup"; var EFTPaymentConfig: Record "NPR Vipps Mp Payment Setup")
     begin
-        EFTSetup.TestField("Payment Type POS");
-        if not EFTPaymentConfig.Get(EFTSetup."Payment Type POS") then begin
+        GetPaymentTypeParameters(EFTSetup."Payment Type POS", EFTPaymentConfig);
+    end;
+
+    internal procedure GetPaymentTypeParameters(VippsPaymentSetupCode: Code[10]; var EFTPaymentConfig: Record "NPR Vipps Mp Payment Setup")
+    begin
+        if not EFTPaymentConfig.Get(VippsPaymentSetupCode) then begin
             EFTPaymentConfig.Init();
-            EFTPaymentConfig."Payment Type POS" := EFTSetup."Payment Type POS";
+            EFTPaymentConfig."Payment Type POS" := VippsPaymentSetupCode;
             EFTPaymentConfig."Log Level" := Enum::"NPR Vipps Mp Log Lvl"::Error;
             EFTPaymentConfig.Insert();
         end;
