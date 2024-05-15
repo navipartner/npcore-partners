@@ -32,7 +32,7 @@
                 Clear(POSUnit);
 
             if not POSUnit.GetProfile(POSLoyaltyProfile) then
-                exit;
+                Clear(POSLoyaltyProfile);
 
             if POSLoyaltyProfile."Assign Loyalty On Sale" then
                 exit; // Handled by OnFinishSale workflow
