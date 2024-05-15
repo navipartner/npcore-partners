@@ -4,7 +4,7 @@ table 6150781 "NPR Vipps Mp Store"
     DataClassification = CustomerContent;
     Caption = 'Vipps Mobilepay Store';
     Extensible = false;
-    LookupPageId = "NPR Vipps Mp Store";
+    LookupPageId = "NPR Vipps Mp Store List";
 
     fields
     {
@@ -46,6 +46,8 @@ table 6150781 "NPR Vipps Mp Store"
                 VippsMpSetupState: Codeunit "NPR Vipps Mp SetupState";
             begin
                 VippsMpSetupState.SetCurrentMsn(Rec."Merchant Serial Number");
+                Rec.Modify();
+                Commit();
                 if (Page.RunModal(Page::"NPR Vipps Mp Webhook List", VippsMpWebhook) = Action::LookupOK) then begin
                     "Webhook Reference" := VippsMpWebhook."Webhook Reference";
                 end;
