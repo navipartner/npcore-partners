@@ -675,6 +675,10 @@
                         exit('NPR-TM_TICKETMGMT-20241602');
                     'TM_TICKETMGMT_2':
                         exit('NPR-TM_TICKETMGMT_2-20241602');
+                    'TM_TICKETMGMT-1':
+                        exit('NPR-TM_TICKETMGMT-20240515');
+                    'TM_TICKETMGMT_2-1':
+                        exit('NPR-TM_TICKETMGMT_2-2024015');
                     'SCAN_VOUCHER':
                         exit('NPR-SCAN_VOUCHER-20241602');
                 end;
