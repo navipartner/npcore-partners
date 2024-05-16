@@ -637,9 +637,9 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
         if TempSalesCrMemoLine."Line Discount %" <> 0 then
-            exit(-(Abs(TempSalesCrMemoLine.GetLineAmountInclVAT() * FindVATBreakDown())))
+            exit(-(Abs(TempSalesCrMemoLine.GetLineAmountInclVAT() * CalculateVATBreakDown())))
         else
-            exit(Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) * FindVATBreakDown()))
+            exit(Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) * CalculateVATBreakDown()))
     end;
 
     local procedure CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
@@ -647,16 +647,14 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         exit(CalculateSumOfAppliedRetailCostAmounts(SalesCrMemoHeader) - CalculateRSGLVATAmount());
     end;
 
-    local procedure FindVATBreakDown(): Decimal
+    local procedure CalculateVATBreakDown(): Decimal
     var
-        Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
-        if not Item.Get(TempSalesCrMemoLine."No.") then
-            exit;
-        if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-            exit;
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(TempSalesCrMemoLine."VAT Bus. Posting Group", TempSalesCrMemoLine."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), TempSalesCrMemoLine."VAT Bus. Posting Group", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), TempSalesCrMemoLine."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
     #endregion
 
