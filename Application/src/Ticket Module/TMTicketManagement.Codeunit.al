@@ -86,7 +86,7 @@
     var
         Token: Text[100];
         TokenLineNumber: Integer;
-        TicketAction: Codeunit "NPR POSAction: Ticket Mgt.";
+        TicketAction: Codeunit "NPR POS Action - Ticket Mgt B.";
     begin
         if (not TicketAction.GetRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token, TokenLineNumber)) then
             exit;
