@@ -41,6 +41,11 @@
                     AssignCode20FieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
                     AssignCode10FieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
                 end;
+            DATABASE::"Sales Invoice Line":
+                begin
+                    AssignCode20FieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
+                    AssignCode10FieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
+                end;
             DATABASE::"NPR POS Sale Line":
                 begin
                     AssignCode10FieldValue(ExchangeLabel."Register No.", RecRef, 'Register No.');
@@ -278,6 +283,8 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesInvLine: Record "Sales Invoice Line";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
     begin
@@ -290,6 +297,14 @@
 
                     if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and (not SalesHeader."Prices Including VAT") then
                         UnitPrice *= (1 + (SalesLine."VAT %" / 100));
+                end;
+            DATABASE::"Sales Invoice Line":
+                begin
+                    RecRef.SetTable(SalesInvLine);
+                    UnitPrice := SalesInvLine."Unit Price";
+
+                    if SalesInvHeader.Get(SalesInvLine."Document No.") and (not SalesInvHeader."Prices Including VAT") then
+                        UnitPrice *= (1 + (SalesInvLine."VAT %" / 100));
                 end;
             DATABASE::"NPR POS Sale Line":
                 begin
@@ -355,6 +370,7 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesLine: Record "Sales Line";
+        SalesInvLine: Record "Sales Invoice Line";
         Type: Integer;
     begin
         case RecRef.Number of
@@ -362,6 +378,11 @@
                 begin
                     AssignIntegerFieldValue(Type, RecRef, 'Type');
                     exit(Type = SalesLine.Type::Item.AsInteger())
+                end;
+            DATABASE::"Sales Invoice Line":
+                begin
+                    AssignIntegerFieldValue(Type, RecRef, 'Type');
+                    exit(Type = SalesInvLine.Type::Item.AsInteger())
                 end;
             DATABASE::"NPR POS Sale Line":
                 begin
