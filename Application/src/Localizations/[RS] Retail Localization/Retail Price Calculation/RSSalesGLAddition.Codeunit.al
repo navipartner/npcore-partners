@@ -166,9 +166,9 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             RSGLEntryType::Margin:
                 GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
             RSGLEntryType::CounterStdCorrection:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
+                GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
             RSGLEntryType::StdCorrection:
-                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Posted to G/L");
+                GenJournalLine.Validate("Debit Amount", -CalculationValueEntry."Cost Posted to G/L");
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
             RSGLEntryType::MarginNoVAT:
@@ -503,7 +503,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
                 end;
         end;
 
-        ApplValueEntry."Cost Posted to G/L" := -ApplValueEntry."Cost Amount (Actual)";
+        ApplValueEntry."Cost Posted to G/L" := ApplValueEntry."Cost Amount (Actual)";
         ApplValueEntry.Insert();
 
         RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(ApplValueEntry);
@@ -607,7 +607,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
-        exit(((PriceListLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") * TempSalesInvoiceLine.Quantity) * FindVATBreakDown())
+        exit(((PriceListLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") * TempSalesInvoiceLine.Quantity) * CalculateVATBreakDown())
     end;
 
     local procedure CalculateRSGLMarginAmount(NewValueEntry: Record "Value Entry"; ValueEntryIn: Record "Value Entry"): Decimal
@@ -615,16 +615,14 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         exit(-(NewValueEntry."Cost per Unit" * Abs(ValueEntryIn."Invoiced Quantity") - TempSalesInvoiceLine."Line Discount Amount"));
     end;
 
-    local procedure FindVATBreakDown(): Decimal
+    local procedure CalculateVATBreakDown(): Decimal
     var
-        Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
-        if not Item.Get(TempSalesInvoiceLine."No.") then
-            exit;
-        if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-            exit;
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(TempSalesInvoiceLine."VAT Bus. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), PriceListLine."VAT Bus. Posting Gr. (Price)", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), TempSalesInvoiceLine."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
     #endregion
 

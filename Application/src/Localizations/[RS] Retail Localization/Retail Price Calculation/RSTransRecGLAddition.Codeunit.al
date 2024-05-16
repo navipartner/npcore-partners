@@ -20,10 +20,10 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not TempTransferLine.FindSet() then
             exit;
 
-        case CheckRetailLocation(TransferReceiptHeader) of
-            true:
+        case true of
+            (not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")):
                 PostAdditionalRetailEntries(TransferReceiptHeader);
-            false:
+            (IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (not IsRetailLocation(TransferReceiptHeader."Transfer-to Code")):
                 PostCorrectionWarehouseEntries(TransferReceiptHeader);
         end;
     end;
@@ -147,7 +147,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     begin
         GenJournalLine.Init();
         GenJournalLine."Document No." := TransferReceiptHeader."No.";
-        GenJournalLine."Posting Date" := Today();
+        GenJournalLine."Posting Date" := TransferReceiptHeader."Posting Date";
         case RSGLEntryType of
             RSGLEntryType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginLbl;
@@ -156,7 +156,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             RSGLEntryType::VAT:
                 GenJournalLine.Description := GenJnlLineVATLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := Today();
+        GenJournalLine."VAT Reporting Date" := TransferReceiptHeader."Posting Date";
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
@@ -453,13 +453,14 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     local procedure CalculateVATBreakDown(): Decimal
     var
         Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
         if not Item.Get(TempTransferLine."Item No.") then
             exit;
-        if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-            exit;
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), PriceListLine."VAT Bus. Posting Gr. (Price)", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), Item."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
 
     local procedure GetRSAccountNoFromSetup(RSGLEntryType: Option VAT,Margin,MarginNoVAT): Code[20]
@@ -556,15 +557,12 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             exit(true);
     end;
 
-    local procedure CheckRetailLocation(TransferReceiptHeader: Record "Transfer Receipt Header"): Boolean
+    local procedure IsRetailLocation(LocationCode: Code[20]): Boolean
     var
         Location: Record Location;
-        Location2: Record Location;
     begin
-        Location.Get(TransferReceiptHeader."Transfer-from Code");
-        Location2.Get(TransferReceiptHeader."Transfer-to Code");
-
-        exit((not Location."NPR Retail Location") and (Location2."NPR Retail Location"))
+        Location.Get(LocationCode);
+        exit(Location."NPR Retail Location");
     end;
 
     local procedure FillTempTransferLines(TransferHeader: Record "Transfer Header")

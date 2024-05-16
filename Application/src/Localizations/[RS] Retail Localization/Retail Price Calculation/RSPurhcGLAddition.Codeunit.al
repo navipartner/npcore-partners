@@ -351,24 +351,12 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     local procedure CalculateVATBreakDown(): Decimal
     var
-        Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
-        case TempPurchLine.Type of
-            "Purchase Line Type"::Item:
-                begin
-                    if not Item.Get(TempPurchLine."No.") then
-                        exit;
-                    if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-                        exit;
-                end;
-            "Purchase Line Type"::"Charge (Item)":
-                begin
-                    if not VATSetup.Get(TempPurchLine."VAT Bus. Posting Group", TempPurchLine."VAT Prod. Posting Group") then
-                        exit;
-                end;
-        end;
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(TempPurchLine."VAT Bus. Posting Group", TempPurchLine."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), TempPurchLine."VAT Bus. Posting Group", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), TempPurchLine."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
 
     #endregion
