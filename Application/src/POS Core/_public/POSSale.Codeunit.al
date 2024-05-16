@@ -301,15 +301,9 @@
     end;
 
     procedure RefreshCurrent()
-    var
-        CurrentView: Codeunit "NPR POS View";
-        POSSession: Codeunit "NPR POS Session";
     begin
-        if not _Rec.Get(_Rec."Register No.", _Rec."Sales Ticket No.") then begin
-            POSSession.GetCurrentView(CurrentView);
-            if CurrentView.GetType() in [Enum::"NPR View Type"::Sale, Enum::"NPR View Type"::Payment] then
-                ThrowNonExistentSaleErr(_Rec);
-        end;
+        if not _Rec.Get(_Rec."Register No.", _Rec."Sales Ticket No.") then
+            ThrowNonExistentSaleErr(_Rec);
         OnRefresh(_Rec);
     end;
 
