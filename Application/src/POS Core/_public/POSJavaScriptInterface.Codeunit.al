@@ -112,7 +112,8 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 InvokeCustomMethod(Method, Context, FrontEnd);
         end;
 
-        POSRefreshData.Refresh();
+        if Method <> 'Require' then
+            POSRefreshData.Refresh();
     end;
 
     local procedure InvokeCustomMethod(Method: Text; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
