@@ -124,7 +124,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     begin
         GenJournalLine.Init();
         GenJournalLine."Document No." := TransferShipmentHeader."No.";
-        GenJournalLine."Posting Date" := Today();
+        GenJournalLine."Posting Date" := TransferShipmentHeader."Posting Date";
         case RSGLEntryType of
             RSGLEntryType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginLbl;
@@ -135,7 +135,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             RSGLEntryType::TransitAdjustment:
                 GenJournalLine.Description := GenJnlLineTransitLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := Today();
+        GenJournalLine."VAT Reporting Date" := TransferShipmentHeader."Posting Date";
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")

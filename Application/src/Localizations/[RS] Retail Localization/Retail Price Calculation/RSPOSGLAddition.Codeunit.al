@@ -193,9 +193,9 @@ codeunit 6151363 "NPR RS POS GL Addition"
             RSGLEntryType::Margin:
                 GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
             RSGLEntryType::CounterStdCorrection:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Posted to G/L");
+                GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
             RSGLEntryType::StdCorrection:
-                GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Posted to G/L");
+                GenJournalLine.Validate("Debit Amount", -CalculationValueEntry."Cost Posted to G/L");
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
             RSGLEntryType::MarginNoVAT:
@@ -470,7 +470,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         if ApplValueEntry."Cost per Unit" = 0 then
             exit;
 
-        ApplValueEntry."Cost Posted to G/L" := -ApplValueEntry."Cost Amount (Actual)";
+        ApplValueEntry."Cost Posted to G/L" := ApplValueEntry."Cost Amount (Actual)";
         ApplValueEntry.Insert();
 
         RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(ApplValueEntry);
@@ -715,17 +715,19 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
     local procedure CalculateVATBreakDown(): Decimal
     var
-        Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
-        if not Item.Get(TempPOSEntrySalesLines."No.") then
+        if not POSStore.Get(TempPOSEntrySalesLines."POS Store Code") then
             exit;
-        if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-            exit;
+        POSPostingProfile.Get(POSStore."POS Posting Profile");
 
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(POSPostingProfile."VAT Bus. Posting Group", TempPOSEntrySalesLines."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), POSPostingProfile."VAT Bus. Posting Group", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), TempPOSEntrySalesLines."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
-
     #endregion
 
     #region Helper Procedures

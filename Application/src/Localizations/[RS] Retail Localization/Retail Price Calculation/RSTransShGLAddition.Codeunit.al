@@ -139,7 +139,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         ValueEntry.FindFirst();
         GenJournalLine.Init();
         GenJournalLine."Document No." := ValueEntry."Document No.";
-        GenJournalLine."Posting Date" := Today();
+        GenJournalLine."Posting Date" := TransferHeader."Posting Date";
         case RSGLEntryType of
             RSGLEntryType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginLbl;
@@ -150,7 +150,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             RSGLEntryType::TransitAdjustment:
                 GenJournalLine.Description := GenJnlLineTransitLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := Today();
+        GenJournalLine."VAT Reporting Date" := TransferHeader."Posting Date";
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
@@ -400,13 +400,14 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     local procedure CalculateVATBreakDown(): Decimal
     var
         Item: Record Item;
-        VATSetup: Record "VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
     begin
         if not Item.Get(TempTransferLine."Item No.") then
             exit;
-        if not VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
-            exit;
-        exit((100 * VATSetup."VAT %") / (100 + VATSetup."VAT %") / 100);
+        if not VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then
+            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), PriceListLine."VAT Bus. Posting Gr. (Price)", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), Item."VAT Prod. Posting Group");
+        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
     #endregion
 
