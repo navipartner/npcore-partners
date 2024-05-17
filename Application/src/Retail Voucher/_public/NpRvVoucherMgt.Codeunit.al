@@ -516,7 +516,10 @@
         else
             VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
 
-        VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
+        if NpRvSalesLine."Posting No." <> '' then
+            VoucherEntry."Document No." := NpRvSalesLine."Posting No."
+        else
+            VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
         VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
         if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
             VoucherEntry.Amount := MagentoPaymentLine.Amount
