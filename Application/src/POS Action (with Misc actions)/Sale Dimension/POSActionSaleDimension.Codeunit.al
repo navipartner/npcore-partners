@@ -256,16 +256,16 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
                     TryGetParameterOptionNo(POSParameterValue, SelectedOptionNo);
                     if SelectedOptionNo <> DimensionSourceOptions::ANY then begin
                         POSParameterValue2 := POSParameterValue;
-                        POSParameterValue2.SetRecFilter();
-                        POSParameterValue2.SetRange(Name, 'DimensionCode');
-                        if POSParameterValue2.FindFirst() then
-                            if POSParameterValue2.Value <> '' then begin
-                                POSParameterValue2.Validate(Value, '');
-                                POSParameterValue2.Modify();
+                        POSParameterValue2.CopyFilters(POSParameterValue);
+                        POSParameterValue.SetRange(Name, 'DimensionCode');
+                        if POSParameterValue.FindFirst() then
+                            if POSParameterValue.Value <> '' then begin
+                                POSParameterValue.Validate(Value, '');
+                                POSParameterValue.Modify();
                             end;
+                        POSParameterValue := POSParameterValue2;
+                        POSParameterValue.CopyFilters(POSParameterValue2);
                     end;
-                    POSParameterValue.Modify();
-
                     GetDimension(POSParameterValue, Dimension, false);
                     ReevaluateDimensionValueCodeParameter(POSParameterValue, Dimension);
                 end;
@@ -315,39 +315,51 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
                     TryGetParameterOptionNo(POSParameterValue, SelectedOptionNo);
                     if SelectedOptionNo <> ValueSelectionOptions::"FIXED" then begin
                         POSParameterValue2 := POSParameterValue;
-                        POSParameterValue2.SetRecFilter();
-                        POSParameterValue2.SetRange(Name, 'DimensionValue');
-                        if POSParameterValue2.FindFirst() then
-                            if POSParameterValue2.Value <> '' then begin
-                                POSParameterValue2.Validate(Value, '');
-                                POSParameterValue2.Modify();
+                        POSParameterValue2.CopyFilters(POSParameterValue);
+                        POSParameterValue.SetRange(Name, 'DimensionValue');
+                        if POSParameterValue.FindFirst() then
+                            if POSParameterValue.Value <> '' then begin
+                                POSParameterValue.Validate(Value, '');
+                                POSParameterValue.Modify();
                             end;
+                        POSParameterValue := POSParameterValue2;
+                        POSParameterValue.CopyFilters(POSParameterValue2);
                     end;
                 end;
         end;
     end;
 
-    local procedure ReevaluateDimensionValueCodeParameter(POSParameterValue: Record "NPR POS Parameter Value"; Dimension: Record Dimension)
+    local procedure ReevaluateDimensionValueCodeParameter(var POSParameterValue: Record "NPR POS Parameter Value"; Dimension: Record Dimension)
     var
         DimensionValue: Record "Dimension Value";
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
         ClearValue: Boolean;
     begin
-        POSParameterValue.SetRecFilter();
+        TempPOSParameterValue := POSParameterValue;
+        TempPOSParameterValue.CopyFilters(POSParameterValue);
         POSParameterValue.SetRange(Name, 'DimensionValue');
-        if not POSParameterValue.FindFirst() or (POSParameterValue.Value = '') then
+        if not POSParameterValue.FindFirst() or (POSParameterValue.Value = '') then begin
+            POSParameterValue := TempPOSParameterValue;
+            POSParameterValue.CopyFilters(TempPOSParameterValue);
             exit;
+        end;
 
         ClearValue := Dimension.Code = '';
         if not ClearValue then
             ClearValue := not DimensionValue.Get(Dimension.Code, CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimensionValue.Code)));
-        if not ClearValue then
+        if not ClearValue then begin
+            POSParameterValue := TempPOSParameterValue;
+            POSParameterValue.CopyFilters(TempPOSParameterValue);
             exit;
+        end;
 
         POSParameterValue.Validate(Value, '');
         POSParameterValue.Modify();
+        POSParameterValue := TempPOSParameterValue;
+        POSParameterValue.CopyFilters(TempPOSParameterValue);
     end;
 
-    local procedure GetDimension(POSParameterValue: Record "NPR POS Parameter Value"; var Dimension: Record Dimension; WithError: Boolean): Boolean
+    local procedure GetDimension(var POSParameterValue: Record "NPR POS Parameter Value"; var Dimension: Record Dimension; WithError: Boolean): Boolean
     var
         DimSource: Integer;
         DimCode: Code[20];
@@ -402,43 +414,64 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure GetDimensionCodeParameter(POSParameterValue: Record "NPR POS Parameter Value"; var DimCode: Code[20]; WithError: Boolean): Boolean
+    local procedure GetDimensionCodeParameter(var POSParameterValue: Record "NPR POS Parameter Value"; var DimCode: Code[20]; WithError: Boolean): Boolean
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
     begin
-        POSParameterValue.SetRecFilter();
+        TempPOSParameterValue := POSParameterValue;
+        TempPOSParameterValue.CopyFilters(POSParameterValue);
         POSParameterValue.SetRange(Name, 'DimensionCode');
         if not (POSParameterValue.FindFirst() and (POSParameterValue.Value <> '')) then begin
             if WithError then
                 Error(ParameterValueMissingErr, 'Dimension Code');
+            POSParameterValue := TempPOSParameterValue;
+            POSParameterValue.CopyFilters(TempPOSParameterValue);
             DimCode := '';
             exit(false);
         end;
         DimCode := CopyStr(POSParameterValue.Value, 1, MaxStrLen(DimCode));
+        POSParameterValue := TempPOSParameterValue;
+        POSParameterValue.CopyFilters(TempPOSParameterValue);
         exit(true);
     end;
 
-    local procedure GetDimensionSourceParameter(POSParameterValue: Record "NPR POS Parameter Value"; var DimSource: Integer; WithError: Boolean): Boolean
+    local procedure GetDimensionSourceParameter(var POSParameterValue: Record "NPR POS Parameter Value"; var DimSource: Integer; WithError: Boolean): Boolean
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
     begin
         DimSource := 0;
-        POSParameterValue.SetRecFilter();
+        TempPOSParameterValue := POSParameterValue;
+        TempPOSParameterValue.CopyFilters(POSParameterValue);
         POSParameterValue.SetRange(Name, 'DimensionSource');
         if not (POSParameterValue.FindFirst() and TryGetParameterOptionNo(POSParameterValue, DimSource)) then begin
             if WithError then
                 Error(ParameterValueMissingErr, 'Dimension Source');
+            POSParameterValue := TempPOSParameterValue;
+            POSParameterValue.CopyFilters(TempPOSParameterValue);
             exit(false);
         end;
+        POSParameterValue := TempPOSParameterValue;
+        POSParameterValue.CopyFilters(TempPOSParameterValue);
         exit(true);
     end;
 
-    local procedure GetValueSelectionParameter(POSParameterValue: Record "NPR POS Parameter Value"; var ValueSelection: Integer; WithError: Boolean): Boolean
+    local procedure GetValueSelectionParameter(var POSParameterValue: Record "NPR POS Parameter Value"; var ValueSelection: Integer; WithError: Boolean): Boolean
+    var
+        TempPOSParameterValue: Record "NPR POS Parameter Value" temporary;
     begin
         ValueSelection := 0;
-        POSParameterValue.SetRecFilter();
+        TempPOSParameterValue := POSParameterValue;
+        TempPOSParameterValue.CopyFilters(POSParameterValue);
         POSParameterValue.SetRange(Name, 'ValueSelection');
         if not (POSParameterValue.FindFirst() and TryGetParameterOptionNo(POSParameterValue, ValueSelection)) then begin
             if WithError then
                 Error(ParameterValueMissingErr, 'Value Selection');
+            POSParameterValue := TempPOSParameterValue;
+            POSParameterValue.CopyFilters(TempPOSParameterValue);
             exit(false);
         end;
+        POSParameterValue := TempPOSParameterValue;
+        POSParameterValue.CopyFilters(TempPOSParameterValue);
         exit(true);
     end;
 
