@@ -30,6 +30,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
         Token: Text[100];
+        ForceEditTicketHolder: Boolean;
     begin
         Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
         Response.Add('ticketHolderTitle', 'Ticket Holder');
@@ -39,8 +40,11 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         Response.Add('ticketHolderPhoneLabel', 'Phone');
 
         RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
+            if (Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
+                if (ForceEditTicketHolder) then
+                    RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
 
-        //Context.SetContext('captureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
         Response.Add('ticketHolderName', SuggestTicketHolderName);
 
         if (StrPos(SuggestNotificationAddress, '@') > 0) then begin
@@ -50,6 +54,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
             Response.Add('ticketHolderPhone', DelChr(SuggestNotificationAddress, '<=>', ' '));
             Response.Add('ticketHolderEmail', '');
         end;
+
         Response.Add('CaptureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
 
         exit;
@@ -100,7 +105,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTMScheduleSelect.js###
-'let main=async({workflow:i,context:t,popup:e,parameters:a,captions:r})=>{debugger;const l=await i.respond("ConfigureWorkflow",t);debugger;return await e.entertainment.scheduleSelection({token:t.TicketToken})===null?{cancel:!0}:((l.CaptureTicketHolder||t.EditTicketHolder)&&await captureTicketHolderInfo(i,t,l),{cancel:!1})};async function captureTicketHolderInfo(i,t,e){let a=await popup.configuration({title:e.ticketHolderTitle,caption:e.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:e.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:e.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:e.ticketHolderPhoneLabel,value:e.ticketHolderPhone}]});a!==null&&await i.respond("SetTicketHolder",a)}'
+'let main=async({workflow:i,context:t,popup:e,parameters:a,captions:r})=>{debugger;const l=await i.respond("ConfigureWorkflow",t);debugger;return t.EditSchedule&&await e.entertainment.scheduleSelection({token:t.TicketToken})===null?{cancel:!0}:((l.CaptureTicketHolder||t.EditTicketHolder)&&await captureTicketHolderInfo(i,t,l),{cancel:!1})};async function captureTicketHolderInfo(i,t,e){let a=await popup.configuration({title:e.ticketHolderTitle,caption:e.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:e.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:e.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:e.ticketHolderPhoneLabel,value:e.ticketHolderPhone}]});a!==null&&await i.respond("SetTicketHolder",a)}'
     );
     end;
 }
