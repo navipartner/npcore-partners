@@ -86,7 +86,8 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         const scheduleSelection = await workflow.run('TM_SCHEDULE_SELECT', {
             context: {
                 TicketToken: context.TicketToken,
-                EditTicketHolder: functionId === 3
+                EditTicketHolder: functionId === 3 || functionId === 5,
+                EditSchedule: functionId === 3
             }
         })
 

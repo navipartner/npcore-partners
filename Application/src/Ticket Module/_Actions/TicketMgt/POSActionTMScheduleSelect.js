@@ -4,9 +4,11 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     const wfConfig = await workflow.respond('ConfigureWorkflow', context);
 
     debugger;
-    let r = await popup.entertainment.scheduleSelection({ token: context.TicketToken });
-    if (r === null) 
-        return {cancel: true}; // selection cancelled
+    if (context.EditSchedule) {
+        let r = await popup.entertainment.scheduleSelection({ token: context.TicketToken });
+        if (r === null) 
+            return {cancel: true}; // selection cancelled
+    }
 
     if (wfConfig.CaptureTicketHolder || context.EditTicketHolder) 
         await captureTicketHolderInfo(workflow, context, wfConfig);

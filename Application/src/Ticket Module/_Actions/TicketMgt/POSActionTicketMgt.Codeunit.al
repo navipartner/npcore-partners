@@ -62,27 +62,34 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
     local procedure InitRequest(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line")
     var
         SaleLineRec: Record "NPR POS Sale Line";
+        FunctionId: integer;
     begin
         SaleLine.GetCurrentSaleLine(SaleLineRec);
 
+        Context.GetInteger('FunctionId', FunctionId);
         Context.SetContext('ShowTicketDialog', ShowTicketNumberDialogForFunction(Context, SaleLineRec));
         Context.SetContext('ShowTicketQtyDialog', ShowTicketQtyDialogForFunction(Context));
         Context.SetContext('ShowReferenceDialog', ShowReferenceDialogForFunction(Context));
-        Context.SetContext('UseFrontEndUx', ShowScheduleSelectionDialogForFunction(Context));
+        Context.SetContext('UseFrontEndUx', UseFrontEndUx(FunctionId));
     end;
 
-    local procedure ShowScheduleSelectionDialogForFunction(Context: Codeunit "NPR POS JSON Helper"): boolean
+    internal procedure UseFrontEndUxForScheduleSelection(): boolean
+    begin
+        exit(UseFrontEndUx(3));
+    end;
+
+    local procedure UseFrontEndUx(FunctionId: integer): boolean
     var
-        FunctionId: integer;
         TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
     begin
 
         if (not TicketRetailManager.UseFrontEndScheduleUX()) then
             exit(false);
 
-        Context.GetInteger('FunctionId', FunctionId);
+        // these functions are supported by the front ux
         exit(FunctionId in [
-            3 // Edit Reservation
+            3, // Edit Reservation
+            5  // Edit TicketHolder
         ])
     end;
 
@@ -142,7 +149,6 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
 
     local procedure RefineWorkflow(Context: Codeunit "NPR POS JSON Helper")
     var
-        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         FunctionId: Integer;
         AdmissionCode: Code[20];
@@ -168,12 +174,9 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             Context.SetContext('VerboseMessage', Welcome);
         end;
 
-        if (FunctionId = 3) then begin
-            if (TicketRequestManager.GetTicketToken(ExternalTicketNumber, TicketToken)) then begin
-                Context.SetContext('UseFrontEndUx', TicketRetailManager.UseFrontEndScheduleUX());
-                Context.SetContext('TicketToken', TicketToken);
-            end;
-        end;
+        Context.SetContext('UseFrontEndUx', UseFrontEndUx(FunctionId));
+        if (TicketRequestManager.GetTicketToken(ExternalTicketNumber, TicketToken)) then
+            Context.SetContext('TicketToken', TicketToken);
 
         AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
         TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
@@ -303,7 +306,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTicketMgt.Codeunit.js### 
-'let main=async({workflow:i,context:e,popup:n,parameters:u,captions:r})=>{var T=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],f=["Standard","MPOS NFC Scan"];let c=Number(u.Function),k=Number(u.InputMethod),s=f[k],t={};windowTitle=r.TicketTitle.substitute(T[c].toString()),t.FunctionId=c,t.DefaultTicketNumber=u.DefaultTicketNumber,await i.respond("ConfigureWorkflow",t);debugger;let a;if(e.ShowTicketDialog){if(s==="Standard"){if(a=await n.input({caption:r.TicketPrompt,title:windowTitle}),!a)return}else if(s==="MPOS NFC Scan"){var o=await i.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!o.IsSuccessful){n.error(o.ErrorMessage,"mPOS NFC Error");return}if(!o.Result.ID)return;a=o.Result.ID}}t.TicketNumber=a,await i.respond("RefineWorkflow",t);let l;if(e.ShowTicketQtyDialog&&(l=await n.numpad({caption:r.TicketQtyPrompt.substitute(e.TicketMaxQty),title:windowTitle}),l===null))return;let d;if(!(e.ShowReferenceDialog&&(d=await n.input({caption:r.ReferencePrompt,title:windowTitle}),d===null)))if(e.UseFrontEndUx){if((await i.run("TM_SCHEDULE_SELECT",{context:{TicketToken:e.TicketToken,EditTicketHolder:c===3}})).cancel){toast.warning("Schedule not updated",{title:windowTitle});return}e.VerboseMessage}else t.TicketQuantity=l,t.TicketReference=d,await i.respond("DoAction",t),e.Verbose&&await n.message({caption:e.VerboseMessage,title:windowTitle})};'
+'let main=async({workflow:i,context:e,popup:n,parameters:c,captions:a})=>{var T=["Admission Count","Register Arrival","Revoke Reservation","Edit Reservation","Reconfirm Reservation","Edit Ticketholder","Change Confirmed Ticket Quantity","Pickup Ticket Reservation","Convert To Membership","Register Departure","Additional Experience"],f=["Standard","MPOS NFC Scan"];let r=Number(c.Function),k=Number(c.InputMethod),s=f[k],t={};windowTitle=a.TicketTitle.substitute(T[r].toString()),t.FunctionId=r,t.DefaultTicketNumber=c.DefaultTicketNumber,await i.respond("ConfigureWorkflow",t);debugger;let o;if(e.ShowTicketDialog){if(s==="Standard"){if(o=await n.input({caption:a.TicketPrompt,title:windowTitle}),!o)return}else if(s==="MPOS NFC Scan"){var u=await i.run("MPOS_API",{context:{IsFromWorkflow:!0,FunctionName:"NFC_SCAN",Parameters:{}}});if(!u.IsSuccessful){n.error(u.ErrorMessage,"mPOS NFC Error");return}if(!u.Result.ID)return;o=u.Result.ID}}t.TicketNumber=o,await i.respond("RefineWorkflow",t);let l;if(e.ShowTicketQtyDialog&&(l=await n.numpad({caption:a.TicketQtyPrompt.substitute(e.TicketMaxQty),title:windowTitle}),l===null))return;let d;if(!(e.ShowReferenceDialog&&(d=await n.input({caption:a.ReferencePrompt,title:windowTitle}),d===null)))if(e.UseFrontEndUx){if((await i.run("TM_SCHEDULE_SELECT",{context:{TicketToken:e.TicketToken,EditTicketHolder:r===3||r===5,EditSchedule:r===3}})).cancel){toast.warning("Schedule not updated",{title:windowTitle});return}e.VerboseMessage}else t.TicketQuantity=l,t.TicketReference=d,await i.respond("DoAction",t),e.Verbose&&await n.message({caption:e.VerboseMessage,title:windowTitle})};'
         )
     end;
 
