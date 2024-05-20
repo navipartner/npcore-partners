@@ -45,6 +45,16 @@
             Caption = 'Insert Cross Reference When Finishing Sale';
             DataClassification = CustomerContent;
         }
+        field(80; "Enforce Exch. Validity Period"; Boolean)
+        {
+            Caption = 'Enforce Exch. Validity Period';
+            DataClassification = CustomerContent;
+        }
+        field(90; "Exchange Grace Period"; DateFormula)
+        {
+            Caption = 'Exchange Grace Period';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
