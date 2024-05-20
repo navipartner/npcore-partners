@@ -124,11 +124,12 @@
         POSAction: Record "NPR POS Action";
         WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
     begin
-        POSAction.Get(Rec."Action Code");
-        if POSAction."Workflow Implementation" = Enum::"NPR POS Workflow"::LEGACY then
-            ActionDescription := POSAction.Description
-        else
-            ActionDescription := WorkflowCaptionBuffer.GetActionDescription(Rec."Action Code");
+        if POSAction.Get(Rec."Action Code") then begin
+            if POSAction."Workflow Implementation" = Enum::"NPR POS Workflow"::LEGACY then
+                ActionDescription := POSAction.Description
+            else
+                ActionDescription := WorkflowCaptionBuffer.GetActionDescription(Rec."Action Code");
+        end;
     end;
 }
 
