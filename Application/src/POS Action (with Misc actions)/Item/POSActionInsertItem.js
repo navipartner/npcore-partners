@@ -18,7 +18,8 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
     if (ticketToken) {
         const scheduleSelection = await workflow.run('TM_SCHEDULE_SELECT', {
             context: {
-                TicketToken: ticketToken
+                TicketToken: ticketToken,
+                EditSchedule: true
             }
         })
         debugger;
