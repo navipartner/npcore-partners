@@ -219,6 +219,7 @@
                     ExchangeLabel.FindSet();
                 end;
                 repeat
+                    CheckEchangeLabelValidity(ExchangeLabel, ExchangeLabelSetup, 0D, false);
                     SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
                     SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
                     if SaleLinePOS.FindLast() then
@@ -454,6 +455,33 @@
         LineRef.SetTable(SaleLinePOS);
         ReferenceNo := CopyStr(NpGpPOSSalesInitMgt.InitReferenceNoSaleLinePOS(SaleLinePOS), 1, MaxStrLen(ReferenceNo));
         //+NPR5.51
+    end;
+
+    local procedure CheckEchangeLabelValidity(ExchangeLabel: Record "NPR Exchange Label"; ExchangeLabelSetup: Record "NPR Exchange Label Setup"; ValidationDate: Date; Silent: Boolean): Boolean
+    var
+        AdjustedValidUntilDate: Date;
+        ExchLableNotValidErr: Label 'The exchange label %1 is not yet valid or has already expired (the validity period starts on %2 and ends on %3).', Comment = '%1 - exchange label barcode, %2 - valid from date, %3 - valid to date';
+    begin
+        if not ExchangeLabelSetup."Enforce Exch. Validity Period" then
+            exit;
+        if (ExchangeLabel."Valid From" = 0D) and (ExchangeLabel."Valid To" = 0D) then
+            exit;
+
+        if ValidationDate = 0D then
+            ValidationDate := Today();
+        if Format(ExchangeLabelSetup."Exchange Grace Period") <> '' then
+            AdjustedValidUntilDate := CalcDate(ExchangeLabelSetup."Exchange Grace Period", ExchangeLabel."Valid To")
+        else
+            AdjustedValidUntilDate := ExchangeLabel."Valid To";
+
+        if (ExchangeLabel."Valid From" > ValidationDate) or
+           ((AdjustedValidUntilDate < ValidationDate) and (AdjustedValidUntilDate <> 0D))
+        then begin
+            if not Silent then
+                Error(ExchLableNotValidErr, ExchangeLabel.Barcode, ExchangeLabel."Valid From", AdjustedValidUntilDate);
+            exit(false);
+        end;
+        exit(true);
     end;
 
     procedure CheckPrefix(Barcode: Text; Prefix: Code[10]): Boolean
