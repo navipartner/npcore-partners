@@ -69,6 +69,9 @@ codeunit 6151058 "NPR Job Queue User Handler"
     var
         JobQueueEntry: Record "Job Queue Entry";
         User: Record User;
+#if not BC17
+        EnvironmentInformation: Codeunit "Environment Information";
+#endif
     begin
         if not (JobQueueEntry.WritePermission() and JobQueueEntry.ReadPermission()) then
             exit(false);
@@ -82,28 +85,53 @@ codeunit 6151058 "NPR Job Queue User Handler"
         if not User.Get(UserSecurityId()) then
             exit(false);
 
-        if User."License Type" = User."License Type"::"Limited User" then
+        if not (User."License Type" in [User."License Type"::"Full User", User."License Type"::"Device Only User"]) then
             exit(false);
 
-        if not CanUserRefreshJobQueueEntriesWithUserPlan() then
-            exit(false);
+#if not BC17
+        if EnvironmentInformation.IsSaaS() then
+            if not CanUserRefreshJobQueueEntriesWithUserPlan() then
+                exit(false);
+#endif
 
         exit(true);
     end;
 
+#if not BC17
     local procedure CanUserRefreshJobQueueEntriesWithUserPlan(): Boolean
     var
         UsersInPlans: Query "Users in Plans";
-        TeamMemberPlanId: Label 'fd1441b8-116b-4fa7-836e-d7956700e0fa', Locked = true;
+        AllowedPlanIDs: List of [Guid];
     begin
+        AllowedPlanIDs := GetAllowedPlanIDs();
+
         UsersInPlans.SetRange(User_Security_ID, UserSecurityId());
-        UsersInPlans.SetRange(Plan_ID, TeamMemberPlanId);
         UsersInPlans.Open();
         while UsersInPlans.Read() do
-            if UsersInPlans.Plan_Name <> '' then
-                exit(false);
-        exit(true);
+            if AllowedPlanIDs.Contains(UsersInPlans.Plan_ID) then
+                exit(true);
+        exit(false);
     end;
+
+    local procedure GetAllowedPlanIDs() AllowedPlanIDs: List of [Guid]
+    var
+        PlanIds: Codeunit "Plan Ids";
+    begin
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetEssentialPlanId(), AllowedPlanIDs);     //Dynamics 365 Business Central Essential
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetEssentialISVPlanId(), AllowedPlanIDs);  //Dynamics 365 Business Central Essential - Embedded
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetPremiumPlanId(), AllowedPlanIDs);       //Dynamics 365 Business Central Premium
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetPremiumISVPlanId(), AllowedPlanIDs);    //Dynamics 365 Business Central Premium - Embedded
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetDevicePlanId(), AllowedPlanIDs);        //Dynamics 365 Business Central Device
+        AddPlanIDToAllowedPlanIDList(PlanIds.GetDeviceISVPlanId(), AllowedPlanIDs);     //Dynamics 365 Business Central Device - Embedded
+    end;
+
+    local procedure AddPlanIDToAllowedPlanIDList(PlanID: Guid; var AllowedPlanIDs: List of [Guid])
+    begin
+        if AllowedPlanIDs.Contains(PlanID) then
+            exit;
+        AllowedPlanIDs.Add(PlanID);
+    end;
+#endif
 
     [TryFunction]
     internal procedure TryCheckRequiredPermissions()
