@@ -31,20 +31,35 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the alphabetical code used to substitute numbers when displaying prices on the exchange label. A unique letter is chosen for each number from 0-9.';
                 }
-                field("Exchange Label Exchange Period"; Rec."Exchange Label Exchange Period")
+                field("Insert Cross Ref. Finish Sale"; Rec."Insert Cross Ref. Finish Sale")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the period length that the exchange labels should be valid for.';
+                    ToolTip = 'Specifies if Cross Reference is inserted after finishing the sale';
+                }
+            }
+            group(Validity)
+            {
+                Caption = 'Validity Period';
+
+                field("Enforce Exch. Validity Period"; Rec."Enforce Exch. Validity Period")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the exchange label validity period should be respected. If enabled, the system won’t accept exchange labels outside their validity period.';
                 }
                 field("Exchange Label Default Date"; Rec."Exchange Label Default Date")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies a date to use as the default "valid from"-date. Leave blank to use the date of creation (ie. "today''s date").';
                 }
-                field("Insert Cross Ref. Finish Sale"; Rec."Insert Cross Ref. Finish Sale")
+                field("Exchange Label Exchange Period"; Rec."Exchange Label Exchange Period")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if Cross Reference is inserted after finishing the sale';
+                    ToolTip = 'Specifies the period length that the exchange labels should be valid for.';
+                }
+                field("Exchange Grace Period"; Rec."Exchange Grace Period")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the grace period during which the exchange label is still considered valid after the validity period has expired.';
                 }
             }
         }
