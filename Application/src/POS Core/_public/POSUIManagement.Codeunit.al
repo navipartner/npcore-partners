@@ -332,6 +332,8 @@
         CaptionsGlobalRows: Label 'Rows';
         CaptionsGlobalReset: Label 'Reset';
         CaptionsGlobalApply: Label 'Apply';
+        CaptionsGlobalAdd:Label 'Add';
+        CaptionsGlobalMove:Label 'Move';
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
@@ -584,6 +586,8 @@
         LogoPickerClearLogoLbl: label 'Clear Logo';
         LogoPickerMaximumFileSizeInfo: Label 'Maximum file size for image uploads is 10 megabytes.';
         GridEditorSelectGridToEditLbl: Label 'Select grid to edit : ';
+        GridEditorRemoveEmptyButtonsLbl: Label 'Remove Empty Buttons';
+        GridEditorResetGridValuesLbl: Label 'Reset Grid Values';
         WizardModalContinueLbl: Label 'Continue';
         WizardModalBackLbl: Label 'Back';
         WizardModalNeedHelpLbl: Label 'Need help?';
@@ -616,7 +620,9 @@
         GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl: Label 'Importing...';
         GlobalSettingsImportOldLayoutSuccessTitleLbl: Label 'Layout imported successfully!';
         GlobalSettingsImportOldLayoutSuccessMessageLbl: Label 'Please be sure to double check the layout and save it.';
+        GlobalSettingsPOSLifecycleMethodsLbl:Label 'POS Lifecycle Methods';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
+        GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
         DialogItemSelectionQuantityOutOfLbl: Label 'Quantity:';
         DialogItemSelectionOutOfLbl: Label 'out of';
@@ -646,6 +652,8 @@
         GlobalSettingsSystemWorkflowTextEnterLbl: Label 'Enter text :';
         ColorSettingsSelectPrimaryColorLbl: Label 'Select color to be used as primary color : ';
         ColorSettingsSelectSecondaryColorLbl: Label 'Select color to be used as secondary color : ';
+        ColorSettingsSelectSystemColorLbl: Label 'Select color to be used as system color : ';
+        ColorSettingsNoColorSelectedLbl:Label 'No Color Selected';
         ColorSettingsChangeColorLbl: Label 'Change Color';
         ColorPickerDeleteColorLbl: Label 'Delete Color';
         ColorPickerSaveColorLbl: Label 'Save Color';
@@ -787,6 +795,8 @@
         Captions.Add('Global_Rows', CaptionsGlobalRows);
         Captions.Add('Global_Reset', CaptionsGlobalReset);
         Captions.Add('Global_Apply', CaptionsGlobalApply);
+        Captions.Add('Global_Add', CaptionsGlobalAdd);
+        Captions.Add('Global_Move', CaptionsGlobalMove);
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
@@ -1031,6 +1041,8 @@
         Captions.Add('Logo_Picker_ClearLogo', LogoPickerClearLogoLbl);
         Captions.Add('Logo_Picker_MaximumFileSizeInfo', LogoPickerMaximumFileSizeInfo);
         Captions.Add('Grid_Editor_SelectGridToEdit', GridEditorSelectGridToEditLbl);
+        Captions.Add('Grid_Editor_RemoveEmptyButtons', GridEditorRemoveEmptyButtonsLbl);
+        Captions.Add('Grid_Editor_ResetGridValues', GridEditorResetGridValuesLbl);
         Captions.Add('Wizard_Modal_Continue', WizardModalContinueLbl);
         Captions.Add('Wizard_Modal_Back', WizardModalBackLbl);
         Captions.Add('Wizard_Modal_NeedHelp', WizardModalNeedHelpLbl);
@@ -1059,6 +1071,7 @@
         Captions.Add('Global_Settings_EditDescription', GlobalSettingsEditDescriptionLbl);
         Captions.Add('Global_Settings_EditVariables', GlobalSettingsEditVariablesLbl);
         Captions.Add('Global_Settings_PleaseEnterNameForThisAction', GlobalSettingsPleaseEnterNameForThisActionLbl);
+        Captions.Add('Global_Settings_NoEditableVariables', GlobalSettingsNoEditableVariablesLbl);
         Captions.Add('Global_Settings_AddNew', GlobalSettingsAddNewLbl);
         Captions.Add('Global_Settings_SystemWorkflows', GlobalSettingsSystemWorkflowsLbl);
         Captions.Add('Global_Settings_SystemWorkflowsDefineWorkflow', GlobalSettingsSystemWorkflowsDefineWorkflowLbl);
@@ -1075,9 +1088,12 @@
         Captions.Add('Global_Settings_ImportOldLayout_IsImportingStatusLabel', GlobalSettingsImportOldLayoutIsImportingStatusLabelLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessTitle', GlobalSettingsImportOldLayoutSuccessTitleLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessMessage', GlobalSettingsImportOldLayoutSuccessMessageLbl);
+        Captions.Add('Global_Settings_POSLifecycleMethods', GlobalSettingsPOSLifecycleMethodsLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
+        Captions.Add('Color_Settings_SelectSystemColor', ColorSettingsSelectSystemColorLbl);
+        Captions.Add('Color_Settings_NoColorSelected', ColorSettingsNoColorSelectedLbl);
         Captions.Add('Dialog_ItemSelection_QuantityOutOf', DialogItemSelectionQuantityOutOfLbl);
         Captions.Add('Dialog_ItemSelection_OutOf', DialogItemSelectionOutOfLbl);
         Captions.Add('Dialog_ItemSelection_EnterTheNumber', DialogItemSelectionEnterTheNumberLbl);
