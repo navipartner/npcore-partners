@@ -306,6 +306,7 @@ xmlport 6060117 "NPR TM Ticket Confirmation"
         if (TempTicketReservationResponse.IsTemporary()) then
             TempTicketReservationResponse.DeleteAll();
 
+        TicketReservationResponse.SetCurrentKey("Session Token ID");
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', DocumentID);
         if (TicketReservationResponse.FindFirst()) then begin
             repeat
