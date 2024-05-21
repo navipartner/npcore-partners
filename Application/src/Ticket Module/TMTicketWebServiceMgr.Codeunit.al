@@ -260,6 +260,7 @@
 
             Token := GetXmlText100(Reservation, 'ticket_token', MaxStrLen(Token), true);
 
+            TicketReservationResponse.SetCurrentKey("Session Token ID");
             TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
             if (TicketReservationResponse.FindFirst()) then
                 if (TicketReservationResponse.Confirmed) then
