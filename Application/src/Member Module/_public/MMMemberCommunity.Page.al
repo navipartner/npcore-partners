@@ -267,11 +267,13 @@
                         MemberServiceName: Label 'member_services', Locked = true;
                         M2AccountServiceName: Label 'm2_account_services', Locked = true;
                         LoyaltyServiceName: Label 'loyalty_services', Locked = true;
+                        AdmissionAppServices: Label 'NPR_AdmissionAppServices', Locked = true;
                         OkMessage: Label 'Services published.';
                     begin
                         WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MM Member WebService", MemberServiceName, true);
                         WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR M2 Account WebService", M2AccountServiceName, true);
                         WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MM Loyalty WebService", LoyaltyServiceName, true);
+                        WebServiceMgt.CreateTenantWebService(5, Codeunit::"NPR MMAdmissionAppWebService", AdmissionAppServices, true);
                         Message(OkMessage);
                     end;
                 }
