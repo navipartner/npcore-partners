@@ -851,7 +851,7 @@
         exit(false);
     end;
 
-    procedure GenerateNewWaiterPadConfig(SalePOS: Record "NPR POS Sale"; RequestNumberOfGuests: Boolean; RequestCustomerName: Boolean; RequestCustomerPhone: Boolean; RequestCustomerEmail: Boolean; var WaiterpadInfoConfig: JsonObject): Boolean
+    procedure GenerateNewWaiterPadConfig(SalePOS: Record "NPR POS Sale"; RequestNumberOfGuests: Boolean; RequestCustomerName: Boolean; RequestCustomerPhone: Boolean; RequestCustomerEmail: Boolean; HideCancel: Boolean; var WaiterpadInfoConfig: JsonObject): Boolean
     var
         WaiterpadInfoConfigOption: JsonObject;
         WaiterpadInfoConfigOptions: JsonArray;
@@ -902,6 +902,7 @@
         end;
         WaiterpadInfoConfig.Add('caption', WelcomeLbl);
         WaiterpadInfoConfig.Add('title', NewWaiterpadLbl);
+        WaiterpadInfoConfig.Add('hideCancel', HideCancel);
         WaiterpadInfoConfig.Add('settings', WaiterpadInfoConfigOptions);
         exit(true);
     end;
