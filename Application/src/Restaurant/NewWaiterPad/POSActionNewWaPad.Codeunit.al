@@ -36,6 +36,8 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         ParamUseSeatingFromContext_DescLbl: Label 'Use seating code from context.';
         ParamHideConfirmDialog_CptLbl: Label 'Hide Confirmation';
         ParamHideConfirmDialog_DescLbl: Label 'Hide the confirmation dialog about the number of existing waiter pads for the seating.';
+        ParamHideCancel_CptLbl: Label 'No Cancel Button';
+        ParamHideCancel_DescLbl: Label 'Hide the Cancel button to prevent the user from being able to cancel the process.';
         ConfirmLbl: Label 'Open new waiter pad?';
         ActionMessageLbl: Label 'New Waiter Pad';
     begin
@@ -58,6 +60,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('RequestCustomerEmail', false, ParamAskForCustomerEmail_CptLbl, ParamAskForCustomerEmail_DescLbl);
         WorkflowConfig.AddBooleanParameter('UseSeatingFromContext', false, ParamUseSeatingFromContext_CptLbl, ParamUseSeatingFromContext_DescLbl);
         WorkflowConfig.AddBooleanParameter('HideConfirmDialog', false, ParamHideConfirmDialog_CptLbl, ParamHideConfirmDialog_DescLbl);
+        WorkflowConfig.AddBooleanParameter('HideCancel', false, ParamHideCancel_CptLbl, ParamHideCancel_DescLbl);
         WorkflowConfig.AddLabel('InputTypeLabel', NPRESeating.TableCaption);
         WorkflowConfig.AddLabel('ConfirmLabel', ConfirmLbl);
         WorkflowConfig.AddLabel('ActionMessageLabel', ActionMessageLbl);
@@ -138,6 +141,7 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         WaiterpadInfoConfig: JsonObject;
         RestaurantCode: Code[20];
         AskForNumberOfGuests: Boolean;
+        HideCancel: Boolean;
         RequestCustomerName: Boolean;
         RequestCustomerPhone: Boolean;
         RequestCustomerEmail: Boolean;
@@ -161,7 +165,8 @@ codeunit 6150665 "NPR POSAction: New Wa. Pad" implements "NPR IPOS Workflow"
         if Context.GetBooleanParameter('RequestCustomerName', RequestCustomerName) then;
         if Context.GetBooleanParameter('RequestCustomerPhone', RequestCustomerPhone) then;
         if Context.GetBooleanParameter('RequestCustomerEmail', RequestCustomerEmail) then;
-        if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, AskForNumberOfGuests, RequestCustomerName, RequestCustomerPhone, RequestCustomerEmail, WaiterpadInfoConfig) then begin
+        if Context.GetBooleanParameter('HideCancel', HideCancel) then;
+        if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, AskForNumberOfGuests, RequestCustomerName, RequestCustomerPhone, RequestCustomerEmail, HideCancel, WaiterpadInfoConfig) then begin
             Context.SetContext('requestCustomerInfo', true);
             Context.SetContext('waiterpadInfoConfig', WaiterpadInfoConfig);
         end else
