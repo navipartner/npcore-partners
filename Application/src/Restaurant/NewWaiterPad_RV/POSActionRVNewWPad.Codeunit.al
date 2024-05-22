@@ -37,7 +37,7 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
         If Step = 'checkSeating' then begin
             BusinessLogic.CheckSeating(SeatingCode(Context));
             Sale.GetCurrentSale(SalePOS);
-            if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, true, true, true, true, WaiterpadInfoConfig) then
+            if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, true, true, true, true, false, WaiterpadInfoConfig) then
                 Context.SetContext('waiterpadInfoConfig', WaiterpadInfoConfig);
             Exit;
         end;
