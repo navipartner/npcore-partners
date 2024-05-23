@@ -183,31 +183,12 @@ codeunit 6151495 "NPR Feature Flags Management"
             TempCompany.DeleteAll();
     end;
 
-    local procedure CheckIfGetFeatureFlagsScheduledInACompany() GetFeatureFlagsScheduled: Boolean;
-    var
-        Companies: Record Company;
-    begin
-        Companies.Reset();
-        Companies.SetLoadFields(Name);
-        if not Companies.FindSet(false) then
-            exit;
-
-        repeat
-            GetFeatureFlagsScheduled := CheckIfGetFeatureFlagsScheduled(Companies.Name);
-        until (Companies.Next() = 0) or GetFeatureFlagsScheduled;
-    end;
-
     internal procedure ScheduleGetFeatureFlagsIntegration()
     var
         JobQueueEntry: Record "Job Queue Entry";
-        TempCompany: Record Company temporary;
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
-        if CheckIfGetFeatureFlagsScheduledInACompany() then
-            exit;
-
-        GetMostUsedCompany(TempCompany);
-        if TempCompany.Name <> CompanyName then
+        if CheckIfGetFeatureFlagsScheduled('') then
             exit;
 
         if not CreateGetFeatureFlagsJobQueueEntry(JobQueueEntry) then
