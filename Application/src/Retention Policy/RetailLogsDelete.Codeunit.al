@@ -27,7 +27,8 @@ codeunit 6059926 "NPR Retail Logs Delete"
         tabledata "NPR MM Admis. Service Entry" = rd,
         tabledata "NPR EFT Receipt" = rd,
         tabledata "NPR POS Layout Archive" = rd,
-        tabledata "NPR M2 Record Change Log" = rd;
+        tabledata "NPR M2 Record Change Log" = rd,
+        tabledata "NPR Sales Price Maint. Log" = rd;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Apply Retention Policy", 'OnApplyRetentionPolicyIndirectPermissionRequired', '', true, true)]
     local procedure DeleteRecordsWithIndirectPermissionsOnApplyRetentionPolicyIndirectPermissionRequired(var RecRef: RecordRef; var Handled: Boolean)
@@ -69,7 +70,8 @@ codeunit 6059926 "NPR Retail Logs Delete"
             Database::"NPR MM Admis. Service Entry",
             Database::"NPR EFT Receipt",
             Database::"NPR POS Layout Archive",
-            Database::"NPR M2 Record Change Log"])
+            Database::"NPR M2 Record Change Log",
+            Database::"NPR Sales Price Maint. Log"])
         then
             exit;
 
