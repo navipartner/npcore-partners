@@ -529,7 +529,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         SimpleInsertCanBeExecuted := (not PostworkflowSubscriptionExists) and (not RequiresAdditionalInformationCollection) and (not ifAddItemAddOns(Item)) and (not BOMComponentsNeedSerialNoInput) and (not RequiresSpecificLotNo) and (not BOMComponentsNeedLotNoInput);
 
-        ItemProcessingEvents.OnBeforeSimpleInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitPrice, SkipItemAvailabilityCheck, SerialSelectionFromList, UsePresetUnitPrice, Setup, FrontEnd, Response, Success, SimpleInsertCanBeExecuted);
+        ItemProcessingEvents.OnBeforeSimpleInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitPrice, SkipItemAvailabilityCheck, SerialSelectionFromList, UsePresetUnitPrice, Setup, FrontEnd, Response, Success, SimpleInsertCanBeExecuted, Item);
         if not SimpleInsertCanBeExecuted then
             exit;
 
