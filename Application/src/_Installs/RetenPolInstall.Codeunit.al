@@ -46,6 +46,8 @@
 
         AddNPRERetentionPolicy(IsUpgrade);
 
+        AddSalesPriceMaintRetentionPolicy(IsUpgrade);
+
         if IsUpgrade then
             LogMessageStopwatch.LogFinish();
     end;
@@ -84,6 +86,7 @@
 #IF NOT BC17 AND NOT BC18
         AddAllowedTable(Database::"NPR EFT Receipt", Enum::"Retention Period Enum"::"6 Months", Enum::"Reten. Pol. Deleting"::"NPR Data Archive");
 #ENDIF
+
         // if you add a new table above, also update codeunit 6059926 "NPR Retail Logs Delete"
 
         if IsUpgrade then
@@ -188,6 +191,35 @@
 
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE');
+    end;
+
+    local procedure AddSalesPriceMaintRetentionPolicy(IsUpgrade: Boolean)
+    var
+        SalesPriceMaintLog: Record "NPR Sales Price Maint. Log";
+        RecRef: RecordRef;
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'SalesPriceMaintenance') then
+                exit;
+
+        SalesPriceMaintLog.SetRange(Processed, false);
+        RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
+        RecRef.GetTable(SalesPriceMaintLog);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        SalesPriceMaintLog.SetRange(Processed, true);
+        RtnPeriodEnum := RtnPeriodEnum::"1 Month";
+        RecRef.GetTable(SalesPriceMaintLog);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Sales Price Maint. Log", RecRef.SystemCreatedAtNo(), TableFilters);
+        CreateRetentionPolicySetup(Database::"NPR Sales Price Maint. Log", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'SalesPriceMaintenance');
     end;
 
     local procedure AddAllowedTable(TableId: Integer; RtnPeriodEnum: Enum "Retention Period Enum"; RetenPolDeleting: Enum "Reten. Pol. Deleting")

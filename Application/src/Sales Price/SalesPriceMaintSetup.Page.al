@@ -67,7 +67,12 @@
                 }
                 field(Factor; Rec.Factor)
                 {
-                    ToolTip = 'Specifies the factor for the unit price';
+                    ToolTip = 'Specifies the factor for the Factor';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Background Processing"; Rec."Background Processing")
+                {
+                    ToolTip = 'Specifies if the Sales Price Lists should be updated in background or immediately. If enabled, codeunit 6014481 "NPR Sales Price Maint. Event" should be scheduled to run via job queue and process the modifications in the background.';
                     ApplicationArea = NPRRetail;
                 }
             }
