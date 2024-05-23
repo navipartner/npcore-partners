@@ -27,6 +27,12 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Currency Code field';
                 }
+                field("Return Payment Method Code"; Rec."Return Payment Method Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Return Payment Method Code field.';
+                    ShowMandatory = true;
+                }
                 field("Fixed Rate"; Rec."Fixed Rate")
                 {
                     ApplicationArea = NPRRetail;
@@ -189,5 +195,13 @@
     internal procedure DenominationSetupVisited(): Boolean
     begin
         exit(DenominationSetupOpened);
+    end;
+
+    internal procedure MandatoryFieldsPopulated() ArePopulated: Boolean
+    begin
+        if Rec.IsEmpty() then
+            exit;
+        Rec.SetRange("Return Payment Method Code", '');
+        ArePopulated := Rec.IsEmpty();
     end;
 }
