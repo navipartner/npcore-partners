@@ -229,6 +229,7 @@
         POSEntry."External Document No." := POSSale."External Document No.";
         POSEntry."Responsibility Center" := POSSale."Responsibility Center";
         POSEntry."Sales Channel" := POSSale."Sales Channel";
+        POSEntry."Customer Posting Group" := POSSale."Customer Posting Group";
 
         OnBeforeInsertPOSEntry(POSSale, POSEntry);
 
