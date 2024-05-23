@@ -100,6 +100,8 @@
                         "Customer Price Group" := Cust."Customer Price Group";
                     if Cust."Customer Disc. Group" <> '' then
                         "Customer Disc. Group" := Cust."Customer Disc. Group";
+                    if Cust."Customer Posting Group" <> '' then
+                        "Customer Posting Group" := Cust."Customer Posting Group";
 
                     if (POSPostingProfile."Default POS Posting Setup" = POSPostingProfile."Default POS Posting Setup"::Customer) or not FoundPostingProfile then begin
                         if not Cust.NPR_IsRestrictedOnPOS(Cust.FieldNo("Gen. Bus. Posting Group")) then
@@ -754,6 +756,12 @@
             Caption = 'Group Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR Group Code".Code;
+        }
+        field(730; "Customer Posting Group"; Code[20])
+        {
+            Caption = 'Customer Posting Group';
+            DataClassification = CustomerContent;
+            TableRelation = "Customer Posting Group";
         }
 
         field(5700; "Responsibility Center"; Code[10])
