@@ -86,7 +86,7 @@ page 6150774 "NPR POS Costumer Input"
                                 SignatureTxt := SignatureTxt + tmp;
                             until SignStream.EOS();
                             InputObj.Add('Signature', SignatureTxt);
-                            CurrPage.HtmlInput.SendInputDataAndLabel(InputObj, False, '', '', '');
+                            CurrPage.HtmlInput.SendInputDataAndLabel(InputObj, False, '', '', '', '');
                         end
                     end;
                 }
