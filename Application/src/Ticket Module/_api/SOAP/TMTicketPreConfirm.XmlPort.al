@@ -1,11 +1,5 @@
 xmlport 6060115 "NPR TM Ticket PreConfirm"
 {
-    // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
-    // TM1.04/TSA/20160118  CASE 231834 NaviPartner Ticket Management
-    // TM1.09/TSA/20160309  CASE 236563 Boolean XML response in changed to use XML style format
-    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
-    // TM1.48/TSA /20200722 CASE 415894 Added expiry utc time to response
-
     Caption = 'Ticket PreConfirm';
     Encoding = UTF8;
     UseDefaultNamespace = true;
@@ -112,12 +106,10 @@ xmlport 6060115 "NPR TM Ticket PreConfirm"
         tmpTicketReservationResponse."Session Token ID" := DocumentID;
         tmpTicketReservationResponse.Status := false;
 
+        TicketReservationResponse.SetCurrentKey("Session Token ID");
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', DocumentID);
         if (TicketReservationResponse.FindFirst()) then
-            //-TM1.48 [415894]
-            //tmpTicketReservationResponse.Status := TicketReservationResponse.Status;
             tmpTicketReservationResponse.TransferFields(TicketReservationResponse, true);
-        //+TM1.48 [415894]
 
         tmpTicketReservationResponse.Insert();
     end;
