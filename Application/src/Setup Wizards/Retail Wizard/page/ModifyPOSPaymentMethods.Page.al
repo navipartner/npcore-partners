@@ -259,10 +259,15 @@ page 6150817 "NPR Modify POS Payment Methods"
     end;
 
     local procedure NextStep(Backwards: Boolean)
+    var
+        MandatoryFieldsNotPopulatedErrLbl: Label 'Fields marked with a red star (*) are mandatory. Ensure all required fields are populated in order to continue.';
     begin
-        if (Step = Step::POSPaymentMethodStep) and (not Backwards) then
+        if (Step = Step::POSPaymentMethodStep) and (not Backwards) then begin
+            if not CurrPage.POSPaymentMethodsPG.Page.MandatoryFieldsPopulated() then
+                Error(MandatoryFieldsNotPopulatedErrLbl);
             if not ShouldContinueWithoutOtherSetupsVisited() then
                 exit;
+        end;
 
         if Backwards then
             Step := Step - 1

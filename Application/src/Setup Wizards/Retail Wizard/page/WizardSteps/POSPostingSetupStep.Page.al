@@ -330,6 +330,7 @@
     internal procedure CopyRealToTemp(var DoNotCopy: Boolean)
     var
         POSPostingSetup: Record "NPR POS Posting Setup";
+        POSPayMethod: Record "NPR POS Payment Method";
     begin
         if POSPostingSetup.FindSet() then
             repeat
@@ -337,6 +338,16 @@
                 if not Rec.Insert() then
                     Rec.Modify();
             until POSPostingSetup.Next() = 0;
+
+        if POSPayMethod.FindSet() then
+            repeat
+                Rec.SetRange("POS Payment Method Code", POSPayMethod.Code);
+                if Rec.IsEmpty() then begin
+                    Rec.Init();
+                    Rec."POS Payment Method Code" := POSPayMethod.Code;
+                    Rec.Insert();
+                end
+            until POSPayMethod.Next() = 0;
 
         DoNotCopy := true;
     end;
@@ -370,6 +381,7 @@
 
     internal procedure ApplyValues(AccountType: Option " ","G/L Account","Bank Account",Customer; AccountNo: Code[20]; DifferenceAccountType: Option " ","G/L Account","Bank Account",Customer; DifferenceAccountNo: Code[20]; DifferenceAccountNoNeg: Code[20])
     begin
+        Rec.Reset();
         if Rec.FindSet() then
             repeat
                 if AccountType <> AccountType::" " then begin
