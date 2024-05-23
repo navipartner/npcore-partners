@@ -18,7 +18,7 @@ page 6150773 "NPR POS HTML Validate Input"
 
                 trigger Ready()
                 begin
-                    CurrPage."Input Validation".SendInputDataAndLabel(jsInput, True, Format(MsgApproveInputLabel), Format(MsgRedoInputLabel), Format(MsgPhoneInputLabel));
+                    CurrPage."Input Validation".SendInputDataAndLabel(jsInput, True, Format(MsgApproveInputLabel), Format(MsgRedoInputLabel), Format(MsgPhoneInputLabel), Format(NoInputLabel));
                 end;
 
                 trigger OkInput()
@@ -53,5 +53,6 @@ page 6150773 "NPR POS HTML Validate Input"
         MsgApproveInputLabel: Label 'ACCEPTED', Comment = 'Input ok. label', MaxLength = 100;
         MsgRedoInputLabel: Label 'MAKE AGAIN', Comment = 'Input not ok, try again. label', MaxLength = 100;
         MsgPhoneInputLabel: Label 'Phone number', Comment = 'Phone number label', MaxLength = 100;
+        NoInputLabel: Label 'No User Input', Comment = 'No User input label', MaxLength = 100;
 
 }
