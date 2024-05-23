@@ -10,13 +10,14 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
 
             trigger OnValidate()
             var
+                SalespersonPurchaser: Record "Salesperson/Purchaser";
                 RegisterCodeAlreadyUsedErr: Label 'Pos unit Password %1 is already in use.', Comment = '%1 = POS Unit Password';
             begin
                 if Rec."NPR Register Password" = '' then
                     exit;
 
-                Rec.SetRange("NPR Register Password", Rec."NPR Register Password");
-                if not Rec.IsEmpty() then
+                SalespersonPurchaser.SetRange("NPR Register Password", Rec."NPR Register Password");
+                if not SalespersonPurchaser.IsEmpty() then
                     Error(RegisterCodeAlreadyUsedErr, Rec."NPR Register Password");
             end;
         }
