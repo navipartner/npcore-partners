@@ -607,7 +607,7 @@
             Codeunit::"NPR Feature Flags Upgrade":
                 case UpgradeStep of
                     'PrepareFeatureFlags':
-                        exit('Upgrade_PrepareFeatureFlags-20231122');
+                        exit('Upgrade_PrepareFeatureFlags-20240521');
                     'CleanAndRecreateGetFeatureFlagJobQueueEntry':
                         exit('Upgrade_CleanAndRecreateGetFeatureFlagJobQueueEntry-20231122');
                 end;

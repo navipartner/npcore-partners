@@ -604,15 +604,11 @@
     var
         FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         JobQueueEntry: Record "Job Queue Entry";
-        CompanyNameText: Text;
     begin
         if FeatureFlagsManagement.GetFeatureFlagsJobQueueEntry(JobQueueEntry, '') then begin
             StartJobQueueEntry(JobQueueEntry);
             exit;
         end;
-
-        if FeatureFlagsManagement.CheckIfGetFeatureFlagsExistsInACompany(JobQueueEntry, CompanyNameText) then
-            exit;
 
         FeatureFlagsManagement.ScheduleGetFeatureFlagsIntegration();
     end;
