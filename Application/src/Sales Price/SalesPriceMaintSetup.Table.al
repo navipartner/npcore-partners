@@ -107,6 +107,11 @@
             DataClassification = CustomerContent;
             TableRelation = "Price List Header";
         }
+        field(40; "Background Processing"; Boolean)
+        {
+            Caption = 'Background Processing';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

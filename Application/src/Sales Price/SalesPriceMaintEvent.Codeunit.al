@@ -3,7 +3,7 @@
     Access = Internal;
     trigger OnRun()
     begin
-        EventTest();
+        ProcessLogInBackground();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
@@ -17,25 +17,25 @@
            (Rec."Standard Cost" = xRec."Standard Cost") and
            (Rec."Item Category Code" = xRec."Item Category Code") then
             exit;
-        UpdateSalesPricesForStaff(Rec);
+        UpdateSalesPricesForStaff(Rec, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Last Direct Cost', true, true)]
     local procedure OnAfterValidateLastDirectCostEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
-        UpdateSalesPricesForStaff(Rec);
+        UpdateSalesPricesForStaff(Rec, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Price/Profit Calculation', true, true)]
     local procedure OnAfterValidatePriceProfitCalcEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
-        UpdateSalesPricesForStaff(Rec);
+        UpdateSalesPricesForStaff(Rec, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Unit Price', true, true)]
     local procedure OnAfterValidateUnitPriceEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
     begin
-        UpdateSalesPricesForStaff(Rec);
+        UpdateSalesPricesForStaff(Rec, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterPostItemJnlLine', '', true, true)]
@@ -44,7 +44,7 @@
         Item: Record Item;
     begin
         if Item.Get(ItemJournalLine."Item No.") then
-            UpdateSalesPricesForStaff(Item);
+            UpdateSalesPricesForStaff(Item, false);
     end;
 
     local procedure ConvertPriceLCYToFCY(PricesInCurrency: Boolean; ExchRateDate: Date; Currency: Record Currency; var UnitPrice: Decimal; CurrencyFactor: Decimal)
@@ -57,19 +57,20 @@
         end;
     end;
 
-    local procedure EventTest()
+    local procedure CreateLogEntry(Item: Record Item)
     var
-        Item: Record Item;
+        SalesPriceMaintLog: Record "NPR Sales Price Maint. Log";
     begin
-        Item.SetRange("No.", '0000050536191');
-        if Item.FindSet() then
-            repeat
-                if Item."No." <> '' then
-                    if Item.Modify(true) then;
-            until Item.Next() = 0;
+        SalesPriceMaintLog.SetRange(Processed, false);
+        SalesPriceMaintLog.SetRange("Item No.", Item."No.");
+        if SalesPriceMaintLog.IsEmpty() then begin
+            SalesPriceMaintLog."Entry No." := 0;
+            SalesPriceMaintLog."Item No." := Item."No.";
+            SalesPriceMaintLog.Insert();
+        end;
     end;
 
-    procedure UpdateSalesPricesForStaff(var Item: Record Item)
+    internal procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)
     var
         SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
         PriceListLine: Record "Price List Line";
@@ -100,8 +101,9 @@
         if RecRef.IsTemporary then
             exit;
 
-        if not TmpItem.Get(Item."No.") then
-            exit;
+        if not FromBackGroundProcessing then
+            if not TmpItem.Get(Item."No.") then
+                exit;
 
         if SalesPriceMaintenanceSetup.FindFirst() then begin
 
@@ -116,105 +118,114 @@
                         if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then
                             BreakLoop := SalesPriceMaintMgt.CheckExcludeItemGroup(SalesPriceMaintenanceSetup.Id, Item."Item Category Code");
 
-                if not BreakLoop then begin
-                    VATPct := 0;
-                    PricesInCurrency := false;
+                if not BreakLoop then
+                    if (not SalesPriceMaintenanceSetup."Background Processing") or FromBackGroundProcessing then begin
+                        VATPct := 0;
+                        PricesInCurrency := false;
 
-                    GetPriceListHeader(SalesPriceMaintenanceSetup, PriceListHeader);
+                        GetPriceListHeader(SalesPriceMaintenanceSetup, PriceListHeader);
 
-                    if VATPostingSetup.Get(PriceListHeader."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
-                        POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
-                        VATPct := VATPostingSetup."VAT %";
-                    end;
+                        if VATPostingSetup.Get(PriceListHeader."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group") then begin
+                            POSSaleTaxCalc.OnGetVATPostingSetup(VATPostingSetup, Handled);
+                            VATPct := VATPostingSetup."VAT %";
+                        end;
 
-                    if SalesPriceMaintenanceSetup.Factor = 0 then
-                        SalesPriceMaintenanceSetup.Factor := 1;
+                        if SalesPriceMaintenanceSetup.Factor = 0 then
+                            SalesPriceMaintenanceSetup.Factor := 1;
 
-                    if (PriceListHeader."Currency Code" <> '') and (PriceListHeader."Currency Code" <> GeneralLedgerSetup."LCY Code") then begin
-                        if Currency.Get(PriceListHeader."Currency Code") then begin
-                            Currency.SetRecFilter();
-                            CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchRateDate, Currency.Code);
-                            PricesInCurrency := true;
+                        if (PriceListHeader."Currency Code" <> '') and (PriceListHeader."Currency Code" <> GeneralLedgerSetup."LCY Code") then begin
+                            if Currency.Get(PriceListHeader."Currency Code") then begin
+                                Currency.SetRecFilter();
+                                CurrencyFactor := CurrencyExchangeRate.ExchangeRate(ExchRateDate, Currency.Code);
+                                PricesInCurrency := true;
+                            end else begin
+                                CurrencyFactor := 1
+                            end;
                         end else begin
                             CurrencyFactor := 1
                         end;
-                    end else begin
-                        CurrencyFactor := 1
-                    end;
 
-                    case SalesPriceMaintenanceSetup."Internal Unit Price" of
-                        SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Cost":
-                            begin
-                                if not PriceListHeader."Price Includes VAT" then
-                                    UnitPrice := Item."Unit Cost" * SalesPriceMaintenanceSetup.Factor
-                                else
-                                    UnitPrice := (Item."Unit Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
-                            end;
-                        SalesPriceMaintenanceSetup."Internal Unit Price"::"Last Direct Cost":
-                            begin
-                                if not PriceListHeader."Price Includes VAT" then
-                                    UnitPrice := Item."Last Direct Cost" * SalesPriceMaintenanceSetup.Factor
-                                else
-                                    UnitPrice := (Item."Last Direct Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
-                            end;
-                        SalesPriceMaintenanceSetup."Internal Unit Price"::"Standard Cost":
-                            begin
-                                if not PriceListHeader."Price Includes VAT" then
-                                    UnitPrice := Item."Standard Cost" * SalesPriceMaintenanceSetup.Factor
-                                else
-                                    UnitPrice := (Item."Standard Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
-                            end;
-                        SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Price":
-                            begin
-                                if not PriceListHeader."Price Includes VAT" then
-                                    UnitPrice := Item."Unit Price" * SalesPriceMaintenanceSetup.Factor
-                                else
-                                    UnitPrice := (Item."Unit Price" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
-                            end;
-                    end;
+                        case SalesPriceMaintenanceSetup."Internal Unit Price" of
+                            SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Cost":
+                                begin
+                                    if not PriceListHeader."Price Includes VAT" then
+                                        UnitPrice := Item."Unit Cost" * SalesPriceMaintenanceSetup.Factor
+                                    else
+                                        UnitPrice := (Item."Unit Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
+                                end;
+                            SalesPriceMaintenanceSetup."Internal Unit Price"::"Last Direct Cost":
+                                begin
+                                    if not PriceListHeader."Price Includes VAT" then
+                                        UnitPrice := Item."Last Direct Cost" * SalesPriceMaintenanceSetup.Factor
+                                    else
+                                        UnitPrice := (Item."Last Direct Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
+                                end;
+                            SalesPriceMaintenanceSetup."Internal Unit Price"::"Standard Cost":
+                                begin
+                                    if not PriceListHeader."Price Includes VAT" then
+                                        UnitPrice := Item."Standard Cost" * SalesPriceMaintenanceSetup.Factor
+                                    else
+                                        UnitPrice := (Item."Standard Cost" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
+                                end;
+                            SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Price":
+                                begin
+                                    if not PriceListHeader."Price Includes VAT" then
+                                        UnitPrice := Item."Unit Price" * SalesPriceMaintenanceSetup.Factor
+                                    else
+                                        UnitPrice := (Item."Unit Price" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
+                                end;
+                        end;
 
-                    Clear(PriceListLine);
-                    PriceListLine.SetRange("Price List Code", PriceListHeader."Code");
-                    PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
-                    PriceListLine.SetRange("Asset No.", Item."No.");
-                    PriceListLine.SetRange("Source Type", PriceListHeader."Source Type");
-                    PriceListLine.SetRange("Source No.", PriceListHeader."Source No.");
-                    PriceListLine.SetRange("Currency Code", PriceListHeader."Currency Code");
-                    PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
-                    PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
-
-                    if not PriceListLine.FindFirst() then begin
                         Clear(PriceListLine);
-                        xPriceListHeader := PriceListHeader;
-                        if PriceListHeader.Status <> PriceListHeader.Status::Draft then begin
-                            PriceListHeader.Status := PriceListHeader.Status::Draft;
-                            PriceListHeader.Modify();
+                        PriceListLine.SetRange("Price List Code", PriceListHeader."Code");
+                        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
+                        PriceListLine.SetRange("Asset No.", Item."No.");
+                        PriceListLine.SetRange("Source Type", PriceListHeader."Source Type");
+                        PriceListLine.SetRange("Source No.", PriceListHeader."Source No.");
+                        PriceListLine.SetRange("Currency Code", PriceListHeader."Currency Code");
+                        PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Sale);
+                        PriceListLine.SetRange("Amount Type", PriceListLine."Amount Type"::Price);
+
+                        if not PriceListLine.FindFirst() then begin
+                            Clear(PriceListLine);
+                            xPriceListHeader := PriceListHeader;
+                            if PriceListHeader.Status <> PriceListHeader.Status::Draft then begin
+                                PriceListHeader.Status := PriceListHeader.Status::Draft;
+                                PriceListHeader.Modify();
+                            end;
+
+                            PriceListLine.Init();
+                            PriceListLine."Price List Code" := PriceListHeader.Code;
+                            PriceListLine.CopyFrom(PriceListHeader);
+                            PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
+                            PriceListLine.Validate("Asset No.", Item."No.");
+                            PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
+                            PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
+                            PriceListLine.Status := xPriceListHeader.Status;
+                            PriceListLine.Insert(true);
+
+                            if PriceListHeader.Status <> xPriceListHeader.Status then begin
+                                PriceListHeader.Status := xPriceListHeader.Status;
+                                PriceListHeader.Modify();
+                            end;
                         end;
 
-                        PriceListLine.Init();
-                        PriceListLine."Price List Code" := PriceListHeader.Code;
-                        PriceListLine.CopyFrom(PriceListHeader);
-                        PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
-                        PriceListLine.Validate("Asset No.", Item."No.");
-                        PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
-                        PriceListLine.Validate("Amount Type", PriceListLine."Amount Type"::Price);
-                        PriceListLine.Status := xPriceListHeader.Status;
-                        PriceListLine.Insert(true);
+                        ConvertPriceLCYToFCY(PricesInCurrency, ExchRateDate, Currency, UnitPrice, CurrencyFactor);
+                        PriceListLine."Unit Price" := UnitPrice;
+                        if PriceListLine."Unit Price" <> 0 then
+                            PriceListLine."Cost Factor" := 0;
+                        PriceListLine.Modify();
+                    end else
+                        CreateLogEntry(Item);
 
-                        if PriceListHeader.Status <> xPriceListHeader.Status then begin
-                            PriceListHeader.Status := xPriceListHeader.Status;
-                            PriceListHeader.Modify();
-                        end;
-                    end;
-
-                    ConvertPriceLCYToFCY(PricesInCurrency, ExchRateDate, Currency, UnitPrice, CurrencyFactor);
-                    PriceListLine."Unit Price" := UnitPrice;
-                    if PriceListLine."Unit Price" <> 0 then
-                        PriceListLine."Cost Factor" := 0;
-                    PriceListLine.Modify();
-                end;
             until SalesPriceMaintenanceSetup.Next() = 0;
         end;
+    end;
+
+    [Obsolete('Please use procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)', 'NPR34.0')]
+    procedure UpdateSalesPricesForStaff(var Item: Record Item)
+    begin
+        UpdateSalesPricesForStaff(Item, false);
     end;
 
     internal procedure ExcludeItemGroup(Current_ItemGroup: Code[20]; ItemCategory_To_Exclude: Code[20]): Boolean
@@ -315,5 +326,25 @@
                     exit(CustomerPriceGroup."VAT Bus. Posting Gr. (Price)");
                 end;
         end;
+    end;
+
+    local procedure ProcessLogInBackground()
+    var
+        SalesPriceMaintLog: Record "NPR Sales Price Maint. Log";
+        SalesPriceMaintLog2: Record "NPR Sales Price Maint. Log";
+        Item: Record Item;
+    begin
+        SelectLatestVersion();
+        SalesPriceMaintLog.SetRange(Processed, false);
+        if SalesPriceMaintLog.FindSet(true) then
+            repeat
+                SalesPriceMaintLog2 := SalesPriceMaintLog;
+                if Item.Get(SalesPriceMaintLog."Item No.") then begin
+                    UpdateSalesPricesForStaff(Item, true);
+                    SalesPriceMaintLog2.Processed := true;
+                    SalesPriceMaintLog2.Modify();
+                end else
+                    SalesPriceMaintLog2.Delete();
+            until SalesPriceMaintLog.Next() = 0;
     end;
 }
