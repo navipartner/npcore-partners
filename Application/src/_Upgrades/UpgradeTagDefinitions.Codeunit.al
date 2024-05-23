@@ -287,6 +287,8 @@
                         exit('NPRE-20230720');
                     'NcTask':
                         exit('NcTask-20231017');
+                    'SalesPriceMaintenance':
+                        exit('SalesPriceMaintenance-20240523');
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of
