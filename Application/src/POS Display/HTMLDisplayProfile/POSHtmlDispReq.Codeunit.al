@@ -58,6 +58,7 @@ codeunit 6060083 "NPR POS Html Disp. Req"
         Request.Add('DisplayAction', 'SendJs');
         Request.Add('Version', HtmlDisplayVersion());
         JsParam.Add('JSAction', 'GetInput');
+        JsParam.Add('Labels', GetLabels());
         JsParam.Add('InputType', Format(HtmlProf."CIO: Money Back"));
         JsParam.WriteTo(JsParamTxt);
         Request.Add('JsParameter', JsParamTxt);
