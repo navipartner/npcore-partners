@@ -1,10 +1,10 @@
-function SendInputDataAndLabel(input, showControl, approve, redo, phone)
+function SendInputDataAndLabel(input, showControl, approveLbl, redoLbl, phoneLbl, noInputLbl)
 {
     try{
         let showPhone = input.PhoneNumber != null && input.PhoneNumber != undefined;;
-        let showSign = input.Signature != null && input.Signature != undefined;
+        let showSign = input.Signature != null && input.Signature != undefined &&  input.Signature !== "[]";
         let showBtns = showControl;
-        init(showPhone, showSign, showBtns, approve, redo);
+        init(showPhone, showSign, showBtns, approveLbl, redoLbl, phoneLbl, noInputLbl);
         if (showSign)
         {
             let signature = JSON.parse(input.Signature);
@@ -16,7 +16,7 @@ function SendInputDataAndLabel(input, showControl, approve, redo, phone)
         if (showPhone)
         {
             let phonebox = document.getElementById("phonebox");
-            phonebox.innerHTML = phone + ": " + input.PhoneNumber;
+            phonebox.innerHTML = phoneLbl + ": " + input.PhoneNumber;
         }
     } catch (e)
     {
@@ -107,7 +107,7 @@ function DrawCanvas(canvas, points)
     }
 }
 
-function init(phonebox, signaturebox, btns, approve, redo, phone)
+function init(phonebox, signaturebox, btns, approveLbl, redoLbl, phoneLbl, noInputLbl)
 {
     let body = window.document.getElementById("controlAddIn");
     let gridlayout = document.createElement("div");
@@ -125,6 +125,7 @@ function init(phonebox, signaturebox, btns, approve, redo, phone)
         phone.style.fontSize = "50px"
         phone.style.width = "100%";
         phone.id = "phonebox";
+        phone.innerHTML = phoneLbl;
         gridlayout.appendChild(phone);
     }
     if (signaturebox)
@@ -137,6 +138,18 @@ function init(phonebox, signaturebox, btns, approve, redo, phone)
         canvas.id = "signaturebox";
         gridlayout.appendChild(canvas);
     }
+    if (!phonebox && !signaturebox)
+    {
+        let noInput = document.createElement("div");
+        noInput.style.backgroundColor = "whitesmoke";
+        noInput.style.gridColumn = "1 / span 2";
+        noInput.style.height = "50px";
+        noInput.style.fontSize = "50px"
+        noInput.style.width = "100%";
+        noInput.id = "noInput";
+        noInput.innerHTML = noInputLbl;
+        gridlayout.appendChild(noInput);
+    }
     if (btns)
     {
         let RedoBtn = document.createElement("button");
@@ -144,13 +157,13 @@ function init(phonebox, signaturebox, btns, approve, redo, phone)
         RedoBtn.style.backgroundColor = "indianred";
         RedoBtn.textContent = "Redo Input";
         RedoBtn.id = "RedoBtn";
-        RedoBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ redo +"<p/>"
+        RedoBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ redoLbl +"<p/>"
         RedoBtn.addEventListener("click", () => Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("RedoInput",[]));
         let OkBtn = document.createElement("button");
         OkBtn.style.width = "100%";
         OkBtn.style.backgroundColor = "darkseagreen";
         OkBtn.id = "OkBtn";
-        OkBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ approve +"<p/>"
+        OkBtn.innerHTML = "<p style=\"font-size: 40px; font-weight: bold;\">"+ approveLbl +"<p/>"
         OkBtn.addEventListener("click", () => Microsoft.Dynamics.NAV.InvokeExtensibilityMethod("OkInput",[]));
         gridlayout.appendChild(RedoBtn);
         gridlayout.appendChild(OkBtn);
