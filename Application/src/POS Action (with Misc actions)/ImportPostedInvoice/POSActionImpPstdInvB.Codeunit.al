@@ -158,8 +158,8 @@ codeunit 6059875 "NPR POS Action: Imp. PstdInv B"
         SaleLinePOS.Validate("Unit Price", SalesInvLine."Unit Price");
         SaleLinePOS."Bin Code" := SalesInvLine."Bin Code";
         SaleLinePOS.Validate("Allow Line Discount", SalesInvLine."Allow Line Disc.");
-        SaleLinePOS.Validate("Discount %", SalesInvLine."Line Discount %");
-        SaleLinePOS.Validate("Discount Amount", SalesInvLine."Line Discount Amount");
+        SaleLinePOS."Discount %" := Abs(SalesInvLine."Line Discount %");
+        SaleLinePOS."Discount Amount" := SalesInvLine."Line Discount Amount";
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         if TransferDim then begin
             SaleLinePOS."Shortcut Dimension 1 Code" := SalesInvLine."Shortcut Dimension 1 Code";
