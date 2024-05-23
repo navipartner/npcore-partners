@@ -16,9 +16,13 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     begin
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
-        DisplayRequest.OpenRequest(Request, (not State.MediaIsDownloaded()));
-        State.SetDidDownload(true);
-        SendRequest(Request);
+        if (not State.MediaIsDownloaded()) then begin
+            DisplayRequest.OpenRequest(Request, true);
+            State.SetDidDownload(true);
+            SendRequest(Request);
+        end else begin
+            UpdateReceipt();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterInitSale', '', true, true)]
@@ -78,6 +82,7 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
         POSUnit.Get(SalePOS."Register No.");
         if (POSUnit."POS HTML Display Profile" = '') then
             exit;
+        UpdateReceipt();
         SendInputSignalToHWC(SalePOS."Sales Ticket No.");
     end;
 
