@@ -385,10 +385,11 @@ codeunit 85175 "NPR MM AchievementTest"
         Assert.AreEqual(1, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
         Assert.IsFalse(Goal.AchievementAcquired, Goal.FieldCaption(AchievementAcquired));
 
+        // Membership2 should not have any activity
         Goal.SetFilter(MembershipEntryNoFilter, '=%1', Membership2EntryNo);
         Goal.Get(GoalCode);
 
-        Assert.AreEqual(1, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
+        Assert.AreEqual(0, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
         Assert.IsFalse(Goal.AchievementAcquired, Goal.FieldCaption(AchievementAcquired));
     end;
 
@@ -444,7 +445,7 @@ codeunit 85175 "NPR MM AchievementTest"
         Assert: Codeunit Assert;
     begin
         Membership1.Get(CreateMembershipAndMember());
-        Membership2EntryNo := CreateMembershipAndMember();
+        Membership2EntryNo := CreateMembershipAndMember(); // Membership gets different community code and membership code
 
         Threshold := 7;
         GoalCode := MemberLibrary.SetupAchievementScenarioSimple(Membership1."Community Code", Membership1."Membership Code", Threshold);
@@ -463,11 +464,12 @@ codeunit 85175 "NPR MM AchievementTest"
         Assert.AreEqual(Threshold, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
         Assert.IsTrue(Goal.AchievementAcquired, Goal.FieldCaption(AchievementAcquired));
 
+        // Membership2 should not have any activity
         Goal.SetFilter(MembershipEntryNoFilter, '=%1', Membership2EntryNo);
         Goal.Get(GoalCode);
 
-        Assert.AreEqual(Threshold, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
-        Assert.IsTrue(Goal.AchievementAcquired, Goal.FieldCaption(AchievementAcquired));
+        Assert.AreEqual(0, Goal.ActivityCount, Goal.FieldCaption(ActivityCount));
+        Assert.IsFalse(Goal.AchievementAcquired, Goal.FieldCaption(AchievementAcquired));
     end;
 
     [Test]

@@ -113,8 +113,10 @@ codeunit 6184713 "NPR MM AchActivityManagement"
         Activity: Record "NPR MM AchActivity";
         Goal: Record "NPR MM AchGoal";
         Achievement: Record "NPR MM Achievement";
+        Membership: Record "NPR MM Membership";
     begin
 
+        // Check if the activity is active and within the timeframe 
         if (not Activity.Get(ActivityCode)) then
             exit;
 
@@ -127,7 +129,14 @@ codeunit 6184713 "NPR MM AchActivityManagement"
         if ((Activity.EnableUntilDate <> 0D) and (Activity.EnableUntilDate < Today())) then
             exit;
 
+        // Activity must be linked to the same membership as the goal
+        if (not Membership.Get((MembershipEntryNo))) then
+            exit;
+
+        // Check if the goal is active and within the timeframe
         Goal.SetFilter(Code, '=%1', GoalCode);
+        Goal.SetFilter(CommunityCode, '=%1', Membership."Community Code");
+        Goal.SetFilter(MembershipCode, '=%1', Membership."Membership Code");
         Goal.SetFilter(MembershipEntryNoFilter, '=%1', MembershipEntryNo);
         Goal.SetAutoCalcFields(ActivityCount);
         if (not Goal.FindFirst()) then
