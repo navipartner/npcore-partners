@@ -414,6 +414,12 @@
         {
             Caption = 'External Transaction ID';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "External Transaction ID".Split('.').Count = 2 then
+                    "PSP Reference" := CopyStr("External Transaction ID".Split('.').Get(2), 1, MaxStrLen("PSP Reference"));
+            end;
         }
         field(630; "External Customer ID"; Text[50])
         {
@@ -494,12 +500,28 @@
             Caption = 'Matched in Reconciliation';
             FieldClass = FlowField;
         }
+        field(810; Reconciled; Boolean)
+        {
+            Caption = 'Reconciled';
+            DataClassification = CustomerContent;
+        }
+        field(820; "Reconciliation Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reconciliation Date';
+        }
+        field(830; "PSP Reference"; Code[16])
+        {
+            Caption = 'PSP Reference';
+            DataClassification = CustomerContent;
+        }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
             CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));
             Caption = 'Moved to POS Entry';
             FieldClass = FlowField;
         }
+
     }
 
     keys
@@ -526,6 +548,9 @@
         {
         }
         key(Key8; "DCC Amount")
+        {
+        }
+        key(Key9; "PSP Reference")
         {
         }
     }

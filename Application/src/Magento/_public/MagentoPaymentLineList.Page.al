@@ -113,6 +113,11 @@
                     ToolTip = 'Specifies Shopify payment transaction ID.';
                 }
 #endif
+                field(Reconciled; Rec.Reconciled)
+                {
+                    ToolTip = 'Specifies if the payment is Reconciled in an Adyen Reconciliation Document.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(factboxes)
