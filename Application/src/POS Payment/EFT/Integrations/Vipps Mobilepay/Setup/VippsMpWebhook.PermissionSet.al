@@ -3,7 +3,7 @@ permissionset 6014404 "NPR Vipps Mp Webhook"
 {
     Assignable = true;
     Caption = 'Vipps Mobilepay Webhook';
-    IncludedPermissionSets = "D365 READ";
+    IncludedPermissionSets = "D365 AUTOMATION";
     Access = Internal;
 
 
