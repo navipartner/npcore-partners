@@ -76,7 +76,6 @@
     {
     }
 
-
     internal procedure SetPageData(var TempEFTTransactionRequest: Record "NPR EFT Transaction Request" temporary)
     begin
         if not Rec.IsTemporary then

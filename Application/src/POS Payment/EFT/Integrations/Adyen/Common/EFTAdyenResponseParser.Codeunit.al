@@ -465,7 +465,7 @@
     begin
         TrySelectToken(JObject, 'POITransactionID.TransactionID', JToken, true);
         EFTTransactionRequest."Reference Number Output" := JToken.AsValue().AsText();
-        EFTTransactionRequest."External Transaction ID" := EFTTransactionRequest."Reference Number Output";
+        EFTTransactionRequest.Validate("External Transaction ID", EFTTransactionRequest."Reference Number Output");
         TrySelectToken(JObject, 'POITransactionID.TimeStamp', JToken, true);
         TransactionDateTime := JToken.AsValue().AsDateTime();
         EFTTransactionRequest."Transaction Date" := DT2Date(TransactionDateTime);

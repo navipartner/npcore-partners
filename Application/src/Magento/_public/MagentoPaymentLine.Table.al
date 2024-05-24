@@ -133,6 +133,11 @@
             Caption = 'Transaction ID';
             DataClassification = CustomerContent;
         }
+        field(230; Reconciled; Boolean)
+        {
+            Caption = 'Reconciled';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

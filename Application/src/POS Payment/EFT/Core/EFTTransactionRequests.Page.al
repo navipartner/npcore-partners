@@ -19,7 +19,7 @@
     // NPR5.54/JAKUBV/20200408  CASE 387990 Transport NPR5.54 - 8 April 2020
 
     Caption = 'EFT Transaction Requests';
-    Editable = false;
+    // Editable = false;
     PageType = List;
     SourceTable = "NPR EFT Transaction Request";
     SourceTableView = SORTING("Entry No.")
@@ -411,6 +411,26 @@
                 {
 
                     ToolTip = 'Specifies if the entry is moved to POS.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Matched in Reconciliation"; Rec."Matched in Reconciliation")
+                {
+                    ToolTip = 'Specifies if the entry is matched in Reconciliation.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("PSP Reference"; Rec."PSP Reference")
+                {
+                    ToolTip = 'Specifies the Adyen Transaction ID.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Reconciled; Rec.Reconciled)
+                {
+                    ToolTip = 'Specifies if the entry is Reconciled with an Adyen Transaction.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Reconciliation Date"; Rec."Reconciliation Date")
+                {
+                    ToolTip = 'Specifies the date of Reconciling current EFT Transaction Request.';
                     ApplicationArea = NPRRetail;
                 }
             }
