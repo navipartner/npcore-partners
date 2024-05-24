@@ -443,12 +443,23 @@
     var
         POSEntry: Record "NPR POS Entry";
         EmailManagement: Codeunit "NPR E-mail Management";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RecRef: RecordRef;
     begin
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        POSEntry.SetFilter("Entry Type", '%1|%2|%3', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::Other);
-        if not POSEntry.FindFirst() then
-            exit;
+        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
+            POSEntry.SetCurrentKey("Document No.");
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            if not POSEntry.FindFirst() then
+                exit;
+
+            if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::Other, POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::"Direct Sale"]) then
+                exit;
+        end else begin
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            POSEntry.SetFilter("Entry Type", '%1|%2|%3', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale", POSEntry."Entry Type"::Other);
+            if not POSEntry.FindFirst() then
+                exit;
+        end;
 
         RecRef.GetTable(POSEntry);
         if EmailManagement.GetEmailAddressFromRecRef(RecRef) = '' then
