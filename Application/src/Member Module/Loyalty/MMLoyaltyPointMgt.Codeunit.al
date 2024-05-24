@@ -207,6 +207,7 @@
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSUnit: Record "NPR POS Unit";
         POSLoyaltyProfile: Record "NPR MM POS Loyalty Profile";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -218,11 +219,15 @@
             exit;
 
         // Calculate points and assign.
+        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then
+            PosEntry.SetCurrentKey("Document No.");
         PosEntry.SetFilter("Document No.", SalePOS."Sales Ticket No.");
         if (PosEntry.FindFirst()) then begin
             PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
             PosEntrySalesLine.SetFilter(Type, '=%1', PosEntrySalesLine.Type::Item);
             PosEntrySalesLine.SetRange("Exclude from Posting", false);
+            if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then
+                PosEntrySalesLine.SetLoadFields("POS Entry No.", Type, "Exclude from Posting", Quantity, "Amount Excl. VAT (LCY)", "Line Discount Amount Incl. VAT", "No.", "Line Dsc. Amt. Excl. VAT (LCY)");
             if (PosEntrySalesLine.FindSet()) then begin
                 repeat
                     SimulateValueEntry(

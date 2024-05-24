@@ -587,18 +587,35 @@
         POSEntry: Record "NPR POS Entry";
         TaxFreeProfile: Record "NPR POS Tax Free Profile";
         POSUnit: Record "NPR POS Unit";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        POSEntry.SetRange("POS Unit No.", SalePOS."Register No.");
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if not POSEntry.FindFirst() then
-            exit;
+        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
+            if not SalePOS."Issue Tax Free Voucher" then
+                exit;
 
-        if not SalePOS."Issue Tax Free Voucher" then
-            exit;
+            if not POSUnit.Get(SalePOS."Register No.") then
+                exit;
 
-        POSUnit.Get(POSEntry."POS Unit No.");
-        if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
-            exit;
+            if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
+                exit;
+
+            POSEntry.SetCurrentKey("Document No.");
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            if POSEntry.IsEmpty then
+                exit;
+        end else begin
+            POSEntry.SetRange("POS Unit No.", SalePOS."Register No.");
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            if not POSEntry.FindFirst() then
+                exit;
+
+            if not SalePOS."Issue Tax Free Voucher" then
+                exit;
+
+            POSUnit.Get(POSEntry."POS Unit No.");
+            if not TaxFreeProfile.Get(POSUnit."POS Tax Free Prof.") then
+                exit;
+        end;
 
         Commit();
 

@@ -29,16 +29,38 @@
 
     procedure PrintPOSEntrySalesReceipt(SalePOS: Record "NPR POS Sale")
     var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
     begin
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-        if not POSEntry.FindFirst() then
-            exit;
+        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
+            if not POSUnit.Get(SalePOS."Register No.") then
+                exit;
 
-        if SkipReceiptPrint(POSEntry) then
-            exit;
+            if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+                exit;
+
+            POSEntry.SetCurrentKey("Document No.");
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            if not POSEntry.FindFirst() then
+                exit;
+
+            if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+                if ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
+                   ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel")
+                then
+                    exit;
+        end else begin
+            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+            if not POSEntry.FindFirst() then
+                exit;
+
+            if SkipReceiptPrint(POSEntry) then
+                exit;
+        end;
 
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
