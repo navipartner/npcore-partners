@@ -49,6 +49,8 @@
                 Clear(NpGpPOSSalesLineReturn);
                 if NpGpPOSSalesLine."Global Reference" <> '' then begin
                     NpGpPOSSalesLineReturn.SetRange("Global Reference", NpGpPOSSalesLine."Global Reference");
+                    NpGpPOSSalesLineReturn.SetFilter("No.", NpGpPOSSalesLine."No.");
+                    NpGpPOSSalesLineReturn.SetFilter("Variant Code", NpGpPOSSalesLine."Variant Code");
                     NpGpPOSSalesLineReturn.SetFilter(Quantity, '<0');
                     if NpGpPOSSalesLineReturn.FindSet() then
                         repeat
@@ -115,6 +117,8 @@
                         if NpGpPOSSalesLine."Global Reference" <> '' then begin
                             NpGpPOSSalesLineReturn.SetRange("Global Reference", NpGpPOSSalesLine."Global Reference");
                             NpGpPOSSalesLineReturn.SetFilter(Quantity, '<0');
+                            NpGpPOSSalesLineReturn.SetFilter("No.", NpGpPOSSalesLine."No.");
+                            NpGpPOSSalesLineReturn.SetFilter("Variant Code", NpGpPOSSalesLine."Variant Code");
                             if NpGpPOSSalesLineReturn.FindSet() then
                                 repeat
                                     TempNpGpPOSSalesLine.Quantity += NpGpPOSSalesLineReturn.Quantity;
