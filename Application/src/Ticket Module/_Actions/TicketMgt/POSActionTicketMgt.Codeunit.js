@@ -95,23 +95,22 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             toast.warning ('Schedule not updated', {title: windowTitle});
             return;
         }
-        if(context.VerboseMessage !== ""){ 
-            //toast.success (context.VerboseMessage, {title: windowTitle});
-        }
-
 
     } else {
         actionSettings.TicketQuantity = ticketQuantity;
         actionSettings.TicketReference = ticketReference;
         await workflow.respond("DoAction", actionSettings);
-
-        if (context.Verbose) { 
-            await popup.message ({
-                caption: context.VerboseMessage, 
-                title: windowTitle});
-        }
     }
 
+    if (context.Verbose) { 
+        await popup.message ({
+            caption: context.VerboseMessage, 
+            title: windowTitle});
+    } else {
+        if(context.VerboseMessage !== ""){ 
+            toast.success (context.VerboseMessage, {title: windowTitle});
+        }
+    }
 
 }
 
