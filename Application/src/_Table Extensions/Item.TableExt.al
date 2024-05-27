@@ -643,15 +643,26 @@ tableextension 6014427 "NPR Item" extends Item
         PeriodDiscountLine: Record "NPR Period Discount Line";
         SalesLinePOS: Record "NPR POS Sale Line";
         POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         MixDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more mixed discount lines.';
         PerDiscLineNotEmptyErr: Label 'You can''t delete %1 %2 as it''s contained in one or more period discount lines.';
-        POSEntryNotEmptyErr: Label 'You can''t delete item %1 as there aren''t any posted entries for it.';
+        POSEntryNotEmptyErr: Label 'You can''t delete item %1 becase it has unposted entries in POS Entry table.';
         SalesLinePOSNotEmptyErr: Label 'You can''t delete item %1 because it is part of an active sales document.';
     begin
-        POSEntry.SetRange("Customer No.", Rec."No.");
-        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
-        if not POSEntry.IsEmpty() then
-            Error(POSEntryNotEmptyErr, Rec."No.");
+        POSEntrySalesLine.SetRange("No.", Rec."No.");
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetLoadFields(Type, "POS Entry No.", "No.");
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                POSEntry.SetRange("Entry No.", POSEntrySalesLine."POS Entry No.");
+                POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+                if not POSEntry.IsEmpty() then
+                    Error(POSEntryNotEmptyErr, Rec."No.");
+
+                POSEntrySalesLine.SetRange("POS Entry No.", POSEntrySalesLine."POS Entry No.");
+                POSEntrySalesLine.FindLast();
+                POSEntrySalesLine.SetRange("POS Entry No.");
+            until POSEntrySalesLine.Next() = 0;
 
         SalesLinePOS.SetRange("Line Type", SalesLinePOS."Line Type"::Item);
         SalesLinePOS.SetRange("No.", Rec."No.");
