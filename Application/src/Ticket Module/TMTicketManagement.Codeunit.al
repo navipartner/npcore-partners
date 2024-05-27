@@ -2568,17 +2568,21 @@
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalTime: DateTime;
     begin
 
         Clear(AdmissionScheduleEntry);
-        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, Today, Time, AdmissionScheduleEntry, WithCreate, ScheduleContext)) then
+        LocalTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+
+        if (GetAdmScheduleEntry(ItemNo, VariantCode, AdmissionCode, DT2Date(LocalTime), DT2Time(LocalTime), AdmissionScheduleEntry, WithCreate, ScheduleContext)) then
             exit(AdmissionScheduleEntry."Entry No.");
 
         if (Admission."Default Schedule"::NEXT_AVAILABLE = GetAdmissionSchedule(ItemNo, VariantCode, AdmissionCode)) then begin
             AdmissionScheduleEntry.Reset();
             AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-            AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', Today);
+            AdmissionScheduleEntry.SetFilter("Admission Start Date", '>%1', DT2Date(LocalTime));
             AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
             if (AdmissionScheduleEntry.FindFirst()) then
                 exit(AdmissionScheduleEntry."Entry No.");
