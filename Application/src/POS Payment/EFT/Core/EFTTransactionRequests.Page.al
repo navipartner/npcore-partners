@@ -19,7 +19,7 @@
     // NPR5.54/JAKUBV/20200408  CASE 387990 Transport NPR5.54 - 8 April 2020
 
     Caption = 'EFT Transaction Requests';
-    // Editable = false;
+    Editable = false;
     PageType = List;
     SourceTable = "NPR EFT Transaction Request";
     SourceTableView = SORTING("Entry No.")
