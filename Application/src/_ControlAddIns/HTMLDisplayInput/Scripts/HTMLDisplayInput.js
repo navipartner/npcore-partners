@@ -1,4 +1,4 @@
-function SendInputDataAndLabel(input, showControl, approveLbl, redoLbl, phoneLbl, noInputLbl)
+function SendInputDataAndLabelV2(input, showControl, approveLbl, redoLbl, phoneLbl, noInputLbl)
 {
     try{
         let showPhone = input.PhoneNumber != null && input.PhoneNumber != undefined;;
