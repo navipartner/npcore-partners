@@ -867,15 +867,27 @@
 
     local procedure InsertTemporaryTicketReservation(TicketElement: XmlElement; Token: Text[100]; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary)
     var
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ExternalItemType: Integer;
     begin
+
+        if (not TicketSetup.Get()) then
+            TicketSetup.Init();
+
+        if (TicketSetup."Authorization Code Scheme" = '') then
+            TicketSetup."Authorization Code Scheme" := '[N*4]-[N*4]';
 
         TmpTicketReservationRequest.Init();
         TmpTicketReservationRequest."Entry No." := TmpTicketReservationRequest.Count() + 1;
         TmpTicketReservationRequest."Session Token ID" := Token;
         TmpTicketReservationRequest."Request Status" := TmpTicketReservationRequest."Request Status"::WIP;
         TmpTicketReservationRequest."Created Date Time" := CurrentDateTime();
+
+        // NOTE!
+        TmpTicketReservationRequest."Primary Request Line" := true;
+        TmpTicketReservationRequest."Authorization Code" := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(TmpTicketReservationRequest."Authorization Code"));
 
         TmpTicketReservationRequest."External Item Code" := CopyStr(NpXmlDomMgt.GetXmlAttributeText(TicketElement, 'external_id', true), 1, MaxStrLen(TmpTicketReservationRequest."External Item Code"));
 
