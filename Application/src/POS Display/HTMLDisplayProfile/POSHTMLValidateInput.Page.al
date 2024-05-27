@@ -18,7 +18,7 @@ page 6150773 "NPR POS HTML Validate Input"
 
                 trigger Ready()
                 begin
-                    CurrPage."Input Validation".SendInputDataAndLabel(jsInput, True, Format(MsgApproveInputLabel), Format(MsgRedoInputLabel), Format(MsgPhoneInputLabel), Format(NoInputLabel));
+                    CurrPage."Input Validation".SendInputDataAndLabelV2(jsInput, True, Format(MsgApproveInputLabel), Format(MsgRedoInputLabel), Format(MsgPhoneInputLabel), Format(NoInputLabel));
                 end;
 
                 trigger OkInput()
