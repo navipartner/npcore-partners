@@ -23,11 +23,23 @@
     var
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
         ArrivalSuccess: Boolean;
+        Ticket: Record "NPR TM Ticket";
+        TicketNumberRequired: Label '[-2001] Ticket No. is required.';
     begin
-        ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
-        if (not ArrivalSuccess) then
-            ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
 
+        if (ExternalTicketNo = '') then begin
+            MessageText := TicketNumberRequired;
+            exit(false);
+        end;
+
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
+        if (Ticket.IsEmpty()) then begin
+            // Try Ticket Request Token
+            ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
+            exit(ArrivalSuccess);
+        end;
+
+        ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
         exit(ArrivalSuccess);
     end;
 
