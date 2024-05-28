@@ -1885,8 +1885,6 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'ApplyDiscount', '', true, true)]
     local procedure OnApplyDiscount(DiscountPriority: Record "NPR Discount Priority"; SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete; RecalculateAllLines: Boolean)
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if not IsSubscribedDiscount(DiscountPriority) then
             exit;
@@ -1894,11 +1892,8 @@
         if (Rec.Quantity = xRec.Quantity) and (Rec."Unit of Measure Code" <> xRec."Unit of Measure Code") then begin
             UpdateAppliedLinesFromTriggeredLine(TempSaleLinePOS, Rec);
         end;
-        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
-            ApplyMixedDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today)
-        else
-            ApplyMixDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
 
+        ApplyMixedDiscounts(SalePOS, TempSaleLinePOS, Rec, RecalculateAllLines, false, Today);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]

@@ -19,7 +19,6 @@
 
     procedure CalculateMixedDiscountLine(RetailJournalLine: Record "NPR Retail Journal Line"; var POSSaleLineTemp: Record "NPR POS Sale Line" temporary; CalculationDate: Date; FindBestMixedDiscount: Boolean) MixedDiscountExists: Boolean
     var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         MixedDiscountMgt: Codeunit "NPR Mixed Discount Management";
         TempPOSSale: Record "NPR POS Sale" temporary;
         Item: Record Item;
@@ -83,10 +82,7 @@
         POSSaleLineTemp.Insert();
 
         if FindBestMixedDiscount then begin
-            if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
-                MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate)
-            else
-                MixedDiscountMgt.FindPotentiallyImpactedMixesAndLines(POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, true, CalculationDate);
+            MixedDiscountMgt.FindImpactedMixedDiscoutnsAndLines(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, TempMixedDiscount, TempMixedDiscountLine, TempImpactedSaleLinePOS, TempDiscountCalcBuffer, true, CalculationDate);
 
             if (TempMixedDiscount.Count = 0) then
                 exit(false);
@@ -106,10 +102,7 @@
             end;
         end;
 
-        if FeatureFlagsManagement.IsEnabled('newMixDiscountCalculation_v2') then
-            MixedDiscountMgt.ApplyMixedDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate)
-        else
-            MixedDiscountMgt.ApplyMixDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate);
+        MixedDiscountMgt.ApplyMixedDiscounts(TempPOSSale, POSSaleLineTemp, POSSaleLineTemp, true, true, CalculationDate);
 
         exit(true);
     end;
