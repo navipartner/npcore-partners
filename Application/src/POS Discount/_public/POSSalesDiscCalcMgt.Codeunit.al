@@ -32,23 +32,17 @@
         StartTime: DateTime;
         SaleLinePOS: Record "NPR POS Sale Line";
         CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         StartTime := CurrentDateTime;
 
-        if FeatureFlagsManagement.IsEnabled('couponsVatAmountCalculationFix_v2') then begin
-            CouponMgt.RemoveDiscount(SalePOS);
+        CouponMgt.RemoveDiscount(SalePOS);
 
-            SetupTempSalesLines(SalePOS, TempSaleLinePOS);
-            if not TempSaleLinePOS.FindLast() then begin
-                CouponMgt.ApplyDiscount(SalePOS);
-                exit;
-            end;
-        end else begin
-            SetupTempSalesLines(SalePOS, TempSaleLinePOS);
-            if not TempSaleLinePOS.FindLast() then
-                exit;
+        SetupTempSalesLines(SalePOS, TempSaleLinePOS);
+        if not TempSaleLinePOS.FindLast() then begin
+            CouponMgt.ApplyDiscount(SalePOS);
+            exit;
         end;
+
         FindAllActiveSaleLineDiscounts(TempDiscountPriority);
 
         //LineOperation & Rec is set as if the last line was just inserted.
