@@ -68,6 +68,11 @@
             Caption = 'Serving Requested Date-Time';
             DataClassification = CustomerContent;
         }
+        field(85; "Served Date-Time"; DateTime)
+        {
+            Caption = 'Served Date-Time';
+            DataClassification = CustomerContent;
+        }
         field(90; Priority; Integer)
         {
             Caption = 'Priority';

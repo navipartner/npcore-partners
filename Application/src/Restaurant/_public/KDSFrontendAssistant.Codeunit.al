@@ -19,6 +19,13 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RefreshKDSData(restaurantId, stationId, includeFinished, startingFrom).WriteTo(Response);
     end;
 
+    procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime) Response: Text
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+    begin
+        KDSFrontendAssistImpl.GetFinishedOrders(restaurantId, startingFrom).WriteTo(Response);
+    end;
+
     procedure GetSetups() Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
