@@ -713,6 +713,16 @@
     end;
 
     internal procedure UpdateOrderStatus(var KitchenOrder: Record "NPR NPRE Kitchen Order")
+    begin
+        SetOrderStatus(KitchenOrder);
+        if KitchenOrder."Order Status" <> KitchenOrder."Order Status"::Finished then
+            KitchenOrder."Finished Date-Time" := 0DT
+        else
+            if KitchenOrder."Finished Date-Time" = 0DT then
+                KitchenOrder."Finished Date-Time" := CurrentDateTime();
+    end;
+
+    local procedure SetOrderStatus(var KitchenOrder: Record "NPR NPRE Kitchen Order")
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         OrderIsReadyForServingOn: Enum "NPR NPRE Order Ready Serving";
@@ -799,6 +809,7 @@
         if KitchenRequest."Line Status" in [KitchenRequest."Line Status"::Served, KitchenRequest."Line Status"::Cancelled] then
             KitchenRequest.FieldError("Line Status");
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::Served;
+        KitchenRequest."Served Date-Time" := CurrentDateTime();
         KitchenRequest.Modify();
 
         CancelKitchenStationRequests(KitchenRequest, true);
@@ -823,6 +834,7 @@
         RevokeServingForChildRequestLines(KitchenRequest);
         KitchenRequest.TestField("Line Status", KitchenRequest."Line Status"::Served);
         KitchenRequest."Line Status" := KitchenRequest."Line Status"::"Ready for Serving";
+        KitchenRequest."Served Date-Time" := 0DT;
         KitchenRequest.Modify();
 
         UpdateOrderStatus(KitchenRequest."Order ID");

@@ -25,6 +25,17 @@
                     ToolTip = 'Specifies the restaurant the ordered was created for.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Order Status"; Rec."Order Status")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies current status of the order.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(Priority; Rec.Priority)
+                {
+                    ToolTip = 'Specifies the priority of the order. The higher the number, the lower the priority. This priority is going to be assigned by default to all kitchen requests created under this order.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Created Date-Time"; Rec."Created Date-Time")
                 {
                     Editable = false;
@@ -36,15 +47,10 @@
                     ToolTip = 'Specifies the date-time the customer requested the order be ready at.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Order Status"; Rec."Order Status")
+                field("Finished Date-Time"; Rec."Finished Date-Time")
                 {
                     Editable = false;
-                    ToolTip = 'Specifies current status of the order.';
-                    ApplicationArea = NPRRetail;
-                }
-                field(Priority; Rec.Priority)
-                {
-                    ToolTip = 'Specifies the priority of the order. The higher the number, the lower the priority. This priority is going to be assigned by default to all kitchen requests created under this order.';
+                    ToolTip = 'Specifies the date-time the order was finished at.';
                     ApplicationArea = NPRRetail;
                 }
                 field("On Hold"; Rec."On Hold")
@@ -83,7 +89,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Req.";
-                RunPageLink = "Order ID" = FIELD("Order ID");
+                RunPageLink = "Order ID" = FIELD("Order ID"), "Restaurant Code" = field("Restaurant Code");
                 RunPageView = SORTING("Order ID");
                 ToolTip = 'View outstaning kitchen requests for the order.';
                 ApplicationArea = NPRRetail;

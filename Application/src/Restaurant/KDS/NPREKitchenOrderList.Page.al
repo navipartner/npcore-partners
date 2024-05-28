@@ -46,6 +46,11 @@
                     ToolTip = 'Specifies the date-time the order was created at.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Finished Date-Time"; Rec."Finished Date-Time")
+                {
+                    ToolTip = 'Specifies the date-time the order was finished at.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(factboxes)
@@ -76,7 +81,7 @@
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NPR NPRE Kitchen Req.";
-                RunPageLink = "Order ID" = FIELD("Order ID");
+                RunPageLink = "Order ID" = FIELD("Order ID"), "Restaurant Code" = field("Restaurant Code");
                 RunPageView = SORTING("Order ID");
                 ToolTip = 'View outstaning kitchen requests for the order.';
                 ApplicationArea = NPRRetail;
