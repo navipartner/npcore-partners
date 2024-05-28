@@ -17,6 +17,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         UpdateDefaultNumberOfGuests();
         SetPrintOnSaleCancel();
         UpdateKitchenRequestProductionStatuses();
+        UpdateOrderFinishedDT();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -164,6 +165,42 @@ codeunit 6151316 "NPR NPRE Upgrade"
                 KitchenReqStation2."Production Status" := "NPR NPRE K.Req.L. Prod.Status".FromInteger(KitchenReqStation."Production Status".AsInteger() * 10);
                 KitchenReqStation2.Modify();
             until KitchenReqStation.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateOrderFinishedDT()
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        KitchenRequest: Record "NPR NPRE Kitchen Request";
+        LastServingDT: DateTime;
+    begin
+        UpgradeStep := 'UpdateOrderFinishedDT';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
+
+        KitchenOrder.SetRange("Order Status", KitchenOrder."Order Status"::Finished);
+        if KitchenOrder.FindSet(true) then
+            repeat
+                LastServingDT := 0DT;
+                KitchenRequest.SetRange("Order ID", KitchenOrder."Order ID");
+                KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::Served);
+                if KitchenRequest.FindSet(true) then
+                    repeat
+                        if KitchenRequest."Served Date-Time" = 0DT then begin
+                            KitchenRequest."Served Date-Time" := KitchenRequest.SystemModifiedAt;
+                            KitchenRequest.Modify();
+                        end;
+                        if (LastServingDT = 0DT) or (LastServingDT < KitchenRequest."Served Date-Time") then
+                            LastServingDT := KitchenRequest."Served Date-Time";
+                    until KitchenRequest.Next() = 0;
+                if (KitchenOrder."Finished Date-Time" = 0DT) and (LastServingDT <> 0DT) then begin
+                    KitchenOrder."Finished Date-Time" := LastServingDT;
+                    KitchenOrder.Modify();
+                end;
+            until KitchenOrder.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

@@ -95,6 +95,12 @@
                     ToolTip = 'Specifies the date-time waiter requested serving of the product on the line.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Served Date-Time"; Rec."Served Date-Time")
+                {
+                    ToolTip = 'Specifies the date-time the request was served at.';
+                    Visible = IsExpediteMode and FinishedIsShown;
+                    ApplicationArea = NPRRetail;
+                }
                 field("Line Status"; Rec."Line Status")
                 {
                     ToolTip = 'Specifies the status of this request.';

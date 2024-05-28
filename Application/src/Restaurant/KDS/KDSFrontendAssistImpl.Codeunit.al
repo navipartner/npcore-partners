@@ -35,7 +35,12 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
     internal procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime) Response: JsonObject
     begin
-        Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), stationId, includeFinished, startingFrom));
+        Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), stationId, includeFinished, false, startingFrom));
+    end;
+
+    internal procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime) Response: JsonObject
+    begin
+        Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), '', true, true, startingFrom));
     end;
 
     internal procedure GetSetups() Response: JsonObject
@@ -152,9 +157,10 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
             SetupProxy.GetRestaurantList(TempRestaurant);
     end;
 
-    local procedure GenerateKDSData(RestaurantCode: Code[20]; KitchenStationFilter: Text; IncludeFinished: Boolean; StartingFromDT: DateTime) Orders: JsonArray
+    local procedure GenerateKDSData(RestaurantCode: Code[20]; KitchenStationFilter: Text; IncludeFinished: Boolean; FinishedOnly: Boolean; StartingFromDT: DateTime) Orders: JsonArray
     var
         NotificationEntry: Record "NPR NPRE Notification Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
         KitchenReqStationsQry: Query "NPR NPRE Kitchen Req. Stations";
         CustomerDetailsDic: Dictionary of [Text, List of [Text]];
@@ -167,16 +173,19 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         LastOrderID: BigInteger;
         LastRequestNo: BigInteger;
     begin
-        if IncludeFinished then begin
+        if IncludeFinished or FinishedOnly then begin
             if StartingFromDT = 0DT then
-                StartingFromDT := CreateDateTime(Today() - 7, 0T);
-            KitchenReqStationsQry.SetFilter(Created_DateTime, '%1..', StartingFromDT);
+                StartingFromDT := CurrentDateTime() - JobQueueMgt.DaysToDuration(3);
+            if FinishedOnly then
+                KitchenReqStationsQry.SetFilter(Finished_Date_Time, '%1..', StartingFromDT)
+            else
+                KitchenReqStationsQry.SetFilter(Created_DateTime, '%1..', StartingFromDT);
         end else
             KitchenReqStationsQry.SetRange(Order_Status, "NPR NPRE Kitchen Order Status"::"Ready for Serving", "NPR NPRE Kitchen Order Status"::Planned);
         if KitchenStationFilter <> '' then begin
             KitchenReqStationsQry.SetRange(Production_Restaurant_Code, RestaurantCode);
             KitchenReqStationsQry.SetFilter(Kitchen_Station, KitchenStationFilter);
-            if not IncludeFinished then
+            if not (IncludeFinished or FinishedOnly) then
                 KitchenReqStationsQry.SetRange(Station_Production_Status, "NPR NPRE K.Req.L. Prod.Status"::"Not Started", "NPR NPRE K.Req.L. Prod.Status"::"On Hold");
         end else
             KitchenReqStationsQry.SetRange(Restaurant_Code, RestaurantCode);
@@ -204,6 +213,10 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 OrderHdr.Add('orderStatusName', StatusEnumValueName(KitchenReqStationsQry.Order_Status));
                 OrderHdr.Add('priority', KitchenReqStationsQry.Order_Priority);
                 OrderHdr.Add('orderCreatedDT', KitchenReqStationsQry.Created_DateTime);
+                if KitchenReqStationsQry.Finished_Date_Time <> 0DT then
+                    OrderHdr.Add('orderFinishedDT', KitchenReqStationsQry.Finished_Date_Time)
+                else
+                    OrderHdr.Add('orderFinishedDT', NullJsonValue);
                 if KitchenReqStationsQry.Expected_Dine_DateTime <> 0DT then
                     OrderHdr.Add('orderExpectedDineDT', KitchenReqStationsQry.Expected_Dine_DateTime)
                 else
@@ -284,6 +297,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     var
         WaiterPad: Record "NPR NPRE Waiter Pad";
         KitchReqSrcbyDoc: Query "NPR NPRE Kitch.Req.Src. by Doc";
+        CustomerEmailTok: Label 'customerEmail', Locked = true;
         CustomerNameTok: Label 'customerName', Locked = true;
         CustomerPhoneNoTok: Label 'customerPhoneNo', Locked = true;
     begin
@@ -297,6 +311,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                     if WaiterPad.Get(KitchReqSrcbyDoc.Source_Document_No_) then begin
                         AddCustomerDetailToDict(CustomerNameTok, WaiterPad.Description, CustomerDetailsDic);
                         AddCustomerDetailToDict(CustomerPhoneNoTok, WaiterPad."Customer Phone No.", CustomerDetailsDic);
+                        AddCustomerDetailToDict(CustomerEmailTok, WaiterPad."Customer E-Mail", CustomerDetailsDic);
                     end;
             end;
         KitchReqSrcbyDoc.Close();

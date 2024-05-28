@@ -13,6 +13,7 @@
             column(Order_Status; "Order Status") { }
             column(Created_DateTime; "Created Date-Time") { }
             column(Expected_Dine_DateTime; "Expected Dine Date-Time") { }
+            column(Finished_Date_Time; "Finished Date-Time") { }
             column(Order_Priority; Priority) { }
             dataitem(KitchenRequest; "NPR NPRE Kitchen Request")
             {

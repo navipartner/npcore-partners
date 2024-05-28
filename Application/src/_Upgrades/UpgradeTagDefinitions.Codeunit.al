@@ -159,6 +159,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateDefaultNumberOfGuests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'SetPrintOnSaleCancel'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestProductionStatuses'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateOrderFinishedDT'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
@@ -590,6 +591,8 @@
                         exit('NPRE_SetPrintOnSaleCancel_20231026');
                     'UpdateKitchenRequestProductionStatuses':
                         exit('NPRE_UpdateKitchenRequestProductionStatuses_20240208');
+                    'UpdateOrderFinishedDT':
+                        exit('NPRE_UpdateOrderFinishedDT_20240528');
                 end;
 
             Codeunit::"NPR Item Upgrade":

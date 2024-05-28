@@ -55,6 +55,11 @@
             Caption = 'Expected Dine Date-Time';
             DataClassification = CustomerContent;
         }
+        field(70; "Finished Date-Time"; DateTime)
+        {
+            Caption = 'Finished Date-Time';
+            DataClassification = CustomerContent;
+        }
         field(500; "Kitchen Station Filter"; Code[20])
         {
             Caption = 'Kitchen Station Filter';
