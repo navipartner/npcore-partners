@@ -11,7 +11,6 @@
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
         TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary;
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         DiscountAmt: Decimal;
         RemainingDiscountAmt: Decimal;
         RemainingQty: Decimal;
@@ -62,18 +61,12 @@
         Coupon.Get(SaleLinePOSCoupon."Coupon No.");
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
             repeat
-                if FeatureFlagsManagement.IsEnabled('couponItemListApplicationReordering') then
-                    ApplyDiscountItemListPercent(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty)
-                else
-                    ApplyDiscountListItemPct(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+                ApplyDiscountItemListPercent(SaleLinePOSCoupon, Coupon."Discount %", TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
             until TempNpDcCouponListItem.Next() = 0;
             exit;
         end;
         repeat
-            if FeatureFlagsManagement.IsEnabled('couponItemListApplicationReordering') then
-                ApplyDiscountItemList(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty)
-            else
-                ApplyDiscountListItem(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty);
+            ApplyDiscountItemList(SaleLinePOSCoupon, DiscountAmt, TempNpDcCouponListItem, RemainingDiscountAmt, RemainingQty)
         until (TempNpDcCouponListItem.Next() = 0) or (DiscountAmt <= 0);
     end;
 
