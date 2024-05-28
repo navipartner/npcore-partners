@@ -110,6 +110,12 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     DrillDownPageId = "NPR MM Member Card";
                 }
+                field(Blocked; Rec.Blocked)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Blocked field';
+                    Editable = false;
+                }
             }
         }
         area(FactBoxes)
