@@ -7,8 +7,7 @@ page 6184535 "NPR Adyen Rec. Activities"
     RefreshOnActivate = true;
     ShowFilter = false;
     Editable = false;
-    UsageCategory = Documents;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     layout
     {
         area(content)
