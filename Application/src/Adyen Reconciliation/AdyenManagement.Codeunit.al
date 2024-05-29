@@ -534,7 +534,7 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
-    procedure ChangeColorLine(ReconciliationLine: Record "NPR Adyen Reconciliation Line"): Text[50]
+    procedure ChangeColorLine(ReconciliationLine: Record "NPR Adyen Recon. Line"): Text[50]
     begin
         if ReconciliationLine.Status in [ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted"] then
             exit('favorable')
@@ -657,7 +657,7 @@ codeunit 6184796 "NPR Adyen Management"
             ResponseObject.Get('id', JsonToken);
             WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
             if WebhookSetup.ID <> '' then begin
-                WebhookSetup.Modify();
+                WebhookSetup.Modify(false);
                 exit(true);
             end;
         end;

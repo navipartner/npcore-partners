@@ -1,12 +1,9 @@
-table 6150789 "NPR Adyen Reconciliation Line"
+table 6150874 "NPR Adyen Recon. Line"
 {
     Access = Internal;
 
     Caption = 'Adyen Reconciliation Line';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteTag = 'NPR35.0';
-    ObsoleteReason = 'Replaced by NPR Adyen Recon. Line.';
 
     fields
     {
@@ -212,16 +209,12 @@ table 6150789 "NPR Adyen Reconciliation Line"
     }
     keys
     {
-        key(Key1; "Document No.", "Line No.", "Merchant Order Reference", "Batch Number")
+        key(Key1; "Document No.", "Line No.")
         {
             Clustered = true;
         }
-        key(Key2; "Batch Number", "Merchant Account")
-        {
-        }
-        key(Key3; "PSP Reference")
-        {
-        }
+        key(Key2; "PSP Reference") { }
+        key(Key3; "Document No.", Status) { }
     }
 
     trigger OnInsert()

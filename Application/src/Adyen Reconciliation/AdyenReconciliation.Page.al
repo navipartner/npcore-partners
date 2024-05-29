@@ -3,9 +3,7 @@ page 6184502 "NPR Adyen Reconciliation"
     Extensible = false;
 
     Caption = 'Adyen Reconciliation';
-    UsageCategory = Documents;
-    ApplicationArea = NPRRetail;
-    AdditionalSearchTerms = 'Adyen Reconciliation';
+    UsageCategory = None;
     PageType = ListPlus;
     SourceTable = "NPR Adyen Reconciliation Hdr";
     RefreshOnActivate = true;
@@ -257,16 +255,10 @@ page 6184502 "NPR Adyen Reconciliation"
                 trigger OnAction()
                 var
                     AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
-                    AdyenReconciliationLine: Record "NPR Adyen Reconciliation Line";
                 begin
-                    AdyenReconciliationLine.Reset();
-                    AdyenReconciliationLine.SetRange("Document No.", Rec."Document No.");
-                    if AdyenReconciliationLine.FindFirst() then begin
-                        if AdyenMerchantSetup.Get(AdyenReconciliationLine."Merchant Account") then
-                            Page.RunModal(Page::"NPR Adyen Merchant Setup", AdyenMerchantSetup)
-                        else
-                            Page.RunModal(Page::"NPR Adyen Merchant Setup");
-                    end else
+                    if AdyenMerchantSetup.Get(Rec."Merchant Account") then
+                        Page.RunModal(Page::"NPR Adyen Merchant Setup", AdyenMerchantSetup)
+                    else
                         Page.RunModal(Page::"NPR Adyen Merchant Setup");
                 end;
             }
@@ -274,40 +266,23 @@ page 6184502 "NPR Adyen Reconciliation"
     }
 
     trigger OnOpenPage()
-    var
-        GLEntry: Record "G/L Entry";
     begin
         if Rec."Document Type" = Rec."Document Type"::"External Settlement detail (C)" then
             _IsExternalReport := true;
-
-        GLEntry.Reset();
-        GLEntry.SetRange("Posting Date", Today());
-        IF GLEntry.FindSet(true) then
-            GLEntry.DeleteAll();
     end;
 
     trigger OnAfterGetRecord()
     var
-        RecLine: Record "NPR Adyen Reconciliation Line";
+        RecLine: Record "NPR Adyen Recon. Line";
     begin
         _DocumentPosted := Rec.Posted;
         RecLine.Reset();
-        RecLine.SetFilter("Document No.", Rec."Document No.");
-        RecLine.SetFilter(Status, '=%1', RecLine.Status::Posted);
+        RecLine.SetRange("Document No.", Rec."Document No.");
+        RecLine.SetRange(Status, RecLine.Status::Posted);
         if RecLine.IsEmpty() then
             _LinePosted := false
         else
             _LinePosted := true;
-    end;
-
-    trigger OnDeleteRecord(): Boolean
-    var
-        ReconciliationLine: Record "NPR Adyen Reconciliation Line";
-    begin
-        ReconciliationLine.Reset();
-        ReconciliationLine.SetRange("Document No.", Rec."Document No.");
-        if ReconciliationLine.FindSet(true) then
-            ReconciliationLine.DeleteAll();
     end;
 
     var
