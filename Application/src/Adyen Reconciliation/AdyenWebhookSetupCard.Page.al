@@ -5,8 +5,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "NPR Adyen Webhook Setup";
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     layout
     {
@@ -123,7 +122,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 begin
                     if Rec.ID = '' then begin
                         if AdyenManagement.CreateWebhook(Rec) then begin
-                            CurrPage.Update();
+                            CurrPage.Update(false);
                             Message(StrSubstNo(WebhookSetUpSuccess, Format(Rec.ID)));
                         end else
                             Error(WebhookSetUpError);

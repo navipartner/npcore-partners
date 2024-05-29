@@ -15,7 +15,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         end;
     end;
 
-    procedure LineIsPosted(Line: Record "NPR Adyen Reconciliation Line"): Boolean
+    procedure LineIsPosted(Line: Record "NPR Adyen Recon. Line"): Boolean
     var
         GLEntry: Record "G/L Entry";
         BankAccountLE: Record "Bank Account Ledger Entry";
@@ -64,7 +64,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             exit(true);
     end;
 
-    procedure PrepareRecords(var RecLine: Record "NPR Adyen Reconciliation Line"): Boolean
+    procedure PrepareRecords(var RecLine: Record "NPR Adyen Recon. Line"): Boolean
     begin
         _AdyenMerchantSetup.Get(RecLine."Merchant Account");
         _AdyenMerchantSetup.TestField("Markup G/L Account");
@@ -176,21 +176,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             POSEntryToPost."Amount Incl. Tax & Round" *= -1;
             POSEntryToPost."Payment Amount" *= -1;
             POSEntryToPost.Insert();
-            /*
-            POSSalesLine.Reset();
-            POSSalesLine.SetRange("POS Entry No.", POSEntryToPost."Entry No.");
-            if POSSalesLine.FindSet() then begin
-                repeat
-                    NewPOSSalesLine := POSSalesLine;
-                    NewPOSSalesLine."Amount Excl. VAT" *= -1;
-                    NewPOSSalesLine."Amount Incl. VAT" *= -1;
-                    NewPOSSalesLine."Amount Excl. VAT (LCY)" *= -1;
-                    NewPOSSalesLine."Amount Incl. VAT (LCY)" *= -1;
-                    NewPOSSalesLine."VAT Base Amount" *= -1;
-                    NewPOSSalesLine.Insert(true);
-                until POSSalesLine.Next() = 0;
-            end;
-            */
             if not AdyenGenericSetup."Post POS Entries Immediately" then begin
                 if POSEntry."Post Item Entry Status" < POSEntry."Post Item Entry Status"::Posted then
                     POSPostEntries.SetPostItemEntries(true);
@@ -259,7 +244,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
     var
         _AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
-        _ReconciliationLine: Record "NPR Adyen Reconciliation Line";
+        _ReconciliationLine: Record "NPR Adyen Recon. Line";
         _Currency: Record Currency;
         _PaymentAccountType: Enum "Gen. Journal Account Type";
         _PaymentAccountNo: Code[20];

@@ -2,10 +2,9 @@ page 6184503 "NPR Adyen Reconciliation Lines"
 {
     Extensible = false;
 
-    UsageCategory = Documents;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     Caption = 'Adyen Reconciliation Lines';
-    SourceTable = "NPR Adyen Reconciliation Line";
+    SourceTable = "NPR Adyen Recon. Line";
     AutoSplitKey = true;
     DelayedInsert = true;
     LinksAllowed = false;
@@ -274,7 +273,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     EFTTransaction: Record "NPR EFT Transaction Request";
                     MagentoPaymentLine: Record "NPR Magento Payment Line";
                     GLEntry: Record "G/L Entry";
-                    ReconciliationLine: Record "NPR Adyen Reconciliation Line";
+                    ReconciliationLine: Record "NPR Adyen Recon. Line";
                 begin
                     CurrPage.SetSelectionFilter(ReconciliationLine);
                     if ReconciliationLine.FindFirst() then begin
@@ -319,7 +318,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 var
                     AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
                     GLEntry: Record "G/L Entry";
-                    ReconciliationLine: Record "NPR Adyen Reconciliation Line";
+                    ReconciliationLine: Record "NPR Adyen Recon. Line";
                 begin
                     CurrPage.SetSelectionFilter(ReconciliationLine);
                     if ReconciliationLine.FindFirst() and (ReconciliationLine.Status = ReconciliationLine.Status::Posted) then begin

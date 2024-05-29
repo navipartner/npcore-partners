@@ -39,7 +39,7 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         _GLEntryNo := GenJournalPostLine.RunWithCheck(GenJnlLine);
     end;
 
-    procedure GLEntryExists(var GLEntry: Record "G/L Entry"; RecLine: Record "NPR Adyen Reconciliation Line") Exists: Boolean
+    procedure GLEntryExists(var GLEntry: Record "G/L Entry"; RecLine: Record "NPR Adyen Recon. Line") Exists: Boolean
     begin
         if _AdyenMerchantSetup.Get(RecLine."Merchant Account") then begin
             GLEntry.Reset();
@@ -71,7 +71,7 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         end;
     end;
 
-    procedure PrepareRecords(var RecLine: Record "NPR Adyen Reconciliation Line"; GLAccountType: Enum "NPR Adyen Posting GL Accounts"): Boolean
+    procedure PrepareRecords(var RecLine: Record "NPR Adyen Recon. Line"; GLAccountType: Enum "NPR Adyen Posting GL Accounts"): Boolean
     begin
         _GLAccountType := GLAccountType;
         if _AdyenMerchantSetup.Get(RecLine."Merchant Account") then begin
@@ -103,7 +103,7 @@ codeunit 6184827 "NPR Adyen Fee Posting"
     end;
 
     var
-        _ReconciliationLine: Record "NPR Adyen Reconciliation Line";
+        _ReconciliationLine: Record "NPR Adyen Recon. Line";
         _AdyenMerchantSetup: Record "NPR Adyen Merchant Setup";
         _GLEntryNo: Integer;
         _GLAccountType: Enum "NPR Adyen Posting GL Accounts";
