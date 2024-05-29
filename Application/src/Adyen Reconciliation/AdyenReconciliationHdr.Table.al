@@ -53,7 +53,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         {
             Caption = 'Total Transactions Amount';
             FieldClass = FlowField;
-            CalcFormula = sum("NPR Adyen Reconciliation Line"."Amount(AAC)" where("Document No." = field("Document No."),
+            CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
                                                                                 "Batch Number" = field("Batch Number"),
                                                                                 "Transaction Type" = filter(Settled | SettledExternallyWithInfo)));
         }
@@ -61,7 +61,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         {
             Caption = 'Total Posted Amount';
             FieldClass = FlowField;
-            CalcFormula = sum("NPR Adyen Reconciliation Line"."Amount(AAC)" where("Document No." = field("Document No."),
+            CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
                                                                                 "Batch Number" = field("Batch Number"),
                                                                                 Status = const(Posted)));
         }
@@ -92,4 +92,14 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         {
         }
     }
+
+    trigger OnDelete()
+    var
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+    begin
+        ReconciliationLine.Reset();
+        ReconciliationLine.SetRange("Document No.", Rec."Document No.");
+        if not ReconciliationLine.IsEmpty() then
+            ReconciliationLine.DeleteAll(true);
+    end;
 }
