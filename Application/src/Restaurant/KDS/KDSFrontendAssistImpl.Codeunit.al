@@ -2,13 +2,14 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 {
     Access = Internal;
 
-    internal procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text) Response: JsonObject
+    internal procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text; lastServerId: Text) Response: JsonObject
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         TempRestaurant: Record "NPR NPRE Restaurant" temporary;
         KitchenOrderList: JsonArray;
         KitchenOrderContent: JsonObject;
     begin
+        CheckServerID(lastServerId);
         GetRestaurantList(restaurantId, TempRestaurant);
 
         KitchenOrder.SetCurrentKey("Restaurant Code", "Order Status", Priority, "Created Date-Time");
@@ -31,29 +32,36 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         until TempRestaurant.Next() = 0;
 
         Response.Add('orders', KitchenOrderList);
+        AddServerIDToResponse(Response);
     end;
 
-    internal procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime) Response: JsonObject
+    internal procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime; lastServerId: Text) Response: JsonObject
     begin
+        CheckServerID(lastServerId);
         Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), stationId, includeFinished, false, startingFrom));
+        AddServerIDToResponse(Response);
     end;
 
-    internal procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime) Response: JsonObject
+    internal procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime; lastServerId: Text) Response: JsonObject
     begin
+        CheckServerID(lastServerId);
         Response.Add('orders', GenerateKDSData(CopyStr(restaurantId, 1, 20), '', true, true, startingFrom));
+        AddServerIDToResponse(Response);
     end;
 
-    internal procedure GetSetups() Response: JsonObject
+    internal procedure GetSetups(lastServerId: Text) Response: JsonObject
     var
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
     begin
+        CheckServerID(lastServerId);
         if not RestaurantSetup.Get() then
             RestaurantSetup.Init();
         Response.Add('warningAfterMinutes', RestaurantSetup."Delayed Ord. Threshold 1 (min)");
         Response.Add('errorAfterMinutes', RestaurantSetup."Delayed Ord. Threshold 2 (min)");
+        AddServerIDToResponse(Response);
     end;
 
-    internal procedure RunKitchenAction(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; KitchenActionToRun: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving")
+    internal procedure RunKitchenAction(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; KitchenActionToRun: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving"; lastServerId: Text) Response: JsonObject
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         KitchenRequest: Record "NPR NPRE Kitchen Request";
@@ -64,6 +72,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     begin
         if (orderId = 0) and (kitchenRequestId = 0) then
             Error(MissingContextParamErr);
+        CheckServerID(lastServerId);
         RestaurantCode := CopyStr(restaurantId, 1, MaxStrLen(RestaurantCode));
 
         KitchenOrderMgt.SetHideValidationDialog(true);
@@ -126,15 +135,18 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                         KitchenOrderMgt.RevokeServingForRequestLine(KitchenRequest);
                 end;
             until KitchenRequest.Next() = 0;
+        AddServerIDToResponse(Response);
     end;
 
-    internal procedure CreateOrderReadyNotifications(orderId: BigInteger)
+    internal procedure CreateOrderReadyNotifications(orderId: BigInteger; lastServerId: Text) Response: JsonObject
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
         NotificationHandler: Codeunit "NPR NPRE Notification Handler";
     begin
+        CheckServerID(lastServerId);
         KitchenOrder.Get(orderId);
         NotificationHandler.CreateOrderNotifications(KitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_READY_FOR_SERVING, 0DT);
+        AddServerIDToResponse(Response);
     end;
 
     local procedure GetRestaurantList(restaurantId: Text; var TempRestaurant: Record "NPR NPRE Restaurant")
@@ -395,5 +407,17 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         KitchenRequestStation.SetRange("Request No.", KitchenRequest."Request No.");
         KitchenRequest.CopyFilter("Production Restaurant Filter", KitchenRequestStation."Production Restaurant Code");
         KitchenRequest.CopyFilter("Kitchen Station Filter", KitchenRequestStation."Kitchen Station");
+    end;
+
+    local procedure CheckServerID(lastServerId: Text)
+    begin
+        //Unlike control addin requests, inbound webservice requests can be load balanced across multiple NSTs meaning the cache sync delay can lead to invisible records.
+        if (lastServerId = '') or (lastServerId <> Format(ServiceInstanceId())) then
+            SelectLatestVersion();
+    end;
+
+    local procedure AddServerIDToResponse(var Response: JsonObject)
+    begin
+        Response.Add('serverId', Format(ServiceInstanceId()));
     end;
 }
