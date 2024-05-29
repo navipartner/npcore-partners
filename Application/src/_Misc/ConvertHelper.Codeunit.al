@@ -163,4 +163,61 @@ codeunit 6060164 "NPR Convert Helper"
         JObject.Add('Version', Version);
     end;
 
+    internal procedure DecodeUnicodeEscapes(EscapedText: Text) UnescapedText: Text
+    var
+        Position: Integer;
+        StartPosition: Integer;
+        EndPosition: Integer;
+        HexValue: Text;
+        UnicodeValue: Integer;
+        UnicodeChar: Text;
+    begin
+        UnescapedText := EscapedText;
+        Position := StrPos(UnescapedText, '_x');
+        while Position > 0 do begin
+            StartPosition := Position;
+            EndPosition := StartPosition + 6;
+
+            if (StrLen(UnescapedText) >= EndPosition) and (CopyStr(UnescapedText, EndPosition, 1) = '_') then begin
+                HexValue := CopyStr(UnescapedText, StartPosition + 2, 4);
+                UnicodeValue := ConvertHexToInteger(HexValue);
+                UnicodeChar := ConvertToChar(UnicodeValue);
+                UnescapedText := CopyStr(UnescapedText, 1, StartPosition - 1) + UnicodeChar + CopyStr(UnescapedText, EndPosition + 1);
+            end;
+
+            Position := StrPos(UnescapedText, '_x');
+        end;
+    end;
+
+    local procedure ConvertHexToInteger(HexStr: Text) Value: Integer
+    var
+        i: Integer;
+        Digit: Integer;
+    begin
+        Value := 0;
+        for i := 1 to StrLen(HexStr) do begin
+            Digit := GetHexDigitValue(CopyStr(HexStr, i, 1));
+            Value := Value * 16 + Digit;
+        end;
+    end;
+
+    local procedure GetHexDigitValue(HexChar: Text[1]) HexDigitValue: Integer
+    var
+        AsciiValue: Integer;
+        InvalidHexadecimalCharacterErrorLbl: Label 'Invalid hexadecimal character: %1';
+    begin
+        AsciiValue := StrPos('0123456789ABCDEF', UpperCase(HexChar));
+        if AsciiValue = 0 then
+            Error(InvalidHexadecimalCharacterErrorLbl, HexChar);
+        HexDigitValue := AsciiValue - 1;
+    end;
+
+    local procedure ConvertToChar(UnicodeValue: Integer) CharText: Text
+    var
+        Char: Char;
+    begin
+        Char := UnicodeValue;
+        CharText := Char;
+    end;
+
 }
