@@ -511,12 +511,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        PostworkflowSubscriptionExists := CheckPostworkflowSubscriptionExists();
-
-        Item.SetLoadFields("NPR Explode BOM auto", "Assembly BOM", "NPR Group sale", "Item Category Code", "Price Includes VAT", "VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group", "NPR Item Addon No.", "NPR Ticket Type");
         Item.SetAutoCalcFields("Assembly BOM");
 
         POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+
+        PostworkflowSubscriptionExists := CheckPostworkflowSubscriptionExists();
+        ItemProcessingEvents.OnAfterCheckPostworkflowSubscriptionExists(Item, PostworkflowSubscriptionExists);
+
         if (Item."NPR Ticket Type" <> '') then
             if (TicketPosAction.UseFrontEndUxForScheduleSelection()) then
                 exit(false);
