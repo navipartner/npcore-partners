@@ -1,6 +1,8 @@
 codeunit 6151373 "NPR Prepayment Mgt."
 {
     Access = Internal;
+    Permissions = TableData "Bank Account Ledger Entry" = rimd;
+
 #if not (BC17 or BC18 or BC19)
     var
         AppliesToID: Label 'PREV', Locked = true;
