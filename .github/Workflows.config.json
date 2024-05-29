@@ -26,9 +26,6 @@
             "name": "BC2103_CLOUD"
         },
         {
-            "name": "BC2304_CLOUD"
-        },
-        {
             "name": "vPrevious_CLOUD",
             "useCompareApp": true
         },
