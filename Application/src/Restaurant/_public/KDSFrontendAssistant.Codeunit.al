@@ -8,10 +8,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
     procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text) Response: Text
     begin
-        Response := RefreshCustomerDisplayKitchenOrders(restaurantId, '');
+        Response := RefreshCustomerDisplayKitchenOrdersV2(restaurantId, '');
     end;
 
-    procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text; lastServerId: Text) Response: Text
+    procedure RefreshCustomerDisplayKitchenOrdersV2(restaurantId: Text; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -21,10 +21,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
     procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime) Response: Text
     begin
-        Response := RefreshKDSData(restaurantId, stationId, includeFinished, startingFrom, '');
+        Response := RefreshKDSDataV2(restaurantId, stationId, includeFinished, startingFrom, '');
     end;
 
-    procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime; lastServerId: Text) Response: Text
+    procedure RefreshKDSDataV2(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -34,10 +34,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
     procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime) Response: Text
     begin
-        Response := GetFinishedOrders(restaurantId, startingFrom, '');
+        Response := GetFinishedOrdersV2(restaurantId, startingFrom, '');
     end;
 
-    procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime; lastServerId: Text) Response: Text
+    procedure GetFinishedOrdersV2(restaurantId: Text; startingFrom: DateTime; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -47,10 +47,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
     procedure GetSetups() Response: Text
     begin
-        Response := GetSetups('');
+        Response := GetSetupsV2('');
     end;
 
-    procedure GetSetups(lastServerId: Text) Response: Text
+    procedure GetSetupsV2(lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -60,10 +60,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure AcceptChange(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        AcceptChange(restaurantId, stationId, kitchenRequestId, orderId, '');
+        AcceptChangeV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure AcceptChange(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure AcceptChangeV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -73,10 +73,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure SetProductionNotStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        SetProductionNotStarted(restaurantId, stationId, kitchenRequestId, orderId, '');
+        SetProductionNotStartedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure SetProductionNotStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure SetProductionNotStartedV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -86,10 +86,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure SetProductionStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        SetProductionStarted(restaurantId, stationId, kitchenRequestId, orderId, '');
+        SetProductionStartedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure SetProductionStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure SetProductionStartedV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -99,10 +99,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure SetProductionFinished(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        SetProductionFinished(restaurantId, stationId, kitchenRequestId, orderId, '');
+        SetProductionFinishedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure SetProductionFinished(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure SetProductionFinishedV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -112,10 +112,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure SetOnHold(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        SetOnHold(restaurantId, stationId, kitchenRequestId, orderId, '');
+        SetOnHoldV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure SetOnHold(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure SetOnHoldV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -125,10 +125,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure Resume(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        Resume(restaurantId, stationId, kitchenRequestId, orderId, '');
+        ResumeV2(restaurantId, stationId, kitchenRequestId, orderId, '');
     end;
 
-    procedure Resume(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure ResumeV2(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -138,10 +138,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure SetServed(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        SetServed(restaurantId, kitchenRequestId, orderId, '');
+        SetServedV2(restaurantId, kitchenRequestId, orderId, '');
     end;
 
-    procedure SetServed(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure SetServedV2(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -151,10 +151,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure RevokeServing(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
-        RevokeServing(restaurantId, kitchenRequestId, orderId, '');
+        RevokeServingV2(restaurantId, kitchenRequestId, orderId, '');
     end;
 
-    procedure RevokeServing(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure RevokeServingV2(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
@@ -164,10 +164,10 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
     procedure CreateOrderReadyNotifications(orderId: BigInteger)
     begin
-        CreateOrderReadyNotifications(orderId, '');
+        CreateOrderReadyNotificationsV2(orderId, '');
     end;
 
-    procedure CreateOrderReadyNotifications(orderId: BigInteger; lastServerId: Text) Response: Text
+    procedure CreateOrderReadyNotificationsV2(orderId: BigInteger; lastServerId: Text) Response: Text
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
     begin
