@@ -395,8 +395,8 @@ report 6014468 "NPR NO Balacing A4 POS"
                 column(Salesperson_DiscountQuantity; DiscountQuantity) { }
                 column(Salesperson_CashDrawerOpenQuantity; CashDrawerOpenQuantity) { }
                 column(Salesperson_ReceiptCopyAmount; ReceiptCopyAmount) { }
-                column(Salesperson_ReceiptCopyQuantity; ReceiptCopyQuantity) { }
-                column(Salesperson_ReceiptPrintQuantity; ReceiptPrintQuantity) { }
+                column(Salesperson_ReceiptCopyQuantity; ReceiptCopyCounter) { }
+                column(Salesperson_ReceiptPrintQuantity; ReceiptPrintCounter) { }
                 column(Salesperson_CancelledReceiptsQuantity; CancelledReceiptsQuantity) { }
                 column(Salesperson_CancelledReceiptsAmount; CancelledReceiptsAmount) { }
                 column(Salesperson_PriceLookupQuantity; PriceLookupQuantity) { }
@@ -809,7 +809,7 @@ report 6014468 "NPR NO Balacing A4 POS"
         Clear(CashDrawerOpenQuantity);
         CashDrawerOpenQuantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::MANUAL_DRAWER_OPEN);
 
-        NOReportStatisticsMgt.CalcCopyAndPrintReceiptsQuantity(POSEntry2, ReceiptCopyAmount, ReceiptCopyQuantity, ReceiptPrintQuantity);
+        NOReportStatisticsMgt.CalcCopyAndPrintReceiptsQuantity(POSEntry2, ReceiptCopyAmount, ReceiptCopyCounter, ReceiptPrintCounter);
 
         Clear(CancelledReceiptsQuantity);
         CancelledReceiptsQuantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaser.Code, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::CANCEL_SALE_END);
@@ -864,16 +864,16 @@ report 6014468 "NPR NO Balacing A4 POS"
         WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity : Decimal;
         CancelledReceiptsQuantity: Integer;
         CashDrawerOpenQuantity: Integer;
-        DiscountQuantity: Integer;
+        DiscountQuantity: Decimal;
         FromPOSEntryNo: Integer;
         PriceLookupQuantity: Integer;
         QuantityCards: Integer;
         QuantityOther: Integer;
-        ReceiptCopyQuantity: Integer;
-        ReceiptPrintQuantity: Integer;
-        ReturnedProductsQuantity: Integer;
+        ReceiptCopyCounter: Integer;
+        ReceiptPrintCounter: Integer;
+        ReturnedProductsQuantity: Decimal;
         ReturnedRecieptsQuantity: Integer;
-        SoldProductsQuantity: Integer;
+        SoldProductsQuantity: Decimal;
         TotalPriceLookupQuantity: Integer;
         VarAttachedBin: Integer;
         VarBin: Integer;
