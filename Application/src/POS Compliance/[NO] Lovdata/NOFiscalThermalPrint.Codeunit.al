@@ -27,7 +27,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
     local procedure PrintThermalReceipt(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
-        Printer: Codeunit "NPR RP Line Print Mgt.";
+        Printer: Codeunit "NPR RP Line Print";
     begin
         Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
         Printer.SetAutoLineBreak(false);
@@ -53,7 +53,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     #region Printing Parts of The Receipt
 
-    local procedure PrintReceiptHeader(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintReceiptHeader(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         CompanyInfo: Record "Company Information";
         POSAuditLog: Record "NPR POS Audit Log";
@@ -120,10 +120,10 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
-    local procedure PrintEODPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintEODPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
-        CardDifference, CashDifference, InitialFloatAmount, CountedAmountInclFloat, CalculatedAmountInclFloat, EndingFloatAmount, TotalEndingCards : Decimal;
+        CalculatedAmountInclFloat, CardDifference, CashDifference, CountedAmountInclFloat, EndingFloatAmount, InitialFloatAmount, TotalEndingCards : Decimal;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, EndOfDayCaptionLbl, 'A11', true, 'CENTER', true, false);
@@ -184,7 +184,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
-    local procedure PrintCardTerminalsPart(var Printer: Codeunit "NPR RP Line Print Mgt."; WorkshiftCheckpointEntryNo: Integer; var TotalCards: Decimal; var TotalDifference: Decimal)
+    local procedure PrintCardTerminalsPart(var Printer: Codeunit "NPR RP Line Print"; WorkshiftCheckpointEntryNo: Integer; var TotalCards: Decimal; var TotalDifference: Decimal)
     var
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -205,7 +205,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         until PaymentBinCheckpoint.Next() = 0;
     end;
 
-    local procedure PrintOtherPaymentsPart(var Printer: Codeunit "NPR RP Line Print Mgt."; WorkshiftCheckpointEntryNo: Integer)
+    local procedure PrintOtherPaymentsPart(var Printer: Codeunit "NPR RP Line Print"; WorkshiftCheckpointEntryNo: Integer)
     var
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -223,9 +223,9 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         until PaymentBinCheckpoint.Next() = 0;
     end;
 
-    local procedure PrintItemCategoryPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintItemCategoryPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity : Decimal;
+        WithItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryAmount, WithoutItemCategoryQuantity : Decimal;
         WithItemCategoryPriceCheckedCounter, WithoutItemCategoryPriceCheckedCounter : Integer;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
@@ -253,7 +253,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
-    local procedure PrintItemCategories(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer)
+    local procedure PrintItemCategories(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer)
     var
         POSUnit: Record "NPR POS Unit";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
@@ -273,7 +273,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintNotProcessedItemCategories(Printer, POSWorkshiftCheckpoint, PreviousZReportDateTime, WithItemCategoryPriceCheckedCounter, AlreadyProcessedItemCategories);
     end;
 
-    local procedure PrintItemCategoriesBasedOnQuery(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSUnit: Record "NPR POS Unit"; PreviousZReportDateTime: DateTime; FromEntryNo: Integer; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
+    local procedure PrintItemCategoriesBasedOnQuery(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; POSUnit: Record "NPR POS Unit"; PreviousZReportDateTime: DateTime; FromEntryNo: Integer; var WithItemCategoryAmount: Decimal; var WithoutItemCategoryAmount: Decimal; var WithItemCategoryQuantity: Decimal; var WithoutItemCategoryQuantity: Decimal; var WithItemCategoryPriceCheckedCounter: Integer; var WithoutItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
     var
         ItemCategory: Record "Item Category";
         ItemCategoryQuery: Query "NPR NO Sales By Item Category";
@@ -311,7 +311,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         ItemCategoryQuery.Close();
     end;
 
-    local procedure PrintNotProcessedItemCategories(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PreviousZReportDateTime: DateTime; var WithItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
+    local procedure PrintNotProcessedItemCategories(var Printer: Codeunit "NPR RP Line Print"; var POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PreviousZReportDateTime: DateTime; var WithItemCategoryPriceCheckedCounter: Integer; var AlreadyProcessedItemCategories: List of [Code[20]])
     var
         ItemCategory: Record "Item Category";
         PriceCheckedCounter: Integer;
@@ -331,7 +331,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
             until ItemCategory.Next() = 0;
     end;
 
-    local procedure PrintSalespersonPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintSalespersonPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSUnit: Record "NPR POS Unit";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -355,7 +355,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
                 PrintSalespersonInfo(Printer, SalespersonPurchaser, POSWorkshiftCheckpoint, PrintGenInfo);
     end;
 
-    local procedure PrintSalespersonInfo(var Printer: Codeunit "NPR RP Line Print Mgt."; SalespersonPurchaser: Record "Salesperson/Purchaser"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PrintGenInfo: Boolean)
+    local procedure PrintSalespersonInfo(var Printer: Codeunit "NPR RP Line Print"; SalespersonPurchaser: Record "Salesperson/Purchaser"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; PrintGenInfo: Boolean)
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -424,7 +424,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
             PrintGeneralInfo(Printer, SalespersonPurchaser.Code, POSWorkshiftCheckpoint);
     end;
 
-    local procedure PrintGeneralInfoPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintGeneralInfoPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSUnit: Record "NPR POS Unit";
         PrintGenInfo: Boolean;
@@ -436,7 +436,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
             PrintGeneralInfo(Printer, '', POSWorkshiftCheckpoint);
     end;
 
-    local procedure PrintMoreInfoPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintMoreInfoPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
@@ -473,7 +473,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(AppVersionCaptionLbl, AppVerTxt), 'A11', false, 'LEFT', true, false);
     end;
 
-    local procedure PrintTotalsPart(var Printer: Codeunit "NPR RP Line Print Mgt."; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintTotalsPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     begin
         POSWorkshiftCheckpoint.CalcFields("FF Total Dir. Item Return(LCY)", "FF Total Dir. Item Sales (LCY)");
         PrintThermalLine(Printer, CaptionValueFormat(TotalSalesAmountCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)")), 'A11', false, 'LEFT', true, false);
@@ -487,7 +487,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     #region Printer Helper Functions
 
-    local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print Mgt."; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
+    local procedure PrintThermalLine(var Printer: Codeunit "NPR RP Line Print"; Value: Text; Font: Text; Bold: Boolean; Alignment: Text; CR: Boolean; Underline: Boolean)
     begin
         case true of
             (Font in ['A11', 'B21', 'Control']):
@@ -545,11 +545,11 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
     end;
 
     #endregion Printer Helper Functions
-    local procedure PrintSalesTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
+    internal procedure PrintSalesTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
     var
         POSWorkshTaxCheckp: Record "NPR POS Worksh. Tax Checkp.";
         Printed: Boolean;
-        AmountIncludingTax, TaxAmount, TaxBaseAmount, TaxRoundingAmount, SumOfTotalAmountIncludingTax : Decimal;
+        AmountIncludingTax, SumOfTotalAmountIncludingTax, TaxAmount, TaxBaseAmount, TaxRoundingAmount : Decimal;
     begin
         POSWorkshTaxCheckp.SetCurrentKey("Workshift Checkpoint Entry No.", "Tax %");
         POSWorkshTaxCheckp.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpointEntryNo);
@@ -581,11 +581,11 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         end;
     end;
 
-    local procedure PrintReturnTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
+    internal procedure PrintReturnTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
     var
         POSWorkshTaxCheckp: Record "NPR POS Worksh. Tax Checkp.";
         Printed: Boolean;
-        AmountIncludingTax, TaxAmount, TaxBaseAmount, TaxRoundingAmount, SumOfTotalAmountIncludingTax : Decimal;
+        AmountIncludingTax, SumOfTotalAmountIncludingTax, TaxAmount, TaxBaseAmount, TaxRoundingAmount : Decimal;
     begin
         POSWorkshTaxCheckp.SetCurrentKey("Workshift Checkpoint Entry No.", "Tax %");
         POSWorkshTaxCheckp.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpointEntryNo);
@@ -617,7 +617,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         end;
     end;
 
-    local procedure PrintTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print Mgt."; TaxPct: Decimal; TaxBaseAmount: Decimal; TaxAmount: Decimal; TaxRoundingAmount: Decimal; AmountIncludingTax: Decimal)
+    local procedure PrintTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print"; TaxPct: Decimal; TaxBaseAmount: Decimal; TaxAmount: Decimal; TaxRoundingAmount: Decimal; AmountIncludingTax: Decimal)
     begin
         PrintThermalLine(Printer, CaptionValueFormat(StrSubstNo(TaxBaseAmountCaptionLbl, TaxPct), FormatNumber(TaxBaseAmount)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(StrSubstNo(TaxAmountCaptionLbl, TaxPct), FormatNumber(TaxAmount)), 'A11', false, 'LEFT', true, false);
@@ -625,7 +625,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(StrSubstNo(AmountIncludingTaxCaptionLbl, TaxPct), FormatNumber(AmountIncludingTax)), 'A11', false, 'LEFT', true, false);
     end;
 
-    local procedure PrintPaymentsQuantityOrAmount(var Printer: Codeunit "NPR RP Line Print Mgt."; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer; PrintQuantity: Boolean; IncludeEFTPaymentMethods: Boolean)
+    local procedure PrintPaymentsQuantityOrAmount(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer; PrintQuantity: Boolean; IncludeEFTPaymentMethods: Boolean)
     var
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
@@ -679,7 +679,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         until PaymentBinCheckpoint.Next() = 0;
     end;
 
-    local procedure PrintGeneralInfo(var Printer: Codeunit "NPR RP Line Print Mgt."; SalespersonPurchaserCode: Code[20]; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintGeneralInfo(var Printer: Codeunit "NPR RP Line Print"; SalespersonPurchaserCode: Code[20]; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSAuditLog: Record "NPR POS Audit Log";
         POSEntry: Record "NPR POS Entry";
@@ -690,13 +690,15 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         AmountCards, AmountOther : Decimal;
         CopyTicketAmount: Decimal;
         DiscountAmount: Decimal;
+        Quantity: Decimal;
+        Quantity2: Decimal;
+        Quantity3: Decimal;
+        ReceiptCopyCounter: Integer;
+        ReceiptPrintCounter: Integer;
         ReturnAmount: Decimal;
         CountCards, CountOther : Integer;
         CountReturned: Integer;
         FromEntryNo: Integer;
-        Quantity: Integer;
-        Quantity2: Integer;
-        Quantity3: Integer;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, GeneralInfoCaptionLbl, 'A11', true, 'CENTER', true, false);
@@ -748,14 +750,14 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
         PrintThermalLine(Printer, CaptionValueFormat(POSOpeningQuantityCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
 
-        NOReportStatisticsMgt.CalcCopyAndPrintReceiptsQuantity(POSEntry, CopyTicketAmount, Quantity, Quantity2);
+        NOReportStatisticsMgt.CalcCopyAndPrintReceiptsQuantity(POSEntry, CopyTicketAmount, ReceiptCopyCounter, ReceiptPrintCounter);
 
         Clear(Quantity3);
         Quantity3 := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaserCode, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::CANCEL_SALE_END);
 
         PrintThermalLine(Printer, CaptionValueFormat(NotEndedSalesQuantityCaptionLbl, Format(Quantity3)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(PrintedReceiptsQuantityCaptionLbl, Format(Quantity2)), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(CopiedReceiptsQuantityCaptionLbl, Format(Quantity)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(PrintedReceiptsQuantityCaptionLbl, Format(ReceiptPrintCounter)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(CopiedReceiptsQuantityCaptionLbl, Format(ReceiptCopyCounter)), 'A11', false, 'LEFT', true, false);
 
         Clear(Quantity);
         Quantity := NOReportStatisticsMgt.GetPOSAuditLogCount(SalespersonPurchaserCode, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, POSAuditLog."Action Type"::PRICE_CHECK);
@@ -781,9 +783,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(DeliveryReceiptAmountCaptionLbl, FormatNumber(0)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, CaptionValueFormat(CopyReceiptsAmountCaptionLbl, FormatNumber(CopyTicketAmount)), 'A11', false, 'LEFT', true, false);
-        // TODO: total prepaid
         PrintThermalLine(Printer, CaptionValueFormat(TotalPrepaidCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
-        // TODO: total pro forma
         PrintThermalLine(Printer, CaptionValueFormat(ProformaReceiptsAmountCaptionLbl, Format(0)), 'A11', false, 'LEFT', true, false);
 
         NOReportStatisticsMgt.CalcAmountsFromPOSAuditLogInfo(SalespersonPurchaserCode, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint.SystemCreatedAt, PreviousZReportDateTime, Amount, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE);
@@ -809,14 +809,17 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
     var
         NOReportStatisticsMgt: Codeunit "NPR NO Report Statistics Mgt.";
         AmountCardsCaptionLbl: Label 'Beløp kort', Locked = true;
+        AmountIncludingTaxCaptionLbl: Label '%1% Totalt', Comment = '%1 - specifies VAT %', Locked = true;
         AmountOtherCaptionLbl: Label 'Beløp annet', Locked = true;
         AppVersionCaptionLbl: Label 'App versjon', Locked = true;
         BrutoSalesCaptionLbl: Label 'Bruttoomsetning', Locked = true;
+        CalculatedAmountInclFloatCaptionLbl: Label 'Beregnet beløp', Locked = true;
         CancelledQuantityCaptionLbl: Label 'Antall kansellerte ordrer', Locked = true;
         CategorizedSalesCaptionLbl: Label 'Med varekategori', Locked = true;
         CopiedReceiptsQuantityCaptionLbl: Label 'Antall kopi kvitteringer', Locked = true;
         CopyReceiptsAmountCaptionLbl: Label 'Totalt kopi kvitteringer', Locked = true;
         CorrectionsCaptionLbl: Label 'Korreksjoner pr bruker', Locked = true;
+        CountedAmountInclFloatCaptionLbl: Label 'Telt beløp', Locked = true;
         DateCaptionLbl: Label 'Dato', Locked = true;
         DeliveryReceiptAmountCaptionLbl: Label 'Totalt leverings kvitteringer', Locked = true;
         DeliveryReceiptQtyCaptionLbl: Label 'Antall leverings kvitteringer', Locked = true;
@@ -829,8 +832,6 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         GeneralInfoCaptionLbl: Label 'Generell info', Locked = true;
         InBankCaptionLbl: Label 'Innskudd til bank', Locked = true;
         InitialFloatAmountCaptionLbl: Label 'Kontanter ved start', Locked = true;
-        CountedAmountInclFloatCaptionLbl: Label 'Telt beløp', Locked = true;
-        CalculatedAmountInclFloatCaptionLbl: Label 'Beregnet beløp', Locked = true;
         IssuedVoucherCaptionLbl: Label 'Solgt gavekort', Locked = true;
         ItemCategoryCaptionLbl: Label 'Artikkelgruppe', Locked = true;
         LastSaleCaptionLbl: Label 'Siste salg', Locked = true;
@@ -863,6 +864,12 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         SoldProductsCaptionLbl: Label 'Antall solgte produkter', Locked = true;
         StartCardCaptionLbl: Label 'Kort ved slutt', Locked = true;
         StartOtherCaptionLbl: Label 'Annet ved slutt', Locked = true;
+        SumOfTotalAmountIncludingTaxCaptionLbl: Label 'Totalt', Locked = true;
+        TaxAmountCaptionLbl: Label '%1% MVA', Comment = '%1 - specifies VAT %', Locked = true;
+        TaxBaseAmountCaptionLbl: Label '%1% Grunnlag', Comment = '%1 - specifies VAT %', Locked = true;
+        TaxCaptionLbl: Label 'MVA', Locked = true;
+        TaxOnReturnCaptionLbl: Label 'MVA fra returer', Locked = true;
+        TaxRoundingCaptionLbl: Label '%1% Øreavrunding', Comment = '%1 - specifies VAT %', Locked = true;
         ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
         TotalCardsCaptionLbl: Label 'Totalt kort', Locked = true;
         TotalDifferenceCaptionLbl: Label 'Avvik Totalt', Locked = true;
@@ -876,16 +883,9 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         TrainingReceiptAmountCaptionLbl: Label 'Totalt opplærings kvitteringer', Locked = true;
         TrainingReceiptQtyCaptionLbl: Label 'Antall opplærings kvitteringer', Locked = true;
         UncategorizedSalesCaptionLbl: Label 'Uten varekategori', Locked = true;
-        TaxCaptionLbl: Label 'MVA', Locked = true;
-        TaxOnReturnCaptionLbl: Label 'MVA fra returer', Locked = true;
         VATRegNumberCaptionLbl: Label 'MVA nummer', Locked = true;
         XReportEntryNoCaptionLbl: Label 'X-rapport Serienummer', Locked = true;
         ZeroLinesAmountCaptionLbl: Label 'Beløp Linjeantall redusert til 0', Locked = true;
         ZeroLinesQtyCaptionLbl: Label 'Antal Linjeantall redusert til 0', Locked = true;
         ZReportEntryNoCaptionLbl: Label 'Z-rapport Serienummer', Locked = true;
-        TaxBaseAmountCaptionLbl: Label '%1% Grunnlag', Comment = '%1 - specifies VAT %', Locked = true;
-        TaxAmountCaptionLbl: Label '%1% MVA', Comment = '%1 - specifies VAT %', Locked = true;
-        TaxRoundingCaptionLbl: Label '%1% Øreavrunding', Comment = '%1 - specifies VAT %', Locked = true;
-        AmountIncludingTaxCaptionLbl: Label '%1% Totalt', Comment = '%1 - specifies VAT %', Locked = true;
-        SumOfTotalAmountIncludingTaxCaptionLbl: Label 'Totalt', Locked = true;
 }

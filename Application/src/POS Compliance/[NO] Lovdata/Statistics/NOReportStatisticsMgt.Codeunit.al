@@ -44,11 +44,11 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         POSPaymentMethod: Record "NPR POS Payment Method";
         Amount: Decimal;
     begin
-        POSEntryPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
                 Clear(Amount);
+                POSEntryPaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
                 POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 if POSEntryPaymentLine.FindSet() then
                     repeat
@@ -70,10 +70,10 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
     begin
         Clear(Amount);
         Clear(ReturnAmount);
-        POSSalesLine.SetLoadFields(Type, "Exclude from Posting", Quantity, "Amount Incl. VAT", "Amount Excl. VAT");
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
+                POSSalesLine.SetLoadFields(Quantity, "Amount Incl. VAT");
                 POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 POSSalesLine.SetRange("Type", POSSalesLine.Type::Item);
                 POSSalesLine.SetFilter("Exclude from Posting", '=%1', false);
@@ -171,7 +171,7 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSEntry.Next() = 0;
     end;
 
-    internal procedure CalcReturnSaleDiscountQuantity(var POSEntry: Record "NPR POS Entry"; var DiscountAmount: Decimal; var CountReturned: Integer; var Quantity: Integer; var Quantity2: Integer; var Quantity3: Integer)
+    internal procedure CalcReturnSaleDiscountQuantity(var POSEntry: Record "NPR POS Entry"; var DiscountAmount: Decimal; var CountReturned: Integer; var Quantity: Decimal; var Quantity2: Decimal; var Quantity3: Decimal)
     var
         Count: Integer;
         POSSalesLine: Record "NPR POS Entry Sales Line";
@@ -181,12 +181,11 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         Clear(Quantity);
         Clear(Quantity2);
         Clear(Quantity3);
-
-        POSSalesLine.SetLoadFields(Quantity, "Line Discount Amount Incl. VAT", "Discount Type");
         POSEntry.SetLoadFields("Entry No.");
         if POSEntry.FindSet() then
             repeat
                 Clear(Count);
+                POSSalesLine.SetLoadFields(Quantity, "Line Discount Amount Incl. VAT", "Discount Type");
                 POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 POSSalesLine.SetRange("Type", POSSalesLine.Type::Item);
                 POSSalesLine.SetFilter("Exclude from Posting", '=%1', false);
@@ -208,13 +207,13 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
             until POSEntry.Next() = 0;
     end;
 
-    internal procedure CalcCopyAndPrintReceiptsQuantity(var POSEntry: Record "NPR POS Entry"; var CopyTicketAmount: Decimal; var Quantity: Integer; var Quantity2: Integer)
+    internal procedure CalcCopyAndPrintReceiptsQuantity(var POSEntry: Record "NPR POS Entry"; var CopyTicketAmount: Decimal; var ReceiptCopyCounter: Integer; var ReceiptPrintCounter: Integer)
     var
         POSAuditLog: Record "NPR POS Audit Log";
     begin
         Clear(CopyTicketAmount);
-        Clear(Quantity);
-        Clear(Quantity2);
+        Clear(ReceiptCopyCounter);
+        Clear(ReceiptPrintCounter);
 
         POSEntry.SetLoadFields("Amount Incl. Tax");
         POSAuditLog.SetLoadFields("Acted on POS Entry No.", "Action Type");
@@ -225,11 +224,11 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
 
                 if not POSAuditLog.IsEmpty() then begin
                     CopyTicketAmount += POSEntry."Amount Incl. Tax";
-                    Quantity += POSAuditLog.Count();
+                    ReceiptCopyCounter += POSAuditLog.Count();
                 end;
 
                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::RECEIPT_PRINT);
-                Quantity2 += POSAuditLog.Count();
+                ReceiptPrintCounter += POSAuditLog.Count();
             until POSEntry.Next() = 0;
     end;
 
