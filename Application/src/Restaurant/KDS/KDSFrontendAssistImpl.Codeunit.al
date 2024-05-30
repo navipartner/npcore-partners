@@ -2,6 +2,10 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 {
     Access = Internal;
 
+    var
+        [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', 'NPR35.0')]
+        _SkipServerIDCheck: Boolean;
+
     internal procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text; lastServerId: Text) Response: JsonObject
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";
@@ -411,6 +415,8 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
 
     local procedure CheckServerID(lastServerId: Text)
     begin
+        if _SkipServerIDCheck then
+            exit;
         //Unlike control addin requests, inbound webservice requests can be load balanced across multiple NSTs meaning the cache sync delay can lead to invisible records.
         if (lastServerId = '') or (lastServerId <> Format(ServiceInstanceId())) then
             SelectLatestVersion();
@@ -419,5 +425,11 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     local procedure AddServerIDToResponse(var Response: JsonObject)
     begin
         Response.Add('serverId', Format(ServiceInstanceId()));
+    end;
+
+    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', 'NPR35.0')]
+    internal procedure SetSkipServerIDCheck(Skip: Boolean)
+    begin
+        _SkipServerIDCheck := Skip;
     end;
 }
