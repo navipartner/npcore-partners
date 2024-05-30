@@ -112,7 +112,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
                 InvokeCustomMethod(Method, Context, FrontEnd);
         end;
 
-        if Method <> 'Require' then
+        if not (Method in ['Require', 'SecureMethod']) then
             POSRefreshData.Refresh();
     end;
 
