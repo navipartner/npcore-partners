@@ -4,6 +4,8 @@
 
     var
         _JsonHelper: Codeunit "NPR Json Helper";
+        _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving";
+        _OrderIdTok: label 'orderId', Locked = true;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS UI Management", 'OnConfigureReusableWorkflows', '', true, true)]
     local procedure OnConfigureReusableWorkflows(var Sender: Codeunit "NPR POS UI Management"; POSSession: Codeunit "NPR POS Session"; Setup: Codeunit "NPR POS Setup")
@@ -144,7 +146,19 @@
     begin
         if Method in
             ['RequestWaiterPadData',
-             'RequestRestaurantLayout']
+             'RequestRestaurantLayout',
+             'RequestKitchenOrders',
+             'RequestKDSData',
+             'KDS_GetSetups',
+             'KDS_AcceptChange',
+             'KDS_SetProductionNotStarted',
+             'KDS_SetProductionStarted',
+             'KDS_SetProductionFinished',
+             'KDS_SetOnHold',
+             'KDS_Resume',
+             'KDS_SetServed',
+             'KDS_SendOrderReadyNotifications',
+             'KDS_RevokeServing']
         then
             Handled := true;
 
@@ -156,12 +170,43 @@
                 end;
             'RequestRestaurantLayout':
                 RefreshRestaurantLayout(FrontEnd, GetRestaurantCode(Context, false));
+            'RequestKitchenOrders':
+                RefreshCustomerDisplayKitchenOrders(Context, FrontEnd);
+            'RequestKDSData':
+                RefreshKDSData(Context, FrontEnd);
+            'KDS_GetSetups':
+                GetSetups(Context, FrontEnd);
+
+            'KDS_AcceptChange':
+                RunKitchenAction(Context, _KitchenAction::"Accept Change");
+            'KDS_SetProductionNotStarted':
+                RunKitchenAction(Context, _KitchenAction::"Set Production Not Started");
+            'KDS_SetProductionStarted':
+                RunKitchenAction(Context, _KitchenAction::"Start Production");
+            'KDS_SetProductionFinished':
+                RunKitchenAction(Context, _KitchenAction::"End Production");
+            'KDS_SetOnHold':
+                RunKitchenAction(Context, _KitchenAction::"Set OnHold");
+            'KDS_Resume':
+                RunKitchenAction(Context, _KitchenAction::"Resume");
+            'KDS_SetServed':
+                RunKitchenAction(Context, _KitchenAction::"Set Served");
+            'KDS_RevokeServing':
+                RunKitchenAction(Context, _KitchenAction::"Revoke Serving");
+            'KDS_SendOrderReadyNotifications':
+                CreateOrderReadyNotifications(Context);
         end;
     end;
 
     local procedure GetRestaurantCode(Context: JsonObject; Required: Boolean) RestaurantCode: Code[20]
     begin
         RestaurantCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'restaurantId', Required), 1, MaxStrLen(RestaurantCode));
+    end;
+
+    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure GetKitchenStationIDFilter(Context: JsonObject): Text
+    begin
+        exit(_JsonHelper.GetJText(Context.AsToken(), 'stationId', false));
     end;
 
     internal procedure RefreshWaiterPadData(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; RestaurantCode: Code[20]; LocationCode: Code[20])
@@ -564,5 +609,71 @@
                 StatusObjectContent.Add('icon', NPREFlowStatus."Icon Class");
                 StatusObjectList.Add(StatusObjectContent);
             until NPREFlowStatus.Next() = 0;
+    end;
+
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure RefreshCustomerDisplayKitchenOrders(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+    begin
+        KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
+        FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.RefreshCustomerDisplayKitchenOrders(GetRestaurantCode(Context, false), ''), FrontEnd);
+    end;
+
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure GetSetups(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+    begin
+        KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
+        FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.GetSetups(''), FrontEnd);
+    end;
+
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure RefreshKDSData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+    begin
+        KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
+        FrontEnd.RespondToFrontEndMethod(
+            Context,
+            KDSFrontendAssistImpl.RefreshKDSData(
+                GetRestaurantCode(Context, true),
+                GetKitchenStationIDFilter(Context),
+                _JsonHelper.GetJBoolean(Context.AsToken(), 'includeFinished', false),
+                _JsonHelper.GetJDT(Context.AsToken(), 'startingFrom', false),
+                ''),
+            FrontEnd);
+    end;
+
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure RunKitchenAction(Context: JsonObject; ActionToRun: Option)
+    var
+        KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
+        RestaurantCode: Code[20];
+        KitchenStationFilter: Text;
+        KitchenRequestId: BigInteger;
+        OrderID: BigInteger;
+        KitchenRequestIdTok: label 'kitchenRequestId', Locked = true;
+    begin
+        KitchenRequestId := _JsonHelper.GetJBigInteger(Context.AsToken(), KitchenRequestIdTok, false);
+        OrderID := _JsonHelper.GetJBigInteger(Context.AsToken(), _OrderIdTok, KitchenRequestId = 0);
+        KitchenStationFilter := GetKitchenStationIDFilter(Context);
+        RestaurantCode := GetRestaurantCode(Context, true);
+
+        KDSFrontendAssistImpl.SetSkipServerIDCheck(true);
+        KDSFrontendAssistImpl.RunKitchenAction(RestaurantCode, KitchenStationFilter, KitchenRequestId, OrderID, ActionToRun, '');
+    end;
+
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    local procedure CreateOrderReadyNotifications(Context: JsonObject)
+    var
+        KitchenOrder: Record "NPR NPRE Kitchen Order";
+        NotificationHandler: Codeunit "NPR NPRE Notification Handler";
+        OrderID: BigInteger;
+    begin
+        OrderID := _JsonHelper.GetJBigInteger(Context.AsToken(), _OrderIdTok, true);
+        KitchenOrder.Get(OrderID);
+        NotificationHandler.CreateOrderNotifications(KitchenOrder, "NPR NPRE Notification Trigger"::KDS_ORDER_READY_FOR_SERVING, 0DT);
     end;
 }
