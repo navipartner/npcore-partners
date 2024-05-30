@@ -9,7 +9,7 @@ codeunit 85012 "NPR Library - Ticket XML API"
 
     procedure MakeReservation(OrderCount: Integer; ItemNumber: Code[20]; Quantity: Integer; AdmissionScheduleEntryNo: Integer; MemberReference: Code[20]; ScannerStation: Code[10]; var Token: Text[100]; var ResponseMessage: Text): Boolean
     begin
-        exit(MakeReservation(OrderCount, ItemNumber, Quantity, 0, MemberReference, ScannerStation, 0, 0, Token, ResponseMessage));
+        exit(MakeReservation(OrderCount, ItemNumber, Quantity, AdmissionScheduleEntryNo, MemberReference, ScannerStation, 0, 0, Token, ResponseMessage));
     end;
 
     procedure MakeReservation(OrderCount: Integer;

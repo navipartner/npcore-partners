@@ -632,6 +632,88 @@ codeunit 85013 "NPR TM API SmokeTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure OfflineValidation2()
+    var
+        TmpCreatedTickets, OrderReferenceTickets : Record "NPR TM Ticket" temporary;
+        TmpAdmScheduleEntryResponseOut: Record "NPR TM Admis. Schedule Entry" temporary;
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        TicketingApi: Codeunit "NPR TM TicketingAPI";
+        OfflineValidation: Codeunit "NPR TM OfflineTicketValidation";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseToken: Text;
+        ResponseMessage: Text;
+        ReservationOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        TicketQuantityPerOrder: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+        ReferenceName: Code[20];
+        AdmissionEntryNo: Integer;
+        ReservationDate: Date;
+        ReservationTime: Time;
+    begin
+
+        ItemNo := SelectSimpleReservationTestScenario(10);
+        TicketBom.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBom.FindFirst();
+
+
+        TicketApiLibrary.AdmissionCapacityCheck(TicketBom."Admission Code", CalcDate('<+1D>'), ItemNo, TmpAdmScheduleEntryResponseOut);
+        TmpAdmScheduleEntryResponseOut.FindSet();
+        TmpAdmScheduleEntryResponseOut.Next(2); // There should 10 time slots of 2.4 hours each
+
+        ExternalOrderNo := GenerateCode20();
+        NumberOfTicketOrders := Random(2) + 1;
+        TicketQuantityPerOrder := Random(5) + 1;
+
+        ReservationOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, TmpAdmScheduleEntryResponseOut."Entry No.", MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        TicketingApi.PickupPreConfirmedTicket(ExternalOrderNo, false, false, false, OrderReferenceTickets);
+        OrderReferenceTickets.Reset();
+        OrderReferenceTickets.SetFilter(Blocked, '=%1', false);
+        if (OrderReferenceTickets.FindSet()) then begin
+            repeat
+                // Admit ticket to admissions
+                TicketBom.SetFilter("Item No.", '=%1', OrderReferenceTickets."Item No.");
+                TicketBom.SetFilter("Variant Code", '=%1', OrderReferenceTickets."Variant Code");
+                TicketBom.SetFilter(Default, '=%1', true);
+
+                // Admit each admission code at a time
+                if (TicketBom.FindSet()) then begin
+                    repeat
+                        ReservationDate := 0D;
+                        ReservationTime := 0T;
+                        OfflineValidation.GetReservation(OrderReferenceTickets."No.", TicketBom."Admission Code", AdmissionEntryNo, ReservationDate, ReservationTime);
+
+                        // TEST
+                        Assert.AreEqual(TmpAdmScheduleEntryResponseOut."Entry No.", AdmissionEntryNo, 'Admission Entry No. does not match.');
+
+                        OfflineValidation.AdmitTicketWithoutValidation(OrderReferenceTickets."External Ticket No.", TicketBom."Admission Code", ReservationDate, ReservationTime);
+                    until (TicketBom.Next() = 0);
+                end;
+            until (OrderReferenceTickets.Next() = 0);
+        end;
+
+        // [TEST]
+        // All tickets should be admitted on slot 3
+        AdmScheduleEntry.Get(TmpAdmScheduleEntryResponseOut."Entry No.");
+        AdmScheduleEntry.CalcFields("Open Admitted");
+        Assert.AreEqual(NumberOfTicketOrders * TicketQuantityPerOrder, AdmScheduleEntry."Open Admitted", 'Expected number of tickets to be admitted on slot 3.');
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ConsumeComplementaryItem()
     var
         TmpCreatedTickets: Record "NPR TM Ticket" temporary;
@@ -1411,6 +1493,7 @@ codeunit 85013 "NPR TM API SmokeTest"
         Assert.AreEqual(3, CountedEntries, 'Customized Calendar for Admision Schedule did not impact closed state on timeslot.');
 
     end;
+
 
     [Normal]
     local procedure CreateNonWorkingEntry(var CustomizedCalendar: Record "Customized Calendar Change"; Date: Date)

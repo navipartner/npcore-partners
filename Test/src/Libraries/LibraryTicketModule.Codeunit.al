@@ -180,17 +180,24 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemNo: Code[20];
         TicketTypeCode: Code[10];
         i, SlotSize : Integer;
+        StartTime, EndTime : Time;
     begin
 
         CreateMinimalSetup();
 
         // This scenario creates a ticket setup that requires a reservation time entry that you provide.
 
-        SlotSize := Round((24 * 60 * 60 - 2) / NumberOfTimeSlots, 0.001); // -2 => 00:00:01 -> 23:59:59 interval
+        SlotSize := Round((24 * 60 * 60) / NumberOfTimeSlots, 1);
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
         AdmissionCode := (CreateAdmissionCode(GenerateCode20(), Admission.Type::OCCASION, Admission."Capacity Limits By"::OVERRIDE, Admission."Default Schedule"::SCHEDULE_ENTRY, '', ''));
         for i := 1 to NumberOfTimeSlots do begin
-            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, (000001T + SlotSize * (i - 1) * 1000), (000001T + SlotSize * i * 1000), true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
+            StartTime := 000001T + (SlotSize * (i - 1) * 1000);
+            EndTime := StartTime + (SlotSize * 1000) - 1000;
+
+            if (i = NumberOfTimeSlots) then
+                EndTime := 235959T;
+
+            ScheduleCode := CreateSchedule(GenerateCode20(), AdmissionSchedule."Schedule Type"::"EVENT", AdmissionSchedule."Admission Is"::OPEN, TODAY, AdmissionSchedule."Recurrence Until Pattern"::NO_END_DATE, StartTime, EndTime, true, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, '');
             CreateScheduleLine(AdmissionCode, ScheduleCode, 1, true, 1000, ScheduleLine."Capacity Control"::ADMITTED, '<+5D>', 0, 0, '');
         end;
 
@@ -302,6 +309,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         ItemVariant: Record "Item Variant";
         ItemReference: Record "Item Reference";
         LibraryInventory: Codeunit "NPR Library - Inventory";
+        VatPostingSetup: Record "VAT Posting Setup";
     begin
         LibraryInventory.CreateItem(TicketItem);
 
@@ -309,6 +317,13 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketItem.Blocked := false;
         TicketItem."NPR Group sale" := false;
         TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
+
+        VatPostingSetup.SetFilter("VAT Bus. Posting Group", '<>%1', '');
+        VatPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', TicketItem."VAT Prod. Posting Group");
+        VatPostingSetup.FindFirst();
+
+        TicketItem."VAT Bus. Posting Gr. (Price)" := VatPostingSetup."VAT Bus. Posting Group";
+        TicketItem."Price Includes VAT" := true;
         TicketItem.Modify();
 
         if (VariantCode <> '') then begin
