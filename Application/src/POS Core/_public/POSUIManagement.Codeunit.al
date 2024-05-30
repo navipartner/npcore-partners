@@ -334,6 +334,7 @@
         CaptionsGlobalApply: Label 'Apply';
         CaptionsGlobalAdd:Label 'Add';
         CaptionsGlobalMove:Label 'Move';
+        CaptionsGlobalOpen:Label 'Open';
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
@@ -605,6 +606,7 @@
         WizardModalFinalizeDescriptionLbl: Label 'Confirm your selection';
         GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
         GlobalSettingsModalEditorTabButtonLbl: Label 'Editor';
+        GlobalSettingsModalEditorMaintenanceTabLbl: Label 'Maintenance';
         GlobalSettingsModalRestaurantTabButtonLbl: Label 'Restaurant';
         GlobalSettingsAuthorizationLbl: Label 'Authorization';
         GlobalSettingsDecimalNumberDigitsLbl: Label 'Decimal Number Digits';
@@ -621,6 +623,10 @@
         GlobalSettingsImportOldLayoutSuccessTitleLbl: Label 'Layout imported successfully!';
         GlobalSettingsImportOldLayoutSuccessMessageLbl: Label 'Please be sure to double check the layout and save it.';
         GlobalSettingsPOSLifecycleMethodsLbl:Label 'POS Lifecycle Methods';
+        GlobalSettingsMaintenancePerformanceProfilerLbl:Label 'Performance Profiler';
+        GlobalSettingsStartStopPerfRecordingLbl:Label 'Opens built-in BC page for starting/stopping performance recordings : ';
+        GlobalSettingsMaintenanceErrorHandlingLbl:Label 'Error Handling';
+        GlobalSettingsMaintenanceShowLastStackTraceLbl:Label 'Show last error stacktrace : ';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
@@ -797,6 +803,7 @@
         Captions.Add('Global_Apply', CaptionsGlobalApply);
         Captions.Add('Global_Add', CaptionsGlobalAdd);
         Captions.Add('Global_Move', CaptionsGlobalMove);
+        Captions.Add('Global_Open',CaptionsGlobalOpen);
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
@@ -1062,6 +1069,7 @@
         Captions.Add('Global_Settings_Authorization', GlobalSettingsAuthorizationLbl);
         Captions.Add('Global_Settings_Modal_RestaurantTabButton', GlobalSettingsModalRestaurantTabButtonLbl);
         Captions.Add('Global_Settings_Modal_EditorTabButton', GlobalSettingsModalEditorTabButtonLbl);
+        Captions.Add('Global_Settings_Modal_MaintenanceTab', GlobalSettingsModalEditorMaintenanceTabLbl);
         Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
         Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
         Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
@@ -1089,6 +1097,10 @@
         Captions.Add('Global_Settings_ImportOldLayout_SuccessTitle', GlobalSettingsImportOldLayoutSuccessTitleLbl);
         Captions.Add('Global_Settings_ImportOldLayout_SuccessMessage', GlobalSettingsImportOldLayoutSuccessMessageLbl);
         Captions.Add('Global_Settings_POSLifecycleMethods', GlobalSettingsPOSLifecycleMethodsLbl);
+        Captions.Add('Global_Settings_Maintenance_PerformanceProfiler',GlobalSettingsMaintenancePerformanceProfilerLbl);
+        Captions.Add('Global_Settings_Maintenance_StartStopPerfRecording',GlobalSettingsStartStopPerfRecordingLbl);
+        Captions.Add('Global_Settings_Maintenance_ErrorHandling',GlobalSettingsMaintenanceErrorHandlingLbl);
+        Captions.Add('Global_Settings_Maintenance_ShowLastStackTrace',GlobalSettingsMaintenanceShowLastStackTraceLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
