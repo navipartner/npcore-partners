@@ -1292,6 +1292,9 @@
         MatchImpactedhMixedDiscounts(TempImpactedMixedDiscount, TempImpactedMixedDiscountLine, TempImpactedDiscountCalcBuffer);
         MatchImpactedMixedDiscountCominations(TempImpactedMixedDiscount, TempImpactedMixedDiscountLine, TempImpactedDiscountCalcBuffer);
 
+        TempImpactedMixedDiscountLine.Reset();
+        TempImpactedDiscountCalcBuffer.Reset();
+
         TempImpactedMixedDiscount.Reset();
         FoundMatchingDiscounts := not TempImpactedMixedDiscount.IsEmpty();
     end;
@@ -1317,6 +1320,11 @@
             if not MatchMixDiscount(TempImpactedMixedDiscount, TempImpactedMixedDiscountLine, TempImpactedDiscountCalcBuffer) then begin
                 TempImpactedMixedDiscountLine.Reset();
                 TempImpactedMixedDiscountLine.SetRange(Code, TempImpactedMixedDiscount.Code);
+                TempImpactedMixedDiscountLine.DeleteAll();
+
+                TempImpactedMixedDiscountLine.Reset();
+                TempImpactedMixedDiscountLine.SetRange("Disc. Grouping Type", TempImpactedMixedDiscountLine."Disc. Grouping Type"::"Mix Discount");
+                TempImpactedMixedDiscountLine.SetRange("No.", TempImpactedMixedDiscount.Code);
                 TempImpactedMixedDiscountLine.DeleteAll();
 
                 TempImpactedDiscountCalcBuffer.Reset();
@@ -1350,10 +1358,25 @@
     local procedure MatchMixDiscount(var TempImpactedMixedDiscount: Record "NPR Mixed Discount" temporary; var TempImpactedMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempImpactedDiscountCalcBuffer: Record "NPR Discount Calc. Buffer" temporary) MixedDiscountMatched: Boolean
     var
         TotalQuantity: Decimal;
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        MixedDiscountLotLinesCount: Integer;
+        ImpactedMixedDiscountLotLinesCount: Integer;
     begin
+        if TempImpactedMixedDiscount.Lot then begin
+            MixedDiscountLine.Reset();
+            MixedDiscountLine.SetRange(Code, TempImpactedMixedDiscount.Code);
+            MixedDiscountLotLinesCount := MixedDiscountLine.Count;
+
+            TempImpactedMixedDiscountLine.Reset();
+            TempImpactedMixedDiscountLine.SetRange(Code, TempImpactedMixedDiscount.Code);
+            ImpactedMixedDiscountLotLinesCount := TempImpactedMixedDiscountLine.Count;
+
+            if MixedDiscountLotLinesCount <> ImpactedMixedDiscountLotLinesCount then
+                exit;
+        end;
 
         if (TempImpactedMixedDiscount."Min. Quantity" <= 0) and not TempImpactedMixedDiscount.Lot then
-            exit(false);
+            exit;
 
         TotalQuantity := 0;
 
@@ -1473,23 +1496,25 @@
 
     procedure MatchMixedDiscountCominationImpact(var TempImpactedMixedDiscount: Record "NPR Mixed Discount" temporary; var TempImpactedMixedDiscountLine: Record "NPR Mixed Discount Line" temporary) MatchedMixedDiscountLine: Boolean
     var
-        TempImpactedMixedDiscountPart: Record "NPR Mixed Discount" temporary;
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+        MixedDiscountLinesCount: Integer;
+        ImpactedMixedDiscountLinesCount: Integer;
     begin
-        TempImpactedMixedDiscountPart.Copy(TempImpactedMixedDiscount, true);
-
         TempImpactedMixedDiscountLine.Reset();
         TempImpactedMixedDiscountLine.SetRange(Code, TempImpactedMixedDiscount.Code);
-        TempImpactedMixedDiscountLine.SetRange("Disc. Grouping Type", TempImpactedMixedDiscountLine."Disc. Grouping Type"::"Mix Discount");
-        if TempImpactedMixedDiscountLine.IsEmpty() then
+        TempImpactedMixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Mix Discount");
+        MatchedMixedDiscountLine := TempImpactedMixedDiscountLine.IsEmpty;
+        if MatchedMixedDiscountLine then
             exit;
 
-        TempImpactedMixedDiscountLine.FindSet();
-        repeat
-            if not TempImpactedMixedDiscountPart.Get(TempImpactedMixedDiscountLine."No.") then
-                exit;
-        until TempImpactedMixedDiscountLine.Next() = 0;
+        ImpactedMixedDiscountLinesCount := TempImpactedMixedDiscountLine.Count();
 
-        MatchedMixedDiscountLine := true;
+        MixedDiscountLine.Reset();
+        MixedDiscountLine.SetRange(Code, TempImpactedMixedDiscount.Code);
+        MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::"Mix Discount");
+        MixedDiscountLinesCount := MixedDiscountLine.Count();
+
+        MatchedMixedDiscountLine := (MixedDiscountLinesCount = ImpactedMixedDiscountLinesCount);
     end;
 
     [Obsolete('Not used. Use function MatchMixedDiscountCominationImpact instead', 'NPR31.0')]
@@ -1686,6 +1711,7 @@
         DiscountCalcBufferLastEntryNo: Integer;
         DiscAmount: Decimal;
     begin
+        Clear(TempMixedDiscountLine);
         Clear(TempMixedDiscount);
         TempMixedDiscount.SetRange("Mix Type", TempMixedDiscount."Mix Type"::Standard, TempMixedDiscount."Mix Type"::Combination);
         if TempMixedDiscount.Count() <= 1 then begin
