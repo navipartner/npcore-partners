@@ -199,7 +199,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
             RSGLEntryType::MarginNoVAT:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+                GenJournalLine.Validate("Debit Amount", Abs(RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Posted to G/L", GenJournalLine)) - Abs(CalculationValueEntry."Sales Amount (Actual)"));
         end;
     end;
 
@@ -217,7 +217,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Sales Amount (Actual)"));
             RSGLEntryType::MarginNoVAT:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+                GenJournalLine.Validate("Debit Amount", Abs(RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Posted to G/L", GenJournalLine)) - Abs(CalculationValueEntry."Sales Amount (Actual)"));
         end;
         GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
     end;
@@ -949,6 +949,19 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ReturnDocNo := POSRMALine."Sales Ticket No.";
     end;
 
+    local procedure RoundAmountToCurrencyRounding(AmountToBeRounded: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if GenJnlLine."Currency Code" = '' then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end else begin
+            Currency.Get(GenJnlLine."Currency Code");
+            Currency.TestField("Amount Rounding Precision");
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end;
+    end;
     #endregion
 
     var
