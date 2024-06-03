@@ -3,7 +3,7 @@ permissionset 6014405 "NPR KDS WebService"
 {
     Assignable = true;
     Caption = 'KDS WebService';
-    IncludedPermissionSets = "D365 READ";
+    IncludedPermissionSets = "D365 AUTOMATION";
     Access = Internal;
 
     Permissions =
