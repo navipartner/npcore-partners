@@ -301,7 +301,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             RSGLEntryType::Margin:
                 GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Amount (Actual)");
             RSGLEntryType::MarginNoVAT:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Amount (Actual)", GenJournalLine) - CalculateRSGLVATAmount());
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount());
         end;
@@ -594,6 +594,20 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         ValueEntry."Valued Quantity" := 0;
         ValueEntry."Invoiced Quantity" := 0;
         ValueEntry."Item Ledger Entry Quantity" := 0;
+    end;
+
+    local procedure RoundAmountToCurrencyRounding(AmountToBeRounded: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if GenJnlLine."Currency Code" = '' then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end else begin
+            Currency.Get(GenJnlLine."Currency Code");
+            Currency.TestField("Amount Rounding Precision");
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end;
     end;
     #endregion
 
