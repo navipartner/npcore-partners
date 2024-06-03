@@ -172,7 +172,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             RSGLEntryType::VAT:
                 GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
             RSGLEntryType::MarginNoVAT:
-                GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+                GenJournalLine.Validate("Debit Amount", Abs(RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Posted to G/L", GenJournalLine)) - Abs(CalculationValueEntry."Sales Amount (Actual)"));
         end;
     end;
 
@@ -539,22 +539,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(RetailValueEntry);
     end;
 
-    local procedure ResetValueEntryAmounts(var ValueEntry: Record "Value Entry")
-    begin
-        ValueEntry."Cost Amount (Actual)" := 0;
-        ValueEntry."Cost Amount (Expected)" := 0;
-        ValueEntry."Cost Amount (Non-Invtbl.)" := 0;
-        ValueEntry."Cost Amount (Actual) (ACY)" := 0;
-        ValueEntry."Cost Amount (Expected) (ACY)" := 0;
-        ValueEntry."Cost Amount (Non-Invtbl.)(ACY)" := 0;
-        ValueEntry."Cost per Unit" := 0;
-        ValueEntry."Sales Amount (Actual)" := 0;
-        ValueEntry."Sales Amount (Expected)" := 0;
-        ValueEntry."Valued Quantity" := 0;
-        ValueEntry."Invoiced Quantity" := 0;
-        ValueEntry."Item Ledger Entry Quantity" := 0;
-    end;
-
     local procedure InsertGLItemLedgerRelation(ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
     var
         GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
@@ -827,6 +811,36 @@ codeunit 6151094 "NPR RS Sales GL Addition"
                     end;
             end;
         until ValueEntry.Next() = 0;
+    end;
+
+    local procedure ResetValueEntryAmounts(var ValueEntry: Record "Value Entry")
+    begin
+        ValueEntry."Cost Amount (Actual)" := 0;
+        ValueEntry."Cost Amount (Expected)" := 0;
+        ValueEntry."Cost Amount (Non-Invtbl.)" := 0;
+        ValueEntry."Cost Amount (Actual) (ACY)" := 0;
+        ValueEntry."Cost Amount (Expected) (ACY)" := 0;
+        ValueEntry."Cost Amount (Non-Invtbl.)(ACY)" := 0;
+        ValueEntry."Cost per Unit" := 0;
+        ValueEntry."Sales Amount (Actual)" := 0;
+        ValueEntry."Sales Amount (Expected)" := 0;
+        ValueEntry."Valued Quantity" := 0;
+        ValueEntry."Invoiced Quantity" := 0;
+        ValueEntry."Item Ledger Entry Quantity" := 0;
+    end;
+
+    local procedure RoundAmountToCurrencyRounding(AmountToBeRounded: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if GenJnlLine."Currency Code" = '' then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end else begin
+            Currency.Get(GenJnlLine."Currency Code");
+            Currency.TestField("Amount Rounding Precision");
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end;
     end;
     #endregion
 
