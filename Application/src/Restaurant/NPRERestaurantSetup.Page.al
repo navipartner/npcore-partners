@@ -160,6 +160,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when restaurant layout is modified on restaurant view. Recommended value is "RV_SAVE_LAYOUT"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SaveLayoutActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -170,6 +172,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when a restaurant is selected on restaurant view. Recommended value is "RV_SELECT_RESTAURANT"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SelectRestaurantActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -180,6 +184,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when a seating (table) is selected on restaurant view. Recommended value is "RV_SELECT_TABLE"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SelectTableActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -191,6 +197,8 @@
                     ToolTip = 'The field is not used.';
                     Visible = false;
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = GoToActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -201,6 +209,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when a new waiter pad is created on restaurant view. Recommended value is "RV_NEW_WAITER_PAD"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = NewWaiterPadActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -211,6 +221,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when a waiter pad is selected on restaurant view.';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SelectWaiterPadActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -221,6 +233,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when waiter pad status is changed on restaurant view. Recommended value is "RV_SET_W/PAD_STATUS"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SetWaiterPadStatusActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -231,6 +245,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when table status is changed on restaurant view. Recommended value is "RV_SET_TABLE_STATUS"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SetTableStatusActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -241,6 +257,8 @@
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when party size (number of guests) is changed for a waiter pad on restaurant view. Recommended value is "RV_SET_PARTYSIZE"';
                     ApplicationArea = NPRRetail;
+                    Style = Unfavorable;
+                    StyleExpr = SetNumberOfGuestsActionRefreshNeeded;
 
                     trigger OnAssistEdit()
                     begin
@@ -343,6 +361,19 @@
                     }
                 }
             }
+            action("Refresh Invalid Action Parameters")
+            {
+                Caption = 'Refresh Invalid Action Parameters';
+                Enabled = RefreshEnabled;
+                Image = RefreshText;
+                ToolTip = 'Executes the Refresh Invalid Action Parameters action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    RefreshInvalidActions();
+                end;
+            }
         }
     }
 
@@ -358,8 +389,63 @@
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
     end;
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        UpdateActionsStyles();
+    end;
+
     var
         ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        GoToActionRefreshNeeded: Boolean;
         HasAzureADConnection: Boolean;
+        NewWaiterPadActionRefreshNeeded: Boolean;
+        RefreshEnabled: Boolean;
+        SaveLayoutActionRefreshNeeded: Boolean;
+        SelectRestaurantActionRefreshNeeded: Boolean;
+        SelectTableActionRefreshNeeded: Boolean;
+        SelectWaiterPadActionRefreshNeeded: Boolean;
+        SetNumberOfGuestsActionRefreshNeeded: Boolean;
+        SetTableStatusActionRefreshNeeded: Boolean;
+        SetWaiterPadStatusActionRefreshNeeded: Boolean;
         ShowKDS: Boolean;
+
+    local procedure UpdateActionsStyles()
+    begin
+        SaveLayoutActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Save Layout Action"), Rec."Save Layout Action");
+        SelectRestaurantActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Select Restaurant Action"), Rec."Select Restaurant Action");
+        SelectTableActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Select Table Action"), Rec."Select Table Action");
+        GoToActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Go to POS Action"), Rec."Go to POS Action");
+        NewWaiterPadActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("New Waiter Pad Action"), Rec."New Waiter Pad Action");
+        SelectWaiterPadActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Select Waiter Pad Action"), Rec."Select Waiter Pad Action");
+        SetWaiterPadStatusActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Set Waiter Pad Status Action"), Rec."Set Waiter Pad Status Action");
+        SetTableStatusActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Set Table Status Action"), Rec."Set Table Status Action");
+        SetNumberOfGuestsActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("Set Number of Guests Action"), Rec."Set Number of Guests Action");
+
+        RefreshEnabled :=
+            SaveLayoutActionRefreshNeeded or SelectRestaurantActionRefreshNeeded or SelectTableActionRefreshNeeded or GoToActionRefreshNeeded or
+            NewWaiterPadActionRefreshNeeded or SelectWaiterPadActionRefreshNeeded or SetWaiterPadStatusActionRefreshNeeded or SetTableStatusActionRefreshNeeded or
+            SetNumberOfGuestsActionRefreshNeeded;
+    end;
+
+    local procedure RefreshInvalidActions()
+    begin
+        if SaveLayoutActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Save Layout Action"), Rec."Save Layout Action");
+        if SelectRestaurantActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Select Restaurant Action"), Rec."Select Restaurant Action");
+        if SelectTableActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Select Table Action"), Rec."Select Table Action");
+        if GoToActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Go to POS Action"), Rec."Go to POS Action");
+        if NewWaiterPadActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("New Waiter Pad Action"), Rec."New Waiter Pad Action");
+        if SelectWaiterPadActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Select Waiter Pad Action"), Rec."Select Waiter Pad Action");
+        if SetWaiterPadStatusActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Set Waiter Pad Status Action"), Rec."Set Waiter Pad Status Action");
+        if SetTableStatusActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Set Table Status Action"), Rec."Set Table Status Action");
+        if SetNumberOfGuestsActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("Set Number of Guests Action"), Rec."Set Number of Guests Action");
+    end;
 }
