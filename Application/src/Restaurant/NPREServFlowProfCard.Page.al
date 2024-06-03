@@ -36,6 +36,8 @@
                         ToolTip = 'Specifies the code for the POS action that is used when a new waiter pad is created at the end of a sale. Recommended value is "NEW_WAITER_PAD"';
                         ApplicationArea = NPRRetail;
                         Enabled = Rec."AutoSave to W/Pad on Sale End";
+                        Style = Unfavorable;
+                        StyleExpr = NewWaiterPadActionRefreshNeeded;
 
                         trigger OnAssistEdit()
                         var
@@ -109,16 +111,59 @@
         }
     }
 
+    actions
+    {
+        area(processing)
+        {
+            action("Refresh Invalid Action Parameters")
+            {
+                Caption = 'Refresh Invalid Action Parameters';
+                Enabled = RefreshEnabled;
+                Image = RefreshText;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Executes the Refresh Invalid Action Parameters action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    RefreshInvalidActions();
+                end;
+            }
+        }
+    }
+
     var
         IsCloseOnPayment: Boolean;
+        NewWaiterPadActionRefreshNeeded: Boolean;
+        RefreshEnabled: Boolean;
 
     trigger OnAfterGetCurrRecord()
     begin
         UpdateControls();
+        UpdateActionsStyles();
     end;
 
     local procedure UpdateControls()
     begin
         IsCloseOnPayment := Rec."Close Waiter Pad On" in [Rec."Close Waiter Pad On"::Payment, Rec."Close Waiter Pad On"::"Payment if Served"];
+    end;
+
+    local procedure UpdateActionsStyles()
+    var
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+    begin
+        NewWaiterPadActionRefreshNeeded := ParamMgt.RefreshParametersRequired(Rec.RecordId(), '', Rec.FieldNo("New Waiter Pad Action"), Rec."New Waiter Pad Action");
+        RefreshEnabled := NewWaiterPadActionRefreshNeeded;
+    end;
+
+    local procedure RefreshInvalidActions()
+    var
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+    begin
+        if NewWaiterPadActionRefreshNeeded then
+            ParamMgt.RefreshParameters(Rec.RecordId(), '', Rec.FieldNo("New Waiter Pad Action"), Rec."New Waiter Pad Action");
     end;
 }
