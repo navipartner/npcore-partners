@@ -175,7 +175,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
                 if CalculationValueEntry."Cost Posted to G/L" <> 0 then
                     GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Cost Posted to G/L") - Abs(CalculationValueEntry."Sales Amount (Actual)"))
                 else
-                    GenJournalLine.Validate("Debit Amount", CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader));
+                    GenJournalLine.Validate("Debit Amount", RoundAmountToCurrencyRounding(CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader), GenJournalLine));
         end;
         GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
     end;
@@ -816,7 +816,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         exit(GenPostingSetup."COGS Account");
     end;
 
-
     local procedure ResetValueEntryAmounts(var ValueEntry: Record "Value Entry")
     begin
         ValueEntry."Cost Amount (Actual)" := 0;
@@ -831,6 +830,20 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         ValueEntry."Invoiced Quantity" := 0;
         ValueEntry."Item Ledger Entry Quantity" := 0;
         ValueEntry."Cost per Unit" := 0;
+    end;
+
+    local procedure RoundAmountToCurrencyRounding(AmountToBeRounded: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if GenJnlLine."Currency Code" = '' then begin
+            Currency.InitRoundingPrecision();
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end else begin
+            Currency.Get(GenJnlLine."Currency Code");
+            Currency.TestField("Amount Rounding Precision");
+            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
+        end;
     end;
     #endregion
 
