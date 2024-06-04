@@ -9,7 +9,8 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         ItemTracking_TitleLbl: Label 'Enter Serial Number';
         ParamSelectSerialNo_CaptionLbl: Label 'Select Serial No.';
         ParamSelectSerialNo_DescLbl: Label 'Enable/Disable select Serial No. from the list';
-
+        ParamSelectSerialNoListEmptyInput_CaptionLbl: Label 'Select Serial No. List/Input';
+        ParamSelectSerialNoListEmptyInput_DescLbl: Label 'Enable/Disable select Serial No. from the list after empty input.';
     begin
         WorkflowConfig.SetNonBlockingUI();
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -18,7 +19,7 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('itemTracking_lead', ItemTracking_LeadLbl);
         WorkflowConfig.AddLabel('itemTracking_instructions', ItemTracking_InstrLbl);
         WorkflowConfig.AddBooleanParameter('SelectSerialNo', false, ParamSelectSerialNo_CaptionLbl, ParamSelectSerialNo_DescLbl);
-
+        WorkflowConfig.AddBooleanParameter('SelectSerialNoListEmptyInput', false, ParamSelectSerialNoListEmptyInput_CaptionLbl, ParamSelectSerialNoListEmptyInput_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text;
@@ -78,9 +79,11 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         NPRPOSActionSetSerialNoB: Codeunit "NPR POS Action Set Serial No B";
         SerialNoInput: Text[50];
         SerialSelectionFromList: Boolean;
-
+        ValidateSerialSelectionFromList: Boolean;
+        SelectSerialNoListEmptyInput: Boolean;
     begin
         if Context.GetBooleanParameter('SelectSerialNo', SerialSelectionFromList) then;
+        if Context.GetBooleanParameter('SelectSerialNoListEmptyInput', SelectSerialNoListEmptyInput) then;
 #pragma warning disable AA0139
         if Context.HasProperty('SerialNoInput') then
             SerialNoInput := Context.GetString('SerialNoInput');
@@ -88,9 +91,10 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
 
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
+        ValidateSerialSelectionFromList := (SelectSerialNoListEmptyInput and SerialSelectionFromList and (SerialNoInput = '')) or (SerialSelectionFromList and not SelectSerialNoListEmptyInput);
         NPRPOSActionSetSerialNoB.AssignSerialNo(SalelinePOS,
                                                 SerialNoInput,
-                                                SerialSelectionFromList,
+                                                ValidateSerialSelectionFromList,
                                                 Setup);
     end;
     // #endregion AssignSerialNo
@@ -99,7 +103,7 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSetSerialNo.js###
-'let main=async({workflow:e,context:s,scope:l,popup:i,parameters:t,captions:a})=>{const{hasSerialNo:n,hasSerialNoResponseMessage:r,requiresSerialNo:o,useSpecificTracking:c}=await e.respond("CheckLineTracking");if(n&&!await i.confirm(r)||(!t.SelectSerialNo||!c)&&(e.context.SerialNoInput=await i.input({title:a.itemTracking_title,caption:a.itemTracking_lead}),e.context.SerialNoInput===null))return"";await e.respond("AssignSerialNo")};'
+'let main=async({workflow:e,context:r,scope:s,popup:t,parameters:i,captions:a})=>{const{hasSerialNo:n,hasSerialNoResponseMessage:c,requiresSerialNo:S,useSpecificTracking:l}=await e.respond("CheckLineTracking");if(n&&!await t.confirm(c)||(!i.SelectSerialNo||!l||i.SelectSerialNo&&i.SelectSerialNoListEmptyInput)&&(e.context.SerialNoInput=await t.input({title:a.itemTracking_title,caption:a.itemTracking_lead}),e.context.SerialNoInput===null))return"";await e.respond("AssignSerialNo")};'
         )
     end;
 
