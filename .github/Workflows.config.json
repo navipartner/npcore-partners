@@ -65,7 +65,8 @@
         "NPRDKFiscal",
         "NPRHUMultiSoftEInv",
         "NPRShopify",
-	"NPRSECleanCash"],
+		"NPRSECleanCash",
+		"NPRATFiscal"],
         "exceptions": [
             {
                 "id": 6151094,
