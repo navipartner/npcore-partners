@@ -6,6 +6,7 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActMergSimlLinesEvents: Codeunit "NPR POSActMergSimlLinesEvents";
         NoLinesErr: Label 'No adequate sale lines are available in the current sale';
         CollapseNotSupportedMsg: Label 'Collapse is not supported for the Items: %1';
         NotCollapsedItems: text;
@@ -17,6 +18,8 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter("Discount Type", '<>%1', SaleLinePOS."Discount Type"::Manual);
+
+        POSActMergSimlLinesEvents.OnBeforeFindLinesToCollapse(SalePOS, SaleLinePOS);
         if not SaleLinePOS.FindSet() then
             Error(NoLinesErr);
 
@@ -30,10 +33,12 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.SetRange("Unit of Measure Code", SaleLinePOS."Unit of Measure Code");
             SaleLinePOS.SetRange("Discount %", SaleLinePOS."Discount %");
 
+            POSActMergSimlLinesEvents.OnBeforeFindSimilarLinesToCollapse(SalePOS, SaleLinePOS);
             if SaleLinePOS.Count() > 1 then begin
 
                 CollapseSupported := true;
                 OnBeforeCollapseSaleLine(SaleLinePOS, CollapseSupported);
+                POSActMergSimlLinesEvents.OnBeforeCollapseSaleLine(SaleLinePOS, CollapseSupported);
                 if not CollapseSupported then
                     CollectNotCollapsedItem(NotCollapsedItems, SaleLinePOS."No.")
                 else begin
@@ -58,6 +63,8 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             SaleLinePOS.SetRange("Unit Price");
             SaleLinePOS.SetRange("Unit of Measure Code");
             SaleLinePOS.SetRange("Discount %");
+
+            POSActMergSimlLinesEvents.OnAfterFindLinesToCollapse(SalePOS, SaleLinePOS);
         until SaleLinePOS.Next() = 0;
 
         if NotCollapsedItems <> '' then
@@ -85,6 +92,7 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             NotCollapsedItems += ', ' + ItemNo;
     end;
 
+    [Obsolete('Not used anymore. Use OnBeforeCollapseSaleLine in codenunit NPR POSActMergSimlLinesEvents instead.', 'NPR35.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCollapseSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var CollapseSupported: Boolean)
     begin
