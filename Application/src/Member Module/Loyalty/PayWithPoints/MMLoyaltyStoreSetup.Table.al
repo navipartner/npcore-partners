@@ -110,6 +110,16 @@
             OptionCaption = 'Today,Previous Month';
             OptionMembers = TODAY,PREVIOUS_MONTH;
         }
+        field(70; CancelReservationFromDate; Date)
+        {
+            Caption = 'Cancel Reservation From Date';
+            DataClassification = CustomerContent;
+        }
+        field(75; ReservationMaxAge; DateFormula)
+        {
+            Caption = 'Reservation Max Age';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Date Filter"; Date)
         {
             Caption = 'Date Filter';

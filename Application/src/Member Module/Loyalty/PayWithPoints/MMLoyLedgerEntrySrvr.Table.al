@@ -93,6 +93,15 @@
             Editable = false;
             FieldClass = FlowField;
         }
+
+        field(1001; "Reservation is Cancelled"; Boolean)
+        {
+            CalcFormula = Exist("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),
+                                                                    "Entry Type" = CONST(RESERVE_CANCELLED)));
+            Caption = 'Reservation is Cancelled';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -100,6 +109,8 @@
         key(Key1; "Entry No.")
         {
         }
+        key(Key2; "Authorization Code")
+        { }
     }
 
     fieldgroups

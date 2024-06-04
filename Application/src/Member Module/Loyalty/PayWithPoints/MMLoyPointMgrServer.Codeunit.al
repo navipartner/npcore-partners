@@ -28,12 +28,15 @@
         PAYMENT_2: Label 'The reserved number of points with authorization code %1 does not match points in payment.';
         PAYMENT_3: Label 'Currency code must be equal to company currency code (%1) and not blank.';
         PAYMENT_4: Label 'The attempted reserved number of points (%1), exceed the members current balance (%2).';
+        CANCEL_1: Label 'The authorization code %1 has been captured and can not be cancelled.';
+        CANCEL_2: Label 'The authorization code %1 has been cancelled and can not be captured.';
         SALE_1: Label 'Incorrect sign.';
         JNL_NOT_EMPTY: Label 'The %1 %2 is not empty. Confirm YES to delete lines and proceed.';
         SELECT_JNL_TYPE: Label 'Select journal template type:';
 
         _MembershipEvents: Codeunit "NPR MM Membership Events";
 
+    [CommitBehavior(CommitBehavior::Error)]
     procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -56,7 +59,6 @@
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
-
         // Store the request in the store ledger
         TmpAuthorizationIn.FindFirst();
         LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
@@ -100,6 +102,7 @@
         exit(true);
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -151,6 +154,85 @@
         TmpPointsOut.Insert();
         exit(true);
     end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure CancelReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCancelLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    var
+        LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        Membership: Record "NPR MM Membership";
+        LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        MembershipEntryNo: Integer;
+    begin
+
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+            exit(false);
+
+        TmpCancelLinesIn.Reset();
+        TmpCancelLinesIn.FindFirst();
+        if (TmpCancelLinesIn."Authorization Code" = '') then begin
+            ResponseMessage := StrSubstNo(RESERVE_1, '', 1);
+            ResponseMessageId := '-1300';
+            exit(false);
+        end;
+
+        ReservationLedgerEntry.SetCurrentKey("Authorization Code");
+        ReservationLedgerEntry.SetAutoCalcFields("Reservation is Captured", "Reservation is Cancelled");
+        ReservationLedgerEntry.SetFilter("Authorization Code", '=%1', TmpCancelLinesIn."Authorization Code");
+        ReservationLedgerEntry.SetFilter("Entry Type", '=%1', ReservationLedgerEntry."Entry Type"::RESERVE);
+        if (ReservationLedgerEntry.FindFirst()) then begin
+            if (ReservationLedgerEntry."Reservation is Captured") then begin
+                ResponseMessage := StrSubstNo(CANCEL_1, TmpCancelLinesIn."Authorization Code");
+                ResponseMessageId := '-1301';
+                exit(false);
+            end;
+
+            if (ReservationLedgerEntry."Reservation is Cancelled") then begin
+                ReservationLedgerEntry.SetFilter("Entry Type", '=%1', ReservationLedgerEntry."Entry Type"::CANCEL_RESERVE);
+                ReservationLedgerEntry.FindFirst();
+                TmpPointsOut.TransferFields(ReservationLedgerEntry, true);
+                TmpPointsOut.Insert();
+                exit(true);
+            end;
+
+        end else begin
+            ResponseMessage := StrSubstNo(RESERVE_1, TmpCancelLinesIn."Authorization Code", 3);
+            ResponseMessageId := '-1302';
+            exit(false);
+        end;
+
+        Membership.Get(MembershipEntryNo);
+
+        // Store the cancel request in the store ledger
+        TmpAuthorizationIn.FindFirst();
+        LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
+
+        LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::CANCEL_RESERVE;
+        LoyaltyStoreLedger."Authorization Code" := TmpCancelLinesIn."Authorization Code";
+        LoyaltyStoreLedger."Retail Id" := TmpAuthorizationIn."Retail Id";
+        LoyaltyStoreLedger."Entry No." := 0;
+
+        if (TmpCancelLinesIn.Type = TmpCancelLinesIn.Type::CANCEL_RESERVATION) then
+            if (not CreateCancelReserveEntry(TmpCancelLinesIn."Authorization Code", LoyaltyStoreLedger."Burned Points")) then begin
+                ResponseMessage := StrSubstNo(RESERVE_1, TmpCancelLinesIn."Authorization Code", 4);
+                ResponseMessageId := '-1303';
+                exit(false);
+            end;
+
+        // finalize store ledger and response
+        Membership.CalcFields("Remaining Points");
+
+        LoyaltyStoreLedger.Balance := Membership."Remaining Points";
+        LoyaltyStoreLedger.Insert();
+
+        LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", 0);
+
+        TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
+        TmpPointsOut.Insert();
+        exit(true);
+    end;
+
 
     procedure GetLoyaltySetup(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
@@ -282,6 +364,9 @@
             exit(false);
         end;
 
+        if (TmpAuthorizationIn."Entry Type" = TmpAuthorizationIn."Entry Type"::CANCEL_RESERVE) then
+            exit(true);
+
         LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', LoyaltyServerStoreLedger."Entry Type"::RECEIPT);
         LoyaltyServerStoreLedger.SetFilter("Reference Number", '=%1', TmpAuthorizationIn."Reference Number");
         LoyaltyServerStoreLedger.SetFilter("Company Name", '=%1', TmpAuthorizationIn."Company Name");
@@ -384,52 +469,36 @@
                     end;
 
                     // make sure there is a reservation entry
-                    LoyaltyServerStoreLedger.SetFilter("Authorization Code", '=%1', TmpPaymentLines."Authorization Code");
-                    if (not LoyaltyServerStoreLedger.FindLast()) then begin
-                        ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 1);
-                        ResponseMessageId := '-1158';
-                        exit(false);
-                    end;
+                    if (TmpPaymentLines."Authorization Code" <> '') then begin
+                        LoyaltyServerStoreLedger.SetCurrentKey("Authorization Code", "Entry Type");
+                        LoyaltyServerStoreLedger.SetFilter("Authorization Code", '=%1', TmpPaymentLines."Authorization Code");
+                        LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', LoyaltyServerStoreLedger."Entry Type"::RESERVE);
+                        if (not LoyaltyServerStoreLedger.FindLast()) then begin
+                            ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 1);
+                            ResponseMessageId := '-1158';
+                            exit(false);
+                        end;
 
-                    if (TmpPaymentLines.Type = TmpPaymentLines.Type::PAYMENT) then begin
-                        if (LoyaltyServerStoreLedger."Entry Type" <> LoyaltyServerStoreLedger."Entry Type"::RESERVE) then begin
-                            ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 2);
-                            ResponseMessageId := '-1159';
+                        // payment points is transferred as positive, but stored as a negative
+                        if ((LoyaltyServerStoreLedger."Burned Points" + TmpPaymentLines."Total Points") <> 0) then begin
+                            ResponseMessage := StrSubstNo(PAYMENT_2, TmpPaymentLines."Authorization Code");
+                            ResponseMessageId := '-1160';
+                            exit(false);
+                        end;
+
+                        LoyaltyServerStoreLedger.CalcFields("Reservation is Captured");
+                        if (LoyaltyServerStoreLedger."Reservation is Captured") then begin
+                            ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 4);
+                            ResponseMessageId := '-1161';
+                            exit(false);
+                        end;
+
+                        if (IsReservationCancelled(TmpPaymentLines."Authorization Code")) then begin
+                            ResponseMessage := StrSubstNo(CANCEL_2, TmpPaymentLines."Authorization Code");
+                            ResponseMessageId := '-2062'; // This needs to be fatal in client. 
                             exit(false);
                         end;
                     end;
-
-                    if (TmpPaymentLines.Type = TmpPaymentLines.Type::REFUND) then begin
-                        if (LoyaltyServerStoreLedger."Entry Type" <> LoyaltyServerStoreLedger."Entry Type"::RESERVE) then begin
-                            ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 5);
-                            ResponseMessageId := '-1159';
-                            exit(false);
-                        end;
-                    end;
-
-                    // payment points is transferred as positive, but stored as a negative
-                    if ((LoyaltyServerStoreLedger."Burned Points" + TmpPaymentLines."Total Points") <> 0) then begin
-                        ResponseMessage := StrSubstNo(PAYMENT_2, TmpPaymentLines."Authorization Code");
-                        ResponseMessageId := '-1160';
-                        exit(false);
-                    end;
-
-                    LoyaltyServerStoreLedger.CalcFields("Reservation is Captured");
-                    if (LoyaltyServerStoreLedger."Reservation is Captured") then begin
-                        ResponseMessage := StrSubstNo(RESERVE_1, TmpPaymentLines."Authorization Code", 4);
-                        ResponseMessageId := '-1161';
-                        exit(false);
-                    end;
-
-                    // Remove the reserved amount
-                    MembershipPointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
-                    MembershipPointsEntry.SetFilter("Authorization Code", '=%1', TmpPaymentLines."Authorization Code");
-                    MembershipPointsEntry.SetFilter("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::RESERVE);
-                    if (MembershipPointsEntry.FindLast()) then begin
-                        MembershipPointsEntry.Points := 0;
-                        MembershipPointsEntry.Modify();
-                    end;
-
                 end;
             until (TmpPaymentLines.Next() = 0);
         end;
@@ -438,6 +507,22 @@
             ResponseMessage := StrSubstNo(PAYMENT_1, BurnedPoints, EarnedPoints);
             ResponseMessageId := '-1190';
             exit(false);
+        end;
+
+        TmpPaymentLines.Reset();
+        if (TmpPaymentLines.FindSet()) then begin
+            repeat
+                // Remove the reserved amount
+                if (TmpPaymentLines."Authorization Code" <> '') then begin
+                    MembershipPointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
+                    MembershipPointsEntry.SetFilter("Authorization Code", '=%1', TmpPaymentLines."Authorization Code");
+                    MembershipPointsEntry.SetFilter("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::RESERVE);
+                    if (MembershipPointsEntry.FindLast()) then begin
+                        MembershipPointsEntry.Points := 0;
+                        MembershipPointsEntry.Modify();
+                    end;
+                end;
+            until (TmpPaymentLines.Next() = 0);
         end;
 
         exit(true);
@@ -644,6 +729,62 @@
 
         _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
+    end;
+
+    local procedure IsReservationCancelled(AuthorizationCode: Text[40]): Boolean
+    var
+        ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
+    begin
+        if (AuthorizationCode = '') then
+            exit(false);
+
+        ReservationLedgerEntry.SetCurrentKey("Authorization Code");
+        ReservationLedgerEntry.SetFilter("Authorization Code", '=%1', AuthorizationCode);
+        ReservationLedgerEntry.SetFilter("Entry Type", '=%1', ReservationLedgerEntry."Entry Type"::CANCEL_RESERVE);
+        exit(not ReservationLedgerEntry.IsEmpty());
+    end;
+
+    internal procedure ExpireReservations(SourceReservation: Record "NPR MM Loy. LedgerEntry (Srvr)")
+    var
+        CancelReservationEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        ReversedPoints: Integer;
+    begin
+        CancelReservationEntry.TransferFields(SourceReservation, false);
+        CancelReservationEntry."Entry No." := 0;
+        CancelReservationEntry."Entry Type" := CancelReservationEntry."Entry Type"::CANCEL_RESERVE;
+        CancelReservationEntry."Foreign Transaction Id" := StrSubstNo('Expired %1', CurrentDateTime());
+        CancelReservationEntry."Transaction Date" := Today();
+        CancelReservationEntry."Transaction Time" := Time;
+        CancelReservationEntry."Earned Points" -= CancelReservationEntry."Earned Points";
+        CancelReservationEntry."Burned Points" -= CancelReservationEntry."Burned Points";
+        CancelReservationEntry.Balance := 0;
+
+        if (CreateCancelReserveEntry(CancelReservationEntry."Authorization Code", ReversedPoints)) then
+            CancelReservationEntry.Insert();
+
+    end;
+
+    local procedure CreateCancelReserveEntry(AuthorizationCodeToCancel: Text[40]; var ReversedPoints: Integer): Boolean
+    var
+        MembershipPointsEntry: Record "NPR MM Members. Points Entry";
+    begin
+        ReversedPoints := 0;
+        MembershipPointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
+        MembershipPointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
+        MembershipPointsEntry.SetFilter("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::RESERVE);
+        if (not MembershipPointsEntry.FindLast()) then
+            exit(false);
+
+        MembershipPointsEntry."Entry No." := 0;
+        MembershipPointsEntry."Entry Type" := MembershipPointsEntry."Entry Type"::RESERVE_CANCELLED;
+        MembershipPointsEntry.Points *= -1;
+        MembershipPointsEntry."Awarded Points" *= -1;
+        MembershipPointsEntry."Amount (LCY)" *= -1;
+        MembershipPointsEntry."Awarded Amount (LCY)" *= -1;
+        MembershipPointsEntry.Insert();
+        ReversedPoints := MembershipPointsEntry.Points;
+
+        exit(true);
     end;
 
     local procedure CreateNotEligibleEntry(LoyaltySetup: Record "NPR MM Loyalty Setup"; var LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)"; Membership: Record "NPR MM Membership"; TotalEarnAmount: Decimal; TotalBurnAmount: Decimal)

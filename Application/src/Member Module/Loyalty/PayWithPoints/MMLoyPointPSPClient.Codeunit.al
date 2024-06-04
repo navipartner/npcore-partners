@@ -85,6 +85,53 @@
         LoyaltyPointsMgrClient.ValidateServiceRequest(EftTransactionRequest);
     end;
 
+    internal procedure CreateEftVoidRequest(PaymentLine: Record "NPR POS Sale Line"; var EftTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    begin
+        EFTTransactionRequest.SetRange("Sales Ticket No.", PaymentLine."Sales Ticket No.");
+        EFTTransactionRequest.SetRange("Sales Line No.", PaymentLine."Line No.");
+        EFTTransactionRequest.SetRange(Reversed, false);
+        if (not EFTTransactionRequest.FindFirst()) then
+            exit(false);
+
+        if (not EftTransactionRequest.IsType(IntegrationName())) then
+            exit(false);
+
+        exit(CreateVoidRequestEntry(EFTTransactionRequest));
+    end;
+
+    local procedure CreateVoidRequestEntry(var EftTransactionRequest: Record "NPR EFT Transaction Request"): Boolean
+    var
+        CancelReservation: Label 'CANCEL RESERVATION', MaxLength = 100;
+    begin
+        if (not EftTransactionRequest.IsType(IntegrationName())) then
+            exit(false);
+
+        if (not (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT,
+                                                                   EftTransactionRequest."Processing Type"::REFUND])) then
+            exit(false);
+
+        if (EftTransactionRequest.Reversed) then
+            exit(false);
+
+        EftTransactionRequest."Amount Input" := -EftTransactionRequest."Amount Input";
+        EftTransactionRequest."Processed Entry No." := EftTransactionRequest."Entry No.";
+
+        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::VOID;
+        EftTransactionRequest.Recoverable := false;
+        EftTransactionRequest.Started := CurrentDateTime();
+        Clear(EFTTransactionRequest.Finished);
+
+        EftTransactionRequest."POS Description" := CancelReservation;
+        EftTransactionRequest."Result Processed" := false;
+        EftTransactionRequest."Result Code" := 0;
+        EftTransactionRequest.Successful := false;
+        EftTransactionRequest."Result Amount" := 0;
+        EftTransactionRequest."Result Description" := '';
+        EftTransactionRequest."Entry No." := 0;
+        EftTransactionRequest.Insert(true);
+        exit(true);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnPrepareRequestSend', '', false, false)]
     local procedure OnCreateHwcEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Request: JsonObject; var RequestMechanism: Enum "NPR EFT Request Mechanism"; var Workflow: Text)
     var
@@ -100,7 +147,6 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnAfterFinancialCommit', '', false, false)]
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "NPR EFT Transaction Request")
     begin
-
         if (not EftTransactionRequest.IsType(IntegrationName())) then
             exit;
 
@@ -113,15 +159,16 @@
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-
-        if (LoyaltyPointsMgrClient.CreateRegisterSalesEftTransaction(IntegrationName(), SaleHeader, EFTTransactionRequest)) then
+        if (LoyaltyPointsMgrClient.CreateRegisterSalesEftTransaction(IntegrationName(), SaleHeader, EFTTransactionRequest)) then begin
             LoyaltyPointsMgrClient.PrepareServiceRequest(EFTTransactionRequest);
+            LoyaltyPointsMgrClient.MakeServiceRequest(EFTTransactionRequest);
+        end;
     end;
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
-        LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Integration Type", "Processing Type");
@@ -130,10 +177,9 @@
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::AUXILIARY);
         EFTTransactionRequest.SetRange("Auxiliary Operation ID", 1);
         EFTTransactionRequest.SetRange("Result Code", 119);
-        if (EFTTransactionRequest.FindFirst()) then begin
-            LoyaltyPointsMgrClient.MakeServiceRequest(EFTTransactionRequest);
+        if (EFTTransactionRequest.FindFirst()) then
             EFTTransactionRequest.PrintReceipts(false);
-        end;
     end;
+
 }
 
