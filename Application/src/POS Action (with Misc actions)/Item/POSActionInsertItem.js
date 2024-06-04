@@ -83,7 +83,7 @@ async function processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWit
             context.bomComponentLineWithoutSerialLotNo = bomComponentLinesWithoutSerialLotNo[i];
             
             if(context.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput){
-                if (parameters.SelectSerialNo && context.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo) {
+                if ((parameters.SelectSerialNo && !parameters.SelectSerialNoListEmptyInput) && context.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo) {
                     response = await workflow.respond("assignSerialNo");
 
                     if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {
@@ -93,7 +93,7 @@ async function processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWit
                 else {                
                     context.serialNoInput = await popup.input({ title: captions.itemTracking_title, caption: format(captions.bomItemTracking_Lead, context.bomComponentLineWithoutSerialLotNo.description, context.bomComponentLineWithoutSerialLotNo.parentBOMDescription) })
 
-                    if (context.serialNoInput) {
+                    if (context.serialNoInput || parameters.SelectSerialNoListEmptyInput) {
                         response = await workflow.respond("assignSerialNo");
 
                         if (!response.assignSerialNoSuccess && response.assignSerialNoSuccessErrorText) {

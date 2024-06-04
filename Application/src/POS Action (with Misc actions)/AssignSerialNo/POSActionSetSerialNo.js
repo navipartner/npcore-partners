@@ -7,7 +7,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
             }
     }
 
-    if (!parameters.SelectSerialNo || !useSpecificTracking) {
+    if (!parameters.SelectSerialNo || !useSpecificTracking || (parameters.SelectSerialNo && parameters.SelectSerialNoListEmptyInput)) {
         workflow.context.SerialNoInput = await popup.input({ title: captions.itemTracking_title, caption: captions.itemTracking_lead })
         if (workflow.context.SerialNoInput === null) {
             return ("");

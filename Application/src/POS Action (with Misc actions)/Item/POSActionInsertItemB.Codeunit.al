@@ -504,9 +504,9 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
     end;
 
-    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean; var RequiresLotNoInputPrompt: Boolean; RequiresLotNoInput: Boolean; RequiresSpecificLotNo: Boolean)
+    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean; var RequiresLotNoInputPrompt: Boolean; RequiresLotNoInput: Boolean; RequiresSpecificLotNo: Boolean; SelectSerialNoListEmptyInput: Boolean; InputSerial: Text)
     begin
-        RequiresSerialNoInputPrompt := RequiresSerialNoInput and ((GetSerialNoFromList and not RequiresSpecificSerialNo) or not GetSerialNoFromList);
+        RequiresSerialNoInputPrompt := RequiresSerialNoInput and ((GetSerialNoFromList and not RequiresSpecificSerialNo) or (GetSerialNoFromList and SelectSerialNoListEmptyInput and (InputSerial = '')) or not GetSerialNoFromList);
         RequiresUnitPriceInputPrompt := RequiresUnitPriceInput and not UsePresetUnitPrice;
         RequiresLotNoInputPrompt := RequiresLotNoInput or RequiresSpecificLotNo;
         ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt or RequiresLotNoInputPrompt;
