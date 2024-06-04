@@ -327,6 +327,42 @@ codeunit 85107 "NPR MM Loyalty Test"
             Error('This test should fail because membership has no points yet.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_ReserveCancel()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        RequestXmlText: Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        TempPaymentLinesRequest.FindFirst();
+        TempPaymentLinesRequest.Type := TempPaymentLinesRequest.Type::CANCEL_RESERVATION;
+        TempPaymentLinesRequest."Authorization Code" := LibraryLoyalty.CreateAuthorizationCode();
+        TempPaymentLinesRequest.Modify();
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateCancelReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_CancelReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        ImportEntry.SetFilter("Document ID", '=%1', DocumentId);
+        ImportEntry.FindFirst();
+        ImportEntry.TestField(Imported, true);
+        ImportEntry.TestField("Runtime Error", false);
+
+        if (ResponseCode = 'OK') then
+            Error('This test should fail because no reservation was made.');
+    end;
+
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -495,6 +531,117 @@ codeunit 85107 "NPR MM Loyalty Test"
         _Assert.AreEqual(PointsToEarn + Points, _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (2).');
 
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_EarnAndCancelReservation()
+    var
+        LibraryLoyalty: Codeunit "NPR Library MemberLoyalty";
+
+        ClientLoyaltyPointsMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        RequestXmlText: Text;
+        ResponseCode: Code[20];
+        ResponseMessage: Text;
+        DocumentId: Text;
+        PointsToEarn, PointsToBurn, RemainingPoints : Integer;
+        ReservationToken: Text[40];
+        LoyaltyCode: Code[20];
+        Qty: Decimal;
+        Amount: Decimal;
+        Points: Integer;
+    begin
+        LoyaltyCode := SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+
+        // Earn points on sale
+        PointsToEarn := 170;
+        SetPointsToEarn(PointsToEarn, TempSalesLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Earn points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(PointsToEarn, _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points after RegisterSale.');
+        RemainingPoints := _LastMembership."Remaining Points";
+
+        TempPointsResponse.FindFirst();
+        _LastMembership.CalcFields("Remaining Points", "Awarded Points (Sale)");
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (1).');
+        _Assert.AreEqual(TempSalesLinesRequest."Total Points", _LastMembership."Awarded Points (Sale)", 'Membership awarded points does not matched earned points (1).');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Reserve points to burn
+        PointsToBurn := 47;
+        LibraryLoyalty.CreatePaymentLine(0, PointsToBurn, '', TempPaymentLinesRequest);
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_ReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Reserve points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual((PointsToEarn - PointsToBurn), _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points (2).');
+
+        TempPointsResponse.FindFirst();
+        ReservationToken := TempPointsResponse."Authorization Code";
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        // Cancel reservation
+        LibraryLoyalty.CreatePaymentLine(0, 0, ReservationToken, TempPaymentLinesRequest);
+        TempPaymentLinesRequest.Type := TempPaymentLinesRequest.Type::CANCEL_RESERVATION;
+        TempPaymentLinesRequest."Authorization Code" := ReservationToken;
+        TempPaymentLinesRequest.Modify();
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateCancelReservePointsTestXml(TempAuthorization, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_CancelReservePoints_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'OK') then
+            Error('Cancel points failed: %1 - %2', ResponseCode, ResponseMessage);
+
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(RemainingPoints, _LastMembership."Remaining Points", 'Membership remaining points does not matched earned points after reservation was cancelled.');
+
+        // Prepare next request
+        TempSalesLinesRequest.DeleteAll();
+        TempPaymentLinesRequest.DeleteAll();
+        TempPointsResponse.DeleteAll();
+
+        TempAuthorization."Reference Number" := GenerateSafeCode20();
+        TempAuthorization.Modify();
+
+        Qty := 1;
+        Amount := 42.49;
+        Points := 55;
+        LibraryLoyalty.CreateSaleLine(GenerateSafeCode20(), GenerateSafeCode10(), Qty, Amount, Points, TempSalesLinesRequest);
+        LibraryLoyalty.CreatePaymentLine(Amount, PointsToBurn, ReservationToken, TempPaymentLinesRequest);
+
+        RequestXmlText := ClientLoyaltyPointsMgr.CreateRegisterSaleTestXml(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryLoyalty.Simulate_RegisterSale_SOAPAction(RequestXmlText, ResponseCode, ResponseMessage, TempPointsResponse, DocumentId);
+
+        if (ResponseCode <> 'ERROR') then
+            Error('Attempting RegisterSale referencing a canceled reservation must fail.');
+
+    end;
+
 
     local procedure InitializeSales()
     var

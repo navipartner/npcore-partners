@@ -1883,8 +1883,14 @@
             TmpMembershipPointsSummary."Points Redeemed" += Membership."Expired Points";
         end else begin
             TmpMembershipPointsSummary."Points Expired" := 0;
-            TmpMembershipPointsSummary."Burn Period Start" := CalcDate('<+1D>', TmpMembershipPointsSummary."Earn Period End");
-            TmpMembershipPointsSummary."Burn Period End" := CalcDate(LoyaltySetup."Collection Period Length", TmpMembershipPointsSummary."Burn Period Start");
+            if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::FIXED) then begin
+                TmpMembershipPointsSummary."Burn Period Start" := CalcDate('<+1D>', TmpMembershipPointsSummary."Earn Period End");
+                TmpMembershipPointsSummary."Burn Period End" := CalcDate(LoyaltySetup."Collection Period Length", TmpMembershipPointsSummary."Burn Period Start");
+            end;
+            if (LoyaltySetup."Collection Period" = LoyaltySetup."Collection Period"::AS_YOU_GO) then begin
+                TmpMembershipPointsSummary."Burn Period Start" := TmpMembershipPointsSummary."Earn Period Start";
+                TmpMembershipPointsSummary."Burn Period End" := TmpMembershipPointsSummary."Earn Period End";
+            end;
         end;
 
         // Estimate value of points

@@ -196,4 +196,33 @@ codeunit 85106 "NPR Library MemberLoyalty"
         LoyaltyWebService.ReservePoints(XmlReservePoints);
         XmlReservePoints.GetResponse(ResponseCode, ResponseMessage, DocumentId, TempPointsResponse);
     end;
+
+    internal procedure Simulate_CancelReservePoints_SOAPAction(XmlRequest: Text; var ResponseCode: Code[20]; var ResponseMessage: Text; var TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var DocumentId: Text) XmlResponse: Text
+    var
+        XmlCancelReservePoints: XMLport "NPR MM CancelReservePoints";
+        TempBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        iStream: InStream;
+        oStream: OutStream;
+        LoyaltyWebService: Codeunit "NPR MM Loyalty WebService";
+    begin
+        // Load request stream to XML port
+        TempBLOBbuffer.Insert();
+        TempBLOBbuffer."Buffer 1".CreateOutStream(oStream);
+        oStream.WriteText(XmlRequest);
+        TempBLOBbuffer.Modify();
+
+        TempBLOBbuffer."Buffer 1".CreateInStream(iStream);
+        XmlCancelReservePoints.SetSource(iStream);
+        XmlCancelReservePoints.Import();
+
+        // Process request
+        LoyaltyWebService.CancelReservePoints(XmlCancelReservePoints);
+        XmlCancelReservePoints.GetResponse(ResponseCode, ResponseMessage, DocumentId, TempPointsResponse);
+    end;
+
+    internal procedure CreateAuthorizationCode(): Text[40]
+    begin
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+
 }

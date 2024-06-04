@@ -17,8 +17,8 @@
         {
             Caption = 'Entry Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Sale,Refund,Withdrawal,Deposit,Expired,Synchronization,Reserve,Capture';
-            OptionMembers = SALE,REFUND,POINT_WITHDRAW,POINT_DEPOSIT,EXPIRED,SYNCHRONIZATION,RESERVE,CAPTURE;
+            OptionCaption = 'Sale,Refund,Withdrawal,Deposit,Expired,Synchronization,Reserve,Capture,Cancelled,';
+            OptionMembers = SALE,REFUND,POINT_WITHDRAW,POINT_DEPOSIT,EXPIRED,SYNCHRONIZATION,RESERVE,CAPTURE,RESERVE_CANCELLED;
         }
         field(11; "Posting Date"; Date)
         {

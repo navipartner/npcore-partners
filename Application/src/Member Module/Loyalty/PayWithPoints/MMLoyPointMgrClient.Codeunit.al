@@ -93,6 +93,9 @@
                 TransformOk := TransformToReservePoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
             EFTTransactionRequest."Processing Type"::REFUND:
                 TransformOk := TransformToReservePoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+            EFTTransactionRequest."Processing Type"::VOID:
+                TransformOk := TransformToCancelPoints(EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+
             EFTTransactionRequest."Processing Type"::AUXILIARY:
                 case EFTTransactionRequest."Auxiliary Operation ID" of
                     1:
@@ -145,6 +148,8 @@
                 HandleReservePointsResult(EFTTransactionRequest, XmlResponseDoc);
             EFTTransactionRequest."Processing Type"::REFUND:
                 HandleReservePointsResult(EFTTransactionRequest, XmlResponseDoc);
+            EFTTransactionRequest."Processing Type"::VOID:
+                HandleCancelPointsResult(EFTTransactionRequest, XmlResponseDoc);
             EFTTransactionRequest."Processing Type"::AUXILIARY:
                 case EFTTransactionRequest."Auxiliary Operation ID" of
                     1:
@@ -261,6 +266,7 @@
         EFTTransactionRequest2.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
         EFTTransactionRequest2.SetRange("Integration Type", LoyaltyPointsPSPClient.IntegrationName());
         EFTTransactionRequest2.SetFilter("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
+        EFTTransactionRequest2.SetFilter(Reversed, '=%1', false);
         if (EFTTransactionRequest2.FindSet()) then begin
             repeat
                 TempRegisterPaymentLines.Init();
@@ -322,6 +328,38 @@
         exit(true);
     end;
 
+    local procedure TransformToCancelPoints(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var SoapAction: Text; var XmlText: Text; var ResponseText: Text): Boolean
+    var
+        TempTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
+    begin
+
+        if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
+            exit(false);
+
+        GetAuthorization(EFTTransactionRequest, LoyaltyStoreSetup, TempTransactionAuthorization);
+
+        TempRegisterPaymentLines."Entry No." := 1;
+        case EFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::VOID:
+                TempRegisterPaymentLines.Type := TempRegisterPaymentLines.Type::CANCEL_RESERVATION;
+            else
+                Error('Unsupported processing type.');
+        end;
+        TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest."Currency Code";
+        TempRegisterPaymentLines."Authorization Code" := CopyStr(EFTTransactionRequest."Authorisation Number", 1, MaxStrLen(TempRegisterPaymentLines."Authorization Code"));
+        TempRegisterPaymentLines."Total Amount" := 0;
+        TempRegisterPaymentLines."Total Points" := 0;
+        TempRegisterPaymentLines.Description := CopyStr(StrSubstNo('Void reservation by %1', UserId()), 1, MaxStrLen(TempRegisterPaymentLines.Description));
+        TempRegisterPaymentLines."Retail Id" := EFTTransactionRequest."Sales Line ID";
+        TempRegisterPaymentLines.Insert();
+
+        SoapAction := 'cancelReservePoints';
+        XmlText := CreateCancelReservePointsSoapXml(TempTransactionAuthorization, TempRegisterPaymentLines);
+        exit(true);
+    end;
+
     local procedure HandleReservePointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
@@ -375,6 +413,62 @@
         if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND) then
             if (EFTTransactionRequest.Successful) then
                 ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 1);
+
+        EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
+
+        EFTTransactionRequest.Modify();
+    end;
+
+    local procedure HandleCancelPointsResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var XmlResponseDoc: XmlDocument)
+    var
+        NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        Element: XmlElement;
+        PointsNode: XmlNode;
+        ResponseMessageNode: XmlNode;
+        OStream: OutStream;
+        ResponseCode: Text;
+        ResponseMessage: Text;
+        MessageCode: Text;
+        AuthorizationCode: Text;
+        ReferenceNumber: Text;
+        NewBalance: Text;
+        ElementPath: Text;
+        ReceiptText: Text;
+        XmlAsText: Text;
+        XmlDomMgt: Codeunit "XML DOM Management";
+    begin
+
+
+        XmlResponseDoc.WriteTo(XmlAsText);
+        XmlAsText := XmlDomMgt.RemoveNameSpaces(XmlAsText);
+        XmlDocument.ReadFrom(XmlAsText, XmlResponseDoc);
+
+        if (not XmlResponseDoc.GetRoot(Element)) then
+            Error(INVALID_XML, NpXmlDomMgt.PrettyPrintXml(XmlAsText));
+
+        // Status
+        ElementPath := '//Body/CancelReservePoints_Result/cancelReservePoints/Response/';
+        ResponseCode := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseCode', 10, true);
+        ResponseMessage := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'Status/ResponseMessage', 1000, true);
+
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/CancelReservePoints_Result/cancelReservePoints/Response/Status/ResponseMessage', ResponseMessageNode);
+        MessageCode := NpXmlDomMgt.GetXmlAttributeText(ResponseMessageNode, 'MessageCode', false);
+
+        // Message payload
+        NpXmlDomMgt.FindNode(Element.AsXmlNode(), '//Body/CancelReservePoints_Result/cancelReservePoints/Response/Points', PointsNode);
+        ReferenceNumber := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'ReferenceNumber', false);
+        AuthorizationCode := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'AuthorizationNumber', false);
+        NewBalance := NpXmlDomMgt.GetXmlAttributeText(PointsNode, 'NewPointBalance', false);
+
+        EFTTransactionRequest.Successful := (UpperCase(ResponseCode) = 'OK');
+        FinalizeTransactionRequest(EFTTransactionRequest, MessageCode, ResponseMessage, AuthorizationCode, ReferenceNumber);
+        EFTTransactionRequest.Modify();
+        Commit();
+
+        ReceiptText := CreateReservePointsSlip(EFTTransactionRequest, 0);
+        EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
+        OStream.Write(ReceiptText);
 
         EFTTransactionRequest."Receipt 2".CreateOutStream(OStream);
         OStream.Write(ReceiptText);
@@ -443,6 +537,14 @@
 
         EFTTransactionRequest.Modify();
         Commit();
+
+        if (not (EFTTransactionRequest.Successful)) then begin
+            // TODO Check Response Code and throw error if needed
+            case MessageCode of
+                '-2062': // Reservation was cancelled prior to capture
+                    Error(ResponseMessage);
+            end;
+        end;
     end;
 
     local procedure FinalizeTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; MessageCode: Text; ResponseMessage: Text; AuthorizationCode: Text; ReferenceNumber: Text)
@@ -1021,6 +1123,57 @@
           '<Reservation>' +
             XmlReservationLines +
           '</Reservation>' +
+        '</Request>';
+    end;
+
+    procedure CreateCancelReservePointsTestXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
+    begin
+
+        XmlText :=
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+        '<CancelReservePoints  xmlns="urn:microsoft-dynamics-nav/xmlports/x6014415">' +
+          CreateCancelReservePointsXml(TmpTransactionAuthorization, TmpRegisterPaymentLines) +
+        '</CancelReservePoints>';
+    end;
+
+    procedure CreateCancelReservePointsSoapXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
+    begin
+
+        XmlText :=
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>' +
+        '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:loy="urn:microsoft-dynamics-schemas/codeunit/loyalty_services">' +
+          '<soapenv:Header/>' +
+          '<soapenv:Body>' +
+            '<loy:CancelReservePoints>' +
+              '<loy:cancelReservePoints>' +
+        CreateCancelReservePointsXml(TmpTransactionAuthorization, TmpRegisterPaymentLines) +
+              '</loy:cancelReservePoints>' +
+            '</loy:CancelReservePoints>' +
+          '</soapenv:Body>' +
+        '</soapenv:Envelope>';
+    end;
+
+    local procedure CreateCancelReservePointsXml(var TmpTransactionAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpRegisterPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary) XmlText: Text
+    var
+        XmlCancelReservationLines: Text;
+        XmlReservationLinesLbl: Label '<Line Type="%1" AuthorizationCode="%2"/>', Locked = true;
+    begin
+
+        TmpTransactionAuthorization.FindFirst();
+
+        if (TmpRegisterPaymentLines.FindSet()) then
+            repeat
+                XmlCancelReservationLines += StrSubstNo(XmlReservationLinesLbl,
+                  Format(TmpRegisterPaymentLines.Type, 0, 9),
+                  Format(TmpRegisterPaymentLines."Authorization Code"));
+            until (TmpRegisterPaymentLines.Next() = 0);
+
+        XmlText :=
+        '<Request>' +
+          CreateAuthorizationSection(TmpTransactionAuthorization) +
+          '<CancelReservation>' +
+            XmlCancelReservationLines +
+          '</CancelReservation>' +
         '</Request>';
     end;
 
