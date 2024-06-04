@@ -885,7 +885,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     #region Http Requests - Misc
     internal procedure IsResponseSuccessfulAndThrowErrorIfNot(var TempJsonBuffer: Record "JSON Buffer" temporary; ResponseText: Text) ResponseSuccessful: Boolean
     begin
-        ResponseSuccessful := IsRepsonseSuccessful(TempJsonBuffer, ResponseText);
+        ResponseSuccessful := IsResponseSuccessful(TempJsonBuffer, ResponseText);
 
         if not ResponseSuccessful and GuiAllowed then
             ThrowErrorForNotSuccessfulResponse(TempJsonBuffer);
@@ -895,11 +895,11 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     var
         TempJsonBuffer: Record "JSON Buffer" temporary;
     begin
-        if not IsRepsonseSuccessful(TempJsonBuffer, ResponseText) and GuiAllowed then
+        if not IsResponseSuccessful(TempJsonBuffer, ResponseText) and GuiAllowed then
             ThrowErrorForNotSuccessfulResponse(TempJsonBuffer);
     end;
 
-    local procedure IsRepsonseSuccessful(var TempJsonBuffer: Record "JSON Buffer" temporary; ResponseText: Text) ResponseSuccessful: Boolean
+    local procedure IsResponseSuccessful(var TempJsonBuffer: Record "JSON Buffer" temporary; ResponseText: Text) ResponseSuccessful: Boolean
     var
         JsonTextReaderWriter: Codeunit "Json Text Reader/Writer";
         PropertyValue: Text;

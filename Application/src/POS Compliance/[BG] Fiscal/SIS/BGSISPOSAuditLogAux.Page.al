@@ -1,7 +1,7 @@
 page 6151316 "NPR BG SIS POS Audit Log Aux."
 {
     ApplicationArea = NPRBGSISFiscal;
-    Caption = 'BG POS SIS Audit Log Aux. Info';
+    Caption = 'BG SIS POS Audit Log Aux. Info';
     Editable = false;
     Extensible = false;
     PageType = List;

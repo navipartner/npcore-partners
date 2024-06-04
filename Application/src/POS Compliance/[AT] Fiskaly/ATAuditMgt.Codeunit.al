@@ -1,6 +1,7 @@
 codeunit 6184848 "NPR AT Audit Mgt."
 {
     Access = Internal;
+    SingleInstance = true;
 
     var
         Enabled: Boolean;
@@ -77,7 +78,8 @@ codeunit 6184848 "NPR AT Audit Mgt."
         if not IsATAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        // TO-DO TestIsProfileSetAccordingToCompliance;
+        TestIsProfileSetAccordingToCompliance(POSUnit."POS Audit Profile");
+        CheckATCashRegister(POSUnit);
     end;
     #endregion
 
@@ -116,6 +118,26 @@ codeunit 6184848 "NPR AT Audit Mgt."
     #endregion
 
     #region Procedures - Validations
+    local procedure TestIsProfileSetAccordingToCompliance(POSAuditProfileCode: Code[20])
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        POSAuditProfile.Get(POSAuditProfileCode);
+        POSAuditProfile.TestField("Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Credit Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Balancing Fiscal No. Series");
+        POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
+        POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
+        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
+        POSAuditProfile.TestField(AllowSalesAndReturnInSameTrans, false);
+    end;
+
+    local procedure CheckATCashRegister(POSUnit: Record "NPR POS Unit")
+    var
+        ATCashRegister: Record "NPR AT Cash Register";
+    begin
+        ATCashRegister.GetWithCheck(POSUnit."No.");
+    end;
     #endregion
 
     #region Procedures - Misc

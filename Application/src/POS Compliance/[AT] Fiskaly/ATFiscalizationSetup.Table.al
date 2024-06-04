@@ -18,6 +18,17 @@ table 6150828 "NPR AT Fiscalization Setup"
             Caption = 'AT Fiscalization Enabled';
             DataClassification = CustomerContent;
         }
+        field(20; "Fiskaly API URL"; Text[250])
+        {
+            Caption = 'Fiskaly API URL';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = URL;
+        }
+        field(30; Training; Boolean)
+        {
+            Caption = 'Training';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -27,4 +38,35 @@ table 6150828 "NPR AT Fiscalization Setup"
             Clustered = true;
         }
     }
+
+    internal procedure GetWithCheck()
+    begin
+        Get();
+        TestField(SystemId);
+        TestField("Fiskaly API URL");
+    end;
+
+    internal procedure GetFONParticipantId(): Text
+    begin
+        if IsNullGuid(SystemId) then
+            exit('');
+
+        exit('FONParticipantId_' + SystemId);
+    end;
+
+    internal procedure GetFONUserId(): Text
+    begin
+        if IsNullGuid(SystemId) then
+            exit('');
+
+        exit('FONUserId_' + SystemId);
+    end;
+
+    internal procedure GetFONUserPIN(): Text
+    begin
+        if IsNullGuid(SystemId) then
+            exit('');
+
+        exit('FONUserPIN_' + SystemId);
+    end;
 }
