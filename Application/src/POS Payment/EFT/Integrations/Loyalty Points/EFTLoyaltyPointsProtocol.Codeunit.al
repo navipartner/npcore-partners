@@ -9,6 +9,10 @@ codeunit 6184741 "NPR EFT LoyaltyPointsProtocol"
                 PaymentTransaction(EftTransactionRequest, HwcRequest, Workflow);
             EftTransactionRequest."Processing Type"::PAYMENT:
                 PaymentTransaction(EftTransactionRequest, HwcRequest, Workflow);
+            EftTransactionRequest."Processing Type"::VOID:
+                VoidTransaction(EftTransactionRequest, HwcRequest, Workflow);
+            else
+                Error('%1 not handled.', EftTransactionRequest."Processing Type");
 
         end;
 
@@ -24,6 +28,16 @@ codeunit 6184741 "NPR EFT LoyaltyPointsProtocol"
         HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
         HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
         HwcRequest.Add('TypeCaption', RESERVE_POINTS);
+    end;
+
+    local procedure VoidTransaction(EftTransactionRequest: Record "NPR EFT Transaction Request"; HwcRequest: JsonObject; var Workflow: Text)
+    var
+        CANCEL_POINTS: Label 'Cancel Points';
+    begin
+        Workflow := Format(Enum::"NPR POS Workflow"::EFT_MEMBER_LOYALTY);
+        HwcRequest.Add('EntryNo', EftTransactionRequest."Entry No.");
+        HwcRequest.Add('AmountCaption', Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
+        HwcRequest.Add('TypeCaption', CANCEL_POINTS);
     end;
 
     internal procedure HandleDeviceResponse(EftTransactionRequest: Record "NPR EFT Transaction Request"; Response: JsonObject; Result: JsonObject)
@@ -51,7 +65,8 @@ codeunit 6184741 "NPR EFT LoyaltyPointsProtocol"
 
         case EftTransactionRequest."Processing Type" of
             EftTransactionRequest."Processing Type"::PAYMENT,
-            EftTransactionRequest."Processing Type"::REFUND:
+            EftTransactionRequest."Processing Type"::REFUND,
+            EftTransactionRequest."Processing Type"::VOID:
                 PaymentTransactionEnd(EftTransactionRequest);
             else
                 Error('%1 not handled.', EftTransactionRequest."Processing Type");
