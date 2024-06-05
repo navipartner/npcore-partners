@@ -342,6 +342,59 @@
     end;
 #pragma warning restore
 
+#pragma warning disable AA0245 
+    procedure CaptureReservePoints(var CaptureReservePoints: XMLport "NPR MM CaptureReservePoints")
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempCaptureLines: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        ImportEntry: Record "NPR Nc Import Entry";
+        OutStr: OutStream;
+        LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
+        ResponseMessage: Text;
+        ResponseMessageId: Text;
+        FileNameLbl: Label 'CaptureReservePoints-%1.xml', Locked = true;
+    begin
+
+        CaptureReservePoints.Import();
+
+        InsertImportEntry('CaptureReservePoints', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, Format(CurrentDateTime(), 0, 9));
+        ImportEntry."Document ID" := CreateDocumentId();
+        ImportEntry.Modify(true);
+        Commit();
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        CaptureReservePoints.SetDestination(OutStr);
+        CaptureReservePoints.Export();
+        ImportEntry.Modify(true);
+        Commit();
+
+        // Process
+        CaptureReservePoints.SetDocumentId := ImportEntry."Document ID";
+        CaptureReservePoints.GetRequest(TempAuthorization, TempCaptureLines);
+        if (LoyaltyPointsMgrServer.CaptureReservation(TempAuthorization, TempCaptureLines, TempPointsResponse, ResponseMessage, ResponseMessageId)) then begin
+            CaptureReservePoints.SetResponse(TempPointsResponse);
+
+            ImportEntry.Imported := true;
+            ImportEntry."Runtime Error" := false;
+        end else begin
+            CaptureReservePoints.SetErrorResponse(ResponseMessage, ResponseMessageId);
+
+            ImportEntry.Imported := true;
+            ImportEntry."Runtime Error" := true;
+        end;
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        CaptureReservePoints.SetDestination(OutStr);
+        CaptureReservePoints.Export();
+
+        ImportEntry.Imported := true;
+        ImportEntry."Runtime Error" := false;
+
+        ImportEntry.Modify(true);
+    end;
+#pragma warning restore
 
 #pragma warning disable AA0245 
     procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "NPR MM Get Loyalty Config.")
@@ -748,6 +801,7 @@
         CreateImportType('POINTS-02', 'PointManagement', 'ReservePoints');
         CreateImportType('POINTS-03', 'PointManagement', 'GetLoyaltyConfiguration');
         CreateImportType('POINTS-04', 'PointManagement', 'CancelReservePoints');
+        CreateImportType('POINTS-05', 'PointManagement', 'CaptureReservePoints');
 
         Commit();
     end;
