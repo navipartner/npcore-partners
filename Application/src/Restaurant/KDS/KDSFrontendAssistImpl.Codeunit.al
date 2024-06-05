@@ -205,6 +205,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
                 KitchenReqStationsQry.SetRange(Station_Production_Status, "NPR NPRE K.Req.L. Prod.Status"::"Not Started", "NPR NPRE K.Req.L. Prod.Status"::"On Hold");
         end else
             KitchenReqStationsQry.SetRange(Restaurant_Code, RestaurantCode);
+        KitchenReqStationsQry.SetFilter(Line_Status, '<>%1', "NPR NPRE K.Request Line Status"::Cancelled);
         KitchenReqStationsQry.Open();
 
         LastOrderID := 0;
