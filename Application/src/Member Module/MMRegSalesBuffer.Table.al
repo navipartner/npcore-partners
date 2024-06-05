@@ -17,8 +17,8 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Authorization,Sales,Return Sales,Payment,Refund,Void,Not Applicable,Cancel Authorization';
-            OptionMembers = AUTHORIZATION,SALES,RETURN,PAYMENT,REFUND,VOID,NA,CANCEL_RESERVATION;
+            OptionCaption = 'Authorization,Sales,Return Sales,Payment,Refund,Void,Not Applicable,Cancel Authorization,Capture Reservation';
+            OptionMembers = AUTHORIZATION,SALES,RETURN,PAYMENT,REFUND,VOID,NA,CANCEL_RESERVATION,CAPTURE;
         }
         field(11; "Authorization Code"; Text[40])
         {

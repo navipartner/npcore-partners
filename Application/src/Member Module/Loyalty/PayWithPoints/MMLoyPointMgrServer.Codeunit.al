@@ -30,6 +30,8 @@
         PAYMENT_4: Label 'The attempted reserved number of points (%1), exceed the members current balance (%2).';
         CANCEL_1: Label 'The authorization code %1 has been captured and can not be cancelled.';
         CANCEL_2: Label 'The authorization code %1 has been cancelled and can not be captured.';
+        CAPTURE_1: Label 'The authorization code %1 has been captured and can not be captured again.';
+
         SALE_1: Label 'Incorrect sign.';
         JNL_NOT_EMPTY: Label 'The %1 %2 is not empty. Confirm YES to delete lines and proceed.';
         SELECT_JNL_TYPE: Label 'Select journal template type:';
@@ -232,6 +234,82 @@
         TmpPointsOut.Insert();
         exit(true);
     end;
+
+    procedure CaptureReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCaptureLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    var
+        LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
+        Membership: Record "NPR MM Membership";
+        LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        MembershipEntryNo: Integer;
+    begin
+
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+            exit(false);
+
+        TmpCaptureLinesIn.Reset();
+        TmpCaptureLinesIn.FindFirst();
+        if (TmpCaptureLinesIn."Authorization Code" = '') then begin
+            ResponseMessage := StrSubstNo(RESERVE_1, '', 1);
+            ResponseMessageId := '-1400';
+            exit(false);
+        end;
+
+        ReservationLedgerEntry.SetCurrentKey("Authorization Code");
+        ReservationLedgerEntry.SetAutoCalcFields("Reservation is Captured", "Reservation is Cancelled");
+        ReservationLedgerEntry.SetFilter("Authorization Code", '=%1', TmpCaptureLinesIn."Authorization Code");
+        ReservationLedgerEntry.SetFilter("Entry Type", '=%1', ReservationLedgerEntry."Entry Type"::RESERVE);
+        if (ReservationLedgerEntry.FindFirst()) then begin
+            if (ReservationLedgerEntry."Reservation is Captured") then begin
+                ResponseMessage := StrSubstNo(CAPTURE_1, TmpCaptureLinesIn."Authorization Code");
+                ResponseMessageId := '-1401';
+                exit(false);
+            end;
+
+            if (ReservationLedgerEntry."Reservation is Cancelled") then begin
+                ResponseMessage := StrSubstNo(CANCEL_2, TmpCaptureLinesIn."Authorization Code");
+                ResponseMessageId := '-1401';
+                exit(false);
+
+            end;
+        end else begin
+            ResponseMessage := StrSubstNo(RESERVE_1, TmpCaptureLinesIn."Authorization Code", 3);
+            ResponseMessageId := '-1402';
+            exit(false);
+        end;
+
+        Membership.Get(MembershipEntryNo);
+
+        // Store the capture request in the store ledger
+        TmpAuthorizationIn.FindFirst();
+        LoyaltyStoreLedger.TransferFields(TmpAuthorizationIn, false);
+
+        LoyaltyStoreLedger."Entry Type" := LoyaltyStoreLedger."Entry Type"::RECEIPT;
+        LoyaltyStoreLedger."Authorization Code" := TmpCaptureLinesIn."Authorization Code";
+        LoyaltyStoreLedger."Retail Id" := TmpAuthorizationIn."Retail Id";
+        LoyaltyStoreLedger."Entry No." := 0;
+
+        if (TmpCaptureLinesIn.Type = TmpCaptureLinesIn.Type::CAPTURE) then
+            if (not CreateCaptureReserveEntry(TmpCaptureLinesIn."Authorization Code", LoyaltyStoreLedger."Burned Points")) then begin
+                ResponseMessage := StrSubstNo(RESERVE_1, TmpCaptureLinesIn."Authorization Code", 4);
+                ResponseMessageId := '-1403';
+                exit(false);
+            end;
+
+        // finalize store ledger and response
+        Membership.CalcFields("Remaining Points");
+
+        LoyaltyStoreLedger.Balance := Membership."Remaining Points";
+        LoyaltyStoreLedger.Insert();
+
+        LoyaltyPointManagement.AfterMembershipPointsUpdate(Membership."Entry No.", 0);
+        _MembershipEvents.OnAfterMembershipPointsUpdate(Membership."Entry No.", 0);
+
+        TmpPointsOut.TransferFields(LoyaltyStoreLedger, true);
+        TmpPointsOut.Insert();
+        exit(true);
+    end;
+
 
 
     procedure GetLoyaltySetup(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpLoyaltySetup: Record "NPR MM Loyalty Setup" temporary; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
@@ -781,9 +859,39 @@
         MembershipPointsEntry."Awarded Points" *= -1;
         MembershipPointsEntry."Amount (LCY)" *= -1;
         MembershipPointsEntry."Awarded Amount (LCY)" *= -1;
+        _MembershipEvents.OnBeforeInsertPointEntry(MembershipPointsEntry);
         MembershipPointsEntry.Insert();
-        ReversedPoints := MembershipPointsEntry.Points;
 
+        ReversedPoints := MembershipPointsEntry.Points;
+        exit(true);
+    end;
+
+    local procedure CreateCaptureReserveEntry(AuthorizationCodeToCancel: Text[40]; var CapturedPoints: Integer): Boolean
+    var
+        ReservePointsEntry: Record "NPR MM Members. Points Entry";
+        CapturePointsEntry: Record "NPR MM Members. Points Entry";
+    begin
+        CapturedPoints := 0;
+        ReservePointsEntry.SetCurrentKey("Authorization Code", "Entry Type");
+        ReservePointsEntry.SetFilter("Authorization Code", '=%1', AuthorizationCodeToCancel);
+        ReservePointsEntry.SetFilter("Entry Type", '=%1', ReservePointsEntry."Entry Type"::RESERVE);
+        if (not ReservePointsEntry.FindLast()) then
+            exit(false);
+
+        CapturePointsEntry.TransferFields(ReservePointsEntry, false);
+        CapturePointsEntry."Entry No." := 0;
+        CapturePointsEntry."Entry Type" := ReservePointsEntry."Entry Type"::CAPTURE;
+        CapturePointsEntry."Redeemed Points" := CapturePointsEntry.Points;
+        CapturePointsEntry."Awarded Amount (LCY)" := CapturePointsEntry."Amount (LCY)";
+        _MembershipEvents.OnBeforeInsertPointEntry(CapturePointsEntry);
+        CapturePointsEntry.Insert();
+
+        ReservePointsEntry.Points := 0;
+        ReservePointsEntry."Awarded Points" := 0;
+        ReservePointsEntry."Awarded Amount (LCY)" := 0;
+        ReservePointsEntry.Modify();
+
+        CapturedPoints := CapturePointsEntry.Points;
         exit(true);
     end;
 
@@ -815,9 +923,6 @@
 
         MembershipPointsEntry."Amount (LCY)" := TotalBurnAmount;
         MembershipPointsEntry.Points := Round(MembershipPointsEntry."Amount (LCY)" * EarnRatio, 1);
-
-        if (LoyaltyStoreLedger."Earned Points" + MembershipPointsEntry.Points < 0) then
-            MembershipPointsEntry.Points := LoyaltyStoreLedger."Earned Points" * -1;
 
         MembershipPointsEntry."Awarded Points" := MembershipPointsEntry.Points;
         MembershipPointsEntry."Awarded Amount (LCY)" := MembershipPointsEntry."Amount (LCY)";
