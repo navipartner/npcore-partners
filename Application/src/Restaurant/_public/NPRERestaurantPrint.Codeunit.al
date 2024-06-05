@@ -93,7 +93,7 @@
                                             WaiterPadLine.FindSet();
                                             repeat
                                                 LogWaiterPadLinePrint(
-                                                    WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0);
+                                                    WaiterPadLine, PrintType, TempWPadLineBuffer."Serving Step", TempWPadLineBuffer."Print Category Code", PrintDateTime, 0, 0);
                                             until WaiterPadLine.Next() = 0;
                                         end;
                                     TempWPadLineBuffer."Output Type"::KDS:
@@ -395,7 +395,7 @@
         exit(true);
     end;
 
-    internal procedure LogWaiterPadLinePrint(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; PrintDateTime: DateTime; OutputType: Integer)
+    internal procedure LogWaiterPadLinePrint(WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; PrintType: Integer; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; PrintDateTime: DateTime; OutputType: Integer; OrderID: BigInteger)
     var
         NewWPadLinePrintLogEntry: Record "NPR NPRE W.Pad Prnt LogEntry";
     begin
@@ -408,6 +408,7 @@
         NewWPadLinePrintLogEntry."Flow Status Code" := FlowStatusCode;
         NewWPadLinePrintLogEntry."Sent Date-Time" := PrintDateTime;
         NewWPadLinePrintLogEntry."Output Type" := OutputType;
+        NewWPadLinePrintLogEntry."Kitchen Order ID" := OrderID;
 
         WaiterPadLine.SetRange("Print Type Filter", NewWPadLinePrintLogEntry."Print Type");
         WaiterPadLine.SetRange("Serving Step Filter", NewWPadLinePrintLogEntry."Flow Status Code");

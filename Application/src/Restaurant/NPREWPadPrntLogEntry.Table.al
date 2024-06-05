@@ -54,7 +54,6 @@
         {
             Caption = 'Output Type';
             DataClassification = CustomerContent;
-            Description = 'NPR5.54';
             OptionCaption = 'Print,KDS';
             OptionMembers = Print,KDS;
         }
@@ -68,13 +67,11 @@
             Caption = 'Sent Quanity (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
-            Description = 'NPR5.55';
         }
         field(50; Context; Option)
         {
             Caption = 'Context';
             DataClassification = CustomerContent;
-            Description = 'NPR5.55';
             OptionCaption = 'Ordering,Line Splitting';
             OptionMembers = Ordering,"Line Splitting";
         }
@@ -84,6 +81,12 @@
             FieldClass = FlowField;
             CalcFormula = Exist("NPR NPRE Waiter Pad Line" where("Waiter Pad No." = field("Waiter Pad No."), "Line No." = field("Waiter Pad Line No.")));
             Editable = false;
+        }
+        field(70; "Kitchen Order ID"; BigInteger)
+        {
+            Caption = 'Kitchen Order ID';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NPRE Kitchen Order";
         }
     }
 
