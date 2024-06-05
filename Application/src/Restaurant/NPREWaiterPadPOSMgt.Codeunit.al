@@ -731,6 +731,18 @@
             WaiterPadLine.ModifyAll("Sale Line Retail ID", GetNullGuid());
     end;
 
+    internal procedure AddPosEntrySalesLineWaiterPadLineLink(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line")
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+    begin
+        POSEntryWaiterPadLink.Init();
+        POSEntryWaiterPadLink."POS Entry No." := POSEntrySalesLine."POS Entry No.";
+        POSEntryWaiterPadLink."POS Entry Sales Line No." := POSEntrySalesLine."Line No.";
+        POSEntryWaiterPadLink."Waiter Pad No." := WaiterPadLine."Waiter Pad No.";
+        POSEntryWaiterPadLink."Waiter Pad Line No." := WaiterPadLine."Line No.";
+        if POSEntryWaiterPadLink.Insert() then;
+    end;
+
     local procedure CopyItemAddOnLinkInfoToWPLine(var WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; SaleLinePOS: Record "NPR POS Sale Line"; var LineRelation: Record "Line Number Buffer")
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
@@ -1028,6 +1040,7 @@
                     WaiterPadLine.Validate("Billed Qty. (Base)", WaiterPadLine."Billed Qty. (Base)" + POSSalesLine."Quantity (Base)");
                 WaiterPadLine.Modify();
             end;
+            AddPosEntrySalesLineWaiterPadLineLink(POSSalesLine, WaiterPadLine);
 
             if WaiterPad.Get(WaiterPadLine."Waiter Pad No.") then
                 WaiterPadMgt.TryCloseWaiterPad(WaiterPad, false, "NPR NPRE W/Pad Closing Reason"::"Finished Sale");
@@ -1056,6 +1069,33 @@
     local procedure OnBeforeLoadPOSQuote(var SalePOS: Record "NPR POS Sale"; var POSQuoteEntry: Record "NPR POS Saved Sale Entry"; var XmlDoc: XmlDocument)
     begin
         ClearSaleHdrNPREPresetFields(SalePOS, true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure RemovePOSEntryWaiterPadLinks(var Rec: Record "NPR POS Entry"; RunTrigger: Boolean)
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", Rec."Entry No.");
+        if not POSEntryWaiterPadLink.IsEmpty() then
+            POSEntryWaiterPadLink.DeleteAll();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry Sales Line", 'OnAfterDeleteEvent', '', true, false)]
+    local procedure RemovePOSEntrySalesLineWaiterPadLinks(var Rec: Record "NPR POS Entry Sales Line"; RunTrigger: Boolean)
+    var
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        POSEntryWaiterPadLink.SetRange("POS Entry No.", Rec."POS Entry No.");
+        POSEntryWaiterPadLink.SetRange("POS Entry Sales Line No.", Rec."Line No.");
+        if not POSEntryWaiterPadLink.IsEmpty() then
+            POSEntryWaiterPadLink.DeleteAll();
     end;
 
     [IntegrationEvent(true, false)]

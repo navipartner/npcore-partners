@@ -14,6 +14,7 @@
     var
         WaiterPadLine: Record "NPR NPRE Waiter Pad Line";
         RestaurantPrint: Codeunit "NPR NPRE Restaurant Print";
+        LastUpdatedKitchenOrderID: BigInteger;
         Success: Boolean;
     begin
         if not (RequestType in [RequestType::Order, RequestType::"Serving Request"]) then
@@ -25,8 +26,8 @@
         WaiterPadLine.Copy(WaiterPadLineIn);
         if WaiterPadLine.FindSet() then
             repeat
-                if SendWPLineToKitchen(WaiterPad, WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime) then begin
-                    RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, RequestType, FlowStatusCode, PrintCategoryCode, SentDateTime, 1);
+                if SendWPLineToKitchen(WaiterPad, WaiterPadLine, FlowStatusCode, PrintCategoryCode, RequestType, SentDateTime, LastUpdatedKitchenOrderID) then begin
+                    RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, RequestType, FlowStatusCode, PrintCategoryCode, SentDateTime, 1, LastUpdatedKitchenOrderID);
                     Success := true;
                 end;
             until WaiterPadLine.Next() = 0;
@@ -34,7 +35,7 @@
         exit(Success);
     end;
 
-    local procedure SendWPLineToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime): Boolean
+    local procedure SendWPLineToKitchen(WaiterPad: Record "NPR NPRE Waiter Pad"; WaiterPadLine: Record "NPR NPRE Waiter Pad Line"; FlowStatusCode: Code[10]; PrintCategoryCode: Code[20]; RequestType: Option "Order","Serving Request"; SentDateTime: DateTime; var LastUpdatedKitchenOrderID: BigInteger): Boolean
     var
         KitchenRequest: Record "NPR NPRE Kitchen Request";
         KitchenRequest2: Record "NPR NPRE Kitchen Request";
@@ -86,6 +87,7 @@
 
         foreach TouchedKitchenOrderID in TouchedKitchenOrderList do
             UpdateOrderStatus(TouchedKitchenOrderID);
+        LastUpdatedKitchenOrderID := TouchedKitchenOrderID;
 
         exit(true);
     end;

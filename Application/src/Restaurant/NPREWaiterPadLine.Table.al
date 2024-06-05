@@ -653,4 +653,29 @@
         GetWaiterPad();
         exit(WaiterPad.Closed);
     end;
+
+    procedure ShowRelatedPOSEntrySalesLines()
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryWaiterPadLink: Record "NPR POS Entry Waiter Pad Link";
+        NoEntriesFoundErr: Label 'There are no related POS entry sales lines found for the current waiter pad line.';
+    begin
+        POSEntryWaiterPadLink.SetCurrentKey("Waiter Pad No.", "Waiter Pad Line No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad No.", "Waiter Pad No.");
+        POSEntryWaiterPadLink.SetRange("Waiter Pad Line No.", "Line No.");
+        if not POSEntryWaiterPadLink.FindSet() then
+            Error(NoEntriesFoundErr);
+
+        repeat
+            POSEntrySalesLine."POS Entry No." := POSEntryWaiterPadLink."POS Entry No.";
+            POSEntrySalesLine."Line No." := POSEntryWaiterPadLink."POS Entry Sales Line No.";
+            POSEntrySalesLine.Mark(true);
+        until POSEntryWaiterPadLink.Next() = 0;
+
+        POSEntrySalesLine.MarkedOnly(true);
+        if POSEntrySalesLine.IsEmpty() then
+            Error(NoEntriesFoundErr);
+
+        Page.Run(0, POSEntrySalesLine);
+    end;
 }
