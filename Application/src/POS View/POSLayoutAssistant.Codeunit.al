@@ -265,6 +265,9 @@ codeunit 6059925 "NPR POS Layout Assistant"
         ParameterSetJArray: JsonArray;
         ParameterJObject: JsonObject;
         OptionJObject: JsonObject;
+        WorkflowCaptionBuffer: Codeunit "NPR Workflow Caption Buffer";
+        ParameterDescription: Text;
+        ParameterNameCaption: Text;
     begin
         Response.Add('dataSourceName', POSAction."Data Source Name");
 
@@ -273,6 +276,19 @@ codeunit 6059925 "NPR POS Layout Assistant"
         if ActionParam.FindSet() then
             repeat
                 Clear(ParameterJObject);
+                Clear(ParameterDescription);
+                Clear(ParameterNameCaption);
+
+                ParameterDescription := WorkflowCaptionBuffer.GetParameterDescriptionCaption(ActionParam."POS Action Code", ActionParam.Name);
+                if (ParameterDescription <> '') then begin
+                    ParameterJObject.Add('description', ParameterDescription);
+                end;
+
+                ParameterNameCaption := WorkflowCaptionBuffer.GetParameterNameCaption(ActionParam."POS Action Code", ActionParam.Name);
+                if (ParameterNameCaption <> '') then begin
+                    ParameterJObject.Add('name_caption', ParameterNameCaption);
+                end;
+
                 ParameterJObject.Add('name', ActionParam.Name);
                 ParameterJObject.Add('data_type', Format(ActionParam."Data Type", 0, 9));
                 if ActionParam."Data Type" = ActionParam."Data Type"::Option then begin
