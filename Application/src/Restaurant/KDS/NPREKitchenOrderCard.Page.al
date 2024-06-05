@@ -94,6 +94,24 @@
                 ToolTip = 'View outstaning kitchen requests for the order.';
                 ApplicationArea = NPRRetail;
             }
+            action(Cancel)
+            {
+                Caption = 'Cancel';
+                Image = CloseDocument;
+                ToolTip = 'Executes the cancel order function. Note that the system will also cancel any unfinished kitchen requests associated with the order. However, it won’t cancel the source document, from which the order was created (usually a waiter pad). You’ll need to do this manually.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+                    ConfirmCancelQst: Label 'This action will cancel kitchen order #%1. Note that the system will also cancel any unfinished kitchen requests associated with the order. However, it won’t cancel the source document, from which the order was created (usually a waiter pad). You’ll need to do this manually.\Are you sure you want to proceed?', Comment = '%1 - order number';
+                begin
+                    CurrPage.SaveRecord();
+                    if not Confirm(ConfirmCancelQst, false, Rec."Order ID") then
+                        exit;
+                    KitchenOrderMgt.CancelKitchenOrder(Rec);
+                end;
+            }
         }
     }
 
@@ -107,5 +125,4 @@
             Error(LinkedRequestsError);
         end;
     end;
-
 }
