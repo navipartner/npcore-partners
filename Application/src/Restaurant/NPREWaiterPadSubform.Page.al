@@ -87,6 +87,11 @@
                     Editable = false;
                     ToolTip = 'Specifies how many units of the product has already been included in a finished sale.';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAssistEdit()
+                    begin
+                        Rec.ShowRelatedPOSEntrySalesLines();
+                    end;
                 }
                 field("Description 2"; Rec."Description 2")
                 {
