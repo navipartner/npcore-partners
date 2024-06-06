@@ -62,7 +62,9 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
     procedure IssueVoucherCreate(var POSSaleLine: Codeunit "NPR POS Sale Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; VoucherType: Record "NPR NpRv Voucher Type"; DiscountType: Text; Quantity: Integer; Amount: Decimal; Discount: Decimal; CustomRefereceNo: Text[50])
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         QtyNotPositiveErr: Label 'You must specify a positive quantity.';
     begin
         NpRvVoucherMgt.GenerateTempVoucher(VoucherType, TempVoucher, CustomRefereceNo);
@@ -75,7 +77,14 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
 
         if SaleLinePOS.Quantity < 0 then
             Error(QtyNotPositiveErr);
-        SaleLinePOS."Unit Price" := Amount;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        if (not SaleLinePOS."Price Includes VAT") then
+            SaleLinePOS."Unit Price" := POSSaleTaxCalc.CalcAmountWithoutVAT(Amount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")
+        else
+            SaleLinePOS."Unit Price" := Amount;
 
         case DiscountType of
             '0':
