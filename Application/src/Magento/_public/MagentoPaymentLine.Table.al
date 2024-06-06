@@ -138,6 +138,33 @@
             Caption = 'Reconciled';
             DataClassification = CustomerContent;
         }
+        field(240; "Reconciliation Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reconciliation Date';
+        }
+        field(250; Reversed; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reversed';
+        }
+        field(260; "Reversed by Entry System ID"; Guid)
+        {
+            Caption = 'Reversed by Entry System ID';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Payment Line".SystemId;
+        }
+        field(270; "Created by Reconciliation"; Boolean)
+        {
+            Caption = 'Created by Reconciliation';
+            DataClassification = CustomerContent;
+        }
+        field(280; "Created by Recon. Posting No."; Code[20])
+        {
+            Caption = 'Created by Reconciliation Posting No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Adyen Recon. Line"."Posting No.";
+        }
     }
 
     keys

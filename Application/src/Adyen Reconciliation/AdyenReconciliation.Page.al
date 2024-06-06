@@ -9,7 +9,7 @@ page 6184502 "NPR Adyen Reconciliation"
     RefreshOnActivate = true;
     InsertAllowed = false;
     ModifyAllowed = true;
-    DeleteAllowed = true;
+    DeleteAllowed = false;
 
     layout
     {
@@ -19,12 +19,6 @@ page 6184502 "NPR Adyen Reconciliation"
             {
                 Caption = 'General';
 
-                field("Document No."; Rec."Document No.")
-                {
-                    ToolTip = 'Specifies the Reconciliation Document No.';
-                    Editable = false;
-                    ApplicationArea = NPRRetail;
-                }
                 field("Document Type"; Rec."Document Type")
                 {
                     ToolTip = 'Specifies the Reconciliation Document Type.';
@@ -43,6 +37,19 @@ page 6184502 "NPR Adyen Reconciliation"
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
+                group(PostingDate)
+                {
+                    Visible = not _PostWithTransactionDate;
+                    ShowCaption = false;
+
+                    field("Posting Date"; Rec."Posting Date")
+                    {
+                        ToolTip = 'Specifies the Date the Transactions are to be posted with.';
+                        ApplicationArea = NPRRetail;
+                        Editable = not _DocumentPosted;
+                    }
+                }
+
                 field("Batch Number"; Rec."Batch Number")
                 {
                     ToolTip = 'Specifies the Reconciliation Batch Number.';
@@ -58,33 +65,33 @@ page 6184502 "NPR Adyen Reconciliation"
                 }
                 field("Opening Balance"; Rec."Opening Balance")
                 {
-                    ToolTip = 'Specifies the opening balance shown on the Adyen''s statement.';
+                    ToolTip = 'Specifies the opening balance (in Adyen Account Currency) shown on the Adyen''s statement.';
                     Editable = false;
                     Visible = not _IsExternalReport;
                     ApplicationArea = NPRRetail;
                 }
                 field("Closing Balance"; Rec."Closing Balance")
                 {
-                    ToolTip = 'Specifies the closing balance shown on the Adyen''s statement.';
+                    ToolTip = 'Specifies the closing balance (in Adyen Account Currency) shown on the Adyen''s statement.';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
                 field("Acquirer Commission"; Rec."Acquirer Commission")
                 {
-                    ToolTip = 'Specifies the Aqcuirer Commission from External Settlement Detail Report.';
+                    ToolTip = 'Specifies the Aqcuirer Commission from External Settlement Detail Report (in Adyen Account Currency).';
                     Editable = false;
                     Visible = _IsExternalReport;
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Transactions Amount"; Rec."Total Transactions Amount")
                 {
-                    ToolTip = 'Specifies the Total Transactions Amount.';
+                    ToolTip = 'Specifies the Total Transactions Amount (in Adyen Account Currency).';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Posted Amount"; Rec."Total Posted Amount")
                 {
-                    ToolTip = 'Specifies the Total Posted Amount.';
+                    ToolTip = 'Specifies the Total Posted Amount (in Adyen Account Currency).';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
@@ -120,9 +127,6 @@ page 6184502 "NPR Adyen Reconciliation"
                 actionref(Match_Promoted; "Match Entries")
                 {
                 }
-                actionref(Reconcile_Promoted; "Reconcile Entries")
-                {
-                }
                 actionref(Post_Promoted; "Post Entries")
                 {
                 }
@@ -148,10 +152,14 @@ page 6184502 "NPR Adyen Reconciliation"
                     trigger OnAction()
                     var
                         WebhookRequest: Record "NPR AF Rec. Webhook Request";
+                        ValidationError: Label 'Report did not pass the Validation Scheme or Adyen Setup is incomplete.\Please check logs for more information.';
                     begin
                         if WebhookRequest.Get(Rec."Webhook Request ID") then begin
-                            _TransactionMatching.CreateSettlementDocuments(WebhookRequest, true, Rec."Document No.");
-                            CurrPage.Update();
+                            if _TransactionMatching.ValidateReportScheme(WebhookRequest) then begin
+                                _TransactionMatching.CreateSettlementDocuments(WebhookRequest, true, Rec."Document No.");
+                                CurrPage.Update();
+                            end else
+                                Error(ValidationError);
                         end;
                     end;
                 }
@@ -167,35 +175,14 @@ page 6184502 "NPR Adyen Reconciliation"
                     trigger OnAction()
                     var
                         MatchedEntries: Integer;
-                        MatchedSuccessResult: Label 'Successfully matched %1 entries!';
-                        MatchedNullResult: Label 'No entries were matched!';
+                        MatchedSuccessResult: Label 'Successfully matched %1 entries.';
+                        MatchedNullResult: Label 'No entries were matched.';
                     begin
                         MatchedEntries := _TransactionMatching.MatchEntries(Rec);
                         if MatchedEntries > 0 then
                             Message(MatchedSuccessResult, Format(MatchedEntries))
                         else
                             Message(MatchedNullResult);
-                        CurrPage.Update();
-                    end;
-                }
-                action("Reconcile Entries")
-                {
-                    Caption = 'Reconcile Entries';
-                    Ellipsis = true;
-                    Image = Reconcile;
-                    Enabled = not _DocumentPosted;
-                    ToolTip = 'Running this action will initiate transaction reconciliation process. (Marks matched entries as "Reconciled").';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        ReconciledSuccessResult: Label 'Successfully reconciled document!';
-                        ReconciledFailedResult: Label 'Couldn''t reconcile some entries!';
-                    begin
-                        if _TransactionMatching.ReconcileEntries(Rec) then
-                            Message(ReconciledSuccessResult)
-                        else
-                            Message(ReconciledFailedResult);
                         CurrPage.Update();
                     end;
                 }
@@ -210,8 +197,8 @@ page 6184502 "NPR Adyen Reconciliation"
 
                     trigger OnAction()
                     var
-                        PostedSuccessResult: Label 'Successfully posted document!';
-                        PostedFailedResult: Label 'Couldn''t post some entries!';
+                        PostedSuccessResult: Label 'Successfully posted document.';
+                        PostedFailedResult: Label 'Couldn''t post some entries.';
                     begin
                         if _TransactionMatching.PostEntries(Rec) then
                             Message(PostedSuccessResult)
@@ -274,14 +261,19 @@ page 6184502 "NPR Adyen Reconciliation"
     trigger OnAfterGetRecord()
     var
         RecLine: Record "NPR Adyen Recon. Line";
+        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        _DocumentPosted := Rec.Posted;
         RecLine.Reset();
         RecLine.SetRange("Document No.", Rec."Document No.");
+        if RecLine.IsEmpty() then begin
+            Rec.Posted := true;
+            Rec.Modify();
+        end;
+        _DocumentPosted := Rec.Posted;
+        if AdyenSetup.Get() then
+            _PostWithTransactionDate := AdyenSetup."Post with Transaction Date";
         RecLine.SetRange(Status, RecLine.Status::Posted);
-        if RecLine.IsEmpty() then
-            _LinePosted := false
-        else
+        if not RecLine.IsEmpty() then
             _LinePosted := true;
     end;
 
@@ -290,4 +282,5 @@ page 6184502 "NPR Adyen Reconciliation"
         _LinePosted: Boolean;
         _IsExternalReport: Boolean;
         _DocumentPosted: Boolean;
+        _PostWithTransactionDate: Boolean;
 }

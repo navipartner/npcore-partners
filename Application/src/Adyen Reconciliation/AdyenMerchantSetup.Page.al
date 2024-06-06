@@ -8,8 +8,6 @@ page 6184582 "NPR Adyen Merchant Setup"
     PageType = Card;
     SourceTable = "NPR Adyen Merchant Setup";
     AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup,adyen merchant setup';
-    DeleteAllowed = true;
-    InsertAllowed = true;
 
     layout
     {
