@@ -120,13 +120,15 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 var
                     AdyenSimulateWebhookRequest: Report "NPR Adyen Simulate Webhook Req";
                     ReportName: Text[100];
-                    EmptyNameError01: Label 'Please specify a Report Name!';
+                    InvalidFileType: Label 'Invalid File Type.\The file you attempted to upload is not a valid format. Please upload a file in .CSV format.';
                 begin
                     ReportName := AdyenSimulateWebhookRequest.RequestReportName();
+                    if ReportName = '' then
+                        Error(InvalidReportName);
+                    if not ReportName.Contains('.csv') then
+                        Error(InvalidFileType);
                     if ReportName <> '' then
-                        _AdyenManagement.SimulateWebhookRequest(ReportName)
-                    else
-                        Error(EmptyNameError01);
+                        _AdyenManagement.EmulateWebhookRequest(ReportName);
                 end;
             }
             group("Create Reconciliation Document")
@@ -146,9 +148,14 @@ page 6184519 "NPR AF Rec. Webhook Requests"
 
                     trigger OnAction()
                     var
+                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to make a Reconciliation Document from is not a valid format. A file must be .CSV format.\\Please update your Report Generation configurations in Adyen Customer Area.';
                         WebhookRequest: Record "NPR AF Rec. Webhook Request";
                     begin
                         WebhookRequest := Rec;
+                        if WebhookRequest."Report Name" = '' then
+                            Error(InvalidReportName);
+                        if not WebhookRequest."Report Name".Contains('.csv') then
+                            Error(InvalidFileType);
                         _AdyenManagement.CreateDocumentFromWebhookRequest(WebhookRequest);
                     end;
                 }
@@ -174,4 +181,5 @@ page 6184519 "NPR AF Rec. Webhook Requests"
 
     var
         _AdyenManagement: Codeunit "NPR Adyen Management";
+        InvalidReportName: Label 'Report name is blank.';
 }

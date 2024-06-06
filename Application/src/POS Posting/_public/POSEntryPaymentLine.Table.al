@@ -314,6 +314,17 @@
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(640; "Created by Reconciliation"; Boolean)
+        {
+            Caption = 'Created by Reconciliation';
+            DataClassification = CustomerContent;
+        }
+        field(650; "Created by Recon. Posting No."; Code[20])
+        {
+            Caption = 'Created by Reconciliation Posting No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Adyen Recon. Line"."Posting No.";
+        }
     }
 
     keys

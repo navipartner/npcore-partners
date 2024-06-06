@@ -63,8 +63,8 @@ page 6184551 "NPR Adyen Webhook Setup List"
                 trigger OnAction()
                 var
                     AdyenManagement: Codeunit "NPR Adyen Management";
-                    WebhookImportSuccess: Label 'Successfully imported %1 Webhook Setups!';
-                    WebhookImportFail: Label 'No Webhook Setups were imported!';
+                    WebhookImportSuccess: Label 'Successfully imported %1 Webhook Setups.';
+                    WebhookImportFail: Label 'No Webhook Setups were imported.';
                 begin
                     if AdyenManagement.ImportWebhooks(0) then
                         Message(StrSubstNo(WebhookImportSuccess, Format(AdyenManagement.GetImportedWebhooksAmount())))

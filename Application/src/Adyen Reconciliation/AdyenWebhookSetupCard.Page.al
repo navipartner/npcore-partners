@@ -33,6 +33,35 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                     ToolTip = 'Specifies the Webhook Type.';
                     Editable = not _WebhookCreated;
                 }
+                field("Include Events Filter"; Rec."Include Events Filter")
+                {
+                    Caption = 'Include Events Filter';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Event Codes filter that will trigger a Webhook.';
+                    Editable = false;
+                    TableRelation = "NPR Adyen Webhook Event Code"."Event Code";
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    var
+                        EventCodes: Page "NPR Adyen Webhook Event Codes";
+                        EventCode: Record "NPR Adyen Webhook Event Code";
+                        SelectionFilterMgt: Codeunit SelectionFilterManagement;
+                        RecRef: RecordRef;
+                    begin
+                        if (Rec.Type = Rec.Type::standard) then begin
+                            Clear(EventCodes);
+                            EventCodes.LookupMode := true;
+                            if EventCodes.RunModal() = Action::LookupOK then begin
+                                EventCodes.SetSelectionFilter(EventCode);
+                                RecRef.GetTable(EventCode);
+                                Rec."Include Events Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, EventCode.FieldNo("Event Code")), 1, MaxStrLen(Rec."Include Events Filter"));
+                                Rec.Modify();
+                                CurrPage.Update();
+                            end;
+                        end;
+                    end;
+                }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRetail;
@@ -85,11 +114,14 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                     var
                         MerchantAccounts: Page "NPR Adyen Merchant Accounts";
                         MerchantAccount: Record "NPR Adyen Merchant Account";
+                        RecRef: RecordRef;
+                        SelectionFilterMgt: Codeunit SelectionFilterManagement;
                     begin
                         MerchantAccounts.LookupMode := true;
                         if MerchantAccounts.RunModal() = Action::LookupOK then begin
                             MerchantAccounts.SetSelectionFilter(MerchantAccount);
-                            Rec."Merchant Accounts Filter" := CopyStr(MerchantAccount.GetFilter(Name), 1, MaxStrLen(Rec."Merchant Accounts Filter"));
+                            RecRef.GetTable(MerchantAccount);
+                            Rec."Merchant Accounts Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, MerchantAccount.FieldNo(Name)), 1, MaxStrLen(Rec."Merchant Accounts Filter"));
                             Rec.Modify();
                             CurrPage.Update();
                         end;
@@ -117,8 +149,8 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 trigger OnAction()
                 var
                     AdyenManagement: Codeunit "NPR Adyen Management";
-                    WebhookSetUpSuccess: Label 'Successfully configured Webhook %1!';
-                    WebhookSetUpError: Label 'Could not configure current Webhook! Please contact your Administrator!';
+                    WebhookSetUpSuccess: Label 'Successfully configured Webhook %1.';
+                    WebhookSetUpError: Label 'Could not configure current Webhook. Please contact your Administrator.';
                 begin
                     if Rec.ID = '' then begin
                         if AdyenManagement.CreateWebhook(Rec) then begin
@@ -127,6 +159,28 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                         end else
                             Error(WebhookSetUpError);
                     end;
+                end;
+            }
+            action("Suggest Web Service URL")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Suggest Web Service URL';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Suggest;
+                ToolTip = 'Running this action will suggest a Web Service URL to an Azure Function.';
+
+                trigger OnAction()
+                var
+                    AdyenManagement: Codeunit "NPR Adyen Management";
+                    ErrorLabel: Label 'Webhook must have an ID first.';
+                begin
+                    if Rec.ID = '' then
+                        Error(ErrorLabel);
+                    AdyenManagement.SuggestAFWebServiceURL(Rec);
+                    CurrPage.Update();
                 end;
             }
         }

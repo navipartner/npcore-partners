@@ -32,4 +32,8 @@ enum 6014668 "NPR Adyen Rec. Log Type"
     {
         Caption = 'Validate Report Scheme';
     }
+    value(70; "Init Setup")
+    {
+        Caption = 'Init Setup';
+    }
 }
