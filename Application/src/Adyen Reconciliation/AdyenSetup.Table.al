@@ -75,10 +75,27 @@ table 6150801 "NPR Adyen Setup"
             Caption = 'Reconciliation Document Nos';
             TableRelation = "No. Series";
         }
+        field(95; "Posting Document Nos."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Posting Document Nos.';
+            TableRelation = "No. Series";
+        }
         field(100; "Report Scheme Docs URL"; Text[2048])
         {
             DataClassification = CustomerContent;
             Caption = 'Report Scheme Docs URL';
+        }
+        field(110; "Recon. Integr. Starting Date"; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reconciliation Integration Starting Date';
+        }
+        field(120; "Post with Transaction Date"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Post with Transaction Date';
+            InitValue = true;
         }
     }
     keys

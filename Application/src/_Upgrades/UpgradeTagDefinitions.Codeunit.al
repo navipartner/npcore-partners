@@ -187,6 +187,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Layout Upgrade", 'UpgradeArchivedPOSLayoutEncoding'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT-1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2-1'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdatePSPReferenceForEFTTrans'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -713,7 +714,11 @@
                     'UpgradeArchivedPOSLayoutEncoding':
                         exit('NPR-UpgradeArchivedPOSLayoutEncoding-20240405');
                 end;
-
+            Codeunit::"NPR Recon. EFT Magento Upgrade":
+                case UpgradeStep of
+                    'UpdatePSPReferenceForEFTTrans':
+                        exit('NPR-UpdatePSPReferenceForEFTTrans-20240603');
+                end;
         end;
     end;
 }

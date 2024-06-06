@@ -52,6 +52,11 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Creates/Enables a Reconciliation Web Service which allow receiving Adyen Webhooks.';
                 }
+                field("Recon. Integr. Starting Date"; Rec."Recon. Integr. Starting Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Indicates when the Adyen Reconciliation Integration went into operation.';
+                }
                 field("Download Report API Key"; Rec."Download Report API Key")
                 {
                     ApplicationArea = NPRRetail;
@@ -63,15 +68,20 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if Posting is automatically performed during a Reconciliation process.';
                 }
-                field("Post POS Entries Immediately"; Rec."Post POS Entries Immediately")
+                field("Post with Transaction Date"; Rec."Post with Transaction Date")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if the Reversed Refund/Chargeback POS Entries are posted immediately or the posting is deferred to a later procedure.';
+                    ToolTip = 'Specifies if the reconciled Transaction are posted with the same date as the transaction was created/captured.';
                 }
                 field("Reconciliation Document Nos."; Rec."Reconciliation Document Nos.")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the No. Series code for Reconciliation Documents.';
+                }
+                field("Posting Document Nos."; Rec."Posting Document Nos.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the No. Series Code for Reconciliation Posting Entries.';
                 }
                 field("Report Scheme Docs URL"; Rec."Report Scheme Docs URL")
                 {
@@ -86,62 +96,62 @@ page 6184531 "NPR Adyen Setup"
     {
         area(Processing)
         {
-            action("Configure Webhooks")
+            group("Additional Setup")
             {
-                ApplicationArea = NPRRetail;
-                Caption = 'Configure Webhooks';
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                Image = Setup;
-                ToolTip = 'Running this action will open Webhook Setup List.';
+                Caption = 'Additional Setup';
 
-                trigger OnAction()
-                begin
-                    Page.Run(Page::"NPR Adyen Webhook Setup List");
-                end;
+                action("Configure Webhooks")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Configure Webhooks';
+                    Image = Setup;
+                    ToolTip = 'Running this action will open Webhook Setup List.';
+                    RunObject = Page "NPR Adyen Webhook Setup List";
+                }
+                action("Open Merchant Account Setup")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Open Merchant Account Setup';
+                    Image = Setup;
+                    ToolTip = 'Running this action will open Merchant Account Setup.';
+                    RunObject = Page "NPR Adyen Merchant Setup";
+                }
             }
-            action("Create Azure AD App")
+            group(Configurations)
             {
-                ApplicationArea = NPRRetail;
-                Caption = 'Create Azure AD App';
-                ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
-                Image = Setup;
+                Caption = 'Configurations';
 
-                trigger OnAction()
-                begin
-                    Clear(_AdyenManagement);
-                    _AdyenManagement.CreateAzureADApplication();
-                end;
-            }
-            action("Create Azure AD App Secret")
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Create Azure AD App Secret';
-                ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
-                Image = Setup;
+                action(CreateSaaSSetup)
+                {
+                    Caption = 'Create Setup (Admin)';
+                    Visible = _IsSaaS;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Creates the Adyen Entra app, with user permissions. Needs Admin.';
+                    Image = Action;
 
-                trigger OnAction()
-                begin
-                    Clear(_AdyenManagement);
-                    _AdyenManagement.CreateAzureADApplicationSecret();
-                end;
-            }
-        }
-        area(Navigation)
-        {
-            action("Open Merchant Account Setup")
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Open Merchant Account Setup';
-                Image = Setup;
-                RunObject = Page "NPR Adyen Merchant Setup";
-                ToolTip = 'Running this action will open Merchant Account Setup.';
+                    trigger OnAction()
+                    begin
+                        _AdyenManagement.CreateSaaSSetup();
+                    end;
+                }
+                action("Upgrade EFT & EC Records")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Upgrade EFT & E-Commerce Records';
+                    Image = Setup;
+                    ToolTip = 'Running this action will start the EFT Transaction Request and Magento Payment Line tables'' upgrade.';
+
+                    trigger OnAction()
+                    begin
+                        _AdyenManagement.SetReconciledEFTMagentoUpgrade();
+                    end;
+                }
             }
         }
     }
-
     trigger OnOpenPage()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -150,9 +160,11 @@ page 6184531 "NPR Adyen Setup"
         end;
         _AdyenGenericSetup := Rec;
         Rec.CalcFields("Active Webhooks");
+        _IsSaaS := not EnvironmentInformation.IsOnPrem();
     end;
 
     var
         _AdyenGenericSetup: Record "NPR Adyen Setup";
         _AdyenManagement: Codeunit "NPR Adyen Management";
+        _IsSaaS: Boolean;
 }

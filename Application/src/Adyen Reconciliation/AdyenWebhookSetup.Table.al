@@ -23,6 +23,11 @@ table 6150805 "NPR Adyen Webhook Setup"
             DataClassification = CustomerContent;
             Caption = 'Type';
         }
+        field(25; "Include Events Filter"; Text[2048])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Include Events Filter';
+        }
         field(30; "Web Service URL"; Text[2048])
         {
             DataClassification = CustomerContent;
@@ -83,7 +88,7 @@ table 6150805 "NPR Adyen Webhook Setup"
     trigger OnModify()
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
-        ModifyError: Label 'Something went wrong!';
+        ModifyError: Label 'Something went wrong.';
     begin
         if (ID <> '') and ((("Web Service User" <> '') and ("Web Service Password" <> '')) or (("Web Service User" = '') and ("Web Service Password" = ''))) then
             if not AdyenManagement.ModifyWebhook(Rec) then
