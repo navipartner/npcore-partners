@@ -576,6 +576,13 @@
             FieldClass = FlowField;
             CalcFormula = exist("NPR BG SIS POS Audit Log Aux." where("Audit Entry Type" = const("POS Entry"), "POS Entry No." = field("Entry No.")));
         }
+        field(880; "AT POS Audit Log"; Boolean)
+        {
+            Editable = false;
+            Caption = 'AT POS Audit Log Aux. Info';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR AT POS Audit Log Aux. Info" where("Audit Entry Type" = const("POS Entry"), "POS Entry No." = field("Entry No.")));
+        }
         field(5052; "Contact No."; Code[20])
         {
             Caption = 'Contact No.';
