@@ -237,6 +237,23 @@ page 6184596 "NPR AT Cash Registers"
                     CurrPage.Update(false);
                 end;
             }
+            action(ListOtherControlReceipts)
+            {
+                ApplicationArea = NPRATFiscal;
+                Caption = 'Import Other Control Receipts';
+                Image = RefreshLines;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Imports information about the other control receipts related to this cash register from Fiskaly into POS audit log.';
+
+                trigger OnAction()
+                var
+                    ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+                begin
+                    ATFiskalyCommunication.ListCashRegisterReceipts(Rec, Enum::"NPR AT Audit Entry Type"::"Control Transaction", ATFiskalyCommunication.GetListOtherCashRegisterControlReceiptsQueryParameters());
+                end;
+            }
         }
     }
 }

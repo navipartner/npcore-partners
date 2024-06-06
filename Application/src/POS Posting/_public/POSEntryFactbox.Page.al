@@ -278,7 +278,29 @@
                         BGSISPOSAuditLogAux.SetRange("Audit Entry Type", BGSISPOSAuditLogAux."Audit Entry Type"::"POS Entry");
                         BGSISPOSAuditLogAux.SetRange("POS Entry No.", Rec."Entry No.");
                         BGSISPOSAuditLogAux.FilterGroup(0);
-                        Page.RunModal(Page::"NPR BG SIS POS Audit Log Aux.", BGSISPOSAuditLogAux);
+                        Page.RunModal(0, BGSISPOSAuditLogAux);
+                    end;
+                }
+            }
+            group(ATPOSAuditLogGroup)
+            {
+                ShowCaption = false;
+                Visible = ShowATAudit;
+                field("AT POS Audit Log"; Rec."AT POS Audit Log")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'AT POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of AT POS Audit Log information.';
+
+                    trigger OnDrillDown()
+                    var
+                        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+                    begin
+                        ATPOSAuditLogAuxInfo.FilterGroup(10);
+                        ATPOSAuditLogAuxInfo.SetRange("Audit Entry Type", ATPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
+                        ATPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        ATPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(0, ATPOSAuditLogAuxInfo);
                     end;
                 }
             }
@@ -351,6 +373,7 @@
         Clear(ShowCroAudit);
         Clear(ShowSIAudit);
         Clear(ShowBGSISAudit);
+        Clear(ShowATAudit);
     end;
 
     local procedure SetShowVariables(POSAuditProfile: Record "NPR POS Audit Profile")
@@ -361,6 +384,7 @@
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
         BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
+        ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
     begin
         case POSAuditProfile."Audit Handler" of
             CleanCashXCCSPProtocol.HandlerCode():
@@ -375,6 +399,8 @@
                 ShowSIAudit := true;
             BGSISAuditMgt.HandlerCode():
                 ShowBGSISAudit := true;
+            ATAuditMgt.HandlerCode():
+                ShowATAudit := true;
         end;
     end;
 
@@ -385,5 +411,6 @@
         ShowRSAudit: Boolean;
         ShowSIAudit: Boolean;
         ShowBGSISAudit: Boolean;
+        ShowATAudit: Boolean;
 }
 

@@ -36,7 +36,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup.GetWithCheck();
         CheckAuthenticateAPICredentials(ATOrganization);
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + AuthenticateAPILbl;
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", AuthenticateAPILbl);
         JsonBody := CreateJSONBodyForAuthenticateAPI(ATOrganization, RefreshToken);
         PrepareHttpRequest(ATOrganization, false, RequestMessage, JsonBody, Url, RestMethod::POST);
 
@@ -84,7 +84,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup.GetWithCheck();
         CheckFONAuthenticationCredentials(ATFiscalizationSetup);
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + AuthenticateFONLbl;
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", AuthenticateFONLbl);
         JsonBody := CreateJSONBodyForAuthenticateFON(ATFiscalizationSetup);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
@@ -107,7 +107,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.CheckIsFONAuthenticationStatusNotAuthenticated();
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + RetrieveFONStatusLbl;
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", RetrieveFONStatusLbl);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
@@ -168,7 +168,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(CreateSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(CreateSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForCreateSCU(ATSCU);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
@@ -194,7 +194,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(RetrieveSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(RetrieveSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower()));
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
@@ -246,7 +246,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(UpdateSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(UpdateSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForUpdateSCU(NewState);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PATCH);
 
@@ -288,7 +288,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + ListSCUsLbl;
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", ListSCUsLbl);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
@@ -319,7 +319,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(CreateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(CreateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForCreateCashRegister(ATCashRegister);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
@@ -346,7 +346,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(CreateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(CreateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()));
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
@@ -405,7 +405,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + StrSubstNo(UpdateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower());
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(UpdateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForUpdateCashRegister(NewState);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PATCH);
 
@@ -448,13 +448,162 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         ATFiscalizationSetup.GetWithCheck();
 
-        Url := ATFiscalizationSetup."Fiskaly API URL" + ListCashRegistersLbl;
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", ListCashRegistersLbl);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
-            Error('%1\\%2', ListCashRegistersErr, ResponseText);
+            Error('%1\\%2', ListCashRegistersErr, GetLastErrorText());
 
         PopulateATCashRegisterForListCashRegisters(ResponseText);
+    end;
+    #endregion
+
+    #region Receipt Management
+    internal procedure ValidateReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        RequestMessage: HttpRequestMessage;
+        ValidateReceiptErr: Label 'Validate Receipt failed.';
+        ValidateReceiptLbl: Label 'cash-register/%1/receipt/%2/validation', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATPOSAuditLogAuxInfo.TestField(SystemId);
+        ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
+        ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(ValidateReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::POST);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', ValidateReceiptErr, GetLastErrorText());
+
+        PopulateATPOSAuditLogAuxInfoForValidateReceipt(ATPOSAuditLogAuxInfo, ResponseText);
+    end;
+
+    internal procedure SignReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        RequestMessage: HttpRequestMessage;
+        SignReceiptErr: Label 'Sign Receipt failed.';
+        SignReceiptLbl: Label 'cash-register/%1/receipt/%2', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
+        JsonBody: Text;
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATPOSAuditLogAuxInfo.TestField(SystemId);
+        ATPOSAuditLogAuxInfo.TestField("POS Entry No.");
+        ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
+        ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
+        ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
+        ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(SignReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
+        JsonBody := CreateJSONBodyForSignReceipt(ATPOSAuditLogAuxInfo);
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', SignReceiptErr, GetLastErrorText());
+
+        PopulateATPOSAuditLogAuxInfoForSignReceipt(ATPOSAuditLogAuxInfo, ResponseText);
+    end;
+
+    internal procedure RetrieveReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        RequestMessage: HttpRequestMessage;
+        RetrieveReceiptErr: Label 'Retrieve Receipt failed.';
+        RetrieveReceiptLbl: Label 'cash-register/%1/receipt/%2', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATPOSAuditLogAuxInfo.TestField(SystemId);
+        ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
+        ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
+        ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
+        ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(RetrieveReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', RetrieveReceiptErr, GetLastErrorText());
+
+        PopulateATPOSAuditLogAuxInfoForRetrieveReceipt(ATPOSAuditLogAuxInfo, ResponseText);
+    end;
+
+    internal procedure ListCashRegisterReceipts(ATCashRegister: Record "NPR AT Cash Register"; ATAuditEntryType: Enum "NPR AT Audit Entry Type"; QueryParameters: Text)
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        RequestMessage: HttpRequestMessage;
+        ListCashRegisterReceiptsErr: Label 'List Cash Register Receipts failed.';
+        ListCashRegisterReceiptsLbl: Label 'cash-register/%1/receipt', Locked = true, Comment = '%1 - Cash Register Id value';
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATCashRegister.TestField(SystemId);
+        ATCashRegister.TestField("AT SCU Code");
+        ATSCU.Get(ATCashRegister."AT SCU Code");
+        ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(ListCashRegisterReceiptsLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()) + QueryParameters);
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', ListCashRegisterReceiptsErr, GetLastErrorText());
+
+        PopulateATPOSAuditLogAuxInfoForListCashRegisterReceipts(ATCashRegister, ATAuditEntryType, ResponseText);
+    end;
+
+    internal procedure GetListOtherCashRegisterControlReceiptsQueryParameters() QueryParameters: Text
+    var
+        QueryParameterAlreadyAdded: Boolean;
+    begin
+        QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'receipt_types[1]', Enum::"NPR AT Receipt Type".Names().Get(Enum::"NPR AT Receipt Type".Ordinals().IndexOf(Enum::"NPR AT Receipt Type"::MONTHLY_CLOSE.AsInteger())));
+        QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'receipt_types[2]', Enum::"NPR AT Receipt Type".Names().Get(Enum::"NPR AT Receipt Type".Ordinals().IndexOf(Enum::"NPR AT Receipt Type"::YEARLY_CLOSE.AsInteger())));
+        QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'receipt_types[3]', Enum::"NPR AT Receipt Type".Names().Get(Enum::"NPR AT Receipt Type".Ordinals().IndexOf(Enum::"NPR AT Receipt Type"::SIGNATURE_CREATION_UNIT_FAULT_CLEARANCE.AsInteger())));
+    end;
+
+    internal procedure UpdateReceiptMetadata(ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        RequestMessage: HttpRequestMessage;
+        UpdateReceiptMetadataErr: Label 'Update Receipt Metadata failed.';
+        UpdateReceiptMetadataLbl: Label 'cash-register/%1/receipt/%2/metadata', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
+        JsonBody: Text;
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATPOSAuditLogAuxInfo.TestField(SystemId);
+        ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
+        ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
+        ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
+        ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(UpdateReceiptMetadataLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
+        JsonBody := CreateJSONBodyForUpdateReceiptMetadata(ATPOSAuditLogAuxInfo);
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PATCH);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', UpdateReceiptMetadataErr, GetLastErrorText());
     end;
     #endregion
 
@@ -560,6 +709,130 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         JsonTextWriter.WriteStringProperty('state', Enum::"NPR AT Cash Register State".Names().Get(Enum::"NPR AT Cash Register State".Ordinals().IndexOf(NewState.AsInteger())));
         JsonTextWriter.WriteEndObject();
         JsonBody := JsonTextWriter.GetJSonAsText();
+    end;
+
+    local procedure CreateJSONBodyForSignReceipt(ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info") JsonBody: Text
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        JsonTextWriter: Codeunit "Json Text Reader/Writer";
+    begin
+        JsonTextWriter.WriteStartObject('');
+
+        ATFiscalizationSetup.Get();
+        if ATFiscalizationSetup.Training then
+            JsonTextWriter.WriteStringProperty('receipt_type', Enum::"NPR AT Receipt Type".Names().Get(Enum::"NPR AT Receipt Type".Ordinals().IndexOf(Enum::"NPR AT Receipt Type"::TRAINING.AsInteger())))
+        else
+            JsonTextWriter.WriteStringProperty('receipt_type', Enum::"NPR AT Receipt Type".Names().Get(Enum::"NPR AT Receipt Type".Ordinals().IndexOf(ATPOSAuditLogAuxInfo."Receipt Type".AsInteger())));
+
+        JsonTextWriter.WriteStartObject('schema');
+        JsonTextWriter.WriteStartObject('standard_v1');
+        AddAmountsPerVATRateJSONArrayForSignReceipt(JsonTextWriter, ATPOSAuditLogAuxInfo."POS Entry No.");
+        AddAmountsPerPaymentTypeJSONArrayForSignReceipt(JsonTextWriter, ATPOSAuditLogAuxInfo."POS Entry No.");
+        AddLineItemsJSONArrayForSignReceipt(JsonTextWriter, ATPOSAuditLogAuxInfo."POS Entry No.");
+        JsonTextWriter.WriteEndObject(); // standard_v1
+        JsonTextWriter.WriteEndObject(); // schema
+
+        AddMetadataForSignReceipt(ATPOSAuditLogAuxInfo, JsonTextWriter);
+
+        JsonTextWriter.WriteEndObject();
+        JsonBody := JsonTextWriter.GetJSonAsText();
+    end;
+
+    local procedure AddAmountsPerVATRateJSONArrayForSignReceipt(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    var
+        ATVATPostingSetupMap: Record "NPR AT VAT Posting Setup Map";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
+    begin
+        JsonTextWriter.WriteStartArray('amounts_per_vat_rate');
+
+        POSEntryTaxLine.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryTaxLine.FindSet() then
+            repeat
+                ATVATPostingSetupMap.SetRange("VAT Identifier", POSEntryTaxLine."VAT Identifier");
+                ATVATPostingSetupMap.FindFirst();
+                ATVATPostingSetupMap.CheckIsATVATRatePopulated();
+
+                JsonTextWriter.WriteStartObject('');
+                JsonTextWriter.WriteStringProperty('vat_rate', Enum::"NPR AT VAT Rate".Names().Get(Enum::"NPR AT VAT Rate".Ordinals().IndexOf(ATVATPostingSetupMap."AT VAT Rate".AsInteger())));
+                JsonTextWriter.WriteStringProperty('amount', Format(POSEntryTaxLine."Amount Including Tax", 0, '<Precision,2:2><Standard Format,2>'));
+                JsonTextWriter.WriteEndObject();
+            until POSEntryTaxLine.Next() = 0;
+
+        JsonTextWriter.WriteEndArray();
+    end;
+
+    local procedure AddAmountsPerPaymentTypeJSONArrayForSignReceipt(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    var
+        Currency: Record Currency;
+        ATPOSPaymentMethodMap: Record "NPR AT POS Payment Method Map";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        JsonTextWriter.WriteStartArray('amounts_per_payment_type');
+
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                ATPOSPaymentMethodMap.Get(POSEntryPaymentLine."POS Payment Method Code");
+                ATPOSPaymentMethodMap.CheckIsATPaymentTypePopulated();
+
+                JsonTextWriter.WriteStartObject('');
+                JsonTextWriter.WriteStringProperty('payment_type', Enum::"NPR AT Payment Type".Names().Get(Enum::"NPR AT Payment Type".Ordinals().IndexOf(ATPOSPaymentMethodMap."AT Payment Type".AsInteger())));
+                JsonTextWriter.WriteStringProperty('amount', Format(POSEntryPaymentLine.Amount, 0, '<Precision,2:26><Standard Format,2>'));
+
+                if POSEntryPaymentLine."Currency Code" <> '' then begin
+                    Currency.Get(POSEntryPaymentLine."Currency Code");
+                    Currency.TestField("ISO Code");
+                    JsonTextWriter.WriteStringProperty('currency_code', Currency."ISO Code");
+                end;
+
+                JsonTextWriter.WriteEndObject();
+            until POSEntryPaymentLine.Next() = 0;
+
+        JsonTextWriter.WriteEndArray();
+    end;
+
+    local procedure AddLineItemsJSONArrayForSignReceipt(var JsonTextReaderWriter: Codeunit "Json Text Reader/Writer"; POSEntryNo: Integer)
+    var
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        UnitPrice: Decimal;
+    begin
+        JsonTextReaderWriter.WriteStartArray('line_items');
+
+        POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
+        POSEntrySalesLine.SetFilter(Quantity, '<>0');
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                JsonTextReaderWriter.WriteStartObject('');
+                JsonTextReaderWriter.WriteStringProperty('quantity', Format(Round(POSEntrySalesLine.Quantity, 0.01), 0, '<Precision,0:26><Standard Format,2>'));
+                JsonTextReaderWriter.WriteStringProperty('text', POSEntrySalesLine.Description);
+                UnitPrice := Abs(Round(POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity, 0.01));
+                JsonTextReaderWriter.WriteStringProperty('price_per_unit', Format(UnitPrice, 0, '<Precision,2:5><Standard Format,2>'));
+                JsonTextReaderWriter.WriteEndObject();
+            until POSEntrySalesLine.Next() = 0;
+
+        JsonTextReaderWriter.WriteEndArray();
+    end;
+
+    local procedure CreateJSONBodyForUpdateReceiptMetadata(ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info") JsonBody: Text
+    var
+        JsonTextWriter: Codeunit "Json Text Reader/Writer";
+    begin
+        JsonTextWriter.WriteStartObject('');
+        JsonTextWriter.WriteStringProperty('bc_company_name', CompanyName());
+        JsonTextWriter.WriteStringProperty('bc_cash_register_code', ATPOSAuditLogAuxInfo."POS Unit No.");
+        JsonTextWriter.WriteStringProperty('bc_scu_code', ATPOSAuditLogAuxInfo."AT SCU Code");
+        JsonTextWriter.WriteEndObject();
+        JsonBody := JsonTextWriter.GetJSonAsText();
+    end;
+
+    local procedure AddMetadataForSignReceipt(ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; var JsonTextWriter: Codeunit "Json Text Reader/Writer")
+    begin
+        JsonTextWriter.WriteStartObject('metadata');
+        JsonTextWriter.WriteStringProperty('bc_company_name', CompanyName());
+        JsonTextWriter.WriteStringProperty('bc_cash_register_code', ATPOSAuditLogAuxInfo."POS Unit No.");
+        JsonTextWriter.WriteStringProperty('bc_scu_code', ATPOSAuditLogAuxInfo."AT SCU Code");
+        JsonTextWriter.WriteEndObject();
     end;
     #endregion
 
@@ -950,9 +1223,266 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
 
         exit(Enum::"NPR AT Cash Register State"::" ");
     end;
+
+    local procedure PopulateATPOSAuditLogAuxInfoForValidateReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    var
+        TypeHelper: Codeunit "Type Helper";
+        PropertyValue, ResponseJson : JsonToken;
+    begin
+        ResponseJson.ReadFrom(ResponseText);
+
+        ResponseJson.SelectToken('validation_result', PropertyValue);
+        ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
+
+        ResponseJson.SelectToken('time_validation', PropertyValue);
+        ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+        ATPOSAuditLogAuxInfo.Modify(true);
+    end;
+
+    local procedure PopulateATPOSAuditLogAuxInfoForSignReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    var
+        ATSCU: Record "NPR AT SCU";
+        TypeHelper: Codeunit "Type Helper";
+        PropertyValue, ResponseJson : JsonToken;
+        Hints: Text;
+    begin
+        ResponseJson.ReadFrom(ResponseText);
+
+        ResponseJson.SelectToken('signature_creation_unit_id', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT SCU Id" := PropertyValue.AsValue().AsText();
+
+        ATSCU.GetBySystemId(PropertyValue.AsValue().AsText());
+        ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+        ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+
+        ResponseJson.SelectToken('cash_register_id', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT Cash Register Id" := PropertyValue.AsValue().AsText();
+
+        ResponseJson.SelectToken('cash_register_serial_number', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."AT Cash Register Serial Number"));
+
+        ResponseJson.SelectToken('receipt_type', PropertyValue);
+        ATPOSAuditLogAuxInfo."Receipt Type" := GetReceiptType(PropertyValue.AsValue().AsText());
+
+        ResponseJson.SelectToken('receipt_number', PropertyValue);
+        ATPOSAuditLogAuxInfo."Receipt Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."Receipt Number"));
+
+        ResponseJson.SelectToken('signed', PropertyValue);
+        ATPOSAuditLogAuxInfo.Signed := PropertyValue.AsValue().AsBoolean();
+
+        ResponseJson.SelectToken('time_signature', PropertyValue);
+        ATPOSAuditLogAuxInfo."Signed At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+
+        ResponseJson.SelectToken('qr_code_data', PropertyValue);
+        ATPOSAuditLogAuxInfo.SetQRCode(PropertyValue.AsValue().AsText());
+
+        Hints := GetReceiptHints(ResponseJson);
+        ATPOSAuditLogAuxInfo.Hints := CopyStr(Hints, 1, MaxStrLen(ATPOSAuditLogAuxInfo.Hints));
+
+        ATPOSAuditLogAuxInfo.Modify(true);
+    end;
+
+    local procedure PopulateATPOSAuditLogAuxInfoForRetrieveReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    var
+        ATSCU: Record "NPR AT SCU";
+        TypeHelper: Codeunit "Type Helper";
+        FONValidationObject, FONValidationObjects, PropertyValue, ResponseJson : JsonToken;
+        Hints: Text;
+    begin
+        ResponseJson.ReadFrom(ResponseText);
+
+        ResponseJson.SelectToken('signature_creation_unit_id', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT SCU Id" := PropertyValue.AsValue().AsText();
+
+        ATSCU.GetBySystemId(PropertyValue.AsValue().AsText());
+        ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+        ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+
+        ResponseJson.SelectToken('cash_register_id', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT Cash Register Id" := PropertyValue.AsValue().AsText();
+
+        ResponseJson.SelectToken('cash_register_serial_number', PropertyValue);
+        ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."AT Cash Register Serial Number"));
+
+        ResponseJson.SelectToken('receipt_type', PropertyValue);
+        ATPOSAuditLogAuxInfo."Receipt Type" := GetReceiptType(PropertyValue.AsValue().AsText());
+
+        ResponseJson.SelectToken('receipt_number', PropertyValue);
+        ATPOSAuditLogAuxInfo."Receipt Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."Receipt Number"));
+
+        ResponseJson.SelectToken('signed', PropertyValue);
+        ATPOSAuditLogAuxInfo.Signed := PropertyValue.AsValue().AsBoolean();
+
+        ResponseJson.SelectToken('time_signature', PropertyValue);
+        ATPOSAuditLogAuxInfo."Signed At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+
+        ResponseJson.SelectToken('qr_code_data', PropertyValue);
+        ATPOSAuditLogAuxInfo.SetQRCode(PropertyValue.AsValue().AsText());
+
+        Hints := GetReceiptHints(ResponseJson);
+        ATPOSAuditLogAuxInfo.Hints := CopyStr(Hints, 1, MaxStrLen(ATPOSAuditLogAuxInfo.Hints));
+
+        if ResponseJson.SelectToken('fon_validations', FONValidationObjects) then
+            if FONValidationObjects.IsArray() then
+                foreach FONValidationObject in FONValidationObjects.AsArray() do begin
+                    FONValidationObject.SelectToken('validation_result', PropertyValue);
+                    ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
+
+                    FONValidationObject.SelectToken('time_validation', PropertyValue);
+                    ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+                end;
+
+        ATPOSAuditLogAuxInfo.Modify(true);
+    end;
+
+    local procedure PopulateATPOSAuditLogAuxInfoForListCashRegisterReceipts(ATCashRegister: Record "NPR AT Cash Register"; ATAuditEntryType: Enum "NPR AT Audit Entry Type"; ResponseText: Text)
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        ATSCU: Record "NPR AT SCU";
+        TypeHelper: Codeunit "Type Helper";
+        Inserted: Boolean;
+        FONValidationObject, FONValidationObjects, PropertyValue, ReceiptObject, ReceiptObjects, ResponseJson : JsonToken;
+        Hints: Text;
+    begin
+        ResponseJson.ReadFrom(ResponseText);
+        if not ResponseJson.SelectToken('data', ReceiptObjects) then
+            exit;
+
+        if not ReceiptObjects.IsArray() then
+            exit;
+
+        foreach ReceiptObject in ReceiptObjects.AsArray() do begin
+            Inserted := InsertOrGetATPOSAuditLogAuxInfo(ATCashRegister, ATPOSAuditLogAuxInfo, ATAuditEntryType, ReceiptObject);
+
+            ReceiptObject.SelectToken('signature_creation_unit_id', PropertyValue);
+            ATPOSAuditLogAuxInfo."AT SCU Id" := PropertyValue.AsValue().AsText();
+
+            ATSCU.GetBySystemId(PropertyValue.AsValue().AsText());
+            ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+            ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+
+            ReceiptObject.SelectToken('cash_register_id', PropertyValue);
+            ATPOSAuditLogAuxInfo."AT Cash Register Id" := PropertyValue.AsValue().AsText();
+
+            ReceiptObject.SelectToken('cash_register_serial_number', PropertyValue);
+            ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."AT Cash Register Serial Number"));
+
+            ReceiptObject.SelectToken('receipt_type', PropertyValue);
+            ATPOSAuditLogAuxInfo."Receipt Type" := GetReceiptType(PropertyValue.AsValue().AsText());
+
+            ReceiptObject.SelectToken('receipt_number', PropertyValue);
+            ATPOSAuditLogAuxInfo."Receipt Number" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ATPOSAuditLogAuxInfo."Receipt Number"));
+
+            ReceiptObject.SelectToken('signed', PropertyValue);
+            ATPOSAuditLogAuxInfo.Signed := PropertyValue.AsValue().AsBoolean();
+
+            ReceiptObject.SelectToken('time_signature', PropertyValue);
+            ATPOSAuditLogAuxInfo."Signed At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+
+            ReceiptObject.SelectToken('qr_code_data', PropertyValue);
+            ATPOSAuditLogAuxInfo.SetQRCode(PropertyValue.AsValue().AsText());
+
+            Hints := GetReceiptHints(ReceiptObject);
+            ATPOSAuditLogAuxInfo.Hints := CopyStr(Hints, 1, MaxStrLen(ATPOSAuditLogAuxInfo.Hints));
+
+            if ReceiptObject.SelectToken('fon_validations', FONValidationObjects) then
+                if FONValidationObjects.IsArray() then
+                    foreach FONValidationObject in FONValidationObjects.AsArray() do begin
+                        FONValidationObject.SelectToken('validation_result', PropertyValue);
+                        ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
+
+                        FONValidationObject.SelectToken('time_validation', PropertyValue);
+                        ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+                    end;
+
+            ATPOSAuditLogAuxInfo.Modify(true);
+
+            if Inserted then
+                UpdateReceiptMetadata(ATPOSAuditLogAuxInfo);
+        end;
+    end;
+
+    local procedure InsertOrGetATPOSAuditLogAuxInfo(ATCashRegister: Record "NPR AT Cash Register"; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ATAuditEntryType: Enum "NPR AT Audit Entry Type"; var ReceiptObject: JsonToken) Inserted: Boolean;
+    var
+        POSUnit: Record "NPR POS Unit";
+        SystemId: Guid;
+        PropertyValue: JsonToken;
+    begin
+        ReceiptObject.SelectToken('_id', PropertyValue);
+        SystemId := PropertyValue.AsValue().AsText();
+        if not ATPOSAuditLogAuxInfo.GetBySystemId(SystemId) then begin
+            ATPOSAuditLogAuxInfo.Init();
+            ATPOSAuditLogAuxInfo."Audit Entry Type" := ATAuditEntryType;
+            ATPOSAuditLogAuxInfo."Entry Date" := Today();
+            POSUnit.Get(ATCashRegister."POS Unit No.");
+            ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+            ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
+            ATPOSAuditLogAuxInfo.SystemId := SystemId;
+            ATPOSAuditLogAuxInfo.Insert(false, true);
+            Inserted := true;
+        end;
+    end;
+
+    local procedure GetFONReceiptValididationStatus(State: Text): Enum "NPR AT FON Rcpt. Valid. Status"
+    begin
+        if Enum::"NPR AT FON Rcpt. Valid. Status".Names().Contains(State) then
+            exit(Enum::"NPR AT FON Rcpt. Valid. Status".FromInteger(Enum::"NPR AT FON Rcpt. Valid. Status".Ordinals().Get(Enum::"NPR AT FON Rcpt. Valid. Status".Names().IndexOf(State))));
+
+        exit(Enum::"NPR AT FON Rcpt. Valid. Status"::" ");
+    end;
+
+    local procedure GetReceiptType(State: Text): Enum "NPR AT Receipt Type"
+    begin
+        if Enum::"NPR AT Receipt Type".Names().Contains(State) then
+            exit(Enum::"NPR AT Receipt Type".FromInteger(Enum::"NPR AT Receipt Type".Ordinals().Get(Enum::"NPR AT Receipt Type".Names().IndexOf(State))));
+
+        exit(Enum::"NPR AT Receipt Type"::" ");
+    end;
+
+    local procedure GetReceiptHints(var ReceiptObject: JsonToken) Hints: Text
+    var
+        HintObject: JsonToken;
+        HintObjects: JsonToken;
+        Hint: Text;
+    begin
+        if ReceiptObject.SelectToken('hints', HintObjects) then
+            if HintObjects.IsArray() then
+                foreach HintObject in HintObjects.AsArray() do begin
+                    HintObject.WriteTo(Hint);
+                    Hints += Hint.Replace('"', '') + '; ';
+                end;
+
+        Hints := Hints.TrimEnd('; ');
+    end;
     #endregion
 
     #region Http Requests - Misc
+    local procedure CreateUrl(BaseUrl: Text; Method: Text) Url: Text
+    begin
+        if BaseUrl.EndsWith('/') then
+            Url := BaseUrl + Method
+        else
+            Url := BaseUrl + '/' + Method;
+    end;
+
+    local procedure PrepareHttpRequest(ATOrganization: Record "NPR AT Organization"; SetAuthorization: Boolean; var RequestMessage: HttpRequestMessage; JsonBody: Text; Url: Text; RestMethodToUse: Option GET,POST,DELETE,PATCH,PUT)
+    var
+        RequestContent: HttpContent;
+        RequestHeaders: HttpHeaders;
+        BearerTokenLbl: Label 'Bearer %1', Locked = true, Comment = '%1 - JWT value';
+    begin
+        if JsonBody <> '' then begin
+            SetRequestContent(RequestContent, RequestHeaders, JsonBody);
+            RequestMessage.Content(RequestContent);
+        end;
+
+        RequestMessage.SetRequestUri(Url);
+        RequestMessage.Method(GetRestMethod(RestMethodToUse));
+        RequestMessage.GetHeaders(RequestHeaders);
+        if SetAuthorization then
+            RequestHeaders.Add('Authorization', StrSubstNo(BearerTokenLbl, GetJWT(ATOrganization)));
+    end;
+
     local procedure SetRequestContent(var RequestContent: HttpContent; var RequestHeaders: HttpHeaders; JsonBody: Text)
     begin
         if JsonBody = '' then
@@ -984,24 +1514,6 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
             Error(ResponseText);
     end;
 
-    local procedure PrepareHttpRequest(ATOrganization: Record "NPR AT Organization"; SetAuthorization: Boolean; var RequestMessage: HttpRequestMessage; JsonBody: Text; Url: Text; RestMethodToUse: Option GET,POST,DELETE,PATCH,PUT)
-    var
-        RequestContent: HttpContent;
-        RequestHeaders: HttpHeaders;
-        BearerTokenLbl: Label 'Bearer %1', Locked = true, Comment = '%1 - JWT value';
-    begin
-        if JsonBody <> '' then begin
-            SetRequestContent(RequestContent, RequestHeaders, JsonBody);
-            RequestMessage.Content(RequestContent);
-        end;
-
-        RequestMessage.SetRequestUri(Url);
-        RequestMessage.Method(GetRestMethod(RestMethodToUse));
-        RequestMessage.GetHeaders(RequestHeaders);
-        if SetAuthorization then
-            RequestHeaders.Add('Authorization', StrSubstNo(BearerTokenLbl, GetJWT(ATOrganization)));
-    end;
-
     local procedure GetRestMethod(RestMethodToCheck: Option GET,POST,DELETE,PATCH,PUT): Text
     begin
         case RestMethodToCheck of
@@ -1016,6 +1528,17 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
             RestMethodToCheck::PUT:
                 exit('PUT');
         end;
+    end;
+
+    local procedure CreateQueryParameter(var QueryParameterAlreadyAdded: Boolean; QueryParameterName: Text; QueryParameterValue: Text) QueryParameter: Text
+    begin
+        if QueryParameterAlreadyAdded then
+            QueryParameter := '&'
+        else
+            QueryParameter := '?';
+
+        QueryParameter += QueryParameterName + '=' + QueryParameterValue;
+        QueryParameterAlreadyAdded := true;
     end;
     #endregion
 
