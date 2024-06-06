@@ -515,6 +515,17 @@
             Caption = 'PSP Reference';
             DataClassification = CustomerContent;
         }
+        field(840; "Created by Reconciliation"; Boolean)
+        {
+            Caption = 'Created by Reconciliation';
+            DataClassification = CustomerContent;
+        }
+        field(850; "Created by Recon. Posting No."; Code[20])
+        {
+            Caption = 'Created by Recon. Posting No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Adyen Recon. Line"."Posting No.";
+        }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
             CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));

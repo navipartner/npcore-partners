@@ -14,6 +14,22 @@ table 6150874 "NPR Adyen Recon. Line"
             TableRelation = "NPR Adyen Reconciliation Hdr"."Document No.";
             DataClassification = CustomerContent;
         }
+        field(5; "Posting No."; Code[20])
+        {
+            Caption = 'Posting No.';
+            DataClassification = CustomerContent;
+        }
+        field(6; "Posting Date"; Date)
+        {
+            Caption = 'Posting Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Posting Date" = 0D then
+                    "Posting Date" := Today();
+            end;
+        }
         field(10; "Line No."; Integer)
         {
             NotBlank = true;
@@ -54,7 +70,6 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(80; "Gross Credit"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Gross Credit';
             DataClassification = CustomerContent;
@@ -65,7 +80,6 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(90; "Gross Debit"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Gross Debit';
             DataClassification = CustomerContent;
@@ -76,14 +90,13 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(100; "Exchange Rate"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Exchange Rate';
             DataClassification = CustomerContent;
         }
         field(110; "Amount (TCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = "Transaction Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount (TCY)';
             DataClassification = CustomerContent;
@@ -96,31 +109,29 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(130; "Net Credit"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Net Credit';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
-                "Amount(AAC)" := "Net Credit" - "Net Debit";
+                "Amount(AAC)" := ("Net Credit" - "Net Debit") + "Payment Fees (NC)";
             end;
         }
         field(140; "Net Debit"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Net Debit';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
             begin
-                "Amount(AAC)" := "Net Credit" - "Net Debit";
+                "Amount(AAC)" := ("Net Credit" - "Net Debit") + "Payment Fees (NC)";
             end;
         }
         field(150; "Amount(AAC)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = "Adyen Acc. Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount (AAC)';
             DataClassification = CustomerContent;
@@ -133,7 +144,7 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(170; "Markup (NC)"; Decimal)
         {
-            Caption = 'Markup (NC)';
+            Caption = 'Markup (AAC)';
             DataClassification = CustomerContent;
         }
         field(180; "Realized Gains or Losses"; Decimal)
@@ -158,27 +169,40 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(220; "Commission (NC)"; Decimal)
         {
-            Caption = 'Commission (NC)';
+            Caption = 'Commission (AAC)';
             DataClassification = CustomerContent;
         }
         field(230; "Scheme Fees (NC)"; Decimal)
         {
-            Caption = 'Scheme Fees (NC)';
+            Caption = 'Scheme Fees (AAC)';
             DataClassification = CustomerContent;
         }
         field(240; "Intercharge (NC)"; Decimal)
         {
-            Caption = 'Intercharge (NC)';
+            Caption = 'Intercharge (AAC)';
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Replaced with "Interchange (NC)"';
+        }
+        field(245; "Interchange (NC)"; Decimal)
+        {
+            Caption = 'Interchange (AAC)';
             DataClassification = CustomerContent;
         }
         field(250; "Payment Fees (NC)"; Decimal)
         {
-            Caption = 'Payment Fees (NC)';
+            Caption = 'Payment Fees (AAC)';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                "Amount(AAC)" := ("Net Credit" - "Net Debit") + "Payment Fees (NC)";
+            end;
         }
         field(260; "Other Commissions (NC)"; Decimal)
         {
-            Caption = 'Other Commissions (NC)';
+            Caption = 'Other Commissions (AAC)';
             DataClassification = CustomerContent;
         }
         field(270; "Matching Table Name"; Enum "NPR Adyen Trans. Rec. Table")
@@ -206,6 +230,41 @@ table 6150874 "NPR Adyen Recon. Line"
             DataClassification = CustomerContent;
             TableRelation = "NPR AF Rec. Webhook Request".ID;
         }
+        field(310; "Amount (LCY)"; Decimal)
+        {
+            Caption = 'Amount (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(320; "Markup (LCY)"; Decimal)
+        {
+            Caption = 'Markup (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(330; "Payment Fees (LCY)"; Decimal)
+        {
+            Caption = 'Payment Fees (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(340; "Commission (LCY)"; Decimal)
+        {
+            Caption = 'Commission (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(350; "Scheme Fees (LCY)"; Decimal)
+        {
+            Caption = 'Scheme Fees (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(360; "Interchange (LCY)"; Decimal)
+        {
+            Caption = 'Interchange (LCY)';
+            DataClassification = CustomerContent;
+        }
+        field(370; "Other Commissions (LCY)"; Decimal)
+        {
+            Caption = 'Other Commissions (LCY)';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -221,14 +280,5 @@ table 6150874 "NPR Adyen Recon. Line"
     begin
         if ("Amount(AAC)" = 0) and ("Transaction Currency Code" = "Adyen Acc. Currency Code") then
             "Amount(AAC)" := "Amount (TCY)";
-    end;
-
-    procedure GetCurrencyCode(): Code[10]
-    var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-    begin
-        if GeneralLedgerSetup.Get() then
-            exit(GeneralLedgerSetup."LCY Code");
-        exit('');
     end;
 }

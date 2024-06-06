@@ -13,22 +13,30 @@ codeunit 6184771 "NPR AF Rec. API Request"
         JsonToken: JsonToken;
         JsonObjectToken: JsonToken;
         JsonValueToken: JsonToken;
+        JsonTestToken: JsonToken;
         JsonObject: JsonObject;
         JsonArrayCounter: Integer;
         ReconciliationWebhook: Record "NPR AF Rec. Webhook Request";
         AdyenSetup: Record "NPR Adyen Setup";
         AdyenManagement: Codeunit "NPR Adyen Management";
         LogType: Enum "NPR Adyen Rec. Log Type";
-        SetupNotConfiguredError: Label 'Adyen Generic Setup is not configured!';
-        ReportLoggedSuccess: Label 'Successfully logged %1 reports!';
-        ReportLoggedError: Label 'No reports were logged!';
-        TaskSchedulerSuccess: Label 'Reconciliation Task has successfully been created!';
-        TaskSchedulerError: Label 'Reconciliation Task creation failed!';
+        SetupNotConfiguredError: Label 'Adyen Generic Setup is not configured.';
+        ReportLoggedSuccess: Label 'Successfully logged %1 reports.';
+        ReportLoggedError: Label 'No reports were logged.';
+        TaskSchedulerSuccess: Label 'Reconciliation Task has successfully been created.';
+        TaskSchedulerError: Label 'Reconciliation Task creation failed.';
+        InvalidFileType: Label 'Invalid File Type.\The file the System attempted to upload is not a valid format. A file must be .CSV format.\\Please update your Report Generation configurations in Adyen Customer Area.';
+        PSPReferenceError: Label 'PSP Reference is blank.';
     begin
         if content <> '' then begin
             if (JsonToken.ReadFrom(content)) then begin
                 JsonObject := JsonToken.AsObject();
                 if (JsonObject.Get('live', JsonToken)) then begin
+                    if (JsonObject.Get('pspReference', JsonTestToken)) then begin
+                        if not JsonTestToken.AsValue().AsText().Contains('.csv') then
+                            exit(InvalidFileType);
+                    end else
+                        exit(PSPReferenceError);
                     ReconciliationWebhook.Init();
                     ReconciliationWebhook.ID := 0;
                     ReconciliationWebhook."Creation Date" := CurrentDateTime();
@@ -70,6 +78,8 @@ codeunit 6184771 "NPR AF Rec. API Request"
                                                     AdyenManagement.CreateLog(LogType::"Background Session", true, TaskSchedulerSuccess, ReconciliationWebhook.ID);
                                                 end else
                                                     AdyenManagement.CreateLog(LogType::"Background Session", false, TaskSchedulerError, ReconciliationWebhook.ID);
+
+                                                Commit();
                                             end;
                                         end;
                                     end;

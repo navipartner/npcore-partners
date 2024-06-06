@@ -6,10 +6,7 @@ page 6184536 "NPR Adyen Reconciliation Logs"
     Caption = 'Adyen Reconciliation Logs';
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Log";
-    InsertAllowed = false;
-    ModifyAllowed = false;
-    DeleteAllowed = true;
-
+    Editable = false;
     Extensible = false;
 
     layout

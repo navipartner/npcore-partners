@@ -26,22 +26,18 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
                     if ReconciliationHeader.Get(NewDocumentsList.Get(i)) then begin
                         MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
                         if MatchedEntries > 0 then
-                            if TransactionMatching.ReconcileEntries(ReconciliationHeader) then
-                                if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
-                                    TransactionMatching.PostEntries(ReconciliationHeader);
+                            if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
+                                TransactionMatching.PostEntries(ReconciliationHeader);
                     end;
 #ELSE
                     NewDocumentsList.Get(i, JsonToken);
                     if ReconciliationHeader.Get(CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(ReconciliationHeader."Document No."))) then begin
                         MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
                         if MatchedEntries > 0 then
-                            if TransactionMatching.ReconcileEntries(ReconciliationHeader) then
-                                if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
-                                    TransactionMatching.PostEntries(ReconciliationHeader);
+                            if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
+                                TransactionMatching.PostEntries(ReconciliationHeader);
                     end;
-                        
 #ENDIF
-
                 end;
             end;
         end;
