@@ -8,11 +8,6 @@ page 6184534 "NPR Adyen Reconciliation List"
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
     AdditionalSearchTerms = 'Adyen Reconciliation';
-    SaveValues = false;
-    RefreshOnActivate = true;
-    InsertAllowed = false;
-    ModifyAllowed = false;
-    DeleteAllowed = true;
     Editable = false;
 
     layout

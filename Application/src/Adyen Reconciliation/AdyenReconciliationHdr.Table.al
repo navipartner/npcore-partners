@@ -10,18 +10,29 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         field(1; "Document No."; Code[20])
         {
             DataClassification = CustomerContent;
-            Caption = 'Document No.';
+            Caption = 'No.';
             NotBlank = true;
         }
         field(10; "Document Type"; Enum "NPR Adyen Report Type")
         {
             DataClassification = CustomerContent;
-            Caption = 'Document Type';
+            Caption = 'Type';
         }
         field(20; "Document Date"; Date)
         {
             DataClassification = CustomerContent;
             Caption = 'Reconciliation Document Date';
+        }
+        field(25; "Posting Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Posting Date';
+
+            trigger OnValidate()
+            begin
+                if "Posting Date" = 0D then
+                    "Posting Date" := Today();
+            end;
         }
         field(30; "Batch Number"; Integer)
         {
@@ -31,12 +42,12 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         field(40; "Opening Balance"; Decimal)
         {
             DataClassification = CustomerContent;
-            Caption = 'Document Opening Balance';
+            Caption = 'Batch Opening Balance (AAC)';
         }
         field(50; "Closing Balance"; Decimal)
         {
             DataClassification = CustomerContent;
-            Caption = 'Document Closing Balance';
+            Caption = 'Batch Closing Balance (AAC)';
         }
         field(60; "Acquirer Commission"; Decimal)
         {
@@ -51,7 +62,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         }
         field(80; "Total Transactions Amount"; Decimal)
         {
-            Caption = 'Total Transactions Amount';
+            Caption = 'Total Transactions Amount (AAC)';
             FieldClass = FlowField;
             CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
                                                                                 "Batch Number" = field("Batch Number"),
@@ -59,7 +70,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         }
         field(90; "Total Posted Amount"; Decimal)
         {
-            Caption = 'Total Posted Amount';
+            Caption = 'Total Posted Amount (AAC)';
             FieldClass = FlowField;
             CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
                                                                                 "Batch Number" = field("Batch Number"),
@@ -95,11 +106,8 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
 
     trigger OnDelete()
     var
-        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
-        ReconciliationLine.Reset();
-        ReconciliationLine.SetRange("Document No.", Rec."Document No.");
-        if not ReconciliationLine.IsEmpty() then
-            ReconciliationLine.DeleteAll(true);
+        AdyenManagement.DeleteReconciliationLines("Document No.");
     end;
 }
