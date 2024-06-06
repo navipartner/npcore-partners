@@ -28,6 +28,18 @@ codeunit 6184848 "NPR AT Audit Mgt."
     begin
         HandleOnHandleAuditLogBeforeInsert(POSAuditLog);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSStore(var Rec: Record "NPR POS Store"; var xRec: Record "NPR POS Store"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSStoreIfAlreadyUsed(xRec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSUnit(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
+    end;
     #endregion
 
     #region AT Fiscal - Audit Profile Mgt
@@ -60,7 +72,72 @@ codeunit 6184848 "NPR AT Audit Mgt."
             exit;
 
         POSEntry.Get(POSAuditLog."Record ID");
-        // TO-DO InsertATAuditLogAuxInfo
+
+        if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
+            InsertATPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
+    end;
+
+    local procedure InsertATPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    var
+        ATCashRegister: Record "NPR AT Cash Register";
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        ATSCU: Record "NPR AT SCU";
+    begin
+        ATPOSAuditLogAuxInfo.Init();
+        ATPOSAuditLogAuxInfo."Audit Entry Type" := ATPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
+        ATPOSAuditLogAuxInfo."POS Entry No." := POSEntry."Entry No.";
+        ATPOSAuditLogAuxInfo."Entry Date" := POSEntry."Entry Date";
+        ATPOSAuditLogAuxInfo."POS Store Code" := POSStore.Code;
+        ATPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
+        ATPOSAuditLogAuxInfo."Source Document No." := POSEntry."Document No.";
+        ATPOSAuditLogAuxInfo."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
+        ATPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
+
+        SetReceiptTypeOnATPOSAuditLogAuxInfo(POSEntry."Entry No.", ATPOSAuditLogAuxInfo);
+
+        ATCashRegister.Get(ATPOSAuditLogAuxInfo."POS Unit No.");
+        ATSCU.Get(ATCashRegister."AT SCU Code");
+        ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+        ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+        ATPOSAuditLogAuxInfo."AT SCU Id" := ATSCU.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Id" := ATCashRegister.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := ATCashRegister."Serial Number";
+
+        ATPOSAuditLogAuxInfo.Insert(true);
+    end;
+
+    local procedure SetReceiptTypeOnATPOSAuditLogAuxInfo(POSEntryNo: Integer; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATPOSAuditLogAuxInfoToRefund: Record "NPR AT POS Audit Log Aux. Info";
+        OriginalPOSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        ATFiscalizationSetup.Get();
+        if ATFiscalizationSetup.Training then begin
+            ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::TRAINING;
+            exit;
+        end;
+
+        case true of
+            ATPOSAuditLogAuxInfo."Amount Incl. Tax" > 0:
+                ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::NORMAL;
+            ATPOSAuditLogAuxInfo."Amount Incl. Tax" < 0:
+                ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::CANCELLATION;
+            ATPOSAuditLogAuxInfo."Amount Incl. Tax" = 0:
+                begin
+                    POSEntrySalesLine.SetRange("POS Entry No.", POSEntryNo);
+                    POSEntrySalesLine.FindFirst();
+
+                    if not OriginalPOSEntrySalesLine.GetBySystemId(POSEntrySalesLine."Orig.POS Entry S.Line SystemId") then
+                        ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::NORMAL
+                    else
+                        if not ATPOSAuditLogAuxInfoToRefund.FindAuditLog(OriginalPOSEntrySalesLine."POS Entry No.") then
+                            ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::NORMAL
+                        else
+                            ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::CANCELLATION;
+                end;
+        end;
     end;
     #endregion
 
@@ -80,6 +157,103 @@ codeunit 6184848 "NPR AT Audit Mgt."
 
         TestIsProfileSetAccordingToCompliance(POSUnit."POS Audit Profile");
         CheckATCashRegister(POSUnit);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeEndSale', '', false, false)]
+    local procedure HandleOnBeforeEndSale(var Sender: Codeunit "NPR POS Sale"; SaleHeader: Record "NPR POS Sale");
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not POSUnit.Get(SaleHeader."Register No.") then
+            exit;
+
+        if not IsATAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
+        CheckAreMandatoryMappingsPopulated(SaleHeader);
+        DoNotAllowHavingBlankItemDescriptions(SaleHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', false, false)]
+    local procedure HandleOnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale");
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+    begin
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
+
+        if not IsATAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if not FindPOSEntry(SalePOS."Sales Ticket No.", POSEntry) then
+            exit;
+
+        if not ATPOSAuditLogAuxInfo.FindAuditLog(POSEntry."Entry No.") then
+            exit;
+
+        ATFiskalyCommunication.SignReceipt(ATPOSAuditLogAuxInfo);
+    end;
+    #endregion
+
+    #region Subscribers - Fiskaly Communication
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR AT Fiskaly Communication", 'OnAfterRetrieveCashRegister', '', false, false)]
+    local procedure HandleOnAfterRetrieveCashRegister(var ATCashRegister: Record "NPR AT Cash Register")
+    begin
+        InsertStateRelatedReceiptsToATPOSAuditLogAuxInfo(ATCashRegister);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR AT Fiskaly Communication", 'OnAfterUpdateCashRegister', '', false, false)]
+    local procedure HandleOnAfterUpdateCashRegister(var ATCashRegister: Record "NPR AT Cash Register")
+    begin
+        InsertStateRelatedReceiptsToATPOSAuditLogAuxInfo(ATCashRegister);
+    end;
+
+    local procedure InsertStateRelatedReceiptsToATPOSAuditLogAuxInfo(var ATCashRegister: Record "NPR AT Cash Register")
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+    begin
+        if IsNullGuid(ATCashRegister."Initialization Receipt Id") and IsNullGuid(ATCashRegister."Decommission Receipt Id") then
+            exit;
+
+        if not IsNullGuid(ATCashRegister."Initialization Receipt Id") then
+            if not ATPOSAuditLogAuxInfo.GetBySystemId(ATCashRegister."Initialization Receipt Id") then
+                InsertATPOSAuditLogAuxInfo(ATCashRegister, Enum::"NPR AT Receipt Type"::INITIALIZATION, ATCashRegister."Initialization Receipt Id");
+
+        if not IsNullGuid(ATCashRegister."Decommission Receipt Id") then
+            if not ATPOSAuditLogAuxInfo.GetBySystemId(ATCashRegister."Decommission Receipt Id") then
+                InsertATPOSAuditLogAuxInfo(ATCashRegister, Enum::"NPR AT Receipt Type"::DECOMMISSION, ATCashRegister."Decommission Receipt Id");
+    end;
+
+    local procedure InsertATPOSAuditLogAuxInfo(ATCashRegister: Record "NPR AT Cash Register"; ReceiptType: Enum "NPR AT Receipt Type"; ReceiptId: Guid)
+    var
+        POSUnit: Record "NPR POS Unit";
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        ATSCU: Record "NPR AT SCU";
+        ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+    begin
+        ATPOSAuditLogAuxInfo.Init();
+        ATPOSAuditLogAuxInfo."Audit Entry Type" := ATPOSAuditLogAuxInfo."Audit Entry Type"::"Control Transaction";
+        ATPOSAuditLogAuxInfo."Entry Date" := Today();
+        POSUnit.Get(ATCashRegister."POS Unit No.");
+        ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+        ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
+        ATPOSAuditLogAuxInfo."Receipt Type" := ReceiptType;
+        ATCashRegister.Get(ATPOSAuditLogAuxInfo."POS Unit No.");
+        ATSCU.Get(ATCashRegister."AT SCU Code");
+        ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+        ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+        ATPOSAuditLogAuxInfo."AT SCU Id" := ATSCU.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Id" := ATCashRegister.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := ATCashRegister."Serial Number";
+        ATPOSAuditLogAuxInfo.SystemId := ReceiptId;
+        ATPOSAuditLogAuxInfo.Insert(false, true);
+
+        ATFiskalyCommunication.RetrieveReceipt(ATPOSAuditLogAuxInfo);
+        ATFiskalyCommunication.UpdateReceiptMetadata(ATPOSAuditLogAuxInfo);
     end;
     #endregion
 
@@ -102,7 +276,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
         exit(true);
     end;
 
-    local procedure HandlerCode(): Code[20]
+    internal procedure HandlerCode(): Code[20]
     var
         HandlerCodeTxt: Label 'AT_FISKALY', Locked = true, MaxLength = 20;
     begin
@@ -114,6 +288,43 @@ codeunit 6184848 "NPR AT Audit Mgt."
         ATFiscalizationSetup: Page "NPR AT Fiscalization Setup";
     begin
         ATFiscalizationSetup.RunModal();
+    end;
+
+    local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for fiscalization.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - AT POS Audit Log Aux. Info table caption';
+    begin
+        ATPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
+        if not ATPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, ATPOSAuditLogAuxInfo.TableCaption());
+    end;
+
+    local procedure ErrorOnRenameOfPOSUnitIfAlreadyUsed(OldPOSUnit: Record "NPR POS Unit")
+    var
+        ATCashRegister: Record "NPR AT Cash Register";
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        CannotRename2Err: Label 'You cannot rename %1 %2 since there is at least one related %3 created at Fiskaly and it can cause data discrepancy.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - AT Cash Register table caption';
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for fiscalization.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - AT POS Audit Log Aux. Info table caption';
+    begin
+        if not IsATAuditEnabled(OldPOSUnit."POS Audit Profile") then
+            exit;
+
+        ATPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
+        if not ATPOSAuditLogAuxInfo.IsEmpty() then
+            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", ATPOSAuditLogAuxInfo.TableCaption());
+
+        ATCashRegister.SetRange("POS Unit No.", OldPOSUnit."No.");
+        ATCashRegister.SetFilter("Created At", '<>%1', 0DT);
+        if not ATCashRegister.IsEmpty() then
+            Error(CannotRename2Err, OldPOSUnit.TableCaption(), OldPOSUnit."No.", ATCashRegister.TableCaption());
+    end;
+
+    local procedure FindPOSEntry(DocumentNo: Code[20]; var POSEntry: Record "NPR POS Entry"): Boolean
+    begin
+        POSEntry.SetCurrentKey("Document No.");
+        POSEntry.SetRange("Document No.", DocumentNo);
+        exit(POSEntry.FindFirst());
     end;
     #endregion
 
@@ -138,8 +349,71 @@ codeunit 6184848 "NPR AT Audit Mgt."
     begin
         ATCashRegister.GetWithCheck(POSUnit."No.");
     end;
-    #endregion
 
-    #region Procedures - Misc
+    local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSSaleLine: Record "NPR POS Sale Line";
+        SalesAndReturnsNotAllowedInSameTransactionErr: Label 'It is not allowed to sale and return item(s) in same transaction.';
+    begin
+        POSAuditProfile.Get(POSAuditProfileCode);
+        if POSAuditProfile.AllowSalesAndReturnInSameTrans then
+            exit;
+
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetFilter(Quantity, '>0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        POSSaleLine.SetFilter(Quantity, '<0');
+        if POSSaleLine.IsEmpty() then
+            exit;
+
+        Error(SalesAndReturnsNotAllowedInSameTransactionErr);
+    end;
+
+    local procedure CheckAreMandatoryMappingsPopulated(SaleHeader: Record "NPR POS Sale")
+    var
+        ATPOSPaymentMethodMap: Record "NPR AT POS Payment Method Map";
+        ATVATPostingSetupMap: Record "NPR AT VAT Posting Setup Map";
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"POS Payment");
+        if POSSaleLine.FindSet() then
+            repeat
+                case POSSaleLine."Line Type" of
+                    POSSaleLine."Line Type"::Item:
+                        begin
+                            ATVATPostingSetupMap.Get(POSSaleLine."VAT Bus. Posting Group", POSSaleLine."VAT Prod. Posting Group");
+                            ATVATPostingSetupMap.CheckIsATVATRatePopulated();
+                        end;
+                    POSSaleLine."Line Type"::"POS Payment":
+                        begin
+                            ATPOSPaymentMethodMap.Get(POSSaleLine."No.");
+                            ATPOSPaymentMethodMap.CheckIsATPaymentTypePopulated();
+                        end;
+                end;
+            until POSSaleLine.Next() = 0;
+    end;
+
+    local procedure DoNotAllowHavingBlankItemDescriptions(SaleHeader: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        BlankItemDescriptionErr: Label '%1 related to %2 %3 cannot have blank %4.', Comment = '%1 - POS Sale Line table caption, %2 - Line Type Item value, %3 - Item No. value, %4 - Description value';
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
+        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
+        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
+        POSSaleLine.SetRange(Description, '');
+        if POSSaleLine.FindFirst() then
+            Error(BlankItemDescriptionErr, POSSaleLine.TableCaption(), Format(POSSaleLine."Line Type"::Item), POSSaleLine."No.", POSSaleLine.FieldCaption(Description));
+    end;
     #endregion
 }
