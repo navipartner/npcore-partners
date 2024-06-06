@@ -174,7 +174,9 @@
 
     internal procedure IssueVouchers(var NpRvSalesLine: Record "NPR NpRv Sales Line"; SaleLinePOS: Record "NPR POS Sale Line")
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         VoucherType: Record "NPR NpRv Voucher Type";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         SignFactor: Integer;
         VoucherAmount: Decimal;
         VoucherQty: Decimal;
@@ -185,9 +187,18 @@
             SaleLinePOS."Unit Price" := Abs(SaleLinePOS."Amount Including VAT");
             SaleLinePOS.Quantity := 1;
         end;
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
 
         VoucherQty := SaleLinePOS.Quantity;
-        VoucherAmount := SaleLinePOS."Unit Price";
+        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Issue Voucher" then begin
+            VoucherAmount := SaleLinePOS."Amount Including VAT";
+            if (not SaleLinePOS."Price Includes VAT") then
+                VoucherAmount += POSSaleTaxCalc.CalcAmountWithVAT(SaleLinePOS."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")
+            else
+                VoucherAmount += SaleLinePOS."Discount Amount"
+        end else
+            VoucherAmount := SaleLinePOS."Unit Price";
 
         IssueVoucher(NpRvSalesLine, VoucherType, SignFactor, VoucherAmount, VoucherQty);
     end;
