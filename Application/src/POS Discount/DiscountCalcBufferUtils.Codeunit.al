@@ -22,6 +22,7 @@ codeunit 6151476 "NPR Discount Calc Buffer Utils"
         TempCurrDiscountCalcBuffer."Discount Code" := MixedDiscountLine.Code;
         TempCurrDiscountCalcBuffer."No." := MixedDiscountLine."No.";
         TempCurrDiscountCalcBuffer."Variant Code" := MixedDiscountLine."Variant Code";
+        TempCurrDiscountCalcBuffer."Unit Of Measure Code" := MixedDiscountLine."Unit of Measure Code";
         TempCurrDiscountCalcBuffer."Discount Record ID" := MixedDiscountLine.RecordId;
     end;
 
