@@ -257,7 +257,119 @@ codeunit 6184848 "NPR AT Audit Mgt."
     end;
     #endregion
 
+    #region Job Queue Management
+    internal procedure InitATFiscalJobQueues(ATFiscalizationEnabled: Boolean)
+    begin
+        InitATValidateReceiptsJobQueue(ATFiscalizationEnabled);
+        InitATImportOtherControlReceiptsJobQueue(ATFiscalizationEnabled);
+    end;
+
+    local procedure InitATValidateReceiptsJobQueue(ATFiscalizationEnabled: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobDescriptionLbl: Label 'AT Validate Receipts', MaxLength = 250;
+    begin
+        if ATFiscalizationEnabled then begin
+            JobQueueManagement.SetJobTimeout(4, 0);  // 4 hours
+            JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 1800, ''); // reschedule to run again in 30 minutes
+            if JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR AT Validate Receipts JQ",
+                '',
+                JobDescriptionLbl,
+                JobQueueManagement.NowWithDelayInSeconds(300),
+                60,
+                DefaultATFiscalJobQueueCategoryCode(),
+                JobQueueEntry)
+            then
+                JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+        end else
+            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Validate Receipts JQ") then begin
+                JobQueueEntry.FindSet(true);
+                repeat
+                    JobQueueEntry.Cancel();
+                until JobQueueEntry.Next() = 0;
+            end;
+    end;
+
+    local procedure InitATImportOtherControlReceiptsJobQueue(ATFiscalizationEnabled: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobDescriptionLbl: Label 'AT Import Other Control Receipts', MaxLength = 250;
+    begin
+        if ATFiscalizationEnabled then begin
+            JobQueueManagement.SetJobTimeout(4, 0);  // 4 hours
+            JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 300, ''); // reschedule to run again in 5 minutes
+            if JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ",
+                '',
+                JobDescriptionLbl,
+                JobQueueManagement.NowWithDelayInSeconds(300),
+                2,
+                DefaultATFiscalJobQueueCategoryCode(),
+                JobQueueEntry)
+            then
+                JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+        end else
+            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ") then begin
+                JobQueueEntry.FindSet(true);
+                repeat
+                    JobQueueEntry.Cancel();
+                until JobQueueEntry.Next() = 0;
+            end;
+    end;
+
+    local procedure DefaultATFiscalJobQueueCategoryCode(): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        ImportListJQCategoryCode: Label 'FISCAL', MaxLength = 10, Locked = true;
+        ImportListJQCategoryDescrLbl: Label 'POS Audit Fiscal Processing', MaxLength = 30;
+    begin
+        JobQueueCategory.InsertRec(ImportListJQCategoryCode, ImportListJQCategoryDescrLbl);
+        exit(JobQueueCategory.Code);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunInitATValidateReceiptsJobQueue()
+    begin
+        InitATValidateReceiptsJobQueue(IsATFiscalizationEnabled());
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RunInitATImportOtherControlReceiptsJobQueue()
+    begin
+        InitATImportOtherControlReceiptsJobQueue(IsATFiscalizationEnabled());
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+    local procedure HandleOnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR AT Validate Receipts JQ", Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ"])
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
+    end;
+    #endregion
+
     #region AT Fiscal - Procedures/Helper Functions
+    internal procedure IsATFiscalizationEnabled(): Boolean
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+    begin
+        if not ATFiscalizationSetup.Get() then
+            exit(false);
+
+        exit(ATFiscalizationSetup."AT Fiscal Enabled");
+    end;
+
     local procedure IsATAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
