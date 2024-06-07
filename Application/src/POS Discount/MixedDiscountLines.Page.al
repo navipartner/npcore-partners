@@ -40,6 +40,11 @@
                     ToolTip = 'Specifies the value of the Variant Code field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Unit of Measure Code"; Rec."Unit of Measure Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Unit of Measure Code field.';
+                }
                 field(Description; Rec.Description)
                 {
 
