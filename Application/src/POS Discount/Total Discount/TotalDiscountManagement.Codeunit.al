@@ -311,13 +311,19 @@ codeunit 6151077 "NPR Total Discount Management"
                             NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
                             NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Item);
                             NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."No.");
+                            NPRTotalDiscountLine.SetFilter("Variant Code", '%1|%2', '', TempCalcTotalDiscountSaleLinePOS."Variant Code");
+                            NPRTotalDiscountLine.SetFilter("Unit Of Measure Code", '%1|%2', '', TempCalcTotalDiscountSaleLinePOS."Unit of Measure Code");
                             Found := not NPRTotalDiscountLine.IsEmpty;
                             if not Found then begin
+                                NPRTotalDiscountLine.SetRange("Variant Code");
+                                NPRTotalDiscountLine.SetRange("Unit Of Measure Code");
                                 NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::"Item Category");
                                 NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Item Category Code");
                                 Found := not NPRTotalDiscountLine.IsEmpty;
                             end;
                             if not Found then begin
+                                NPRTotalDiscountLine.SetRange("Variant Code");
+                                NPRTotalDiscountLine.SetRange("Unit Of Measure Code");
                                 NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Vendor);
                                 NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Vendor No.");
                                 Found := not NPRTotalDiscountLine.IsEmpty;
@@ -377,13 +383,19 @@ codeunit 6151077 "NPR Total Discount Management"
                             NPRTotalDiscountLine.SetRange("Total Discount Code", NPRTotalDiscountHeader.Code);
                             NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Item);
                             NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."No.");
+                            NPRTotalDiscountLine.SetFilter("Variant Code", '%1|%2', TempCalcTotalDiscountSaleLinePOS."Variant Code", '');
+                            NPRTotalDiscountLine.SetFilter("Unit Of Measure Code", '%1|%2', TempCalcTotalDiscountSaleLinePOS."Unit of Measure Code", '');
                             Found := not NPRTotalDiscountLine.IsEmpty;
                             if not Found then begin
+                                NPRTotalDiscountLine.SetRange("Variant Code");
+                                NPRTotalDiscountLine.SetRange("Unit Of Measure Code");
                                 NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::"Item Category");
                                 NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Item Category Code");
                                 Found := not NPRTotalDiscountLine.IsEmpty;
                             end;
                             if not Found then begin
+                                NPRTotalDiscountLine.SetRange("Variant Code");
+                                NPRTotalDiscountLine.SetRange("Unit Of Measure Code");
                                 NPRTotalDiscountLine.SetRange(Type, NPRTotalDiscountLine.Type::Vendor);
                                 NPRTotalDiscountLine.SetRange("No.", TempCalcTotalDiscountSaleLinePOS."Vendor No.");
                                 Found := not NPRTotalDiscountLine.IsEmpty;
