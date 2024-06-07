@@ -20,6 +20,8 @@ codeunit 6184764 "NPR UPG POSMenu Actions v3"
         UpgradePOSMenu_TMTicketMgmt2();
         UpgradePOSMenu_TMTicketMgmt_1();
         UpgradePOSMenu_TMTicketMgmt2_1();
+        UpgradeOSMenuButtonParameterActionCodes();
+
     end;
 
     local procedure UpgradePOSMenu_MMMembermgmt()
@@ -330,5 +332,44 @@ codeunit 6184764 "NPR UPG POSMenu Actions v3"
     local procedure CurrCodeunitId(): Integer
     begin
         exit(Codeunit::"NPR UPG POSMenu Actions v3");
+    end;
+
+    local procedure UpgradeOSMenuButtonParameterActionCodes()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POSMenu Actions v3', 'UpgradeOSMenuButtonParameterActionCodes');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeOSMenuButtonParameterActionCodes')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        UpdatePOSMenuButtonParameterActionCodes();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'UpgradeOSMenuButtonParameterActionCodes'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdatePOSMenuButtonParameterActionCodes()
+    var
+        POSMenuButton: Record "NPR POS Menu Button";
+        POSParameterValue: Record "NPR POS Parameter Value";
+    begin
+        POSMenuButton.Reset();
+        POSMenuButton.SetRange("Action Type", POSMenuButton."Action Type"::Action);
+        POSMenuButton.SetFilter("Action Code", '<>%1', '');
+        POSMenuButton.SetLoadFields("Action Type", "Action Code", "Menu Code", ID);
+        if POSMenuButton.FindSet(false) then
+            repeat
+                POSParameterValue.Reset();
+                POSParameterValue.SetRange("Table No.", Database::"NPR POS Menu Button");
+                POSParameterValue.SetRange(Code, POSMenuButton."Menu Code");
+                POSParameterValue.SetRange("Record ID", POSMenuButton.RecordId);
+                POSParameterValue.SetRange(ID, POSMenuButton.ID);
+                POSParameterValue.SetFilter("Action Code", '<>%1', POSMenuButton."Action Code");
+                if not POSParameterValue.IsEmpty then
+                    POSParameterValue.ModifyAll("Action Code", POSMenuButton."Action Code");
+            until POSMenuButton.Next() = 0;
     end;
 }
