@@ -254,6 +254,23 @@ page 6184596 "NPR AT Cash Registers"
                     ATFiskalyCommunication.ListCashRegisterReceipts(Rec, Enum::"NPR AT Audit Entry Type"::"Control Transaction", ATFiskalyCommunication.GetListOtherCashRegisterControlReceiptsQueryParameters());
                 end;
             }
+            action(ExportCashRegister)
+            {
+                ApplicationArea = NPRATFiscal;
+                Caption = 'Export Cash Register';
+                Image = ExportElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Exports the electronic journal (DEP7) for cash register from Fiskaly into the file.';
+
+                trigger OnAction()
+                var
+                    ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+                begin
+                    ATFiskalyCommunication.ExportCashRegister(Rec, ATFiskalyCommunication.GetExportCashRegisterQueryParameters());
+                end;
+            }
         }
     }
 }
