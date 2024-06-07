@@ -14,7 +14,20 @@ pageextension 6014492 "NPR Customer List" extends "Customer List"
                 ToolTip = 'Specifies the customer''s No.';
             }
         }
-
+        addafter("Sales (LCY)")
+        {
+            field("NPR Total Sales POS"; Rec."NPR Total Sales POS")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the total net amount of POS sales to the customer in LCY.';
+            }
+            field("NPR Total Sales"; Rec."NPR Total Sales POS" + Rec."Sales (LCY)")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Total Sales (LCY)';
+                ToolTip = 'Specifies the sum of POS and backoffice (ERP) sales to the customer in LCY.';
+            }
+        }
         addlast(Control1)
         {
             field("NPR E-Mail"; Rec."E-Mail")

@@ -240,7 +240,7 @@ tableextension 6014423 "NPR Customer" extends Customer
                                                                         "Entry Date" = FIELD("Date Filter"),
                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
-            Caption = 'Total Sales POS';
+            Caption = 'Sales POS (LCY)';
             Editable = false;
         }
         field(6014406; "NPR Total Sales"; Decimal)
@@ -248,10 +248,13 @@ tableextension 6014423 "NPR Customer" extends Customer
             Caption = 'Total Sales';
             DataClassification = CustomerContent;
             Editable = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'It makes no sense to have a physical field that is only needed to show the sum of 2 other flowfields on the customer card.';
         }
         modify("Sales (LCY)")
         {
-            Caption = 'Total Sales ERP';
+            Caption = 'Sales ERP (LCY)';
         }
     }
 
