@@ -10,7 +10,7 @@ codeunit 6151333 "NPR POS Action: SS Paym. Cash" implements "NPR IPOS Workflow"
         WorkflowConfig.SetWorkflowTypeUnattended();
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
-        WorkflowConfig.AddTextParameter('PaymentType', '', PaymentTypeCaptionLbl, PaymentTypeDescriptionLbl);
+        WorkflowConfig.AddTextParameter('PaymentType', 'K', PaymentTypeCaptionLbl, PaymentTypeDescriptionLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -23,25 +23,32 @@ codeunit 6151333 "NPR POS Action: SS Paym. Cash" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; Context: codeunit "NPR POS JSON Helper"): JsonObject
+    local procedure TryEndSale(POSSession: Codeunit "NPR POS Session"; Context: codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         POSActionSSPaymCash: Codeunit "NPR POS Action SS Paym. CashB";
         POSPaymentMethod: Record "NPR POS Payment Method";
         PaymentErr: Label 'Only cash';
+        EndSaleSuccess: Boolean;
+        PaymentMethodCode: Text;
     begin
         POSActionSSPaymCash.EnsureSaleIsNotEmpty(POSSession);
 
-        POSPaymentMethod.Get(Context.GetStringParameter('PaymentType'));
-        IF POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CASH THEN
+        if (not Context.GetString('paymentType', PaymentMethodCode)) then
+            PaymentMethodCode := Context.GetStringParameter('PaymentType');
+
+        POSPaymentMethod.Get(CopyStr(PaymentMethodCode, 1, MaxStrLen(POSPaymentMethod.Code)));
+        if (POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::CASH) then
             Error(PaymentErr);
-        POSActionSSPaymCash.EndSale(POSSession, POSPaymentMethod);
+
+        EndSaleSuccess := POSActionSSPaymCash.EndSale(POSSession, POSPaymentMethod);
+        Response.Add('endSaleSuccess', EndSaleSuccess);
     END;
 
     local procedure GetActionScript(): Text
     begin
         exit(
-       //###NPR_INJECT_FROM_FILE:POSActionSSPaymentCash.js###
-       'let main=async({})=>{await workflow.respond("TryEndSale")};'
+//###NPR_INJECT_FROM_FILE:POSActionSSPaymentCash.js###
+'let main=async({})=>{const e=await workflow.respond("TryEndSale");return{endSaleExecuted:!0,endSaleSuccess:e}};'
         );
     end;
 

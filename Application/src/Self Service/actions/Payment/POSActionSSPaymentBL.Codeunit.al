@@ -17,8 +17,14 @@ codeunit 6151482 "NPR POS Action: SS Payment BL"
         // TODO: Add a payment interface specifically for selfservice as it will have less options and each of them will have a different workflow.
         // For now hardcoding this to EFT.        
         // (same flow normal payment uses)
-        POSPaymentMethodOut.TestField("Processing Type", POSPaymentMethodOut."Processing Type"::EFT);
-        WorkflowNameOut := Format(Enum::"NPR POS Workflow"::SS_EFT);
+        case POSPaymentMethodOut."Processing Type" of
+            POSPaymentMethodOut."Processing Type"::CASH:
+                WorkflowNameOut := Format(Enum::"NPR POS Workflow"::SS_PAYMENT_CASH);
+            POSPaymentMethodOut."Processing Type"::EFT:
+                WorkflowNameOut := Format(Enum::"NPR POS Workflow"::SS_EFT);
+            else
+                Error('Unsupported payment method');
+        end;
 
         PaymentLine.CalculateBalance(POSPaymentMethodOut, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         AmountOut := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, true);

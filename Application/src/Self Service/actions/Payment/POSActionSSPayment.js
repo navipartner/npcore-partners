@@ -1,5 +1,5 @@
 let main = async ({ workflow, runtime }) => {
-    runtime.suspendTimeout(); //Avoid self-service timeout
+  runtime.suspendTimeout(); //Avoid self-service timeout
 
     const { dispatchToWorkflow, paymentType, amount } = await workflow.respond("preparePaymentWorkflow");
 
@@ -8,8 +8,12 @@ let main = async ({ workflow, runtime }) => {
     }
     
     const paymentResult = await workflow.run(dispatchToWorkflow, { context: { paymentType, amount } });
-    
-    if (paymentResult.tryEndSale) {
+
+    if (paymentResult && paymentResult.endSaleExecuted) {
+      return {"success": paymentResult.endSaleSuccess};
+    }
+
+    if (paymentResult && paymentResult.tryEndSale) {
       return await workflow.respond("tryEndSale");
     }
     

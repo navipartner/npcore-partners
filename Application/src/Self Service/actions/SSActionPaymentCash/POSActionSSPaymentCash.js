@@ -1,4 +1,5 @@
 let main = async ({}) => {
-    await workflow.respond("TryEndSale");
+    const success = await workflow.respond("TryEndSale");
+    return ({"endSaleExecuted": true, "endSaleSuccess": success});
 };
 
