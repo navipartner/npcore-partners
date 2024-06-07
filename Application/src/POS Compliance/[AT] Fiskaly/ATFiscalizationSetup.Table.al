@@ -17,6 +17,13 @@ table 6150828 "NPR AT Fiscalization Setup"
         {
             Caption = 'AT Fiscalization Enabled';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
+            begin
+                ATAuditMgt.InitATFiscalJobQueues("AT Fiscal Enabled");
+            end;
         }
         field(20; "Fiskaly API URL"; Text[250])
         {
