@@ -116,6 +116,12 @@ table 6059875 "NPR Total Discount Line"
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(15; "Unit Of Measure Code"; Code[10])
+        {
+            Caption = 'Unit Of Measure Code';
+            DataClassification = CustomerContent;
+                                    TableRelation = if ("Type" = const(Item), "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."));
+        }
     }
 
     keys

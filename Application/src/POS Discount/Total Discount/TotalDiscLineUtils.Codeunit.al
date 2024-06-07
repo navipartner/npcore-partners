@@ -85,6 +85,7 @@ codeunit 6151078 "NPR Total Disc. Line Utils"
     begin
         NPRTotalDiscountLine."No." := '';
         NPRTotalDiscountLine."Variant Code" := '';
+        NPRTotalDiscountLine."Unit Of Measure Code" := '';
         NPRTotalDiscountLine.Description := '';
         NPRTotalDiscountLine."Description 2" := '';
         NPRTotalDiscountLine."Vendor No." := '';
