@@ -166,6 +166,12 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
         }
+        field(43; "Unit of Measure Code"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Unit of Measure Code';
+            TableRelation = if ("Disc. Grouping Type" = const(Item), "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."));
+        }
         field(200; "Item Group"; Boolean)
         {
             Caption = 'Item Group';

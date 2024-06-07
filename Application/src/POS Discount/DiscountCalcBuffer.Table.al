@@ -109,6 +109,11 @@ table 6060029 "NPR Discount Calc. Buffer"
             Caption = 'Discount. Min. Quantity';
             DataClassification = CustomerContent;
         }
+        field(190; "Unit Of Measure Code"; Code[10])
+        {
+            Caption = 'Unit Of Measure Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
