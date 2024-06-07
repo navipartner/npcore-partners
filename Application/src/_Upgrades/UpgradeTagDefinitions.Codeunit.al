@@ -187,6 +187,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Layout Upgrade", 'UpgradeArchivedPOSLayoutEncoding'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT-1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2-1'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'UpgradeOSMenuButtonParameterActionCodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdatePSPReferenceForEFTTrans'));
     end;
 
@@ -687,6 +688,8 @@
                         exit('NPR-TM_TICKETMGMT_2-2024015');
                     'SCAN_VOUCHER':
                         exit('NPR-SCAN_VOUCHER-20241602');
+                    'UpgradeOSMenuButtonParameterActionCodes':
+                        exit('UpgradeOSMenuButtonParameterActionCodes-20240605');
                 end;
             Codeunit::"NPR UPG Vipps Mp Setup":
                 begin
