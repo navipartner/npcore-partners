@@ -588,5 +588,133 @@
             until RecRef.Next() = 0;
     end;
 
-}
+    procedure ExchangeLabelsExist(RecVariant: Variant): Boolean
+    var
+        ExchangeLabel: Record "NPR Exchange Label";
+    begin
+        FilterExchangeLabels(RecVariant, ExchangeLabel);
+        exit(not ExchangeLabel.IsEmpty());
+    end;
 
+    local procedure FilterExchangeLabels(RecVariant: Variant; var ExchangeLabel: Record "NPR Exchange Label")
+    var
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSSale: Record "NPR POS Sale";
+        POSSaleLine: Record "NPR POS Sale Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesInvLine: Record "Sales Invoice Line";
+        DataTypeManagement: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+        CannotConvertToRecRefErr: Label 'Supplied parameter "%1" cannot be converted to a RecordRef type.', Comment = '%1 - parameter value';
+        UnsupportedTableErr: Label 'Exchange labels are not supported for supplied %1', Comment = '%1 - table caption';
+    begin
+        if not DataTypeManagement.GetRecordRef(RecVariant, RecRef) then
+            Error(CannotConvertToRecRefErr, RecVariant);
+
+        case RecRef.Number of
+            Database::"Sales Header":
+                begin
+                    RecRef.SetTable(SalesHeader);
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Line");
+                    ExchangeLabel.SetRange("Sales Header Type", SalesHeader."Document Type");
+                    ExchangeLabel.SetRange("Sales Header No.", SalesHeader."No.");
+                end;
+            Database::"Sales Line":
+                begin
+                    RecRef.SetTable(SalesLine);
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Line");
+                    ExchangeLabel.SetRange("Sales Header Type", SalesLine."Document Type");
+                    ExchangeLabel.SetRange("Sales Header No.", SalesLine."Document No.");
+                    ExchangeLabel.SetRange("Sales Line No.", SalesLine."Line No.");
+                end;
+
+            Database::"Sales Invoice Header":
+                begin
+                    RecRef.SetTable(SalesInvHeader);
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Line");
+                    ExchangeLabel.SetRange("Sales Header Type", SalesHeader."Document Type"::Order);
+                    ExchangeLabel.SetRange("Sales Header No.", SalesInvHeader."Order No.");
+                    if ExchangeLabel.FindSet() then
+                        repeat
+                            ExchangeLabel.Mark(true);
+                        until ExchangeLabel.Next() = 0;
+
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Invoice Line");
+                    ExchangeLabel.SetRange("Sales Header Type");
+                    ExchangeLabel.SetRange("Sales Header No.", SalesInvHeader."No.");
+                    if ExchangeLabel.FindSet() then
+                        repeat
+                            ExchangeLabel.Mark(true);
+                        until ExchangeLabel.Next() = 0;
+                    ExchangeLabel.MarkedOnly(true);
+                end;
+            Database::"Sales Invoice Line":
+                begin
+                    RecRef.SetTable(SalesInvLine);
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Line");
+                    ExchangeLabel.SetRange("Sales Header Type", SalesHeader."Document Type"::Order);
+                    ExchangeLabel.SetRange("Sales Header No.", SalesInvLine."Order No.");
+                    ExchangeLabel.SetRange("Sales Line No.", SalesInvLine."Line No.");
+                    if ExchangeLabel.FindSet() then
+                        repeat
+                            ExchangeLabel.Mark(true);
+                        until ExchangeLabel.Next() = 0;
+
+                    ExchangeLabel.SetRange("Table No.", Database::"Sales Invoice Line");
+                    ExchangeLabel.SetRange("Sales Header Type");
+                    ExchangeLabel.SetRange("Sales Header No.", SalesInvLine."Document No.");
+                    if ExchangeLabel.FindSet() then
+                        repeat
+                            ExchangeLabel.Mark(true);
+                        until ExchangeLabel.Next() = 0;
+                    ExchangeLabel.MarkedOnly(true);
+                end;
+
+            Database::"NPR POS Sale":
+                begin
+                    RecRef.SetTable(POSSale);
+                    ExchangeLabel.SetRange("Table No.", Database::"NPR POS Sale Line");
+                    ExchangeLabel.SetRange("Register No.", POSSale."Register No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+                end;
+            Database::"NPR POS Sale Line":
+                begin
+                    RecRef.SetTable(POSSaleLine);
+                    ExchangeLabel.SetRange("Table No.", Database::"NPR POS Sale Line");
+                    ExchangeLabel.SetRange("Register No.", POSSaleLine."Register No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
+                    ExchangeLabel.SetRange("Sales Line No.", POSSaleLine."Line No.");
+                end;
+
+            Database::"NPR POS Entry":
+                begin
+                    RecRef.SetTable(POSEntry);
+                    ExchangeLabel.SetFilter("Table No.", '%1|%2', Database::"NPR POS Sale Line", Database::"NPR POS Entry Sales Line");
+                    ExchangeLabel.SetRange("Register No.", POSEntry."POS Unit No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", POSEntry."Document No.");
+                end;
+            Database::"NPR POS Entry Sales Line":
+                begin
+                    RecRef.SetTable(POSEntrySalesLine);
+                    ExchangeLabel.SetFilter("Table No.", '%1|%2', Database::"NPR POS Sale Line", Database::"NPR POS Entry Sales Line");
+                    ExchangeLabel.SetRange("Register No.", POSEntrySalesLine."POS Unit No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", POSEntrySalesLine."Document No.");
+                    ExchangeLabel.SetRange("Sales Line No.", POSEntrySalesLine."Line No.");
+                end;
+            else
+                Error(UnsupportedTableErr, RecRef.Caption());
+        end;
+    end;
+
+    procedure DeleteExchangeLabels(RecVariant: Variant)
+    var
+        ExchangeLabel: Record "NPR Exchange Label";
+    begin
+        FilterExchangeLabels(RecVariant, ExchangeLabel);
+        if not ExchangeLabel.IsEmpty() then
+            ExchangeLabel.DeleteAll();
+    end;
+}

@@ -17,6 +17,7 @@ codeunit 6059950 "NPR Print Exchange Labels"
         RecRef.GetTable(SalesLine);
         ExchLabelMgt.PrintLabels(PrintType, RecRef, ValidFromDate);
     end;
+
     procedure PrintLabelsSalesInvLine(PrintType: Option Single,LineQuantity,All,Selection,Package; var SalesInvLine: Record "Sales Invoice Line"; ValidFromDate: Date)
     var
         ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
@@ -24,5 +25,19 @@ codeunit 6059950 "NPR Print Exchange Labels"
     begin
         RecRef.GetTable(SalesInvLine);
         ExchLabelMgt.PrintLabels(PrintType, RecRef, ValidFromDate);
+    end;
+
+    procedure ExchangeLabelsExist(RecVariant: Variant): Boolean
+    var
+        ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
+    begin
+        exit(ExchLabelMgt.ExchangeLabelsExist(RecVariant));
+    end;
+
+    procedure DeleteExchangeLabels(RecVariant: Variant)
+    var
+        ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
+    begin
+        ExchLabelMgt.DeleteExchangeLabels(RecVariant);
     end;
 }
