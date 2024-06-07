@@ -607,6 +607,83 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     end;
     #endregion
 
+    #region Export Data Management
+    internal procedure ExportCashRegister(ATCashRegister: Record "NPR AT Cash Register"; QueryParameters: Text)
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        FileManagement: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        RequestMessage: HttpRequestMessage;
+        ExportCashRegisterErr: Label 'Export Cash Register failed.';
+        ExportCashRegisterLbl: Label 'cash-register/%1/export', Locked = true, Comment = '%1 - Cash Register Id value';
+        FileNameLbl: Label '%1.json', Locked = true;
+        OutStream: OutStream;
+        ResponseText: Text;
+        Url: Text;
+    begin
+        ATCashRegister.TestField(SystemId);
+        ATCashRegister.TestField("AT SCU Code");
+        ATSCU.Get(ATCashRegister."AT SCU Code");
+        ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
+        ATFiscalizationSetup.GetWithCheck();
+
+        Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(ExportCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()) + QueryParameters);
+        PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
+
+        if not SendHttpRequest(RequestMessage, ResponseText) then
+            Error('%1\\%2', ExportCashRegisterErr, GetLastErrorText());
+
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(ResponseText);
+        FileManagement.BLOBExportWithEncoding(TempBlob, StrSubstNo(FileNameLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()), true, TextEncoding::UTF8);
+    end;
+
+    internal procedure GetExportCashRegisterQueryParameters() QueryParameters: Text
+    var
+        ATExpCashRegFilters: Page "NPR AT Exp. Cash Reg. Filters";
+        QueryParameterAlreadyAdded: Boolean;
+        EndSignatureDateTime, StartSignatureDateTime : DateTime;
+        EndReceiptNo, StartReceiptNo : Integer;
+        EndReceiptNumberCannotBeSmallerFromStartReceiptNumberErr: Label 'End Receipt Number cannot be smaller from Start Receipt Number.';
+        ReceiptNumbersCannotBeNegativeErr: Label 'Receipt numbers cannot be negative numbers.';
+        StartSignatureDateTimeCannotBeBeforeEndSignatureDateTimeErr: Label 'End Signature DateTime cannot be before Start Signature DateTime.';
+    begin
+        if ATExpCashRegFilters.RunModal() <> Action::OK then
+            Error('');
+
+        StartReceiptNo := ATExpCashRegFilters.GetStartReceiptNo();
+        EndReceiptNo := ATExpCashRegFilters.GetEndReceiptNo();
+        StartSignatureDateTime := ATExpCashRegFilters.GetStartSignatureDateTime();
+        EndSignatureDateTime := ATExpCashRegFilters.GetEndSignatureDateTime();
+
+        if (StartReceiptNo < 0) or (EndReceiptNo < 0) then
+            Error(ReceiptNumbersCannotBeNegativeErr);
+
+        if (StartReceiptNo <> 0) and (EndReceiptNo <> 0) and (EndReceiptNo < StartReceiptNo) then
+            Error(EndReceiptNumberCannotBeSmallerFromStartReceiptNumberErr);
+
+        if (StartSignatureDateTime <> 0DT) and (EndSignatureDateTime <> 0DT) and (EndSignatureDateTime < StartSignatureDateTime) then
+            Error(StartSignatureDateTimeCannotBeBeforeEndSignatureDateTimeErr);
+
+        if (StartReceiptNo = 0) and (EndReceiptNo = 0) and (StartSignatureDateTime = 0DT) and (EndSignatureDateTime = 0DT) then
+            exit;
+
+        if StartReceiptNo <> 0 then
+            QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'start_receipt_number', Format(StartReceiptNo));
+
+        if EndReceiptNo <> 0 then
+            QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'end_receipt_number', Format(EndReceiptNo));
+
+        if StartSignatureDateTime <> 0DT then
+            QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'start_time_signature', Format(GetUnixTimestamp(StartSignatureDateTime)));
+
+        if EndSignatureDateTime <> 0DT then
+            QueryParameters += CreateQueryParameter(QueryParameterAlreadyAdded, 'end_time_signature', Format(GetUnixTimestamp(EndSignatureDateTime)));
+    end;
+    #endregion
+
     #region JSON Fiscal Creators
     local procedure CreateJSONBodyForAuthenticateAPI(ATOrganization: Record "NPR AT Organization"; RefreshToken: Text) JsonBody: Text
     var
@@ -1547,6 +1624,18 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         CompanyInformation.Get();
         CompanyInformation.TestField("VAT Registration No.");
+    end;
+
+    local procedure GetUnixTimestamp(DateTime: DateTime): Integer
+    var
+        DurationMs: BigInteger;
+        OriginDateTime: DateTime;
+        Duration: Duration;
+    begin
+        Evaluate(OriginDateTime, '1970-01-01T00:00:00Z', 9);
+        Duration := DateTime - OriginDateTime;
+        DurationMs := Duration;
+        exit((DurationMs / 1000) div 1);
     end;
     #endregion
 
