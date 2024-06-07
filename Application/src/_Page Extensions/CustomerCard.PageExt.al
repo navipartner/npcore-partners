@@ -107,34 +107,31 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
-#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
         modify(TotalSales2)
         {
-            Visible = false;
+            Caption = 'Sales ERP - Fiscal Year';
         }
-#ENDIF
-
         addafter(TotalSales2)
         {
-#IF (BC1700 or BC1701 or BC1702 or BC1703 or BC1704 or BC1800 or BC1801 or BC1802 or BC1803 or BC1804)
-            field("NPR Sales (LCY)"; Rec."Sales (LCY)")
+            field("NPR Total Sales POS"; CustPOSSalesLCY)
             {
                 ApplicationArea = NPRRetail;
-                ToolTip = 'Specifies the value of the Sales Amount (Actual) field';
-
+                Caption = 'Sales POS - Fiscal Year';
+                ToolTip = 'Specifies your total POS sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all finished POS sales.';
+                AutoFormatType = 1;
+                Style = Strong;
+                StyleExpr = true;
+                Editable = false;
             }
-#ENDIF
-            field("NPR Total Sales POS"; Rec."NPR Total Sales POS")
+            field("NPR Total Sales"; CustPOSSalesLCY + CustSalesLCY)
             {
                 ApplicationArea = NPRRetail;
-                ToolTip = 'Specifies the value of the Total Sales from POS entries ';
-            }
-
-            field("NPR Total Sales"; Rec."NPR Total Sales")
-            {
-                ApplicationArea = NPRRetail;
-                ToolTip = 'Specifies the value of the Total Sales from POS and Backend';
-
+                Caption = 'Total Sales - Fiscal Year';
+                ToolTip = 'Specifies the sum of your POS and backoffice (ERP) sales turnover with the customer in the current fiscal year.';
+                AutoFormatType = 1;
+                Style = Strong;
+                StyleExpr = true;
+                Editable = false;
             }
         }
 
@@ -274,6 +271,8 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 
     var
         UserSetup: Record "User Setup";
+        CustPOSSalesLCY: Decimal;
+        CustSalesLCY: Decimal;
         MagentoVersion: Decimal;
         ReasonText: Text;
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
@@ -284,19 +283,19 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         ShopifyIntegrationIsEnabled: Boolean;
 #endif
 
-    trigger OnAfterGetRecord()
+    trigger OnAfterGetCurrRecord()
+    var
+        Customer: Record Customer;
+        CustomerMgt: Codeunit "Customer Mgt.";
     begin
-        if UserSetup.Get(UserId) then
-            if UserSetup."NPR Anonymize Customers" then
-                ToAnonymizeEditable := true
-            else
-                ToAnonymizeEditable := false;
-        Rec.CalcFields("NPR Total Sales POS", "Sales (LCY)");
-        Rec."NPR Total Sales" := Rec."NPR Total Sales POS" + Rec."Sales (LCY)";
+        Customer.Copy(Rec);
+        Customer.SetFilter("Date Filter", CustomerMgt.GetCurrentYearFilter());
+        Customer.CalcFields("Sales (LCY)", "NPR Total Sales POS");
+        CustSalesLCY := Customer."Sales (LCY)";
+        CustPOSSalesLCY := Customer."NPR Total Sales POS";
 
         ITAuxCustomer.ReadITAuxCustomerFields(Rec);
     end;
-
 
     trigger OnOpenPage()
 #if not BC17
@@ -307,16 +306,8 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 #if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
 #endif
-
-        ToAnonymizeEditable := false;
-
         SetMagentoVersion();
-
-        if UserSetup.Get(UserId) then
-            if UserSetup."NPR Anonymize Customers" then
-                ToAnonymizeEditable := true
-            else
-                ToAnonymizeEditable := false;
+        ToAnonymizeEditable := UserSetup.Get(UserId) and UserSetup."NPR Anonymize Customers";
     end;
 
     local procedure SetMagentoVersion()
