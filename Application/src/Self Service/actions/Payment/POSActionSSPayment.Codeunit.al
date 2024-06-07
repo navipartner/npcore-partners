@@ -77,7 +77,7 @@ codeunit 6151291 "NPR POS Action: SS Payment" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSSPayment.js###
-'let main=async({workflow:e,runtime:a})=>{a.suspendTimeout();const{dispatchToWorkflow:n,paymentType:s,amount:t}=await e.respond("preparePaymentWorkflow");return t===0?await e.respond("tryEndSale"):(await e.run(n,{context:{paymentType:s,amount:t}})).tryEndSale?await e.respond("tryEndSale"):{success:!1}};'
+'let main=async({workflow:t,runtime:a})=>{a.suspendTimeout();const{dispatchToWorkflow:s,paymentType:r,amount:n}=await t.respond("preparePaymentWorkflow");if(n===0)return await t.respond("tryEndSale");const e=await t.run(s,{context:{paymentType:r,amount:n}});return e&&e.endSaleExecuted?{success:e.endSaleSuccess}:e&&e.tryEndSale?await t.respond("tryEndSale"):{success:!1}};'
         );
     end;
 }
