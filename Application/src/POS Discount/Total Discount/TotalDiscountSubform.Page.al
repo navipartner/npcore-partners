@@ -33,6 +33,13 @@ page 6150907 "NPR Total Discount Subform"
                     ToolTip = 'Defines the Variant Code of the Total Discount Line. If the Type field is set to Item you can choose an item variant.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Unit Of Measure Code"; Rec."Unit Of Measure Code")
+                {
+
+                    Enabled = (Rec."Type" = Rec."Type"::Item);
+                    ToolTip = 'Defines the Unit of Measure Code of the Total Discount Line. If the Type field is set to Item you can choose a unit of measure.';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Description; Rec.Description)
                 {
 
