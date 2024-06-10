@@ -202,6 +202,22 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR NpCs Workflow";
         }
+        field(140; "Data Processing Handler ID"; Code[20])
+        {
+            Caption = 'Data Processing Handler ID';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ConfirmDataProcessingHandlerChangeQst: Label 'You have changed %1. Note that the previous value may have already been used to set up associated task processor, import task type and data log subscriber records. These will not be updated automatically. You must update them manually or the functionality will not work properly.\\Are you sure you want to change the field value?', Comment = '%1 - field caption';
+            begin
+                if "Data Processing Handler ID" = '' then
+                    SetDataProcessingHandlerIDToDefaultValue();
+                if "Data Processing Handler ID" <> xRec."Data Processing Handler ID" then
+                    if not Confirm(ConfirmDataProcessingHandlerChangeQst, false, FieldCaption("Data Processing Handler ID")) then
+                        "Data Processing Handler ID" := xRec."Data Processing Handler ID";
+            end;
+        }
     }
 
     keys
@@ -212,9 +228,17 @@ table 6150807 "NPR Spfy Integration Setup"
         }
     }
 
+    trigger OnInsert()
+    begin
+        SetDataProcessingHandlerIDToDefaultValue();
+    end;
+
+    procedure SetDataProcessingHandlerIDToDefaultValue()
     var
-        SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
-        RecordHasBeenRead: Boolean;
+        ShopifyDataProcessingHandlerID: Label 'SHOPIFY', Locked = true, MaxLength = 20;
+    begin
+        "Data Processing Handler ID" := ShopifyDataProcessingHandlerID;
+    end;
 
     procedure GetRecordOnce(ReRead: Boolean)
     begin
@@ -222,9 +246,13 @@ table 6150807 "NPR Spfy Integration Setup"
             exit;
         if not Get() then begin
             Init();
-            Insert();
+            Insert(true);
         end;
         RecordHasBeenRead := true;
     end;
+
+    var
+        SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
+        RecordHasBeenRead: Boolean;
 }
 #endif

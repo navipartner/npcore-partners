@@ -9,12 +9,14 @@ codeunit 6059988 "NPR HL App Upgrade"
         SetHLSetupDefaultValues();
         RemoveDeletedCheckmark();
         UpdateHeyLoyaltyDataLogSubscribers();
+        SetDataProcessingHandlerID();
     end;
 
     var
         LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeStep: Text;
 
     local procedure MoveHeyLoyaltyValueMappings()
     var
@@ -28,9 +30,10 @@ codeunit 6059988 "NPR HL App Upgrade"
         MMMembershipSetup2: Record "NPR MM Membership Setup";
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings')) then
+        UpgradeStep := 'MoveHeyLoyaltyValueMappings';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', 'MoveHeyLoyaltyValueMappings');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
 
         NPRAttributeValue.SetFilter("HeyLoyalty Value", '<>%1', '');
         if NPRAttributeValue.FindSet(true) then
@@ -76,7 +79,7 @@ codeunit 6059988 "NPR HL App Upgrade"
                 CountryRegion2.Modify();
             until CountryRegion.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'MoveHeyLoyaltyValueMappings'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -84,9 +87,10 @@ codeunit 6059988 "NPR HL App Upgrade"
     var
         HLSetup: Record "NPR HL Integration Setup";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues')) then
+        UpgradeStep := 'SetHLSetupDefaultValues';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', 'SetHLSetupDefaultValues');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
 
         if HLSetup.Get() then begin
             HLSetup."Require GDPR Approval" := true;
@@ -94,7 +98,7 @@ codeunit 6059988 "NPR HL App Upgrade"
             HLSetup.Modify();
         end;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -104,9 +108,10 @@ codeunit 6059988 "NPR HL App Upgrade"
         HLMember: Record "NPR HL HeyLoyalty Member";
         HLMember2: Record "NPR HL HeyLoyalty Member";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'RemoveDeletedCheckmark')) then
+        UpgradeStep := 'RemoveDeletedCheckmark';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', 'RemoveDeletedCheckmark');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
 
         HLMember.SetRange(Deleted, true);
         HLMember.SetFilter("Member Entry No.", '<>%1', 0);
@@ -119,7 +124,7 @@ codeunit 6059988 "NPR HL App Upgrade"
                 end;
             until HLMember.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'RemoveDeletedCheckmark'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -127,16 +132,40 @@ codeunit 6059988 "NPR HL App Upgrade"
     var
         DataLogSubscriber: Record "NPR Data Log Subscriber";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
+        DataLogSubscriberCode: Code[20];
     begin
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'UpdateHeyLoyaltyDataLogSubscribers')) then
+        UpgradeStep := 'UpdateHeyLoyaltyDataLogSubscribers';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', 'UpdateHeyLoyaltyDataLogSubscribers');
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
 
-        DataLogSubscriber.SetRange(Code, HLIntegrationMgt.HeyLoyaltyCode());
-        if not DataLogSubscriber.IsEmpty() then
-            DataLogSubscriber.ModifyAll("Delayed Data Processing (sec)", 20);
+        DataLogSubscriberCode := HLIntegrationMgt.DataProcessingHandlerID(false);
+        if DataLogSubscriberCode <> '' then begin
+            DataLogSubscriber.SetRange(Code, DataLogSubscriberCode);
+            if not DataLogSubscriber.IsEmpty() then
+                DataLogSubscriber.ModifyAll("Delayed Data Processing (sec)", 20);
+        end;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'UpdateHeyLoyaltyDataLogSubscribers'));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    internal procedure SetDataProcessingHandlerID()
+    var
+        HLSetup: Record "NPR HL Integration Setup";
+    begin
+        UpgradeStep := 'SetDataProcessingHandlerID';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
+
+        if HLSetup.Get() then
+            if HLSetup."Data Processing Handler ID" = '' then begin
+                HLSetup.SetDataProcessingHandlerIDToDefaultValue();
+                HLSetup.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 }

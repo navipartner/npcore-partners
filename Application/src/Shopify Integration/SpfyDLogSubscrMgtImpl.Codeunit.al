@@ -81,7 +81,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
         if Format(DataLogSetup) <> Format(xDataLogSetup) then
             DataLogSetup.Modify(true);
 
-        DataLogSubscriber.AddAsSubscriber(SpfyIntegrationMgt.ShopifyCode(), DataLogSetup."Table ID");
+        DataLogSubscriber.AddAsSubscriber(SpfyIntegrationMgt.DataProcessingHandlerID(true), DataLogSetup."Table ID");
         xDataLogSubscriber := DataLogSubscriber;
         SpfyIntegrationEvents.OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea, DataLogSetup."Table ID", DataLogSubscriber, Handled);
         if not Handled then

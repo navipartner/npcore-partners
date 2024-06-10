@@ -113,6 +113,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetHLSetupDefaultValues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'RemoveDeletedCheckmark'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'UpdateHeyLoyaltyDataLogSubscribers'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetDataProcessingHandlerID'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RegistItemWorkshLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailCampaignItems'));
@@ -189,6 +190,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2-1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'UpgradeOSMenuButtonParameterActionCodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdatePSPReferenceForEFTTrans'));
+#if not BC17
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
+#endif
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -477,6 +481,8 @@
                         exit('RemoveDeletedCheckmark_20231024');
                     'UpdateHeyLoyaltyDataLogSubscribers':
                         exit('UpdateHeyLoyaltyDataLogSubscribers_20231024');
+                    'SetDataProcessingHandlerID':
+                        exit('NPR-HL-SetDataProcessingHandlerID-20240610');
                 end;
             Codeunit::"NPR UPG Vend Item No Expansion":
                 case UpgradeStep of
@@ -722,6 +728,13 @@
                     'UpdatePSPReferenceForEFTTrans':
                         exit('NPR-UpdatePSPReferenceForEFTTrans-20240603');
                 end;
+#if not BC17
+            Codeunit::"NPR Spfy App Upgrade":
+                case UpgradeStep of
+                    'SetDataProcessingHandlerID':
+                        exit('NPR-Spfy-SetDataProcessingHandlerID-20240610');
+                end;
+#endif
         end;
     end;
 }

@@ -149,7 +149,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ImportTypeDescTxt: Label 'Create Shopify Order', MaxLength = 50;
     begin
         InitImportType(
-            ImportType, StrSubstNo('%1_CREATE_ORDER', SpfyIntegrationMgt.ShopifyCode()), ImportTypeDescTxt,
+            ImportType, StrSubstNo('%1_CREATE_ORDER', ShopifyImportListTaskPrefix()), ImportTypeDescTxt,
             "NPR Nc IL Process Handler"::"Spfy Order Create", "NPR Nc IL Lookup Handler"::"Spfy Order Lookup");
     end;
 
@@ -158,7 +158,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ImportTypeDescTxt: Label 'Delete Shopify Order', MaxLength = 50;
     begin
         InitImportType(
-            ImportType, StrSubstNo('%1_DELETE_ORDER', SpfyIntegrationMgt.ShopifyCode()), ImportTypeDescTxt,
+            ImportType, StrSubstNo('%1_DELETE_ORDER', ShopifyImportListTaskPrefix()), ImportTypeDescTxt,
             "NPR Nc IL Process Handler"::"Spfy Order Delete", "NPR Nc IL Lookup Handler"::"Spfy Order Lookup");
     end;
 
@@ -167,7 +167,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ImportTypeDescTxt: Label 'Post Shopify Order', MaxLength = 50;
     begin
         InitImportType(
-            ImportType, StrSubstNo('%1_POST_ORDER', SpfyIntegrationMgt.ShopifyCode()), ImportTypeDescTxt,
+            ImportType, StrSubstNo('%1_POST_ORDER', ShopifyImportListTaskPrefix()), ImportTypeDescTxt,
             "NPR Nc IL Process Handler"::"Spfy Order Post", "NPR Nc IL Lookup Handler"::"Spfy Order Lookup");
     end;
 
@@ -217,15 +217,19 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
             //Import list processing job
             Clear(JQParamStrMgt);
-            JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), SpfyIntegrationMgt.ShopifyCode() + '*'));
+            JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ShopifyImportListTaskPrefix() + '*'));
             JQParamStrMgt.AddToParamDict(NcImportListProcessing.ParamProcessImport());
 
-            JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, SpfyIntegrationMgt.ShopifyCode() + '*', '', 5);
+            JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, ShopifyImportListTaskPrefix() + '*', '', 5);
         end else
             if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId()) then
                 JobQueueEntry.Cancel();
     end;
 
+    local procedure ShopifyImportListTaskPrefix(): Text
+    begin
+        exit(CopyStr(SpfyIntegrationMgt.DataProcessingHandlerID(true), 1, 10));
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
@@ -1113,7 +1117,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         LinkID := SalesHeader.AddLink('', SalesHeader."No.");
         RecordLink.Get(LinkID);
         RecordLink.Type := RecordLink.Type::Note;
-        RecordLink."User ID" := SpfyIntegrationMgt.ShopifyCode();
+        RecordLink."User ID" := SpfyIntegrationMgt.DataProcessingHandlerID(true);
         RecordLinkMgt.WriteNote(RecordLink, CommentLine);
         RecordLink.Modify(true);
     end;

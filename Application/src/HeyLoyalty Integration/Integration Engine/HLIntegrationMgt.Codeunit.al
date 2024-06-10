@@ -267,7 +267,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         if Enable then
             Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", DummyNcTask)
         else begin
-            ParameterFilterTxt := StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), HLScheduleSend.GetHeyLoyaltyTaskProcessorCode());
+            ParameterFilterTxt := StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(true));
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
             JobQueueEntry.SetFilter("Parameter String", ParameterFilterTxt);
@@ -302,9 +302,9 @@ codeunit 6059993 "NPR HL Integration Mgt."
         TicketAdmisDescrTxt: Label 'Each ticket admission (scan)', MaxLength = 80;
         WelcomeNotifDescrTxt: Label 'New tickets', MaxLength = 80;
     begin
-        if not TicketNotifPrifile.Get(HeyLoyaltyCode()) then begin
+        TicketNotifPrifile."Profile Code" := CopyStr(DataProcessingHandlerID(true), 1, MaxStrLen(TicketNotifPrifile."Profile Code"));
+        if not TicketNotifPrifile.Find() then begin
             TicketNotifPrifile.Init();
-            TicketNotifPrifile."Profile Code" := HeyLoyaltyCode();
             TicketNotifPrifile.Description := ProfileDescrTxt;
             TicketNotifPrifile.Insert();
         end else
@@ -402,13 +402,6 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(Confirm(AllowedOnlyInTestEnvMsg, false));
     end;
 
-    procedure HeyLoyaltyCode(): Code[10]
-    var
-        HeyLoyaltyTaskProcessorCode: Label 'HEYLOY', Locked = true, MaxLength = 10;
-    begin
-        exit(HeyLoyaltyTaskProcessorCode);
-    end;
-
     procedure NonTempParameterError()
     var
         ErroMsgWithCallStackLbl: Label '%1\Call stack:\%2', Comment = '%1 - error message, %2 - error call stack';
@@ -480,6 +473,24 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         HLSetup.GetRecordOnce(false);
         exit(HLSetup."Send Heybooking Err. to E-Mail");
+    end;
+
+    procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
+    begin
+        if not AutoCreate then
+            if HLSetup.IsEmpty() then
+                exit('');
+
+        HLSetup.GetRecordOnce(false);
+        if HLSetup."Data Processing Handler ID" = '' then begin
+            SelectLatestVersion();
+            HLSetup.GetRecordOnce(true);
+            if HLSetup."Data Processing Handler ID" = '' then begin
+                HLSetup.SetDataProcessingHandlerIDToDefaultValue();
+                HLSetup.Modify();
+            end;
+        end;
+        exit(HLSetup."Data Processing Handler ID");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
