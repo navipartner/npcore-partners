@@ -673,6 +673,7 @@
             if TempDiscountPriority.FindSet() then
                 repeat
                     POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
+                    TempSaleLinePOS2.FindFirst();
                     TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
                 until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
         "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
