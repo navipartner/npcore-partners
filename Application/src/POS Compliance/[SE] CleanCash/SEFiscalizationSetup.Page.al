@@ -80,7 +80,7 @@ page 6184577 "NPR SE Fiscalization Setup"
     local procedure InsertCertificatinDetails()
     var
         CertifiedModelLbl: Label 'NP Retail', Locked = true;
-        CertifiedVersionLbl: Label '1.00', Locked = true;
+        CertifiedVersionLbl: Label 'SE 1.00', Locked = true;
         CertifiedSoftwareDesignationLbl: Label 'Microsoft Business Central', Locked = true;
     begin
         CertificationModel := CertifiedModelLbl;
