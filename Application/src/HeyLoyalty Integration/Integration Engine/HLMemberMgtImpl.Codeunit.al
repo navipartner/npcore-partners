@@ -788,7 +788,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     var
         HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
     begin
-        if TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode() then
+        if (TaskProcessor.Code = '') or (TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(false)) then
             exit;
         SkipProcessing := not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members);
         MaxNoOfDataLogRecordsToProcess := 0;
@@ -799,7 +799,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     var
         HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
     begin
-        if TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode() then
+        if (TaskProcessor.Code = '') or (TaskProcessor.Code <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(false)) then
             exit;
         Handled := true;
         if not HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then

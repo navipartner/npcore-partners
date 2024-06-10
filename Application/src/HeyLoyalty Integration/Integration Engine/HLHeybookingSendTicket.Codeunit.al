@@ -35,7 +35,7 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         NcTask."Table No." := Database::"NPR TM Ticket Notif. Entry";
         NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
         NcTask."Log Date" := CurrentDateTime();
-        NcTask."Task Processor Code" := HLScheduleSend.GetHeyLoyaltyTaskProcessorCode();
+        NcTask."Task Processor Code" := HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(true);
         NcTask."Last Processing Started at" := CurrentDateTime();
 
         ClearLastError();
@@ -276,11 +276,11 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", 'OnBeforeProcessTask', '', true, false)]
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
     var
-        HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
+        HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
     begin
         if Task."Table No." <> Database::"NPR TM Ticket Notif. Entry" then
             exit;
-        if Task."Task Processor Code" <> HLIntegrationMgt.HeyLoyaltyCode() then
+        if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(false)) then
             exit;
 
         Error(NotReprocessibleErr);
