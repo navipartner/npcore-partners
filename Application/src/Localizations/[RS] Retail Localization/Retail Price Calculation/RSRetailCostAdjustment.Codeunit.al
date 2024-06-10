@@ -6,11 +6,11 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     local procedure OnBeforeRunWithCheck(var IsHandled: Boolean; ItemJournalLine: Record "Item Journal Line"; CalledFromAdjustment: Boolean)
     var
         Location: Record Location;
-        RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         LocationFilters: List of [Code[20]];
         LocationFilter: Code[20];
     begin
-        if not RetailLocalizationMgt.IsRetailLocalizationEnabled() then
+        if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
         if not CalledFromAdjustment then
@@ -38,11 +38,11 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     local procedure ItemCostManagement_OnAfterSetFilters(var ValueEntry: Record "Value Entry"; var Item: Record Item)
     var
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
-        RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         ValueEntryFilter: Text;
         TextBuilder: TextBuilder;
     begin
-        if not RetailLocalizationMgt.IsRetailLocalizationEnabled() then
+        if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
         if not RSRetValueEntryMapp.FindSet() then
@@ -57,6 +57,27 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
         FormatRetailValueEntryFilter(ValueEntryFilter, TextBuilder);
 
         ValueEntry.SetFilter("Entry No.", StrSubstNo('<>%1', ValueEntryFilter));
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnPostLinesOnAfterPostLine', '', false, false)]
+    local procedure OnPostLinesOnAfterPostLine(var ItemJournalLine: Record "Item Journal Line")
+    var
+        ValueEntry: Record "Value Entry";
+        Location: Record Location;
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+    begin
+        if not RSRLocalizationMgt.IsRSLocalizationActive() then
+            exit;
+
+        Location.Get(ItemJournalLine."Location Code");
+        if not (Location."NPR Retail Location") then
+            exit;
+
+        ValueEntry.SetRange("Document No.", ItemJournalLine."Document No.");
+        if not ValueEntry.FindLast() then
+            exit;
+
+        RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(ValueEntry);
     end;
 
     #region RS Retail Cost Adjustment Helper Procedures
