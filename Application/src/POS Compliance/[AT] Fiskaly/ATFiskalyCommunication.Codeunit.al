@@ -496,6 +496,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ResponseText: Text;
         Url: Text;
     begin
+        ATPOSAuditLogAuxInfo.TestField(Signed, false);
         ATPOSAuditLogAuxInfo.TestField(SystemId);
         ATPOSAuditLogAuxInfo.TestField("POS Entry No.");
         ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
@@ -1363,7 +1364,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     var
         ATSCU: Record "NPR AT SCU";
         TypeHelper: Codeunit "Type Helper";
-        FONValidationObject, FONValidationObjects, PropertyValue, ResponseJson : JsonToken;
+        PropertyValue, ResponseJson : JsonToken;
         Hints: Text;
     begin
         ResponseJson.ReadFrom(ResponseText);
@@ -1399,15 +1400,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Hints := GetReceiptHints(ResponseJson);
         ATPOSAuditLogAuxInfo.Hints := CopyStr(Hints, 1, MaxStrLen(ATPOSAuditLogAuxInfo.Hints));
 
-        if ResponseJson.SelectToken('fon_validations', FONValidationObjects) then
-            if FONValidationObjects.IsArray() then
-                foreach FONValidationObject in FONValidationObjects.AsArray() do begin
-                    FONValidationObject.SelectToken('validation_result', PropertyValue);
-                    ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
-
-                    FONValidationObject.SelectToken('time_validation', PropertyValue);
-                    ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
-                end;
+        PopulateValidationFieldsOnATPOSAuditLogAuxInfo(ATPOSAuditLogAuxInfo, ResponseJson);
 
         ATPOSAuditLogAuxInfo.Modify(true);
     end;
@@ -1418,7 +1411,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATSCU: Record "NPR AT SCU";
         TypeHelper: Codeunit "Type Helper";
         Inserted: Boolean;
-        FONValidationObject, FONValidationObjects, PropertyValue, ReceiptObject, ReceiptObjects, ResponseJson : JsonToken;
+        PropertyValue, ReceiptObject, ReceiptObjects, ResponseJson : JsonToken;
         Hints: Text;
     begin
         ResponseJson.ReadFrom(ResponseText);
@@ -1462,15 +1455,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
             Hints := GetReceiptHints(ReceiptObject);
             ATPOSAuditLogAuxInfo.Hints := CopyStr(Hints, 1, MaxStrLen(ATPOSAuditLogAuxInfo.Hints));
 
-            if ReceiptObject.SelectToken('fon_validations', FONValidationObjects) then
-                if FONValidationObjects.IsArray() then
-                    foreach FONValidationObject in FONValidationObjects.AsArray() do begin
-                        FONValidationObject.SelectToken('validation_result', PropertyValue);
-                        ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
-
-                        FONValidationObject.SelectToken('time_validation', PropertyValue);
-                        ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
-                    end;
+            PopulateValidationFieldsOnATPOSAuditLogAuxInfo(ATPOSAuditLogAuxInfo, ReceiptObject);
 
             ATPOSAuditLogAuxInfo.Modify(true);
 
@@ -1487,18 +1472,20 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         ReceiptObject.SelectToken('_id', PropertyValue);
         SystemId := PropertyValue.AsValue().AsText();
-        if not ATPOSAuditLogAuxInfo.GetBySystemId(SystemId) then begin
-            ATPOSAuditLogAuxInfo.Init();
-            ATPOSAuditLogAuxInfo."Audit Entry Type" := ATAuditEntryType;
-            ATPOSAuditLogAuxInfo."Entry Date" := Today();
-            POSUnit.Get(ATCashRegister."POS Unit No.");
-            ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
-            ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
-            ATPOSAuditLogAuxInfo.SystemId := SystemId;
-            ATPOSAuditLogAuxInfo.Insert(false, true);
-            Inserted := true;
-        end;
+        if ATPOSAuditLogAuxInfo.GetBySystemId(SystemId) then
+            exit;
+
+        ATPOSAuditLogAuxInfo.Init();
+        ATPOSAuditLogAuxInfo."Audit Entry Type" := ATAuditEntryType;
+        ATPOSAuditLogAuxInfo."Entry Date" := Today();
+        POSUnit.Get(ATCashRegister."POS Unit No.");
+        ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+        ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
+        ATPOSAuditLogAuxInfo.SystemId := SystemId;
+        ATPOSAuditLogAuxInfo.Insert(false, true);
+        Inserted := true;
     end;
+
 
     local procedure GetFONReceiptValididationStatus(State: Text): Enum "NPR AT FON Rcpt. Valid. Status"
     begin
@@ -1516,18 +1503,42 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         exit(Enum::"NPR AT Receipt Type"::" ");
     end;
 
+    local procedure PopulateValidationFieldsOnATPOSAuditLogAuxInfo(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; var ReceiptObject: JsonToken)
+    var
+        TypeHelper: Codeunit "Type Helper";
+        FONValidationObject, FONValidationObjects, PropertyValue : JsonToken;
+    begin
+        if not ReceiptObject.SelectToken('fon_validations', FONValidationObjects) then
+            exit;
+
+        if not FONValidationObjects.IsArray() then
+            exit;
+
+        foreach FONValidationObject in FONValidationObjects.AsArray() do begin
+            FONValidationObject.SelectToken('validation_result', PropertyValue);
+            ATPOSAuditLogAuxInfo."FON Receipt Validation Status" := GetFONReceiptValididationStatus(PropertyValue.AsValue().AsText());
+
+            FONValidationObject.SelectToken('time_validation', PropertyValue);
+            ATPOSAuditLogAuxInfo."Validated At" := TypeHelper.EvaluateUnixTimestamp(PropertyValue.AsValue().AsBigInteger());
+        end;
+    end;
+
     local procedure GetReceiptHints(var ReceiptObject: JsonToken) Hints: Text
     var
         HintObject: JsonToken;
         HintObjects: JsonToken;
         Hint: Text;
     begin
-        if ReceiptObject.SelectToken('hints', HintObjects) then
-            if HintObjects.IsArray() then
-                foreach HintObject in HintObjects.AsArray() do begin
-                    HintObject.WriteTo(Hint);
-                    Hints += Hint.Replace('"', '') + '; ';
-                end;
+        if not ReceiptObject.SelectToken('hints', HintObjects) then
+            exit;
+
+        if not HintObjects.IsArray() then
+            exit;
+
+        foreach HintObject in HintObjects.AsArray() do begin
+            HintObject.WriteTo(Hint);
+            Hints += Hint.Replace('"', '') + '; ';
+        end;
 
         Hints := Hints.TrimEnd('; ');
     end;
