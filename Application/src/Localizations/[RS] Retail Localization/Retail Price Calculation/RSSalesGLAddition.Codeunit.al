@@ -10,11 +10,8 @@ codeunit 6151094 "NPR RS Sales GL Addition"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', false, false)]
     local procedure AddSalesGLEntries(SalesInvoiceHeader: Record "Sales Invoice Header"; PreviewMode: Boolean; CommitIsSuppressed: Boolean)
     var
-        GenJournalLine: Record "Gen. Journal Line";
         RetailValueEntry: Record "Value Entry";
-        StdCorrectionValueEntry: Record "Value Entry";
-        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        RSGLEntryType: Option VAT,Margin,MarginNoVAT,StdCorrection,CounterStdCorrection;
+        RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
@@ -24,33 +21,24 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
         FillRetailSalesLines(SalesInvoiceHeader);
 
-        if not TempSalesInvoiceLine.FindSet() then
+        if TempSalesInvoiceLine.IsEmpty() then
             exit;
 
         FilterPriceListHeader(SalesInvoiceHeader);
 
+        TempSalesInvoiceLine.FindSet();
         repeat
-            Clear(RetailValueEntry);
-            Clear(StdCorrectionValueEntry);
-
             FindPriceListLine(TempSalesInvoiceLine."Location Code", TempSalesInvoiceLine."No.");
 
-            InsertRetailValueEntries(RetailValueEntry, StdCorrectionValueEntry, SalesInvoiceHeader);
+            InsertRetailValueEntries(RetailValueEntry, SalesInvoiceHeader);
 
             if (RetailValueEntry."Entry No." <> 0) and (RetailValueEntry."Cost Amount (Actual)" <> 0) then begin
-                CreateAdditionalGLEntries(GenJournalLine, RetailValueEntry, SalesInvoiceHeader, RSGLEntryType::Margin);
-                CreateAdditionalGLEntries(GenJournalLine, RetailValueEntry, SalesInvoiceHeader, RSGLEntryType::VAT);
-                CreateAdditionalGLEntries(GenJournalLine, RetailValueEntry, SalesInvoiceHeader, RSGLEntryType::MarginNoVAT);
-                InsertGLItemLedgerRelation(RetailValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSGLEntryType::VAT));
-                InsertGLItemLedgerRelation(RetailValueEntry, GetInventoryAccountFromInvPostingSetup(RetailValueEntry."Location Code"));
-                InsertGLItemLedgerRelation(RetailValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSGLEntryType::MarginNoVAT));
-            end;
-
-            if StdCorrectionValueEntry."Entry No." <> 0 then begin
-                CreateAdditionalGLEntries(GenJournalLine, StdCorrectionValueEntry, SalesInvoiceHeader, RSGLEntryType::StdCorrection);
-                CreateAdditionalGLEntries(GenJournalLine, StdCorrectionValueEntry, SalesInvoiceHeader, RSGLEntryType::CounterStdCorrection);
-                InsertGLItemLedgerRelation(StdCorrectionValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSGLEntryType::StdCorrection));
-                InsertGLItemLedgerRelation(StdCorrectionValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSGLEntryType::CounterStdCorrection));
+                CreateAdditionalGLEntries(RetailValueEntry, SalesInvoiceHeader, RSRetailCalculationType::"Margin with VAT");
+                CreateAdditionalGLEntries(RetailValueEntry, SalesInvoiceHeader, RSRetailCalculationType::VAT);
+                CreateAdditionalGLEntries(RetailValueEntry, SalesInvoiceHeader, RSRetailCalculationType::Margin);
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::VAT));
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::"Margin with VAT"));
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::Margin));
             end;
 
             CheckIfNivelationNeeded(SalesInvoiceHeader);
@@ -77,23 +65,23 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         NivelationHeader."Posting Date" := SalesInvoiceHeader."Posting Date";
         NivelationHeader.Insert(true);
         LineNo := NivelationLines.GetInitialLine() + 10000;
-        if TempNivSalesInvLines.FindSet() then
-            repeat
-                NivelationLines.Init();
-                NivelationLines."Line No." := LineNo;
-                NivelationLines."Document No." := NivelationHeader."No.";
-                NivelationLines."Location Code" := TempNivSalesInvLines."Location Code";
-                FindPriceListLine(TempNivSalesInvLines."Location Code", TempNivSalesInvLines."No.");
-                NivelationLines."Price Valid Date" := PriceListLine."Starting Date";
-                NivelationLines."Posting Date" := SalesInvoiceHeader."Posting Date";
-                NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
-                NivelationLines.Validate("Item No.", TempNivSalesInvLines."No.");
-                NivelationLines."Old Price" := PriceListLine."Unit Price";
-                NivelationLines.Quantity := TempNivSalesInvLines.Quantity;
-                NivelationLines.Validate("New Price", TempNivSalesInvLines.GetLineAmountInclVAT() / TempNivSalesInvLines.Quantity);
-                NivelationLines.Insert(true);
-                LineNo += 10000;
-            until TempNivSalesInvLines.Next() = 0;
+        TempNivSalesInvLines.FindSet();
+        repeat
+            NivelationLines.Init();
+            NivelationLines."Line No." := LineNo;
+            NivelationLines."Document No." := NivelationHeader."No.";
+            NivelationLines."Location Code" := TempNivSalesInvLines."Location Code";
+            FindPriceListLine(TempNivSalesInvLines."Location Code", TempNivSalesInvLines."No.");
+            NivelationLines."Price Valid Date" := PriceListLine."Starting Date";
+            NivelationLines."Posting Date" := SalesInvoiceHeader."Posting Date";
+            NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
+            NivelationLines.Validate("Item No.", TempNivSalesInvLines."No.");
+            NivelationLines."Old Price" := PriceListLine."Unit Price";
+            NivelationLines.Quantity := TempNivSalesInvLines.Quantity;
+            NivelationLines.Validate("New Price", TempNivSalesInvLines.GetLineAmountInclVAT() / TempNivSalesInvLines.Quantity);
+            NivelationLines.Insert(true);
+            LineNo += 10000;
+        until TempNivSalesInvLines.Next() = 0;
         NivelationHeader.CalcFields(Amount);
         NivelationHeader.Modify();
 
@@ -122,25 +110,26 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
     #region GL Entry Posting
 
-    local procedure CreateAdditionalGLEntries(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,StdCorrection,CounterStdCorrection)
+    local procedure CreateAdditionalGLEntries(CalculationValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
+        GenJournalLine: Record "Gen. Journal Line";
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
         GLSetup: Record "General Ledger Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         GenJournalLine.Init();
-        InitGenLineFromLastGLEntry(GenJournalLine, RSGLEntryType);
+        InitGenLineFromLastGLEntry(GenJournalLine, RSRetailCalculationType);
         GenJnlPostLine.GetGLReg(GLRegister);
         GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
-        GenJournalLine."Account No." := GetRSAccountNoFromSetup(SalesInvoiceHeader, RSGLEntryType);
+        GenJournalLine."Account No." := GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        ValidateGenJnlLinePositiveAmounts(GenJournalLine, RSGLEntryType, CalculationValueEntry);
+        ValidateGenJnlLinePositiveAmounts(GenJournalLine, RSRetailCalculationType, CalculationValueEntry);
 
         if GenJournalLine.Amount = 0 then
             exit;
@@ -160,19 +149,19 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         PostGLAcc(GenJournalLine, GLEntry);
     end;
 
-    local procedure ValidateGenJnlLinePositiveAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,StdCorrection,CounterStdCorrection; CalculationValueEntry: Record "Value Entry")
+    local procedure ValidateGenJnlLinePositiveAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
     begin
-        case RSGLEntryType of
-            RSGLEntryType::Margin:
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
                 GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Posted to G/L"));
-            RSGLEntryType::CounterStdCorrection:
+            RSRetailCalculationType::"Counter COGS Correction", RSRetailCalculationType::"Counter Std Correction":
                 GenJournalLine.Validate("Credit Amount", -CalculationValueEntry."Cost Posted to G/L");
-            RSGLEntryType::StdCorrection:
+            RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
                 GenJournalLine.Validate("Debit Amount", -CalculationValueEntry."Cost Posted to G/L");
-            RSGLEntryType::VAT:
+            RSRetailCalculationType::VAT:
                 GenJournalLine.Validate("Debit Amount", Abs(CalculationValueEntry."Sales Amount (Actual)"));
-            RSGLEntryType::MarginNoVAT:
-                GenJournalLine.Validate("Debit Amount", Abs(RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Posted to G/L", GenJournalLine)) - Abs(CalculationValueEntry."Sales Amount (Actual)"));
+            RSRetailCalculationType::Margin:
+                GenJournalLine.Validate("Debit Amount", Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Posted to G/L", GenJournalLine)) - Abs(CalculationValueEntry."Sales Amount (Actual)"));
         end;
     end;
 
@@ -208,13 +197,14 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         end;
     end;
 
-    local procedure InitGenLineFromLastGLEntry(var GenJournalLine: Record "Gen. Journal Line"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,StdCorrection,CounterStdCorrection)
+    local procedure InitGenLineFromLastGLEntry(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
         GenJnlLineMarginLbl: Label 'G/L Calculation Margin';
         GenJnlLineMarginNoVATLbl: Label 'G/L Calculation Margin Excl. VAT';
         GenJnlLineVATLbl: Label 'G/L Calculation VAT';
-        GenJnlLineStdCorrectionLbl: Label 'COGS Correction';
+        GenJnlLineCOGSCorrectionLbl: Label 'COGS Correction';
+        GenJnLineStdCorrectionLbl: Label 'Standard Correction';
     begin
         if not GLEntry.FindLast() then
             exit;
@@ -222,17 +212,17 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         GenJournalLine."Document No." := GLEntry."Document No.";
         GenJournalLine."External Document No." := GLEntry."External Document No.";
         GenJournalLine."Posting Date" := GLEntry."Posting Date";
-        case RSGLEntryType of
-            RSGLEntryType::Margin:
+        case RSRetailCalculationType of
+            RSRetailCalculationType::"Margin with VAT":
                 GenJournalLine.Description := GenJnlLineMarginLbl;
-            RSGLEntryType::MarginNoVAT:
+            RSRetailCalculationType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginNoVATLbl;
-            RSGLEntryType::VAT:
+            RSRetailCalculationType::VAT:
                 GenJournalLine.Description := GenJnlLineVATLbl;
-            RSGLEntryType::StdCorrection:
-                GenJournalLine.Description := GenJnlLineStdCorrectionLbl;
-            RSGLEntryType::CounterStdCorrection:
-                GenJournalLine.Description := GenJnlLineStdCorrectionLbl;
+            RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Counter COGS Correction":
+                GenJournalLine.Description := GenJnlLineCOGSCorrectionLbl;
+            RSRetailCalculationType::"Standard Correction", RSRetailCalculationType::"Counter Std Correction":
+                GenJournalLine.Description := GenJnLineStdCorrectionLbl;
         end;
         GenJournalLine."VAT Bus. Posting Group" := GLEntry."VAT Bus. Posting Group";
         GenJournalLine."VAT Prod. Posting Group" := GLEntry."VAT Prod. Posting Group";
@@ -453,79 +443,158 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
     #region Additional Item Ledger and Value Entry Posting
 
-    local procedure InsertRetailValueEntries(var RetailValueEntry: Record "Value Entry"; var ApplValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure InsertRetailValueEntries(var RetailValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         StdValueEntry: Record "Value Entry";
+        StdCorrectionValueEntry: Record "Value Entry";
+        SumOfCOGSCostPerUnit: Decimal;
+        SumOfCOGSCostAmtAct: Decimal;
     begin
         StdValueEntry.SetRange("Location Code", TempSalesInvoiceLine."Location Code");
         StdValueEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
         StdValueEntry.SetRange("Item No.", TempSalesInvoiceLine."No.");
+        StdValueEntry.SetRange("Document Line No.", TempSalesInvoiceLine."Line No.");
+
         if not StdValueEntry.FindFirst() then
             exit;
 
-        InsertAppliedValueEntryAdj(ApplValueEntry, StdValueEntry);
+        InsertAppliedValueEntryAdj(StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, SalesInvoiceHeader);
 
-        InsertRetailValueEntry(RetailValueEntry, StdValueEntry, ApplValueEntry)
+        InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct)
     end;
 
-    local procedure InsertAppliedValueEntryAdj(var ApplValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry")
+    local procedure InsertAppliedValueEntryAdj(var StdCorrectionValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; StdValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         StdItemLedgerEntry: Record "Item Ledger Entry";
-        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        SumOfAppliedCostAmounts: Decimal;
-        SumOfQty: Decimal;
-        CorrectionEntryDescLbl: Label 'COGS Correction';
+        TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary;
+        ApplValueEntry: Record "Value Entry";
+        ShowAppliedEntries: Codeunit "Show Applied Entries";
+        QtyTakenFromEntry: Decimal;
+        QtyNeeded: Decimal;
     begin
         if not StdItemLedgerEntry.Get(StdValueEntry."Item Ledger Entry No.") then
             exit;
 
-        GetApplicationItemLedgEntryCost(SumOfAppliedCostAmounts, SumOfQty, StdItemLedgerEntry);
+        CorrectStdValueEntry(StdCorrectionValueEntry, StdValueEntry, SalesInvoiceHeader);
 
-        if Abs(StdValueEntry."Cost per Unit") = Abs(SumOfAppliedCostAmounts / SumOfQty) then
+        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
+
+        if TempApplicationItemLedgerEntry.IsEmpty() then
             exit;
 
-        ApplValueEntry.Init();
-        ApplValueEntry.Copy(StdValueEntry);
-        ApplValueEntry."Entry No." := StdValueEntry.GetLastEntryNo() + 1;
-        ApplValueEntry.Description := CorrectionEntryDescLbl;
-        ResetValueEntryAmounts(ApplValueEntry);
+        QtyNeeded := TempSalesInvoiceLine.Quantity;
 
-        case (SumOfAppliedCostAmounts / SumOfQty) > StdValueEntry."Cost per Unit" of
-            true:
-                begin
-                    ApplValueEntry."Cost per Unit" := (SumOfAppliedCostAmounts / SumOfQty) - StdValueEntry."Cost per Unit";
-                    ApplValueEntry."Cost Amount (Actual)" := -Abs(ApplValueEntry."Cost per Unit" * StdValueEntry."Invoiced Quantity");
-                end;
-            false:
-                begin
-                    ApplValueEntry."Cost per Unit" := -(StdValueEntry."Cost per Unit" - (SumOfAppliedCostAmounts / SumOfQty));
-                    ApplValueEntry."Cost Amount (Actual)" := Abs(ApplValueEntry."Cost per Unit" * StdValueEntry."Invoiced Quantity");
-                end;
-        end;
-
-        ApplValueEntry."Cost Posted to G/L" := ApplValueEntry."Cost Amount (Actual)";
-        ApplValueEntry.Insert();
-
-        RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(ApplValueEntry);
+        TempApplicationItemLedgerEntry.FindSet();
+        repeat
+            ApplValueEntry.SetRange("Item Ledger Entry No.", TempApplicationItemLedgerEntry."Entry No.");
+            if ApplValueEntry.FindSet() then
+                repeat
+                    if ApplValueEntry."Document Type" in [ApplValueEntry."Document Type"::"Transfer Receipt", ApplValueEntry."Document Type"::"Sales Credit Memo", ApplValueEntry."Document Type"::" "] then
+                        HandleApplicationValueEntry(ApplValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, QtyNeeded, QtyTakenFromEntry, StdValueEntry, SalesInvoiceHeader);
+                until (ApplValueEntry.Next() = 0) or (QtyNeeded <= 0);
+        until TempApplicationItemLedgerEntry.Next() = 0;
     end;
 
-    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; ApplValueEntry: Record "Value Entry")
+    local procedure HandleApplicationValueEntry(ApplValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal; QtyTakenFromEntry: Decimal; StdValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
-        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+    begin
+        if not RSRetValueEntryMapp.Get(ApplValueEntry."Entry No.") then
+            exit;
+        if not ((RSRetValueEntryMapp."COGS Correction") and (RSRetValueEntryMapp.Open)) then
+            exit;
+
+        QtyTakenFromEntry := RSRetValueEntryMapp."Remaining Quantity";
+        case true of
+            (QtyTakenFromEntry < QtyNeeded) or (QtyTakenFromEntry = QtyNeeded):
+                begin
+                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, SalesInvoiceHeader, ApplValueEntry."Cost per Unit", QtyTakenFromEntry);
+                    RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, QtyTakenFromEntry);
+                end;
+            QtyTakenFromEntry > QtyNeeded:
+                begin
+                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, SalesInvoiceHeader, ApplValueEntry."Cost per Unit", QtyNeeded);
+                    RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, QtyNeeded);
+                end;
+        end;
+        QtyNeeded := QtyNeeded - QtyTakenFromEntry;
+    end;
+
+    local procedure InsertCOGSCorrectionValueEntry(var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; StdValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header"; ApplCostPerUnit: Decimal; ApplQty: Decimal)
+    var
+        COGSCorrectionValueEntry: Record "Value Entry";
+        RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
+        CorrectionEntryDescLbl: Label 'COGS Correction';
+    begin
+        COGSCorrectionValueEntry.Init();
+        COGSCorrectionValueEntry.Copy(StdValueEntry);
+        COGSCorrectionValueEntry."Entry No." := COGSCorrectionValueEntry.GetLastEntryNo() + 1;
+        RSRLocalizationMgt.ResetValueEntryAmounts(COGSCorrectionValueEntry);
+        COGSCorrectionValueEntry."Cost per Unit" := ApplCostPerUnit;
+        COGSCorrectionValueEntry."Invoiced Quantity" := -ApplQty;
+        COGSCorrectionValueEntry."Item Ledger Entry Quantity" := -ApplQty;
+        COGSCorrectionValueEntry."Valued Quantity" := -ApplQty;
+        COGSCorrectionValueEntry."Cost Amount (Actual)" := COGSCorrectionValueEntry."Cost per Unit" * COGSCorrectionValueEntry."Invoiced Quantity";
+        COGSCorrectionValueEntry."Cost Posted to G/L" := COGSCorrectionValueEntry."Cost Amount (Actual)";
+        COGSCorrectionValueEntry.Description := CorrectionEntryDescLbl;
+        COGSCorrectionValueEntry.Insert();
+
+        SumOfCOGSCostPerUnit += COGSCorrectionValueEntry."Cost per Unit";
+        SumOfCOGSCostAmtAct += Abs(COGSCorrectionValueEntry."Cost Amount (Actual)");
+
+        CreateAdditionalGLEntries(COGSCorrectionValueEntry, SalesInvoiceHeader, RSRetailCalculationType::"COGS Correction");
+        CreateAdditionalGLEntries(COGSCorrectionValueEntry, SalesInvoiceHeader, RSRetailCalculationType::"Counter COGS Correction");
+        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::"COGS Correction"));
+        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::"Counter COGS Correction"));
+
+        RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(COGSCorrectionValueEntry);
+    end;
+
+    local procedure CorrectStdValueEntry(var StdCorrectionValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
+        StdCorrectionValueEntryDescLbl: Label 'Standard Correction';
+    begin
+        Clear(StdCorrectionValueEntry);
+        StdCorrectionValueEntry.Init();
+        StdCorrectionValueEntry.Copy(StdValueEntry);
+        StdCorrectionValueEntry."Entry No." := StdCorrectionValueEntry.GetLastEntryNo() + 1;
+        RSRLocalizationMgt.ResetValueEntryAmounts(StdCorrectionValueEntry);
+        StdCorrectionValueEntry."Cost Amount (Actual)" := Abs(StdValueEntry."Cost Amount (Actual)");
+        StdCorrectionValueEntry."Cost Posted to G/L" := StdCorrectionValueEntry."Cost Amount (Actual)";
+        StdCorrectionValueEntry."Cost per Unit" := -StdValueEntry."Cost per Unit";
+        StdCorrectionValueEntry."Invoiced Quantity" := Abs(StdValueEntry."Invoiced Quantity");
+        StdCorrectionValueEntry."Valued Quantity" := Abs(StdValueEntry."Valued Quantity");
+        StdCorrectionValueEntry."Item Ledger Entry Quantity" := Abs(StdValueEntry."Item Ledger Entry Quantity");
+        StdCorrectionValueEntry.Description := StdCorrectionValueEntryDescLbl;
+        StdCorrectionValueEntry.Insert();
+
+        RSRLocalizationMgt.InsertStdCorrectionValueEntryMappingEntry(StdCorrectionValueEntry);
+
+        CreateAdditionalGLEntries(StdCorrectionValueEntry, SalesInvoiceHeader, RSRetailCalculationType::"Standard Correction");
+        CreateAdditionalGLEntries(StdCorrectionValueEntry, SalesInvoiceHeader, RSRetailCalculationType::"Counter Std Correction");
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetCOGSAccountFromGenPostingSetup(SalesInvoiceHeader));
+        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetRSAccountNoFromSetup(SalesInvoiceHeader, RSRetailCalculationType::"Counter Std Correction"));
+    end;
+
+    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal)
+    var
         CalculationValueEntryDescLbl: Label 'Calculation';
     begin
+        Clear(RetailValueEntry);
         RetailValueEntry.Init();
         RetailValueEntry.Copy(StdValueEntry);
         RetailValueEntry."Entry No." := StdValueEntry.GetLastEntryNo() + 1;
 
-        ResetValueEntryAmounts(RetailValueEntry);
+        RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
 
-        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit" - ApplValueEntry."Cost per Unit";
+        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit" - SumOfCOGSCostPerUnit - StdCorrectionValueEntry."Cost per Unit";
 
-        if PriceListLine."Unit Price" <> (StdValueEntry."Cost Amount (Actual)" + ApplValueEntry."Cost Amount (Actual)") then
-            RetailValueEntry."Cost Amount (Actual)" := CalculateRSGLMarginAmount(RetailValueEntry, StdValueEntry);
+        if (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then
+            RetailValueEntry."Cost Amount (Actual)" := -Abs((PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) - SumOfCOGSCostAmtAct);
 
-        if PriceListLine."Unit Price" <> Abs(StdValueEntry."Sales Amount (Actual)") then
+        if (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) <> Abs(StdValueEntry."Sales Amount (Actual)") then
             RetailValueEntry."Sales Amount (Actual)" := CalculateRSGLVATAmount();
 
         RetailValueEntry."Cost Posted to G/L" := RetailValueEntry."Cost Amount (Actual)";
@@ -538,75 +607,36 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(RetailValueEntry);
     end;
-
-    local procedure InsertGLItemLedgerRelation(ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
-    var
-        GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
-        GLEntry: Record "G/L Entry";
-        GLRegister: Record "G/L Register";
-    begin
-        GenJnlPostLine.GetGLReg(GLRegister);
-        GLEntry.SetLoadFields("Entry No.", "G/L Account No.", "Document No.");
-        GLEntry.SetRange("G/L Account No.", GLAccountNo);
-        GLEntry.SetRange("Document No.", ValueEntry."Document No.");
-        if not GLEntry.FindSet() then
-            exit;
-        repeat
-            if not GLItemLedgerRelation.Get(GLEntry."Entry No.", ValueEntry."Entry No.") then begin
-                GLItemLedgerRelation.Init();
-                GLItemLedgerRelation."Value Entry No." := ValueEntry."Entry No.";
-                GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
-
-                GLItemLedgerRelation."G/L Entry No." := GLEntry."Entry No.";
-                GLItemLedgerRelation.Insert(true);
-            end;
-        until GLEntry.Next() = 0;
-    end;
     #endregion
 
     #region Retail Price Calculation
 
-    local procedure GetRSAccountNoFromSetup(SalesInvoiceHeader: Record "Sales Invoice Header"; RSGLEntryType: Option VAT,Margin,MarginNoVAT,StdCorrection,CounterStdCorrection): Code[20]
+    local procedure GetRSAccountNoFromSetup(SalesInvoiceHeader: Record "Sales Invoice Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
     begin
         LocalizationSetup.Get();
-        case RSGLEntryType of
-            RSGLEntryType::VAT:
+        case RSRetailCalculationType of
+            RSRetailCalculationType::VAT:
                 begin
                     LocalizationSetup.TestField("RS Calc. VAT GL Account");
                     exit(LocalizationSetup."RS Calc. VAT GL Account");
                 end;
-            RSGLEntryType::Margin, RSGLEntryType::CounterStdCorrection:
-                exit(GetInventoryAccountFromInvPostingSetup(TempSalesInvoiceLine."Location Code"));
-            RSGLEntryType::MarginNoVAT:
+            RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Counter COGS Correction", RSRetailCalculationType::"Counter Std Correction":
+                exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempSalesInvoiceLine."No.", TempSalesInvoiceLine."Location Code"));
+            RSRetailCalculationType::Margin:
                 begin
                     LocalizationSetup.TestField("RS Calc. Margin GL Account");
                     exit(LocalizationSetup."RS Calc. Margin GL Account");
                 end;
-            RSGLEntryType::StdCorrection:
+            RSRetailCalculationType::"COGS Correction", RSRetailCalculationType::"Standard Correction":
                 exit(GetCOGSAccountFromGenPostingSetup(SalesInvoiceHeader))
         end;
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
-        exit(((PriceListLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") * TempSalesInvoiceLine.Quantity) * CalculateVATBreakDown())
-    end;
-
-    local procedure CalculateRSGLMarginAmount(NewValueEntry: Record "Value Entry"; ValueEntryIn: Record "Value Entry"): Decimal
-    begin
-        exit(-(NewValueEntry."Cost per Unit" * Abs(ValueEntryIn."Invoiced Quantity") - TempSalesInvoiceLine."Line Discount Amount"));
-    end;
-
-    local procedure CalculateVATBreakDown(): Decimal
-    var
-        VATPostingSetup: Record "VAT Posting Setup";
-        VATPostingSetupNotFoundErr: Label '%1 has not been found for %2:%3, %4:%5', Comment = '%1 = VAT Posting Setup, %2 = VAT Bus. Post. Gr. Caption , %3 = VAT Bus. Post. Gr., %4 = VAT Prod. Post. Gr. Caption, %5 = VAT Prod. Post. Gr.';
-    begin
-        if not VATPostingSetup.Get(TempSalesInvoiceLine."VAT Bus. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group") then
-            Error(VATPostingSetupNotFoundErr, VATPostingSetup.TableCaption, VATPostingSetup.FieldCaption("VAT Bus. Posting Group"), PriceListLine."VAT Bus. Posting Gr. (Price)", VATPostingSetup.FieldCaption("VAT Prod. Posting Group"), TempSalesInvoiceLine."VAT Prod. Posting Group");
-        exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
+        exit(((PriceListLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") * TempSalesInvoiceLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesInvoiceLine."VAT Bus. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group"))
     end;
     #endregion
 
@@ -688,8 +718,9 @@ codeunit 6151094 "NPR RS Sales GL Addition"
     begin
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.SetFilter(Type, '%1|%2', SalesInvoiceLine.Type::Item, SalesInvoiceLine.Type::"Charge (Item)");
-        if not SalesInvoiceLine.FindSet() then
+        if SalesInvoiceLine.IsEmpty() then
             exit;
+        SalesInvoiceLine.FindSet();
         repeat
             if Location.Get(SalesInvoiceLine."Location Code") then
                 if Location."NPR Retail Location" then begin
@@ -746,20 +777,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, SalesInvoiceHeader."Posting Date"));
     end;
 
-    local procedure GetInventoryAccountFromInvPostingSetup(LocationCode: Code[10]): Code[20]
-    var
-        InventoryPostingSetup: Record "Inventory Posting Setup";
-        Item: Record Item;
-        InvPostingSetupNotFoundErr: Label '%1 for %2 : %3 and %4 : %5 not found.', Comment = '%1 = Inventory Posting Setup Table Caption, %2 = Location Code Field Caption %3 = Location Code, %4 = Invt. Posting Group Code Field Caption, %5 = Inventory Posting Group';
-    begin
-        Item.Get(TempSalesInvoiceLine."No.");
-        if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
-            Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
-                    InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
-        InventoryPostingSetup.TestField("Inventory Account");
-        exit(InventoryPostingSetup."Inventory Account");
-    end;
-
     local procedure GetCOGSAccountFromGenPostingSetup(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
     var
         GenPostingSetup: Record "General Posting Setup";
@@ -768,80 +785,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         exit(GenPostingSetup."COGS Account");
     end;
 
-    local procedure GetApplicationItemLedgEntryCost(var SumOfCostAmounts: Decimal; var SumOfQty: Decimal; StdItemLedgerEntry: Record "Item Ledger Entry")
-    var
-        TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary;
-        ShowAppliedEntries: Codeunit "Show Applied Entries";
-        SumOfQtyPerEntry: Decimal;
-        SumOfCostPerUnit: Decimal;
-    begin
-        ShowAppliedEntries.FindAppliedEntries(StdItemLedgerEntry, TempApplicationItemLedgerEntry);
-
-        if not TempApplicationItemLedgerEntry.FindSet() then
-            exit;
-
-        repeat
-            Clear(SumOfCostPerUnit);
-            Clear(SumOfQtyPerEntry);
-            GetApplicationValueEntryCost(SumOfCostPerUnit, SumOfQtyPerEntry, TempApplicationItemLedgerEntry);
-            SumOfCostAmounts += SumOfCostPerUnit * SumOfQtyPerEntry;
-            SumOfQty += SumOfQtyPerEntry;
-        until TempApplicationItemLedgerEntry.Next() = 0;
-    end;
-
-    local procedure GetApplicationValueEntryCost(var SumOfCostPerUnit: Decimal; var SumOfQty: Decimal; TempApplicationItemLedgerEntry: Record "Item Ledger Entry" temporary)
-    var
-        ValueEntry: Record "Value Entry";
-        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
-    begin
-        ValueEntry.SetRange("Item Ledger Entry No.", TempApplicationItemLedgerEntry."Entry No.");
-        if not ValueEntry.FindSet() then
-            exit;
-        repeat
-            case RSRetValueEntryMapp.Get(ValueEntry."Entry No.") of
-                true:
-                    if RSRetValueEntryMapp."COGS Correction" then begin
-                        SumOfCostPerUnit += ValueEntry."Cost per Unit";
-                        SumOfQty += Abs(ValueEntry."Invoiced Quantity");
-                    end;
-                false:
-                    begin
-                        SumOfCostPerUnit += ValueEntry."Cost per Unit";
-                        SumOfQty += Abs(ValueEntry."Invoiced Quantity");
-                    end;
-            end;
-        until ValueEntry.Next() = 0;
-    end;
-
-    local procedure ResetValueEntryAmounts(var ValueEntry: Record "Value Entry")
-    begin
-        ValueEntry."Cost Amount (Actual)" := 0;
-        ValueEntry."Cost Amount (Expected)" := 0;
-        ValueEntry."Cost Amount (Non-Invtbl.)" := 0;
-        ValueEntry."Cost Amount (Actual) (ACY)" := 0;
-        ValueEntry."Cost Amount (Expected) (ACY)" := 0;
-        ValueEntry."Cost Amount (Non-Invtbl.)(ACY)" := 0;
-        ValueEntry."Cost per Unit" := 0;
-        ValueEntry."Sales Amount (Actual)" := 0;
-        ValueEntry."Sales Amount (Expected)" := 0;
-        ValueEntry."Valued Quantity" := 0;
-        ValueEntry."Invoiced Quantity" := 0;
-        ValueEntry."Item Ledger Entry Quantity" := 0;
-    end;
-
-    local procedure RoundAmountToCurrencyRounding(AmountToBeRounded: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
-    var
-        Currency: Record Currency;
-    begin
-        if GenJnlLine."Currency Code" = '' then begin
-            Currency.InitRoundingPrecision();
-            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
-        end else begin
-            Currency.Get(GenJnlLine."Currency Code");
-            Currency.TestField("Amount Rounding Precision");
-            exit(Round(AmountToBeRounded, Currency."Amount Rounding Precision"));
-        end;
-    end;
     #endregion
 
     var
@@ -853,6 +796,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         TempNivSalesInvLines: Record "Sales Invoice Line" temporary;
         TempSalesInvoiceLine: Record "Sales Invoice Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         JobLine: Boolean;
         AddCurrencyCode: Code[10];
         AddCurrGLEntryVATAmt: Decimal;
