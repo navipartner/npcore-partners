@@ -137,6 +137,11 @@ page 6184638 "NPR AT POS Audit Log Aux. Info"
                     ApplicationArea = NPRATFiscal;
                     ToolTip = 'Specifies the date and time when the receipt is validated at FinanzOnline.';
                 }
+                field("Receipt Printed"; Rec."Receipt Printed")
+                {
+                    ApplicationArea = NPRATFiscal;
+                    ToolTip = 'Specifies whether the receipt is already printed or not.';
+                }
                 field(SystemId; Rec.SystemId)
                 {
                     ApplicationArea = NPRATFiscal;
@@ -204,6 +209,23 @@ page 6184638 "NPR AT POS Audit Log Aux. Info"
                     ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
                 begin
                     ATFiskalyCommunication.UpdateReceiptMetadata(Rec);
+                end;
+            }
+            action(PrintReceipt)
+            {
+                ApplicationArea = NPRATFiscal;
+                Caption = 'Print Receipt';
+                Image = PrintVoucher;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Prints the receipt.';
+
+                trigger OnAction()
+                var
+                    ATFiscalThermalPrint: Codeunit "NPR AT Fiscal Thermal Print";
+                begin
+                    ATFiscalThermalPrint.PrintReceipt(Rec);
                 end;
             }
         }
