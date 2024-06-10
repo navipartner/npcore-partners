@@ -585,16 +585,27 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(ShopifySetup."C&C Order Workflow Code");
     end;
 
+    procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
+    begin
+        if not AutoCreate then
+            if ShopifySetup.IsEmpty() then
+                exit('');
+
+        ShopifySetup.GetRecordOnce(false);
+        if ShopifySetup."Data Processing Handler ID" = '' then begin
+            SelectLatestVersion();
+            ShopifySetup.GetRecordOnce(true);
+            if ShopifySetup."Data Processing Handler ID" = '' then begin
+                ShopifySetup.SetDataProcessingHandlerIDToDefaultValue();
+                ShopifySetup.Modify();
+            end;
+        end;
+        exit(ShopifySetup."Data Processing Handler ID");
+    end;
+
     procedure SetRereadSetup()
     begin
         Clear(ShopifySetup);
-    end;
-
-    procedure ShopifyCode(): Code[10]
-    var
-        ShopifyTaskProcessorCode: Label 'SHOPIFY', Locked = true, MaxLength = 10;
-    begin
-        exit(ShopifyTaskProcessorCode);
     end;
 
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)
