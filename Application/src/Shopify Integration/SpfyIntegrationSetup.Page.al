@@ -35,6 +35,11 @@ page 6184553 "NPR Spfy Integration Setup"
                     ToolTip = 'Specifies the Shopify Api version. Default value is "2024-01"';
                     ApplicationArea = NPRShopify;
                 }
+                field("Data Processing Handler ID"; Rec."Data Processing Handler ID")
+                {
+                    ToolTip = 'Specifies a code used by the system to identify the import types, task processor and data log subscribers associated with the Shopify integration.';
+                    ApplicationArea = NPRShopify;
+                }
                 group(ItemListIntegrationArea)
                 {
                     Caption = 'Item List Integration Area';
@@ -308,7 +313,7 @@ page 6184553 "NPR Spfy Integration Setup"
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
-            Rec.Insert();
+            Rec.Insert(true);
         end;
         PreparexDataSet();
         UpdateControlVisibility();

@@ -39,6 +39,11 @@ page 6150720 "NPR HL Integration Setup"
                     ObsoleteReason = 'Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.';
 
                 }
+                field("Data Processing Handler ID"; Rec."Data Processing Handler ID")
+                {
+                    ToolTip = 'Specifies a code used by the system to identify the task processor, ticket notification profile and data log subscribers associated with the HeyLoyalty integration.';
+                    ApplicationArea = NPRHeyLoyalty;
+                }
                 group(MemberListIntegrationArea)
                 {
                     Caption = 'Member List Integration Area';
@@ -275,7 +280,7 @@ page 6150720 "NPR HL Integration Setup"
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
-            Rec.Insert();
+            Rec.Insert(true);
         end;
         xSetup := Rec;
         UpdateControlVisibility();
