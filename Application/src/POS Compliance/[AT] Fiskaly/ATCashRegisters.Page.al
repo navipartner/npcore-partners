@@ -271,6 +271,23 @@ page 6184596 "NPR AT Cash Registers"
                     ATFiskalyCommunication.ExportCashRegister(Rec, ATFiskalyCommunication.GetExportCashRegisterQueryParameters());
                 end;
             }
+            action(CreateControlReceipt)
+            {
+                ApplicationArea = NPRATFiscal;
+                Caption = 'Create Control Receipt';
+                Image = PreviewChecks;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Creates the control receipt at Fiskaly and imports information about it into POS audit log.';
+
+                trigger OnAction()
+                var
+                    ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
+                begin
+                    ATAuditMgt.CreateControlReceipt(Rec);
+                end;
+            }
         }
     }
 }

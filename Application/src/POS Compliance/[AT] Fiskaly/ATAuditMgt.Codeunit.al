@@ -43,6 +43,49 @@ codeunit 6184848 "NPR AT Audit Mgt."
     #endregion
 
     #region AT Fiscal - Audit Profile Mgt
+    internal procedure CreateControlReceipt(ATCashRegister: Record "NPR AT Cash Register")
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+        ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+    begin
+        ATCashRegister.TestField(State, ATCashRegister.State::INITIALIZED);
+        CheckCanControlReceiptBeCreated();
+        InsertATPOSAuditLogAuxInfo(ATCashRegister, ATPOSAuditLogAuxInfo);
+        ATFiskalyCommunication.SignControlReceipt(ATPOSAuditLogAuxInfo);
+    end;
+
+    local procedure CheckCanControlReceiptBeCreated()
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ControlReceiptCannotBeCreatedErr: Label 'Control receipt cannot be created when the fiscalization is in training mode.';
+    begin
+        ATFiscalizationSetup.Get();
+        if ATFiscalizationSetup.Training then
+            Error(ControlReceiptCannotBeCreatedErr);
+    end;
+
+    local procedure InsertATPOSAuditLogAuxInfo(ATCashRegister: Record "NPR AT Cash Register"; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
+    var
+        POSUnit: Record "NPR POS Unit";
+        ATSCU: Record "NPR AT SCU";
+    begin
+        ATPOSAuditLogAuxInfo.Init();
+        ATPOSAuditLogAuxInfo."Audit Entry Type" := ATPOSAuditLogAuxInfo."Audit Entry Type"::"Control Transaction";
+        ATPOSAuditLogAuxInfo."Entry Date" := Today();
+        POSUnit.Get(ATCashRegister."POS Unit No.");
+        ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+        ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
+        ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::NORMAL;
+        ATCashRegister.Get(ATPOSAuditLogAuxInfo."POS Unit No.");
+        ATSCU.Get(ATCashRegister."AT SCU Code");
+        ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
+        ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
+        ATPOSAuditLogAuxInfo."AT SCU Id" := ATSCU.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Id" := ATCashRegister.SystemId;
+        ATPOSAuditLogAuxInfo."AT Cash Register Serial Number" := ATCashRegister."Serial Number";
+        ATPOSAuditLogAuxInfo.Insert(true);
+    end;
+
     local procedure AddATAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;
@@ -182,6 +225,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+        ATFiscalThermalPrint: Codeunit "NPR AT Fiscal Thermal Print";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -196,6 +240,23 @@ codeunit 6184848 "NPR AT Audit Mgt."
             exit;
 
         ATFiskalyCommunication.SignReceipt(ATPOSAuditLogAuxInfo);
+
+        ATFiscalThermalPrint.PrintReceipt(ATPOSAuditLogAuxInfo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
+    local procedure HandleOnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]);
+    var
+        POSUnit: Record "NPR POS Unit";
+        NewSalesTicketNo: Code[20];
+    begin
+        Setup.GetPOSUnit(POSUnit);
+        if not IsATAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        NewSalesTicketNo := GetSourceDocumentNoForReceiptNo(SalesTicketNo);
+        if NewSalesTicketNo <> '' then
+            SalesTicketNo := NewSalesTicketNo;
     end;
     #endregion
 
@@ -395,6 +456,13 @@ codeunit 6184848 "NPR AT Audit Mgt."
         exit(HandlerCodeTxt);
     end;
 
+    internal procedure GetControlReceiptItemText(): Text
+    var
+        ControlReceiptItemTextLbl: Label 'Nullbeleg', Locked = true;
+    begin
+        exit(ControlReceiptItemTextLbl);
+    end;
+
     local procedure OnActionShowSetup()
     var
         ATFiscalizationSetup: Page "NPR AT Fiscalization Setup";
@@ -440,6 +508,33 @@ codeunit 6184848 "NPR AT Audit Mgt."
         POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetRange("Document No.", DocumentNo);
         exit(POSEntry.FindFirst());
+    end;
+
+    local procedure GetSourceDocumentNoForReceiptNo(ReceiptNo: Text[30]): Code[20]
+    var
+        ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
+    begin
+        ATPOSAuditLogAuxInfo.FilterGroup(10);
+        ATPOSAuditLogAuxInfo.SetRange("Receipt Number", ReceiptNo);
+        ATPOSAuditLogAuxInfo.FilterGroup(0);
+
+        case ATPOSAuditLogAuxInfo.Count() of
+            0:
+                exit('');
+            1:
+                begin
+                    if ATPOSAuditLogAuxInfo.FindFirst() then
+                        exit(ATPOSAuditLogAuxInfo."Source Document No.");
+
+                    exit('');
+                end;
+            else begin
+                if Page.RunModal(0, ATPOSAuditLogAuxInfo) <> Action::LookupOK then
+                    exit('');
+
+                exit(ATPOSAuditLogAuxInfo."Source Document No.");
+            end;
+        end;
     end;
     #endregion
 
