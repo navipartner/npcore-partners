@@ -72,6 +72,21 @@ table 6150837 "NPR RS Ret. Value Entry Mapp."
             Caption = 'COGS Correction';
             DataClassification = CustomerContent;
         }
+        field(13; "Standard Correction"; Boolean)
+        {
+            Caption = 'Standard Correction';
+            DataClassification = CustomerContent;
+        }
+        field(14; Open; Boolean)
+        {
+            Caption = 'Open';
+            DataClassification = CustomerContent;
+        }
+        field(15; "Remaining Quantity"; Decimal)
+        {
+            Caption = 'Remaining Quantity';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
