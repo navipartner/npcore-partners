@@ -59,6 +59,21 @@ page 6184587 "NPR RS Ret. Value Entry Mapp."
                     ApplicationArea = NPRRSRLocal;
                     ToolTip = 'Specifies the value of the COGS Correction field.';
                 }
+                field("Standard Correction"; Rec."Standard Correction")
+                {
+                    ApplicationArea = NPRRSRLocal;
+                    ToolTip = 'Specifies the value of the Standard Correction field.';
+                }
+                field(Open; Rec.Open)
+                {
+                    ApplicationArea = NPRRSRLocal;
+                    ToolTip = 'Specifies the value of the Open field.';
+                }
+                field("Remaining Quantity"; Rec."Remaining Quantity")
+                {
+                    ApplicationArea = NPRRSRLocal;
+                    ToolTip = 'Specifies the value of the Remaining Quantity field.';
+                }
             }
         }
     }
