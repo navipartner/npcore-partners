@@ -150,6 +150,22 @@ table 6059800 "NPR HL Integration Setup"
                     MailManagement.CheckValidEmailAddresses("Send Heybooking Err. to E-Mail");
             end;
         }
+        field(140; "Data Processing Handler ID"; Code[20])
+        {
+            Caption = 'Data Processing Handler ID';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ConfirmDataProcessingHandlerChangeQst: Label 'You have changed %1. Note that the previous value may have already been used to set up associated task processor, ticket notification profile and data log subscriber records. These will not be updated automatically. You must update them manually or the functionality will not work properly.\\Are you sure you want to change the field value?', Comment = '%1 - field caption';
+            begin
+                if "Data Processing Handler ID" = '' then
+                    SetDataProcessingHandlerIDToDefaultValue();
+                if "Data Processing Handler ID" <> xRec."Data Processing Handler ID" then
+                    if not Confirm(ConfirmDataProcessingHandlerChangeQst, false, FieldCaption("Data Processing Handler ID")) then
+                        "Data Processing Handler ID" := xRec."Data Processing Handler ID";
+            end;
+        }
     }
 
     keys
@@ -159,6 +175,17 @@ table 6059800 "NPR HL Integration Setup"
             Clustered = true;
         }
     }
+    trigger OnInsert()
+    begin
+        SetDataProcessingHandlerIDToDefaultValue();
+    end;
+
+    procedure SetDataProcessingHandlerIDToDefaultValue()
+    var
+        HeyLoyaltyDataProcessingHandlerID: Label 'HEYLOY', Locked = true, MaxLength = 20;
+    begin
+        "Data Processing Handler ID" := HeyLoyaltyDataProcessingHandlerID;
+    end;
 
     procedure GetRecordOnce(ReRead: Boolean)
     begin
@@ -166,7 +193,7 @@ table 6059800 "NPR HL Integration Setup"
             exit;
         if not Get() then begin
             Init();
-            exit;
+            Insert(true);
         end;
         RecordHasBeenRead := true;
     end;

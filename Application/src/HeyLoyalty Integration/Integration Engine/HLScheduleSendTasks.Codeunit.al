@@ -21,7 +21,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
             exit;
 
         if NcTask."Task Processor Code" = '' then begin
-            NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
+            NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode(true);
             if NcTask."Entry No." <> 0 then
                 NcTask.Modify();
         end;
@@ -31,18 +31,19 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, NcTask."Task Processor Code", true, '', NoOfMinutesBetweenRuns);
     end;
 
-    procedure GetHeyLoyaltyTaskProcessorCode(): Code[20]
+    procedure GetHeyLoyaltyTaskProcessorCode(AutoCreate: Boolean): Code[20]
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
         HeyLoyaltyTaskProcessorDescription: Label 'HeyLoyalty updates', MaxLength = 50;
     begin
-        if not NcTaskProcessor.Get(HLIntegrationMgt.HeyLoyaltyCode()) then begin
-            NcTaskProcessor.Init();
-            NcTaskProcessor.Code := HLIntegrationMgt.HeyLoyaltyCode();
-            NcTaskProcessor.Description := HeyLoyaltyTaskProcessorDescription;
-            NcTaskProcessor.Insert(true);
-        end;
+        NcTaskProcessor.Code := HLIntegrationMgt.DataProcessingHandlerID(AutoCreate);
+        if (NcTaskProcessor.Code <> '') and AutoCreate then
+            if not NcTaskProcessor.Find() then begin
+                NcTaskProcessor.Init();
+                NcTaskProcessor.Description := HeyLoyaltyTaskProcessorDescription;
+                NcTaskProcessor.Insert(true);
+            end;
         exit(NcTaskProcessor.Code);
     end;
 
@@ -51,10 +52,8 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
     var
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
     begin
-        if Task."Task Processor Code" <> HLIntegrationMgt.HeyLoyaltyCode() then
+        if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetHeyLoyaltyTaskProcessorCode(false)) then
             exit;
-
-        GetHeyLoyaltyTaskProcessorCode();  //Make sure HeyLoyality task processor is created
         if HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Members) then
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR HL HeyLoyalty Member");
         if HLIntegrationMgt.IsEnabled("NPR HL Integration Area"::Heybooking) then
@@ -104,7 +103,7 @@ codeunit 6059996 "NPR HL Schedule Send Tasks"
         NcTask.Init();
         NcTask."Entry No." := 0;
         NcTask.Type := TaskType;
-        NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode();
+        NcTask."Task Processor Code" := GetHeyLoyaltyTaskProcessorCode(true);
         NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
         NcTask."Table No." := RecRef.Number;
         NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));

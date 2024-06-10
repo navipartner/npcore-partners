@@ -61,7 +61,7 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
         if Format(DataLogSetup) <> Format(xDataLogSetup) then
             DataLogSetup.Modify(true);
 
-        DataLogSubscriber.AddAsSubscriber(HLIntegrationMgt.HeyLoyaltyCode(), DataLogSetup."Table ID");
+        DataLogSubscriber.AddAsSubscriber(HLIntegrationMgt.DataProcessingHandlerID(true), DataLogSetup."Table ID");
         xDataLogSubscriber := DataLogSubscriber;
         HLIntegrationEvents.OnSetupDataLogSubsriberDataProcessingParams(IntegrationArea, DataLogSetup."Table ID", DataLogSubscriber, Handled);
         if not Handled then
@@ -94,7 +94,7 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
     var
         HLIntegrationMgt: Codeunit "NPR HL Integration Mgt.";
     begin
-        exit(HLIntegrationMgt.HeyLoyaltyCode());
+        exit(HLIntegrationMgt.DataProcessingHandlerID(true));
     end;
 
     local procedure CheckSubscriberSetupIsConsistent(DataLogSubscriber: Record "NPR Data Log Subscriber")

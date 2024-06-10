@@ -38,12 +38,12 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     begin
         if Enable then begin
             JobQueueMgt.SetStoreCode(ShopifyStoreCode);
-            JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, GetShopifyTaskProcessorCode(), true, '', 1);
+            JobQueueMgt.ScheduleNcTaskProcessing(JobQueueEntry, GetShopifyTaskProcessorCode(true), true, '', 1);
         end else begin
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
             JobQueueEntry.SetFilter("Parameter String", '%1&%2',
-                StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), GetShopifyTaskProcessorCode()),
+                StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), GetShopifyTaskProcessorCode(true)),
                 StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamStoreCode(), ShopifyStoreCode));
             if JobQueueEntry.FindSet() then
                 repeat
@@ -53,17 +53,18 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         end;
     end;
 
-    procedure GetShopifyTaskProcessorCode(): Code[20]
+    procedure GetShopifyTaskProcessorCode(AutoCreate: Boolean): Code[20]
     var
         NcTaskProcessor: Record "NPR Nc Task Processor";
         ShopifyTaskProcessorDescription: Label 'Shopify updates', MaxLength = 50;
     begin
-        if not NcTaskProcessor.Get(SpfyIntegrationMgt.ShopifyCode()) then begin
-            NcTaskProcessor.Init();
-            NcTaskProcessor.Code := SpfyIntegrationMgt.ShopifyCode();
-            NcTaskProcessor.Description := ShopifyTaskProcessorDescription;
-            NcTaskProcessor.Insert(true);
-        end;
+        NcTaskProcessor.Code := SpfyIntegrationMgt.DataProcessingHandlerID(AutoCreate);
+        if (NcTaskProcessor.Code <> '') and AutoCreate then
+            if not NcTaskProcessor.Find() then begin
+                NcTaskProcessor.Init();
+                NcTaskProcessor.Description := ShopifyTaskProcessorDescription;
+                NcTaskProcessor.Insert(true);
+            end;
         exit(NcTaskProcessor.Code);
     end;
 
@@ -116,7 +117,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     begin
         NcTask.Init();
         NcTask."Entry No." := 0;
-        NcTask."Task Processor Code" := GetShopifyTaskProcessorCode();
+        NcTask."Task Processor Code" := GetShopifyTaskProcessorCode(true);
         NcTask.Type := TaskType;
         NcTask."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(NcTask."Company Name"));
         NcTask."Table No." := RecRef.Number();
@@ -180,9 +181,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", 'OnBeforeProcessTask', '', true, false)]
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
     begin
-        if Task."Task Processor Code" <> SpfyIntegrationMgt.ShopifyCode() then
+        if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
             exit;
-        GetShopifyTaskProcessorCode();  //Make sure Shopify task processor is created
         if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::Item);
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Variant");
@@ -208,7 +208,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnBeforeUpdateTasks', '', false, false)]
     local procedure CheckIfHLIntegrationIsEnabled(TaskProcessor: Record "NPR Nc Task Processor"; var MaxNoOfDataLogRecordsToProcess: Integer; var SkipProcessing: Boolean)
     begin
-        if TaskProcessor.Code <> GetShopifyTaskProcessorCode() then
+        if (TaskProcessor.Code = '') or (TaskProcessor.Code <> GetShopifyTaskProcessorCode(false)) then
             exit;
         SkipProcessing := not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
         MaxNoOfDataLogRecordsToProcess := 0;
@@ -217,7 +217,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Data Log Sub. Mgt.", 'OnCheckIfDataLogSubscriberIsEnabled', '', false, false)]
     local procedure CheckIfDataLogSubscriberShouldBeProcessed(DataLogSubscriber: Record "NPR Data Log Subscriber"; var IsEnabled: Boolean)
     begin
-        if DataLogSubscriber.Code <> GetShopifyTaskProcessorCode() then
+        if (DataLogSubscriber.Code = '') or (DataLogSubscriber.Code <> SpfyIntegrationMgt.DataProcessingHandlerID(false)) then
             exit;
         case DataLogSubscriber."Table ID" of
             Database::Item,
@@ -243,7 +243,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnUpdateTasksOnAfterGetNewSetOfDataLogRecords', '', false, false)]
     local procedure ProcessHLDataLogRecords(TaskProcessor: Record "NPR Nc Task Processor"; ProcessCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record"; var NewTasksInserted: Boolean; var Handled: Boolean)
     begin
-        if TaskProcessor.Code <> GetShopifyTaskProcessorCode() then
+        if (TaskProcessor.Code = '') or (TaskProcessor.Code <> GetShopifyTaskProcessorCode(false)) then
             exit;
         Handled := true;
         SelectLatestVersion();
