@@ -407,6 +407,9 @@ codeunit 6184848 "NPR AT Audit Mgt."
         ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
         CannotRenameErr: Label 'You cannot rename %1 %2 since there is at least one related %3 record and it can cause data discrepancy since it is being used for fiscalization.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - AT POS Audit Log Aux. Info table caption';
     begin
+        if not IsATFiscalizationEnabled() then
+            exit;
+
         ATPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
         if not ATPOSAuditLogAuxInfo.IsEmpty() then
             Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, ATPOSAuditLogAuxInfo.TableCaption());

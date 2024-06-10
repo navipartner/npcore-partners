@@ -154,6 +154,7 @@ page 6184638 "NPR AT POS Audit Log Aux. Info"
             {
                 ApplicationArea = NPRATFiscal;
                 Caption = 'Sign';
+                Enabled = SignReceiptEnabled;
                 Image = Signature;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -207,4 +208,12 @@ page 6184638 "NPR AT POS Audit Log Aux. Info"
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        SignReceiptEnabled := not Rec.Signed;
+    end;
+
+    var
+        SignReceiptEnabled: Boolean;
 }
