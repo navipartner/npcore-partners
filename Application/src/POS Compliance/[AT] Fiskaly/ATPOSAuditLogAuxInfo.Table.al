@@ -126,6 +126,11 @@ table 6150857 "NPR AT POS Audit Log Aux. Info"
             Caption = 'Validated At';
             DataClassification = CustomerContent;
         }
+        field(180; "Receipt Printed"; Boolean)
+        {
+            Caption = 'Receipt Printed';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
