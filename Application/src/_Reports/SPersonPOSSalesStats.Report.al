@@ -66,7 +66,7 @@ report 6014446 "NPR S.Person POS Sales Stats"
                     StartDate := CalcDate('<-1Y>', "Salesperson/Purchaser".GetRangeMin("Date Filter"));
                     EndDate := CalcDate('<-1Y>', "Salesperson/Purchaser".GetRangeMax("Date Filter"));
                     SalespersonLastYear.SetRange("Date Filter", StartDate, EndDate);
-                    SalespersonLastYear.NPRGetVESalesCostDiscount(SalesLCY, COGSLCY, DiscountAmount);
+                    SalespersonLastYear.NPRGetVESalesCostDiscount(SalesLCYSalesPersonLastYear, COGSLCYSalesPersonLastYear, DiscountAmountSalesPersonLastYear);
                 end;
 
                 POSSLDiscAmtType.SetFilter(SalespersonCode, "Salesperson/Purchaser".Code);
