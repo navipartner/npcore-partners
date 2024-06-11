@@ -211,7 +211,7 @@
             if (TicketReservationRequest."Primary Request Line") then begin
                 SuggestNotificationAddress := TicketReservationRequest."Notification Address";
                 SuggestTicketHolderName := TicketReservationRequest.TicketHolderName;
-                AdmissionCode := Admission."Admission Code";
+                AdmissionCode := TicketReservationRequest."Admission Code";
 
                 if (GetMember(Ticket."External Member Card No.", Member)) then begin
                     SuggestTicketHolderName := Member."Display Name";
@@ -255,9 +255,6 @@
             end;
 
         until (TicketReservationRequest.Next() = 0);
-
-
-
     end;
 
     procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
@@ -281,11 +278,11 @@
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketParticipant: Page "NPR TM Acquire Participant";
         TicketHolderInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
-        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
         AttributeManagement: Codeunit "NPR Attribute Management";
         AdmissionCode: Code[20];
     begin
-        if (TicketRetailManager.UseFrontEndScheduleUX()) then
+
+        if (not GuiAllowed()) then
             exit(false);
 
         TicketHolderInformation := RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
