@@ -107,7 +107,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
             caption: context.VerboseMessage, 
             title: windowTitle});
     } else {
-        if(context.VerboseMessage !== ""){ 
+        if(context.VerboseMessage){ 
             toast.success (context.VerboseMessage, {title: windowTitle});
         }
     }
