@@ -423,6 +423,12 @@ End Function
         <Field Name="AttributeValue5_EventAttributeSet2">
           <DataField>AttributeValue5_EventAttributeSet2</DataField>
         </Field>
+        <Field Name="FromTo_RecordLink">
+          <DataField>FromTo_RecordLink</DataField>
+        </Field>
+        <Field Name="Note_RecordLink">
+          <DataField>Note_RecordLink</DataField>
+        </Field>
         <Field Name="Comment_CommentLine">
           <DataField>Comment_CommentLine</DataField>
         </Field>
