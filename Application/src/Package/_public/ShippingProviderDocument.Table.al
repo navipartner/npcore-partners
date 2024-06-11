@@ -732,7 +732,10 @@ table 6014452 "NPR Shipping Provider Document"
         Tb.Append(Format(Rec."Entry No."));
         Tb.Append('_');
         Tb.Append(FldRef.Caption);
-        Tb.Append('.xml');
+        if Rec."Request XML Name".Contains('json') then
+            Tb.Append('.json')
+        else
+            Tb.Append('.xml');
         FileMgmt.BLOBExport(TempBlob, Tb.ToText(), true);
     end;
 
