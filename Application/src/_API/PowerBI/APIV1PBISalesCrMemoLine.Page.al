@@ -80,6 +80,10 @@ page 6150778 "NPR APIV1 PBISalesCrMemoLine"
                 {
                     Caption = 'Dimension Set ID', Locked = true;
                 }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
             }
         }
     }
