@@ -140,6 +140,10 @@ page 6060083 "NPR APIV1 PBIPurch. Rcpt. Line"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
             }
         }
     }
