@@ -41,8 +41,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             exit;
         RequestURL := BaseURL() + 'shipments/';
         RequestString := BuildShipmentRequest(PakkelabelsShipment);
-        if not ExecuteCall('POST', Response, Silent) then
+        if not ExecuteCall('POST', Response, Silent) then begin
+            SetShippingDocumentRequestAndResponseSource(PakkelabelsShipment, RequestString, Response);
             exit;
+        end;
 
 
         ShipmentID := CopyStr(GetJsonText(Response, 'id', 0), 1, 20);
@@ -52,7 +54,40 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             PakkelabelsShipment."Response Shipment ID" := ShipmentID;
         PakkelabelsShipment."Response Package No." := ShipmentNumber;
         PakkelabelsShipment."Creation Time" := CreateDateTime(Today, Time);
+        SetShippingDocumentRequestAndResponseSource(PakkelabelsShipment, RequestString, Response);
         PakkelabelsShipment.Modify(true);
+    end;
+
+    local procedure SetShippingDocumentRequestAndResponseSource(var ShippingProviderDocument: Record "NPR Shipping Provider Document"; RequestText: Text; var Response: JsonToken)
+    var
+        ResponseText: Text;
+        OutStr: OutStream;
+    begin
+        ShippingProviderDocument."Request XML Name" := 'Request ' +
+                                                Format(Today) +
+                                                ' ' +
+                                                Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
+                                                ' ' +
+                                                Format(ShippingProviderDocument."Entry No.") +
+                                                '.json';
+        Clear(ShippingProviderDocument."Request XML");
+        ShippingProviderDocument."Request XML".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(RequestText);
+
+        Clear(OutStr);
+        if Response.WriteTo(ResponseText) then;
+        ShippingProviderDocument."Response XML Name" := 'Response ' +
+                                                      Format(Today) +
+                                                      ' ' +
+                                                      Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
+                                                      ' ' +
+                                                      Format(ShippingProviderDocument."Entry No.") +
+                                                      '.json';
+        Clear(ShippingProviderDocument."Response XML");
+        ShippingProviderDocument."Response XML".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(ResponseText);
+        if GetLastErrorText() <> '' then
+            ShippingProviderDocument.Modify(true);
     end;
 
     procedure GetPrinters(_CurrentPage: Integer; silent: Boolean);
@@ -496,6 +531,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                 Message(GetLastErrorText())
             else
                 Error(GetLastErrorText());
+            Response.ReadFrom(ResponseText);
             exit(false)
         end;
 
@@ -577,7 +613,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     begin
         if not InitPackageProvider() then
             exit;
-        CreateShipment(PacsoftShipmentDocument, false)
+        CreateShipment(PacsoftShipmentDocument, true)
     end;
 
 
