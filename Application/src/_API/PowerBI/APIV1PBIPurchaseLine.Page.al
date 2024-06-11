@@ -204,6 +204,10 @@ page 6060039 "NPR APIV1 PBIPurchase Line"
                 {
                     Caption = 'Expected Receipt Date', Locked = true;
                 }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
             }
         }
     }

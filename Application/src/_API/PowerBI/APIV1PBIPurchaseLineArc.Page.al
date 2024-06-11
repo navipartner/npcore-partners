@@ -176,6 +176,10 @@ page 6060062 "NPR APIV1 PBIPurchase Line Arc"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(description; Rec.Description)
+                {
+                    Caption = 'Description', Locked = true;
+                }
             }
         }
     }
