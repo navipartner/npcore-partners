@@ -91,6 +91,10 @@ xmlport 6151144 "NPR M2 Get Extended Account"
                                     TryGetEanNo(SellToEan);
                                 end;
                             }
+                            fieldelement(totalSalesFiscalYear; TmpSellToCustomer."Sales (LCY)")
+                            {
+                                XmlName = 'TotalSalesFiscalYear';
+                            }
                         }
                     }
                     tableelement(tmpbilltocustomer; Customer)
@@ -112,6 +116,10 @@ xmlport 6151144 "NPR M2 Get Extended Account"
                                 begin
                                     TryGetEanNo(BillToEan);
                                 end;
+                            }
+                            fieldelement(totalSalesFiscalYear; TmpBillToCustomer."Sales (LCY)")
+                            {
+                                XmlName = 'TotalSalesFiscalYear';
                             }
                         }
                     }
@@ -136,6 +144,8 @@ xmlport 6151144 "NPR M2 Get Extended Account"
     end;
 
     internal procedure SetResponse(var TmpContactIn: Record Contact temporary; var TmpSellToCustomerIn: Record Customer temporary; var TmpBillToCustomerIn: Record Customer temporary)
+    var
+        CustomerMgt: Codeunit "Customer Mgt.";
     begin
 
         ResponseMessage := 'Contact Id is unknown.';
@@ -147,11 +157,17 @@ xmlport 6151144 "NPR M2 Get Extended Account"
             if (TmpSellToCustomerIn.FindFirst()) then begin
                 TmpSellToCustomer.TransferFields(TmpSellToCustomerIn, true);
                 TmpSellToCustomer.Insert();
+
+                TmpSellToCustomer.SetFilter("Date Filter", CustomerMgt.GetCurrentYearFilter());
+                TmpSellToCustomer.CalcFields("Sales (LCY)");
             end;
 
             if (TmpBillToCustomerIn.FindFirst()) then begin
                 TmpBillToCustomer.TransferFields(TmpBillToCustomerIn, true);
                 TmpBillToCustomer.Insert();
+
+                TmpBillToCustomer.SetFilter("Date Filter", CustomerMgt.GetCurrentYearFilter());
+                TmpBillToCustomer.CalcFields("Sales (LCY)");
             end;
 
             ResponseCode := 'OK';
