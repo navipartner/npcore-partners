@@ -41,9 +41,10 @@
         TicketManagement: Codeunit "NPR TM Ticket Management";
         InvalidEntry: Boolean;
         ScheduleEntryNo: Integer;
-        ExternalEntryNo: Integer;
         AdmissionEntryNo: Integer;
         RespLbl: Label '%1 %2', Locked = true;
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalAdmissionTime: DateTime;
     begin
         if (not OfflineTicketValidation.Get(EntryNo)) then
             exit(false);
@@ -118,23 +119,27 @@
         end;
 
         repeat
-            if (GetInitialEntry(Ticket."No.", AccessEntry."Admission Code", ExternalEntryNo)) then
-                SetInitialTime(ExternalEntryNo, false, OfflineTicketValidation);
+            LocalAdmissionTime := TimeHelper.GetLocalTimeAtAdmission(AccessEntry."Admission Code");
+            ScheduleEntryNo := 0;
 
-            if (GetReservation(Ticket."No.", AccessEntry."Admission Code", ExternalEntryNo)) then
-                SetReservationTime(ExternalEntryNo, true, OfflineTicketValidation);
+            if (GetInitialEntry(Ticket."No.", AccessEntry."Admission Code", ScheduleEntryNo)) then
+                SetInitialTime(ScheduleEntryNo, false, OfflineTicketValidation);
+
+            if (GetReservation(Ticket."No.", AccessEntry."Admission Code", ScheduleEntryNo)) then
+                SetReservationTime(ScheduleEntryNo, true, OfflineTicketValidation);
 
             if (OfflineTicketValidation."Event Date" = 0D) then begin
-                OfflineTicketValidation."Event Date" := Today();
+                OfflineTicketValidation."Event Date" := DT2Date(LocalAdmissionTime);
                 OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
             end;
 
             if (OfflineTicketValidation."Event Time" = 0T) then begin
-                OfflineTicketValidation."Event Time" := Time;
+                OfflineTicketValidation."Event Time" := DT2Time(LocalAdmissionTime);
                 OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
             end;
 
-            ScheduleEntryNo := GetInternalScheduleEntryNo(AccessEntry."Admission Code", OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
+            if (ScheduleEntryNo = 0) then
+                ScheduleEntryNo := GetInternalScheduleEntryNo(AccessEntry."Admission Code", OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
 
             if (ScheduleEntryNo = 0) then begin
                 OfflineTicketValidation."Process Status" := OfflineTicketValidation."Process Status"::INVALID;
@@ -276,7 +281,9 @@
         AdmittedTicketAccessEntry."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
-        AdmittedTicketAccessEntry."Created Datetime" := CreateDateTime(pDate, pTime);
+        AdmittedTicketAccessEntry.AdmittedDate := pDate;
+        AdmittedTicketAccessEntry.AdmittedTime := pTime;
+        AdmittedTicketAccessEntry."Created Datetime" := CurrentDateTime();
         AdmittedTicketAccessEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(AdmittedTicketAccessEntry."User ID"));
         AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo(StationIdLbl, CurrentDateTime());
         AdmittedTicketAccessEntry.Insert();
@@ -415,24 +422,23 @@
         exit(true);
     end;
 
-    local procedure SetInitialTime(ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
+    local procedure SetInitialTime(var ExternalAdmSchEntryNo: Integer; ForceUpdate: Boolean; var OfflineTicketValidation: Record "NPR TM Offline Ticket Valid.")
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         RespLbl: Label '%1 %2', Locked = true;
     begin
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalAdmSchEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        ExternalAdmSchEntryNo := 0;
+
         if (not AdmissionScheduleEntry.FindLast()) then
             exit;
 
         if (OfflineTicketValidation."Event Date" = 0D) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Date" := AdmissionScheduleEntry."Admission Start Date";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
-        end;
-
-        if (OfflineTicketValidation."Event Time" = 0T) or (ForceUpdate) then begin
             OfflineTicketValidation."Event Time" := AdmissionScheduleEntry."Admission Start Time";
-            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
+            OfflineTicketValidation."Process Response Text" := StrSubstNo(RespLbl, OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
+            ExternalAdmSchEntryNo := AdmissionScheduleEntry."External Schedule Entry No.";
         end;
     end;
 
