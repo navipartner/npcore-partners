@@ -142,6 +142,7 @@ codeunit 6059947 "NPR Package Management"
         SalesShipmentHeader: Record "Sales Shipment Header";
         ShipToAddress: Record "Ship-to Address";
         SalesShipmentLine: Record "Sales Shipment Line";
+        ShipmondoEvents: Codeunit "NPR Shipmondo Events";
         DocFound: Boolean;
     begin
         if not InitPackageProvider() then
@@ -267,11 +268,11 @@ codeunit 6059947 "NPR Package Management"
         if ShipmentDocument."Shipment Date" < TODAY then
             ShipmentDocument."Shipment Date" := TODAY;
 
+        ShipmondoEvents.AddEntryOnBeforeShipmentDocumentModify(ShipmentDocument);
         ShipmentDocument.MODIFY(true);
 
         COMMIT();
         exit(true);
-
     end;
 
     procedure PostDimension(RecRef: RecordRef)
