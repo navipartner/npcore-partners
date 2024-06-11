@@ -1,8 +1,8 @@
 ﻿report 6060150 "NPR Event Customer Template"
 {
-    #IF NOT BC17 
-    Extensible = False; 
-    #ENDIF
+#IF NOT BC17
+    Extensible = False;
+#ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Event Customer Template.rdlc';
     UsageCategory = ReportsAndAnalysis;
@@ -276,6 +276,36 @@
                         CurrReport.Break();
                 end;
             }
+            dataitem("Record Link"; "Record Link")
+            {
+                DataItemTableView = SORTING("Link ID") WHERE(Type = CONST(Note));
+                column(FromTo_RecordLink; FromTo)
+                {
+                }
+                column(Note_RecordLink; Format(NoteText))
+                {
+                }
+
+                trigger OnAfterGetRecord()
+                var
+                    NoteInStream: InStream;
+                begin
+                    Clear(NoteText);
+                    FromTo := '';
+                    if Note.HasValue() then begin
+                        CalcFields(Note);
+                        Note.CreateInStream(NoteInStream, TextEncoding::UTF8);
+                        NoteText.Read(NoteInStream);
+                        FromTo := StrSubstNo(FromToLbl, GetUserName("User ID"), GetUserName("To User ID"));
+                    end;
+                end;
+
+                trigger OnPreDataItem()
+                begin
+                    SetRange(Company, CompanyName);
+                    SetRange("Record ID", Job.RecordId);
+                end;
+            }
             dataitem("Comment Line"; "Comment Line")
             {
                 DataItemLink = "No." = FIELD("No.");
@@ -320,12 +350,15 @@
         Resource: Record Resource;
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         EventAttrMgt: Codeunit "NPR Event Attribute Mgt.";
+        NoteText: BigText;
         EventAttributeTempName1: Code[20];
         EventAttributeTempName2: Code[20];
         EstTotalAmtInclVAT: Decimal;
         TotalAmount: Decimal;
+        FromToLbl: Label 'From %1 to %2: ', Comment = '%1 = From User ID, %2 = To User ID';
         AttributeValue: array[5] of Text;
         ColumnCaption: array[5] of Text;
+        FromTo: Text;
         CommentsForCustomer: Text;
 
     local procedure FormatDate(Date: Date): Text
@@ -342,6 +375,19 @@
         if Time <> 0T then
             exit(Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>'));
         exit('');
+    end;
+
+    local procedure GetUserName(UserID: Text): Text
+    var
+        User: Record User;
+        EveryoneLbl: Label 'Everyone';
+    begin
+        User.SetRange("User Name", UserID);
+        if User.FindFirst() and (User."Full Name" <> '') then
+            exit(User."Full Name");
+        if UserID = '' then
+            exit(EveryoneLbl);
+        exit(UserID);
     end;
 }
 
