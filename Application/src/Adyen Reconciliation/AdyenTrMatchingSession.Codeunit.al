@@ -1,7 +1,6 @@
 codeunit 6184786 "NPR Adyen Tr. Matching Session"
 {
     Access = Internal;
-    TableNo = "NPR AF Rec. Webhook Request";
 
     trigger OnRun()
     var
@@ -16,30 +15,39 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
         AdyenGenericSetup: Record "NPR Adyen Setup";
         ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         i: Integer;
+        RecWebhookRequests: Record "NPR AF Rec. Webhook Request";
     begin
-        Rec.FindLast();
-        if TransactionMatching.ValidateReportScheme(Rec) then begin
-            NewDocumentsList := TransactionMatching.CreateSettlementDocuments(Rec, false, '');
-            if NewDocumentsList.Count() > 0 then begin
-                for i := 1 to NewDocumentsList.Count() do begin
+        // Process all not processed Webhook Entries
+        RecWebhookRequests.Reset();
+        RecWebhookRequests.SetRange(Processed, false);
+        if RecWebhookRequests.IsEmpty() then
+            exit;
+
+        if RecWebhookRequests.FindSet(true) then
+            repeat
+                if TransactionMatching.ValidateReportScheme(RecWebhookRequests) then begin
+                    NewDocumentsList := TransactionMatching.CreateSettlementDocuments(RecWebhookRequests, false, '');
+                    if NewDocumentsList.Count() > 0 then begin
+                        for i := 1 to NewDocumentsList.Count() do begin
 #IF NOT BC17
-                    if ReconciliationHeader.Get(NewDocumentsList.Get(i)) then begin
-                        MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
-                        if MatchedEntries > 0 then
-                            if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
-                                TransactionMatching.PostEntries(ReconciliationHeader);
-                    end;
+                            if ReconciliationHeader.Get(NewDocumentsList.Get(i)) then begin
+                                MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
+                                if MatchedEntries > 0 then
+                                    if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
+                                        TransactionMatching.PostEntries(ReconciliationHeader);
+                            end;
 #ELSE
-                    NewDocumentsList.Get(i, JsonToken);
-                    if ReconciliationHeader.Get(CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(ReconciliationHeader."Document No."))) then begin
-                        MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
-                        if MatchedEntries > 0 then
-                            if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
-                                TransactionMatching.PostEntries(ReconciliationHeader);
-                    end;
+                        NewDocumentsList.Get(i, JsonToken);
+                        if ReconciliationHeader.Get(CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(ReconciliationHeader."Document No."))) then begin
+                            MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
+                            if MatchedEntries > 0 then
+                                if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
+                                    TransactionMatching.PostEntries(ReconciliationHeader);
+                        end;
 #ENDIF
+                        end;
+                    end;
                 end;
-            end;
-        end;
+            until RecWebhookRequests.Next() = 0;
     end;
 }

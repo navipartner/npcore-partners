@@ -88,11 +88,9 @@ table 6150805 "NPR Adyen Webhook Setup"
     trigger OnModify()
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
-        ModifyError: Label 'Something went wrong.';
     begin
         if (ID <> '') and ((("Web Service User" <> '') and ("Web Service Password" <> '')) or (("Web Service User" = '') and ("Web Service Password" = ''))) then
-            if not AdyenManagement.ModifyWebhook(Rec) then
-                Error(ModifyError);
+            AdyenManagement.ModifyWebhook(Rec);
     end;
 
     trigger OnDelete()

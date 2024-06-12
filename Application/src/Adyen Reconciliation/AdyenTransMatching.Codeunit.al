@@ -10,6 +10,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         JsonToken: JsonToken;
+        JsonObject: JsonObject;
         MBCombination: JsonObject;
         MerchantBatchValues: List of [JsonObject];
         CurrentMerchantAccount: Text;
@@ -36,8 +37,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if not GetReportData(ReportWebhookRequest) then
             exit;
 
-        CreateMerchantBatchListFromLines(MerchantBatchValues);
-
+        if not RecreateExistingDocument then
+            CreateMerchantBatchListFromLines(MerchantBatchValues)
+        else begin
+            JsonObject.Add('Merchant Account', ReconciliationHeader."Merchant Account");
+            JsonObject.Add('Batch Number', ReconciliationHeader."Batch Number");
+            if MerchantBatchValues.IndexOf(JsonObject) = 0 then
+                MerchantBatchValues.Add(JsonObject);
+        end;
         foreach MBCombination in MerchantBatchValues do begin
             MBCombination.Get('Merchant Account', JsonToken);
             CurrentMerchantAccount := JsonToken.AsValue().AsText();
@@ -46,16 +53,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 CurrentBatchNumber := JsonToken.AsValue().AsInteger();
             end;
 
-            if not InitReconciliationHeader(ReconciliationHeader, RecreateExistingDocument, CurrentBatchNumber, CurrentMerchantAccount, ExistingDocumentNo, ReportWebhookRequest) then
-                exit;
+            if InitReconciliationHeader(ReconciliationHeader, RecreateExistingDocument, CurrentBatchNumber, CurrentMerchantAccount, ExistingDocumentNo, ReportWebhookRequest) then begin
+                EntryAmount := InsertReconciliationLines(CurrentMerchantAccount, CurrentBatchNumber, ReconciliationHeader, ReportWebhookRequest);
 
-            EntryAmount := InsertReconciliationLines(CurrentMerchantAccount, CurrentBatchNumber, ReconciliationHeader, ReportWebhookRequest);
-
-            if (EntryAmount > 0) then begin
-                _AdyenManagement.CreateLog(_LogType::"Import Lines", true, StrSubstNo(ImportLinesSuccess01, ReconciliationHeader."Document No.", Format(EntryAmount)), ReportWebhookRequest.ID);
-                NewDocumentsList.Add(ReconciliationHeader."Document No.");
-            end else
-                _AdyenManagement.CreateLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError02, ReportWebhookRequest."Report Name"), ReportWebhookRequest.ID);
+                if (EntryAmount > 0) then begin
+                    _AdyenManagement.CreateLog(_LogType::"Import Lines", true, StrSubstNo(ImportLinesSuccess01, ReconciliationHeader."Document No.", Format(EntryAmount)), ReportWebhookRequest.ID);
+                    NewDocumentsList.Add(ReconciliationHeader."Document No.");
+                end else begin
+                    ReconciliationHeader.Delete();
+                    _AdyenManagement.CreateLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError02, ReportWebhookRequest."Report Name", CurrentMerchantAccount), ReportWebhookRequest.ID);
+                end;
+            end;
         end;
         exit(NewDocumentsList);
     end;
@@ -68,39 +76,41 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         Handled: Boolean;
     begin
         ReconciliationLine.Reset();
-        ReconciliationLine.SetCurrentKey("Document No.", Status);
         ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
         ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine.Status::" ", ReconciliationLine.Status::"Failed to Match");
         if not ReconciliationLine.FindSet(true) then begin
-            _AdyenManagement.CreateLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError02, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+            _AdyenManagement.CreateLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError02, ReconciliationHeader."Document No.", ReconciliationHeader."Merchant Account"), ReconciliationHeader."Webhook Request ID");
             exit(MatchedEntries);
         end;
+        Clear(MatchedEntries);
+        Clear(UnmatchedEntries);
         repeat
             ReconciliationLine2 := ReconciliationLine;
             Handled := false;
             //Future event
             if not Handled then begin
-                case ReconciliationLine."Transaction Type" of
-                    ReconciliationLine."Transaction Type"::Settled,
-                    ReconciliationLine."Transaction Type"::SettledExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::Refunded,
-                    ReconciliationLine."Transaction Type"::RefundedExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::Chargeback,
-                    ReconciliationLine."Transaction Type"::SecondChargeback,
-                    ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::ChargebackReversed,
-                    ReconciliationLine."Transaction Type"::RefundedReversed,
-                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                case ReconciliationLine2."Transaction Type" of
+                    ReconciliationLine2."Transaction Type"::Settled,
+                    ReconciliationLine2."Transaction Type"::SettledExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::Refunded,
+                    ReconciliationLine2."Transaction Type"::RefundedExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::Chargeback,
+                    ReconciliationLine2."Transaction Type"::SecondChargeback,
+                    ReconciliationLine2."Transaction Type"::ChargebackExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::ChargebackReversed,
+                    ReconciliationLine2."Transaction Type"::RefundedReversed,
+                    ReconciliationLine2."Transaction Type"::ChargebackReversedExternallyWithInfo:
                         begin
                             MatchedEntries += TryMatchingPayment(ReconciliationLine2, UnmatchedEntries, ReconciliationHeader);
                         end;
-                    ReconciliationLine."Transaction Type"::Fee,
-                    ReconciliationLine."Transaction Type"::InvoiceDeduction,
-                    ReconciliationLine."Transaction Type"::PaymentCost,
-                    ReconciliationLine."Transaction Type"::MerchantPayout,
-                    ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
+                    ReconciliationLine2."Transaction Type"::Fee,
+                    ReconciliationLine2."Transaction Type"::InvoiceDeduction,
+                    ReconciliationLine2."Transaction Type"::PaymentCost,
+                    ReconciliationLine2."Transaction Type"::MerchantPayout,
+                    ReconciliationLine2."Transaction Type"::AcquirerPayout,
+                    ReconciliationLine2."Transaction Type"::AdvancementCommissionExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::RefundedInstallmentExternallyWithInfo,
+                    ReconciliationLine2."Transaction Type"::SettledInstallmentExternallyWithInfo:
                         begin
                             MatchedEntries += TryMatchingAdjustments(ReconciliationLine2, UnmatchedEntries, ReconciliationHeader);
                         end;
@@ -128,6 +138,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             _AdyenManagement.CreateLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
         end;
+        ReconciliationLine.SetRange(Status);
         ReconciliationLine.FindSet();
         repeat
             Handled := false;
@@ -162,7 +173,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         exit(true);
     end;
 
-    internal procedure ValidateReportScheme(WebhookRequest: Record "NPR AF Rec. Webhook Request"): Boolean
+    internal procedure ValidateReportScheme(var WebhookRequest: Record "NPR AF Rec. Webhook Request"): Boolean
     var
         SchemeValid: Boolean;
         SchemeValidationField: Text;
@@ -208,6 +219,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
         _AdyenManagement.CreateLog(_LogType::"Validate Report Scheme", true, ValidSchemeText, WebhookRequest.ID);
+        WebhookRequest.Processed := true;
+        WebhookRequest.Modify();
         exit(true);
     end;
 
@@ -226,6 +239,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         NoSeriesMgt: Codeunit NoSeriesManagement;
 #endif
         AdyenGenericSetup: Record "NPR Adyen Setup";
+        DocumentExistLbl: Label 'A Reconciliation document with identification fields Merchant Account: ''%1'' and Batch Number: ''%2'' already exist.';
     begin
         if (not RecreateExistingDocument) then begin
             AdyenGenericSetup.Get();
@@ -236,18 +250,20 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationHeader.Reset();
             ReconciliationHeader.SetRange("Batch Number", CurrentBatchNumber);
             ReconciliationHeader.SetRange("Merchant Account", CurrentMerchantAccount);
-            if not ReconciliationHeader.IsEmpty() then
-                ReconciliationHeader.DeleteAll(true);
+            if not ReconciliationHeader.IsEmpty() then begin
+                _AdyenManagement.CreateLog(_LogType::"Get Report", false, StrSubstNo(DocumentExistLbl, CurrentMerchantAccount, Format(CurrentBatchNumber)), WebhookRequest.ID);
+                exit(false);
+            end;
 
             ReconciliationHeader.Init();
-
             ReconciliationHeader."Document No." := NoSeriesMgt.GetNextNo(AdyenGenericSetup."Reconciliation Document Nos.", Today(), true);
             ReconciliationHeader."Document Date" := Today();
             ReconciliationHeader."Posting Date" := Today();
             ReconciliationHeader.Insert();
         end else begin
             ReconciliationHeader.Get(ExistingDocumentNo);
-            ReconciliationHeader.Posted := false;
+            if ReconciliationHeader.Posted then
+                exit(false);
             ReconciliationHeader."Document Date" := Today();
             _AdyenManagement.DeleteReconciliationLines(ReconciliationHeader."Document No.");
         end;
@@ -322,23 +338,23 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Modification Reference" := CopyStr(GetValueAtCell(LineNo, 9), 1, MaxStrLen(ReconciliationLine."Modification Reference"));
         ReconciliationLine."Transaction Currency Code" := CopyStr(GetValueAtCell(LineNo, 10), 1, MaxStrLen(ReconciliationLine."Transaction Currency Code"));
 
-        if Evaluate(ReconciliationLine."Exchange Rate", GetValueAtCell(LineNo, 13)) then;
+        if Evaluate(ReconciliationLine."Exchange Rate", GetValueAtCell(LineNo, 13), 9) then;
         ReconciliationLine."Adyen Acc. Currency Code" := CopyStr(GetValueAtCell(LineNo, 14), 1, MaxStrLen(ReconciliationLine."Adyen Acc. Currency Code"));
         ReconciliationHeader."Adyen Acc. Currency Code" := ReconciliationLine."Adyen Acc. Currency Code";
 
-        if Evaluate(ReconciliationLine."Commission (NC)", GetValueAtCell(LineNo, 17)) then;
-        if Evaluate(ReconciliationLine."Markup (NC)", GetValueAtCell(LineNo, 18)) then;
-        if Evaluate(ReconciliationLine."Scheme Fees (NC)", GetValueAtCell(LineNo, 25)) then;
-        if Evaluate(ReconciliationLine."Interchange (NC)", GetValueAtCell(LineNo, 26)) then;
-        if Evaluate(ReconciliationLine."Payment Fees (NC)", GetValueAtCell(LineNo, 27)) then;
+        if Evaluate(ReconciliationLine."Commission (NC)", GetValueAtCell(LineNo, 17), 9) then;
+        if Evaluate(ReconciliationLine."Markup (NC)", GetValueAtCell(LineNo, 18), 9) then;
+        if Evaluate(ReconciliationLine."Scheme Fees (NC)", GetValueAtCell(LineNo, 25), 9) then;
+        if Evaluate(ReconciliationLine."Interchange (NC)", GetValueAtCell(LineNo, 26), 9) then;
+        if Evaluate(ReconciliationLine."Payment Fees (NC)", GetValueAtCell(LineNo, 27), 9) then;
 
-        if Evaluate(ReconciliationLine."Gross Debit", GetValueAtCell(LineNo, 11)) then
+        if Evaluate(ReconciliationLine."Gross Debit", GetValueAtCell(LineNo, 11), 9) then
             ReconciliationLine.Validate("Gross Debit");
-        if Evaluate(ReconciliationLine."Gross Credit", GetValueAtCell(LineNo, 12)) then
+        if Evaluate(ReconciliationLine."Gross Credit", GetValueAtCell(LineNo, 12), 9) then
             ReconciliationLine.Validate("Gross Credit");
-        if Evaluate(ReconciliationLine."Net Debit", GetValueAtCell(LineNo, 15)) then
+        if Evaluate(ReconciliationLine."Net Debit", GetValueAtCell(LineNo, 15), 9) then
             ReconciliationLine.Validate("Net Debit");
-        if Evaluate(ReconciliationLine."Net Credit", GetValueAtCell(LineNo, 16)) then
+        if Evaluate(ReconciliationLine."Net Credit", GetValueAtCell(LineNo, 16), 9) then
             ReconciliationLine.Validate("Net Credit");
 
         ReconciliationLine."Other Commissions (NC)" := ReconciliationLine."Payment Fees (NC)" - ReconciliationLine."Markup (NC)";
@@ -362,6 +378,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::InvoiceDeduction;
             'MerchantPayout':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::MerchantPayout;
+            'AcquirerPayout':
+                begin
+                    InsertAcquirerPayout(ReconciliationHeader, LineNo);
+                    ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::AcquirerPayout;
+                end;
             'PaymentCost':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::PaymentCost;
             'SettledExternallyWithInfo':
@@ -404,15 +425,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             UnmatchedEntries += 1;
             exit;
         end;
-        if TryMatchingPaymentWithEFT(ReconciliationLine, UnmatchedEntries, MatchedEntries, ReconciliationHeader) then
+        if TryMatchingPaymentWithEFT(ReconciliationLine, MatchedEntries, ReconciliationHeader) then
             exit;
-        if TryMatchingPaymentWithMagento(ReconciliationLine, UnmatchedEntries, MatchedEntries, ReconciliationHeader) then
+        if TryMatchingPaymentWithMagento(ReconciliationLine, MatchedEntries, ReconciliationHeader) then
             exit;
         ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
         UnmatchedEntries += 1;
     end;
 
-    local procedure TryMatchingPaymentWithEFT(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var UnmatchedEntries: Integer; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    local procedure TryMatchingPaymentWithEFT(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         PaymentLine: Record "NPR POS Entry Payment Line";
@@ -445,7 +466,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                                                     ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo] then begin
             if not PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") then begin
                 ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-                UnmatchedEntries += 1;
                 _AdyenManagement.CreateLog(_LogType::"Match Transactions", false,
                     MatchTransactionsError05,
                     ReconciliationHeader."Webhook Request ID");
@@ -479,7 +499,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         end else begin
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-            UnmatchedEntries += 1;
             _AdyenManagement.CreateLog(_LogType::"Match Transactions", false,
                 StrSubstNo(MatchTransactionsError01, Format(EFTTransactionRequest."Entry No."),
                                                         Format(EFTTransactionRequest."Result Amount" = ReconciliationLine."Amount (TCY)"),
@@ -491,7 +510,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         exit(true);
     end;
 
-    local procedure TryMatchingPaymentWithMagento(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var UnmatchedEntries: Integer; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    local procedure TryMatchingPaymentWithMagento(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
@@ -542,7 +561,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             // TODO Calculate Realized Gains or Losses
         end else begin
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-            UnmatchedEntries += 1;
             _AdyenManagement.CreateLog(_LogType::"Match Transactions", false,
                 StrSubstNo(MatchTransactionsError04, Format(MagentoPaymentLine."Document Type"),
                                                      Format(MagentoPaymentLine."Document No."),
@@ -570,7 +588,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Transaction Type"::PaymentCost:
                 RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
             ReconciliationLine."Transaction Type"::MerchantPayout:
-                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout G/L Account");
+                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout Account");
+            ReconciliationLine."Transaction Type"::AcquirerPayout:
+                RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Acquirer Payout Account");
             ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo:
                 RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
             ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo:
@@ -670,26 +690,35 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         FeeCreateAndPost: Codeunit "NPR Adyen Fee Posting";
         GLAccountType: Enum "NPR Adyen Posting GL Accounts";
+        RecordsOK: Boolean;
     begin
         if not IsNullGuid(ReconciliationLine."Matching Entry System ID") then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Posted;
             exit(UnPostedEntries);
         end;
+        RecordsOK := false;
         case ReconciliationLine."Transaction Type" of
             ReconciliationLine."Transaction Type"::Fee:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Fee G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Fee G/L Account");
             ReconciliationLine."Transaction Type"::InvoiceDeduction:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Invoice Deduction G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Invoice Deduction G/L Account");
             ReconciliationLine."Transaction Type"::PaymentCost:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Chargeback Fees G/L Account");
             ReconciliationLine."Transaction Type"::MerchantPayout:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Merchant Payout Account");
+            ReconciliationLine."Transaction Type"::AcquirerPayout:
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Acquirer Payout Account");
             ReconciliationLine."Transaction Type"::AdvancementCommissionExternallyWithInfo:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Advancement External Commission G/L Account");
             ReconciliationLine."Transaction Type"::RefundedInstallmentExternallyWithInfo:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Refunded External Commission G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Refunded External Commission G/L Account");
             ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
-                FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
+                RecordsOK := FeeCreateAndPost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
+        end;
+        if not RecordsOK then begin
+            UnPostedEntries += 1;
+            _AdyenManagement.CreateLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
+            exit(UnPostedEntries);
         end;
         if not FeeCreateAndPost.FeePosted(ReconciliationLine) then begin
             if not FeeCreateAndPost.Run() then begin
@@ -769,11 +798,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ToBalance: Decimal;
     begin
         if GetValueAtCell(LineNo, 20).Contains('from') then begin
-            if Evaluate(FromBalance, GetValueAtCell(LineNo, 16)) then;
+            if Evaluate(FromBalance, GetValueAtCell(LineNo, 16), 9) then;
             ReconciliationHeader."Opening Balance" += FromBalance; // Might close multiple batches
         end else
             if GetValueAtCell(LineNo, 20).Contains('to') then begin
-                if Evaluate(ToBalance, GetValueAtCell(LineNo, 15)) then;
+                if Evaluate(ToBalance, GetValueAtCell(LineNo, 15), 9) then;
                 ReconciliationHeader."Closing Balance" += ToBalance; // Probably always is a single closing balance entry
             end;
         ReconciliationHeader.Modify();
@@ -781,8 +810,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure InsertAcquirerPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
     begin
-        if Evaluate(ReconciliationHeader."Closing Balance", GetValueAtCell(LineNo, 15)) then;
-        if Evaluate(ReconciliationHeader."Acquirer Commission", GetValueAtCell(LineNo, 17)) then;
+        if Evaluate(ReconciliationHeader."Closing Balance", GetValueAtCell(LineNo, 15), 9) then;
+        if Evaluate(ReconciliationHeader."Acquirer Commission", GetValueAtCell(LineNo, 17), 9) then;
         ReconciliationHeader.Modify();
     end;
 
@@ -800,8 +829,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     case GetValueAtCell(LineNo, 8) of
                         'Balancetransfer':
                             InsertBalanceTransfer(ReconciliationHeader, LineNo);
-                        'AcquirerPayout':
-                            InsertAcquirerPayout(ReconciliationHeader, LineNo);
                         else
                             InsertReconciliationLine(ReconciliationLine, ReconciliationHeader, CurrentBatchNumber, CurrentMerchantAccount, ReportWebhookRequest, LineNo, EntryAmount);
                     end;
@@ -861,11 +888,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         GetReportError02: Label 'Webhook request with ID %1 does not have a Report Download URL.\Please contact your System Administrator.';
         GetReportSuccess01: Label 'Report ''%1'' was successfully retrieved.';
         ImportLinesError01: Label 'Report ''%1'' has no entries. Report Data exist - %2';
-        ImportLinesError02: Label 'Report ''%1'' has no transactions.';
+        ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';
         ImportLinesError03: Label 'Unsupported Journal Type: %1.\Entry was skipped.';
         ImportLinesSuccess01: Label 'Adyen Reconciliation Document %1 was successfully created with %2 transaction entries.';
         MatchTransactionsError01: Label 'Failed to match with EFT Transaction Request No. %1 because of one of the conditions:\\    Amounts are equal: %2\EFT Transaction Amount:%3, Reconciliation Line Transaction Amount:%4\\Financial Impact: %5';
-        MatchTransactionsError02: Label 'Adyen Reconciliation Document %1 does not contain any transaction.';
+        MatchTransactionsError02: Label 'Adyen Reconciliation Document %1 does not contain any transactions within Marchant Account ''%2''.';
         MatchTransactionsError03: Label 'Couldn''t match %1 entries in Adyen Reconciliation Document %2.';
         MatchTransactionsError04: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3).\\    Amounts are not equal:\Magento Payment Line Amount:%4, Reconciliation Line Transaction Amount:%5';
         MatchTransactionsError05: Label 'EFT Transaction Request was found, however the POS Entry Payment Line does not exist. Please check if the Sale is posted.';

@@ -121,9 +121,6 @@ page 6184502 "NPR Adyen Reconciliation"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-                actionref(ReCreate_Promoted; "Re-Create Document")
-                {
-                }
                 actionref(Match_Promoted; "Match Entries")
                 {
                 }
@@ -140,29 +137,6 @@ page 6184502 "NPR Adyen Reconciliation"
                 Caption = 'Manage';
                 Image = Process;
 
-                action("Re-Create Document")
-                {
-                    Caption = 'Re-Create Document';
-                    Ellipsis = true;
-                    Image = SuggestLines;
-                    Enabled = not _LinePosted;
-                    ToolTip = 'Running this action will re-Create current Document (Not available if the Document is Posted).';
-                    ApplicationArea = NPRRetail;
-
-                    trigger OnAction()
-                    var
-                        WebhookRequest: Record "NPR AF Rec. Webhook Request";
-                        ValidationError: Label 'Report did not pass the Validation Scheme or Adyen Setup is incomplete.\Please check logs for more information.';
-                    begin
-                        if WebhookRequest.Get(Rec."Webhook Request ID") then begin
-                            if _TransactionMatching.ValidateReportScheme(WebhookRequest) then begin
-                                _TransactionMatching.CreateSettlementDocuments(WebhookRequest, true, Rec."Document No.");
-                                CurrPage.Update();
-                            end else
-                                Error(ValidationError);
-                        end;
-                    end;
-                }
                 action("Match Entries")
                 {
                     Caption = 'Match Entries';
@@ -272,14 +246,10 @@ page 6184502 "NPR Adyen Reconciliation"
         _DocumentPosted := Rec.Posted;
         if AdyenSetup.Get() then
             _PostWithTransactionDate := AdyenSetup."Post with Transaction Date";
-        RecLine.SetRange(Status, RecLine.Status::Posted);
-        if not RecLine.IsEmpty() then
-            _LinePosted := true;
     end;
 
     var
         _TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
-        _LinePosted: Boolean;
         _IsExternalReport: Boolean;
         _DocumentPosted: Boolean;
         _PostWithTransactionDate: Boolean;

@@ -16,7 +16,29 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         else
             GenJnlLine."Posting Date" := _ReconciliationHeader."Posting Date";
         GenJnlLine."Document Type" := GenJnlLine."Document Type"::" ";
-        GenJnlLine."Account Type" := GenJnlLine."Bal. Account Type"::"G/L Account";
+        case _GLAccountType of
+            _GLAccountType::"Merchant Payout Account":
+                begin
+                    case _AdyenMerchantSetup."Merchant Payout Acc. Type" of
+                        _AdyenMerchantSetup."Merchant Payout Acc. Type"::"G/L Account":
+                            GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
+                        _AdyenMerchantSetup."Merchant Payout Acc. Type"::"Bank Account":
+                            GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Bank Account";
+                    end;
+                end;
+            _GLAccountType::"Acquirer Payout Account":
+                begin
+                    case _AdyenMerchantSetup."Acquirer Payout Acc. Type" of
+                        _AdyenMerchantSetup."Acquirer Payout Acc. Type"::"G/L Account":
+                            GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
+                        _AdyenMerchantSetup."Acquirer Payout Acc. Type"::"Bank Account":
+                            GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Bank Account";
+                    end;
+                end;
+            else
+                GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
+        end;
+
 
         GenJnlLine."Copy VAT Setup to Jnl. Lines" := false;
         case _GLAccountType of
@@ -35,10 +57,15 @@ codeunit 6184827 "NPR Adyen Fee Posting"
                     GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Chargeback Fees G/L Account");
                     AmountType := AmountType::"Chargeback Fees";
                 end;
-            _GLAccountType::"Merchant Payout G/L Account":
+            _GLAccountType::"Merchant Payout Account":
                 begin
-                    GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Merchant Payout G/L Account");
+                    GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Merchant Payout Acc. No.");
                     AmountType := AmountType::"Merchant Payout";
+                end;
+            _GLAccountType::"Acquirer Payout Account":
+                begin
+                    GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Acquirer Payout Acc. No.");
+                    AmountType := AmountType::"Acquirer Payout";
                 end;
             _GLAccountType::"Advancement External Commission G/L Account":
                 begin
@@ -84,8 +111,10 @@ codeunit 6184827 "NPR Adyen Fee Posting"
                 TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Invoice Deduction");
             _GLAccountType::"Chargeback Fees G/L Account":
                 TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Chargeback Fees");
-            _GLAccountType::"Merchant Payout G/L Account":
+            _GLAccountType::"Merchant Payout Account":
                 TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Merchant Payout");
+            _GLAccountType::"Acquirer Payout Account":
+                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Acquirer Payout");
             _GLAccountType::"Advancement External Commission G/L Account":
                 TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Advancement External Commission");
             _GLAccountType::"Refunded External Commission G/L Account":
@@ -100,32 +129,33 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         exit(false);
     end;
 
-    internal procedure PrepareRecords(var RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr"; GLAccountType: Enum "NPR Adyen Posting GL Accounts"): Boolean
+    [TryFunction]
+    internal procedure PrepareRecords(var RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr"; GLAccountType: Enum "NPR Adyen Posting GL Accounts")
     begin
         _AdyenSetup.Get();
         _GLAccountType := GLAccountType;
-        if _AdyenMerchantSetup.Get(RecLine."Merchant Account") then begin
-            case _GLAccountType of
-                _GLAccountType::"Fee G/L Account":
-                    _AdyenMerchantSetup.TestField("Fee G/L Account");
-                _GLAccountType::"Invoice Deduction G/L Account":
-                    _AdyenMerchantSetup.TestField("Invoice Deduction G/L Account");
-                _GLAccountType::"Chargeback Fees G/L Account":
-                    _AdyenMerchantSetup.TestField("Chargeback Fees G/L Account");
-                _GLAccountType::"Merchant Payout G/L Account":
-                    _AdyenMerchantSetup.TestField("Merchant Payout G/L Account");
-                _GLAccountType::"Advancement External Commission G/L Account":
-                    _AdyenMerchantSetup.TestField("Advancement EC G/L Account");
-                _GLAccountType::"Refunded External Commission G/L Account":
-                    _AdyenMerchantSetup.TestField("Refunded EC G/L Account");
-                _GLAccountType::"Settled External Commission G/L Account":
-                    _AdyenMerchantSetup.TestField("Settled EC G/L Account");
-            end;
-            _AdyenMerchantSetup.TestField("Reconciled Payment Acc. No.");
-            _ReconciliationLine := RecLine;
-            _ReconciliationHeader := RecHeader;
-            exit(true);
+        _AdyenMerchantSetup.Get(RecLine."Merchant Account");
+        case _GLAccountType of
+            _GLAccountType::"Fee G/L Account":
+                _AdyenMerchantSetup.TestField("Fee G/L Account");
+            _GLAccountType::"Invoice Deduction G/L Account":
+                _AdyenMerchantSetup.TestField("Invoice Deduction G/L Account");
+            _GLAccountType::"Chargeback Fees G/L Account":
+                _AdyenMerchantSetup.TestField("Chargeback Fees G/L Account");
+            _GLAccountType::"Merchant Payout Account":
+                _AdyenMerchantSetup.TestField("Merchant Payout Acc. No.");
+            _GLAccountType::"Acquirer Payout Account":
+                _AdyenMerchantSetup.TestField("Acquirer Payout Acc. No.");
+            _GLAccountType::"Advancement External Commission G/L Account":
+                _AdyenMerchantSetup.TestField("Advancement EC G/L Account");
+            _GLAccountType::"Refunded External Commission G/L Account":
+                _AdyenMerchantSetup.TestField("Refunded EC G/L Account");
+            _GLAccountType::"Settled External Commission G/L Account":
+                _AdyenMerchantSetup.TestField("Settled EC G/L Account");
         end;
+        _AdyenMerchantSetup.TestField("Reconciled Payment Acc. No.");
+        _ReconciliationLine := RecLine;
+        _ReconciliationHeader := RecHeader;
     end;
 
     internal procedure GetGlEntrySystemID(): Guid
