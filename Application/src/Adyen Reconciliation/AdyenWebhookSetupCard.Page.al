@@ -175,12 +175,37 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 trigger OnAction()
                 var
                     AdyenManagement: Codeunit "NPR Adyen Management";
-                    ErrorLabel: Label 'Webhook must have an ID first.';
                 begin
-                    if Rec.ID = '' then
-                        Error(ErrorLabel);
                     AdyenManagement.SuggestAFWebServiceURL(Rec);
                     CurrPage.Update();
+                end;
+            }
+            action(Refresh)
+            {
+                Caption = 'Refresh';
+                ApplicationArea = NPRRetail;
+                Image = Refresh;
+                ToolTip = 'Running this action will Refresh the page.';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                var
+                    Window: Dialog;
+                    RefreshingLbl: Label 'Refreshing...';
+                    UpdatedLbl: Label 'Configurations were Updated.';
+                    UpToDateLbl: Label 'Webhook Setup is already Up to Date.';
+                    AdyenManagement: Codeunit "NPR Adyen Management";
+                begin
+                    Window.Open(RefreshingLbl);
+                    if AdyenManagement.RefreshWebhook(Rec) then begin
+                        CurrPage.Update();
+                        Message(UpdatedLbl);
+                    end else
+                        Message(UpToDateLbl);
+                    Window.Close();
                 end;
             }
         }

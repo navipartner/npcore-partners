@@ -16,23 +16,28 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Company ID';
+            InitValue = 'NavipartnerAfP';
+            Editable = false;
         }
         field(20; "Enable Reconciliation"; Boolean)
         {
             DataClassification = CustomerContent;
-            Caption = 'Enable Reconciliation';
+            Caption = 'Enable Adyen Automation';
 
             trigger OnValidate()
             var
                 WebService: Record "Web Service Aggregate";
                 WebServiceManagement: Codeunit "Web Service Management";
+                AdyenManagement: Codeunit "NPR Adyen Management";
             begin
                 if "Enable Reconciliation" then begin
-                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenReconciliation', true);
+                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', true);
+                    AdyenManagement.CreateReconciliationJob(Codeunit::"NPR Adyen Tr. Matching Session");
                     "Enable Automatic Posting" := true;
                     Modify();
                 end else begin
-                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenReconciliation', false);
+                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', false);
+                    AdyenManagement.CancelReconciliationJob(Codeunit::"NPR Adyen Tr. Matching Session");
                 end;
             end;
         }
@@ -40,6 +45,14 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Management Base URL';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Replaced with .';
+        }
+        field(35; "Environment Type"; Enum "NPR Adyen Environment Type")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Environment Type';
         }
         field(40; "Management API Key"; Text[2048])
         {
@@ -85,6 +98,9 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Report Scheme Docs URL';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(110; "Recon. Integr. Starting Date"; DateTime)
         {

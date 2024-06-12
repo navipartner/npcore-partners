@@ -3,6 +3,7 @@ page 6184534 "NPR Adyen Reconciliation List"
     Caption = 'Adyen Reconciliation List';
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Hdr";
+    SourceTableView = sorting("Document No.") order(descending);
     CardPageId = "NPR Adyen Reconciliation";
     Extensible = false;
     UsageCategory = Administration;
@@ -104,6 +105,34 @@ page 6184534 "NPR Adyen Reconciliation List"
                         _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
                     end;
                 }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(Refresh)
+            {
+                Caption = 'Refresh';
+                ApplicationArea = NPRRetail;
+                Image = Refresh;
+                ToolTip = 'Running this action will Refresh the page.';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                var
+                    RefreshingLbl: Label 'Refreshing...';
+                    Window: Dialog;
+                begin
+                    Window.Open(RefreshingLbl);
+                    CurrPage.Update();
+                    Window.Close();
+                end;
             }
         }
     }
