@@ -5,8 +5,7 @@ report 6014536 "NPR Adyen Simulate Webhook Req"
 #ENDIF
     Caption = 'Adyen Simulate Webhook Request';
     ProcessingOnly = true;
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
 
     requestpage
     {

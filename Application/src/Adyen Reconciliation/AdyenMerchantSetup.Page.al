@@ -55,10 +55,25 @@ page 6184582 "NPR Adyen Merchant Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Invoice Deduction G/L Account.';
                 }
-                field("Merchant Payout G/L Account"; Rec."Merchant Payout G/L Account")
+                field("Merchant Payout Acc. Type"; Rec."Merchant Payout Acc. Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Merchant Payout G/L Account.';
+                    ToolTip = 'Specifies the Merchant Payout Account Type.';
+                }
+                field("Merchant Payout Acc. No."; Rec."Merchant Payout Acc. No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Merchant Payout Account No.';
+                }
+                field("Acquirer Payout Acc. Type"; Rec."Acquirer Payout Acc. Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Acquirer Payout Account Type.';
+                }
+                field("Acquirer Payout Acc. No."; Rec."Acquirer Payout Acc. No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Acquirer Payout Account No.';
                 }
                 field("Reconciled Payment Acc. Type"; Rec."Reconciled Payment Acc. Type")
                 {

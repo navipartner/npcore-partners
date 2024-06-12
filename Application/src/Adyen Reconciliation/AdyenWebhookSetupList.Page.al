@@ -5,6 +5,7 @@ page 6184551 "NPR Adyen Webhook Setup List"
     Caption = 'Adyen Webhook Setup List';
     PageType = List;
     SourceTable = "NPR Adyen Webhook Setup";
+    SourceTableView = sorting("Primary Key") order(descending);
     CardPageID = "NPR Adyen Webhook Setup Card";
     RefreshOnActivate = true;
     Extensible = false;
@@ -25,6 +26,16 @@ page 6184551 "NPR Adyen Webhook Setup List"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Webhook Type.';
+                }
+                field("Include Events Filter"; Rec."Include Events Filter")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Webhook Events Filter';
+                }
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Webhook Description.';
                 }
                 field(Active; Rec.Active)
                 {

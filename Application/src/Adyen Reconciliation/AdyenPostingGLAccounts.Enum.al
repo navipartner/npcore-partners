@@ -29,9 +29,9 @@ enum 6014674 "NPR Adyen Posting GL Accounts"
     {
         Caption = 'Chargeback Fees G/L Account';
     }
-    value(60; "Merchant Payout G/L Account")
+    value(60; "Merchant Payout Account")
     {
-        Caption = 'Merchant Payout G/L Account';
+        Caption = 'Merchant Payout Account';
     }
     value(70; "Advancement External Commission G/L Account")
     {
@@ -44,5 +44,9 @@ enum 6014674 "NPR Adyen Posting GL Accounts"
     value(90; "Settled External Commission G/L Account")
     {
         Caption = 'Settled External Commission G/L Account';
+    }
+    value(100; "Acquirer Payout Account")
+    {
+        Caption = 'Acquirer Payout Account';
     }
 }

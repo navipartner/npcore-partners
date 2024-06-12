@@ -65,8 +65,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
             Caption = 'Total Transactions Amount (AAC)';
             FieldClass = FlowField;
             CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
-                                                                                "Batch Number" = field("Batch Number"),
-                                                                                "Transaction Type" = filter(Settled | SettledExternallyWithInfo)));
+                                                                                "Batch Number" = field("Batch Number")));
         }
         field(90; "Total Posted Amount"; Decimal)
         {

@@ -2,7 +2,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Webhook Request';
+    Caption = 'Adyen Reconciliation Webhook Report Ready';
     DataClassification = CustomerContent;
 
     fields
@@ -25,12 +25,18 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Editable = false;
             Caption = 'Status Code';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(30; "Status Description"; Text[256])
         {
             DataClassification = CustomerContent;
             Editable = false;
             Caption = 'Status Description';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(40; Live; Boolean)
         {
@@ -94,6 +100,17 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Caption = 'Request Data';
         }
+        field(120; Processed; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Processed';
+        }
+        field(130; "Adyen Webhook Entry No."; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Adyen Webhook Entry No.';
+            TableRelation = "NPR Adyen Webhook"."Entry No.";
+        }
     }
     keys
     {
@@ -128,5 +145,34 @@ table 6150791 "NPR AF Rec. Webhook Request"
     begin
         CalcFields("Request Data");
         "Request Data".CreateInStream(InStr, TextEncoding::UTF8);
+    end;
+
+    procedure GetReportData(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+#IF BC17
+        InStr: InStream;
+#ENDIF
+    begin
+        if not "Report Data".HasValue() then
+            exit('');
+#IF BC17
+        GetReportDataStream(InStr);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
+#ELSE
+        exit(TypeHelper.ReadAsTextWithSeparator(GetReportDataStream(), TypeHelper.LFSeparator()));
+#ENDIF
+    end;
+
+#IF BC17
+    procedure GetReportDataStream(var InStr: InStream)
+#ELSE
+    procedure GetReportDataStream() InStr: InStream
+#ENDIF
+    begin
+        if "Report Data".HasValue then begin
+            CalcFields("Report Data");
+            "Report Data".CreateInStream(InStr, TextEncoding::UTF8);
+        end;
     end;
 }

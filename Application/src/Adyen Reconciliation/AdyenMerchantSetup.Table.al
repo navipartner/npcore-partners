@@ -48,17 +48,48 @@ table 6150829 "NPR Adyen Merchant Setup"
             Caption = 'Invoice Deduction G/L Account';
             TableRelation = "G/L Account";
         }
+        field(65; "Merchant Payout Acc. Type"; Enum "Gen. Journal Account Type")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Merchant Payout Acc. Type';
+            ValuesAllowed = "G/L Account", "Bank Account";
+        }
         field(70; "Merchant Payout G/L Account"; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Payout G/L Account';
             TableRelation = "G/L Account";
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Replaced with Merchant Payout Acc. No.';
+        }
+        field(75; "Merchant Payout Acc. No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Merchant Payout Acc. No.';
+            TableRelation = if ("Merchant Payout Acc. Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Merchant Payout Acc. Type" = const("Bank Account")) "Bank Account";
         }
         field(80; "Chargeback Fees G/L Account"; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Chargeback Fees G/L Account';
             TableRelation = "G/L Account";
+        }
+        field(85; "Acquirer Payout Acc. Type"; Enum "Gen. Journal Account Type")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Acquirer Payout Acc. Type';
+            ValuesAllowed = "G/L Account", "Bank Account";
+        }
+        field(86; "Acquirer Payout Acc. No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Acquirer Payout Acc. No.';
+            TableRelation = if ("Acquirer Payout Acc. Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Acquirer Payout Acc. Type" = const("Bank Account")) "Bank Account";
         }
         field(90; "Reconciled Payment Acc. Type"; Enum "Gen. Journal Account Type")
         {

@@ -32,6 +32,10 @@ enum 6014687 "NPR Adyen Recon. Amount Type"
     {
         Caption = 'Merchant Payout';
     }
+    value(65; "Acquirer Payout")
+    {
+        Caption = 'Acquirer Payout';
+    }
     value(70; "Advancement External Commission")
     {
         Caption = 'Advancement External Commission';

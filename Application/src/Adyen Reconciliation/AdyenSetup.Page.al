@@ -8,6 +8,7 @@ page 6184531 "NPR Adyen Setup"
     PageType = Card;
     SourceTable = "NPR Adyen Setup";
     AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup';
+    ContextSensitiveHelpPage = 'docs/'; // TODO
     DeleteAllowed = false;
     InsertAllowed = false;
 
@@ -18,24 +19,24 @@ page 6184531 "NPR Adyen Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Company ID"; Rec."Company ID")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Company ID.';
-                }
                 field("Active Webhooks"; Rec."Active Webhooks")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Active Webhook Count.';
                 }
+                field("Enable Adyen Automation"; Rec."Enable Reconciliation")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Creates/Enables Processing Job Queue and an Adyen Automation Web Service which allows receiving Adyen Webhooks.';
+                }
             }
             group(Management)
             {
                 Caption = 'Management';
-                field("Management Base URL"; Rec."Management Base URL")
+                field("Environment Type"; Rec."Environment Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Management Base URL.';
+                    ToolTip = 'Specifies the Environment Type.';
                 }
                 field("Management API Key"; Rec."Management API Key")
                 {
@@ -47,11 +48,6 @@ page 6184531 "NPR Adyen Setup"
             group(Reconciliation)
             {
                 Caption = 'Reconciliation';
-                field("Enable Reconciliation"; Rec."Enable Reconciliation")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Creates/Enables a Reconciliation Web Service which allow receiving Adyen Webhooks.';
-                }
                 field("Recon. Integr. Starting Date"; Rec."Recon. Integr. Starting Date")
                 {
                     ApplicationArea = NPRRetail;
@@ -82,11 +78,6 @@ page 6184531 "NPR Adyen Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the No. Series Code for Reconciliation Posting Entries.';
-                }
-                field("Report Scheme Docs URL"; Rec."Report Scheme Docs URL")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the URL to a valid Report Scheme example.';
                 }
             }
         }

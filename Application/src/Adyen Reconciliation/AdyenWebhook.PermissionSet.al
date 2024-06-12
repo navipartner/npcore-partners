@@ -9,8 +9,9 @@ permissionset 6014406 "NPR Adyen Webhook"
     Permissions =
         codeunit "NPR AF Rec. API Request" = X,
         codeunit "NPR Adyen Management" = X,
-        tabledata "NPR AF Rec. Webhook Request" = IM,
+        tabledata "NPR AF Rec. Webhook Request" = RIM,
         tabledata "NPR Adyen Setup" = R,
+        tabledata "NPR Adyen Webhook" = RIM,
         tabledata "NPR Adyen Reconciliation Log" = I;
 }
 #endif

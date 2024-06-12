@@ -6,6 +6,7 @@ page 6184536 "NPR Adyen Reconciliation Logs"
     Caption = 'Adyen Reconciliation Logs';
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Log";
+    SourceTableView = sorting(ID) order(descending);
     Editable = false;
     Extensible = false;
 
@@ -53,6 +54,27 @@ page 6184536 "NPR Adyen Reconciliation Logs"
     {
         area(Processing)
         {
+            action(Refresh)
+            {
+                Caption = 'Refresh';
+                ApplicationArea = NPRRetail;
+                Image = Refresh;
+                ToolTip = 'Running this action will Refresh the page.';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                var
+                    RefreshingLbl: Label 'Refreshing...';
+                    Window: Dialog;
+                begin
+                    Window.Open(RefreshingLbl);
+                    CurrPage.Update();
+                    Window.Close();
+                end;
+            }
             action("Show Valid Report Scheme")
             {
                 ApplicationArea = NPRRetail;
@@ -67,9 +89,10 @@ page 6184536 "NPR Adyen Reconciliation Logs"
                 trigger OnAction()
                 var
                     AdyenGenericSetup: Record "NPR Adyen Setup";
+                    ReportSchemeURL: Label 'https://docs.navipartner.com/docs/', Locked = true; // TODO
                 begin
                     if AdyenGenericSetup.Get() then
-                        Hyperlink(AdyenGenericSetup."Report Scheme Docs URL");
+                        Hyperlink(ReportSchemeURL);
                 end;
             }
         }
