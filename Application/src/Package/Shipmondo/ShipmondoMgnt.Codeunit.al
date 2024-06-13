@@ -354,7 +354,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                 end;
                 if PakkeShippingAgent."Declared Value Required" then begin
                     Output += ',';
-                    Output += StrSubstNo(QueryParams11Lbl, BuildDeclaredValue(PackageDimension));
+                    Output += StrSubstNo(QueryParams11Lbl, BuildDeclaredValue(PackageDimension, PakkeShippingAgent, PakkelabelsShipment."Currency Code"));
                 end;
                 if i <> J then
                     Output += '},'
@@ -366,10 +366,18 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
 
     end;
 
-    local procedure BuildDeclaredValue(PackageDimension: Record "NPR Package Dimension") DeclaredValueJsonObject: JsonObject;
+    local procedure BuildDeclaredValue(PackageDimension: Record "NPR Package Dimension"; PackageShippingAgent: Record "NPR Package Shipping Agent"; PackageCurrencyCode: Code[20]) DeclaredValueJsonObject: JsonObject;
+    var
     begin
-        DeclaredValueJsonObject.Add('amount', PackageDimension."Package Amount Incl. VAT");
-        DeclaredValueJsonObject.Add('currency_code', PackageDimension."Package Amount Currency Code");
+        if PackageDimension."Package Amount Incl. VAT" > PackageShippingAgent."Declared Max Amount Value" then
+            DeclaredValueJsonObject.Add('amount', PackageShippingAgent."Declared Max Amount Value")
+        else
+            DeclaredValueJsonObject.Add('amount', PackageDimension."Package Amount Incl. VAT");
+
+        if PackageShippingAgent."Declared Value Currency Code" <> '' then
+            DeclaredValueJsonObject.Add('currency_code', PackageShippingAgent."Declared Value Currency Code")
+        else
+            DeclaredValueJsonObject.Add('currency_code', PackageCurrencyCode);
     end;
 
     local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Shipping Provider Document"): Boolean;

@@ -83,10 +83,22 @@
             Caption = 'Declared Value Required';
             DataClassification = CustomerContent;
         }
+        field(85; "Declared Max Amount Value"; Decimal)
+        {
+            Caption = 'Declared Max Amount Value';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
         field(90; "Shipping Provider Code"; Code[50])
         {
             Caption = 'Shipping Provider Code';
             DataClassification = CustomerContent;
+        }
+        field(100; "Declared Value Currency Code"; Code[10])
+        {
+            Caption = 'Declared Value Currency Code';
+            DataClassification = CustomerContent;
+            TableRelation = Currency;
         }
     }
 
