@@ -39,6 +39,7 @@
                 begin
                     Clear(POSSavedSales);
                     POSSavedSales.SetIsInEndOfTheDayProcess(true);
+                    POSSavedSales.SetTableView(POSSavedSaleEntry);
                     POSSavedSales.LookupMode(true);
                     Confirmed := POSSavedSales.RunModal() = Action::LookupOK;
                 end;
