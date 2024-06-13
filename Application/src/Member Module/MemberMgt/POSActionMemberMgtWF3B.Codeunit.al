@@ -6,6 +6,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
         MemberCardList: Page "NPR MM Member Card List";
+        MemberCardListPhone: Page "NPR MM Member Card List MPos";
         MemberCardCount: Integer;
     begin
         Member.SetFilter(Blocked, '=%1', false);
@@ -21,13 +22,23 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         case true of
             MemberCardCount > 1:
                 begin
-                    MemberCardList.SetTableView(MemberCard);
-                    MemberCardList.Editable(false);
-                    MemberCardList.LookupMode(true);
-                    if (Action::LookupOK <> MemberCardList.RunModal()) then
-                        exit(false);
+                    if (Session.CurrentClientType = Session.CurrentClientType::Phone) then begin
+                        MemberCardListPhone.SetTableView(MemberCard);
+                        MemberCardListPhone.Editable(false);
+                        MemberCardListPhone.LookupMode(true);
+                        if (Action::LookupOK <> MemberCardListPhone.RunModal()) then
+                            exit(false);
 
-                    MemberCardList.GetRecord(MemberCard);
+                        MemberCardListPhone.GetRecord(MemberCard);
+                    end else begin
+                        MemberCardList.SetTableView(MemberCard);
+                        MemberCardList.Editable(false);
+                        MemberCardList.LookupMode(true);
+                        if (Action::LookupOK <> MemberCardList.RunModal()) then
+                            exit(false);
+
+                        MemberCardList.GetRecord(MemberCard);
+                    end;
                 end;
             MemberCardCount = 1:
                 begin
@@ -41,12 +52,21 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
                 case true of
                     MemberCardCount > 1:
                         begin
-                            MemberCardList.SetTableView(MemberCard);
-                            MemberCardList.Editable(false);
-                            MemberCardList.LookupMode(true);
-                            if (Action::LookupOK <> MemberCardList.RunModal()) then
-                                exit;
-                            MemberCardList.GetRecord(MemberCard);
+                            if (Session.CurrentClientType = Session.CurrentClientType::Phone) then begin
+                                MemberCardListPhone.SetTableView(MemberCard);
+                                MemberCardListPhone.Editable(false);
+                                MemberCardListPhone.LookupMode(true);
+                                if (Action::LookupOK <> MemberCardListPhone.RunModal()) then
+                                    exit;
+                                MemberCardListPhone.GetRecord(MemberCard);
+                            end else begin
+                                MemberCardList.SetTableView(MemberCard);
+                                MemberCardList.Editable(false);
+                                MemberCardList.LookupMode(true);
+                                if (Action::LookupOK <> MemberCardList.RunModal()) then
+                                    exit;
+                                MemberCardList.GetRecord(MemberCard);
+                            end;
                         end;
                     else begin
                         if (not MemberCard.FindFirst()) then
@@ -64,13 +84,23 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
     local procedure ChooseMemberWithSearchUIWorkList(var Member: Record "NPR MM Member"): Boolean
     var
         MemberList: Page "NPR MM Members";
+        MemberListPhone: Page "NPR MM Members MPos";
         PageAction: Action;
     begin
-        MemberList.LookupMode(true);
-        MemberList.SetTableView(Member);
-        PageAction := MemberList.RunModal();
-        if (PageAction = Action::LookupOK) then
-            MemberList.GetRecord(Member);
+        if (Session.CurrentClientType() = ClientType::Phone) then begin
+            MemberListPhone.LookupMode(true);
+            MemberListPhone.SetTableView(Member);
+            PageAction := MemberListPhone.RunModal();
+            if (PageAction = Action::LookupOK) then
+                MemberListPhone.GetRecord(Member);
+
+        end else begin
+            MemberList.LookupMode(true);
+            MemberList.SetTableView(Member);
+            PageAction := MemberList.RunModal();
+            if (PageAction = Action::LookupOK) then
+                MemberList.GetRecord(Member);
+        end;
 
         exit(Member."External Member No." <> '');
     end;
