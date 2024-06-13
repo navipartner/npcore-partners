@@ -19,4 +19,9 @@ codeunit 6184795 "NPR Shipmondo Events"
     begin
 
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterPopulatePackageAmountFields(SalesHeader: Record "Sales Header"; var PackageDimension: Record "NPR Package Dimension"; var FieldsPopulated: Boolean)
+    begin
+    end;
 }
