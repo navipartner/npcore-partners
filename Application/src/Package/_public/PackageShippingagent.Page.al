@@ -107,6 +107,16 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Declared Value Required field.';
                 }
+                field("Declared Max Amount Value"; Rec."Declared Max Amount Value")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Declared Max Amount Value field.';
+                }
+                field("Declared Value Currency Code"; Rec."Declared Value Currency Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Declared Value Currency Code field.';
+                }
             }
             part("NPR Services Combination"; "NPR Services Combination")
             {
