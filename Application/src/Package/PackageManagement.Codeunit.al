@@ -403,6 +403,7 @@ codeunit 6059947 "NPR Package Management"
     local procedure UpdatePackageAmountFields(SalesHeader: Record "Sales Header");
     var
         PackageDimension: Record "NPR Package Dimension";
+        ShipmondoEvents: Codeunit "NPR Shipmondo Events";
         FieldsPopulated: Boolean;
     begin
         if not GetPackageAmountRequired(SalesHeader) then
@@ -412,6 +413,7 @@ codeunit 6059947 "NPR Package Management"
             exit;
 
         FieldsPopulated := PopulatePackageAmountFields(SalesHeader, PackageDimension);
+        ShipmondoEvents.OnAfterPopulatePackageAmountFields(SalesHeader, PackageDimension, FieldsPopulated);
         if not FieldsPopulated then
             exit;
 
