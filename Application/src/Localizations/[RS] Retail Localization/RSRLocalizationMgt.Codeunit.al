@@ -22,8 +22,10 @@ codeunit 6151490 "NPR RS R Localization Mgt."
             exit;
         PurchInvLines.SetLoadFields("Document No.", "Location Code");
         PurchInvLines.SetRange("Document No.", PostedPurchInvHdr."No.");
-        if not PurchInvLines.FindSet() then
+        if PurchInvLines.IsEmpty() then
             exit;
+
+        PurchInvLines.FindSet();
         repeat
             case true of
                 PurchInvLines."Location Code" <> '':
