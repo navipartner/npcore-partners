@@ -19,7 +19,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         FillRetailPOSEntryLines(POSEntry);
 
-        if not TempPOSEntrySalesLines.IsEmpty() then
+        if TempPOSEntrySalesLines.IsEmpty() then
             exit;
 
         FilterPriceListHeader(POSEntry);
@@ -857,8 +857,9 @@ codeunit 6151363 "NPR RS POS GL Addition"
     begin
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.SetFilter(Type, 'Item');
-        if not POSEntrySalesLine.FindSet() then
+        if POSEntrySalesLine.IsEmpty() then
             exit;
+        POSEntrySalesLine.FindSet();
         repeat
             if Location.Get(POSEntrySalesLine."Location Code") then
                 if Location."NPR Retail Location" then begin
