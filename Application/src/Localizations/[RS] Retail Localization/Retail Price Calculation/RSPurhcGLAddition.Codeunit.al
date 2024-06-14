@@ -443,7 +443,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         ItemChargeAssignment.SetRange("Document No.", TempPurchLine."Document No.");
         ItemChargeAssignment.SetRange("Document Line No.", TempPurchLine."Line No.");
         ItemChargeAssignment.SetRange("Item Charge No.", TempPurchLine."No.");
-        if not ItemChargeAssignment.IsEmpty() then
+        if ItemChargeAssignment.IsEmpty() then
             exit;
 
         ItemChargeAssignment.FindSet();

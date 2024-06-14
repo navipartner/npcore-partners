@@ -217,9 +217,10 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         StdItemLedgerEntry.SetRange("Location Code", TransferReceiptHeader."Transfer-to Code");
         StdItemLedgerEntry.SetRange("Item No.", TempTransferLine."Item No.");
         StdItemLedgerEntry.SetRange("Order Line No.", TempTransferLine."Line No.");
-        if not StdItemLedgerEntry.FindSet() then
+        if StdItemLedgerEntry.IsEmpty() then
             exit;
 
+        StdItemLedgerEntry.FindSet();
         repeat
             InsertRetailValueEntry(TempRetailValueEntry, StdItemLedgerEntry);
         until StdItemLedgerEntry.Next() = 0;
@@ -401,8 +402,9 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         TransferLine: Record "Transfer Line";
     begin
         TransferLine.SetRange("Document No.", TransferHeader."No.");
-        if not TransferLine.FindSet() then
+        if TransferLine.IsEmpty() then
             exit;
+        TransferLine.FindSet();
         repeat
             TempTransferLine.Init();
             TempTransferLine.Copy(TransferLine);

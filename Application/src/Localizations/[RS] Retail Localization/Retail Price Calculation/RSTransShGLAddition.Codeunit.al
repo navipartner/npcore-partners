@@ -487,7 +487,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TransferLine.SetRange("Document No.", TransferHeader."No.");
         if TransferLine.IsEmpty() then
             exit;
-        TempTransferLine.FindSet();
+        TransferLine.FindSet();
         repeat
             if Location.Get(TransferHeader."Transfer-from Code") then
                 if Location."NPR Retail Location" then begin
