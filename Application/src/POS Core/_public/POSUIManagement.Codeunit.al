@@ -335,6 +335,8 @@
         CaptionsGlobalAdd:Label 'Add';
         CaptionsGlobalMove:Label 'Move';
         CaptionsGlobalOpen:Label 'Open';
+        CaptionsGlobalPreviewModeLbl:Label 'PREVIEW MODE';
+        WorkflowsDisabledPreviewModeLbl:Label 'Running workflows in preview mode is not enabled';
         BalancingCashMovementsLbl: Label 'Cash Movements';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
@@ -545,6 +547,7 @@
         EditableButtonRunDecreaseLbl: Label 'Run DECREASE';
         EditableButtonNoButtonToPasteErrorLbl: Label 'No button to paste';
         FooterUnsavedChangesLbl: Label 'You have unsaved changes. Please save or discard them.';
+        FooterPreviewModeActiveLbl: Label 'Preview mode active';
         SaveLayoutModalEnterNewLayoutNameLbl: Label 'Enter new layout name';
         SaveLayoutModalHowDoYouWantToProceedLbl: Label 'How do you want to proceed?';
         SaveLayoutModalPleaseNoteOverwriteLbl: Label ' Please note that overwriting this layout will affect the below POS Units:';
@@ -730,6 +733,22 @@
         BinTransferDescriptionLbl: Label 'Description';
         BinTransferCashCountNothingToCountLbl: Label 'Nothing to count';
         BinTransferCashCountNothingToCountMessageLbl: Label 'There is nothing to count in this payment bin.';
+        NotificationToastMembershipExpirationLbl:Label 'Membership exp.: ';
+        NotificationToastValidForAdmissionLbl:Label 'Valid for admission: ';
+        VariablesDialogTitleLbl:Label 'POS parameter values';
+        VariablesDialogNameLbl:Label 'Name';
+        VariablesDialogDescriptionLbl:Label 'Description';
+        VariablesDialogDataTypeLbl:Label 'Data type';
+        VariablesDialogValueLbl: Label 'Value';
+        VariablesDialogActionLbl: Label 'Action';
+        VariablesDialogInputErrorBooleanLbl:Label 'Input value can only be true or false';
+        VariablesDialogInputErrorEnumLbl:Label 'Input value not matching any options';
+        VariablesDialogInputErrorIntegerLbl:Label 'Please enter a valid whole number without leading zeros';
+        VariablesDialogDataTypeIntegerLbl:Label 'Integer';
+        VariablesDialogDataTypeDecimalLbl:Label 'Decimal';
+        VariablesDialogDataTypeTextLbl:Label 'Text';
+        VariablesDialogDataTypeBooleanLbl:Label 'Boolean';
+        VariablesDialogDataTypeOptionLbl:Label 'Option';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -804,6 +823,8 @@
         Captions.Add('Global_Add', CaptionsGlobalAdd);
         Captions.Add('Global_Move', CaptionsGlobalMove);
         Captions.Add('Global_Open',CaptionsGlobalOpen);
+        Captions.Add('Global_PreviewMode',CaptionsGlobalPreviewModeLbl);
+        Captions.Add('Global_WorkflowsDisabledPreviewMode',WorkflowsDisabledPreviewModeLbl);
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
@@ -1006,6 +1027,7 @@
         Captions.Add('Editable_Button_RunDecrease', EditableButtonRunDecreaseLbl);
         Captions.Add('Editable_Button_NoButtonToPasteError', EditableButtonNoButtonToPasteErrorLbl);
         Captions.Add('Footer_UnsavedChanges', FooterUnsavedChangesLbl);
+        Captions.Add('Footer_PreviewModeActive',FooterPreviewModeActiveLbl);
         Captions.Add('Save_Layout_Modal_EnterNewLayoutName', SaveLayoutModalEnterNewLayoutNameLbl);
         Captions.Add('Save_Layout_Modal_HowDoYouWantToProceed', SaveLayoutModalHowDoYouWantToProceedLbl);
         Captions.Add('Save_Layout_Modal_PleaseNoteOverwrite', SaveLayoutModalPleaseNoteOverwriteLbl);
@@ -1192,6 +1214,22 @@
         Captions.Add('BinTransfer_Description', BinTransferDescriptionLbl);
         Captions.Add('BinTransfer_CashCountNothingToCount', BinTransferCashCountNothingToCountLbl);
         Captions.Add('BinTransfer_CashCountNothingToCountMessage', BinTransferCashCountNothingToCountMessageLbl);
+        Captions.Add('NotificationToast_Membership_Expiration',NotificationToastMembershipExpirationLbl);
+        Captions.Add('NotificationToast_Valid_For_Admission',NotificationToastValidForAdmissionLbl);
+        Captions.Add('VariablesDialog_Title',VariablesDialogTitleLbl);
+        Captions.Add('VariablesDialog_Name',VariablesDialogNameLbl);
+        Captions.Add('VariablesDialog_Description',VariablesDialogDescriptionLbl);
+        Captions.Add('VariablesDialog_DataType',VariablesDialogDataTypeLbl);
+        Captions.Add('VariablesDialog_Value',VariablesDialogValueLbl);
+        Captions.Add('VariablesDialog_Action',VariablesDialogActionLbl);
+        Captions.Add('VariablesDialog_InputErrorBoolean',VariablesDialogInputErrorBooleanLbl);
+        Captions.Add('VariablesDialog_InputErrorEnum',VariablesDialogInputErrorEnumLbl);
+        Captions.Add('VariablesDialog_InputErrorInteger',VariablesDialogInputErrorIntegerLbl);
+        Captions.Add('VariablesDialog_DataTypeInteger',VariablesDialogDataTypeIntegerLbl);
+        Captions.Add('VariablesDialog_DataTypeDecimal',VariablesDialogDataTypeDecimalLbl);
+        Captions.Add('VariablesDialog_DataTypeText',VariablesDialogDataTypeTextLbl);
+        Captions.Add('VariablesDialog_DataTypeBoolean',VariablesDialogDataTypeBooleanLbl);
+        Captions.Add('VariablesDialog_DataTypeOption',VariablesDialogDataTypeOptionLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
