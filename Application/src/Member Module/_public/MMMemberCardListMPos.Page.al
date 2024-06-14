@@ -1,16 +1,14 @@
 page 6184671 "NPR MM Member Card List MPos"
 {
-    Caption = 'Member Cards';
+    Caption = 'Member Cards (Phone)';
     ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
-    AdditionalSearchTerms = ' Member Card List';
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     Editable = true;
     PageType = List;
     SourceTable = "NPR MM Member Card";
-    UsageCategory = Lists;
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+    UsageCategory = None;
     CardPageId = "NPR MM Member Card Card";
     PromotedActionCategories = 'New,Manage,Report,History,Raptor,Navigate,Arrival,Print';
 

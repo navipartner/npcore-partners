@@ -1,9 +1,8 @@
 page 6184670 "NPR MM Members MPos"
 {
     Extensible = True;
-    Caption = 'Members';
+    Caption = 'Members (Phone)';
     ContextSensitiveHelpPage = 'docs/entertainment/membership/intro/';
-    AdditionalSearchTerms = 'Member List';
     CardPageID = "NPR MM Member Card";
     DataCaptionExpression = Rec."External Member No.";
     DeleteAllowed = false;
@@ -13,8 +12,7 @@ page 6184670 "NPR MM Members MPos"
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "NPR MM Member";
-    UsageCategory = Lists;
-    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+    UsageCategory = None;
 
     layout
     {
