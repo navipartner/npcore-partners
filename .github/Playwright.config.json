@@ -1,0 +1,15 @@
+{
+    "appFolder": "Application",
+    "testAppFolder": "",
+    "bcptAppFolder": "",
+    "runTests": false,
+    "playwright": {
+        "runTests": true,
+        "folder": "IntegrationTest",
+        "envFilename": ".env",
+        "rapidstart": "MINIMAL-NPR.rapidstart",
+        "workersCount": 3,
+        "runCodeunitId": "6060099",
+        "createUsers": ["RESTUSER", "MPOSUSER", "E2EWORKER1", "E2EWORKER2", "E2EWORKER3", "E2EWORKER4", "E2EWORKER5", "E2EWORKER6"]
+    }
+}

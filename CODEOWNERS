@@ -4,6 +4,7 @@
 
 /.github/ @navipartner/pipelines
 /CODEOWNERS @navipartner/dev-management
+/IntegrationTest/ @navipartner/frontend
 
 /Application/src/_ControlAddIns/Dragonglass/ @navipartner/frontend
 /Application/src/_ControlAddIns/HardwareConnector/ @navipartner/hardware

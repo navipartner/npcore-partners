@@ -1,0 +1,30 @@
+name: 'Playwright'
+run-name: ${{ github.workflow }}
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 21 * * *"
+
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  Run:
+    uses: navipartner/devops/.github/workflows/MainWorkflow.yaml@main
+    secrets: inherit
+    with:
+      pipelineType: other
+      pipelineSubType: playwright
