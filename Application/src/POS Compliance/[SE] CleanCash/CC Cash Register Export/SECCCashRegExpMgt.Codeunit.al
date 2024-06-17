@@ -17,12 +17,12 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure DownloadExportFile(Document: XmlDocument; StartDate: Date; EndDate: Date)
     var
-        IStream: InStream;
-        OStream: OutStream;
         TempBlob: Codeunit "Temp Blob";
+        IStream: InStream;
         ExportFileTitleTxt: Label 'Export Cash Register Journal File';
-        XmlFileFilterTxt: Label 'Xml File (*.xml)|*.xml', Locked = true;
         FileNameFormatLbl: Label 'ExportAvDataFranJournalminneEnligtSKVFS2021-16_%1-%2.xml', Comment = '%1 - Start Date, %2 - End Date', Locked = true;
+        XmlFileFilterTxt: Label 'Xml File (*.xml)|*.xml', Locked = true;
+        OStream: OutStream;
         FileName: Text;
     begin
         FileName := StrSubstNo(FileNameFormatLbl, StartDate, EndDate);
@@ -69,8 +69,8 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
     local procedure AppendDesignatedCashRegWCompanyInfoSection(var DocExportElement: XmlElement; CompanyInfo: Record "Company Information"; POSUnitNo: Code[20])
     var
         CleanCashSetup: Record "NPR CleanCash Setup";
-        DesignatedCashRegElement: XmlElement;
         CompanyInfoElement: XmlElement;
+        DesignatedCashRegElement: XmlElement;
     begin
         if not CleanCashSetup.Get(POSUnitNo) then
             exit;
@@ -108,6 +108,9 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
         AppendXReportSection(CashRegSystemElement, StartDate, EndDate, CleanCashSetup, CompanyInfo);
         AppendZReportSection(CashRegSystemElement, StartDate, EndDate, CleanCashSetup, CompanyInfo);
         AppendCashRegisterLoginInfo(CashRegSystemElement, StartDate, EndDate, CleanCashSetup);
+        AppendTrainingReceipt(CashRegSystemElement, CompanyInfo, CleanCashSetup, StartDate, EndDate);
+        AppendParkRegisteredItem(CashRegSystemElement, CleanCashSetup, StartDate, EndDate);
+        AppendVerificationData(CashRegSystemElement, CleanCashSetup, StartDate, EndDate);
 
         CashRegListElement.Add(CashRegSystemElement);
         DocExportElement.Add(CashRegListElement);
@@ -172,8 +175,8 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
     local procedure AppendDeletedItemsSection(var CashRegSystemElement: XmlElement; StartDate: Date; EndDate: Date)
     var
         SECCCashRegAuditLog: Record "NPR SE CC Cash Reg. Audit Log";
-        DeletedItemElement: XmlElement;
         DeletedItemValues: List of [Text];
+        DeletedItemElement: XmlElement;
     begin
         SECCCashRegAuditLog.SetRange("Entry Type", SECCCashRegAuditLog."Entry Type"::DELETE_ITEM);
         SECCCashRegAuditLog.SetFilter("Entry Date", StartEndDateFilterLbl, StartDate, EndDate);
@@ -203,19 +206,19 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure AppendIssuedReceiptsSection(var CashRegSystemElement: XmlElement; StartDate: Date; EndDate: Date; CleanCashSetup: Record "NPR CleanCash Setup"; CompanyInfo: Record "Company Information")
     var
+        Item: Record Item;
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         POSEntry: Record "NPR POS Entry";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSStore: Record "NPR POS Store";
-        Item: Record Item;
         IssuedReceiptElement: XmlElement;
-        ItemsSoldListElement: XmlElement;
         ItemSoldElement: XmlElement;
-        LineDiscountListElement: XmlElement;
+        ItemsSoldListElement: XmlElement;
         LineDiscountElement: XmlElement;
-        PaymentMethodsListElement: XmlElement;
+        LineDiscountListElement: XmlElement;
         PaymentMethodElement: XmlElement;
+        PaymentMethodsListElement: XmlElement;
     begin
         CleanCashTransaction.SetLoadFields("POS Entry No.", "Pos Id", "Receipt Id", "Receipt DateTime", "Receipt Total", "Organisation No.", "CleanCash Unit Id", "CleanCash Code");
         CleanCashTransaction.SetRange("POS Unit No.", CleanCashSetup.Register);
@@ -308,19 +311,19 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure AppendIssuedReturnReceiptsSection(var CashRegSystemElement: XmlElement; StartDate: Date; EndDate: Date; CleanCashSetup: Record "NPR CleanCash Setup"; CompanyInfo: Record "Company Information")
     var
+        Item: Record Item;
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         POSEntry: Record "NPR POS Entry";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSStore: Record "NPR POS Store";
-        Item: Record Item;
         IssuedReturnReceiptElement: XmlElement;
-        ItemsSoldListElement: XmlElement;
         ItemSoldElement: XmlElement;
-        LineDiscountListElement: XmlElement;
+        ItemsSoldListElement: XmlElement;
         LineDiscountElement: XmlElement;
-        PaymentMethodsListElement: XmlElement;
+        LineDiscountListElement: XmlElement;
         PaymentMethodElement: XmlElement;
+        PaymentMethodsListElement: XmlElement;
     begin
         CleanCashTransaction.SetLoadFields("POS Entry No.", "Pos Id", "Receipt Id", "Receipt DateTime", "Receipt Total", "Organisation No.", "CleanCash Unit Id", "CleanCash Code");
         CleanCashTransaction.SetRange("POS Unit No.", CleanCashSetup.Register);
@@ -414,19 +417,19 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure AppendIssuedReceiptCopiesSection(var CashRegSystemElement: XmlElement; StartDate: Date; EndDate: Date; CleanCashSetup: Record "NPR CleanCash Setup"; CompanyInfo: Record "Company Information")
     var
+        Item: Record Item;
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         POSEntry: Record "NPR POS Entry";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         POSStore: Record "NPR POS Store";
-        Item: Record Item;
         IssuedReceiptCopyElement: XmlElement;
-        ItemsSoldListElement: XmlElement;
         ItemSoldElement: XmlElement;
-        LineDiscountListElement: XmlElement;
+        ItemsSoldListElement: XmlElement;
         LineDiscountElement: XmlElement;
-        PaymentMethodsListElement: XmlElement;
+        LineDiscountListElement: XmlElement;
         PaymentMethodElement: XmlElement;
+        PaymentMethodsListElement: XmlElement;
     begin
         CleanCashTransaction.SetLoadFields("POS Entry No.", "Pos Id", "Receipt Id", "Receipt DateTime", "Receipt Total", "Organisation No.", "CleanCash Unit Id", "CleanCash Code");
         CleanCashTransaction.SetRange("POS Unit No.", CleanCashSetup.Register);
@@ -521,10 +524,10 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
     local procedure AppendVATTotalsSection(var IssuedReceiptElement: XmlElement; POSEntry: Record "NPR POS Entry"; Return: Boolean)
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        VATRateListElement: XmlElement;
-        VATRateElement: XmlElement;
-        TotalsPerVATRate: Dictionary of [Decimal, Decimal];
         VATRate: Decimal;
+        TotalsPerVATRate: Dictionary of [Decimal, Decimal];
+        VATRateElement: XmlElement;
+        VATRateListElement: XmlElement;
     begin
         POSEntrySalesLine.SetLoadFields(Quantity, "VAT %", "Amount Incl. VAT", "Amount Excl. VAT");
         POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
@@ -602,8 +605,8 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure AppendTotalSalesAmountsSection(var ReportElement: XmlElement; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        TotalSalesListElement: XmlElement;
         TotalSalesElement: XmlElement;
+        TotalSalesListElement: XmlElement;
     begin
         TotalSalesListElement := CreateXmlElement('TotalaForsaljningssummorForOlikaHuvudgrupperLISTA', '');
         TotalSalesElement := CreateXmlElement('TotalForsaljningssummaForOlikaHuvudgrupper', '');
@@ -661,8 +664,8 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
     local procedure AppendTaxWorshiftSummarySection(var ReportElement: XmlElement; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSWorkshiftTaxCheckpoint: Record "NPR POS Worksh. Tax Checkp.";
-        TaxSummaryListElement: XmlElement;
         TaxSummaryElement: XmlElement;
+        TaxSummaryListElement: XmlElement;
     begin
         POSWorkshiftTaxCheckpoint.SetLoadFields("Tax %", "Tax Amount");
         POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
@@ -681,8 +684,8 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
     local procedure AppendPaymentMethodsSection(var ReportElement: XmlElement; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
         POSPaymentBinCheckp: Record "NPR POS Payment Bin Checkp.";
-        TotalPaymentMethodsListElement: XmlElement;
         TotalPaymentMethodElement: XmlElement;
+        TotalPaymentMethodsListElement: XmlElement;
     begin
         POSPaymentBinCheckp.SetLoadFields("Payment Method No.", "Calculated Amount Incl. Float");
         POSPaymentBinCheckp.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
@@ -720,6 +723,163 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
         CashRegSystemElement.Add(CreateXmlElement('StoppAvKassaregister', Format(LogOutPOSUnit)));
         CashRegSystemElement.Add(CreateXmlElement('InloggningIKassaregister', Format(LogInPOSUnit)));
         CashRegSystemElement.Add(CreateXmlElement('UtloggningUrKassaregister', Format(LogOutPOSUnit)));
+    end;
+
+    local procedure AppendTrainingReceipt(var CashRegSystemElement: XmlElement; CompanyInfo: Record "Company Information"; CleanCashSetup: Record "NPR CleanCash Setup"; StartDate: Date; EndDate: Date)
+    var
+        Item: Record Item;
+        CleanCashTransaction: Record "NPR CleanCash Trans. Request";
+        POSEntry: Record "NPR POS Entry";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSStore: Record "NPR POS Store";
+        ItemSoldElement: XmlElement;
+        ItemsSoldListElement: XmlElement;
+        LineDiscountElement: XmlElement;
+        LineDiscountListElement: XmlElement;
+        OvningskvittoElment: XmlElement;
+        PaymentMethodElement: XmlElement;
+        PaymentMethodsListElement: XmlElement;
+    begin
+        CleanCashTransaction.SetLoadFields("POS Entry No.", "Receipt Id", "Receipt DateTime", "Receipt Total", "CleanCash Unit Id", "CleanCash Code");
+        CleanCashTransaction.SetRange("POS Unit No.", CleanCashSetup.Register);
+        CleanCashTransaction.SetRange("Request Send Status", CleanCashTransaction."Request Send Status"::COMPLETE);
+        CleanCashTransaction.SetRange("Receipt Type", CleanCashTransaction."Receipt Type"::ovning);
+        CleanCashTransaction.SetFilter("Receipt DateTime", StartEndDateFilterLbl, CreateDateTime(StartDate, 0T), CreateDateTime(EndDate, 0T));
+        CleanCashTransaction.SetFilter("Request Type", '%1|%2', CleanCashTransaction."Request Type"::RegisterSalesReceipt, CleanCashTransaction."Request Type"::RegisterReturnReceipt);
+        if CleanCashTransaction.IsEmpty() then
+            exit;
+        CleanCashTransaction.FindSet();
+        repeat
+            OvningskvittoElment := CreateXmlElement('OvningskvittoElment', '');
+            OvningskvittoElment.Add(CreateXmlElement('ForetagetsNamn', CompanyInfo.Name));
+            OvningskvittoElment.Add(CreateXmlElement('OrganisationsnummerEllerPersonnummer', CleanCashSetup."Organization ID"));
+            POSEntry.SetLoadFields("POS Store Code", "Tax Amount");
+            POSEntry.Get(CleanCashTransaction."POS Entry No.");
+            POSStore.SetLoadFields(Address);
+            POSStore.Get(POSEntry."POS Store Code");
+            OvningskvittoElment.Add(CreateXmlElement('DenAdressDarForsaljningSker', POSStore.Address));
+            OvningskvittoElment.Add(CreateXmlElement('DatumOchKlockslagNarKvittoFramstalls', Format(CleanCashTransaction."Receipt DateTime")));
+            OvningskvittoElment.Add(CreateXmlElement('LopnummerForOvningskvitto', CleanCashTransaction."Receipt Id"));
+            OvningskvittoElment.Add(CreateXmlElement('Kassabeteckning', CleanCashSetup.Register));
+
+            ItemsSoldListElement := CreateXmlElement('SaldaArtiklarLISTA', '');
+            POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+            POSEntrySalesLine.SetFilter(Quantity, '>0');
+            if POSEntrySalesLine.FindSet() then
+                repeat
+                    Item.Get(POSEntrySalesLine."No.");
+                    ItemSoldElement := CreateXmlElement('SaldArtikel', '');
+                    ItemSoldElement.Add(CreateXmlElement('Artikelnummer', POSEntrySalesLine."No."));
+                    ItemSoldElement.Add(CreateXmlElement('Artikelnamn', POSEntrySalesLine.Description));
+                    ItemSoldElement.Add(CreateXmlElement('AntalAvSaldArtikel', Format(POSEntrySalesLine.Quantity)));
+                    ItemSoldElement.Add(CreateXmlElement('EnhetForViktLangdTidEllerVolym', POSEntrySalesLine."Unit of Measure Code"));
+                    ItemSoldElement.Add(CreateXmlElement('PrisPerEnhet', Format(POSEntrySalesLine."Unit Price")));
+                    ItemSoldElement.Add(CreateXmlElement('PrisPaSaldArtikel', Format(POSEntrySalesLine."Amount Incl. VAT")));
+
+                    if POSEntrySalesLine."Line Discount %" <> 0 then begin
+                        LineDiscountListElement := CreateXmlElement('RabatterPaSaldArtikelLISTA', '');
+                        LineDiscountElement := CreateXmlElement('RabattPaSaldArtikel', '');
+                        LineDiscountElement := CreateXmlElement('RabattensBelopp', Format(POSEntrySalesLine."Line Discount Amount Incl. VAT"));
+                        LineDiscountListElement.Add(LineDiscountElement);
+                        ItemSoldElement.Add(LineDiscountListElement);
+                    end;
+                    ItemSoldElement.Add(CreateXmlElement('MervardesskattesatsForSaldArtikel', Format(POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT")));
+                    ItemSoldElement.Add(CreateXmlElement('ArtikelnsRegistreringstidpunkt', Format(Item.SystemCreatedAt)));
+                    ItemsSoldListElement.Add(ItemSoldElement);
+                until POSEntrySalesLine.Next() = 0;
+            OvningskvittoElment.Add(ItemsSoldListElement);
+
+            OvningskvittoElment.Add(CreateXmlElement('TotaltForsaljningsbeloppISvenskaKronor', Format(CleanCashTransaction."Receipt Total")));
+            OvningskvittoElment.Add(CreateXmlElement('MervardesskattPaForsaljningsbeloppet', Format(POSEntry."Tax Amount")));
+
+            PaymentMethodsListElement := CreateXmlElement('TotalaForsaljningssummorPerBetalningsmedelLISTA', '');
+
+            POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+            POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+            if POSEntryPaymentLine.FindSet() then
+                repeat
+                    PaymentMethodElement := CreateXmlElement('TotalForsaljningssummaPerBetalningsmedel', '');
+                    PaymentMethodElement.Add(CreateXmlElement('Betalningsmedel', POSEntryPaymentLine."POS Payment Method Code"));
+                    PaymentMethodElement.Add(CreateXmlElement('ForsaljningssummaPerBetalningsmedel', Format(POSEntryPaymentLine."Amount (LCY)")));
+                    PaymentMethodsListElement.Add(PaymentMethodElement);
+                until POSEntryPaymentLine.Next() = 0;
+
+            OvningskvittoElment.Add(PaymentMethodsListElement);
+            AppendVATTotalsSection(OvningskvittoElment, POSEntry, false);
+            CashRegSystemElement.Add(OvningskvittoElment);
+
+            OvningskvittoElment.Add(CreateXmlElement('LopnummerForZdagrapportPaKvitto', GetWorkshiftZReportNo(POSEntry)));
+            OvningskvittoElment.Add(CreateXmlElement('Kontrollkod', CleanCashTransaction."CleanCash Unit Id"));
+            OvningskvittoElment.Add(CreateXmlElement('Avstamningskod', CleanCashTransaction."CleanCash Code"));
+        until CleanCashTransaction.Next() = 0;
+    end;
+
+    local procedure AppendParkRegisteredItem(var CashRegSystemElement: XmlElement; CleanCashSetup: Record "NPR CleanCash Setup"; StartDate: Date; EndDate: Date)
+    var
+        Item: Record Item;
+        POSSavedSales: Record "NPR POS Saved Sale Entry";
+        POSSavedSalesLine: Record "NPR POS Saved Sale Line";
+        DiscountElement: XmlElement;
+        DiscountListElement: XmlElement;
+        ParkeraRegisteredArtikel: XmlElement;
+    begin
+        POSSavedSales.SetRange("Register No.", CleanCashSetup.Register);
+        POSSavedSales.SetFilter("Created at", StartEndDateFilterLbl, CreateDateTime(StartDate, 0T), CreateDateTime(EndDate, 0T));
+
+        if POSSavedSales.IsEmpty() then
+            exit;
+        POSSavedSales.FindSet();
+        repeat
+            POSSavedSalesLine.SetRange("Quote Entry No.", POSSavedSales."Entry No.");
+            POSSavedSalesLine.SetLoadFields("No.", Description, Quantity, "Unit Price", "Unit of Measure Code", "Amount Including VAT", "Discount %", "Discount Amount", Amount);
+            if POSSavedSalesLine.FindSet() then
+                repeat
+                    Item.Get(POSSavedSalesLine."No.");
+                    ParkeraRegisteredArtikel := CreateXmlElement('ParkeraRegistreradArtikel', '');
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('Artikelnummer', POSSavedSalesLine."No."));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('Artikelnamn', POSSavedSalesLine.Description));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('AntalAvRegistreradArtikel', Format(POSSavedSalesLine.Quantity)));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('PrisPerEnhet', Format(POSSavedSalesLine."Unit Price")));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('EnhetForViktLangdTidEllerVolym', Format(POSSavedSalesLine."Unit of Measure Code")));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('PrisPaRegistreradArtikel', Format(POSSavedSalesLine."Amount Including VAT")));
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('MervardesskattesatsForRegistreradArtikel', GetVATPercentageFromSetup(CleanCashSetup, Item)));
+
+                    if POSSavedSalesLine."Discount %" <> 0 then begin
+                        DiscountListElement := CreateXmlElement('RabatterPaRegistreradArtikelLISTA', '');
+                        DiscountElement := CreateXmlElement('RabattPaRegistreradArtikel', '');
+                        DiscountElement := CreateXmlElement('RabattensBelopp', Format(POSSavedSalesLine."Discount Amount"));
+                        DiscountListElement.Add(DiscountElement);
+                        ParkeraRegisteredArtikel.Add(DiscountListElement);
+                    end;
+
+                    ParkeraRegisteredArtikel.Add(CreateXmlElement('MervardesskattesatsForRegistreradArtikel', Format(POSSavedSalesLine."Amount Including VAT" - POSSavedSalesLine.Amount)));
+                    CashRegSystemElement.Add(ParkeraRegisteredArtikel);
+                until POSSavedSalesLine.Next() = 0;
+        until POSSavedSales.Next() = 0;
+    end;
+
+    local procedure AppendVerificationData(var CashRegSystemElement: XmlElement; CleanCashSetup: Record "NPR CleanCash Setup"; StartDate: Date; EndDate: Date)
+    var
+        CleanCashTransaction: Record "NPR CleanCash Trans. Request";
+        KontrollprogramOchKontrollserverElement: XmlElement;
+    begin
+        CleanCashTransaction.SetLoadFields("Receipt Id", "CleanCash Code", "CleanCash Main Status", "POS Document No.");
+        CleanCashTransaction.SetRange("POS Unit No.", CleanCashSetup.Register);
+        CleanCashTransaction.SetRange("Request Send Status", CleanCashTransaction."Request Send Status"::COMPLETE);
+        CleanCashTransaction.SetFilter("Receipt DateTime", StartEndDateFilterLbl, CreateDateTime(StartDate, 0T), CreateDateTime(EndDate, 0T));
+        if CleanCashTransaction.IsEmpty() then
+            exit;
+        CleanCashTransaction.FindSet();
+        repeat
+            KontrollprogramOchKontrollserverElement := CreateXmlElement('VerifieringAvKvittodataMellanKontrollprogramOchKontrollserver', '');
+            KontrollprogramOchKontrollserverElement.Add(CreateXmlElement('StatuskodFranKontrollprogrammet', Format(CleanCashTransaction."CleanCash Main Status")));
+            KontrollprogramOchKontrollserverElement.Add(CreateXmlElement('VerifieringAvKvittodataMellanKontrollprogramOchKontrollserver', CleanCashTransaction."CleanCash Code"));
+            KontrollprogramOchKontrollserverElement.Add(CreateXmlElement('LopnummerForKassakvitto', CleanCashTransaction."Receipt Id"));
+            KontrollprogramOchKontrollserverElement.Add(CreateXmlElement('AntalDokument', CleanCashTransaction."POS Document No."));
+            CashRegSystemElement.Add(KontrollprogramOchKontrollserverElement);
+        until CleanCashTransaction.Next() = 0;
     end;
 
     local procedure CalculateUnitPriceExclVAT(UnitPrice: Text; VATPerc: Text): Decimal
@@ -794,10 +954,10 @@ codeunit 6184843 "NPR SE CC Cash Reg. Exp. Mgt."
 
     local procedure GetVATPercentageFromSetup(CleanCashSetup: Record "NPR CleanCash Setup"; Item: Record Item): Text
     var
-        VATPostingSetup: Record "VAT Posting Setup";
-        POSUnit: Record "NPR POS Unit";
         POSPostingProfile: Record "NPR POS Posting Profile";
         POSStore: Record "NPR POS Store";
+        POSUnit: Record "NPR POS Unit";
+        VATPostingSetup: Record "VAT Posting Setup";
     begin
         if not POSUnit.Get(CleanCashSetup.Register) then
             exit;
