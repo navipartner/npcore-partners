@@ -1,0 +1,23 @@
+Before starting balancing tests you need to have multiple currencies payment (EUR, USD, SEK and DKK)
+
+Please make sure you have layout with a name of Default as it will be used for fallback layout during cleanup.
+
+Please make sure you don't have any E2E Testing named layouts before starting the tests.
+
+Since we are using 3 workers to run tests you must create 4 users and assign them different POS units, add them in ENV file like this: 
+E2E_USER_0_USERNAME=TEST-USER
+E2E_USER_0_PASSWORD=Test-user-0
+
+E2E_USER_1_USERNAME=TEST-USER-1
+E2E_USER_1_PASSWORD=Test-user-1
+
+E2E_USER_2_USERNAME=TEST-USER-2
+E2E_USER_2_PASSWORD=Test-user-2
+
+For restaurant tests we need default user that has restaurant POS unit, with restaurant default view: 
+E2E_RESTAURANT_USERNAME=username
+E2E_RESTAURANT_PASSWORD=password
+
+Last user should not have layout selected so it can run old MPOS tests:
+E2E_OLD_MPOS_USERNAME=username
+E2E_OLD_MPOS_PASSWORD=password

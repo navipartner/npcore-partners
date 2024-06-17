@@ -1,0 +1,47 @@
+{
+    "location": {
+        "new": {
+            "id": "1234",
+            "name": "New Location"
+        },
+        "edited": {
+            "id": "5678",
+            "name": "Edited Location"
+        }
+    },
+    "element": {
+        "room": {
+            "roomNumber": "11",
+            "caption": "Room11"
+        },
+        "table": {
+            "tableNumber": "22",
+            "caption": "Table22",
+            "configure": {
+                "count": "4",
+                "minimum": "2",
+                "maximum": "6",
+                "round": "true",
+                "width": "2",
+                "height": "2",
+                "rotation": "45"
+            }
+        },
+        "wall": {
+            "wallNumber": "33",
+            "caption": "Wall33",
+            "configure": {
+                "width": "2",
+                "length": "4",
+                "rotation": "20"
+            }
+        },
+        "bar": {
+            "barNumber": "44",
+            "caption": "Bar44",
+            "configure": {
+                "rotation": "33"
+            }
+        }
+    }
+}
