@@ -161,6 +161,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATSCU.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATSCU.SystemId);
         ATSCU.TestField(Description);
         ATSCU.TestField("AT Organization Code");
         ATSCU.TestField("Created At", 0DT);
@@ -189,6 +190,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATSCU.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATSCU.SystemId);
         ATSCU.TestField("AT Organization Code");
         ATSCU.IsThereAnyOtherActiveSCUForThisOrganization();
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
@@ -219,6 +221,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATSCU.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATSCU.SystemId);
         ATSCU.TestField("AT Organization Code");
 
         case NewState of
@@ -312,6 +315,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATCashRegister.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATCashRegister.SystemId);
         ATCashRegister.TestField(Description);
         ATCashRegister.TestField("AT SCU Code");
         ATCashRegister.TestField("Created At", 0DT);
@@ -341,6 +345,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATCashRegister.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATCashRegister.SystemId);
         ATCashRegister.TestField("AT SCU Code");
         ATSCU.GetWithCheck(ATCashRegister."AT SCU Code");
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
@@ -371,6 +376,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATCashRegister.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATCashRegister.SystemId);
         ATCashRegister.TestField("AT SCU Code");
 
         case NewState of
@@ -470,8 +476,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo.SystemId);
         ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
         ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo."AT Cash Register Id");
         ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
 
@@ -498,10 +506,12 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         ATPOSAuditLogAuxInfo.TestField(Signed, false);
         ATPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo.SystemId);
         ATPOSAuditLogAuxInfo.TestField("POS Entry No.");
         ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
         ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
         ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo."AT Cash Register Id");
         ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
         ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
@@ -528,9 +538,11 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo.SystemId);
         ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
         ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
         ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo."AT Cash Register Id");
         ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
         ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
@@ -558,10 +570,12 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     begin
         ATPOSAuditLogAuxInfo.TestField(Signed, false);
         ATPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo.SystemId);
         ATPOSAuditLogAuxInfo.TestField("Audit Entry Type", ATPOSAuditLogAuxInfo."Audit Entry Type"::"Control Transaction");
         ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
         ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
         ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo."AT Cash Register Id");
         ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
         ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
@@ -588,6 +602,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATCashRegister.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATCashRegister.SystemId);
         ATCashRegister.TestField("AT SCU Code");
         ATSCU.Get(ATCashRegister."AT SCU Code");
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
@@ -624,9 +639,11 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATPOSAuditLogAuxInfo.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo.SystemId);
         ATPOSAuditLogAuxInfo.TestField("AT Organization Code");
         ATPOSAuditLogAuxInfo.TestField("AT SCU Code");
         ATPOSAuditLogAuxInfo.TestField("AT Cash Register Id");
+        CheckIsGUIDAccordingToUUIDv4Standard(ATPOSAuditLogAuxInfo."AT Cash Register Id");
         ATSCU.GetWithCheck(ATPOSAuditLogAuxInfo."AT SCU Code");
         ATOrganization.GetWithCheck(ATPOSAuditLogAuxInfo."AT Organization Code");
         ATFiscalizationSetup.GetWithCheck();
@@ -657,6 +674,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url: Text;
     begin
         ATCashRegister.TestField(SystemId);
+        CheckIsGUIDAccordingToUUIDv4Standard(ATCashRegister.SystemId);
         ATCashRegister.TestField("AT SCU Code");
         ATSCU.Get(ATCashRegister."AT SCU Code");
         ATOrganization.GetWithCheck(ATSCU."AT Organization Code");
@@ -1604,18 +1622,18 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATPOSAuditLogAuxInfo.Modify(true);
     end;
 
-    local procedure GetFONReceiptValididationStatus(State: Text): Enum "NPR AT FON Rcpt. Valid. Status"
+    local procedure GetFONReceiptValididationStatus(ValidationResult: Text): Enum "NPR AT FON Rcpt. Valid. Status"
     begin
-        if Enum::"NPR AT FON Rcpt. Valid. Status".Names().Contains(State) then
-            exit(Enum::"NPR AT FON Rcpt. Valid. Status".FromInteger(Enum::"NPR AT FON Rcpt. Valid. Status".Ordinals().Get(Enum::"NPR AT FON Rcpt. Valid. Status".Names().IndexOf(State))));
+        if Enum::"NPR AT FON Rcpt. Valid. Status".Names().Contains(ValidationResult) then
+            exit(Enum::"NPR AT FON Rcpt. Valid. Status".FromInteger(Enum::"NPR AT FON Rcpt. Valid. Status".Ordinals().Get(Enum::"NPR AT FON Rcpt. Valid. Status".Names().IndexOf(ValidationResult))));
 
         exit(Enum::"NPR AT FON Rcpt. Valid. Status"::" ");
     end;
 
-    local procedure GetReceiptType(State: Text): Enum "NPR AT Receipt Type"
+    local procedure GetReceiptType(ReceiptType: Text): Enum "NPR AT Receipt Type"
     begin
-        if Enum::"NPR AT Receipt Type".Names().Contains(State) then
-            exit(Enum::"NPR AT Receipt Type".FromInteger(Enum::"NPR AT Receipt Type".Ordinals().Get(Enum::"NPR AT Receipt Type".Names().IndexOf(State))));
+        if Enum::"NPR AT Receipt Type".Names().Contains(ReceiptType) then
+            exit(Enum::"NPR AT Receipt Type".FromInteger(Enum::"NPR AT Receipt Type".Ordinals().Get(Enum::"NPR AT Receipt Type".Names().IndexOf(ReceiptType))));
 
         exit(Enum::"NPR AT Receipt Type"::" ");
     end;
@@ -1764,6 +1782,22 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Duration := DateTime - OriginDateTime;
         DurationMs := Duration;
         exit((DurationMs / 1000) div 1);
+    end;
+
+    local procedure CheckIsGUIDAccordingToUUIDv4Standard(GUIDToCheck: Guid)
+    var
+#IF BC17
+        RegEx: Codeunit DotNet_Regex;
+#ELSE
+        Regex: Codeunit Regex;
+#ENDIF
+        UUIDv4StandardErr: Label 'GUID %1 is not according to UUIDv4 standard pattern.', Comment = '%1 - GUID value';
+        UUIDv4StandardPatternLbl: Label '[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}', Locked = true;
+        GUIDToCheckAsText: Text;
+    begin
+        GUIDToCheckAsText := Format(GUIDToCheck, 0, 4).ToLower();
+        if not Regex.IsMatch(GUIDToCheckAsText, UUIDv4StandardPatternLbl) then
+            Error(UUIDv4StandardErr, GUIDToCheck);
     end;
     #endregion
 
