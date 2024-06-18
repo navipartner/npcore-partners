@@ -7,11 +7,8 @@ codeunit 6184805 "NPR Spfy C&C Order Handler"
     trigger OnRun()
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        IntegrationNotEnabledErr: Label 'CC order integration area is not enabled.';
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Click And Collect") then
-            Error(IntegrationNotEnabledErr);
-
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Click And Collect");
         ProcessCCOrder(Rec);
     end;
 

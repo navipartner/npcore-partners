@@ -60,7 +60,7 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
     value(90; Shopify)
     {
         Caption = 'Shopify Integration', Locked = true, MaxLength = 50;
-        Implementation = "NPR Feature Management" = "NPR Shopify Integr. Feature";
+        Implementation = "NPR Feature Management" = "NPR Spfy Integration Feature";
     }
 #endif
 }

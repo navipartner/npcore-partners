@@ -40,6 +40,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     internal procedure CaptureShopifyPayment(var NcTask: Record "NPR Nc Task"; SaveToDb: Boolean)
     var
         PaymentLine: Record "NPR Magento Payment Line";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
         Success: Boolean;
     begin
@@ -49,7 +50,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         Success := false;
 
         if PrepareShopifyTransactionRequest(NcTask, 0) then
-            Success := SpfyIntegrationMgt.SendTransactionRequest(NcTask);
+            Success := SpfyCommunicationHandler.SendTransactionRequest(NcTask);
 
         if SaveToDb then begin
             if Success then begin
@@ -72,6 +73,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     internal procedure RefundShopifyPayment(var NcTask: Record "NPR Nc Task"; SaveToDb: Boolean)
     var
         PaymentLine: Record "NPR Magento Payment Line";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
         Success: Boolean;
     begin
@@ -81,7 +83,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         Success := false;
 
         if PrepareShopifyTransactionRequest(NcTask, 1) then
-            Success := SpfyIntegrationMgt.SendTransactionRequest(NcTask);
+            Success := SpfyCommunicationHandler.SendTransactionRequest(NcTask);
 
         if SaveToDb then begin
             if Success then begin
@@ -151,6 +153,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SalesInvHeader: Record "Sales Invoice Header";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
         JArray: JsonArray;
         JObject: JsonObject;
@@ -194,10 +197,10 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
         ClearLastError();
         if StopOnRequestError then begin
-            SpfyIntegrationMgt.GetShopifyOrderTransactions(NcTask, JObject);
+            SpfyCommunicationHandler.GetShopifyOrderTransactions(NcTask, JObject);
             Success := true;
         end else
-            Success := SpfyIntegrationMgt.TryGetShopifyOrderTransactions(NcTask, JObject);
+            Success := SpfyCommunicationHandler.TryGetShopifyOrderTransactions(NcTask, JObject);
         if Success then begin
             JObject.SelectToken('transactions', JToken);
             JArray := JToken.AsArray();

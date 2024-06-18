@@ -1,5 +1,5 @@
 #if not BC17
-codeunit 6184826 "NPR Shopify Integr. Feature" implements "NPR Feature Management"
+codeunit 6184826 "NPR Spfy Integration Feature" implements "NPR Feature Management"
 {
     Access = Internal;
 

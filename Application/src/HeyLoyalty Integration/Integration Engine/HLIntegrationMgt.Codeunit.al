@@ -4,8 +4,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
     SingleInstance = true;
 
     var
-        HLSetup: Record "NPR HL Integration Setup";
-        HLIntegrationEvents: Codeunit "NPR HL Integration Events";
+        _HLSetup: Record "NPR HL Integration Setup";
+        _HLIntegrationEvents: Codeunit "NPR HL Integration Events";
 
 #if Debug
     trigger OnRun()
@@ -180,12 +180,12 @@ codeunit 6059993 "NPR HL Integration Mgt."
         AuthSignature: Text;
         Hash: Text;
     begin
-        HLSetup.GetRecordOnce(false);
+        _HLSetup.GetRecordOnce(false);
         DateString := Format(CurrentDateTime, 0, 9);
 
-        Hash := CryptoMgt.GenerateHash(DateString, HLSetup."HeyLoyalty Api Secret", HashAlgorithmType::SHA256);
+        Hash := CryptoMgt.GenerateHash(DateString, _HLSetup."HeyLoyalty Api Secret", HashAlgorithmType::SHA256);
         Hash := Base64Convert.ToBase64(LowerCase(DelChr(Hash, '=', '-')), TextEnc::UTF8);
-        AuthSignature := Base64Convert.ToBase64(StrSubstNo('%1:%2', HLSetup."HeyLoyalty Api Key", Hash), TextEnc::UTF8);
+        AuthSignature := Base64Convert.ToBase64(StrSubstNo('%1:%2', _HLSetup."HeyLoyalty Api Key", Hash), TextEnc::UTF8);
         exit(AuthSignature);
     end;
 
@@ -207,19 +207,19 @@ codeunit 6059993 "NPR HL Integration Mgt."
 
     local procedure GetHLMemberListUrl(): Text
     begin
-        HLSetup.GetRecordOnce(false);
-        HLSetup.TestField("HeyLoyalty Api Url");
-        HLSetup.TestField("HeyLoyalty Member List Id");
-        exit(HLSetup."HeyLoyalty Api Url" + '/lists/' + HLSetup."HeyLoyalty Member List Id");
+        _HLSetup.GetRecordOnce(false);
+        _HLSetup.TestField("HeyLoyalty Api Url");
+        _HLSetup.TestField("HeyLoyalty Member List Id");
+        exit(_HLSetup."HeyLoyalty Api Url" + '/lists/' + _HLSetup."HeyLoyalty Member List Id");
     end;
 
     local procedure GetHeybookingUrl(var IntegrationID: Code[20]): Text
     begin
-        HLSetup.GetRecordOnce(false);
-        HLSetup.TestField("Heycommerce/Booking DB Api Url");
-        HLSetup.TestField("Heybooking Integration Id");
-        IntegrationID := HLSetup."Heybooking Integration Id";
-        exit(HLSetup."Heycommerce/Booking DB Api Url" + '/booking');
+        _HLSetup.GetRecordOnce(false);
+        _HLSetup.TestField("Heycommerce/Booking DB Api Url");
+        _HLSetup.TestField("Heybooking Integration Id");
+        IntegrationID := _HLSetup."Heybooking Integration Id";
+        exit(_HLSetup."Heycommerce/Booking DB Api Url" + '/booking');
     end;
 
     local procedure GetHLMembersUrl(): Text
@@ -250,7 +250,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
 
     procedure SetupTaskProcessingJobQueue()
     begin
-        Clear(HLSetup);
+        Clear(_HLSetup);
         SetupTaskProcessingJobQueue(IsEnabled(Enum::"NPR HL Integration Area"::Members));
     end;
 
@@ -343,20 +343,20 @@ codeunit 6059993 "NPR HL Integration Mgt."
         AreaIsEnabled: Boolean;
         Handled: Boolean;
     begin
-        HLIntegrationEvents.OnCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
+        _HLIntegrationEvents.OnCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
         if Handled then
             exit(AreaIsEnabled);
 
-        HLSetup.GetRecordOnce(false);
-        if not HLSetup."Enable Integration" then
+        _HLSetup.GetRecordOnce(false);
+        if not _HLSetup."Enable Integration" then
             exit(false);
         case IntegrationArea of
             IntegrationArea::" ":
-                exit(HLSetup."Enable Integration");
+                exit(_HLSetup."Enable Integration");
             IntegrationArea::Members:
-                exit(HLSetup."Member Integration");
+                exit(_HLSetup."Member Integration");
             IntegrationArea::Heybooking:
-                exit(HLSetup."Heybooking Integration Enabled");
+                exit(_HLSetup."Heybooking Integration Enabled");
         end;
     end;
 
@@ -365,7 +365,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         Handled: Boolean;
         TableIsIntegrated: Boolean;
     begin
-        HLIntegrationEvents.OnCheckIfIsIntegratedTable(IntegrationArea, TableId, TableIsIntegrated, Handled);
+        _HLIntegrationEvents.OnCheckIfIsIntegratedTable(IntegrationArea, TableId, TableIsIntegrated, Handled);
         if Handled then
             exit(TableIsIntegrated);
 
@@ -390,8 +390,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
     [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
     procedure IsInstantTaskEnqueue(): Boolean
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Instant Task Enqueue");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Instant Task Enqueue");
     end;
 
     [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
@@ -435,62 +435,62 @@ codeunit 6059993 "NPR HL Integration Mgt."
 
     procedure HLMembershipCodeFieldID(): Text[50]
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Membership HL Field ID");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Membership HL Field ID");
     end;
 
     procedure ReadWebhookPayloadEnabled(): Boolean
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Read Member Data from Webhook");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Read Member Data from Webhook");
     end;
 
     procedure UnsubscribeIfBlocked(): Boolean
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Unsubscribe if Blocked");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Unsubscribe if Blocked");
     end;
 
     procedure RequireGDPRApproval(): Boolean
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Require GDPR Approval");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Require GDPR Approval");
     end;
 
     procedure RequireNewsletterSubscr(): Boolean
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Require Newsletter Subscrip.");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Require Newsletter Subscrip.");
     end;
 
     procedure RequiredContactInfo(): Enum "NPR HL Required Contact Method"
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Required Contact Info");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Required Contact Info");
     end;
 
     procedure SendHeybookingErrToEmail(): Text
     begin
-        HLSetup.GetRecordOnce(false);
-        exit(HLSetup."Send Heybooking Err. to E-Mail");
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Send Heybooking Err. to E-Mail");
     end;
 
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
     begin
         if not AutoCreate then
-            if HLSetup.IsEmpty() then
+            if _HLSetup.IsEmpty() then
                 exit('');
 
-        HLSetup.GetRecordOnce(false);
-        if HLSetup."Data Processing Handler ID" = '' then begin
+        _HLSetup.GetRecordOnce(false);
+        if _HLSetup."Data Processing Handler ID" = '' then begin
             SelectLatestVersion();
-            HLSetup.GetRecordOnce(true);
-            if HLSetup."Data Processing Handler ID" = '' then begin
-                HLSetup.SetDataProcessingHandlerIDToDefaultValue();
-                HLSetup.Modify();
+            _HLSetup.GetRecordOnce(true);
+            if _HLSetup."Data Processing Handler ID" = '' then begin
+                _HLSetup.SetDataProcessingHandlerIDToDefaultValue();
+                _HLSetup.Modify();
             end;
         end;
-        exit(HLSetup."Data Processing Handler ID");
+        exit(_HLSetup."Data Processing Handler ID");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
@@ -546,4 +546,32 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
     end;
     #endregion
+
+#if not (BC17 or BC18)
+    #region clear configuration on company/environment copy
+    [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
+    local procedure SpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
+    begin
+        DisableIntegration(NewCompanyName);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure SpfyOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    begin
+        DisableIntegration(CompanyName);
+    end;
+
+    local procedure DisableIntegration(NewCompanyName: Text)
+    var
+        HLSetup: Record "NPR HL Integration Setup";
+    begin
+        if (NewCompanyName <> '') and (NewCompanyName <> CompanyName()) then
+            HLSetup.ChangeCompany(NewCompanyName);
+        if HLSetup.Get() and HLSetup."Enable Integration" then begin
+            HLSetup."Enable Integration" := false;
+            HLSetup.Modify();
+        end;
+    end;
+    #endregion
+#endif
 }

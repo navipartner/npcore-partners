@@ -32,6 +32,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure SendItem(var NcTask: Record "NPR Nc Task")
     var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ShopifyItemID: Text[30];
         Success: Boolean;
@@ -44,11 +45,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if PrepareItemUpdateRequest(NcTask, ShopifyItemID) then
             case NcTask.Type of
                 NcTask.Type::Insert:
-                    Success := SpfyIntegrationMgt.SendItemCreateRequest(NcTask, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendItemCreateRequest(NcTask, ShopifyResponse);
                 NcTask.Type::Modify:
-                    Success := SpfyIntegrationMgt.SendItemUpdateRequest(NcTask, ShopifyItemID, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendItemUpdateRequest(NcTask, ShopifyItemID, ShopifyResponse);
                 NcTask.Type::Delete:
-                    Success := SpfyIntegrationMgt.SendItemDeleteRequest(NcTask, ShopifyItemID);
+                    Success := SpfyCommunicationHandler.SendItemDeleteRequest(NcTask, ShopifyItemID);
             end;
         NcTask.Modify();
         Commit();
@@ -61,6 +62,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure SendItemVariant(var NcTask: Record "NPR Nc Task")
     var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         ShopifyItemID: Text[30];
         ShopifyVariantID: Text[30];
@@ -74,11 +76,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if PrepareItemVariantUpdateRequest(NcTask, ShopifyItemID, ShopifyVariantID) then
             case NcTask.Type of
                 NcTask.Type::Insert:
-                    Success := SpfyIntegrationMgt.SendItemVariantCreateRequest(NcTask, ShopifyItemID, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendItemVariantCreateRequest(NcTask, ShopifyItemID, ShopifyResponse);
                 NcTask.Type::Modify:
-                    Success := SpfyIntegrationMgt.SendItemVariantUpdateRequest(NcTask, ShopifyVariantID, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendItemVariantUpdateRequest(NcTask, ShopifyVariantID, ShopifyResponse);
                 NcTask.Type::Delete:
-                    Success := SpfyIntegrationMgt.SendItemVariantDeleteRequest(NcTask, ShopifyItemID, ShopifyVariantID);
+                    Success := SpfyCommunicationHandler.SendItemVariantDeleteRequest(NcTask, ShopifyItemID, ShopifyVariantID);
             end;
         NcTask.Modify();
         Commit();
@@ -94,6 +96,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         TempItemVariant: Record "Item Variant" temporary;
         TempNcTask: Record "NPR Nc Task" temporary;
         NcTaskOutput: Record "NPR Nc Task Output";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
         ShopifyInventoryItemID: Text[30];
         Success: Boolean;
@@ -119,7 +122,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     TempNcTask."Store Code" := NcTask."Store Code";
                     TempNcTask."Data Output" := NcTaskOutput.Data;
                     TempNcTask."Record Value" := CopyStr(NcTaskOutput.Name, 1, MaxStrLen(TempNcTask."Record Value"));
-                    if SpfyIntegrationMgt.SendInvetoryItemUpdateRequest(TempNcTask, ShopifyInventoryItemID) then
+                    if SpfyCommunicationHandler.SendInvetoryItemUpdateRequest(TempNcTask, ShopifyInventoryItemID) then
                         NcTaskOutput.Status := NcTaskOutput.Status::Success;
                     NcTaskOutput.Response := TempNcTask.Response;
                 end;
@@ -139,6 +142,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure SendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
     var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
@@ -147,7 +151,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         Success := false;
 
         if PrepareInventoryLevelUpdateRequest(NcTask) then
-            Success := SpfyIntegrationMgt.SendInvetoryLevelUpdateRequest(NcTask);
+            Success := SpfyCommunicationHandler.SendInvetoryLevelUpdateRequest(NcTask);
 
         NcTask.Modify();
         Commit();
@@ -673,6 +677,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     procedure SelectShopifyLocation(ShopifyStoreCode: Code[20]; var SelectedLocation: Text): Boolean
     var
         TempShopifyLocation: Record "NPR Spfy Location" temporary;
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ReceivedShopifyLocations: JsonArray;
         ReceivedShopifyLocation: JsonToken;
         ShopifyResponse: JsonToken;
@@ -680,7 +685,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     begin
         Window.Open(QueryingShopifyLbl);
         ClearLastError();
-        if not SpfyIntegrationMgt.GetShopifyLocations(ShopifyStoreCode, ShopifyResponse) then
+        if not SpfyCommunicationHandler.GetShopifyLocations(ShopifyStoreCode, ShopifyResponse) then
             Error(GetLastErrorText());
         ShopifyResponse.AsObject().Get('locations', ShopifyResponse);
         ReceivedShopifyLocations := ShopifyResponse.AsArray();
@@ -738,6 +743,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure TryGetShopifyVariantIDs(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; WithDialog: Boolean; var ShopifyItemID: Text[30]; var ShopifyVariantID: Text[30]; var ShopifyInventoryItemID: Text[30]): Boolean
     var
         TempNcTask: Record "NPR Nc Task" temporary;
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         OStream: OutStream;
         ShopifyResponse: JsonToken;
@@ -763,7 +769,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJson.WriteTo(OStream);
 
         ClearLastError();
-        Success := SpfyIntegrationMgt.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
         if Success then begin
             ReceivedShopifyID :=
                 JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''productVariants''].[''edges''][0].[''node''].[''product''].[''id'']', false);
@@ -788,7 +794,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     RequestJson.WriteTo(OStream);
 
                     ClearLastError();
-                    Success := SpfyIntegrationMgt.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
                     if Success then begin
                         ReceivedShopifyID :=
                             JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''products''].[''edges''][0].[''node''].[''id'']', false);

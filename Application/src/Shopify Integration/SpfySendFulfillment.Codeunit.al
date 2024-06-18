@@ -22,7 +22,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     local procedure SendShopifyFulfillment(var NcTask: Record "NPR Nc Task")
     var
         TempCalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
@@ -32,7 +32,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         Success := false;
 
         if PrepareFulfillment(NcTask, TempCalculatedFulfillmentLines) then
-            Success := SpfyIntegrationMgt.SendFulfillmentRequest(NcTask);
+            Success := SpfyCommunicationHandler.SendFulfillmentRequest(NcTask);
         if Success then
             SaveFulfillmentEntries(TempCalculatedFulfillmentLines);
 
@@ -48,7 +48,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         FulfillmentOrder: JsonToken;
         FulfillmentOrderLine: JsonToken;
         FulfillmentOrderLines: JsonToken;
@@ -62,7 +62,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             NcTask."Store Code" :=
                 CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
 #pragma warning disable AA0139
-        SpfyIntegrationMgt.GetShopifyOrderFulfillmentOrders(NcTask."Store Code", NcTask."Record Value", ShopifyResponse);
+        SpfyCommunicationHandler.GetShopifyOrderFulfillmentOrders(NcTask."Store Code", NcTask."Record Value", ShopifyResponse);
 #pragma warning restore AA0139
         ShopifyResponse.AsObject().Get('fulfillment_orders', ShopifyResponse);
         foreach FulfillmentOrder in ShopifyResponse.AsArray() do
