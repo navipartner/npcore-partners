@@ -16,7 +16,6 @@
         NOT_SAME_MEMBER: Label 'All request lines need to have the same member number.';
         MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
         MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Reference for setup.';
-        WELCOME: Label 'Welcome %1.';
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
 
     procedure ValidateMemberAssignedTickets(Token: Text[100]; FailWithError: Boolean) Success: Boolean
@@ -316,7 +315,7 @@
         end;
     end;
 
-    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; ShowWelcomeMessage: Boolean)
+    internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         TicketManagement: Codeunit "NPR TM Ticket Management";
@@ -332,6 +331,7 @@
         TicketIsReused: Boolean;
         ErrorReason: Text;
         ExternalItemNo: Code[50];
+    // WELCOME: Label 'Welcome %1.';
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -352,9 +352,6 @@
             TicketToPrint.Get(TicketNo);
             TicketToPrint.SetRecFilter();
         end;
-
-        if (ShowWelcomeMessage) then
-            Message(WELCOME, Member."Display Name");
 
         if (TicketToPrint.GetFilters() <> '') then begin
             MembershipSetup.Get(Membership."Membership Code");

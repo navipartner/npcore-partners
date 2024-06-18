@@ -115,12 +115,12 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         exit(ChooseMemberCardViaMemberSearchUI(ExtMemberCardNo));
     end;
 
-    internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
+    internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; var MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean)
     begin
         GetMembershipFromCardNumberWithUI(InputMethod, ExternalMemberCardNo, Membership, MemberCard, WithActivate, '');
     end;
 
-    internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean; ForeignCommunityCode: Code[20])
+    internal procedure GetMembershipFromCardNumberWithUI(InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT; var ExternalMemberCardNo: Text[100]; var Membership: Record "NPR MM Membership"; var MemberCard: Record "NPR MM Member Card"; WithActivate: Boolean; ForeignCommunityCode: Code[20])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
@@ -186,7 +186,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
-    procedure POSMemberArrival(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20])
+    procedure POSMemberArrival(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]) MemberCardEntryNo: Integer
     var
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -207,6 +207,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         PlaceHolderLbl: Label '%1/%2', Locked = true;
     begin
         GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true, ForeignCommunityCode);
+        MemberCardEntryNo := MemberCard."Entry No.";
 
         MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, '', 'POS', LogEntryNo, ResponseMessage, ResponseCode);
         Commit(); // so log entry stays
@@ -305,7 +306,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         end;
     end;
 
-    local procedure UpdatePOSSalesInfo(var SaleLinePOS: Record "NPR POS Sale Line"; MembershipEntryNo: Integer; MemberEntryNo: Integer; MembercardEntryNo: Integer; ScannedCardData: Text[200])
+    local procedure UpdatePOSSalesInfo(var SaleLinePOS: Record "NPR POS Sale Line"; MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; ScannedCardData: Text[200])
     var
         POSSalesInfo: Record "NPR MM POS Sales Info";
     begin
@@ -319,16 +320,15 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         POSSalesInfo.Init();
         POSSalesInfo."Membership Entry No." := MembershipEntryNo;
         POSSalesInfo."Member Entry No." := MemberEntryNo;
-        POSSalesInfo."Member Card Entry No." := MembercardEntryNo;
+        POSSalesInfo."Member Card Entry No." := MemberCardEntryNo;
         POSSalesInfo."Scanned Card Data" := ScannedCardData;
         POSSalesInfo.Modify();
-
     end;
 
-    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]; SelectReq: Boolean) MembershipEntryNo: Integer
+    procedure SelectMembership(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]; SelectReq: Boolean) MemberCardEntryNo: Integer
     var
-        MemberCard: Record "NPR MM Member Card";
-        Membership: Record "NPR MM Membership";
+        MemberCardOut: Record "NPR MM Member Card";
+        MembershipOut: Record "NPR MM Membership";
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
@@ -361,7 +361,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
                     POSMemberCardEdit.LookupMode(true);
                     ClearLastError();
                     if (POSMemberCardEdit.RunModal() = Action::LookupOK) then
-                        MembershipSelected := AssignPOSMember(SalePOS, ExtMemberNo);
+                        MembershipSelected := AssignPOSMember(SalePOS, ExtMemberNo, MemberCardOut);
                 end;
 
                 if (not MembershipSelected) then begin
@@ -372,21 +372,20 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
             until (MembershipSelected);
 
         end else begin
-            GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, true, ForeignCommunityCode);
+            GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, MembershipOut, MemberCardOut, true, ForeignCommunityCode);
 
-            if (AssignMembershipToPOSWorker(SalePOS, Membership."Entry No.", ExternalMemberCardNo)) then begin
+            if (AssignMembershipToPOSWorker(SalePOS, MembershipOut."Entry No.", ExternalMemberCardNo)) then begin
                 POSSale.Refresh(SalePOS);
                 POSSale.Modify(false, false);
             end;
 
-            exit(Membership."Entry No.");
+            exit(MemberCardOut."Entry No.");
         end;
     end;
 
-    local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]): Boolean
+    local procedure AssignPOSMember(var SalePOS: Record "NPR POS Sale"; var ExternalMemberNo: Code[20]; var MemberCard: Record "NPR MM Member Card"): Boolean
     var
         Membership: Record "NPR MM Membership";
-        MemberCard: Record "NPR MM Member Card";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberEntryNo: Integer;
         ExternalMemberCardNo: Text[100];

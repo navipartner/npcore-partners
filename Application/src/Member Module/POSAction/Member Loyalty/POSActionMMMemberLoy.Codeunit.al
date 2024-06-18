@@ -15,6 +15,8 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
         FunctionOptionString_CptLbl: Label 'Select Membership,View Points,Redeem Points,Available Coupons,Select Membership (EAN Box)';
         LoyaltyWindowTitle: Label '%1 - Membership Loyalty.';
         MemberCardPrompt: Label 'Member Card No.';
+        ToastMessageCaption: Label 'Toast Message Timer';
+        ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -26,6 +28,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
                                         FunctionOptionString_CptLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefInput_CptLbl, ParamDefInput_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('LoyaltyWindowTitle', LoyaltyWindowTitle);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
     end;
@@ -48,7 +51,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMMMemberLoy.js###
-'let main=async({workflow:e,context:r,parameters:n,popup:l,captions:o})=>{await e.respond("OnBeforeWorkflow");var m=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"],t=n.Function.toInt();t<0&&(t=0),n.DefaultInputValue.length>0&&(r.show_dialog=!1);let u=o.LoyaltyWindowTitle.substitute(m[t]),a="";if(r.show_dialog&&(a=await l.input({caption:o.MemberCardPrompt,title:u}),a===null))return;let i=await e.respond("do_work",{membercard_number:a});i.workflowName!=""&&await e.run(i.workflowName,{parameters:i.parameters})};'
+'let main=async({workflow:i,context:r,parameters:a,popup:l,captions:m})=>{await i.respond("OnBeforeWorkflow");var s=["Select Membership","View Points","Redeem Points","Available Coupons","Select Membership (EAN Box)"],n=a.Function.toInt();n<0&&(n=0),a.DefaultInputValue.length>0&&(r.show_dialog=!1);let d=m.LoyaltyWindowTitle.substitute(s[n]),t="";if(r.show_dialog&&(t=await l.input({caption:m.MemberCardPrompt,title:d}),t===null))return;let e=await i.respond("do_work",{membercard_number:t});const o=a.ToastMessageTimer!==null&&a.ToastMessageTimer!==void 0&&a.ToastMessageTimer!==0?a.ToastMessageTimer:15;e.MemberScanned&&o>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,hideAfter:o,memberExpiry:e.MemberScanned.ExpiryDate}),e.workflowName!=""&&await i.run(e.workflowName,{parameters:e.parameters})};'
         )
     end;
 
@@ -99,7 +102,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
 
         case FunctionId of
             0:
-                BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
+                Response := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
             1:
                 BusinessLogic.ViewPoints(MemberCardNumber, ForeignCommunityCode);
             2:
@@ -107,12 +110,13 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
             3:
                 BusinessLogic.SelectAvailableCoupon(Context, FrontEnd, MemberCardNumber, ForeignCommunityCode, ActionContext);
             4:
-                BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
+                Response := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
 
         end;
         HandleWorkflowResponse(Response, ActionContext);
         exit(Response);
     end;
+
 
     internal procedure HandleWorkflowResponse(var Response: JsonObject; ActionContextIn: JsonObject): Boolean
     var
