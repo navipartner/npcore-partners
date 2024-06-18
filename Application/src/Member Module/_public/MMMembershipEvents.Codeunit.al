@@ -176,4 +176,9 @@
     internal procedure OnGetMembershipMembers_OnBeforeTempMemberInfoResponseInsert(var TempMemberInfoResponse: Record "NPR MM Member Info Capture")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddMemberScannedToastData(MembershipEntryNo: Integer; MemberEntryNo: Integer; var MemberScannedData: JsonObject)
+    begin
+    end;
 }

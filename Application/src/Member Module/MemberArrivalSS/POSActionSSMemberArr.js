@@ -4,10 +4,21 @@ let main = async ({workflow, popup, captions,parameters}) => {
         if (result === null) {
             return(" ");
         }
-        await workflow.respond("MemberArrival", {membercard_number: result});
+        memberCardDetails = await workflow.respond("MemberArrival", {membercard_number: result});
     }
     else
     {
-        await workflow.respond("MemberArrival");  
+        memberCardDetails = await workflow.respond("MemberArrival");  
+    }
+
+    const hideAfter = parameters.ToastMessageTimer !== null && parameters.ToastMessageTimer !== undefined && parameters.ToastMessageTimer !== 0 ? parameters.ToastMessageTimer : 15;
+    if (memberCardDetails.MemberScanned && hideAfter > 0) {
+        toast.memberScanned({
+            memberImg: memberCardDetails.MemberScanned.ImageDataUrl,
+            memberName: memberCardDetails.MemberScanned.Name,
+            validForAdmission: memberCardDetails.MemberScanned.Valid,
+            hideAfter: hideAfter,
+            memberExpiry: memberCardDetails.MemberScanned.ExpiryDate
+        })
     }
 };

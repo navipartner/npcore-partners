@@ -130,12 +130,14 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
             SetActionContent(ActionContext, POSAction);
     end;
 
-    procedure SetCustomer(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20])
+    procedure SetCustomer(MemberCardNumber: Text[100]; ForeignCommunityCode: Code[20]) Response: JsonObject
     var
         POSActionMemberMgt: Codeunit "NPR POS Action Member MgtWF3-B";
         POSSale: Codeunit "NPR POS Sale";
+        MemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         POSSession: Codeunit "NPR POS Session";
         SalePOS: Record "NPR POS Sale";
+        MemberCardEntryNo: Integer;
     begin
 
         POSSession.GetSale(POSSale);
@@ -143,9 +145,12 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
         SalePOS.Find();
         POSSale.Refresh(SalePOS);
 
-        if (SalePOS."Customer No." = '') then
-            if (POSActionMemberMgt.SelectMembership(2, MemberCardNumber, ForeignCommunityCode, false)) = 0 then
-                exit;
+        if (SalePOS."Customer No." <> '') then
+            exit;
+
+        MemberCardEntryNo := POSActionMemberMgt.SelectMembership(2, MemberCardNumber, ForeignCommunityCode, false);
+        MemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 1, Response);
+
     end;
 
     local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]; ForeignCommunityCode: Code[20]): Boolean

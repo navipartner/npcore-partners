@@ -18,13 +18,14 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         ParamAdmissionCode_DescLbl: Label 'Specifies the Admission Code';
         ParamDefaultInputValue_CptLbl: Label 'Default Input Value';
         ParamDefaultInputValue_DescLbl: Label 'Specifies the Default Input Value';
-        ParamSuppressWelcomeMessage_CptLbl: Label 'Suppress Welcome Message';
-        ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
         ParamPOSWorkflow_DefaultValue, ParamDialogPrompt_DefaultValue : Text[250];
         ParamForeignCommunity_CptLbl: Label 'Foreign Community Code';
         ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
+        ToastMessageCaption: Label 'Toast Message Timer';
+        ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
+
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -45,8 +46,8 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
                                 ParamPOSWorkflow_OptCptLbl);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInputValue_CptLbl, ParamDefaultInputValue_DescLbl);
-        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
     end;
@@ -55,25 +56,24 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
     begin
         case Step of
             'MemberArrival':
-                SetMemberArrival(Context, Setup);
+                FrontEnd.WorkflowResponse(SetMemberArrival(Context, Setup));
         end;
     end;
 
-    local procedure SetMemberArrival(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
+    local procedure SetMemberArrival(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         MemberCardNumber: Text[100];
+        MemberCardEntryNo: Integer;
         DialogPrompt: Integer;
         DialogMethodType: Option;
         POSWorkflowType: Option;
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
-        ShowWelcomeMessage: Boolean;
         POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
         ForeignCommunityCode: Code[20];
     begin
-        ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
         DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
         ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
@@ -107,7 +107,8 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
 
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
-        POSActionMemberArrival.MemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup, ForeignCommunityCode);
+        MemberCardEntryNo := POSActionMemberArrival.MemberArrival(DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup, ForeignCommunityCode);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
@@ -127,6 +128,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
             EanBoxEvent.Insert(true);
         end;
     end;
+
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
     local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
@@ -173,11 +175,12 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         exit(Format(Enum::"NPR POS Workflow"::MM_MEMBER_ARRIVAL));
     end;
 
+
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionMMMemberArr.js###
-'let main=async({workflow:l,popup:r,captions:t,parameters:e})=>{if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let a=await r.input({caption:t.MemberCardPrompt,title:t.MembershipTitle,value:e.DefaultInputValue});if(a===null)return" ";await l.respond("MemberArrival",{membercard_number:a})}else await l.respond("MemberArrival")};'
+'let main=async({workflow:i,popup:t,captions:m,parameters:e})=>{let a;debugger;if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let r=await t.input({caption:m.MemberCardPrompt,title:m.MembershipTitle,value:e.DefaultInputValue});if(r===null)return" ";a=await i.respond("MemberArrival",{membercard_number:r})}else a=await i.respond("MemberArrival");const n=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;a.MemberScanned&&n>0&&toast.memberScanned({memberImg:a.MemberScanned.ImageDataUrl,memberName:a.MemberScanned.Name,validForAdmission:a.MemberScanned.Valid,hideAfter:n,memberExpiry:a.MemberScanned.ExpiryDate})};'
         );
     end;
 }

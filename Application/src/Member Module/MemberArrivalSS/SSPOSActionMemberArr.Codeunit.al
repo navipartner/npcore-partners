@@ -17,11 +17,11 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
         ParamAdmissionCode_DescLbl: Label 'Specifies the Admission Code';
         ParamDefaultInputValue_CptLbl: Label 'Default Input Value';
         ParamDefaultInputValue_DescLbl: Label 'Specifies the Default Input Value';
-        ParamSuppressWelcomeMessage_CptLbl: Label 'Suppress Welcome Message';
-        ParamSuppressWelcomeMessage_DescLbl: Label 'Specifies if welcome message will be shown';
         MemberCardPrompt: Label 'Enter Member Card Number';
         MembershipTitle: Label 'Member Arrival - Membership Management.';
         ParamPOSWorkflow_DefaultValue, ParamDialogPrompt_DefaultValue : Text[250];
+        ToastMessageCaption: Label 'Toast Message Timer';
+        ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -41,7 +41,7 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
                                 ParamPOSWorkflow_OptCptLbl);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', ParamAdmissionCode_CptLbl, ParamAdmissionCode_DescLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInputValue_CptLbl, ParamDefaultInputValue_DescLbl);
-        WorkflowConfig.AddBooleanParameter('SuppressWelcomeMessage', false, ParamSuppressWelcomeMessage_CptLbl, ParamSuppressWelcomeMessage_DescLbl);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', -1, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPrompt);
         WorkflowConfig.AddLabel('MembershipTitle', MembershipTitle);
         WorkflowConfig.SetWorkflowTypeUnattended();
@@ -51,24 +51,24 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
     begin
         case Step of
             'MemberArrival':
-                SetMemberArrival(Context, Setup);
+                FrontEnd.WorkflowResponse(SetMemberArrival(Context, Setup));
         end;
     end;
 
-    local procedure SetMemberArrival(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup")
+    local procedure SetMemberArrival(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         MemberCardNumber: Text[100];
+        MemberCardEntryNo: Integer;
         DialogPrompt: Integer;
         DialogMethodType: Option;
         POSWorkflowType: Option;
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
-        ShowWelcomeMessage: Boolean;
         POSActionSSMemberArrival: Codeunit "NPR POS Action SS: MemberArr.B";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
     begin
-        ShowWelcomeMessage := not (Context.GetBooleanParameter('SuppressWelcomeMessage'));
         DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
         DialogPrompt := Context.GetIntegerParameter('DialogPrompt');
 
@@ -102,17 +102,18 @@ codeunit 6151535 "NPR SS POS Action: Member Arr." implements "NPR IPOS Workflow"
 
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
-        if ((MemberCardNumber = '') and (DialogMethodType <> DialogMethod::FACIAL_RECOGNITION)) then
+        if (MemberCardNumber = '') then
             Error('Member Card Number is required for Member Arrival.');
 
-        POSActionSSMemberArrival.SetMemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
+        MemberCardEntryNo := POSActionSSMemberArrival.SetMemberArrival(DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionSSMemberArr.js###
-'let main=async({workflow:l,popup:r,captions:t,parameters:e})=>{if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let a=await r.input({caption:t.MemberCardPrompt,title:t.MembershipTitle,value:e.DefaultInputValue});if(a===null)return" ";await l.respond("MemberArrival",{membercard_number:a})}else await l.respond("MemberArrival")};'
+'let main=async({workflow:a,popup:t,captions:m,parameters:e})=>{if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let i=await t.input({caption:m.MemberCardPrompt,title:m.MembershipTitle,value:e.DefaultInputValue});if(i===null)return" ";memberCardDetails=await a.respond("MemberArrival",{membercard_number:i})}else memberCardDetails=await a.respond("MemberArrival");const r=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;memberCardDetails.MemberScanned&&r>0&&toast.memberScanned({memberImg:memberCardDetails.MemberScanned.ImageDataUrl,memberName:memberCardDetails.MemberScanned.Name,validForAdmission:memberCardDetails.MemberScanned.Valid,hideAfter:r,memberExpiry:memberCardDetails.MemberScanned.ExpiryDate})};'
         );
     end;
 }

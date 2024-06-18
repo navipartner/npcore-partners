@@ -1,4 +1,4 @@
-let main = async ({workflow, context, popup, captions,parameters}) => {
+let main = async ({workflow, context, popup, captions, parameters}) => {
     if (parameters.Function < 0) {
         parameters.Function = parameters.Function["Member Arrival"];
     };
@@ -18,15 +18,14 @@ let main = async ({workflow, context, popup, captions,parameters}) => {
 
     // If function is one of the membership alteration actions, fetch the options and prompt teller to choose 
     if (parameters.Function >= parameters.Function["Regret Membership Entry"] && parameters.Function <= parameters.Function["Cancel Membership"] ) {
-        let lookupProperties = JSON.parse(await workflow.respond("GetMembershipAlterationLookup"));
+        let lookupProperties = await workflow.respond("GetMembershipAlterationLookup");
         context.memberCardInput = lookupProperties.cardnumber;
-        let lookupDataArray = JSON.parse(lookupProperties.data);
-        if (lookupDataArray.length == 0) {
+        if (lookupProperties.data?.length == 0) {
             await popup.error ({title: captions.windowTitle, caption: lookupProperties.notFoundMessage});
             return;
         }
 
-        let driver = data.createArrayDriver(lookupDataArray);
+        let driver = data.createArrayDriver(lookupProperties.data);
         let source = data.createDataSource(driver);
         source.loadAll = false;
         let result = await popup.lookup({
@@ -34,7 +33,7 @@ let main = async ({workflow, context, popup, captions,parameters}) => {
             configuration: {
                 className: "custom-lookup", 
                 styleSheet: "", 
-                layout: JSON.parse(lookupProperties.layout), 
+                layout: lookupProperties.layout, 
                 result: rows => rows ? rows.map (row => row ? row.itemno : null) : null
             }, 
             source: source
@@ -46,12 +45,33 @@ let main = async ({workflow, context, popup, captions,parameters}) => {
         context.itemNumber = result[0].itemno;
     }
 
+ 
     // Process the main request
     let membershipResponse = await workflow.respond ("DoManageMembership");
+
     if (parameters.Function == parameters.Function["View Membership Entry"]) {
-        let membershipEntries = JSON.parse (membershipResponse);
-        let driver = data.createArrayDriver(JSON.parse(membershipEntries.data));
+        let driver = data.createArrayDriver(membershipResponse.data);
         let source = data.createDataSource(driver);
-        let result = await popup.lookup({title: membershipEntries.title, configuration: {className: "custom-lookup", styleSheet: "", layout: JSON.parse(membershipEntries.layout)}, source: source});
+        let result = await popup.lookup({
+            title: membershipResponse.title, 
+            configuration: {
+                className: "custom-lookup", 
+                styleSheet: "", 
+                layout: membershipResponse.layout}, 
+            source: source
+        });
     }
+
+    debugger;
+    const hideAfter = parameters.ToastMessageTimer !== null && parameters.ToastMessageTimer !== undefined && parameters.ToastMessageTimer !== 0 ? parameters.ToastMessageTimer : 15;
+    if (membershipResponse.MemberScanned && hideAfter > 0) {
+        toast.memberScanned({
+            memberImg: membershipResponse.MemberScanned.ImageDataUrl,
+            memberName: membershipResponse.MemberScanned.Name,
+            validForAdmission: membershipResponse.MemberScanned.Valid,
+            hideAfter: hideAfter,
+            memberExpiry: membershipResponse.MemberScanned.ExpiryDate
+        });
+    }
+
 }

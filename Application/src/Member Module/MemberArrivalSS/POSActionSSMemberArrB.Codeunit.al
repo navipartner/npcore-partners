@@ -2,16 +2,15 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
 {
     Access = Internal;
 
-    procedure SetMemberArrival(ShowWelcomeMessage: Boolean; DefaultInputValue: Text; DialogMethodType: Option; POSWorkflowType: Option; MemberCardNumber: Text[100]; AdmissionCode: Code[20]; Setup: Codeunit "NPR POS Setup")
+    internal procedure SetMemberArrival(DefaultInputValue: Text; DialogMethodType: Option; POSWorkflowType: Option; MemberCardNumber: Text[100]; AdmissionCode: Code[20]; Setup: Codeunit "NPR POS Setup") MemberCardEntryNo: Integer
     begin
-
         if (DefaultInputValue <> '') then
             MemberCardNumber := CopyStr(DefaultInputValue, 1, MaxStrLen(MemberCardNumber));
 
-        MemberArrival(DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, ShowWelcomeMessage, Setup);
+        exit(MemberArrival(DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup));
     end;
 
-    local procedure MemberArrival(InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ShowWelcomeMessage: Boolean; POSSetup: Codeunit "NPR POS Setup")
+    local procedure MemberArrival(InputMethod: Option; POSWorkflowType: Option; ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; POSSetup: Codeunit "NPR POS Setup") MemberCardEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
@@ -28,21 +27,19 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
         ResponseCode: Integer;
         ResponseMessage: Text;
         Token: Text[100];
-        DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
         PosUnitNo: Code[10];
     begin
 
-        if (InputMethod = DialogMethod::NO_PROMPT) and (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI(ExternalMemberCardNo)) then
-                Error(MEMBER_REQUIRED);
+        if (ExternalMemberCardNo = '') then
+            Error(MEMBER_REQUIRED);
 
         PosUnitNo := POSSetup.GetPOSUnitNo();
 
         case POSWorkflowType of
             POSWorkflowMethod::POS:
-                POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo, '');
+                MemberCardEntryNo := POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo, '');
             POSWorkflowMethod::Automatic,
             POSWorkflowMethod::GuestCheckIn:
                 begin
@@ -57,17 +54,18 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
                         Error(ResponseMessage);
 
                     MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo));
+                    MemberCardEntryNo := MemberCard."Entry No.";
                     Membership.Get(MemberCard."Membership Entry No.");
                     MembershipSetup.Get(Membership."Membership Code");
 
                     MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, MemberCard."Membership Entry No.", MemberCard."Member Entry No.", MemberCard."Entry No.", ExternalMemberCardNo);
 
                     if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ShowWelcomeMessage);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo);
 
                     if (POSWorkflowType = POSWorkflowMethod::GuestCheckIn) then begin
                         MemberTicketManager.PromptForMemberGuestArrival(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, Token);
-                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ShowWelcomeMessage);
+                        MemberTicketManager.MemberFastCheckIn(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo);
                     end;
 
                     MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
@@ -75,18 +73,6 @@ codeunit 6151536 "NPR POS Action SS: MemberArr.B"
 
                 end;
         end;
-    end;
-
-    local procedure SelectMemberCardUI(var ExtMemberCardNo: Text[100]): Boolean
-    var
-        MemberCard: Record "NPR MM Member Card";
-    begin
-
-        if (ACTION::LookupOK <> PAGE.RunModal(0, MemberCard)) then
-            exit(false);
-
-        ExtMemberCardNo := MemberCard."External Card No.";
-        exit(ExtMemberCardNo <> '');
     end;
 
 }

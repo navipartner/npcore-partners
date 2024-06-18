@@ -4,7 +4,6 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     var functionInt = parameters.Function.toInt();
 
     if (functionInt < 0) { functionInt = 0; };
-    
     if (parameters.DefaultInputValue.length > 0) { context.show_dialog = false; };
     
     let windowTitle = captions.LoyaltyWindowTitle.substitute(optionNames[functionInt]);
@@ -16,6 +15,18 @@ let main = async ({ workflow, context, parameters, popup, captions }) => {
     };
     
     let result = await workflow.respond("do_work", { membercard_number: membercard_number });
+
+    const hideAfter = parameters.ToastMessageTimer !== null && parameters.ToastMessageTimer !== undefined && parameters.ToastMessageTimer !== 0 ? parameters.ToastMessageTimer : 15;
+    if (result.MemberScanned && hideAfter > 0) {
+        toast.memberScanned({
+            memberImg: result.MemberScanned.ImageDataUrl,
+            memberName: result.MemberScanned.Name,
+            validForAdmission: result.MemberScanned.Valid,
+            hideAfter: hideAfter,
+            memberExpiry: result.MemberScanned.ExpiryDate
+       })
+    }
+
     if (result.workflowName == "") {
         return;
     }
