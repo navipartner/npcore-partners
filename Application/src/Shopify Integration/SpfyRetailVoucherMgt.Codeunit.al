@@ -330,10 +330,8 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         NothingToDoErr: Label 'There is nothing to do (there are no retail vouchers in the system to be sent to Shopify Store ''%1'').';
         StoreIntegrNotEnabledErr: Label 'Integration must be enabled for Shopify Store ''%1''.';
         StoreNotSelectedErr: Label 'You must select a Shopify Store Code.';
-        VoucherIntegrNotEnabledErr: Label 'Retail Voucher Integration must be enabled.';
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers") then
-            Error(VoucherIntegrNotEnabledErr);
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
         if ShopifyStore.Count() <> 1 then
             Error(StoreNotSelectedErr);
         ShopifyStore.FindFirst();

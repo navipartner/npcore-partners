@@ -12,10 +12,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         StartedAt: DateTime;
         CancelledOrderProcessingEnabled: Boolean;
         ClosedOrderProcessingEnabled: Boolean;
-        IntegrationIsNotEnabledErr: Label 'Sales Order integration is not enabled. Please enable it in Shopify Integration Setup, or disable this Job Queue Entry.';
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders") then
-            Error(IntegrationIsNotEnabledErr);
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Sales Orders");
         CancelledOrderProcessingEnabled := SpfyIntegrationMgt.ProcessCancelledOrders();
         ClosedOrderProcessingEnabled := SpfyIntegrationMgt.ProcessFinishedOrders();
 
@@ -46,6 +44,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     local procedure DownloadOrders(ShopifyStore: Record "NPR Spfy Store"; OrderStatus: Option Open,Closed,Cancelled)
     var
         ImportType: Record "NPR Nc Import Type";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         Orders: JsonArray;
         Link: Text;
         NextLink: Text;
@@ -63,7 +62,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end;
 
         repeat
-            if SpfyIntegrationMgt.TryDownloadOrders(ShopifyStore.Code, Link, ShopifyStore."Last Orders Imported At" - 600 * 1000, Limit, SelectStr(OrderStatus + 1, OrderStatusesTxt), Orders, NextLink) then begin
+            if SpfyCommunicationHandler.TryDownloadOrders(ShopifyStore.Code, Link, ShopifyStore."Last Orders Imported At" - 600 * 1000, Limit, SelectStr(OrderStatus + 1, OrderStatusesTxt), Orders, NextLink) then begin
                 SaveOrders(ShopifyStore, Orders, OrderStatus, ImportType);
                 Link := NextLink;
             end else
