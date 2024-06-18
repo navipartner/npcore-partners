@@ -260,24 +260,21 @@
                     Image = Transactions;
                     action("Transfer Item")
                     {
-                        Caption = 'Transfer Item';
+                        Caption = 'Transfer Items (Selection)';
                         Image = TransferToLines;
 
-                        ToolTip = 'Executes the Transfer Item action';
+                        ToolTip = 'Executes the Transfer Items (Selection) action';
                         ApplicationArea = NPRRetail;
 
                         trigger OnAction()
                         var
-                            UnitPriceErr: Label 'Item no. %1 does not have any salesprice.', Comment = '%1 = Item no.';
+                            Item: Record Item;
                             ItemList: Page "Item List";
                         begin
                             ItemList.LookupMode := true;
                             if (ItemList.RunModal() = ACTION::LookupOK) then begin
-                                ItemList.GetRecord(Item);
-                                if Item."Unit Price" = 0 then
-                                    Error(UnitPriceErr, Item."No.");
-                                Item.SetRange("No.", Item."No.");
-                                TransferToPeriod();
+                                ItemList.SetSelection(Item);
+                                TransferToPeriod(Item);
                             end;
                         end;
                     }
@@ -291,17 +288,17 @@
 
                         trigger OnAction()
                         var
+                            Item: Record Item;
                             ItemCategory: Record "Item Category";
                             ItemCategories: Page "Item Categories";
                         begin
                             Clear(ItemCategories);
                             ItemCategories.LookupMode := true;
                             if ItemCategories.RunModal() = ACTION::LookupOK then begin
-                                Item.Reset();
                                 ItemCategories.GetRecord(ItemCategory);
                                 Item.SetRange("Item Category Code", ItemCategory.Code);
                                 Item.SetFilter("Unit Price", '<>0');
-                                TransferToPeriod();
+                                TransferToPeriod(Item);
                             end;
                         end;
                     }
@@ -315,16 +312,16 @@
 
                         trigger OnAction()
                         var
+                            Item: Record Item;
                             Vendor: Record Vendor;
                             VendorList: Page "Vendor List";
                         begin
                             VendorList.LookupMode := true;
                             if (VendorList.RunModal() = ACTION::LookupOK) then begin
                                 VendorList.GetRecord(Vendor);
-                                Item.Reset();
                                 Item.SetRange("Vendor No.", Vendor."No.");
                                 Item.SetFilter("Unit Price", '<>0');
-                                TransferToPeriod();
+                                TransferToPeriod(Item);
                             end;
                         end;
                     }
@@ -397,12 +394,12 @@
 
                         trigger OnAction()
                         var
+                            Item: Record Item;
                             TransferItemsQst: Label 'Do you wish to transfer all items to this period?';
                         begin
-                            Item.Reset();
                             Item.SetFilter("Unit Price", '<>0');
                             if Confirm(TransferItemsQst, false) then
-                                TransferToPeriod();
+                                TransferToPeriod(Item);
                         end;
                     }
                 }
@@ -487,49 +484,72 @@
         }
     }
 
-    var
-        Item: Record Item;
-
-    internal procedure TransferToPeriod()
+    internal procedure TransferToPeriod(var Item: Record Item)
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
         InputDialog: Page "NPR Input Dialog";
+        ProgressWindow: Dialog;
         Percentage: Decimal;
+        NoTransferred: Integer;
+        RecNo: Integer;
+        TotalRecNo: Integer;
+        ItemsAlreadyIncluded: TextBuilder;
+        ItemsWOutPrice: TextBuilder;
+        AlreadyExistsErr: Label 'The following items already exist in the period:\%1.', Comment = '%1 - list of items';
+        ZeroPriceErr: Label 'The following items have not been transferred due to missing item price:\%1.', Comment = '%1 - list of items';
         TransferItemNoErr: Label 'There are no items to transfer';
-        ItemNoErr: Label 'Item No. %1 already exists in the period', Comment = '%1 = Item no.';
         OkMsg: Label '%1 Items have been transferred to Period %2', Comment = '%1 = No. of items, %2 = Period no.';
         EnterCostsLbl: Label 'Enter cost savings in % ';
+        WindowTxt1: Label 'Processing items...\\';
+        WindowTxt2: Label '@1@@@@@@@@@@@@@@@@@@@';
     begin
         if Item.IsEmpty() then
             Error(TransferItemNoErr);
 
-        Item.FindSet();
         Percentage := 0;
-
         InputDialog.SetInput(1, Percentage, EnterCostsLbl);
         if InputDialog.RunModal() = ACTION::OK then
             InputDialog.InputDecimal(1, Percentage);
-
         if Percentage = 0 then
             exit;
+
+        ProgressWindow.Open(
+            WindowTxt1 +
+            WindowTxt2);
+        TotalRecNo := Item.Count();
+
+        Item.FindSet();
         repeat
-            if PeriodDiscountLine.Get(Rec.Code, Item."No.") then
-                Message(ItemNoErr, Item."No.")
-            else begin
-                PeriodDiscountLine.Init();
-                PeriodDiscountLine.Code := Rec.Code;
-                PeriodDiscountLine."Item No." := Item."No.";
-                PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
-                PeriodDiscountLine."Discount %" := Percentage;
-                PeriodDiscountLine.Validate("Discount Amount", Item."Unit Price" - PeriodDiscountLine."Campaign Unit Price");
-                PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
-                PeriodDiscountLine."Starting Date" := Rec."Starting Date";
-                PeriodDiscountLine."Ending Date" := Rec."Ending Date";
-                PeriodDiscountLine.Status := Rec.Status;
-                PeriodDiscountLine.Insert(true);
+            case true of
+                Item."Unit Price" = 0:
+                    AddItemToList(Item."No.", ItemsWOutPrice);
+                PeriodDiscountLine.Get(Rec.Code, Item."No."):
+                    AddItemToList(Item."No.", ItemsAlreadyIncluded);
+                else begin
+                    PeriodDiscountLine.Init();
+                    PeriodDiscountLine.Code := Rec.Code;
+                    PeriodDiscountLine."Item No." := Item."No.";
+                    PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
+                    PeriodDiscountLine."Discount %" := Percentage;
+                    PeriodDiscountLine.Validate("Discount Amount", Item."Unit Price" - PeriodDiscountLine."Campaign Unit Price");
+                    PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
+                    PeriodDiscountLine."Starting Date" := Rec."Starting Date";
+                    PeriodDiscountLine."Ending Date" := Rec."Ending Date";
+                    PeriodDiscountLine.Status := Rec.Status;
+                    PeriodDiscountLine.Insert(true);
+                    NoTransferred += 1;
+                end;
             end;
+            RecNo += 1;
+            ProgressWindow.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
         until Item.Next() = 0;
-        Message(OkMsg, Item.Count, Rec.Code);
+
+        ProgressWindow.Close();
+        Message(OkMsg, NoTransferred, Rec.Code);
+        if ItemsWOutPrice.Length <> 0 then
+            Message(ZeroPriceErr, ItemsWOutPrice.ToText().TrimEnd('|'));
+        if ItemsAlreadyIncluded.Length <> 0 then
+            Message(AlreadyExistsErr, ItemsAlreadyIncluded.ToText().TrimEnd('|'));
     end;
 
     local procedure GetFieldCaption(CaptionFieldNo: Integer) Caption: Text
@@ -638,5 +658,12 @@
 
         CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);
         CurrRecRef.SetTable(Rec);
+    end;
+
+    local procedure AddItemToList(ItemNo: Code[20]; var DestinationItemNoList: TextBuilder)
+    begin
+        if ItemNo = '' then
+            exit;
+        DestinationItemNoList.Append(ItemNo + '|');
     end;
 }
