@@ -673,16 +673,21 @@
             if TempDiscountPriority.FindSet() then
                 repeat
                     POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
-                    TempSaleLinePOS2.FindFirst();
-                    TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
+                    if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
+                        TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
+                        TempSaleLinePOS2.Modify();
+                    end;
                 until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
-        "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
-        "VAT %" := TempSaleLinePOS2."VAT %";
-        "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
-        "Unit Price" := TempSaleLinePOS2."Unit Price";
-        "Discount Type" := TempSaleLinePOS2."Discount Type";
-        "Discount Code" := TempSaleLinePOS2."Discount Code";
-        "Discount Pct." := TempSaleLinePOS2."Discount %";
+
+        if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
+            "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
+            "VAT %" := TempSaleLinePOS2."VAT %";
+            "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
+            "Unit Price" := TempSaleLinePOS2."Unit Price";
+            "Discount Type" := TempSaleLinePOS2."Discount Type";
+            "Discount Code" := TempSaleLinePOS2."Discount Code";
+            "Discount Pct." := TempSaleLinePOS2."Discount %";
+        end;
     end;
 
     internal procedure CalcProfit()
