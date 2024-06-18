@@ -184,6 +184,7 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
     var
         POSEntry: Record "NPR POS Entry";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         TMTicketManagement: Codeunit "NPR TM Ticket Management";
         MMMemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         TaxFree: Codeunit "NPR Tax Free Handler Mgt.";
@@ -200,12 +201,15 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
             MMMemberRetailIntegration.PrintMembershipOnEndOfSales(SalesTicketNo);
 
         if PrintRetailVoucher then begin
-            NpRvVoucher.SetRange("Issue Document Type", NpRvVoucher."Issue Document Type"::"Audit Roll");
-            NpRvVoucher.SetRange("Issue Document No.", SalesTicketNo);
-            if NpRvVoucher.FindSet() then
+            NpRvVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
+            NpRvVoucherEntry.SetFilter("Entry Type", '%1|%2', NpRvVoucherEntry."Entry Type"::"Issue Voucher", NpRvVoucherEntry."Entry Type"::"Partner Issue Voucher");
+            NpRvVoucherEntry.SetRange("Document Type", NpRvVoucherEntry."Document Type"::"POS Entry");
+            NpRvVoucherEntry.SetRange("Document No.", SalesTicketNo);
+            if NpRvVoucherEntry.FindSet() then
                 repeat
-                    Codeunit.Run(codeunit::"NPR NpRv Voucher Mgt.", NpRvVoucher);
-                until NpRvVoucher.Next() = 0;
+                    if NpRvVoucher.Get(NpRvVoucherEntry."Voucher No.") then
+                        Codeunit.Run(codeunit::"NPR NpRv Voucher Mgt.", NpRvVoucher);
+                until NpRvVoucherEntry.Next() = 0;
         end;
 
         if PrintTerminalReceipt then begin
