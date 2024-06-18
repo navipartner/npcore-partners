@@ -6,478 +6,19 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     Permissions = tabledata "NPR Spfy Integration Setup" = rim;
 
     var
-        ShopifySetup: Record "NPR Spfy Integration Setup";
+        _ShopifySetup: Record "NPR Spfy Integration Setup";
 
-    [TryFunction]
-    procedure TryDownloadOrders(ShopifyStoreCode: Code[20]; Link: Text; FromDT: DateTime; Limit: Integer; Status: Text; var Orders: JsonArray; var NextLink: Text)
+    procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area")
     var
-        NcTask: Record "NPR Nc Task";
-        Result: JsonObject;
-        Token: JsonToken;
-        ResponseText: Text;
-        Url: Text;
-        OrderCount: Integer;
-        NoOrdersErr: Label 'No Orders within the filter: %1';
+        IntegrationDisabledErr: Label 'NaviPartner BC-Shopify integration is disabled. Please open the "Shopify Integration Setup" page and enable the integration.';
+        IntegrationAreaDisabledErr: Label 'The "%1" area/option of NaviPartner BC-Shopify integration is disabled.', Comment = '%1 - integration area name';
     begin
-        Clear(NextLink);
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-
-        if Link = '' then
-            Url := GetShopifyUrl(NcTask."Store Code") +
-                StrSubstNo('orders.json?status=%1&updated_at_min=%2&limit=%3', Status, Format(FromDT, 0, 9), Format(Limit))
+        if IsEnabled(IntegrationArea) then
+            exit;
+        if IntegrationArea = IntegrationArea::" " then
+            Error(IntegrationDisabledErr)
         else
-            Url := Link;
-
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url, NextLink);
-
-        Result.ReadFrom(ResponseText);
-        Result.SelectToken('orders', Token);
-        Orders := Token.AsArray();
-        OrderCount := Orders.Count();
-        if OrderCount = 0 then
-            Error(NoOrdersErr, Url);
-    end;
-
-    [TryFunction]
-    procedure SendFulfillmentRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'fulfillments.json';
-        SendShopifyRequest(NcTask, 'POST', Url);
-    end;
-
-    procedure GetShopifyOrderFulfillmentOrders(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(ShopifyStoreCode) + StrSubstNo('orders/%1/fulfillment_orders.json', ShopifyOrderID);
-        ResponseText := SendShopifyRequest(ShopifyStoreCode, 'GET', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure GetShopifyLocations(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
-    var
-        NcTask: Record "NPR Nc Task";
-        ResponseText: Text;
-        Url: Text;
-    begin
-        NcTask."Store Code" := ShopifyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + 'locations.json';
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendTransactionRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, 'POST', Url);
-    end;
-
-    [TryFunction]
-    procedure TryGetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var SpfyOrderTransactions: JsonObject)
-    begin
-        GetShopifyOrderTransactions(NcTask, SpfyOrderTransactions);
-    end;
-
-    procedure GetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var SpfyOrderTransactions: JsonObject)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
-        SpfyOrderTransactions.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + 'graphql.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendItemCreateRequest(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'products.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendItemUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1.json', ShopifyItemID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendItemDeleteRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30])
-    var
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1.json', ShopifyItemID);
-        SendShopifyRequest(NcTask, 'DELETE', Url);
-    end;
-
-    [TryFunction]
-    procedure SendItemVariantCreateRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1/variants.json', ShopifyItemID);
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendItemVariantUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyVariantID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('variants/%1.json', ShopifyVariantID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendItemVariantDeleteRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30]; ShopifyVariantID: Text[30])
-    var
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1/variants/%2.json', ShopifyItemID, ShopifyVariantID);
-        SendShopifyRequest(NcTask, 'DELETE', Url);
-    end;
-
-    [TryFunction]
-    procedure SendInvetoryLevelUpdateRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'inventory_levels/set.json';
-        SendShopifyRequest(NcTask, 'POST', Url);
-    end;
-
-    [TryFunction]
-    procedure SendInvetoryItemUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyInventoryItemID: Text[30])
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('inventory_items/%1.json', ShopifyInventoryItemID);
-        SendShopifyRequest(NcTask, 'PUT', Url);
-    end;
-
-    [TryFunction]
-    procedure SendCloseOrderRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/close.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, 'POST', Url);
-    end;
-
-    [TryFunction]
-    procedure RetrieveGiftCardInfoFromShopify(ShopifyStoreCode: Code[20]; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        NcTask: Record "NPR Nc Task";
-        ResponseText: Text;
-        Url: Text;
-    begin
-        NcTask."Store Code" := ShopifyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardCreateRequest(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'gift_cards.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardDisableRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/disable.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardBalanceAdjustmentRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30])
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/adjustments.json', ShopifyGiftCardID);
-        SendShopifyRequest(NcTask, 'POST', Url);
-    end;
-
-    local procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
-    var
-        NoRequestBodyErr: Label 'Each request must have a json formatted content attached';
-    begin
-        NcTask.TestField("Store Code");
-        NcTask.testfield("Record Value");
-        if not NcTask."Data Output".HasValue then
-            Error(NoRequestBodyErr);
-    end;
-
-    local procedure SendShopifyRequest(ShopifyStoreCode: Code[20]; RestMethod: text; Url: Text) ResponseText: Text
-    var
-        NcTask: Record "NPR Nc Task";
-        NextLink: Text;
-    begin
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-        ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
-    end;
-
-    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text) ResponseText: Text
-    var
-        NextLink: Text;
-    begin
-        ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
-    end;
-
-    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var NextLink: Text) ResponseText: Text
-    begin
-        if not TrySendShopifyRequest(NcTask, RestMethod, Url, NextLink, ResponseText) then
-            Error(GetLastErrorText());
-    end;
-
-    [TryFunction]
-    local procedure TrySendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var NextLink: Text; var ResponseText: Text)
-    var
-        Client: HttpClient;
-        Content: HttpContent;
-        Headers: HttpHeaders;
-        RequestMsg: HttpRequestMessage;
-        ResponseMsg: HttpResponseMessage;
-        InStr: InStream;
-        Links: array[1] of Text;
-    begin
-        CheckHttpClientRequestsAllowed();
-
-        Clear(NextLink);
-
-        if NcTask."Data Output".HasValue then begin
-            NcTask."Data Output".CreateInStream(InStr);
-            Content.WriteFrom(InStr);
-
-            Content.GetHeaders(Headers);
-            if Headers.Contains('Content-Type') then
-                Headers.Remove('Content-Type');
-            Headers.Add('Content-Type', 'application/json');
-
-            RequestMsg.Content := Content;
-        end;
-
-        RequestMsg.SetRequestUri(Url);
-        RequestMsg.Method(RestMethod);
-        RequestMsg.GetHeaders(Headers);
-        Headers.Add('X-Shopify-Access-Token', GetShopifyAccessToken(NcTask."Store Code"));
-        Headers.Add('Accept', 'application/json');
-        Headers.Add('User-Agent', 'Dynamics 365');
-
-        if not Client.Send(RequestMsg, ResponseMsg) then
-            Error(GetLastErrorText);
-
-        SaveResponse(NcTask, ResponseMsg);
-
-        if not ResponseMsg.Content.ReadAs(ResponseText) then
-            ResponseText := '';
-        if ResponseText = '' then
-            ResponseText := '{}';
-
-        if not ResponseMsg.IsSuccessStatusCode() then
-            if not TreatAsSuccess(NcTask, ResponseMsg) then
-                Error('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
-
-        Headers := ResponseMsg.Headers();
-        if Headers.Contains('Link') then begin
-            Headers.GetValues('Link', Links);
-            NextLink := ParseNextLink(Links[1]);
-        end;
-    end;
-
-    local procedure SaveResponse(var NcTask: Record "NPR Nc Task"; var ResponseMsg: HttpResponseMessage)
-    var
-        Content: HttpContent;
-        InStr: InStream;
-        OutStr: OutStream;
-    begin
-        Content := ResponseMsg.Content();
-
-        clear(NcTask.Response);
-        NcTask.Response.CreateInStream(InStr);
-        Content.ReadAs(InStr);
-
-        NcTask.Response.CreateOutStream(OutStr);
-        CopyStream(OutStr, InStr);
-    end;
-
-    local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage): Boolean
-    var
-        ResponseJToken: JsonToken;
-        ErrorJToken: JsonToken;
-        ResponseText: Text;
-        AlreadyCapturedTok: Label 'The authorized transaction has already been captured', Locked = true;
-        AlreadyDisabledTok: Label 'Gift card is disabled', Locked = true;
-    begin
-        if not (ResponseMsg.Content.ReadAs(ResponseText) and ResponseJToken.ReadFrom(ResponseText)) then
-            exit(false);
-        case true of
-            (NcTask."Table No." = Database::"NPR Magento Payment Line") and (ResponseMsg.HttpStatusCode() = 422):
-                if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
-                    exit(ErrorJToken.AsValue().AsText() = AlreadyCapturedTok);
-
-            (NcTask."Table No." = Database::"NPR NpRv Voucher Entry") and (ResponseMsg.HttpStatusCode() = 422):
-                if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
-                    exit(ErrorJToken.AsValue().AsText() = AlreadyDisabledTok);
-        end;
-        exit(false);
-    end;
-
-    local procedure ParseNextLink(Link: Text) NextLink: Text
-    var
-        Rel: Text;
-        RelPosition: Integer;
-        IndexPosition: Integer;
-        RelKey: Text;
-        RelLen: Integer;
-    begin
-        RelKey := '>; rel=';
-        RelLen := StrLen(RelKey);
-        repeat
-            if Link = '' then
-                exit('');
-
-            if Link[1] = '<' then
-                Link := DelStr(Link, 1, 1);
-            RelPosition := StrPos(Link, RelKey);
-            if RelPosition = 0 then
-                exit('');
-
-            IndexPosition := StrPos(Link, ', ');
-
-            if IndexPosition < RelPosition + RelLen then
-                Rel := CopyStr(Link, RelPosition + RelLen)
-            else
-                Rel := CopyStr(Link, RelPosition + RelLen, IndexPosition - RelPosition - RelLen);
-            Rel := DelChr(Rel, '=', '"');
-            if Rel = 'next' then begin
-                NextLink := DelStr(Link, RelPosition);
-                exit(NextLink);
-            end;
-
-            if IndexPosition > 0 then
-                Link := DelStr(Link, 1, IndexPosition + 1)
-            else
-                Link := '';
-        until Link = '';
-
-        exit('');
-    end;
-
-    local procedure CheckHttpClientRequestsAllowed()
-    var
-        EnvironmentInfo: Codeunit "Environment Information";
-        NAVAppSettings: Record "NAV App Setting";
-        HttpRequrestsAreNotAllowedErr: Label 'Http requests are blocked by default in sandbox environments. In order to proceed, you must allow HttpClient requests for NP Retail extension.';
-    begin
-        if EnvironmentInfo.IsSandbox() then
-            if not (NAVAppSettings.Get('992c2309-cca4-43cb-9e41-911f482ec088') and NAVAppSettings."Allow HttpClient Requests") then
-                Error(HttpRequrestsAreNotAllowedErr);
-    end;
-
-    local procedure GetShopifyUrl(ShopifyStoreCode: Code[20]) ShopifyUrl: Text
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-    begin
-        ShopifySetup.GetRecordOnce(false);
-        ShopifySetup.TestField("Enable Integration");
-        ShopifySetup.TestField("Shopify Api Version");
-
-        ShopifyStore.Get(ShopifyStoreCode);
-        ShopifyStore.TestField(Enabled);
-        ShopifyStore.TestField("Shopify Url");
-
-        ShopifyUrl := StrSubstNo('%1/admin/api/%2/', ShopifyStore."Shopify Url", ShopifySetup."Shopify Api Version");
-    end;
-
-    local procedure GetShopifyAccessToken(ShopifyStoreCode: Code[20]): Text
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-    begin
-        ShopifySetup.GetRecordOnce(false);
-        ShopifySetup.TestField("Enable Integration");
-
-        ShopifyStore.Get(ShopifyStoreCode);
-        ShopifyStore.TestField(Enabled);
-        ShopifyStore.TestField("Shopify Access Token");
-
-        exit(ShopifyStore."Shopify Access Token");
+            Error(IntegrationAreaDisabledErr)
     end;
 
     procedure IsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"): Boolean
@@ -490,28 +31,28 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         if Handled then
             exit(AreaIsEnabled);
 
-        ShopifySetup.GetRecordOnce(false);
-        if not ShopifySetup."Enable Integration" then
+        _ShopifySetup.GetRecordOnce(false);
+        if not _ShopifySetup."Enable Integration" then
             exit(false);
         case IntegrationArea of
             IntegrationArea::" ":
-                exit(ShopifySetup."Enable Integration");
+                exit(_ShopifySetup."Enable Integration");
             IntegrationArea::Items:
-                exit(ShopifySetup."Item List Integration");
+                exit(_ShopifySetup."Item List Integration");
             IntegrationArea::"Inventory Levels":
-                exit(ShopifySetup."Send Inventory Updates");
+                exit(_ShopifySetup."Send Inventory Updates");
             IntegrationArea::"Sales Orders":
-                exit(ShopifySetup."Sales Order Integration");
+                exit(_ShopifySetup."Sales Order Integration");
             IntegrationArea::"Order Fulfillments":
-                exit(ShopifySetup."Send Order Fulfillments");
+                exit(_ShopifySetup."Send Order Fulfillments");
             IntegrationArea::"Payment Capture Requests":
-                exit(ShopifySetup."Send Payment Capture Requests");
+                exit(_ShopifySetup."Send Payment Capture Requests");
             IntegrationArea::"Close Order Requests":
-                exit(ShopifySetup."Send Close Order Requets");
+                exit(_ShopifySetup."Send Close Order Requets");
             IntegrationArea::"Retail Vouchers":
-                exit(ShopifySetup."Retail Voucher Integration");
+                exit(_ShopifySetup."Retail Voucher Integration");
             IntegrationArea::"Click And Collect":
-                exit(ShopifySetup."C&C Order Integration");
+                exit(_ShopifySetup."C&C Order Integration");
         end;
     end;
 
@@ -522,90 +63,97 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(ShopifyStore.Get(ShopifyStoreCode) and ShopifyStore.Enabled);
     end;
 
+    procedure ShopifyApiVersion(): Text
+    begin
+        _ShopifySetup.GetRecordOnce(false);
+        _ShopifySetup.TestField("Shopify Api Version");
+        exit(_ShopifySetup."Shopify Api Version");
+    end;
+
     procedure IsSendSalesPrices(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(not ShopifySetup."Do Not Sync. Sales Prices");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(not _ShopifySetup."Do Not Sync. Sales Prices");
     end;
 
     procedure IsSendShopifyNameAndDescription(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Set Shopify Name/Descr. in BC");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Set Shopify Name/Descr. in BC");
     end;
 
     procedure IsAllowedFinancialStatus(FinancialStatus: Text): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
+        _ShopifySetup.GetRecordOnce(false);
         case FinancialStatus of
             'authorized':
-                exit(ShopifySetup."Allowed Payment Statuses" in
-                    [ShopifySetup."Allowed Payment Statuses"::Authorized, ShopifySetup."Allowed Payment Statuses"::Both]);
+                exit(_ShopifySetup."Allowed Payment Statuses" in
+                    [_ShopifySetup."Allowed Payment Statuses"::Authorized, _ShopifySetup."Allowed Payment Statuses"::Both]);
             'paid':
-                exit(ShopifySetup."Allowed Payment Statuses" in
-                    [ShopifySetup."Allowed Payment Statuses"::Paid, ShopifySetup."Allowed Payment Statuses"::Both]);
+                exit(_ShopifySetup."Allowed Payment Statuses" in
+                    [_ShopifySetup."Allowed Payment Statuses"::Paid, _ShopifySetup."Allowed Payment Statuses"::Both]);
         end;
         exit(false);
     end;
 
     procedure ProcessCancelledOrders(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Delete on Cancellation");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Delete on Cancellation");
     end;
 
     procedure ProcessFinishedOrders(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Post on Completion");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Post on Completion");
     end;
 
     procedure CreatePmtLinesOnOrderImport(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Get Payment Lines From Shopify" = ShopifySetup."Get Payment Lines From Shopify"::ON_ORDER_IMPORT);
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Get Payment Lines From Shopify" = _ShopifySetup."Get Payment Lines From Shopify"::ON_ORDER_IMPORT);
     end;
 
     procedure IsSendNegativeInventory(): Boolean
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Send Negative Inventory");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Send Negative Inventory");
     end;
 
     procedure IncludeTrasferOrders(): Option No,Outbound,All
     begin
-        ShopifySetup.GetRecordOnce(false);
-        exit(ShopifySetup."Include Transfer Orders");
+        _ShopifySetup.GetRecordOnce(false);
+        exit(_ShopifySetup."Include Transfer Orders");
     end;
 
     procedure GetCCWorkflowCode(): Code[20]
     begin
-        ShopifySetup.GetRecordOnce(false);
-        ShopifySetup.TestField("C&C Order Workflow Code");
-        exit(ShopifySetup."C&C Order Workflow Code");
+        _ShopifySetup.GetRecordOnce(false);
+        _ShopifySetup.TestField("C&C Order Workflow Code");
+        exit(_ShopifySetup."C&C Order Workflow Code");
     end;
 
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
     begin
         if not AutoCreate then
-            if ShopifySetup.IsEmpty() then
+            if _ShopifySetup.IsEmpty() then
                 exit('');
 
-        ShopifySetup.GetRecordOnce(false);
-        if ShopifySetup."Data Processing Handler ID" = '' then begin
+        _ShopifySetup.GetRecordOnce(false);
+        if _ShopifySetup."Data Processing Handler ID" = '' then begin
             SelectLatestVersion();
-            ShopifySetup.GetRecordOnce(true);
-            if ShopifySetup."Data Processing Handler ID" = '' then begin
-                ShopifySetup.SetDataProcessingHandlerIDToDefaultValue();
-                ShopifySetup.Modify();
+            _ShopifySetup.GetRecordOnce(true);
+            if _ShopifySetup."Data Processing Handler ID" = '' then begin
+                _ShopifySetup.SetDataProcessingHandlerIDToDefaultValue();
+                _ShopifySetup.Modify();
             end;
         end;
-        exit(ShopifySetup."Data Processing Handler ID");
+        exit(_ShopifySetup."Data Processing Handler ID");
     end;
 
     procedure SetRereadSetup()
     begin
-        Clear(ShopifySetup);
+        Clear(_ShopifySetup);
     end;
 
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)
@@ -673,5 +221,41 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
     end;
     #endregion
+
+#if not BC18
+    #region clear configuration on company/environment copy
+    [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
+    local procedure SpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
+    begin
+        DisableIntegration(NewCompanyName);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure SpfyOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    begin
+        DisableIntegration(CompanyName);
+    end;
+
+    local procedure DisableIntegration(NewCompanyName: Text)
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        if (NewCompanyName <> '') and (NewCompanyName <> CompanyName()) then begin
+            ShopifyStore.ChangeCompany(NewCompanyName);
+            ShopifySetup.ChangeCompany(NewCompanyName)
+        end;
+        if ShopifySetup.Get() and ShopifySetup."Enable Integration" then begin
+            ShopifySetup."Enable Integration" := false;
+            ShopifySetup.Modify();
+        end;
+        if ShopifyStore.FindSet(true) then
+            repeat
+                ShopifyStore.Enabled := false;
+                ShopifyStore.Modify();
+            until ShopifyStore.Next() = 0;
+    end;
+    #endregion
+#endif
 }
 #endif

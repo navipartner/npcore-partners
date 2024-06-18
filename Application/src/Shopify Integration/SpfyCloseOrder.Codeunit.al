@@ -58,14 +58,14 @@ codeunit 6184807 "NPR Spfy Close Order"
 
     local procedure CloseShopifyOrder(var NcTask: Record "NPR Nc Task")
     var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         ClearLastError();
         Success := false;
-        Success := SpfyIntegrationMgt.SendCloseOrderRequest(NcTask);
+        Success := SpfyCommunicationHandler.SendCloseOrderRequest(NcTask);
 
         NcTask.Modify();
         Commit();

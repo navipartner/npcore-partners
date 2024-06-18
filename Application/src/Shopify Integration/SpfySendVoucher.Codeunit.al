@@ -24,7 +24,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure SendVoucher(var NcTask: Record "NPR Nc Task")
     var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         OutStr: OutStream;
         ShopifyGiftCardID: Text[30];
@@ -40,9 +40,9 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if SendToShopify then
             case NcTask.Type of
                 NcTask.Type::Insert:
-                    Success := SpfyIntegrationMgt.SendGiftCardCreateRequest(NcTask, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendGiftCardCreateRequest(NcTask, ShopifyResponse);
                 NcTask.Type::Modify:
-                    Success := SpfyIntegrationMgt.SendGiftCardUpdateRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.SendGiftCardUpdateRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
             end;
         if Success and not SendToShopify then begin
             NcTask.Response.CreateOutStream(OutStr);
@@ -60,7 +60,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure SendVoucherAmtUpdate(var NcTask: Record "NPR Nc Task")
     var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         OutStr: OutStream;
         ShopifyGiftCardID: Text[30];
         SendToShopify: Boolean;
@@ -73,7 +73,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         Success := PrepareGiftCardBalanceAdjustmentRequest(NcTask, ShopifyGiftCardID, SendToShopify);
         if SendToShopify then
-            Success := SpfyIntegrationMgt.SendGiftCardBalanceAdjustmentRequest(NcTask, ShopifyGiftCardID);
+            Success := SpfyCommunicationHandler.SendGiftCardBalanceAdjustmentRequest(NcTask, ShopifyGiftCardID);
         if Success and not SendToShopify then begin
             NcTask.Response.CreateOutStream(OutStr);
             OutStr.WriteText(GetLastErrorText());
@@ -87,7 +87,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure SendVoucherDisableReq(var NcTask: Record "NPR Nc Task")
     var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         OutStr: OutStream;
         ShopifyResponse: JsonToken;
         ShopifyGiftCardID: Text[30];
@@ -102,7 +102,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Success := PrepareGiftCardDisableRequest(NcTask, ShopifyGiftCardID, SendToShopify);
         if Success then begin
             if SendToShopify then begin
-                Success := SpfyIntegrationMgt.SendGiftCardDisableRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
+                Success := SpfyCommunicationHandler.SendGiftCardDisableRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
                 if Success then
                     MarkVoucherAsDisabled(NcTask, ShopifyResponse)
             end else begin
@@ -165,7 +165,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     var
         Voucher: Record "NPR NpRv Voucher";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         VoucherRecRef: RecordRef;
         AdjmtJObject: JsonObject;
@@ -193,7 +193,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         end;
 
         ClearLastError();
-        if not SpfyIntegrationMgt.RetrieveGiftCardInfoFromShopify(ShopifyStoreCode, ShopifyGiftCardID, ResponseJToken) then
+        if not SpfyCommunicationHandler.RetrieveGiftCardInfoFromShopify(ShopifyStoreCode, ShopifyGiftCardID, ResponseJToken) then
             Error(BalanceQueryFailedErr, Voucher."No.", GetLastErrorText());
         CurrentShopifyBalance := JsonHelper.GetJDecimal(ResponseJToken, 'gift_card.balance', true);
 
@@ -231,7 +231,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Voucher: Record "NPR NpRv Voucher";
         VoucherCreateNcTask: Record "NPR Nc Task";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         VoucherRecRef: RecordRef;
         ResponseJToken: JsonToken;
@@ -254,7 +254,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
             exit;
         end;
 
-        if not SpfyIntegrationMgt.RetrieveGiftCardInfoFromShopify(ShopifyStoreCode, ShopifyGiftCardID, ResponseJToken) then
+        if not SpfyCommunicationHandler.RetrieveGiftCardInfoFromShopify(ShopifyStoreCode, ShopifyGiftCardID, ResponseJToken) then
             Error(GiftCardQueryFailedErr, Voucher."No.", GetLastErrorText());
 
         if JsonHelper.GetJDate(ResponseJToken, 'gift_card.disabled_at', false) <> 0D then begin

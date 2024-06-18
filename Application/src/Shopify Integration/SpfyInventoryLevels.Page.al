@@ -75,10 +75,8 @@ page 6184564 "NPR Spfy Inventory Levels"
                     SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
                     FilterPage: FilterPageBuilder;
                     ConfirmQst: Label 'This function will recalculate inventory levels for all or selected Shopify integrated locations and items.';
-                    InvtAreaNotEnabledErr: Label 'Inventory integration area is not enabled.';
                 begin
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then
-                        Error(InvtAreaNotEnabledErr);
+                    SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
                     if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), false) then
                         exit;
                     FilterPage.AddTable(Item.TableCaption(), Database::Item);
