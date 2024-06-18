@@ -20,7 +20,6 @@ codeunit 85134 "NPR POS Act. MemberArr Tests"
         POSWorkflowType: Option;
         AdmissionCode: Code[20];
         DefaultInputValue: Text;
-        ShowWelcomeMessage: Boolean;
         POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
@@ -37,7 +36,6 @@ codeunit 85134 "NPR POS Act. MemberArr Tests"
         DefaultInputValue := '';
         DialogPrompt := 1; //Member Card Number
         DialogMethod := DialogMethod::NO_PROMPT;
-        ShowWelcomeMessage := false;
         AdmissionCode := '';
         POSWorkflowType := 0; //POSSales
 
@@ -47,7 +45,7 @@ codeunit 85134 "NPR POS Act. MemberArr Tests"
         CardNo := AddMemberCard();
         POSSession.GetSetup(POSSetup);
 
-        POSActionMemberArrival.MemberArrival(ShowWelcomeMessage, DefaultInputValue, DialogMethod, POSWorkflowType, CardNo, AdmissionCode, POSSetup, '');
+        POSActionMemberArrival.MemberArrival(DefaultInputValue, DialogMethod, POSWorkflowType, CardNo, AdmissionCode, POSSetup, '');
 
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);

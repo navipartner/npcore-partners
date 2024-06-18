@@ -24,6 +24,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         ParamDefaultInput_DescLbl: Label 'Specifies the default value of the Input';
         ParamForeignCommunity_CptLbl: Label 'Foreign Community Code';
         ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
+        ToastMessageCaption: Label 'Toast Message Timer';
+        ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
     begin
         WorkflowConfig.AddActionDescription(Action_Description);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -45,6 +47,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                                         ParamDialogPrompt_OptCptLbl);
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInput_CptLbl, ParamDefaultInput_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
+        WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPromptLbl);
         WorkflowConfig.AddLabel('MemberNumberPrompt', MemberNumberPromptLbl);
         WorkflowConfig.AddLabel('MembershipNumberPrompt', MembershipNumberPromptLbl);
@@ -65,7 +68,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         end;
     end;
 
-    procedure ManageMembershipAction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
+    procedure ManageMembershipAction(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") Response: JsonObject
     var
         FunctionId: Integer;
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
@@ -74,6 +77,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         ExternalMemberCardNo: Text[100];
         SelectReq: Boolean;
         ForeignCommunityCode: Code[20];
+        MemberCardEntryNo: Integer;
+        MemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
     begin
         if (not Context.GetIntegerParameter('Function', FunctionId)) then
             FunctionId := 0;
@@ -82,14 +87,19 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         GetFrontEndInputs(Context, ExternalMemberCardNo, FrontEndInputMethod);
         ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
 
-        JsonText := '{}';
         case FunctionId of
             0:
-                POSActionMemberMgtWF3B.POSMemberArrival(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
+                begin
+                    MemberCardEntryNo := POSActionMemberMgtWF3B.POSMemberArrival(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
+                    MemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
+                end;
             1:
-                POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode, SelectReq);
+                begin
+                    MemberCardEntryNo := POSActionMemberMgtWF3B.SelectMembership(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode, SelectReq);
+                    MemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 1, Response);
+                end;
             2:
-                JsonText := GetMembershipEntryLookupJson(FrontEndInputMethod, ExternalMemberCardNo);
+                Response := GetMembershipEntryLookupJson(FrontEndInputMethod, ExternalMemberCardNo);
             3:
                 ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::REGRET, ExternalMemberCardNo);
             4:
@@ -107,19 +117,18 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
             10:
                 POSActionMemberMgtWF3B.EditActiveMembership();
         end;
-        exit(JsonText);
+        exit(Response);
     end;
 
-    local procedure GetMembershipEntryLookupJson(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]) JsonText: Text
+    local procedure GetMembershipEntryLookupJson(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]) LookupProperties: JsonObject;
     var
         MembershipEntry: Record "NPR MM Membership Entry";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         POSActionMemberMgtWF3B: Codeunit "NPR POS Action Member MgtWF3-B";
-        LookupProperties: JsonObject;
+
         MembershipEntries: JsonArray;
         MEMBERSHIP_ENTRIES: Label 'Membership Entries.';
-        MembershipEntriesJsonText: Text;
     begin
         POSActionMemberMgtWF3B.GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
 
@@ -133,13 +142,10 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 MembershipEntries.Add(GetMembershipEntryLookupDataToJson(MembershipEntry))
             until (MembershipEntry.Next() = 0);
         end;
-        MembershipEntries.WriteTo(MembershipEntriesJsonText);
 
         LookupProperties.Add('title', MEMBERSHIP_ENTRIES);
-        LookupProperties.Add('data', MembershipEntriesJsonText);
+        LookupProperties.Add('data', MembershipEntries);
         LookupProperties.Add('layout', GetMembershipEntryLayout());
-        LookupProperties.WriteTo(JsonText);
-
     end;
 
     local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Helper"; AlterationType: Option; ExternalMemberCardNo: Text[100])
@@ -154,14 +160,13 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         POSActionMemberMgtWF3B.ExecuteMembershipAlteration(POSSaleLine, AlterationType, ExternalMemberCardNo, ItemNo);
     end;
 
-    procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") JsonText: Text
+    procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") LookupProperties: JsonObject
     var
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         POSActionMemberMgtWF3B: Codeunit "NPR POS Action Member MgtWF3-B";
         FunctionId: Integer;
-        LookupProperties: JsonObject;
         REGRET_OPTION: Label 'Regret options...';
         EXTEND_OPTION: Label 'Extend options...';
         RENEW_OPTION: Label 'Renew options...';
@@ -176,6 +181,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         TextOut: Text;
         IntegerOut: Integer;
     begin
+
         if (not Context.GetIntegerParameter('Function', IntegerOut)) then
             IntegerOut := 0;
         FunctionId := IntegerOut;
@@ -223,22 +229,20 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         LookupProperties.Add('cardnumber', ExternalMemberCardNo);
         LookupProperties.Add('data', CreateAlterMembershipOptions(Membership."Entry No.", MembershipAlterationSetup));
         LookupProperties.Add('layout', GetAlterMembershipLayout());
-        LookupProperties.WriteTo(JsonText);
 
     end;
 
-    local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") Options: Text
+    local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") OptionsArray: JsonArray
     var
         TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        OptionsArray: JsonArray;
     begin
 
         if (not MembershipAlterationSetup.FindFirst()) then
-            exit('[]');
+            exit;
 
         if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TempMembershipEntry)) then
-            exit('[]');
+            exit;
 
         TempMembershipEntry.Reset();
         TempMembershipEntry.FindSet();
@@ -247,7 +251,6 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
             OptionsArray.Add(GetMembershipEntryLookupDataToJson(TempMembershipEntry));
         until (TempMembershipEntry.Next() = 0);
 
-        OptionsArray.WriteTo(Options);
     end;
 
     local procedure GetMembershipEntryLookupDataToJson(var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ChangeOption: JsonObject
@@ -264,13 +267,13 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         exit(ChangeOption);
     end;
 
-    local procedure GetMembershipEntryLayout() FieldLayout: Text
+    local procedure GetMembershipEntryLayout() MembershipEntryFieldLayout: JsonObject;
     var
         TmpMembershipEntry: Record "NPR MM Membership Entry";
         Control: JsonArray;
         Row: JsonObject;
         Rows: JsonArray;
-        MembershipEntryFieldLayout: JsonObject;
+
     begin
 
         Control.ReadFrom('[]');
@@ -295,17 +298,14 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         MembershipEntryFieldLayout.ReadFrom('{}');
         MembershipEntryFieldLayout.Add('className', 'custom-lookup-row');
         MembershipEntryFieldLayout.Add('rows', Rows);
-
-        MembershipEntryFieldLayout.WriteTo(FieldLayout);
     end;
 
-    local procedure GetAlterMembershipLayout() FieldLayout: Text
+    local procedure GetAlterMembershipLayout() AlterMembershipFieldLayout: JsonObject
     var
         TmpMembershipEntry: Record "NPR MM Membership Entry";
         Control: JsonArray;
         Row: JsonObject;
         Rows: JsonArray;
-        AlterMembershipFieldLayout: JsonObject;
     begin
 
         Control.ReadFrom('[]');
@@ -330,8 +330,6 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         AlterMembershipFieldLayout.ReadFrom('{}');
         AlterMembershipFieldLayout.Add('className', 'custom-lookup-row');
         AlterMembershipFieldLayout.Add('rows', Rows);
-
-        AlterMembershipFieldLayout.WriteTo(FieldLayout);
     end;
 
     local procedure CreatLookupControl(FieldClassName: Text; FieldCaption: Text; FieldId: Text; FieldAlignment: Text; FieldFontSize: Text; FieldWidth: Text; IsSearchable: Boolean) FieldMetaData: JsonObject
@@ -380,7 +378,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js### 
-'let main=async({workflow:c,context:l,popup:i,captions:u,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);let b=u.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(l.memberCardInput=await i.input({caption:u.MemberCardPrompt,title:u.windowTitle}),l.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(l.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let t=JSON.parse(await c.respond("GetMembershipAlterationLookup"));l.memberCardInput=t.cardnumber;let n=JSON.parse(t.data);if(n.length==0){await i.error({title:u.windowTitle,caption:t.notFoundMessage});return}let a=data.createArrayDriver(n),r=data.createDataSource(a);r.loadAll=!1;let o=await i.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout),result:d=>d?d.map(s=>s?s.itemno:null):null},source:r});if(o===null||o.length===0)return;l.itemNumber=o[0].itemno}let m=await c.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let t=JSON.parse(m),n=data.createArrayDriver(JSON.parse(t.data)),a=data.createDataSource(n),r=await i.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:JSON.parse(t.layout)},source:a})}};'
+'let main=async({workflow:d,context:n,popup:l,captions:u,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);let s=u.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(n.memberCardInput=await l.input({caption:u.MemberCardPrompt,title:u.windowTitle}),n.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(n.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await d.respond("GetMembershipAlterationLookup");if(n.memberCardInput=i.cardnumber,i.data?.length==0){await l.error({title:u.windowTitle,caption:i.notFoundMessage});return}let a=data.createArrayDriver(i.data),o=data.createDataSource(a);o.loadAll=!1;let r=await l.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:c=>c?c.map(b=>b?b.itemno:null):null},source:o});if(r===null||r.length===0)return;n.itemNumber=r[0].itemno}let t=await d.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),a=data.createDataSource(i),o=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:a})}debugger;const m=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&m>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:m,memberExpiry:t.MemberScanned.ExpiryDate})};'
         )
     end;
 
