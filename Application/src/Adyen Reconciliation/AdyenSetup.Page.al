@@ -143,12 +143,21 @@ page 6184531 "NPR Adyen Setup"
     trigger OnOpenPage()
     var
         EnvironmentInformation: Codeunit "Environment Information";
+        AdyenSetupInit: Record "NPR Adyen Setup";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
             Rec.Insert();
-        end;
+        end else
+            if Rec."Company ID" = '' then begin
+                AdyenSetupInit.Init();
+                if Rec."Company ID" <> AdyenSetupInit."Company ID" then begin
+                    Rec."Company ID" := AdyenSetupInit."Company ID";
+                    Rec.Modify();
+                end;
+            end;
+
         _AdyenGenericSetup := Rec;
         Rec.CalcFields("Active Webhooks");
         _IsSaaS := not EnvironmentInformation.IsOnPrem();

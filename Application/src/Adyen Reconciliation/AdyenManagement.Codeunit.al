@@ -7,7 +7,7 @@ codeunit 6184796 "NPR Adyen Management"
         HttpClient: HttpClient;
         HttpResponseMessage: HttpResponseMessage;
         MerchantAccount: Record "NPR Adyen Merchant Account";
-        GetMerchantsEndpoint: Label '/companies/%1/merchants', Locked = true;
+        GetMerchantsEndpoint: Label '/merchants', Locked = true;
         RequestURL: Text;
         ResponseText: Text;
         JsonToken: JsonToken;
@@ -20,10 +20,11 @@ codeunit 6184796 "NPR Adyen Management"
         InitiateAdyenManagement();
 
         HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup."Management API Key");
-        RequestURL := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetMerchantsEndpoint, _AdyenSetup."Company ID") + '?pageSize=100';
+        RequestURL := GetManagementAPIURL(_AdyenSetup."Environment Type") + GetMerchantsEndpoint + '?pageSize=100';
         if PageNumber > 0 then
-            RequestURL += '&pageNumber=' + Format(PageNumber);
-
+            RequestURL += '&pageNumber=' + Format(PageNumber)
+        else
+            MerchantAccount.DeleteAll();
         HttpClient.Get(RequestURL, HttpResponseMessage);
         if (HttpResponseMessage.IsSuccessStatusCode()) then begin
             HttpResponseMessage.Content().ReadAs(ResponseText);
@@ -55,7 +56,8 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure CreateWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup"): Boolean
     var
-        CreateWebhookEndpoint: Label '/companies/%1/webhooks', Locked = true;
+        CreateWebhookEndpoint: Label '/merchants/%1/webhooks', Locked = true;
+        AFWebServiceURL: Label 'https://adyenreconciliation.azurewebsites.net/api/AdyenCloud', Locked = true;
         RequestText: Text;
         ResponseText: Text;
         RequestUrl: Text;
@@ -70,16 +72,18 @@ codeunit 6184796 "NPR Adyen Management"
             WebhookSetup.TestField("Web Service Password");
         end;
 
-        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(CreateWebhookEndpoint, _AdyenSetup."Company ID");
+        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(CreateWebhookEndpoint, WebhookSetup."Merchant Account");
 
         RequestText := CreateWebhookHttpRequestObject(WebhookSetup);
-        ResponseText := CreateWebhookHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST);
+        ResponseText := CreateAdyenHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST);
         JsonToken.ReadFrom(ResponseText);
         ResponseObject := JsonToken.AsObject();
         if ResponseObject.Get('id', JsonToken) then begin
             WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
+            if ResponseObject.Get('description', JsonToken) then
+                WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
             WebhookSetup.Modify(false);
-            if (WebhookSetup."Web Service URL" <> '') and (WebhookSetup."Web Service URL".Contains('https://adyenreconciliation.azurewebsites.net/api')) then
+            if (WebhookSetup."Web Service URL" <> '') and (WebhookSetup."Web Service URL".Contains(AFWebServiceURL)) then
                 SuggestAFWebServiceURL(WebhookSetup);
             exit(true);
         end;
@@ -87,7 +91,7 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure RefreshWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup"): Boolean
     var
-        GetWebhookEndpoint: Label '/companies/%1/webhooks/%2', Locked = true;
+        GetWebhookEndpoint: Label '/merchants/%1/webhooks/%2', Locked = true;
         WebhookDoesNotExist: Label 'Webhook with ID %1 does not exist anymore.';
         RequestUrl: Text;
         ResponseText: Text;
@@ -97,23 +101,21 @@ codeunit 6184796 "NPR Adyen Management"
         InitiateAdyenManagement();
 
         WebhookSetup.TestField(ID);
-        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetWebhookEndpoint, _AdyenSetup."Company ID", WebhookSetup.ID);
+        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetWebhookEndpoint, WebhookSetup."Merchant Account", WebhookSetup.ID);
 
-        ResponseText := CreateWebhookHttpRequest('', RequestUrl, Enum::"Http Request Type"::GET);
+        ResponseText := CreateAdyenHttpRequest('', RequestUrl, Enum::"Http Request Type"::GET);
         JsonToken.ReadFrom(ResponseText);
         ResponseObject := JsonToken.AsObject();
         if ResponseObject.Get('id', JsonToken) then begin
             if (JsonToken.AsValue().AsText() = WebhookSetup.ID) then
                 exit(CompareWebhookConfigurations(WebhookSetup, ResponseObject));
         end else
-            Error(WebhookDoesNotExist, WebhookSetup.ID);
+            Message(WebhookDoesNotExist, WebhookSetup.ID);
     end;
 
     internal procedure CompareWebhookConfigurations(var WebhookSetup: Record "NPR Adyen Webhook Setup"; WebhookObject: JsonObject) Updated: Boolean
     var
         JsonToken: JsonToken;
-        MerchantToken: JsonToken;
-        MerchantFilterUpdated: Boolean;
     begin
         if WebhookObject.Get('url', JsonToken) then
             if JsonToken.AsValue().AsText() <> WebhookSetup."Web Service URL" then begin
@@ -126,29 +128,6 @@ codeunit 6184796 "NPR Adyen Management"
                 WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, 150);
                 WebhookSetup.Modify(false);
                 Updated := true;
-            end;
-        if WebhookObject.Get('filterMerchantAccountType', JsonToken) then
-            if JsonToken.AsValue().AsText() <> WebhookSetup."Merchant Accounts Filter Type".Names().Get(WebhookSetup."Merchant Accounts Filter Type".Ordinals().IndexOf(WebhookSetup."Merchant Accounts Filter Type".AsInteger())) then begin
-                WebhookSetup."Merchant Accounts Filter Type" := Enum::"NPR Adyen Merchant Filter Type".FromInteger(WebhookSetup."Merchant Accounts Filter Type".Ordinals().Get(WebhookSetup."Merchant Accounts Filter Type".Names().IndexOf(JsonToken.AsValue().AsText())));
-                WebhookSetup.Modify(false);
-                Updated := true;
-            end;
-        if WebhookObject.Get('filterMerchantAccounts', JsonToken) then
-            if JsonToken.IsArray() then begin
-                MerchantFilterUpdated := false;
-                foreach MerchantToken in JsonToken.AsArray() do begin
-                    if not WebhookSetup."Merchant Accounts Filter".Contains(MerchantToken.AsValue().AsText()) then begin
-                        if not MerchantFilterUpdated then
-                            WebhookSetup."Merchant Accounts Filter" := '';
-                        WebhookSetup."Merchant Accounts Filter" += CopyStr(MerchantToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Merchant Accounts Filter")) + '|';
-                        MerchantFilterUpdated := true;
-                    end;
-                end;
-                if (MerchantFilterUpdated and WebhookSetup."Merchant Accounts Filter".Contains('|')) then begin
-                    WebhookSetup."Merchant Accounts Filter" := DelChr(WebhookSetup."Merchant Accounts Filter", '>', '|');
-                    WebhookSetup.Modify(false);
-                    Updated := true;
-                end;
             end;
         if WebhookObject.Get('active', JsonToken) then
             if JsonToken.AsValue().AsBoolean() <> WebhookSetup.Active then begin
@@ -168,17 +147,12 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure CreateDocumentFromWebhookRequest(var WebhookRequest: Record "NPR AF Rec. Webhook Request")
     var
-        HttpClient: HttpClient;
-        HttpResponseMessage: HttpResponseMessage;
-        ResponseText: Text;
-        ReportOutStream: OutStream;
         ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         RequestIsEmptyError01: Label 'Webhook Request No. %1 has no Report Download URL. Try another one.';
         DocumentExistConfirmation: Label 'Such document already exists. Open?';
         MultipleDocumentExist: Label 'Such documents already exist. Open?';
         UndefinedReportSchemeError: Label 'Report Scheme is undefined.';
         SchemeNotImplemented: Label 'Current Report Scheme is not yet implemented. Contact your Administrator.';
-        HttpErrorLabel: Label '%1 - %2';
         TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
 #IF NOT BC17
         NewDocumentsList: List of [Code[20]];
@@ -190,67 +164,54 @@ codeunit 6184796 "NPR Adyen Management"
         i: Integer;
     begin
         if (WebhookRequest."Report Download URL" = '') then
-            Error(RequestIsEmptyError01, WebhookRequest.ID)
-        else begin
-            ReconciliationHeader.Reset();
-            ReconciliationHeader.SetRange("Webhook Request ID", WebhookRequest.ID);
-            if ReconciliationHeader.FindSet(false) then begin
-                if ReconciliationHeader.Count() > 1 then begin
-                    if Confirm(MultipleDocumentExist) then
-                        Page.Run(Page::"NPR Adyen Reconciliation List", ReconciliationHeader);
-                end else begin
-                    if Confirm(DocumentExistConfirmation) then
-                        Page.Run(Page::"NPR Adyen Reconciliation", ReconciliationHeader);
-                end;
+            Error(RequestIsEmptyError01, Format(WebhookRequest.ID));
+
+        ReconciliationHeader.Reset();
+        ReconciliationHeader.SetRange("Webhook Request ID", WebhookRequest.ID);
+        if ReconciliationHeader.FindSet(false) then begin
+            if ReconciliationHeader.Count() > 1 then begin
+                if Confirm(MultipleDocumentExist) then
+                    Page.Run(Page::"NPR Adyen Reconciliation List", ReconciliationHeader);
             end else begin
-                Clear(WebhookRequest."Report Data");
-                _AdyenSetup.Get();
-                HttpClient.DefaultRequestHeaders.Add('x-api-key', _AdyenSetup."Download Report API Key");
-                HttpClient.Get(WebhookRequest."Report Download URL", HttpResponseMessage);
-                if (HttpResponseMessage.IsSuccessStatusCode()) then begin
-                    HttpResponseMessage.Content().ReadAs(ResponseText);
-                    WebhookRequest."Report Data".CreateOutStream(ReportOutStream, TextEncoding::UTF8);
-                    ReportOutStream.WriteText(ResponseText);
-                    WebhookRequest.Validate("Report Data");
-                    WebhookRequest.Modify();
-                end else
-                    Error(HttpErrorLabel, Format(HttpResponseMessage.HttpStatusCode()), HttpResponseMessage.ReasonPhrase());
-                if TransactionMatching.ValidateReportScheme(WebhookRequest) then begin
-                    case WebhookRequest."Report Type" of
-                        WebhookRequest."Report Type"::"Settlement details":
-                            begin
-                                NewDocumentsList := TransactionMatching.CreateSettlementDocuments(WebhookRequest, false, '');
-                                if NewDocumentsList.Count() > 0 then begin
-                                    for i := 1 to NewDocumentsList.Count() do begin
+                if Confirm(DocumentExistConfirmation) then
+                    Page.Run(Page::"NPR Adyen Reconciliation", ReconciliationHeader);
+            end;
+        end else begin
+            if TransactionMatching.ValidateReportScheme(WebhookRequest) then begin
+                case WebhookRequest."Report Type" of
+                    WebhookRequest."Report Type"::"Settlement details":
+                        begin
+                            NewDocumentsList := TransactionMatching.CreateSettlementDocuments(WebhookRequest, false, '');
+                            if NewDocumentsList.Count() > 0 then begin
+                                for i := 1 to NewDocumentsList.Count() do begin
 #IF NOT BC17
-                                        NewDocumentsFilter += NewDocumentsList.Get(i) + '|';
+                                    NewDocumentsFilter += NewDocumentsList.Get(i) + '|';
 #ELSE
                                     NewDocumentsList.Get(i, JsonToken);
                                     NewDocumentsFilter += JsonToken.AsValue().AsCode() + '|';
 #ENDIF
-                                    end;
-                                    ReconciliationHeader.SetFilter("Document No.", DelChr(NewDocumentsFilter, '>', '|'));
-                                    if ReconciliationHeader.FindSet(false) then begin
-                                        if NewDocumentsList.Count() > 1 then
-                                            Page.Run(Page::"NPR Adyen Reconciliation List", ReconciliationHeader)
-                                        else
-                                            Page.Run(Page::"NPR Adyen Reconciliation", ReconciliationHeader);
-                                    end;
-
-                                end else begin
-                                    OpenLogs(WebhookRequest);
                                 end;
+                                ReconciliationHeader.SetFilter("Document No.", DelChr(NewDocumentsFilter, '>', '|'));
+                                if ReconciliationHeader.FindSet(false) then begin
+                                    if NewDocumentsList.Count() > 1 then
+                                        Page.Run(Page::"NPR Adyen Reconciliation List", ReconciliationHeader)
+                                    else
+                                        Page.Run(Page::"NPR Adyen Reconciliation", ReconciliationHeader);
+                                end;
+
+                            end else begin
+                                OpenLogs(WebhookRequest);
                             end;
-                        WebhookRequest."Report Type"::"External Settlement detail (C)":
-                            begin
-                                Error(SchemeNotImplemented);
-                            end;
-                        WebhookRequest."Report Type"::Undefined:
-                            Error(UndefinedReportSchemeError);
-                    end;
-                end else begin
-                    OpenLogs(WebhookRequest);
+                        end;
+                    WebhookRequest."Report Type"::"External Settlement detail (C)":
+                        begin
+                            Error(SchemeNotImplemented);
+                        end;
+                    WebhookRequest."Report Type"::Undefined:
+                        Error(UndefinedReportSchemeError);
                 end;
+            end else begin
+                OpenLogs(WebhookRequest);
             end;
         end;
     end;
@@ -264,6 +225,7 @@ codeunit 6184796 "NPR Adyen Management"
         ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         UndefinedReportSchemeError: Label 'Report Scheme is undefined.';
         FileNotUploaded: Label 'The file was not uploaded.';
+        LocalFileLbl: Label 'Local File Upload', Locked = true;
         TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
 #IF NOT BC17
         NewDocumentsList: List of [Code[20]];
@@ -278,12 +240,12 @@ codeunit 6184796 "NPR Adyen Management"
         WebhookRequest.Init();
         WebhookRequest.ID := 0;
         WebhookRequest."Creation Date" := CurrentDateTime();
-        WebhookRequest."Report Download URL" := 'Local File Upload';
+        WebhookRequest."Report Download URL" := LocalFileLbl;
 
-        if UploadIntoStream('Import Report', '', 'Microsoft Excel Comma Separated Values File (*.CSV)|*.CSV', FileName, InStr) then begin
+        if UploadIntoStream('Import Report', '', 'Microsoft Excel Worksheet (*.xlsx)|*.xlsx', FileName, InStr) then begin
             WebhookRequest.Validate("PSP Reference", FileName);
             WebhookRequest.Validate("Report Name", FileName);
-            WebhookRequest."Report Data".CreateOutStream(OutStr);
+            WebhookRequest."Report Data".CreateOutStream(OutStr, TextEncoding::UTF8);
             if (not CopyStream(OutStr, InStr)) then Error(FileNotUploaded);
             WebhookRequest.Insert();
         end else
@@ -338,7 +300,7 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure ModifyWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup") Success: Boolean
     var
         RequestUrl: Text;
-        ChangeWebhookEndpoint: Label '/companies/%1/webhooks/%2', Locked = true;
+        ChangeWebhookEndpoint: Label '/merchants/%1/webhooks/%2', Locked = true;
         NoResponseLbl: Label 'Internal Server Error: No Valid Response.';
         RequestObject: JsonObject;
         AdditionalSettingsObject: JsonObject;
@@ -346,14 +308,12 @@ codeunit 6184796 "NPR Adyen Management"
         ResponseObject: JsonObject;
         JsonToken: JsonToken;
         RequestText: Text;
-        MerchantAccount: Record "NPR Adyen Merchant Account";
         EventCode: Record "NPR Adyen Webhook Event Code";
-        MerchantsArray: JsonArray;
         EventCodesArray: JsonArray;
     begin
         InitiateAdyenManagement();
 
-        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(ChangeWebhookEndpoint, _AdyenSetup."Company ID", WebhookSetup.ID);
+        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(ChangeWebhookEndpoint, WebhookSetup."Merchant Account", WebhookSetup.ID);
 
         RequestObject.Add('active', WebhookSetup.Active);
         RequestObject.Add('url', WebhookSetup."Web Service URL");
@@ -361,18 +321,7 @@ codeunit 6184796 "NPR Adyen Management"
             RequestObject.Add('description', WebhookSetup.Description);
         RequestObject.Add('username', WebhookSetup."Web Service User");
         RequestObject.Add('password', WebhookSetup."Web Service Password");
-        RequestObject.Add('filterMerchantAccountType', Format(WebhookSetup."Merchant Accounts Filter Type"));
-        if WebhookSetup."Merchant Accounts Filter Type" <> WebhookSetup."Merchant Accounts Filter Type"::allAccounts then begin
-            MerchantAccount.Reset();
-            if WebhookSetup."Merchant Accounts Filter" <> '' then
-                MerchantAccount.SetFilter(Name, WebhookSetup."Merchant Accounts Filter");
-            if MerchantAccount.FindSet(false) then begin
-                repeat
-                    MerchantsArray.Add(MerchantAccount.Name);
-                until MerchantAccount.Next() = 0;
-            end;
-            RequestObject.Add('filterMerchantAccounts', MerchantsArray);
-        end;
+
         if (WebhookSetup.Type = WebhookSetup.Type::standard) and (WebhookSetup."Include Events Filter" <> '') then begin
             EventCode.Reset();
             EventCode.SetFilter("Event Code", WebhookSetup."Include Events Filter");
@@ -386,7 +335,7 @@ codeunit 6184796 "NPR Adyen Management"
         end;
 
         RequestObject.WriteTo(RequestText);
-        ResponseText := CreateWebhookHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::PATCH);
+        ResponseText := CreateAdyenHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::PATCH);
 
         JsonToken.ReadFrom(ResponseText);
         ResponseObject := JsonToken.AsObject();
@@ -412,26 +361,25 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure DeleteWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup")
     var
         RequestUrl: Text;
-        DeleteWebhookEndpoint: Label '/companies/%1/webhooks/%2', Locked = true;
+        DeleteWebhookEndpoint: Label '/merchants/%1/webhooks/%2', Locked = true;
         SuccessDeleteLbl: Label 'Successfully deleted Webhook %1 from Adyen.';
         AlreadyDeletedLbl: Label 'Webhook with ID %1 had already been deleted.';
     begin
         InitiateAdyenManagement();
         WebhookSetup.TestField(ID);
 
-        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(DeleteWebhookEndpoint, _AdyenSetup."Company ID", WebhookSetup.ID);
-        if CreateWebhookHttpRequest('', RequestUrl, Enum::"Http Request Type"::DELETE) = '' then
+        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(DeleteWebhookEndpoint, WebhookSetup."Merchant Account", WebhookSetup.ID);
+        if CreateAdyenHttpRequest('', RequestUrl, Enum::"Http Request Type"::DELETE) = '' then
             Message(SuccessDeleteLbl, WebhookSetup.ID)
         else
             Message(AlreadyDeletedLbl, WebhookSetup.ID);
     end;
 
-    internal procedure ImportWebhooks(pageNumber: Integer) Updated: Boolean
+    internal procedure ImportWebhooks(pageNumber: Integer; MerchantAccount: Text[80])
     var
         WebhookSetup: Record "NPR Adyen Webhook Setup";
         WebhookType: Enum "NPR Adyen Webhook Type";
-        MerchantFilterType: Enum "NPR Adyen Merchant Filter Type";
-        GetAllWebhooksEndpoint: Label '/companies/%1/webhooks', Locked = true;
+        GetAllWebhooksEndpoint: Label '/merchants/%1/webhooks', Locked = true;
         HttpErrorLabel: Label '%1 - %2';
         HttpClient: HttpClient;
         HttpResponseMessage: HttpResponseMessage;
@@ -444,15 +392,13 @@ codeunit 6184796 "NPR Adyen Management"
         PagesTotal: Integer;
         WebhooksArray: JsonArray;
         WebhookObject: JsonObject;
-        MerchantArray: JsonArray;
-        MerchantToken: JsonToken;
         EventCodeArray: JsonArray;
         EventCodeToken: JsonToken;
         i: Integer;
     begin
         InitiateAdyenManagement();
 
-        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetAllWebhooksEndpoint, _AdyenSetup."Company ID") + '?pageSize=100';
+        RequestUrl := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetAllWebhooksEndpoint, MerchantAccount) + '?pageSize=100';
         if pageNumber > 0 then
             RequestURL += '&pageNumber=' + Format(pageNumber);
 
@@ -469,7 +415,7 @@ codeunit 6184796 "NPR Adyen Management"
             JsonObject.Get('pagesTotal', JsonToken);
             pagesTotal := JsonToken.AsValue().AsInteger();
             if not JsonObject.Get('data', JsonToken) then
-                exit(false);
+                exit;
             WebhooksArray := JsonToken.AsArray();
             if WebhooksArray.Count() > 0 then begin
                 for i := 0 to WebhooksArray.Count() - 1 do begin
@@ -495,15 +441,7 @@ codeunit 6184796 "NPR Adyen Management"
                             end;
                             WebhookObject.Get('active', JsonToken);
                             WebhookSetup.Active := JsonToken.AsValue().AsBoolean();
-                            WebhookObject.Get('filterMerchantAccountType', JsonToken);
-                            WebhookSetup."Merchant Accounts Filter Type" := Enum::"NPR Adyen Merchant Filter Type".FromInteger(MerchantFilterType.Ordinals().Get(MerchantFilterType.Names().IndexOf(JsonToken.AsValue().AsText())));
-                            if WebhookObject.Get('filterMerchantAccounts', JsonToken) then begin
-                                MerchantArray := JsonToken.AsArray();
-                                foreach MerchantToken in MerchantArray do
-                                    WebhookSetup."Merchant Accounts Filter" += CopyStr(MerchantToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup."Merchant Accounts Filter")) + '|';
-                                if WebhookSetup."Merchant Accounts Filter".Contains('|') then
-                                    WebhookSetup."Merchant Accounts Filter" := DelChr(WebhookSetup."Merchant Accounts Filter", '>', '|');
-                            end;
+                            WebhookSetup."Merchant Account" := MerchantAccount;
                             if WebhookSetup.Type = WebhookSetup.Type::standard then begin
                                 if WebhookObject.Get('additionalSettings', JsonToken) then begin
                                     if JsonToken.AsObject().Get('includeEventCodes', JsonToken) then begin
@@ -520,13 +458,12 @@ codeunit 6184796 "NPR Adyen Management"
                             WebhookSetup.Insert();
                             _ImportedWebhooks += 1;
                             Commit();
-                            Updated := true;
                         end;
                     end;
                 end;
                 if (pagesTotal > 1) and (pageNumber = 0) then
                     for i := 2 to pagesTotal do begin
-                        ImportWebhooks(i);
+                        ImportWebhooks(i, MerchantAccount);
                     end;
             end;
         end else
@@ -545,6 +482,20 @@ codeunit 6184796 "NPR Adyen Management"
         Log.Init();
         Log.ID := 0;
         Log."Webhook Request ID" := RequestID;
+        Log.Type := LogTypeLocal;
+        Log."Creation Date" := CurrentDateTime();
+        Log.Success := Success;
+        Log.Description := CopyStr(Description, 1, MaxStrLen(Log.Description));
+        Log.Insert();
+    end;
+
+    internal procedure CreateGeneralLog(LogTypeLocal: Enum "NPR Adyen Webhook Log Type"; Success: Boolean; Description: Text; RequestEntryNo: Integer)
+    var
+        Log: Record "NPR Adyen Webhook Log";
+    begin
+        Log.Init();
+        Log."Entry No." := 0;
+        Log."Webhook Request Entry No." := RequestEntryNo;
         Log.Type := LogTypeLocal;
         Log."Creation Date" := CurrentDateTime();
         Log.Success := Success;
@@ -643,55 +594,70 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure ChangeColorLine(ReconciliationLine: Record "NPR Adyen Recon. Line"): Text[50]
     begin
-        if ReconciliationLine.Status in [ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted"] then
-            exit('favorable')
-        else
-            exit('Unfavorable');
+        case ReconciliationLine.Status of
+            ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted":
+                exit('Favorable');
+            ReconciliationLine.Status::"Failed to Match":
+                exit('Unfavorable');
+            else
+                exit('Standard');
+        end;
     end;
 
     internal procedure ChangeColorDocument(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Text[50]
     begin
         if ReconciliationHeader.Posted then
-            exit('favorable')
+            exit('Favorable')
         else
             exit('Unfavorable');
     end;
 
-    internal procedure EmulateWebhookRequest(ReportName: Text[100])
+    internal procedure EmulateWebhookRequest(ReportName: Text[100]; MerchantAccount: Text[80]; Live: Boolean)
     var
-        RequestContent: Label '{"live":"false","notificationItems":[{"NotificationRequestItem":{"amount":{"currency":"EUR","value":0},"eventCode":"REPORT_AVAILABLE","eventDate":"2024-03-28T13:10:26+01:00","merchantAccountCode":"NavipartnerAfPPOS","merchantReference":"","pspReference":"%2","reason":"%1","success":"true"}}]}', Locked = true;
-        ReportDownloadURL: Label 'https://ca-test.adyen.com/reports/download/MerchantAccount/NavipartnerAfPPOS/', Locked = true;
+        RequestContent: Label '{"live":"%4","notificationItems":[{"NotificationRequestItem":{"amount":{"currency":"EUR","value":0},"eventCode":"REPORT_AVAILABLE","eventDate":"2024-01-01T00:00:00+01:00","merchantAccountCode":"%3","merchantReference":"","pspReference":"%2","reason":"%1","success":"true"}}]}', Locked = true;
+        ReportDownloadURL: Label 'https://ca-%2.adyen.com/reports/download/MerchantAccount/%1/', Locked = true;
+        ReportDownloadURLString: Text;
         ErrorText01: Label 'Could not download the report - %1 %2';
+        TestURL: Label 'test', Locked = true;
+        LiveURL: Label 'live', Locked = true;
         HttpClient: HttpClient;
         HttpResponseMessage: HttpResponseMessage;
-        ResponseText: Text;
-        ReportOutStream: OutStream;
+        HttpContent: HttpContent;
+        InStr: InStream;
+        OutStr: OutStream;
         RequestOutStream: OutStream;
         WebhookRequest: Record "NPR AF Rec. Webhook Request";
     begin
         _AdyenSetup.Get();
         HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup."Download Report API Key");
-        HttpClient.Get(ReportDownloadURL + ReportName, HttpResponseMessage);
-        if (HttpResponseMessage.IsSuccessStatusCode) then begin
-            HttpResponseMessage.Content.ReadAs(ResponseText);
+        if Live then
+            ReportDownloadURLString := StrSubstNo(ReportDownloadURL, MerchantAccount, LiveURL)
+        else
+            ReportDownloadURLString := StrSubstNo(ReportDownloadURL, MerchantAccount, TestURL);
 
+        HttpClient.Get(ReportDownloadURLString + ReportName, HttpResponseMessage);
+        if (HttpResponseMessage.IsSuccessStatusCode) then begin
             WebhookRequest.Init();
             WebhookRequest.ID := 0;
             WebhookRequest."Creation Date" := CurrentDateTime();
-            WebhookRequest."Report Download URL" := ReportDownloadURL + ReportName;
+            WebhookRequest."Report Download URL" := ReportDownloadURLString + ReportName;
             WebhookRequest."Report Name" := ReportName;
-            WebhookRequest."Report Data".CreateOutStream(ReportOutStream, TextEncoding::UTF8);
-            ReportOutStream.WriteText(ResponseText);
+            WebhookRequest."Report Data".CreateInStream(InStr, TextEncoding::UTF8);
+            HttpContent := HttpResponseMessage.Content();
+            HttpContent.ReadAs(InStr);
+            WebhookRequest."Report Data".CreateOutStream(OutStr);
+            CopyStream(OutStr, InStr);
             WebhookRequest.Validate("Report Data");
             WebhookRequest."Request Data".CreateOutStream(RequestOutStream, TextEncoding::UTF8);
-            RequestOutStream.WriteText(StrSubstNo(RequestContent, ReportDownloadURL + ReportName, ReportName));
+
+            RequestOutStream.WriteText(StrSubstNo(RequestContent, ReportDownloadURLString + ReportName, ReportName, MerchantAccount, Format(Live)));
             WebhookRequest.Insert();
             WebhookRequest.Validate("Request Data");
             WebhookRequest.Modify();
             exit;
         end;
 
-        Error(ErrorText01, HttpResponseMessage.HttpStatusCode(), HttpResponseMessage.ReasonPhrase());
+        Error(ErrorText01, Format(HttpResponseMessage.HttpStatusCode()), HttpResponseMessage.ReasonPhrase());
     end;
 
     internal procedure SetReconciledEFTMagentoUpgrade()
@@ -807,8 +773,6 @@ codeunit 6184796 "NPR Adyen Management"
     var
         RequestObject: JsonObject;
         AdditionalSettingsObject: JsonObject;
-        MerchantsArray: JsonArray;
-        MerchantAccount: Record "NPR Adyen Merchant Account";
         EventCode: Record "NPR Adyen Webhook Event Code";
         EventCodesArray: JsonArray;
     begin
@@ -824,18 +788,6 @@ codeunit 6184796 "NPR Adyen Management"
         RequestObject.Add('acceptsSelfSignedCertificate', true);
         RequestObject.Add('acceptsUntrustedRootCertificate', true);
         RequestObject.Add('populateSoapActionHeader', false);
-        RequestObject.Add('filterMerchantAccountType', Format(WebhookSetup."Merchant Accounts Filter Type"));
-        if WebhookSetup."Merchant Accounts Filter Type" <> WebhookSetup."Merchant Accounts Filter Type"::allAccounts then begin
-            MerchantAccount.Reset();
-            if WebhookSetup."Merchant Accounts Filter" <> '' then
-                MerchantAccount.SetFilter(Name, WebhookSetup."Merchant Accounts Filter");
-            if MerchantAccount.FindSet(false) then begin
-                repeat
-                    MerchantsArray.Add(MerchantAccount.Name);
-                until MerchantAccount.Next() = 0;
-            end;
-            RequestObject.Add('filterMerchantAccounts', MerchantsArray);
-        end;
         if (WebhookSetup.Type = WebhookSetup.Type::standard) and (WebhookSetup."Include Events Filter" <> '') then begin
             EventCode.Reset();
             EventCode.SetFilter("Event Code", WebhookSetup."Include Events Filter");
@@ -850,7 +802,7 @@ codeunit 6184796 "NPR Adyen Management"
         RequestObject.WriteTo(RequestText);
     end;
 
-    local procedure CreateWebhookHttpRequest(RequestText: Text; RequestUrl: Text; Method: Enum "Http Request Type"): Text
+    local procedure CreateAdyenHttpRequest(RequestText: Text; RequestUrl: Text; Method: Enum "Http Request Type"): Text
     var
         HttpClient: HttpClient;
         HttpContent: HttpContent;
@@ -859,6 +811,8 @@ codeunit 6184796 "NPR Adyen Management"
         HttpResponseMessage: HttpResponseMessage;
         ResponseText: Text;
     begin
+        if _AdyenSetup."Management API Key" = '' then
+            exit('');
         Clear(HttpRequestMessage);
         HttpContent.GetHeaders(HttpHeaders);
         HttpHeaders.Clear();
@@ -965,7 +919,7 @@ codeunit 6184796 "NPR Adyen Management"
     end;
 
     [NonDebuggable]
-    internal procedure SuggestAFWebServiceURL(Rec: Record "NPR Adyen Webhook Setup")
+    internal procedure SuggestAFWebServiceURL(var Rec: Record "NPR Adyen Webhook Setup")
     var
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
@@ -1003,10 +957,16 @@ codeunit 6184796 "NPR Adyen Management"
         JsonRequest: JsonObject;
         OutStr: OutStream;
         AdyenManagement: Codeunit "NPR Adyen Management";
-        LogType: Enum "NPR Adyen Rec. Log Type";
+        LogType: Enum "NPR Adyen Webhook Log Type";
         SuccessfullyReceivedAndLoggedLbl: Label 'Web Service has successfully received and logged a Webhook Request.';
         ErrorLbl: Label 'Web Service could not successfully log a Webhook Request because of some issue: %1.';
+        ReferenceValidationErrorLbl: Label 'Could not validate Webhook Reference.';
     begin
+        if not ValidateWebhookReference(json) then begin
+            AdyenManagement.CreateGeneralLog(LogType::Error, false, StrSubstNo(ErrorLbl, ReferenceValidationErrorLbl), AdyenWebhook."Entry No.");
+            exit(false);
+        end;
+
         AdyenWebhook.Init();
         AdyenWebhook."Entry No." := 0;
         AdyenWebhook."Request Data".CreateOutStream(OutStr, TextEncoding::UTF8);
@@ -1021,11 +981,12 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenWebhook.Insert();
 
         if AdyenWebhook.Success then begin
-            AdyenManagement.CreateLog(LogType::"Background Session", true, SuccessfullyReceivedAndLoggedLbl, 0);
+            AdyenManagement.CreateGeneralLog(LogType::Register, true, SuccessfullyReceivedAndLoggedLbl, AdyenWebhook."Entry No.");
             Commit();
-            ProcessEvent(AdyenWebhook);
+            if not ProcessEvent(AdyenWebhook) then
+                AdyenManagement.CreateGeneralLog(LogType::Error, false, GetLastErrorText(), AdyenWebhook."Entry No.");
         end else
-            AdyenManagement.CreateLog(LogType::"Background Session", false, ErrorLbl, 0);
+            AdyenManagement.CreateGeneralLog(LogType::Error, false, StrSubstNo(ErrorLbl, GetLastErrorText()), AdyenWebhook."Entry No.");
 
         exit(AdyenWebhook.Success);
     end;
@@ -1051,6 +1012,58 @@ codeunit 6184796 "NPR Adyen Management"
     begin
         if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID) then
             JobQueueEntry.Cancel();
+    end;
+
+    local procedure ValidateWebhookReference(json: Text): Boolean
+    var
+        MerchantAccount: Record "NPR Adyen Merchant Account";
+        ResponseText: Text;
+        JsonObject: JsonObject;
+        RequestObject: JsonObject;
+        RequestToken: JsonToken;
+        JsonToken: JsonToken;
+        JsonWebhookToken: JsonToken;
+        RequestURL: Text;
+        GetWebhooksEndpoint: Label '/merchants/%1/webhooks', Locked = true;
+    begin
+        if not _AdyenSetup.Get() then
+            exit;
+        UpdateMerchantList(0);
+
+        if MerchantAccount.FindSet() then
+            repeat
+                RequestURL := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetWebhooksEndpoint, MerchantAccount.Name);
+                ResponseText := CreateAdyenHttpRequest('', RequestURL, Enum::"Http Request Type"::GET);
+
+                if ResponseText = '' then
+                    exit;
+
+                JsonObject.ReadFrom(ResponseText);
+                if not JsonObject.Get('data', JsonToken) then
+                    exit;
+
+                RequestObject.ReadFrom(json);
+                if not RequestObject.Get('WebhookReference', RequestToken) then
+                    exit;
+
+                foreach JsonWebhookToken in JsonToken.AsArray() do begin
+                    if JsonWebhookToken.AsObject().Get('id', JsonWebhookToken) then
+                        if JsonWebhookToken.AsValue().AsCode() = RequestToken.AsValue().AsCode() then
+                            exit(true);
+                end;
+            until MerchantAccount.Next() = 0;
+    end;
+
+    internal procedure InitReportReadyWebhookSetup(var WebhookSetup: Record "NPR Adyen Webhook Setup"; WebhookEventsFilter: Text; MerchantAccount: Text[80])
+    begin
+        WebhookSetup.Init();
+        WebhookSetup."Primary Key" := 0;
+        WebhookSetup."Merchant Account" := MerchantAccount;
+        WebhookSetup.Type := Enum::"NPR Adyen Webhook Type"::standard;
+        WebhookSetup."Include Events Filter" := CopyStr(WebhookEventsFilter, 1, 2048);
+        WebhookSetup.Active := true;
+        WebhookSetup.Insert();
+        SuggestAFWebServiceURL(WebhookSetup);
     end;
 
     local procedure SecretDisplayName(): Text
@@ -1187,6 +1200,7 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenWebhook."Webhook Reference" := WebhookReference;
     end;
 
+    [TryFunction]
     local procedure ProcessEvent(AdyenWebhook: Record "NPR Adyen Webhook")
     var
         ReportReady: Codeunit "NPR Adyen Process Report Ready";

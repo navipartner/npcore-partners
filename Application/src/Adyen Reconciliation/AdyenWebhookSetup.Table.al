@@ -61,15 +61,27 @@ table 6150805 "NPR Adyen Webhook Setup"
             DataClassification = CustomerContent;
             Caption = 'Active';
         }
+        field(75; "Merchant Account"; Text[80])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Merchant Account';
+            TableRelation = "NPR Adyen Merchant Account".Name;
+        }
         field(80; "Merchant Accounts Filter Type"; Enum "NPR Adyen Merchant Filter Type")
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter Type';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(90; "Merchant Accounts Filter"; Text[2048])
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(100; Description; Text[150])
         {

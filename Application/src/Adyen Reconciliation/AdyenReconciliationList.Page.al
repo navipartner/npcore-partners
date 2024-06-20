@@ -10,6 +10,7 @@ page 6184534 "NPR Adyen Reconciliation List"
     ApplicationArea = NPRRetail;
     AdditionalSearchTerms = 'Adyen Reconciliation';
     Editable = false;
+    DeleteAllowed = true;
 
     layout
     {
@@ -54,6 +55,17 @@ page 6184534 "NPR Adyen Reconciliation List"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Document Date.';
+                    StyleExpr = _StyleExprTxt;
+
+                    trigger OnValidate()
+                    begin
+                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
+                    end;
+                }
+                field("Transactions Date"; Rec."Transactions Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Transactions Date.';
                     StyleExpr = _StyleExprTxt;
 
                     trigger OnValidate()

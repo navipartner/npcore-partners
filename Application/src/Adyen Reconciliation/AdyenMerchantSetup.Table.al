@@ -80,13 +80,13 @@ table 6150829 "NPR Adyen Merchant Setup"
         field(85; "Acquirer Payout Acc. Type"; Enum "Gen. Journal Account Type")
         {
             DataClassification = CustomerContent;
-            Caption = 'Acquirer Payout Acc. Type';
+            Caption = 'External Merchant Payout Acc. Type';
             ValuesAllowed = "G/L Account", "Bank Account";
         }
         field(86; "Acquirer Payout Acc. No."; Code[20])
         {
             DataClassification = CustomerContent;
-            Caption = 'Acquirer Payout Acc. No.';
+            Caption = 'External Merchant Payout Acc. No.';
             TableRelation = if ("Acquirer Payout Acc. Type" = const("G/L Account")) "G/L Account"
             else
             if ("Acquirer Payout Acc. Type" = const("Bank Account")) "Bank Account";

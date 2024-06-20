@@ -5,9 +5,10 @@ codeunit 6184827 "NPR Adyen Fee Posting"
     var
         GenJnlLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
-        GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
         AdyenManagement: Codeunit "NPR Adyen Management";
         AmountType: Enum "NPR Adyen Recon. Amount Type";
+        EFTTransPosting: Codeunit "NPR Adyen EFT Trans. Posting";
+        GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         GenJnlLine.Init();
         GenJnlLine.SetSuppressCommit(true);
@@ -87,15 +88,16 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         GenJnlLine.Description := CopyStr(_ReconciliationLine."Modification Reference", 1, MaxStrLen(GenJnlLine.Description));
         if GLSetup.Get() and (_ReconciliationLine."Adyen Acc. Currency Code" <> GLSetup."LCY Code") then
             GenJnlLine.Validate("Currency Code", _ReconciliationLine."Adyen Acc. Currency Code");
-        GenJnlLine."Bal. Account Type" := _AdyenMerchantSetup."Reconciled Payment Acc. Type";
-        GenJnlLine."Bal. Account No." := _AdyenMerchantSetup."Reconciled Payment Acc. No.";
         GenJnlLine.Validate(Amount, _ReconciliationLine."Amount(AAC)");
         GenJnlLine."Source Code" := _AdyenMerchantSetup."Posting Source Code";
+        _GLEntryNo := EFTTransPosting.PostGenJnlLine(GenJnlLine, GenJournalPostLine);
 
-        _GLEntryNo := GenJournalPostLine.RunWithCheck(GenJnlLine);
+        GenJnlLine."Account Type" := _AdyenMerchantSetup."Reconciled Payment Acc. Type";
+        GenJnlLine.Validate("Account No.", _AdyenMerchantSetup."Reconciled Payment Acc. No.");
+        GenJnlLine.Validate(Amount, -_ReconciliationLine."Amount(AAC)");
+        EFTTransPosting.PostGenJnlLine(GenJnlLine, GenJournalPostLine);
 
-        if _GLEntryNo <> 0 then
-            AdyenManagement.CreateGLEntryReconciliationLineRelation(_GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", AmountType, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+        AdyenManagement.CreateGLEntryReconciliationLineRelation(_GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", AmountType, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
     end;
 
     internal procedure FeePosted(RecLine: Record "NPR Adyen Recon. Line"): Boolean
@@ -135,6 +137,7 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         _AdyenSetup.Get();
         _GLAccountType := GLAccountType;
         _AdyenMerchantSetup.Get(RecLine."Merchant Account");
+
         case _GLAccountType of
             _GLAccountType::"Fee G/L Account":
                 _AdyenMerchantSetup.TestField("Fee G/L Account");

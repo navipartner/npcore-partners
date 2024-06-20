@@ -1,32 +1,32 @@
-page 6184536 "NPR Adyen Reconciliation Logs"
+page 6184669 "NPR Adyen Webhook Logs"
 {
     ApplicationArea = NPRRetail;
     UsageCategory = History;
-    AdditionalSearchTerms = 'adyen logs,adyen reconciliaiton logs,reconciliation logs';
-    Caption = 'Adyen Reconciliation Logs';
+    AdditionalSearchTerms = 'adyen logs,adyen webhook logs,webhook logs';
+    Caption = 'Adyen Webhook Logs';
     PageType = List;
-    SourceTable = "NPR Adyen Reconciliation Log";
-    SourceTableView = sorting(ID) order(descending);
+    SourceTable = "NPR Adyen Webhook Log";
+    SourceTableView = sorting("Entry No.") order(descending);
     Editable = false;
     Extensible = false;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(General)
             {
-                field(ID; Rec.ID)
+                field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Log ID.';
+                    ToolTip = 'Specifies the Entry No.';
                 }
                 field("Creation Date"; Rec."Creation Date")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Log Creation Date.';
+                    ToolTip = 'Specifies the Creation Date.';
                 }
-                field(Type; Rec."Type")
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Log Type.';
@@ -39,12 +39,12 @@ page 6184536 "NPR Adyen Reconciliation Logs"
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Log Description.';
+                    ToolTip = 'Specifies the Error Description.';
                 }
-                field("Webhook Request ID"; Rec."Webhook Request ID")
+                field("Webhook Request Entry No."; Rec."Webhook Request Entry No.")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the related Webhook Request ID.';
+                    ToolTip = 'Specifies the Webhook Request Entry No. that the current Log applies to.';
                 }
             }
         }
@@ -90,26 +90,6 @@ page 6184536 "NPR Adyen Reconciliation Logs"
                 begin
                     if Rec.Description <> '' then
                         Message(Rec.Description);
-                end;
-            }
-            action("Show Valid Report Scheme")
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Show valid Report Scheme';
-                Image = LinkWeb;
-                ToolTip = 'Running this action will open Open Valid Report Scheme Picture.';
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-
-                trigger OnAction()
-                var
-                    AdyenGenericSetup: Record "NPR Adyen Setup";
-                    ReportSchemeURL: Label 'https://docs.navipartner.com/docs/', Locked = true; // TODO
-                begin
-                    if AdyenGenericSetup.Get() then
-                        Hyperlink(ReportSchemeURL);
                 end;
             }
         }

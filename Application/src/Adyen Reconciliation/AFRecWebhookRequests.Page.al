@@ -61,15 +61,6 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 }
             }
         }
-        area(factboxes)
-        {
-            part(ReportData; "NPR Adyen WH Report Factbox")
-            {
-                ApplicationArea = NPRRetail;
-                Editable = false;
-                SubPageLink = ID = field(ID);
-            }
-        }
     }
     actions
     {
@@ -113,8 +104,6 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 begin
                     Logs.FilterGroup(0);
                     Logs.SetRange("Webhook Request ID", Rec.ID);
-                    Logs.SetCurrentKey(ID);
-                    Logs.Ascending(false);
                     Logs.FilterGroup(2);
                     Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
                 end;
@@ -139,13 +128,13 @@ page 6184519 "NPR AF Rec. Webhook Requests"
 
                     trigger OnAction()
                     var
-                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to make a Reconciliation Document from is not a valid format. The file must be in .CSV format.\\Please update your Report Generation configurations in Adyen Customer Area.';
+                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to make a Reconciliation Document from is not a valid format. The file must be in .XLSX format.\\Please update your Report Generation configurations in Adyen Customer Area.';
                         WebhookRequest: Record "NPR AF Rec. Webhook Request";
                     begin
                         WebhookRequest := Rec;
                         if WebhookRequest."Report Name" = '' then
                             Error(InvalidReportName);
-                        if not WebhookRequest."Report Name".Contains('.csv') then
+                        if not WebhookRequest."Report Name".Contains('.xlsx') then
                             Error(InvalidFileType);
                         _AdyenManagement.CreateDocumentFromWebhookRequest(WebhookRequest);
                     end;
@@ -181,15 +170,28 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                     var
                         AdyenSimulateWebhookRequest: Report "NPR Adyen Simulate Webhook Req";
                         ReportName: Text[100];
-                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to upload is not a valid format. Please upload a file in .CSV format.';
+                        MerchantAccount: Text[80];
+                        Live: Boolean;
+                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to upload is not a valid format. Please upload a file in .XLSX format.';
+                        InvalidMerchantAccount: Label 'Merchant Account is blank.';
+                        ReportDetails: Text;
                     begin
-                        ReportName := AdyenSimulateWebhookRequest.RequestReportName();
+                        ReportDetails := AdyenSimulateWebhookRequest.RequestReportName();
+                        if ReportDetails <> '' then begin
+                            ReportName := CopyStr(ReportDetails.Split('|').Get(1), 1, 100);
+                            MerchantAccount := CopyStr(ReportDetails.Split('|').Get(2), 1, 80);
+                            if Evaluate(Live, ReportDetails.Split('|').Get(3)) then;
+                        end;
                         if ReportName = '' then
                             Error(InvalidReportName);
-                        if not ReportName.Contains('.csv') then
+                        if not ReportName.Contains('.xlsx') then
                             Error(InvalidFileType);
-                        if ReportName <> '' then
-                            _AdyenManagement.EmulateWebhookRequest(ReportName);
+                        if MerchantAccount = '' then
+                            Error(InvalidMerchantAccount);
+                        if (ReportName <> '') and (MerchantAccount <> '') then
+                            _AdyenManagement.EmulateWebhookRequest(ReportName, MerchantAccount, Live);
+
+                        CurrPage.Update();
                     end;
                 }
             }
