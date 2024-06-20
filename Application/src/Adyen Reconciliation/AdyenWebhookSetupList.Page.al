@@ -42,15 +42,10 @@ page 6184551 "NPR Adyen Webhook Setup List"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the Webhook is Active.';
                 }
-                field("Merchant Accounts Filter Type"; Rec."Merchant Accounts Filter Type")
+                field("Merchant Account"; Rec."Merchant Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Marchant Accounts Filter Type.';
-                }
-                field("Merchant Accounts Filter"; Rec."Merchant Accounts Filter")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Filter the Merchant Accounts list you want to setup a Webhook for.';
+                    ToolTip = 'Specifies the Merchant Account the current Webhook will work for.';
                 }
             }
         }
@@ -76,11 +71,22 @@ page 6184551 "NPR Adyen Webhook Setup List"
                     AdyenManagement: Codeunit "NPR Adyen Management";
                     WebhookImportSuccess: Label 'Successfully imported %1 Webhook Setups.';
                     WebhookImportFail: Label 'No Webhook Setups were imported.';
+                    MerchantAccounts: Record "NPR Adyen Merchant Account";
+                    ImportedWebhooks: Integer;
                 begin
-                    if AdyenManagement.ImportWebhooks(0) then
-                        Message(StrSubstNo(WebhookImportSuccess, Format(AdyenManagement.GetImportedWebhooksAmount())))
-                    else
-                        Error(WebhookImportFail);
+                    AdyenManagement.UpdateMerchantList(0);
+                    if MerchantAccounts.FindSet() then begin
+                        Clear(ImportedWebhooks);
+                        repeat
+                            AdyenManagement.ImportWebhooks(0, MerchantAccounts.Name);
+                        until MerchantAccounts.Next() = 0;
+
+                        ImportedWebhooks := AdyenManagement.GetImportedWebhooksAmount();
+                        if ImportedWebhooks > 0 then
+                            Message(StrSubstNo(WebhookImportSuccess, Format(ImportedWebhooks)))
+                        else
+                            Message(WebhookImportFail);
+                    end;
                 end;
             }
         }

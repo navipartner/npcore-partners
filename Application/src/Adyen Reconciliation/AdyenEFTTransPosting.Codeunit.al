@@ -35,6 +35,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _AdyenMerchantSetup.TestField("Markup G/L Account");
         _AdyenMerchantSetup.TestField("Other commissions G/L Account");
         _AdyenMerchantSetup.TestField("Reconciled Payment Acc. No.");
+
         if (RecLine."Realized Gains or Losses" <> 0) and (RecLine."Transaction Currency Code" <> '') then begin
             _Currency.Get(RecLine."Transaction Currency Code");
             _Currency.TestField("Realized Gains Acc.");
@@ -64,6 +65,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                 _PaymentAccountType := _PaymentAccountType::"G/L Account";
             POSPostingSetup."Account Type"::"Bank Account":
                 _PaymentAccountType := _PaymentAccountType::"Bank Account";
+            POSPostingSetup."Account Type"::Customer:
+                _PaymentAccountType := _PaymentAccountType::Customer;
         end;
         _PaymentAccountNo := POSPostingSetup."Account No.";
     end;
@@ -73,11 +76,14 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                                                                    BalAccountNo: Code[20];
                                                                    DimensionSetID: Integer;
                                                                    CurrencyCode: Code[20];
-                                                                   Description: Text[100]) GLEntryNo: Integer;
+                                                                   Description: Text[100];
+                                                                   ReturnBalancingAccountNo: Boolean): Integer;
     var
-        GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
         GenJnlLine: Record "Gen. Journal Line";
+        GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
         DimensionManagement: Codeunit DimensionManagement;
+        GLEntryNo: Integer;
+        BalancingGLEntryNo: Integer;
     begin
         GenJnlLine.Init();
         GenJnlLine.SetSuppressCommit(true);
@@ -99,10 +105,27 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         DimensionManagement.UpdateGlobalDimFromDimSetID(
           GenJnlLine."Dimension Set ID", GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code");
 
-        GenJnlLine."Bal. Account Type" := BalAccountType;
-        GenJnlLine."Bal. Account No." := BalAccountNo;
+
         GenJnlLine."Source Code" := _AdyenMerchantSetup."Posting Source Code";
+        GLEntryNo := PostGenJnlLine(GenJnlLine, GenJournalPostLine);
+
+        GenJnlLine."Account Type" := BalAccountType;
+        GenJnlLine.Validate("Account No.", BalAccountNo);
+        GenJnlLine.Validate(Amount, -GenJnlLine.Amount);
+        BalancingGLEntryNo := PostGenJnlLine(GenJnlLine, GenJournalPostLine);
+
+        if ReturnBalancingAccountNo then
+            exit(BalancingGLEntryNo)
+        else
+            exit(GLEntryNo);
+    end;
+
+    internal procedure PostGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line") GLEntryNo: Integer
+    begin
         GLEntryNo := GenJournalPostLine.RunWithCheck(GenJnlLine);
+
+        if GLEntryNo = 0 then
+            GLEntryNo := GenJournalPostLine.GetNextEntryNo() - 1;
     end;
 
     local procedure PostEFT()
@@ -154,6 +177,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     ReversePOSPaymentLine."Created by Reconciliation" := true;
                     ReversePOSPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
                     ReversePOSPaymentLine.Insert();
+                    // PostReversePOSPaymentLine.Run
 
                     ReverseEFTTransactionRequest := EFTTransactionRequest;
                     ReverseEFTTransactionRequest."Entry No." := 0;
@@ -220,8 +244,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
 
                     ReverseMagentoPaymentLine := MagentoPaymentLine;
-
-
                     MagentoPaymentLine.SetRange("Document Table No.", ReverseMagentoPaymentLine."Document Table No.");
                     MagentoPaymentLine.SetRange("Document No.", ReverseMagentoPaymentLine."Document No.");
                     MagentoPaymentLine.SetRange("Document Type", ReverseMagentoPaymentLine."Document Type");
@@ -257,6 +279,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     end;
                     ReverseMagentoPaymentLine.Insert();
 
+                    // PostReverseMagentoPaymentLine
+
                     MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
                     MagentoPaymentLine."Reversed by Entry System ID" := ReverseMagentoPaymentLine.SystemId;
                     MagentoPaymentLine.Reversed := true;
@@ -285,29 +309,24 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         GLEntryNo: Integer;
     begin
         if (_ReconciliationLine."Amount (TCY)" <> 0) and (not _TransactionPosted) then begin
-            GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", AdyenTransactionLabel);
-            if GLEntryNo <> 0 then
-                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+            GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", AdyenTransactionLabel, true);
+            AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _MarkupPosted) then begin
-            GLEntryNo := CreatePostGL(_ReconciliationLine."Markup (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Markup G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenMarkupLabel);
-            if GLEntryNo <> 0 then
-                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Markup, _ReconciliationLine."Markup (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+            GLEntryNo := CreatePostGL(_ReconciliationLine."Markup (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Markup G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenMarkupLabel, false);
+            AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Markup, _ReconciliationLine."Markup (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if (_ReconciliationLine."Other Commissions (LCY)" <> 0) and (not _CommissionsPosted) then begin
-            GLEntryNo := CreatePostGL(_ReconciliationLine."Other Commissions (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Other commissions G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenOtherCommissionsLabel);
-            if GLEntryNo <> 0 then
-                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Other commissions", _ReconciliationLine."Other Commissions (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+            GLEntryNo := CreatePostGL(_ReconciliationLine."Other Commissions (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Other commissions G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenOtherCommissionsLabel, false);
+            AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Other commissions", _ReconciliationLine."Other Commissions (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if (_ReconciliationLine."Realized Gains or Losses" <> 0) and (not _RealizedGainsOrLossesPosted) then begin
             if _ReconciliationLine."Realized Gains or Losses" < 0 then begin
-                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Gains Acc.", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenRealizedGainsLabel);
-                if GLEntryNo <> 0 then
-                    AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Gains", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Gains Acc.", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenRealizedGainsLabel, false);
+                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Gains", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
             end else begin
-                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Losses Acc.", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenRealizedLossesLabel);
-                if GLEntryNo <> 0 then
-                    AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Losses", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Losses Acc.", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenRealizedLossesLabel, false);
+                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Losses", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
             end;
         end;
     end;

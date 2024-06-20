@@ -29,7 +29,7 @@ page 6184582 "NPR Adyen Merchant Setup"
             }
             group(Reconciliation)
             {
-                Caption = 'Reconciliatiom';
+                Caption = 'Reconciliation';
                 field("Fee G/L Account"; Rec."Fee G/L Account")
                 {
                     ApplicationArea = NPRRetail;

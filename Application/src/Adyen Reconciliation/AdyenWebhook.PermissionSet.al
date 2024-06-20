@@ -12,6 +12,8 @@ permissionset 6014406 "NPR Adyen Webhook"
         tabledata "NPR AF Rec. Webhook Request" = RIM,
         tabledata "NPR Adyen Setup" = R,
         tabledata "NPR Adyen Webhook" = RIM,
-        tabledata "NPR Adyen Reconciliation Log" = I;
+        tabledata "NPR Adyen Reconciliation Log" = I,
+        tabledata "NPR Adyen Webhook Log" = I,
+        tabledata "NPR Adyen Merchant Account" = RIMD;
 }
 #endif

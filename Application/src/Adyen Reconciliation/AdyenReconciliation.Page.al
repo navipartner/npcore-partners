@@ -9,7 +9,7 @@ page 6184502 "NPR Adyen Reconciliation"
     RefreshOnActivate = true;
     InsertAllowed = false;
     ModifyAllowed = true;
-    DeleteAllowed = false;
+    DeleteAllowed = true;
 
     layout
     {
@@ -34,6 +34,12 @@ page 6184502 "NPR Adyen Reconciliation"
                 field("Document Date"; Rec."Document Date")
                 {
                     ToolTip = 'Specifies the Reconciliation Document Date.';
+                    Editable = false;
+                    ApplicationArea = NPRRetail;
+                }
+                field("Transactions Date"; Rec."Transactions Date")
+                {
+                    ToolTip = 'Specifies the Report Transactions Date.';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
@@ -101,6 +107,12 @@ page 6184502 "NPR Adyen Reconciliation"
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
+                field("Merchant Payout"; Rec."Merchant Payout")
+                {
+                    ToolTip = 'Specifies the Merchant Payout.';
+                    Editable = false;
+                    ApplicationArea = NPRRetail;
+                }
             }
             part("Reconciliation Lines"; "NPR Adyen Reconciliation Lines")
             {
@@ -121,6 +133,9 @@ page 6184502 "NPR Adyen Reconciliation"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
+                actionref(Recreate_Promoted; "Recreate Document")
+                {
+                }
                 actionref(Match_Promoted; "Match Entries")
                 {
                 }
@@ -137,10 +152,32 @@ page 6184502 "NPR Adyen Reconciliation"
                 Caption = 'Manage';
                 Image = Process;
 
+                action("Recreate Document")
+                {
+                    Caption = 'Recreate Document';
+                    Image = RefreshText;
+                    Enabled = not _DocumentPosted;
+                    ToolTip = 'Running this action will initiate the Document Recreation process, which includes downloading the report and re-importing the entries, except for the posted ones.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        UpdatedEnties: Integer;
+                        UpdatedEntriesSuccessLbl: Label 'Successfully recreated %1 entry/entries.';
+                        UpdatedEntriesEmptyLbl: Label 'No entries were updated.';
+                    begin
+                        UpdatedEnties := _TransactionMatching.RecreateDocumentEntries(Rec);
+                        if UpdatedEnties > 0 then begin
+                            Message(UpdatedEntriesSuccessLbl, Format(UpdatedEnties));
+                            CurrPage.Update();
+                        end else
+                            Message(UpdatedEntriesEmptyLbl);
+                    end;
+                }
+
                 action("Match Entries")
                 {
                     Caption = 'Match Entries';
-                    Ellipsis = true;
                     Image = SelectEntries;
                     Enabled = not _DocumentPosted;
                     ToolTip = 'Running this action will initiate transaction matching process (Assignes Matching table and Matching entry No.).';
@@ -163,7 +200,6 @@ page 6184502 "NPR Adyen Reconciliation"
                 action("Post Entries")
                 {
                     Caption = 'Post Entries';
-                    Ellipsis = true;
                     Image = PostingEntries;
                     Enabled = not _DocumentPosted;
                     ToolTip = 'Running this action will post transactions.';
@@ -188,7 +224,6 @@ page 6184502 "NPR Adyen Reconciliation"
             action("Show Logs")
             {
                 Caption = 'Show Logs';
-                Ellipsis = true;
                 Image = Log;
                 ToolTip = 'Running this action will open Adyen Reconciliation Log Journal.';
                 ApplicationArea = NPRRetail;

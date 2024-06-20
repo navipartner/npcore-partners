@@ -12,6 +12,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
     trigger OnUpgradePerCompany()
     begin
         UpdatePSPReferenceForEFTTrans();
+        UpdateAdyenSetupCompanyID();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -38,4 +39,30 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
+
+    local procedure UpdateAdyenSetupCompanyID()
+    var
+        AdyenSetup: Record "NPR Adyen Setup";
+        AdyenSetupCompanyID: Record "NPR Adyen Setup";
+    begin
+        UpgradeStep := 'UpdateAdyenSetupCompanyID';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+
+        if not AdyenSetup.Get() then
+            exit;
+
+        AdyenSetupCompanyID.Init();
+        if AdyenSetup."Company ID" = AdyenSetupCompanyID."Company ID" then
+            exit;
+
+        AdyenSetup."Company ID" := AdyenSetupCompanyID."Company ID";
+        AdyenSetup.Modify(false);
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+
 }

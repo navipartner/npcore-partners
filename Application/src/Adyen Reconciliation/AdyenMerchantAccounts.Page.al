@@ -45,8 +45,6 @@ page 6184552 "NPR Adyen Merchant Accounts"
 
                 trigger OnAction()
                 begin
-                    _MerchantAccount.Reset();
-                    _MerchantAccount.DeleteAll();
                     if _AdyenManagement.UpdateMerchantList(0) then
                         CurrPage.Update();
                 end;
@@ -56,13 +54,10 @@ page 6184552 "NPR Adyen Merchant Accounts"
 
     trigger OnOpenPage()
     begin
-        _MerchantAccount.Reset();
-        _MerchantAccount.DeleteAll();
         if _AdyenManagement.UpdateMerchantList(0) then
             CurrPage.Update();
     end;
 
     var
-        _MerchantAccount: Record "NPR Adyen Merchant Account";
         _AdyenManagement: Codeunit "NPR Adyen Management";
 }

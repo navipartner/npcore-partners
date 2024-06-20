@@ -34,7 +34,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit;
         end;
 
-        if not GetReportData(ReportWebhookRequest) then
+        if not GetReportData(ReportWebhookRequest, false) then
             exit;
 
         if not RecreateExistingDocument then
@@ -74,6 +74,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine2: Record "NPR Adyen Recon. Line";
         UnmatchedEntries: Integer;
         Handled: Boolean;
+        Window: Dialog;
+        MatchingEntriesLbl: Label 'Attempting to Match Reconciliation Line entries...\\Matching #1 Entry out of #2';
+        ProcessedEntries: Integer;
+        TotalEntries: Integer;
     begin
         ReconciliationLine.Reset();
         ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
@@ -84,6 +88,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         Clear(MatchedEntries);
         Clear(UnmatchedEntries);
+
+        if GuiAllowed then begin
+            Clear(ProcessedEntries);
+            TotalEntries := ReconciliationLine.Count();
+            Window.Open(MatchingEntriesLbl);
+            Window.Update(1, TotalEntries);
+        end;
+
         repeat
             ReconciliationLine2 := ReconciliationLine;
             Handled := false;
@@ -117,7 +129,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
                 ReconciliationLine2.Modify();
             end;
+
+            if GuiAllowed then begin
+                ProcessedEntries += 1;
+                Window.Update(2, ProcessedEntries);
+            end;
+
         until ReconciliationLine.Next() = 0;
+
+        if GuiAllowed() then
+            Window.Close();
+
         if UnmatchedEntries > 0 then
             _AdyenManagement.CreateLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError03, Format(UnmatchedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID")
         else
@@ -130,19 +152,40 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine: Record "NPR Adyen Recon. Line";
         UnPostedEntries: Integer;
         Handled: Boolean;
+        Window: Dialog;
+        TotalEntries: Integer;
+        ProcessedEntries: Integer;
+        PostingEntriesLbl: Label 'Attempting to Post Reconciliation Line entries...\\Posting #1 Entry out of #2';
     begin
         ReconciliationLine.Reset();
         ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine."Status"::Posted);
+        if ReconciliationLine.IsEmpty() then begin
+            _AdyenManagement.CreateLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+            ReconciliationHeader.Posted := true;
+            ReconciliationHeader.Modify();
+            exit(true);
+        end;
+
         ReconciliationLine.SetRange(Status, ReconciliationLine."Status"::Matched);
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
         end;
-        ReconciliationLine.SetRange(Status);
+        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine.Status::Posted);
         ReconciliationLine.FindSet();
+
+        if GuiAllowed then begin
+            Clear(ProcessedEntries);
+            TotalEntries := ReconciliationLine.Count();
+            Window.Open(PostingEntriesLbl);
+            Window.Update(1, TotalEntries);
+        end;
+
         repeat
             Handled := false;
             if not Handled then begin
+                AssignPostingDateAndNo(ReconciliationLine, ReconciliationHeader);
                 Commit();
                 case ReconciliationLine."Matching Table Name" of
                     ReconciliationLine."Matching Table Name"::"EFT Transaction",
@@ -161,7 +204,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
                 ReconciliationLine.Modify();
             end;
+
+            if GuiAllowed then begin
+                ProcessedEntries += 1;
+                Window.Update(2, ProcessedEntries);
+            end;
         until ReconciliationLine.Next() = 0;
+
+        if GuiAllowed() then
+            Window.Close();
 
         if UnPostedEntries > 0 then begin
             _AdyenManagement.CreateLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError03, Format(UnPostedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
@@ -198,8 +249,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             _AdyenManagement.CreateLog(_LogType::"Init Setup", false, PostingNosEmpty, WebhookRequest.ID);
             exit;
         end;
-        if not GetReportData(WebhookRequest) then
+        if not GetReportData(WebhookRequest, false) then
             exit;
+        _AdyenManagement.DefineReportScheme(WebhookRequest."Report Type", Scheme, SchemeColumnNumber);
 
         if WebhookRequest."Report Type" = WebhookRequest."Report Type"::Undefined then
             exit;
@@ -224,10 +276,49 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         exit(true);
     end;
 
+    internal procedure RecreateDocumentEntries(var RecHeader: Record "NPR Adyen Reconciliation Hdr"): Integer
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+        WebhookRequest: Record "NPR AF Rec. Webhook Request";
+        InsertedEntryAmount: Integer;
+        DeletedEntryAmount: Integer;
+        WebhookRequestDoesNotExistLbl: Label 'Webhook Request with ID %1 does not exist anymore.';
+        DocumentIsPostedLbl: Label 'Document %1 is already posted.';
+        NoUnpostedEntriesLbl: Label 'Document %1 is not yet posted, however there are no unposted entries to recreate.';
+        AdyenSetupDoesNotExistLbl: Label 'Adyen Setup does not exist.';
+        GLSetupDoesNotExistLbl: Label 'General Ledger Setup does not exist.';
+    begin
+        if not _GLSetup.Get() then
+            Error(GLSetupDoesNotExistLbl);
+        if not _AdyenSetup.Get() then
+            Error(AdyenSetupDoesNotExistLbl);
+        if RecHeader.Posted then
+            Error(DocumentIsPostedLbl, RecHeader."Document No.");
+
+        RecLine.Reset();
+        RecLine.SetRange("Document No.", RecHeader."Document No.");
+        RecLine.SetFilter(Status, '<>%1', RecLine.Status::Posted);
+        if RecLine.IsEmpty() then
+            Error(NoUnpostedEntriesLbl, RecHeader."Document No.");
+
+        if not WebhookRequest.Get(RecHeader."Webhook Request ID") then
+            Error(WebhookRequestDoesNotExistLbl, Format(RecHeader."Webhook Request ID"));
+
+        if RecLine.FindSet(true) then
+            RecLine.DeleteAll();
+
+        GetReportData(WebhookRequest, true);
+        InsertedEntryAmount := InsertReconciliationLines(RecHeader."Merchant Account", RecHeader."Batch Number", RecHeader, WebhookRequest);
+        RecLine.SetRange(Status, RecLine.Status::Posted);
+        if RecLine.FindSet() then
+            DeletedEntryAmount := DeleteDuplicateEntries(RecLine, RecHeader);
+        exit(InsertedEntryAmount - DeletedEntryAmount);
+    end;
+
     local procedure GetValueAtCell(RowNo: Integer; ColNo: Integer): Text
     begin
-        if (Temp_CSVBuffer.Get(RowNo, ColNo)) then
-            exit(Temp_CSVBuffer.Value);
+        if (Temp_ExcelBuffer.Get(RowNo, ColNo)) then
+            exit(Temp_ExcelBuffer."Cell Value as Text");
         exit('');
     end;
 
@@ -278,20 +369,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure InitReconciliationLine(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; var ReconciliationLine: Record "NPR Adyen Recon. Line")
     var
         xReconciliationLine: Record "NPR Adyen Recon. Line";
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
-        NoSeriesMgt: Codeunit "No. Series";
-#else
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-#endif
-        AdyenSetup: Record "NPR Adyen Setup";
     begin
         xReconciliationLine.SetCurrentKey("Line No.");
         xReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
         ReconciliationLine.Init();
         ReconciliationLine."Document No." := ReconciliationHeader."Document No.";
         ReconciliationLine."Line No." := 1;
-        if AdyenSetup.Get() and (AdyenSetup."Posting Document Nos." <> '') then
-            ReconciliationLine."Posting No." := NoSeriesMgt.GetNextNo(AdyenSetup."Posting Document Nos.", Today(), true);
+
         if xReconciliationLine.FindLast() then
             ReconciliationLine."Line No." += xReconciliationLine."Line No.";
     end;
@@ -319,6 +403,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure InsertReconciliationLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; BatchNumber: Integer; MerchantAccount: Text; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer; var EntryAmount: Integer): Boolean
     var
+        TransactionDate: DateTime;
     begin
         InitReconciliationLine(ReconciliationHeader, ReconciliationLine);
         ReconciliationLine."Merchant Order Reference" := CopyStr(GetValueAtCell(LineNo, 24), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
@@ -328,7 +413,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Merchant Account" := CopyStr(MerchantAccount, 1, MaxStrLen(ReconciliationLine."Merchant Account"));
         ReconciliationLine."PSP Reference" := CopyStr(GetValueAtCell(LineNo, 3), 1, MaxStrLen(ReconciliationLine."PSP Reference"));
         ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, 4), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
-        if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 6)) then;
+
+        if Evaluate(TransactionDate, GetValueAtCell(LineNo, 6)) then begin
+            ReconciliationLine."Transaction Date" := TransactionDate;
+            if ReconciliationHeader."Transactions Date" = 0D then begin
+                ReconciliationHeader."Transactions Date" := DT2Date(ReconciliationLine."Transaction Date");
+                ReconciliationHeader.Modify();
+            end;
+        end;
 
         if _AdyenSetup."Post with Transaction Date" then
             ReconciliationLine."Posting Date" := DT2Date(ReconciliationLine."Transaction Date")
@@ -377,7 +469,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             'InvoiceDeduction':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::InvoiceDeduction;
             'MerchantPayout':
-                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::MerchantPayout;
+                begin
+                    FillMerchantPayout(ReconciliationHeader, LineNo);
+                    ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::MerchantPayout;
+                end;
             'AcquirerPayout':
                 begin
                     InsertAcquirerPayout(ReconciliationHeader, LineNo);
@@ -731,51 +826,85 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.Status := ReconciliationLine.Status::Posted;
     end;
 
-    local procedure GetReportData(var ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"): Boolean
+    local procedure GetReportData(var ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; RecreateDocument: Boolean): Boolean
     var
         ReportInStream: InStream;
-        ReportOutStream: OutStream;
         HttpClient: HttpClient;
         HttpResponseMessage: HttpResponseMessage;
-        ResponseText: Text;
+        HttpContent: HttpContent;
+        InStr: InStream;
+        OutStr: OutStream;
         ErrorLabel: Text;
+        DownloadURLMissingLbl: Label 'Webhook request with ID %1 does not have a Report Download URL.\Please contact your System Administrator.';
+        AdyenSetupDoesNotExistLbl: Label 'Adyen Setup does not exist.';
+        HttpErrorText: Text;
+        FromFile: Boolean;
+        LocalFileLbl: Label 'Local File Upload', Locked = true;
     begin
-        if not ReportWebhookRequest."Report Data".HasValue() then begin
-            if ReportWebhookRequest."Report Download URL" = '' then begin
-                _AdyenManagement.CreateLog(_LogType::"Get Report", false, StrSubstNo(GetReportError02, Format(ReportWebhookRequest.ID)), ReportWebhookRequest.ID);
-                exit(false);
-            end;
-            _AdyenManagement.CreateLog(_LogType::"Get Report", false, StrSubstNo(GetReportError01, Format(ReportWebhookRequest.ID)), ReportWebhookRequest.ID);
-            HttpClient.Get(ReportWebhookRequest."Report Download URL", HttpResponseMessage);
-
-            if (not HttpResponseMessage.IsSuccessStatusCode()) then begin
-                _AdyenManagement.CreateLog(_LogType::"Get Report", false, Format(HttpResponseMessage.HttpStatusCode()) + ': ' + HttpResponseMessage.ReasonPhrase(), ReportWebhookRequest.ID);
-                exit(false);
-            end;
-            // Downloading CSV Report
-            HttpResponseMessage.Content.ReadAs(ResponseText);
-            ReportWebhookRequest."Report Data".CreateOutStream(ReportOutStream, TextEncoding::UTF8);
-            ReportOutStream.WriteText(ResponseText);
-            ReportWebhookRequest.Validate("Report Data");
-            ReportWebhookRequest.Modify();
-        end else
-            _AdyenManagement.CreateLog(_LogType::"Get Report", true, StrSubstNo(GetReportSuccess01, ReportWebhookRequest."Report Name"), ReportWebhookRequest.ID);
-
-        ReportWebhookRequest.CalcFields("Report Data");
-        ReportWebhookRequest."Report Data".CreateInStream(ReportInStream);
-
-        // Create Lines from Report Data
-        if not Temp_CSVBuffer.IsEmpty() then
-            Temp_CSVBuffer.DeleteAll();
-        Temp_CSVBuffer.LoadDataFromStream(ReportInStream, ',');
-
-        if Temp_CSVBuffer.GetNumberOfLines() < 2 then begin
-            ErrorLabel := Format(ReportWebhookRequest."Report Data".HasValue) + ': ' + Format(ReportWebhookRequest."Report Data".Length);
-            _AdyenManagement.CreateLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError01, ReportWebhookRequest."Report Name", ErrorLabel), ReportWebhookRequest.ID);
+        if not _AdyenSetup.Get() then begin
+            if RecreateDocument then
+                Error(AdyenSetupDoesNotExistLbl);
+            _AdyenManagement.CreateLog(_LogType::"Init Setup", false, AdyenSetupDoesNotExistLbl, ReportWebhookRequest.ID);
             exit(false);
         end;
 
+        FromFile := ReportWebhookRequest."Report Download URL" = LocalFileLbl;
+
+        if not FromFile then begin
+            Clear(ReportWebhookRequest."Report Data");
+
+            if ReportWebhookRequest."Report Download URL" = '' then begin
+                if RecreateDocument then
+                    Error(DownloadURLMissingLbl, Format(ReportWebhookRequest.ID));
+                _AdyenManagement.CreateLog(_LogType::"Get Report", false, StrSubstNo(GetReportError02, Format(ReportWebhookRequest.ID)), ReportWebhookRequest.ID);
+                exit(false);
+            end;
+
+            HttpClient.DefaultRequestHeaders.Add('x-api-key', _AdyenSetup."Download Report API Key");
+            HttpClient.Get(ReportWebhookRequest."Report Download URL", HttpResponseMessage);
+            if (HttpResponseMessage.IsSuccessStatusCode()) then begin
+                HttpContent := HttpResponseMessage.Content();
+                ReportWebhookRequest."Report Data".CreateInStream(InStr);
+                HttpContent.ReadAs(InStr);
+                ReportWebhookRequest."Report Data".CreateOutStream(OutStr);
+                CopyStream(OutStr, InStr);
+
+                ReportWebhookRequest.Validate("Report Data");
+                ReportWebhookRequest.Modify();
+            end else begin
+                if not RecreateDocument then begin
+                    _AdyenManagement.CreateLog(_LogType::"Get Report", false, Format(HttpResponseMessage.HttpStatusCode()) + ': ' + HttpResponseMessage.ReasonPhrase(), ReportWebhookRequest.ID);
+                    exit(false);
+                end else begin
+                    HttpErrorText := Format(HttpResponseMessage.HttpStatusCode()) + ': ' + HttpResponseMessage.ReasonPhrase();
+                    Error(HttpErrorText);
+                end;
+            end;
+        end;
+
+        ReportWebhookRequest."Report Data".CreateInStream(ReportInStream, TextEncoding::UTF8);
+
+        ReadExcelSheet(ReportInStream);
+
+        if GetNumberOfRows() < 2 then begin
+            ErrorLabel := Format(ReportWebhookRequest."Report Data".HasValue) + ': ' + Format(ReportWebhookRequest."Report Data".Length);
+            if not RecreateDocument then begin
+                _AdyenManagement.CreateLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError01, ReportWebhookRequest."Report Name", ErrorLabel), ReportWebhookRequest.ID);
+                exit(false);
+            end else
+                Error(ImportLinesError01, ReportWebhookRequest."Report Name", ErrorLabel);
+        end;
         exit(true);
+    end;
+
+    local procedure ReadExcelSheet(var ReportInStream: InStream)
+    var
+        SheetNameLbl: Label 'data', Locked = true;
+    begin
+        Temp_ExcelBuffer.Reset();
+        Temp_ExcelBuffer.DeleteAll();
+        Temp_ExcelBuffer.OpenBookStream(ReportInStream, SheetNameLbl);
+        Temp_ExcelBuffer.ReadSheet();
     end;
 
     local procedure CreateMerchantBatchListFromLines(var MerchantBatchValues: List of [JsonObject])
@@ -783,7 +912,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         LineNo: Integer;
         JsonObject: JsonObject;
     begin
-        for LineNo := 2 to Temp_CSVBuffer.GetNumberOfLines() do begin
+
+        for LineNo := 2 to GetNumberOfRows() do begin
             Clear(JsonObject);
             JsonObject.Add('Merchant Account', GetValueAtCell(LineNo, 2));
             JsonObject.Add('Batch Number', GetValueAtCell(LineNo, 21));
@@ -792,25 +922,38 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
     end;
 
+    local procedure GetNumberOfRows(): Integer
+    begin
+        Temp_ExcelBuffer.Reset();
+        if Temp_ExcelBuffer.FindLast() then
+            exit(Temp_ExcelBuffer."Row No.");
+    end;
+
+    local procedure FillMerchantPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
+    begin
+        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, 15), 9) then
+            ReconciliationHeader.Modify();
+    end;
+
     local procedure InsertBalanceTransfer(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
     var
         FromBalance: Decimal;
         ToBalance: Decimal;
     begin
         if GetValueAtCell(LineNo, 20).Contains('from') then begin
-            if Evaluate(FromBalance, GetValueAtCell(LineNo, 16), 9) then;
-            ReconciliationHeader."Opening Balance" += FromBalance; // Might close multiple batches
+            if Evaluate(FromBalance, GetValueAtCell(LineNo, 16), 9) then
+                ReconciliationHeader."Opening Balance" += FromBalance; // Might close multiple batches
         end else
             if GetValueAtCell(LineNo, 20).Contains('to') then begin
-                if Evaluate(ToBalance, GetValueAtCell(LineNo, 15), 9) then;
-                ReconciliationHeader."Closing Balance" += ToBalance; // Probably always is a single closing balance entry
+                if Evaluate(ToBalance, GetValueAtCell(LineNo, 15), 9) then
+                    ReconciliationHeader."Closing Balance" += ToBalance; // Probably always is a single closing balance entry
             end;
         ReconciliationHeader.Modify();
     end;
 
     local procedure InsertAcquirerPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
     begin
-        if Evaluate(ReconciliationHeader."Closing Balance", GetValueAtCell(LineNo, 15), 9) then;
+        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, 15), 9) then;
         if Evaluate(ReconciliationHeader."Acquirer Commission", GetValueAtCell(LineNo, 17), 9) then;
         ReconciliationHeader.Modify();
     end;
@@ -821,7 +964,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         LineNo: Integer;
     begin
         EntryAmount := 0;
-        for LineNo := 2 to Temp_CSVBuffer.GetNumberOfLines() do begin
+        for LineNo := 2 to GetNumberOfRows() do begin
             if (GetValueAtCell(LineNo, 2) = CurrentMerchantAccount) then begin
                 if (GetValueAtCell(LineNo, 21) = Format(CurrentBatchNumber)) or
                     (ReportWebhookRequest."Report Type" <> ReportWebhookRequest."Report Type"::"Settlement details")
@@ -876,17 +1019,78 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.Modify();
     end;
 
+    local procedure DeleteDuplicateEntries(var RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr"): Integer
+    var
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        DeletedEntries: Integer;
+    begin
+        ReconciliationLine.Reset();
+        ReconciliationLine.SetRange("Document No.", RecHeader."Document No.");
+        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine.Status::Posted);
+        if ReconciliationLine.FindSet(true) then
+            repeat
+                if ReconciliationLine."PSP Reference" <> '' then begin
+                    RecLine.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+                    if RecLine.FindFirst() then begin
+                        ReconciliationLine.Delete();
+                        DeletedEntries += 1;
+                    end;
+                    RecLine.SetRange("PSP Reference");
+                end else begin
+                    case ReconciliationLine."Transaction Type" of
+                        ReconciliationLine."Transaction Type"::Fee:
+                            begin
+                                RecLine.SetRange("Modification Reference", ReconciliationLine."Modification Reference");
+                                if RecLine.FindFirst() then begin
+                                    ReconciliationLine.Delete();
+                                    DeletedEntries += 1;
+                                end;
+                                RecLine.SetRange("Modification Reference");
+                            end;
+                        else begin
+                            RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
+                            RecLine.SetRange("Amount(AAC)", ReconciliationLine."Amount(AAC)");
+                            if RecLine.FindFirst() then begin
+                                ReconciliationLine.Delete();
+                                DeletedEntries += 1;
+                            end;
+                            RecLine.SetRange("Transaction Type");
+                            RecLine.SetRange("Amount(AAC)");
+                        end;
+                    end;
+                end;
+            until ReconciliationLine.Next() = 0;
+
+        exit(DeletedEntries);
+    end;
+
+    local procedure AssignPostingDateAndNo(var RecLine: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr")
+    var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#else
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+#endif
+    begin
+        if _AdyenSetup.Get() and (_AdyenSetup."Posting Document Nos." <> '') then begin
+            RecLine."Posting No." := NoSeriesMgt.GetNextNo(_AdyenSetup."Posting Document Nos.", Today(), true);
+            if _AdyenSetup."Post with Transaction Date" then
+                RecLine."Posting Date" := DT2Date(RecLine."Transaction Date")
+            else
+                RecLine."Posting Date" := RecHeader."Posting Date";
+            RecLine.Modify();
+        end;
+    end;
+
     var
         _AdyenManagement: Codeunit "NPR Adyen Management";
         _GLSetup: Record "General Ledger Setup";
         _AdyenSetup: Record "NPR Adyen Setup";
-        Temp_CSVBuffer: Record "CSV Buffer" temporary;
+        Temp_ExcelBuffer: Record "Excel Buffer" temporary;
         _LogType: Enum "NPR Adyen Rec. Log Type";
         _CurrExchRate: Record "Currency Exchange Rate";
         GetWebhookError: Label 'Webhook request with ID %1 does not exist.';
-        GetReportError01: Label 'Webhook request with ID %1 does not store any Report Data. Retrying download...';
         GetReportError02: Label 'Webhook request with ID %1 does not have a Report Download URL.\Please contact your System Administrator.';
-        GetReportSuccess01: Label 'Report ''%1'' was successfully retrieved.';
         ImportLinesError01: Label 'Report ''%1'' has no entries. Report Data exist - %2';
         ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';
         ImportLinesError03: Label 'Unsupported Journal Type: %1.\Entry was skipped.';

@@ -146,33 +146,4 @@ table 6150791 "NPR AF Rec. Webhook Request"
         CalcFields("Request Data");
         "Request Data".CreateInStream(InStr, TextEncoding::UTF8);
     end;
-
-    procedure GetReportData(): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-#IF BC17
-        InStr: InStream;
-#ENDIF
-    begin
-        if not "Report Data".HasValue() then
-            exit('');
-#IF BC17
-        GetReportDataStream(InStr);
-        exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
-#ELSE
-        exit(TypeHelper.ReadAsTextWithSeparator(GetReportDataStream(), TypeHelper.LFSeparator()));
-#ENDIF
-    end;
-
-#IF BC17
-    procedure GetReportDataStream(var InStr: InStream)
-#ELSE
-    procedure GetReportDataStream() InStr: InStream
-#ENDIF
-    begin
-        if "Report Data".HasValue then begin
-            CalcFields("Report Data");
-            "Report Data".CreateInStream(InStr, TextEncoding::UTF8);
-        end;
-    end;
 }

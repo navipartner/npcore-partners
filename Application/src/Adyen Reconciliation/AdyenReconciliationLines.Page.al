@@ -5,6 +5,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
     UsageCategory = None;
     Caption = 'Adyen Reconciliation Lines';
     SourceTable = "NPR Adyen Recon. Line";
+    SourceTableView = sorting(Status) order(ascending);
     AutoSplitKey = true;
     DelayedInsert = true;
     LinksAllowed = false;
