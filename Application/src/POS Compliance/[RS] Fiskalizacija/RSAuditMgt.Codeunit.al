@@ -151,7 +151,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
-    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]);
+    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]; Context: Codeunit "NPR POS JSON Helper");
     var
         POSUnit: Record "NPR POS Unit";
         NewSalesTicketNo: Code[20];
@@ -160,7 +160,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        NewSalesTicketNo := GetPOSEntryNoFromInvoiceCounter(SalesTicketNo);
+        NewSalesTicketNo := GetPOSEntryNoFromAuditLog(Context);
+
         if NewSalesTicketNo <> '' then
             SalesTicketNo := NewSalesTicketNo;
     end;
@@ -984,18 +985,25 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo.Modify();
     end;
 
-    local procedure GetPOSEntryNoFromInvoiceCounter(SalesTicketNo: Code[20]): Code[20]
+    local procedure GetPOSEntryNoFromAuditLog(Context: Codeunit "NPR POS JSON Helper"): Code[20]
     var
-        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        NormalSalesFixedAffixLbl: Label 'ПП', Locked = true;
-        TraningSalesFixedAffixLbl: Label 'ОП', Locked = true;
+        SalesTicketNo: Text[30];
+        SalesTicketPartsList: List of [Text];
+        SalesTicketPart: Text;
+        TextBuilder: TextBuilder;
     begin
-        RSFiscalizationSetup.Get();
-        if RSFiscalizationSetup.Training then
-            RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + TraningSalesFixedAffixLbl)
-        else
-            RSPOSAuditLogAuxInfo.SetRange("Invoice Counter", SalesTicketNo + NormalSalesFixedAffixLbl);
+        SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
+        SalesTicketPartsList := SalesTicketNo.Split('-');
+
+        if SalesTicketPartsList.Count() = 2 then begin
+            SalesTicketPartsList.Insert(1, SalesTicketPartsList.Get(1));
+            foreach SalesTicketPart in SalesTicketPartsList do
+                TextBuilder.Append(SalesTicketPart + '-');
+            SalesTicketNo := CopyStr(TextBuilder.ToText().TrimEnd('-'), 1, MaxStrLen(SalesTicketNo));
+        end;
+
+        RSPOSAuditLogAuxInfo.SetRange("Invoice Number", SalesTicketNo);
         if RSPOSAuditLogAuxInfo.FindFirst() then
             exit(RSPOSAuditLogAuxInfo."Source Document No.");
     end;
