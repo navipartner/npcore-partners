@@ -61,11 +61,13 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         GLRegister: Record "G/L Register";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
+        SourceCodeSetup: Record "Source Code Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
-        GenJournalLine.Init();
         InitGeneralJournalLine(GenJournalLine, TransferReceiptHeader, RSRetailCalculationType);
-        GenJnlPostLine.GetGLReg(GLRegister);
+        SourceCodeSetup.Get();
+        GLRegister.SetRange("Source Code", SourceCodeSetup."Inventory Post Cost");
+        GLRegister.FindLast();
         GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
         GLSetup.Get();
@@ -89,6 +91,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             end;
 
         PostGLAcc(GenJournalLine, GLEntry);
+        RSRLocalizationMgt.ModifyGLRegForRetailCalculationEntries(GLRegister, GLEntry);
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")

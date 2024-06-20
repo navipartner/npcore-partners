@@ -240,5 +240,10 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
 
+    internal procedure ModifyGLRegForRetailCalculationEntries(var GLRegister: Record "G/L Register"; GLEntry: Record "G/L Entry")
+    begin
+        GLRegister."To Entry No." := GLEntry."Entry No.";
+        GLRegister.Modify();
+    end;
     #endregion RS Retail Localization Helper Procedures
 }
