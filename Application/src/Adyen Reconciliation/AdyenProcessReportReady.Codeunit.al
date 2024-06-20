@@ -4,26 +4,21 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
 
     procedure ProcessReportReadyWebhook(AdyenWebhook: Record "NPR Adyen Webhook")
     var
-        HttpClient: HttpClient;
-        HttpResponseMessage: HttpResponseMessage;
         WebhookInStream: InStream;
-        ReportOutStream: OutStream;
         ReportURL: Text;
-        ResponseText: Text;
         JsonToken: JsonToken;
         JsonObjectToken: JsonToken;
         JsonValueToken: JsonToken;
         JsonObject: JsonObject;
         ReconciliationWebhook: Record "NPR AF Rec. Webhook Request";
-        AdyenSetup: Record "NPR Adyen Setup";
         AdyenManagement: Codeunit "NPR Adyen Management";
-        LogType: Enum "NPR Adyen Rec. Log Type";
-        SetupNotConfiguredError: Label 'Adyen Generic Setup is not configured.';
+        LogType: Enum "NPR Adyen Webhook Log Type";
+        RecLogType: Enum "NPR Adyen Rec. Log Type";
         SuccessImportLbl: Label 'Adyen Reconciliation Webhook Request was successfully imported.';
     begin
         if AdyenWebhook."Webhook Data".HasValue() then begin
             AdyenWebhook.CalcFields("Webhook Data");
-            AdyenWebhook."Webhook Data".CreateInStream(WebhookInStream);
+            AdyenWebhook."Webhook Data".CreateInStream(WebhookInStream, TextEncoding::UTF8);
 
             if (JsonToken.ReadFrom(WebhookInStream)) then begin
                 JsonObject := JsonToken.AsObject();
@@ -36,7 +31,8 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
                     ReconciliationWebhook.Live := JsonToken.AsValue().AsBoolean();
                     ReconciliationWebhook."Request Data" := AdyenWebhook."Webhook Data";
                     ReconciliationWebhook.Insert();
-                    AdyenManagement.CreateLog(LogType::"Background Session", true, SuccessImportLbl, ReconciliationWebhook.ID);
+                    AdyenManagement.CreateGeneralLog(LogType::Process, true, SuccessImportLbl, AdyenWebhook."Entry No.");
+                    AdyenManagement.CreateLog(RecLogType::"Background Session", true, SuccessImportLbl, ReconciliationWebhook.ID);
                     Commit();
                     if (JsonObject.Get('notificationItems', JsonToken)) then begin
                         if JsonToken.IsArray() then
@@ -46,21 +42,10 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
                                         if JsonObjectToken.IsObject() then begin
                                             if (JsonObjectToken.AsObject().Get('reason', JsonValueToken)) then begin
                                                 ReportURL := JsonValueToken.AsValue().AsText();
-                                                if not AdyenSetup.Get() then
-                                                    AdyenManagement.CreateLog(LogType::"Background Session", false, SetupNotConfiguredError, ReconciliationWebhook.ID);
                                                 if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then
                                                     ReconciliationWebhook.Validate("PSP Reference", JsonValueToken.AsValue().AsText());
                                                 ReconciliationWebhook."Report Download URL" := CopyStr(ReportURL, 1, MaxStrLen(ReconciliationWebhook."Report Download URL"));
                                                 ReconciliationWebhook."Report Name" := CopyStr(ReportURL.Split('/').Get(ReportURL.Split('/').Count()), 1, MaxStrLen(ReconciliationWebhook."Report Name"));
-                                                HttpClient.DefaultRequestHeaders().Add('x-api-key', AdyenSetup."Download Report API Key");
-                                                HttpClient.Get(ReportURL, HttpResponseMessage);
-
-                                                if (HttpResponseMessage.IsSuccessStatusCode()) then begin
-                                                    // Downloading CSV Report
-                                                    HttpResponseMessage.Content().ReadAs(ResponseText);
-                                                    ReconciliationWebhook."Report Data".CreateOutStream(ReportOutStream, TextEncoding::UTF8);
-                                                    ReportOutStream.WriteText(ResponseText);
-                                                end;
                                                 ReconciliationWebhook.Modify();
                                             end;
                                         end;

@@ -39,6 +39,11 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
             DataClassification = CustomerContent;
             Caption = 'Batch Number';
         }
+        field(35; "Transactions Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Transactions Date';
+        }
         field(40; "Opening Balance"; Decimal)
         {
             DataClassification = CustomerContent;
@@ -52,7 +57,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         field(60; "Acquirer Commission"; Decimal)
         {
             DataClassification = CustomerContent;
-            Caption = 'Acquirer Commission';
+            Caption = 'External Merchant Commission';
         }
         field(70; "Adyen Acc. Currency Code"; Code[10])
         {
@@ -65,15 +70,17 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
             Caption = 'Total Transactions Amount (AAC)';
             FieldClass = FlowField;
             CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
-                                                                                "Batch Number" = field("Batch Number")));
+                                                                            "Batch Number" = field("Batch Number"),
+                                                                            "Transaction Type" = filter(<> MerchantPayout | AcquirerPayout)));
         }
         field(90; "Total Posted Amount"; Decimal)
         {
             Caption = 'Total Posted Amount (AAC)';
             FieldClass = FlowField;
             CalcFormula = sum("NPR Adyen Recon. Line"."Amount(AAC)" where("Document No." = field("Document No."),
-                                                                                "Batch Number" = field("Batch Number"),
-                                                                                Status = const(Posted)));
+                                                                            "Batch Number" = field("Batch Number"),
+                                                                            "Transaction Type" = filter(<> MerchantPayout | AcquirerPayout),
+                                                                            Status = const(Posted)));
         }
         field(100; "Webhook Request ID"; Integer)
         {
@@ -91,6 +98,11 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
             DataClassification = CustomerContent;
             Caption = 'Merchant Account';
         }
+        field(130; "Merchant Payout"; Decimal)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Merchant Payout';
+        }
     }
     keys
     {
@@ -106,7 +118,18 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
     trigger OnDelete()
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
+        DocumentIsPostedLbl: Label 'The document %1 cannot be deleted because it is already posted.';
+        DocumentIsPartiallyPostedLbl: Label 'The document %1 cannot be deleted because it is partially posted.\\You can try to "Recreate" the current document. The posted lines will remain intact.';
+        RecLine: Record "NPR Adyen Recon. Line";
     begin
+        if Rec.Posted then
+            Error(DocumentIsPostedLbl, Rec."Document No.");
+        RecLine.Reset();
+        RecLine.SetRange("Document No.", Rec."Document No.");
+        RecLine.SetRange(Status, RecLine.Status::Posted);
+        if not RecLine.IsEmpty() then
+            Error(DocumentIsPartiallyPostedLbl, Rec."Document No.");
+
         AdyenManagement.DeleteReconciliationLines("Document No.");
     end;
 }

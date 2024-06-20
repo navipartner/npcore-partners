@@ -97,35 +97,10 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the Webhook is Active.';
                 }
-                field("Merchant Accounts Filter Type"; Rec."Merchant Accounts Filter Type")
+                field("Merchant Account"; Rec."Merchant Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Marchant Accounts Filter Type.';
-                }
-                field("Merchant Accounts Filter"; Rec."Merchant Accounts Filter")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Filter the Merchant Accounts list you want to setup a Webhook for.';
-                    TableRelation = "NPR Adyen Merchant Account".Name;
-                    AssistEdit = true;
-                    Editable = false;
-
-                    trigger OnAssistEdit()
-                    var
-                        MerchantAccounts: Page "NPR Adyen Merchant Accounts";
-                        MerchantAccount: Record "NPR Adyen Merchant Account";
-                        RecRef: RecordRef;
-                        SelectionFilterMgt: Codeunit SelectionFilterManagement;
-                    begin
-                        MerchantAccounts.LookupMode := true;
-                        if MerchantAccounts.RunModal() = Action::LookupOK then begin
-                            MerchantAccounts.SetSelectionFilter(MerchantAccount);
-                            RecRef.GetTable(MerchantAccount);
-                            Rec."Merchant Accounts Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, MerchantAccount.FieldNo(Name)), 1, MaxStrLen(Rec."Merchant Accounts Filter"));
-                            Rec.Modify();
-                            CurrPage.Update();
-                        end;
-                    end;
+                    ToolTip = 'Specifies the Merchant Account the current Webhook will work for.';
                 }
             }
         }
@@ -214,6 +189,14 @@ page 6184550 "NPR Adyen Webhook Setup Card"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         xRec.Init();
+    end;
+
+    trigger OnOpenPage()
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        if Rec.ID <> '' then
+            AdyenManagement.RefreshWebhook(Rec);
     end;
 
     trigger OnAfterGetRecord()

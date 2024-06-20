@@ -87,6 +87,27 @@ page 6184665 "NPR Adyen Webhooks"
     {
         area(Processing)
         {
+            action("Show Logs")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Show Logs';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Log;
+                ToolTip = 'Running this action will show Logs.';
+
+                trigger OnAction()
+                var
+                    Logs: Record "NPR Adyen Webhook Log";
+                begin
+                    Logs.FilterGroup(0);
+                    Logs.SetRange("Webhook Request Entry No.", Rec."Entry No.");
+                    Logs.FilterGroup(2);
+                    Page.Run(Page::"NPR Adyen Webhook Logs", Logs);
+                end;
+            }
             action(Refresh)
             {
                 Caption = 'Refresh';

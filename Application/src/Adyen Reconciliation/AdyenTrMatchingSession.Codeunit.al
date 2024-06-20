@@ -25,6 +25,7 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
 
         if RecWebhookRequests.FindSet(true) then
             repeat
+                Clear(TransactionMatching);
                 if TransactionMatching.ValidateReportScheme(RecWebhookRequests) then begin
                     NewDocumentsList := TransactionMatching.CreateSettlementDocuments(RecWebhookRequests, false, '');
                     if NewDocumentsList.Count() > 0 then begin
