@@ -105,7 +105,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
         TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
         if TakePhotoEnabled then
             POSActionTakePhotoB.CheckIfPhotoIsTaken(Sale);
-        OnBeforeHendleReverse(Setup, SalesTicketNo);
+        OnBeforeHendleReverse(Setup, SalesTicketNo, Context);
         POSActionRevDirSaleB.HendleReverse(SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, IncludePaymentLines, CopyLineDimensions);
     end;
 
@@ -129,7 +129,7 @@ codeunit 6150798 "NPR POS Action: Rev. Dir. Sale" implements "NPR IPOS Workflow"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20])
+    local procedure OnBeforeHendleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]; Context: Codeunit "NPR POS JSON Helper")
     begin
     end;
 
