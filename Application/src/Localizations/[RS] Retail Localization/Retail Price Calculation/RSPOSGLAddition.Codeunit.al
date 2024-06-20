@@ -116,7 +116,8 @@ codeunit 6151363 "NPR RS POS GL Addition"
     begin
         GenJournalLine.Init();
         InitGenLineFromLastGLEntry(GenJournalLine, RSRetailCalculationType);
-        GenJnlPostLine.GetGLReg(GLRegister);
+        GLRegister.SetRange("Source Code", GenJournalLine."Source Code");
+        GLRegister.FindLast();
         GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
         GLSetup.Get();
@@ -155,6 +156,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         end;
 
         PostGLAcc(GenJournalLine, GLEntry);
+        RSRLocalizationMgt.ModifyGLRegForRetailCalculationEntries(GLRegister, GLEntry);
     end;
 
     local procedure ValidateNegativeDebitCredit(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
@@ -283,6 +285,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
         GenJournalLine."Gen. Posting Type" := GLEntry."Gen. Posting Type";
         GenJournalLine."Document Date" := GLEntry."Posting Date";
         GenJournalLine."Due Date" := GLEntry."Posting Date";
+        GenJournalLine."Source Code" := GLEntry."Source Code";
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
