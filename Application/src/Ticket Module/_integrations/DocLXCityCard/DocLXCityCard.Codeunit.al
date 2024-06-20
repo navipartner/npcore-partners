@@ -118,6 +118,8 @@ codeunit 6184830 "NPR DocLXCityCard"
         LogEntry.SetFilter(CouponResultCode, '=%1', '200');
         if (LogEntry.FindLast()) then begin
             Result.ReadFrom(StrSubstNo('{"state": {"code": 200, "message": "Attempt coupon reuse"}, "coupon": {"type": "%1", "no": "%2", "reference_no": "%3", "sales_document_no": "%4"}}', LogEntry.CouponType, LogEntry.CouponNo, LogEntry.CouponReferenceNo, SalesDocumentNo));
+            CouponNo := LogEntry.CouponNo;
+
             LogEntry.Reset();
             LogEntry.SetCurrentKey(CardNumber, CityCode, LocationCode);
             LogEntry.SetFilter(CardNumber, '=%1', CardNumber);
@@ -127,6 +129,10 @@ codeunit 6184830 "NPR DocLXCityCard"
             LogEntry.SetFilter(CouponResultCode, '=%1', '');
             if (LogEntry.FindLast()) then begin
                 EntryNo := LogEntry.EntryNo;
+                if (IsCouponArchived(CouponNo)) then
+                    // we need a different error code than 523 to indicate that the coupon is archived but we want to show the original message from CityCard 
+                    Result.ReadFrom(StrSubstNo('{"state": {"code": 5230, "message": "523 - %5"}, "coupon": {"type": "%1", "no": "%2", "reference_no": "%3", "sales_document_no": "%4"}}', LogEntry.CouponType, LogEntry.CouponNo, LogEntry.CouponReferenceNo, SalesDocumentNo, LogEntry.ValidationResultMessage));
+
                 UpdateLogCoupon(LogEntry.EntryNo, Result);
                 exit
             end;
@@ -176,6 +182,13 @@ codeunit 6184830 "NPR DocLXCityCard"
 
         CouponNo := Coupon."No.";
         CouponReferenceNo := Coupon."Reference No.";
+    end;
+
+    local procedure IsCouponArchived(CouponNo: Code[20]): Boolean
+    var
+        Coupon: Record "NPR NpDc Coupon";
+    begin
+        exit(not Coupon.Get(CouponNo));
     end;
 
     internal procedure GetDefaultCityCode(LocationCode: Code[10]): Code[10]
