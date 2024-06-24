@@ -71,7 +71,7 @@ codeunit 85050 "NPR TM Performance Test"
         InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         UpdateItemForPOSSaleUsage(Item, _POSUnit, _POSStore, UnitPrice, true);
-        CreateDicountPctTicketCoupon(Quantity, 100, Item."No.", TempCoupon);
+        CreateDiscountPctTicketCoupon(Quantity, 100, Item."No.", TempCoupon);
     end;
 
     local procedure PosTickets_Create(TicketsToSell: Integer)
@@ -196,7 +196,7 @@ codeunit 85050 "NPR TM Performance Test"
         InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         UpdateItemForPOSSaleUsage(Item, _POSUnit, _POSStore, UnitPrice, true);
-        CreateDicountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
+        CreateDiscountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
 
         CountBefore := Ticket.Count();
 
@@ -233,7 +233,7 @@ codeunit 85050 "NPR TM Performance Test"
         InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         UpdateItemForPOSSaleUsage(Item, _POSUnit, _POSStore, UnitPrice, true);
-        CreateDicountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
+        CreateDiscountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
 
         CountBefore := Ticket.Count();
 
@@ -279,7 +279,7 @@ codeunit 85050 "NPR TM Performance Test"
         InitializeData();
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         UpdateItemForPOSSaleUsage(Item, _POSUnit, _POSStore, UnitPrice, true);
-        CreateDicountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
+        CreateDiscountPctTicketCoupon(TicketsToSell, 100, Item."No.", TempCoupon);
 
         CountBefore := Ticket.Count();
 
@@ -307,7 +307,7 @@ codeunit 85050 "NPR TM Performance Test"
     begin
     end;
 
-    local procedure CreateDicountPctTicketCoupon(Quantity: Integer; DiscountPct: Decimal; TicketItemNo: Code[20]; var TempCoupon: Record "NPR NpDc Coupon")
+    local procedure CreateDiscountPctTicketCoupon(Quantity: Integer; DiscountPct: Decimal; TicketItemNo: Code[20]; var TempCoupon: Record "NPR NpDc Coupon")
     var
         LibraryCoupon: Codeunit "NPR Library Coupon";
         CouponType: Record "NPR NpDc Coupon Type";
@@ -343,7 +343,6 @@ codeunit 85050 "NPR TM Performance Test"
     begin
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
     end;
-
 
     procedure InitializeData()
     var
