@@ -45,6 +45,11 @@ codeunit 6059919 "NPR Videos"
         VarietyMatrixPopup(sender, VarModuleInfo.Id);
         PriceSetup(sender, VarModuleInfo.Id);
         SalesPriceListsAndWorksheets(sender, VarModuleInfo.Id);
+        SetUpNPPayAndAydenTerminals(sender, VarModuleInfo.Id);
+        SetUpMinorTomAndHardwareConnector(sender, VarModuleInfo.Id);
+        RetailPrintTemplates(sender, VarModuleInfo.Id);
+        FrontendEditor(sender, VarModuleInfo.Id);
+        AddLogoOnReceipt(sender, VarModuleInfo.Id);
     end;
 
     local procedure POSIntroduction(var Video: Codeunit Video; AppID: Guid)
@@ -339,6 +344,46 @@ codeunit 6059919 "NPR Videos"
     var
         VideoLbl: Label 'https://www.youtube.com/embed/DZFlAhoDlvI?si=LQXLZtV8zqXK4oit', locked = true;
         TitleLbl: Label 'NP POS Academy 37: Sales Price Lists and Worksheets';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure SetUpNPPayAndAydenTerminals(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/lYpd0Pe4X6E', locked = true;
+        TitleLbl: Label 'NP POS Academy 38: Setting up NP Pay to use Ayden terminals';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure SetUpMinorTomAndHardwareConnector(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/oJW4ECnU10g', locked = true;
+        TitleLbl: Label 'NP POS Academy 39: How to set up the Minor Tom and Hardware Connector';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure RetailPrintTemplates(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/d_UHXC1cILQ', locked = true;
+        TitleLbl: Label 'NP POS Academy 40: Retail Print Templates';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure FrontendEditor(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/TOnYujxa7wc', locked = true;
+        TitleLbl: Label 'NP POS Academy 41: The Frontend Editor';
+    begin
+        Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
+    end;
+
+    local procedure AddLogoOnReceipt(var Video: Codeunit Video; AppID: Guid)
+    var
+        VideoLbl: Label 'https://www.youtube.com/embed/M6naAmEB7fo', locked = true;
+        TitleLbl: Label 'NP POS Academy 42: How to add a logo on a receipt';
     begin
         Video.Register(AppID, TitleLbl, VideoLbl, Enum::"Video Category"::NPR);
     end;
