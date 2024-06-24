@@ -31,17 +31,17 @@ export const removeLayout = async (page: Page, uniqueKey: number) => {
   if (
     await page
       .frameLocator("iframe")
-      .getByText("Default [Classic1]")
+      .getByText("SHOP 1 ENU [Classic1]")
       .nth(1)
       .isVisible()
   ) {
     await page
       .frameLocator("iframe")
-      .getByText("Default [Classic1]")
+      .getByText("SHOP 1 ENU [Classic1]")
       .nth(1)
       .click();
   } else {
-    await page.frameLocator("iframe").getByText("Default [Classic1]").click();
+    await page.frameLocator("iframe").getByText("SHOP 1 ENU [Classic1]").click();
   }
   await page
     .frameLocator("iframe")

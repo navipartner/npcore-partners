@@ -7,9 +7,10 @@
         "runTests": true,
         "folder": "IntegrationTest",
         "envFilename": ".env",
-        "rapidstart": "MINIMAL-NPR.rapidstart",
+        "rapidstart": "PLAYWRIGHT.rapidstart",
         "workersCount": 3,
         "runCodeunitId": "6060099",
+        "runCodeunitMethod": "ImportPosUnitsAndUsers",
         "createUsers": ["RESTUSER", "MPOSUSER", "E2EWORKER1", "E2EWORKER2", "E2EWORKER3", "E2EWORKER4", "E2EWORKER5", "E2EWORKER6"]
     }
 }
