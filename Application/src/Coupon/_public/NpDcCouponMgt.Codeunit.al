@@ -281,7 +281,7 @@
         until Coupon.Next() = 0;
     end;
 
-    local procedure ArchiveCoupon(var Coupon: Record "NPR NpDc Coupon")
+    internal procedure ArchiveCoupon(var Coupon: Record "NPR NpDc Coupon")
     var
         CouponEntry: Record "NPR NpDc Coupon Entry";
     begin
