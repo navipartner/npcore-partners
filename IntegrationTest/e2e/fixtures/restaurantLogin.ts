@@ -4,12 +4,7 @@ export const restaurantLogin = async (
   page: Page,
   shouldAuthenticate = true
 ) => {
-  await page.goto("/");
-  await page
-    .getByRole("link", {
-      name: /https:\/\/([a-zA-Z0-9.-]+)\.dynamics-retail\.net\/BC\/SignIn\?ReturnUrl=BC\/Tablet\.aspx\?page=6150750&tenant=default/,
-    })
-    .click();
+  await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
   if (shouldAuthenticate) {
     await page.getByLabel("User name:").fill(process.env.E2E_USERNAME ?? "");
     await page.getByLabel("Password:").fill(process.env.E2E_PASSWORD ?? "");

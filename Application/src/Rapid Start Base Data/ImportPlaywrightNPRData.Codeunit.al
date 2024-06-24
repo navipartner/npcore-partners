@@ -6,7 +6,6 @@
     var
         AllObj: Record AllObj;
         Attempts: Integer;
-        UserPosUnitMapping: Dictionary of [Code[50], Code[10]];
     begin
         //We've had problems that invoking this codeunit on a container programmatically right after publishing npretail give errors on missing npretail tables. 
         //This shouldn't be possible NST behaviour, so we try to workaround what appears to be a race condition in MS end by delaying up to 100 seconds:        
@@ -16,18 +15,30 @@
             Sleep(1000 * 10);
         end;
 
+        // Import PLAYWRIGHT.rapidstart
+        ImportRapidPackageFromFeed('PLAYWRIGHT.rapidstart');
+
+        Sleep(1000 * 10);
+
+        // Users and POS Units
+        ImportPosUnitsAndUsers();
+    end;
+
+    procedure ImportPosUnitsAndUsers()
+    var
+        UserPosUnitMapping: Dictionary of [Code[50], Code[10]];
+    begin
         // User to PosUnit mapping
         UserPosUnitMapping.Add('RESTUSER', '04');
         UserPosUnitMapping.Add('MPOSUSER', '03');
         UserPosUnitMapping.Add('E2EWORKER1', '01');
-        UserPosUnitMapping.Add('E2EWORKER2', '');
+        UserPosUnitMapping.Add('E2EWORKER2', '02');
         UserPosUnitMapping.Add('E2EWORKER3', '');
         UserPosUnitMapping.Add('E2EWORKER4', '');
         UserPosUnitMapping.Add('E2EWORKER5', '');
         UserPosUnitMapping.Add('E2EWORKER6', '');
 
-        //ImportRapidPackageFromFeed('MINIMAL-NPR.rapidstart');
-
+        // Run mapping
         AssignPosUnitsToUsers(UserPosUnitMapping, '01');
     end;
 

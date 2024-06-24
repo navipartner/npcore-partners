@@ -62,3 +62,12 @@ In debug mode the tests will open a browser window and the test code, such that 
 ```
 pnpm run e2e:debug
 ```
+
+
+## Testing on Crane container
+
+* Create a Crane container with template `CORE-23` (At the moment, there is an issue with admin rights with `CORE-24` template)
+* Wait until the container is fully created and you're able to login
+* Run `SetupCranePlaywright.ps1` script in PowerShell to import all required data and add new BC users. The script can take up to 10mins to complete.
+* Set `E2E_URL` in `.env`
+* Run e2e tests
