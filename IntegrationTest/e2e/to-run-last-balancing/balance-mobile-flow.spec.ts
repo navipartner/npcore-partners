@@ -430,12 +430,7 @@ test.describe("Balancing v4 mobile test", () => {
       .getByRole("button", { name: "Complete Balancing" })
       .click();
     await page.setViewportSize({ width: 1075, height: 720 });
-    await page.goto("/");
-    await page
-      .getByRole("link", {
-        name: /https:\/\/([a-zA-Z0-9.-]+)\.dynamics-retail\.net\/BC\/SignIn\?ReturnUrl=BC\/Tablet\.aspx\?page=6150750&tenant=default/,
-      })
-      .click();
+    await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
     const popupLocator = page.locator("[id=b3]");
     if ((await popupLocator.count()) > 0) {
       await page.getByRole("button", { name: "OK" }).click();
@@ -598,12 +593,7 @@ test.describe("Balancing v4 mobile test", () => {
       .getByRole("button", { name: "Complete Balancing" })
       .click();
     await page.setViewportSize({ width: 1075, height: 720 });
-    await page.goto("/");
-    await page
-      .getByRole("link", {
-        name: /https:\/\/([a-zA-Z0-9.-]+)\.dynamics-retail\.net\/BC\/SignIn\?ReturnUrl=BC\/Tablet\.aspx\?page=6150750&tenant=default/,
-      })
-      .click();
+    await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
     const popupLocator = page.locator("[id=b3]");
     if ((await popupLocator.count()) > 0) {
       await page.getByRole("button", { name: "OK" }).click();

@@ -7,12 +7,7 @@ export const login = async (
   username?: string,
   password?: string
 ) => {
-  await page.goto("/");
-  await page
-    .getByRole("link", {
-      name: /https:\/\/([a-zA-Z0-9.-]+)\.dynamics-retail\.net\/BC\/SignIn\?ReturnUrl=BC\/Tablet\.aspx\?page=6150750&tenant=default/,
-    })
-    .click();
+  await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
   await page.getByLabel("User name:").fill(username ?? "");
   await page.getByLabel("Password:").fill(password ?? "");
   await page.getByRole("button", { name: "Sign In" }).click();
