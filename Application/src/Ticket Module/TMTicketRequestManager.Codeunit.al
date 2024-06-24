@@ -42,12 +42,20 @@
         MessageTextLbl: Label '%1: (%2)', Locked = true;
     begin
 
-        StartTime := Time();
-        TMTicket.LockTable(true);
-        if (TMTicket.FindFirst()) then;
-        EndTime := Time();
+        case Source of
+            'MakeTicketReservation': // Test show not to lock at this point in time.
+                DurationMs := -1;
 
-        DurationMs := EndTime - StartTime;
+            else begin
+                StartTime := Time();
+                TMTicket.LockTable(true);
+                if (TMTicket.FindFirst()) then;
+                EndTime := Time();
+                DurationMs := EndTime - StartTime;
+            end;
+        end;
+
+
         if (not ActiveSession.Get(ServiceInstanceId(), SessionId())) then
             Clear(ActiveSession);
 
