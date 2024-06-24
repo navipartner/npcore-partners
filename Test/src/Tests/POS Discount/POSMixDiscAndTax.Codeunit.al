@@ -7953,7 +7953,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         exit(DATABASE::"NPR Mixed Discount");
     end;
 
-    local procedure CreateTotalDiscountPct(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean): Decimal
+    internal procedure CreateTotalDiscountPct(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
         DiscPct: Decimal;

@@ -4673,9 +4673,9 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryERM: Codeunit "Library - ERM";
     begin
-            //Clean any previous mock session
-            POSSession.ClearAll();
-            Clear(POSSession);
+        //Clean any previous mock session
+        POSSession.ClearAll();
+        Clear(POSSession);
 
         if not Initialized then begin
             SalesSetup.Get();
@@ -4874,7 +4874,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         exit(DATABASE::"NPR Period Discount");
     end;
 
-    local procedure CreateDiscount(Item: Record Item; DiscPct: Decimal; var PeriodDiscountLine: Record "NPR Period Discount Line")
+    internal procedure CreateDiscount(Item: Record Item; DiscPct: Decimal; var PeriodDiscountLine: Record "NPR Period Discount Line")
     var
         PeriodDiscount: Record "NPR Period Discount";
     begin
