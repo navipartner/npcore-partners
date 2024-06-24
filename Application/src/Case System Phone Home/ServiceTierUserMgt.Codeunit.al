@@ -31,7 +31,7 @@
         InitCaseSystemCallback(TempClientDiagnostic);
     end;
 
-    local procedure InitCaseSystemCallback(TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary)
+    internal procedure InitCaseSystemCallback(TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary)
     var
         Company: Record Company;
         EnvironmentInformation: Codeunit "Environment Information";
