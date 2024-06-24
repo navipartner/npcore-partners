@@ -7175,7 +7175,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         GLEntry.DeleteAll();
     end;
 
-    local procedure CreateDiscount(Item: Record Item; LineDiscPct: Decimal): Decimal
+    internal procedure CreateDiscount(Item: Record Item; LineDiscPct: Decimal): Decimal
     var
         PriceListLine: Record "Price List Line";
     begin
