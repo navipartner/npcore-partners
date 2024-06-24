@@ -684,12 +684,12 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the Dimensions List';
                     ApplicationArea = NPRRetail;
                 }
-                action("POS Posting Setup")
+                action("Inventory Posting Setup")
                 {
-                    Caption = 'POS Posting Setup';
-                    RunObject = Page "NPR POS Posting Setup";
+                    Caption = 'Inventory Posting Setup';
+                    RunObject = Page "Inventory Posting Setup";
 
-                    ToolTip = 'View or edit the POS Posting Setup';
+                    ToolTip = 'View or edit the Inventory Posting Setup';
                     ApplicationArea = NPRRetail;
                 }
 
