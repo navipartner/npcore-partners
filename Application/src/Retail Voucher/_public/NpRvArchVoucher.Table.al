@@ -302,7 +302,7 @@
             Editable = false;
             FieldClass = FlowField;
         }
-        field(1013; "Issue External Document No."; Code[20])
+        field(1013; "Issue External Document No."; Code[50])
         {
             CalcFormula = Max("NPR NpRv Arch. Voucher Entry"."External Document No." WHERE("Arch. Voucher No." = FIELD("No."),
                                                                                         "Entry Type" = FILTER("Issue Voucher" | "Partner Issue Voucher")));
