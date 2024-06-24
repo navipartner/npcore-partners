@@ -4950,7 +4950,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         exit(DATABASE::"NPR Quantity Discount Header");
     end;
 
-    local procedure CreateDiscount(Item: Record Item; DiscPct: Decimal; var QuantityDiscountLine: Record "NPR Quantity Discount Line")
+    internal procedure CreateDiscount(Item: Record Item; DiscPct: Decimal; var QuantityDiscountLine: Record "NPR Quantity Discount Line")
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
     begin
