@@ -289,7 +289,7 @@
                         if not Confirm(ArchiveCouponQst, false, Coupon.Count) then
                             exit;
 
-                        NpDcCouponMgt.ArchiveCoupons(Rec);
+                        NpDcCouponMgt.ArchiveCoupon(Rec);
                     end;
                 }
             }
