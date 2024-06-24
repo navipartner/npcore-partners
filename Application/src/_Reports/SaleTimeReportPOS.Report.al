@@ -561,7 +561,7 @@ report 6014418 "NPR Sale Time Report POS"
 
                     POSUnitNoFilter := "POS Entry".GetFilter("POS Unit No.");
                     if POSUnitNoFilter <> '' then begin
-                        POSSalesline.SetRange("POS Unit No.", POSUnitNoFilter);
+                        POSSalesline.SetFilter("POS Unit No.", POSUnitNoFilter);
                         NoOfPOSSalesLines += POSSalesline.Count();
                     end;
                     if POSSalesLine.FindSet() then
