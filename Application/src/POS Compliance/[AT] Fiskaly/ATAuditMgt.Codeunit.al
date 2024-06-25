@@ -66,8 +66,8 @@ codeunit 6184848 "NPR AT Audit Mgt."
 
     local procedure InsertATPOSAuditLogAuxInfo(ATCashRegister: Record "NPR AT Cash Register"; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
     var
-        POSUnit: Record "NPR POS Unit";
         ATSCU: Record "NPR AT SCU";
+        POSUnit: Record "NPR POS Unit";
     begin
         ATPOSAuditLogAuxInfo.Init();
         ATPOSAuditLogAuxInfo."Audit Entry Type" := ATPOSAuditLogAuxInfo."Audit Entry Type"::"Control Transaction";
@@ -76,7 +76,6 @@ codeunit 6184848 "NPR AT Audit Mgt."
         ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
         ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
         ATPOSAuditLogAuxInfo."Receipt Type" := ATPOSAuditLogAuxInfo."Receipt Type"::NORMAL;
-        ATCashRegister.Get(ATPOSAuditLogAuxInfo."POS Unit No.");
         ATSCU.Get(ATCashRegister."AT SCU Code");
         ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
         ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
@@ -224,8 +223,9 @@ codeunit 6184848 "NPR AT Audit Mgt."
         ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
-        ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
         ATFiscalThermalPrint: Codeunit "NPR AT Fiscal Thermal Print";
+        ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
+        IsHandled: Boolean;
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -240,6 +240,10 @@ codeunit 6184848 "NPR AT Audit Mgt."
             exit;
 
         ATFiskalyCommunication.SignReceipt(ATPOSAuditLogAuxInfo);
+
+        OnBeforePrintReceiptOnHandleOnAfterEndSale(IsHandled);
+        if IsHandled then
+            exit;
 
         ATFiscalThermalPrint.PrintReceipt(ATPOSAuditLogAuxInfo);
     end;
@@ -291,9 +295,9 @@ codeunit 6184848 "NPR AT Audit Mgt."
 
     local procedure InsertATPOSAuditLogAuxInfo(ATCashRegister: Record "NPR AT Cash Register"; ReceiptType: Enum "NPR AT Receipt Type"; ReceiptId: Guid)
     var
-        POSUnit: Record "NPR POS Unit";
         ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info";
         ATSCU: Record "NPR AT SCU";
+        POSUnit: Record "NPR POS Unit";
         ATFiskalyCommunication: Codeunit "NPR AT Fiskaly Communication";
     begin
         ATPOSAuditLogAuxInfo.Init();
@@ -303,7 +307,6 @@ codeunit 6184848 "NPR AT Audit Mgt."
         ATPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
         ATPOSAuditLogAuxInfo."POS Unit No." := ATCashRegister."POS Unit No.";
         ATPOSAuditLogAuxInfo."Receipt Type" := ReceiptType;
-        ATCashRegister.Get(ATPOSAuditLogAuxInfo."POS Unit No.");
         ATSCU.Get(ATCashRegister."AT SCU Code");
         ATPOSAuditLogAuxInfo."AT Organization Code" := ATSCU."AT Organization Code";
         ATPOSAuditLogAuxInfo."AT SCU Code" := ATSCU.Code;
@@ -624,6 +627,13 @@ codeunit 6184848 "NPR AT Audit Mgt."
         POSSaleLine.SetRange(Description, '');
         if POSSaleLine.FindFirst() then
             Error(BlankItemDescriptionErr, POSSaleLine.TableCaption(), Format(POSSaleLine."Line Type"::Item), POSSaleLine."No.", POSSaleLine.FieldCaption(Description));
+    end;
+    #endregion
+
+    #region Automation Test Mockup Helpers
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintReceiptOnHandleOnAfterEndSale(var IsHandled: Boolean)
+    begin
     end;
     #endregion
 }
