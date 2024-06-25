@@ -195,10 +195,12 @@ codeunit 85172 "NPR Library BG SIS Fiscal"
     end;
 
     local procedure InsertPOSAuditProfile(var POSAuditProfile: Record "NPR POS Audit Profile")
+    var
+        BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
     begin
         POSAuditProfile.Init();
-        POSAuditProfile.Code := HandlerCode();
-        POSAuditProfile."Audit Handler" := HandlerCode();
+        POSAuditProfile.Code := CopyStr(BGSISAuditMgt.HandlerCode(), 1, MaxStrLen(POSAuditProfile.Code));
+        POSAuditProfile."Audit Handler" := CopyStr(BGSISAuditMgt.HandlerCode(), 1, MaxStrLen(POSAuditProfile."Audit Handler"));
         POSAuditProfile."Audit Log Enabled" := true;
         POSAuditProfile."Fill Sale Fiscal No. On" := POSAuditProfile."Fill Sale Fiscal No. On"::Successful;
         POSAuditProfile."Require Item Return Reason" := true;
@@ -311,12 +313,5 @@ codeunit 85172 "NPR Library BG SIS Fiscal"
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_1', 'TEST_99999999');
         exit(NoSeries.Code);
-    end;
-
-    local procedure HandlerCode(): Code[20]
-    var
-        HandlerCodeTxt: Label 'BG_SIS', Locked = true, MaxLength = 20;
-    begin
-        exit(HandlerCodeTxt);
     end;
 }

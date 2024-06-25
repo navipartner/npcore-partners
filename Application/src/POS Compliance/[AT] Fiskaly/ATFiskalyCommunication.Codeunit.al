@@ -73,6 +73,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     internal procedure AuthenticateFON(var ATOrganization: Record "NPR AT Organization")
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         AuthenticateFONErr: Label 'FinanzOnline Authentication failed.';
         AuthenticateFONLbl: Label 'fon/auth', Locked = true;
@@ -88,6 +89,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         JsonBody := CreateJSONBodyForAuthenticateFON(ATFiscalizationSetup);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
+        OnBeforeSendHttpRequestForAuthenticateFON(RequestMessage, ResponseText, ATOrganization, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', AuthenticateFONErr, GetLastErrorText());
 
@@ -97,6 +102,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     internal procedure RetrieveFONStatus(var ATOrganization: Record "NPR AT Organization")
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         RetrieveFONStatusErr: Label 'Retrieve FinanzOnline authentication status failed.';
         RetrieveFONStatusLbl: Label 'fon/auth', Locked = true;
@@ -109,6 +115,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
 
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", RetrieveFONStatusLbl);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
+
+        OnBeforeSendHttpRequestForRetrieveFONStatus(RequestMessage, ResponseText, ATOrganization, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', RetrieveFONStatusErr, GetLastErrorText());
@@ -153,6 +163,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CreateSCUErr: Label 'Create Signature Creation Unit failed.';
         CreateSCULbl: Label 'signature-creation-unit/%1', Locked = true, Comment = '%1 - Signature Creation Unit Id value';
@@ -173,6 +184,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         JsonBody := CreateJSONBodyForCreateSCU(ATSCU);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
+        OnBeforeSendHttpRequestForCreateSCU(RequestMessage, ResponseText, ATSCU, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', CreateSCUErr, GetLastErrorText());
 
@@ -183,6 +198,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         RetrieveSCUErr: Label 'Retrieve Signature Creation Unit failed.';
         RetrieveSCULbl: Label 'signature-creation-unit/%1', Locked = true, Comment = '%1 - Signature Creation Unit Id value';
@@ -199,6 +215,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(RetrieveSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower()));
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
+        OnBeforeSendHttpRequestForRetrieveSCU(RequestMessage, ResponseText, ATSCU, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', RetrieveSCUErr, GetLastErrorText());
 
@@ -210,6 +230,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATCashRegister: Record "NPR AT Cash Register";
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CannotUpdateToStateDueToRelatedRecordErr: Label 'You cannot set the %1 to %2, since there is at least one related %3 which %4 has to be set to %5 or %6.', Comment = '%1 - AT SCU State field caption, %2 - New State value, %3 - AT Cash Register table caption, %4 - AT Cash Register State field value, %5 - AT Cash Register State DECOMMISSIONED value, %6 - AT Cash Register State DEFECTIVE value';
         CannotUpdateToStateErr: Label 'You cannot set the %1 to %2, since it must have %1 %3 or %4 in order to be able to do that.', Comment = '%1 - AT SCU State field caption, %2 - New State value, %3 - AT SCU State INITIALIZED value, %4 - AT SCU State OUTAGE value';
@@ -252,6 +273,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(UpdateSCULbl, Format(ATSCU.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForUpdateSCU(NewState);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PATCH);
+
+        OnBeforeSendHttpRequestForUpdateSCU(RequestMessage, ResponseText, ATSCU, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', UpdateSCUErr, GetLastErrorText());
@@ -307,6 +332,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
         ATSCU: Record "NPR AT SCU";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CreateCashRegisterErr: Label 'Create Cash Register failed.';
         CreateCashRegisterLbl: Label 'cash-register/%1', Locked = true, Comment = '%1 - Cash Register Id value';
@@ -327,6 +353,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         JsonBody := CreateJSONBodyForCreateCashRegister(ATCashRegister);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
 
+        OnBeforeSendHttpRequestForCreateCashRegister(RequestMessage, ResponseText, ATCashRegister, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', CreateCashRegisterErr, GetLastErrorText());
 
@@ -338,6 +368,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
         ATSCU: Record "NPR AT SCU";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CreateCashRegisterErr: Label 'Retrieve Cash Register failed.';
         CreateCashRegisterLbl: Label 'cash-register/%1', Locked = true, Comment = '%1 - Cash Register Id value';
@@ -354,6 +385,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(CreateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()));
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::GET);
 
+        OnBeforeSendHttpRequestForRetrieveCashRegister(RequestMessage, ResponseText, ATCashRegister, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', CreateCashRegisterErr, GetLastErrorText());
 
@@ -366,6 +401,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
         ATSCU: Record "NPR AT SCU";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         CannotUpdateToStateErr: Label 'You cannot set the %1 to %2, since it must have %1 %3 or %4 in order to be able to do that.', Comment = '%1 - AT Cash Register State field caption, %2 - New State value, %3 - AT Cash Register State INITIALIZED value, %4 - AT Cash Register State OUTAGE value';
         UpdateCashRegisterErr: Label 'Update Cash Register failed.';
@@ -414,6 +450,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(UpdateCashRegisterLbl, Format(ATCashRegister.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForUpdateCashRegister(NewState);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PATCH);
+
+        OnBeforeSendHttpRequestForUpdateCashRegister(RequestMessage, ResponseText, ATCashRegister, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', UpdateCashRegisterErr, GetLastErrorText());
@@ -469,6 +509,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     var
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         ValidateReceiptErr: Label 'Validate Receipt failed.';
         ValidateReceiptLbl: Label 'cash-register/%1/receipt/%2/validation', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
@@ -486,6 +527,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(ValidateReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
         PrepareHttpRequest(ATOrganization, true, RequestMessage, '', Url, RestMethod::POST);
 
+        OnBeforeSendHttpRequestForValidateReceipt(RequestMessage, ResponseText, ATPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', ValidateReceiptErr, GetLastErrorText());
 
@@ -497,6 +542,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
         ATSCU: Record "NPR AT SCU";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         SignReceiptErr: Label 'Sign Receipt failed.';
         SignReceiptLbl: Label 'cash-register/%1/receipt/%2', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
@@ -519,6 +565,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(SignReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForSignReceipt(ATPOSAuditLogAuxInfo);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
+
+        OnBeforeSendHttpRequestForSignReceipt(RequestMessage, ResponseText, ATPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', SignReceiptErr, GetLastErrorText());
@@ -561,6 +611,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
         ATOrganization: Record "NPR AT Organization";
         ATSCU: Record "NPR AT SCU";
+        IsHandled: Boolean;
         RequestMessage: HttpRequestMessage;
         SignControlReceiptErr: Label 'Sign Control Receipt failed.';
         SignControlReceiptLbl: Label 'cash-register/%1/receipt/%2', Locked = true, Comment = '%1 - Cash Register Id value, %2 - Receipt Id value';
@@ -583,6 +634,10 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Url := CreateUrl(ATFiscalizationSetup."Fiskaly API URL", StrSubstNo(SignControlReceiptLbl, Format(ATPOSAuditLogAuxInfo."AT Cash Register Id", 0, 4).ToLower(), Format(ATPOSAuditLogAuxInfo.SystemId, 0, 4).ToLower()));
         JsonBody := CreateJSONBodyForSignControlReceipt(ATPOSAuditLogAuxInfo);
         PrepareHttpRequest(ATOrganization, true, RequestMessage, JsonBody, Url, RestMethod::PUT);
+
+        OnBeforeSendHttpRequestForSignControlReceipt(RequestMessage, ResponseText, ATPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendHttpRequest(RequestMessage, ResponseText) then
             Error('%1\\%2', SignControlReceiptErr, GetLastErrorText());
@@ -1008,7 +1063,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
     #endregion
 
     #region JSON Fiscal Parsers
-    local procedure PopulateATOrganizationForAuthenticateFON(var ATOrganization: Record "NPR AT Organization"; ResponseText: Text)
+    internal procedure PopulateATOrganizationForAuthenticateFON(var ATOrganization: Record "NPR AT Organization"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1023,7 +1078,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATOrganization.Modify(true);
     end;
 
-    local procedure PopulateATOrganizationForRetrieveFONStatus(var ATOrganization: Record "NPR AT Organization"; ResponseText: Text)
+    internal procedure PopulateATOrganizationForRetrieveFONStatus(var ATOrganization: Record "NPR AT Organization"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1047,7 +1102,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         exit(Enum::"NPR AT FON Auth. Status"::" ");
     end;
 
-    local procedure PopulateATSCUForCreateSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
+    internal procedure PopulateATSCUForCreateSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1068,7 +1123,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATSCU.Modify(true);
     end;
 
-    local procedure PopulateATSCUForRetrieveSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
+    internal procedure PopulateATSCUForRetrieveSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1096,7 +1151,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATSCU.Modify(true);
     end;
 
-    local procedure PopulateATSCUForUpdateSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
+    internal procedure PopulateATSCUForUpdateSCU(var ATSCU: Record "NPR AT SCU"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1198,7 +1253,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         exit(Enum::"NPR AT SCU State"::" ");
     end;
 
-    local procedure PopulateATCashRegisterForCreateCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
+    internal procedure PopulateATCashRegisterForCreateCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1219,7 +1274,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATCashRegister.Modify(true);
     end;
 
-    local procedure PopulateATCashRegisterForRetrieveCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
+    internal procedure PopulateATCashRegisterForRetrieveCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1263,7 +1318,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATCashRegister.Modify(true);
     end;
 
-    local procedure PopulateATCashRegisterForUpdateCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
+    internal procedure PopulateATCashRegisterForUpdateCashRegister(var ATCashRegister: Record "NPR AT Cash Register"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1395,7 +1450,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         exit(Enum::"NPR AT Cash Register State"::" ");
     end;
 
-    local procedure PopulateATPOSAuditLogAuxInfoForValidateReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    internal procedure PopulateATPOSAuditLogAuxInfoForValidateReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
     var
         TypeHelper: Codeunit "Type Helper";
         PropertyValue, ResponseJson : JsonToken;
@@ -1410,7 +1465,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATPOSAuditLogAuxInfo.Modify(true);
     end;
 
-    local procedure PopulateATPOSAuditLogAuxInfoForSignReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    internal procedure PopulateATPOSAuditLogAuxInfoForSignReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
     var
         ATSCU: Record "NPR AT SCU";
         TypeHelper: Codeunit "Type Helper";
@@ -1453,7 +1508,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         ATPOSAuditLogAuxInfo.Modify(true);
     end;
 
-    local procedure PopulateATPOSAuditLogAuxInfoForRetrieveReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    internal procedure PopulateATPOSAuditLogAuxInfoForRetrieveReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
     var
         ATSCU: Record "NPR AT SCU";
         TypeHelper: Codeunit "Type Helper";
@@ -1579,7 +1634,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         Inserted := true;
     end;
 
-    local procedure PopulateATPOSAuditLogAuxInfoForSignControlReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
+    internal procedure PopulateATPOSAuditLogAuxInfoForSignControlReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; ResponseText: Text)
     var
         ATSCU: Record "NPR AT SCU";
         TypeHelper: Codeunit "Type Helper";
@@ -1690,6 +1745,7 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
 
     local procedure PrepareHttpRequest(ATOrganization: Record "NPR AT Organization"; SetAuthorization: Boolean; var RequestMessage: HttpRequestMessage; JsonBody: Text; Url: Text; RestMethodToUse: Option GET,POST,DELETE,PATCH,PUT)
     var
+        IsHandled: Boolean;
         RequestContent: HttpContent;
         RequestHeaders: HttpHeaders;
         BearerTokenLbl: Label 'Bearer %1', Locked = true, Comment = '%1 - JWT value';
@@ -1702,8 +1758,15 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method(GetRestMethod(RestMethodToUse));
         RequestMessage.GetHeaders(RequestHeaders);
-        if SetAuthorization then
-            RequestHeaders.Add('Authorization', StrSubstNo(BearerTokenLbl, GetJWT(ATOrganization)));
+
+        if not SetAuthorization then
+            exit;
+
+        OnBeforeSetAuthorizationOnPrepareHttpRequest(RequestHeaders, IsHandled);
+        if IsHandled then
+            exit;
+
+        RequestHeaders.Add('Authorization', StrSubstNo(BearerTokenLbl, GetJWT(ATOrganization)));
     end;
 
     local procedure SetRequestContent(var RequestContent: HttpContent; var RequestHeaders: HttpHeaders; JsonBody: Text)
@@ -1809,6 +1872,68 @@ codeunit 6184861 "NPR AT Fiskaly Communication"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateCashRegister(var ATCashRegister: Record "NPR AT Cash Register")
+    begin
+    end;
+    #endregion
+
+    #region Automation Test Mockup Helpers
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetAuthorizationOnPrepareHttpRequest(var RequestHeaders: HttpHeaders; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForAuthenticateFON(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATOrganization: Record "NPR AT Organization"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForCreateSCU(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATSCU: Record "NPR AT SCU"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForRetrieveSCU(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATSCU: Record "NPR AT SCU"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForUpdateSCU(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATSCU: Record "NPR AT SCU"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForRetrieveFONStatus(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATOrganization: Record "NPR AT Organization"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForCreateCashRegister(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATCashRegister: Record "NPR AT Cash Register"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForRetrieveCashRegister(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATCashRegister: Record "NPR AT Cash Register"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForUpdateCashRegister(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATCashRegister: Record "NPR AT Cash Register"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForValidateReceipt(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSignReceipt(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSignControlReceipt(var RequestMessage: HttpRequestMessage; var ResponseText: Text; var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info"; var IsHandled: Boolean)
     begin
     end;
     #endregion
