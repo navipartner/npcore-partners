@@ -15,6 +15,27 @@
         {
             group(General)
             {
+                field(FiscalVersion; FRAuditMgt.GetFiscalVersion())
+                {
+                    ToolTip = 'Specifies the value of the NP Retail Fiscal Version field';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    Caption = 'NPRetail Fiscal Version';
+                }
+                field(ComplianceVersion; FRAuditMgt.GetComplianceVersion())
+                {
+                    ToolTip = 'Specifies the value of the Infocert NF525 compliance targeted by current NPRetail Fiscal version';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    Caption = 'Infocert Compliance Version';
+                }
+                field(CertificationNumber; FRAuditMgt.GetCertificationNumber())
+                {
+                    ToolTip = 'Specifies the value of the NP Retail certification number';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    Caption = 'NP Retail Certification Number';
+                }
                 field("Signing Certificate Password"; Rec."Signing Certificate Password")
                 {
 
@@ -38,31 +59,6 @@
                 {
 
                     ToolTip = 'Specifies the value of the Yearly Workshift Duration field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Last Auto Archived Workshift"; Rec."Last Auto Archived Workshift")
-                {
-
-                    Editable = false;
-                    ToolTip = 'Specifies the value of the Last Auto Archived Workshift field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Auto Archive URL"; Rec."Auto Archive URL")
-                {
-
-                    ToolTip = 'Specifies the value of the Auto Archive URL field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Auto Archive API Key"; Rec."Auto Archive API Key")
-                {
-
-                    ToolTip = 'Specifies the value of the Auto Archive API Key field';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Auto Archive SAS"; Rec."Auto Archive SAS")
-                {
-
-                    ToolTip = 'Specifies the value of the Auto Archive SAS field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Item VAT Identifier Filter"; VATIDFilter)
@@ -205,6 +201,7 @@
     end;
 
     var
+        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
         CAPTION_PARTNER_MOD: Label 'Modification description';
         VATIDFilter: Text;
 }

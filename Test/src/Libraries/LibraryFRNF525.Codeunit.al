@@ -64,6 +64,8 @@ codeunit 85040 "NPR Library FR NF525"
         FRAuditNoSeries.Insert();
 
         POSStore.Get(POSUnit."POS Store Code");
+        POSStore.Name := 'FR Store';
+        POSStore.Address := 'Test Address';
         POSStore."Registration No." := 'Test';
         POSStore."Country/Region Code" := 'FR';
         POSStore.Modify();
@@ -76,7 +78,9 @@ codeunit 85040 "NPR Library FR NF525"
         NoSeriesLine: Record "No. Series Line";
     begin
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_1', 'TEST_99999999');
+        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, '1', '99999999');
+        NoSeriesLine."Last No. Used" := '1';
+        NoSeriesLine.Modify();
         exit(NoSeries.Code);
     end;
 

@@ -195,27 +195,27 @@ codeunit 85039 "NPR French Compliance Tests"
         // [Then] All 6 sales have been signed in a DIRECT_SALE_END chain
         POSAuditLog.SetRange("Acted on POS Entry No.", EntryNo1);
         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
-        POSAuditLog.SetRange("External Description", 'Sale (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Vente (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, '', false);
 
         POSAuditLog.SetRange("Acted on POS Entry No.", ReturnEntryNo1);
-        POSAuditLog.SetRange("External Description", 'Cancellation (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Remboursement (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, PreviousSignature, true);
 
         POSAuditLog.SetRange("Acted on POS Entry No.", EntryNo2);
-        POSAuditLog.SetRange("External Description", 'Sale (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Vente (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, PreviousSignature, true);
 
         POSAuditLog.SetRange("Acted on POS Entry No.", ReturnEntryNo2);
-        POSAuditLog.SetRange("External Description", 'Cancellation (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Remboursement (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, PreviousSignature, true);
 
         POSAuditLog.SetRange("Acted on POS Entry No.", EntryNo3);
-        POSAuditLog.SetRange("External Description", 'Sale (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Vente (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, PreviousSignature, true);
 
         POSAuditLog.SetRange("Acted on POS Entry No.", ReturnEntryNo3);
-        POSAuditLog.SetRange("External Description", 'Cancellation (Ticket)');
+        POSAuditLog.SetRange("External Description", 'Remboursement (Ticket)');
         PreviousSignature := ValidateNextSignature(POSAuditLog, PreviousSignature, true);
 
         // [Then] we have JET events for individual returned item lines.

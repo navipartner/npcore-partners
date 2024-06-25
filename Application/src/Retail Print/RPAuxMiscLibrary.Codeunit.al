@@ -289,6 +289,8 @@
         end else begin
             ProcessingValue := Format(POSEntryOutputLog2.Count());
         end;
+
+        OnAfterGetReceiptPrintCount(RecRef, ProcessingValue, IncludeFirstPrint)
     end;
 
     local procedure GetBlobAsText(var TemplateLine: Record "NPR RP Template Line"; RecID: RecordID)
@@ -491,6 +493,11 @@
     local procedure OnLineFunction(CodeunitID: Integer; FunctionName: Text; RecID: RecordId; var Handled: Boolean; var Skip: Boolean; var TemplateLine: Record "NPR RP Template Line")
     begin
         DoFunction(CodeunitID, FunctionName, TemplateLine, RecID, Handled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetReceiptPrintCount(RecRef: RecordRef; var ProcessingValue: Text[2048]; IncludeFirstPrint: Boolean)
+    begin
     end;
 #pragma warning restore AA0139
 }
