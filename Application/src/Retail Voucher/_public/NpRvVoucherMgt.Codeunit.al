@@ -179,6 +179,7 @@
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         SignFactor: Integer;
         VoucherAmount: Decimal;
+        VoucherDiscountAmount: Decimal;
         VoucherQty: Decimal;
     begin
         SignFactor := 1;
@@ -192,11 +193,20 @@
 
         VoucherQty := SaleLinePOS.Quantity;
         if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"Issue Voucher" then begin
-            VoucherAmount := SaleLinePOS."Amount Including VAT";
-            if (not SaleLinePOS."Price Includes VAT") then
-                VoucherAmount += POSSaleTaxCalc.CalcAmountWithVAT(SaleLinePOS."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")
+            if SaleLinePOs.Quantity <> 0 then
+                VoucherAmount := SaleLinePOS."Amount Including VAT" / SaleLinePOS.Quantity
             else
-                VoucherAmount += SaleLinePOS."Discount Amount"
+                VoucherAmount := SaleLinePOS."Amount Including VAT";
+
+            if SaleLinePOS.Quantity <> 0 then
+                VoucherDiscountAmount := SaleLinePOS."Discount Amount" / SaleLinePOS.Quantity
+            else
+                VoucherDiscountAmount := SaleLinePOS."Discount Amount";
+
+            if (not SaleLinePOS."Price Includes VAT") then
+                VoucherAmount += POSSaleTaxCalc.CalcAmountWithVAT(VoucherDiscountAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision")
+            else
+                VoucherAmount += VoucherDiscountAmount
         end else
             VoucherAmount := SaleLinePOS."Unit Price";
 

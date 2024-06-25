@@ -89,7 +89,10 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         case DiscountType of
             '0':
                 begin
-                    SaleLinePOS."Discount Amount" := Discount * SaleLinePOS.Quantity;
+                    if (not SaleLinePOS."Price Includes VAT") then
+                        SaleLinePOS."Discount Amount" := POSSaleTaxCalc.CalcAmountWithoutVAT(Discount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision") * SaleLinePOS.Quantity
+                    else
+                        SaleLinePOS."Discount Amount" := Discount * SaleLinePOS.Quantity;
                 end;
             '1':
                 begin
