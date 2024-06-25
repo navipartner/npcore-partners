@@ -17790,6 +17790,9 @@ End Function
         <Field Name="Salesperson_SoldProductsQuantity">
           <DataField>Salesperson_SoldProductsQuantity</DataField>
         </Field>
+        <Field Name="Salesperson_SoldProductsQuantityFormat">
+          <DataField>Salesperson_SoldProductsQuantityFormat</DataField>
+        </Field>
         <Field Name="Salesperson_ReturnedProductsQuantity">
           <DataField>Salesperson_ReturnedProductsQuantity</DataField>
         </Field>
@@ -17798,6 +17801,9 @@ End Function
         </Field>
         <Field Name="Salesperson_DiscountQuantity">
           <DataField>Salesperson_DiscountQuantity</DataField>
+        </Field>
+        <Field Name="Salesperson_DiscountQuantityFormat">
+          <DataField>Salesperson_DiscountQuantityFormat</DataField>
         </Field>
         <Field Name="Salesperson_CashDrawerOpenQuantity">
           <DataField>Salesperson_CashDrawerOpenQuantity</DataField>

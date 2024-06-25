@@ -13,43 +13,43 @@
 
             tableelement(pcheckpoint; "NPR POS Workshift Checkpoint")
             {
-            XmlName = 'GrandPeriod';
-            textelement(archivesignature)
-            {
-                XmlName = 'ArchiveSignature';
-            }
-            fieldelement(SystemEntryKey; PCheckpoint."Entry No.")
-            {
-                XmlName = 'SystemEntryNo';
-            }
-            textelement(pexternalid)
-            {
-                XmlName = 'SequentialID';
-            }
+                XmlName = 'GrandPeriod';
+                textelement(archivesignature)
+                {
+                    XmlName = 'ArchiveSignature';
+                }
+                fieldelement(SystemEntryKey; PCheckpoint."Entry No.")
+                {
+                    XmlName = 'SystemEntryNo';
+                }
+                textelement(pexternalid)
+                {
+                    XmlName = 'SequentialID';
+                }
                 textelement(pfromdate)
-            {
-                XmlName = 'FromDate';
-            }
+                {
+                    XmlName = 'FromDate';
+                }
                 textelement(ptodate)
-            {
-                XmlName = 'ToDate';
-            }
-            textelement(pgrandtotal)
-            {
-                XmlName = 'GrandTotal';
-            }
-            textelement(pperpetualabsolutegrandtotal)
-            {
-                XmlName = 'PerpetualAbsoluteGrandTotal';
-            }
-            textelement(pperpetualgrandtotal)
-            {
-                XmlName = 'PerpetualGrandTotal';
-            }
-            textelement(psignature)
-            {
-                XmlName = 'PeriodGrandTotalSignature';
-            }
+                {
+                    XmlName = 'ToDate';
+                }
+                textelement(pgrandtotal)
+                {
+                    XmlName = 'GrandTotal';
+                }
+                textelement(pperpetualabsolutegrandtotal)
+                {
+                    XmlName = 'PerpetualAbsoluteGrandTotal';
+                }
+                textelement(pperpetualgrandtotal)
+                {
+                    XmlName = 'PerpetualGrandTotal';
+                }
+                textelement(psignature)
+                {
+                    XmlName = 'PeriodGrandTotalSignature';
+                }
 
                 textelement(tickets)
                 {
@@ -91,6 +91,10 @@
                             {
                                 XmlName = 'DocumentType';
                             }
+                            textelement(documenttypedescription)
+                            {
+                                XmlName = 'DocumentTypeDescription';
+                            }
                             fieldelement(NoOfSaleLines; ticket_pos_entry."No. of Sales Lines")
                             {
                             }
@@ -98,6 +102,9 @@
                             {
                             }
                             fieldelement(TotalExclTax; ticket_pos_entry."Amount Excl. Tax")
+                            {
+                            }
+                            fieldelement(TotalDiscountInclTax; ticket_pos_entry."Discount Amount Incl. VAT")
                             {
                             }
                             textelement(tsignature)
@@ -157,9 +164,14 @@
                                     fieldelement(UnitOfMeasureCode; "POS Sales Line"."Unit of Measure Code")
                                     {
                                     }
-                                    fieldelement(CreatedAt; "POS Sales Line"."POS Sale Line Created At")
+                                    textelement(possaleslinecreatedat)
                                     {
+                                        XmlName = 'CreatedAt';
                                     }
+                                    trigger OnAfterGetRecord()
+                                    begin
+                                        possaleslinecreatedat := Format("POS Sales Line"."POS Sale Line Created At", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
+                                    end;
                                 }
                             }
                             textelement(TaxLines)
@@ -219,8 +231,9 @@
                                     {
                                         XmlName = 'ExchangeRate';
                                     }
-                                    fieldelement(CreatedAt; "POS Payment Line"."POS Payment Line Created At")
+                                    textelement(pospaymentlinecreatedat)
                                     {
+                                        XmlName = 'CreatedAt';
                                     }
 
                                     trigger OnAfterGetRecord()
@@ -232,6 +245,8 @@
 
                                         PaymentLineType := Format(POSPaymentMethod."Processing Type");
                                         PaymentLineExchRate := Format(Round("POS Payment Line"."Amount (LCY)" / "POS Payment Line"."Amount (Sales Currency)", 0.00001, '='));
+
+                                        pospaymentlinecreatedat := Format("POS Payment Line"."POS Payment Line Created At", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                                     end;
                                 }
                             }
@@ -456,6 +471,7 @@
                                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
                                 POSAuditLog.FindFirst(); //ticket_pos_entry started from entry 1, looks like filter was not applied.
                                 DocumentType := POSAuditLog."External Type";
+                                documenttypedescription := POSAuditLog."External Description";
                                 TSignature := GetAuditSignature(POSAuditLog);
                             end;
 
@@ -499,6 +515,10 @@
                             {
                                 XmlName = 'ID';
                             }
+                            textelement(fiscaldocumentno)
+                            {
+                                XmlName = 'FiscalDocumentNumber';
+                            }
                             textelement(outputreprintnumber)
                             {
                                 XmlName = 'ReprintNumber';
@@ -509,13 +529,23 @@
                             fieldelement(UserCode; POSEntryOutputLog."User ID")
                             {
                             }
-                            fieldelement(Timestamp; POSEntryOutputLog."Output Timestamp")
+                            textelement(posentryoutputlogtimestamp)
                             {
+                                XmlName = 'Timestamp';
                             }
                             textelement(outputsignature)
                             {
                                 XmlName = 'DuplicateSignature';
                             }
+
+                            trigger OnPreXmlItem()
+                            var
+                                RecRef: RecordRef;
+                            begin
+                                RecRef.Get(duplicate."Record ID");
+                                RecRef.SetTable(POSEntryOutputLog);
+                                POSEntryOutputLog.SetRecFilter();
+                            end;
 
                             trigger OnAfterGetRecord()
                             var
@@ -526,6 +556,8 @@
                                 POSAuditLog := duplicate;
                                 POSAuditLog.SetRecFilter();
                                 OutputSignature := GetAuditSignature(POSAuditLog);
+                                fiscaldocumentno := duplicate."Acted on POS Entry Fiscal No.";
+                                posentryoutputlogtimestamp := Format(POSEntryOutputLog."Output Timestamp", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                             end;
                         }
                         tableelement(duplicate_additional_info; "NPR FR POS Audit Log Add. Info")
@@ -595,8 +627,9 @@
                         fieldelement(SequenceNumber; grandtotal."External ID")
                         {
                         }
-                        fieldelement(CreatedAt; grandtotal."Log Timestamp")
+                        textelement(grandtotalcreatedat)
                         {
+                            XmlName = 'CreatedAt';
                         }
                         textelement(grandtotalinclvat)
                         {
@@ -625,6 +658,7 @@
                             grandtotalinclvat := GetSplitStringValue(grandtotal."Additional Information", '|', 1);
                             perpetualabsolutegrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 2);
                             perpetualgrandtotal := GetSplitStringValue(grandtotal."Additional Information", '|', 3);
+                            grandtotalcreatedat := Format(grandtotal."Log Timestamp", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                         end;
 
                         trigger OnPreXmlItem()
@@ -655,8 +689,9 @@
                         fieldelement(Salesperson; jet_entry."Active Salesperson Code")
                         {
                         }
-                        fieldelement(Timestamp; jet_entry."Log Timestamp")
+                        textelement(jetentrytimestamp)
                         {
+                            XmlName = 'Timestamp';
                         }
                         fieldelement(AdditionalInfo; jet_entry."Additional Information")
                         {
@@ -673,6 +708,7 @@
                             POSAuditLog := jet_entry;
                             POSAuditLog.SetRecFilter();
                             JSignature := GetAuditSignature(POSAuditLog);
+                            jetentrytimestamp := Format(jet_entry."Log Timestamp", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2><Second dec.><Comma,.>Z');
                         end;
 
                         trigger OnPreXmlItem()
@@ -693,52 +729,52 @@
                                 jet_entry."Action Type"::CUSTOM);
                         end;
                     }
-            }
+                }
 
-            trigger OnAfterGetRecord()
+                trigger OnAfterGetRecord()
                 var
-                POSAuditLog: Record "NPR POS Audit Log";
-            begin
-                PCheckpoint.TestField(Type, PCheckpoint.Type::PREPORT);
-                PCheckpoint.TestField(Open, false);
+                    POSAuditLog: Record "NPR POS Audit Log";
+                begin
+                    PCheckpoint.TestField(Type, PCheckpoint.Type::PREPORT);
+                    PCheckpoint.TestField(Open, false);
                     PCheckpoint.SetRecFilter();
 
-                POSAuditLog.SetRange("Record ID", PCheckpoint.RecordId);
-                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                POSAuditLog.FindLast();
+                    POSAuditLog.SetRange("Record ID", PCheckpoint.RecordId);
+                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
+                    POSAuditLog.FindLast();
 
                     //Set globals and top level tableelement fields
                     _POSUnitNo := PCheckpoint."POS Unit No.";
-                _ToPOSAuditLogEntryNo := POSAuditLog."Entry No.";
-                _PeriodType := POSAuditLog."Action Custom Subtype";
+                    _ToPOSAuditLogEntryNo := POSAuditLog."Entry No.";
+                    _PeriodType := POSAuditLog."Action Custom Subtype";
                     ptodate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
-                PExternalID := POSAuditLog."External ID";
-                PSignature := GetAuditSignature(POSAuditLog);
-                PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
-                PPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
-                PPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
+                    PExternalID := POSAuditLog."External ID";
+                    PSignature := GetAuditSignature(POSAuditLog);
+                    PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
+                    PPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
+                    PPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
 
                     POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
                     POSAuditLog.FindFirst();
-                ArchiveSignature := GetAuditSignature(POSAuditLog);
+                    ArchiveSignature := GetAuditSignature(POSAuditLog);
 
-                //Filter either from last period of same type on the same POS unit or, if it's the first, from the POS Unit JET Init.
-                POSAuditLog.Reset();
-                POSAuditLog.SetRange("Acted on POS Unit No.", _POSUnitNo);
+                    //Filter either from last period of same type on the same POS unit or, if it's the first, from the POS Unit JET Init.
+                    POSAuditLog.Reset();
+                    POSAuditLog.SetRange("Acted on POS Unit No.", _POSUnitNo);
                     POSAuditLog.SetFilter("Entry No.", '<%1', _ToPOSAuditLogEntryNo);
-                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
-                POSAuditLog.SetRange("Action Custom Subtype", _PeriodType);
-                if POSAuditLog.FindLast() then begin
-                    _FromPOSAuditLogEntryNo := POSAuditLog."Entry No." + 1;
+                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
+                    POSAuditLog.SetRange("Action Custom Subtype", _PeriodType);
+                    if POSAuditLog.FindLast() then begin
+                        _FromPOSAuditLogEntryNo := POSAuditLog."Entry No." + 1;
                         pfromdate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
-                end else begin
-                    POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::LOG_INIT);
-                    POSAuditLog.SetRange("Action Custom Subtype");
-                    POSAuditLog.FindLast();
-                    _FromPOSAuditLogEntryNo := POSAuditLog."Entry No.";
+                    end else begin
+                        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::LOG_INIT);
+                        POSAuditLog.SetRange("Action Custom Subtype");
+                        POSAuditLog.FindLast();
+                        _FromPOSAuditLogEntryNo := POSAuditLog."Entry No.";
                         pfromdate := Format(DT2Date(POSAuditLog.SystemCreatedAt), 0, 9);
+                    end;
                 end;
-            end;
 
             }
         }

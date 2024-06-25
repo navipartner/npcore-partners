@@ -93,8 +93,10 @@
         RecRef: RecordRef;
         TemplateMgt: Codeunit "NPR RP Template Mgt.";
         POSEntryOutputLogMgt: Codeunit "NPR POS Entry Output Log Mgt.";
+        LogHandled: Boolean;
     begin
         if ReportSelection.FindSet() then begin
+            OnBeforeRunReportSelectionType(ReportSelection, RecRefIn);
             Commit();
 
             repeat
@@ -124,7 +126,9 @@
                 RecRef.Close();
             until ReportSelection.Next() = 0;
 
-            POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection);
+            OnBeforeLogOutput(ReportSelection, RecRefIn, LogHandled);
+            if not LogHandled then
+                POSEntryOutputLogMgt.LogOutput(RecRefIn, ReportSelection);
             Commit();
 
             OnAfterRunReportSelectionType(ReportSelection, RecRefIn);
@@ -138,6 +142,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRunReportSelectionType(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRunReportSelectionType(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLogOutput(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef; var Handled: Boolean)
     begin
     end;
 }

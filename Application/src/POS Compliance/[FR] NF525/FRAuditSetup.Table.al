@@ -61,22 +61,34 @@
         {
             Caption = 'Last Auto Archived Workshift';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(50; "Auto Archive URL"; Text[250])
         {
             Caption = 'Auto Archive URL';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(51; "Auto Archive API Key"; Text[250])
         {
             Caption = 'Auto Archive API Key';
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(52; "Auto Archive SAS"; Text[250])
         {
             Caption = 'Auto Archive SAS';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(60; "Item VAT Identifier Filter"; Text[250])
         {
