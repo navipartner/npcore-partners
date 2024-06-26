@@ -1,8 +1,8 @@
-﻿page 6184583 "NPR AT Organization Card"
+page 6184680 "NPR AT Organizations Step"
 {
-    Caption = 'AT Organization Card';
+    Caption = 'AT Organizations';
     Extensible = false;
-    PageType = Card;
+    PageType = List;
     SourceTable = "NPR AT Organization";
     UsageCategory = None;
 
@@ -10,69 +10,56 @@
     {
         area(Content)
         {
-            group(General)
+            repeater(Repeater)
             {
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = NPRATFiscal;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the code to identify this AT Fiskaly organization.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = NPRATFiscal;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the text that describes this AT Fiskaly organization.';
                 }
-            }
-            group(FiskalyConnectionCredentials)
-            {
-                Caption = 'Fiskaly Connection Credentials';
-                group(Keys)
+                field(FiskalyAPIKey; FiskalyAPIKeyValue)
                 {
-                    ShowCaption = false;
-                    field(APIKey; APIKeyValue)
-                    {
-                        ApplicationArea = NPRATFiscal;
-                        Caption = 'API Key';
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the API Key provided by Fiskaly.';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Fiskaly API Key';
+                    ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the API Key provided by Fiskaly.';
 
-                        trigger OnValidate()
-                        begin
-                            if APIKeyValue = '' then
-                                ATSecretMgt.RemoveSecretKey(Rec.GetAPIKeyName())
-                            else
-                                ATSecretMgt.SetSecretKey(Rec.GetAPIKeyName(), APIKeyValue);
-                        end;
-                    }
-                    field(APISecret; APISecretValue)
-                    {
-                        ApplicationArea = NPRATFiscal;
-                        Caption = 'API Secret';
-                        ExtendedDatatype = Masked;
-                        ToolTip = 'Specifies the value of the API Secret provided by Fiskaly.';
-
-                        trigger OnValidate()
-                        begin
-                            if APISecretValue = '' then
-                                ATSecretMgt.RemoveSecretKey(Rec.GetAPISecretName())
-                            else
-                                ATSecretMgt.SetSecretKey(Rec.GetAPISecretName(), APISecretValue);
-                        end;
-                    }
+                    trigger OnValidate()
+                    begin
+                        if FiskalyAPIKeyValue = '' then
+                            ATSecretMgt.RemoveSecretKey(Rec.GetAPIKeyName())
+                        else
+                            ATSecretMgt.SetSecretKey(Rec.GetAPIKeyName(), FiskalyAPIKeyValue);
+                    end;
                 }
-            }
-            group(FONAuthentication)
-            {
-                Caption = 'FinanzOnline Authentication';
+                field(FiskalyAPISecret; FiskalyAPISecretValue)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Fiskaly API Secret';
+                    ExtendedDatatype = Masked;
+                    ToolTip = 'Specifies the value of the API Secret provided by Fiskaly.';
 
+                    trigger OnValidate()
+                    begin
+                        if FiskalyAPISecretValue = '' then
+                            ATSecretMgt.RemoveSecretKey(Rec.GetAPISecretName())
+                        else
+                            ATSecretMgt.SetSecretKey(Rec.GetAPISecretName(), FiskalyAPISecretValue);
+                    end;
+                }
                 field("FON Authentication Status"; Rec."FON Authentication Status")
                 {
-                    ApplicationArea = NPRATFiscal;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the status of FinanzOnline authentication. Must be authenticated with FinanzOnline before transitioning Signature Creation Units and Cash Registers to INITIALIZED.';
                 }
                 field("FON Authenticated At"; Rec."FON Authenticated At")
                 {
-                    ApplicationArea = NPRATFiscal;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the date and time when authentication is done at FinanzOnline.';
                 }
             }
@@ -85,7 +72,7 @@
         {
             action(AuthenticateFON)
             {
-                ApplicationArea = NPRATFiscal;
+                ApplicationArea = NPRRetail;
                 Caption = 'Authenticate FON';
                 Image = LinkWeb;
                 Promoted = true;
@@ -104,7 +91,7 @@
             }
             action(RetrieveFONStatus)
             {
-                ApplicationArea = NPRATFiscal;
+                ApplicationArea = NPRRetail;
                 Caption = 'Retrieve FON Status';
                 Image = Refresh;
                 Promoted = true;
@@ -132,18 +119,18 @@
 
     var
         ATSecretMgt: Codeunit "NPR AT Secret Mgt.";
-        APIKeyValue: Text[250];
-        APISecretValue: Text[250];
+        FiskalyAPIKeyValue: Text[250];
+        FiskalyAPISecretValue: Text[250];
 
     local procedure ClearSecretValues()
     begin
-        Clear(APIKeyValue);
-        Clear(APISecretValue);
+        Clear(FiskalyAPIKeyValue);
+        Clear(FiskalyAPISecretValue);
     end;
 
     local procedure GetSecretValues()
     begin
-        APIKeyValue := CopyStr(ATSecretMgt.GetSecretKey(Rec.GetAPIKeyName()), 1, MaxStrLen(APIKeyValue));
-        APISecretValue := CopyStr(ATSecretMgt.GetSecretKey(Rec.GetAPISecretName()), 1, MaxStrLen(APISecretValue));
+        FiskalyAPIKeyValue := CopyStr(ATSecretMgt.GetSecretKey(Rec.GetAPIKeyName()), 1, MaxStrLen(FiskalyAPIKeyValue));
+        FiskalyAPISecretValue := CopyStr(ATSecretMgt.GetSecretKey(Rec.GetAPISecretName()), 1, MaxStrLen(FiskalyAPISecretValue));
     end;
 }

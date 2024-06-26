@@ -17,6 +17,7 @@
         AddBGSISFiscalizationSetupsWizard();
         AddSIFiscalizationSetupsWizard();
         AddITFiscalizationSetupsWizard();
+        AddATFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -160,6 +161,19 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup IT POS Paym. Meth.", ITSetupPOSPaymMethTxt, AssistedSetupGroup::NPRITFiscal);
     end;
 
+    local procedure AddATFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        ATFiscalizationSetupTxt: Label 'Welcome to Austrian Fiscalization Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT Fiscal", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT Fiskaly", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT POS Audit Profile", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT VAT Posting Setup", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT POS Paym. Meth.", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -190,6 +204,7 @@
         SIFiscalizationSetups();
         BGSISFiscalizationSetups();
         ITFiscalizationSetups();
+        ATFiscalizationSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
             HideChecklistIfPOSEntryExist();
@@ -1366,7 +1381,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1381,7 +1396,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1408,6 +1423,9 @@
             Modul::ITFiscalizationSetup:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-ITFiscalization-v1.0');
+            Modul::ATFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-ATFiscalization-v1.0');
         end;
     end;
 
@@ -2274,7 +2292,240 @@
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup IT POS Unit Mapping");
     end;
+    #endregion
 
+    #region AT Fiscalization Wizards
+    local procedure ATFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::ATFiscalization)) then
+            exit;
+
+        RemoveATFiscalizationSetupGuidedExperience();
+
+        AddATFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::ATFiscalization));
+    end;
+
+    local procedure RemoveATFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT Fiskaly");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT POS Audit Profile");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT VAT Posting Setup");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT POS Paym. Meth.");
+    end;
+
+    local procedure AddATFiscalizationSetupsWizard()
+    begin
+        EnableATFiscalSetupWizard();
+        EnableATFiskalySetupWizard();
+        EnableATAuditProfileSetupWizard();
+        EnableATVATPostingSetupWizard();
+        EnableATPOSPaymentMethodSetupWizard();
+    end;
+
+    local procedure EnableATFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup AT Fiscal",
+                                                AssistedSetupGroup::NPRATFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableATFiskalySetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Integration with Fiskaly', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Integration with Fiskaly', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT Fiskaly") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup AT Fiskaly",
+                                                AssistedSetupGroup::NPRATFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableATAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT POS Audit Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup AT POS Audit Profile",
+                                                AssistedSetupGroup::NPRATFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableATVATPostingSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup VAT Posting Setups', Locked = true;
+        SetupDescriptionTxt: Label 'Setup VAT Posting Setups', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT VAT Posting Setup") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                5,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup AT VAT Posting Setup",
+                                                AssistedSetupGroup::NPRATFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableATPOSPaymentMethodSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup AT POS Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup AT POS Paym. Meth.",
+                                                AssistedSetupGroup::NPRATFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupATFiscalWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupATFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT Fiskaly", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupATFiskalyWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupATFiskalyWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT POS Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupATPOSAuditProfileWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupATAuditProfileWizardStatus();
+    end;
+
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT VAT Posting Setup", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupATVATPostingSetupWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupATVATPostingSetupWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT POS Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupATPOSPaymMethWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupATPOSPaymMethWizardStatus();
+    end;
+
+    local procedure UpdateSetupATFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup AT Fiscal");
+    end;
+
+    local procedure UpdateSetupATFiskalyWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup AT Fiskaly");
+    end;
+
+    local procedure UpdateSetupATAuditProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup AT POS Audit Profile");
+    end;
+
+    local procedure UpdateSetupATVATPostingSetupWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup AT VAT Posting Setup");
+    end;
+
+    local procedure UpdateSetupATPOSPaymMethWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup AT POS Paym. Meth.");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR AT Fiscalization Setup", 'OnAfterValidateEvent', 'AT Fiscal Enabled', false, false)]
+    local procedure ResetATFiscalWizard_OnAfterValidateATFiscalEnabled(var Rec: Record "NPR AT Fiscalization Setup"; var xRec: Record "NPR AT Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."AT Fiscal Enabled" <> xRec."AT Fiscal Enabled") and not Rec."AT Fiscal Enabled" then
+            ResetSetupATFiscalWizardStatus();
+    end;
+
+    local procedure ResetSetupATFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup AT Fiscal");
+    end;
     #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
@@ -2302,6 +2553,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization;
 #endif
 }

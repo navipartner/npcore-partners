@@ -32,4 +32,8 @@ enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
     {
         Caption = 'NP IT Fiscalization';
     }
+    value(6014408; NPRATFiscal)
+    {
+        Caption = 'NP AT Fiscalization';
+    }
 }

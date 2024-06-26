@@ -1,6 +1,6 @@
-page 6151487 "NPR Setup BG SIS Fiscal"
+page 6184676 "NPR Setup AT VAT Posting Setup"
 {
-    Caption = 'Setup BG SIS Fiscalization';
+    Caption = 'Setup AT VAT Posting Setup Mapping';
     Extensible = false;
     PageType = NavigatePage;
 
@@ -42,12 +42,12 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 Visible = IntroStepVisible;
                 group(Welcome)
                 {
-                    Caption = 'Welcome to BG SIS Fiscalization Setup';
+                    Caption = 'Welcome to VAT Posting Setup Mapping Setup';
                     Visible = IntroStepVisible;
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'This essential step ensures your business adheres to Bulgarian fiscal regulations. Enable BG SIS fiscalization and set up related settings for a comprehensive and compliant financial foundation.';
+                        InstructionalText = 'Systematically map each VAT Posting Setup to its corresponding financial category, ensuring coherence in reporting and facilitating efficient reconciliation processes.';
                     }
                 }
                 group("Let's go!")
@@ -61,23 +61,22 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 }
             }
 
-            // BG SIS Fiscal Setup
-            group(EnableFiscalStep)
+            // AT VAT Posting Setups
+            group(SetVATPostingSetupStep)
             {
-                Visible = EnableFiscalStepVisible;
-                group(EnableBGSISFiscal)
+                Visible = SetVATPostingSetupStepVisible;
+                group(SeATVATPostingSetups)
                 {
-                    Caption = 'Enable BG SIS Fiscalization';
+                    Caption = 'Set AT VAT Posting Setups';
                     ShowCaption = false;
                     Editable = true;
-                    part(BGSISEnableFiscalStep; "NPR BG SIS Enable Fiscal Step")
+                    part(ATVATPostingSetupStep; "NPR AT VAT Posting Setup Step")
                     {
-                        Caption = 'Enabling BG SIS Fiscalization in the setup is essential for the effective operation of fiscalization.';
+                        Caption = 'Select a VAT Posting Setup and choose its corresponding mapping. This ensures accurate reporting and reconciliation of transactions.';
                         ApplicationArea = NPRRetail;
                     }
                 }
             }
-
             // Finish Step
             group(Finish)
             {
@@ -87,13 +86,13 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                     Caption = 'Finish';
                     InstructionalText = 'That was the last step of this wizard.';
                 }
-                group(NotAllMandatoryDataPopulatedMsg)
+                group(NotAllMandatoryDataFilledInMsg)
                 {
-                    Caption = '';
-                    InstructionalText = 'Unable to complete BG SIS Fiscalization Setup. Please ensure all required fields, including enabling BG SIS fiscalization are filled correctly.';
+                    Caption = ' ';
+                    InstructionalText = 'VAT Posting Setup Mapping Setup could not be completed. Please ensure that any VAT Posting Setup is mapped to its corresponding financial category before moving forward.';
                     Visible = not DataPopulated;
                 }
-                group(AllMandatoryDataPopulatedMsg)
+                group(AnyDataFilledInMsg)
                 {
                     Caption = '';
                     InstructionalText = 'To finish the setup, choose Finish.';
@@ -113,8 +112,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
-                ToolTip = 'Go to the previous step.';
-
+                ToolTip = 'Executes the Back action';
                 trigger OnAction();
                 begin
                     NextStep(true);
@@ -127,8 +125,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
-                ToolTip = 'Go to the next step.';
-
+                ToolTip = 'Executes the Next action';
                 trigger OnAction();
                 begin
                     NextStep(false);
@@ -141,7 +138,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
-                ToolTip = 'Finish this step.';
+                ToolTip = 'Executes the Finish action';
                 trigger OnAction();
                 begin
                     FinishAction();
@@ -149,7 +146,6 @@ page 6151487 "NPR Setup BG SIS Fiscal"
             }
         }
     }
-
     trigger OnInit();
     begin
         LoadTopBanners();
@@ -168,13 +164,13 @@ page 6151487 "NPR Setup BG SIS Fiscal"
         MediaResourcesStandard: Record "Media Resources";
         BackActionEnabled: Boolean;
         DataPopulated: Boolean;
-        EnableFiscalStepVisible: Boolean;
         FinishActionEnabled: Boolean;
         FinishStepVisible: Boolean;
         IntroStepVisible: Boolean;
         NextActionEnabled: Boolean;
+        SetVATPostingSetupStepVisible: Boolean;
         TopBannerVisible: Boolean;
-        Step: Option Start,EnableFiscalStep,Finish;
+        Step: Option Start,SetVATPostingSetupStep,Finish;
 
     local procedure EnableControls();
     begin
@@ -183,8 +179,8 @@ page 6151487 "NPR Setup BG SIS Fiscal"
         case Step of
             Step::Start:
                 ShowIntroStep();
-            Step::EnableFiscalStep:
-                ShowEnableFiscalStep();
+            Step::SetVATPostingSetupStep:
+                ShowVATPostingSetupStep();
             Step::Finish:
                 ShowFinishStep();
         end;
@@ -205,28 +201,28 @@ page 6151487 "NPR Setup BG SIS Fiscal"
         IntroStepVisible := true;
     end;
 
-    local procedure ShowEnableFiscalStep()
+    local procedure ShowVATPostingSetupStep()
     begin
-        CurrPage.BGSISEnableFiscalStep.Page.CopyToTemp();
-        EnableFiscalStepVisible := true;
+        CurrPage.ATVATPostingSetupStep.Page.CopyToTemp();
+        SetVATPostingSetupStepVisible := true;
     end;
 
     local procedure ShowFinishStep()
     begin
-        CheckIfDataPopulated();
+        CheckIfDataFilledIn();
         FinishStepVisible := true;
         NextActionEnabled := false;
         FinishActionEnabled := DataPopulated;
     end;
 
-    local procedure CheckIfDataPopulated()
+    local procedure CheckIfDataFilledIn()
     begin
-        DataPopulated := CurrPage.BGSISEnableFiscalStep.Page.IsDataPopulated();
+        DataPopulated := CurrPage.ATVATPostingSetupStep.Page.IsDataPopulated();
     end;
 
     local procedure FinishAction();
     begin
-        CurrPage.BGSISEnableFiscalStep.Page.CreateFiscalSetupData();
+        CurrPage.ATVATPostingSetupStep.Page.CreateVATPostingSetupMappingData();
         OnAfterFinishStep(DataPopulated);
         CurrPage.Close();
     end;
@@ -238,7 +234,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
         NextActionEnabled := true;
 
         IntroStepVisible := false;
-        EnableFiscalStepVisible := false;
+        SetVATPostingSetupStepVisible := false;
         FinishStepVisible := false;
     end;
 
