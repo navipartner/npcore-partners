@@ -1,6 +1,6 @@
-page 6151487 "NPR Setup BG SIS Fiscal"
+page 6184672 "NPR Setup AT Fiscal"
 {
-    Caption = 'Setup BG SIS Fiscalization';
+    Caption = 'Setup AT Fiscalization';
     Extensible = false;
     PageType = NavigatePage;
 
@@ -42,12 +42,12 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 Visible = IntroStepVisible;
                 group(Welcome)
                 {
-                    Caption = 'Welcome to BG SIS Fiscalization Setup';
+                    Caption = 'Welcome to AT Fiscalization Setup';
                     Visible = IntroStepVisible;
                     group(Group18)
                     {
                         Caption = '';
-                        InstructionalText = 'This essential step ensures your business adheres to Bulgarian fiscal regulations. Enable BG SIS fiscalization and set up related settings for a comprehensive and compliant financial foundation.';
+                        InstructionalText = 'This essential step ensures your business adheres to Austrian fiscal regulations. Enable AT fiscalization and set up related settings for a comprehensive and compliant financial foundation.';
                     }
                 }
                 group("Let's go!")
@@ -61,19 +61,19 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 }
             }
 
-            // BG SIS Fiscal Setup
+            // AT Fiscal Setup
             group(EnableFiscalStep)
             {
                 Visible = EnableFiscalStepVisible;
-                group(EnableBGSISFiscal)
+                group(EnableATFiscal)
                 {
-                    Caption = 'Enable BG SIS Fiscalization';
-                    ShowCaption = false;
+                    Caption = 'Enable AT Fiscalization';
                     Editable = true;
-                    part(BGSISEnableFiscalStep; "NPR BG SIS Enable Fiscal Step")
+                    ShowCaption = false;
+                    part(ATEnableFiscalStep; "NPR AT Enable Fiscal Step")
                     {
-                        Caption = 'Enabling BG SIS Fiscalization in the setup is essential for the effective operation of fiscalization.';
                         ApplicationArea = NPRRetail;
+                        Caption = 'Enabling AT Fiscalization in the setup is essential for the effective operation of fiscalization.';
                     }
                 }
             }
@@ -90,7 +90,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
                 group(NotAllMandatoryDataPopulatedMsg)
                 {
                     Caption = '';
-                    InstructionalText = 'Unable to complete BG SIS Fiscalization Setup. Please ensure all required fields, including enabling BG SIS fiscalization are filled correctly.';
+                    InstructionalText = 'Unable to complete AT Fiscalization Setup. Please ensure all required fields, including enabling AT fiscalization are filled correctly.';
                     Visible = not DataPopulated;
                 }
                 group(AllMandatoryDataPopulatedMsg)
@@ -207,7 +207,7 @@ page 6151487 "NPR Setup BG SIS Fiscal"
 
     local procedure ShowEnableFiscalStep()
     begin
-        CurrPage.BGSISEnableFiscalStep.Page.CopyToTemp();
+        CurrPage.ATEnableFiscalStep.Page.CopyToTemp();
         EnableFiscalStepVisible := true;
     end;
 
@@ -221,12 +221,12 @@ page 6151487 "NPR Setup BG SIS Fiscal"
 
     local procedure CheckIfDataPopulated()
     begin
-        DataPopulated := CurrPage.BGSISEnableFiscalStep.Page.IsDataPopulated();
+        DataPopulated := CurrPage.ATEnableFiscalStep.Page.IsDataPopulated();
     end;
 
     local procedure FinishAction();
     begin
-        CurrPage.BGSISEnableFiscalStep.Page.CreateFiscalSetupData();
+        CurrPage.ATEnableFiscalStep.Page.CreateFiscalSetupData();
         OnAfterFinishStep(DataPopulated);
         CurrPage.Close();
     end;
