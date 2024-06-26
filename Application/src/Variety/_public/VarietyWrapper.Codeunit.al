@@ -42,6 +42,7 @@
         Item.Get(SalesLine."No.");
         //check its a Variety item
         TestItemIsVariety(Item);
+        OnBeforeGetMasterLineMapSalesLineShowVariety(SalesLine, Item, ShowFieldNo);
         //find or create a line that is a master line
         if not MasterLineMap.Get(Database::"Sales Line", SalesLine.SystemId) then
             Clear(MasterLineMap);
@@ -82,6 +83,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapPurchLineShowVariety(PurchLine, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"Purchase Line", PurchLine.SystemId) then
             Clear(MasterLineMap);
 
@@ -119,6 +121,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapPriceShowVariety(PriceListLine, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"Price List Line", PriceListLine.SystemId) then
             Clear(MasterLineMap);
 
@@ -150,6 +153,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapRetailJournalLineShowVariety(RetailJournalLine, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"NPR Retail Journal Line", RetailJournalLine.SystemId) then
             Clear(MasterLineMap);
 
@@ -179,6 +183,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapItemReplenishmentShowVariety(ItemReplenishByStore, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"NPR Item Repl. by Store", ItemReplenishByStore.SystemId) then
             Clear(MasterLineMap);
 
@@ -210,6 +215,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapItemJnlLineShowVariety(ItemJnlLine, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"Item Journal Line", ItemJnlLine.SystemId) then
             Clear(MasterLineMap);
 
@@ -255,6 +261,7 @@
         //check its a Variety item
         TestItemIsVariety(Item);
         //find or create a line that is a master line
+        OnBeforeGetMasterLineMapTransferLineShowVariety(TransferLine, Item, ShowFieldNo);
         if not MasterLineMap.Get(Database::"Transfer Line", TransferLine.SystemId) then
             Clear(MasterLineMap);
 
@@ -592,6 +599,41 @@
             if Item.Get(Rec."Item No.") then
                 Rec."NPR Description 2" := Item."Description 2";
         end;
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapSalesLineShowVariety(SalesLine: Record "Sales Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapPurchLineShowVariety(PurchLine: Record "Purchase Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapPriceShowVariety(PriceListLine: Record "Price List Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapRetailJournalLineShowVariety(RetailJournalLine: Record "NPR Retail Journal Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapItemReplenishmentShowVariety(ItemReplenishByStore: Record "NPR Item Repl. by Store"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapItemJnlLineShowVariety(ItemJnlLine: Record "Item Journal Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnBeforeGetMasterLineMapTransferLineShowVariety(TransferLine: Record "Transfer Line"; Item: Record Item; ShowFieldNo: Integer)
+    begin
     end;
 
     local procedure GetCalculationDate(DateIn: Date): Text
