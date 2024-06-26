@@ -61,8 +61,8 @@
         InitializeFTP(ServerName, NcEndpointFTP.Username, NcEndpointFTP.Password, FtpPort, NcEndpointFTP.Passive, NcEndpointFTP.EncMode);
         FTPResponse := FTPClient.UploadFile(InStr, FilePath + NcTaskOutput.Name);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -70,8 +70,8 @@
                     if NcEndpointFTP."File Temporary Extension" <> '' then begin
                         FTPResponse := FTPClient.RenameFile(FilePath + NcTaskOutput.Name, FilePath + OriginalFileName);
 
-                        FTPResponse.Get('StatusCode', JToken);
-                        ResponseCodeText := JToken.AsValue().AsText();
+                        if FTPResponse.Get('StatusCode', JToken) then
+                            ResponseCodeText := JToken.AsValue().AsText();
 
                         if ResponseCodeText <> '200' then begin
                             FTPClient.Destruct();
@@ -191,8 +191,8 @@
         end else
             FTPResponse := FTPClient.CreateDirectory(FtpPath);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -221,8 +221,8 @@
                 Error(GetLastErrorText());
         end else begin
             FTPResponse := FTPClient.ListDirectory('/');
-            FTPResponse.Get('StatusCode', JToken);
-            ResponseCodeText := JToken.AsValue().AsText();
+            if FTPResponse.Get('StatusCode', JToken) then
+                ResponseCodeText := JToken.AsValue().AsText();
             case ResponseCodeText of
                 '200':
                     begin
