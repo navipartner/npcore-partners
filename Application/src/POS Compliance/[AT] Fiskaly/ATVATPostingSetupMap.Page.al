@@ -25,7 +25,7 @@ page 6184632 "NPR AT VAT Posting Setup Map"
                 }
                 field("VAT Identifier"; Rec."VAT Identifier")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRATFiscal;
                     ToolTip = 'Specifies the VAT Identifier for Fiskaly.';
                 }
                 field("AT VAT Rate"; Rec."AT VAT Rate")
