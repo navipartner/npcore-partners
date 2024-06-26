@@ -4,15 +4,15 @@ pageextension 6014532 "NPR Company Information" extends "Company Information"
     {
         addlast(Processing)
         {
-            action("NPR nvoke Case System Call")
+            action("NPR Check NP Retail License")
             {
-                Caption = 'Invoke Case System Call';
+                Caption = 'Check NP Retail License';
                 Image = CheckDuplicates;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                ToolTip = 'Executes the action which invokes the call to the case system.';
                 ApplicationArea = NPRRetail;
+                ToolTip = 'Executes the Check NP Retail License action.';
                 trigger OnAction()
                 var
                     TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
