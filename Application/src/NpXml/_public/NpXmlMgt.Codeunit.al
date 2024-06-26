@@ -795,13 +795,16 @@
         FtpClient.Construct(FtpConn."Server Host", FtpConn.Username, FtpConn.Password, FtpConn."Server Port", 10000, FtpConn."FTP Passive Transfer Mode", FtpConn."FTP Enc. Mode", FtpConn."Force Behavior");
         FTPResponse := FtpClient.UploadFile(InS, GetFTPandSFTPRemotePath(NPXmlTemplate, Filename));
         FtpClient.Destruct();
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
+
         if (ResponseCodeText <> '200') then begin
             FTPResponse.Get('Error', JToken);
             AddTextToResponseTempBlob(StrSubstNo(SendFailedErr, JToken.AsValue().AsText()));
             Error(SendFailedErr, JToken.AsValue().AsText());
         end;
+
         AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] FTP: ' + NPXmlTemplate."FTP Connection" + ' -->' + CRLF());
     end;
 

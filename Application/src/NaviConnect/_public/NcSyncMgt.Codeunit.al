@@ -81,8 +81,8 @@
         Path := DirPath + Filename;
         FTPResponse := FTPClient.DownloadFile(Path);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -375,8 +375,8 @@
 
         FTPResponse := FTPClient.ListDirectory(ManagePathSlashes(ImportType."Ftp Path"));
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
         FTPClient.Destruct();
 
@@ -484,8 +484,8 @@
     begin
         FTPResponse := FTPClient.DirectoryExists(FtpUrl);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
         case ResponseCodeText of
             '200':
@@ -508,13 +508,18 @@
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
+        ErrorTxt: Text;
     begin
         FTPResponse := FTPClient.DeleteFile(FtpUrl);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
-        if ResponseCodeText <> '200' then
-            Error(ResponseCodeText);
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
+
+        if ResponseCodeText <> '200' then begin
+            if (FTPResponse.Get('Error', JToken)) then
+                ErrorTxt := JToken.AsValue().AsText();
+            Error(ErrorTxt);
+        end;
     end;
 
 #pragma warning disable AA0139
@@ -545,13 +550,18 @@
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
+        ErrorTxt: Text;
     begin
         FTPResponse := FTPClient.CreateDirectory(FtpUrl);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
-        if ResponseCodeText <> '200' then
-            Error(ResponseCodeText);
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
+
+        if ResponseCodeText <> '200' then begin
+            if (FTPResponse.Get('Error', JToken)) then
+                ErrorTxt := JToken.AsValue().AsText();
+            Error(ErrorTxt);
+        end;
     end;
 
     [TryFunction]
@@ -560,14 +570,18 @@
         FTPResponse: JsonObject;
         JToken: JsonToken;
         ResponseCodeText: Text;
+        ErrorTxt: Text;
     begin
         FTPResponse := FTPClient.RenameFile(Path, NewPath);
 
-        FTPResponse.Get('StatusCode', JToken);
-        ResponseCodeText := JToken.AsValue().AsText();
+        if FTPResponse.Get('StatusCode', JToken) then
+            ResponseCodeText := JToken.AsValue().AsText();
 
-        if ResponseCodeText <> '200' then
-            Error(ResponseCodeText);
+        if ResponseCodeText <> '200' then begin
+            if (FTPResponse.Get('Error', JToken)) then
+                ErrorTxt := JToken.AsValue().AsText();
+            Error(ErrorTxt);
+        end;
     end;
     #endregion Aux
 

@@ -404,19 +404,19 @@
         azFuncWQuery: Text;
     begin
         azFuncWQuery := AZFunction + '?code=' + gHttpHostKey;
-        if not FtpClient.Post(azFuncWQuery, Content, httpResponse) then
+        if FtpClient.Post(azFuncWQuery, Content, httpResponse) then
+            if httpResponse.IsSuccessStatusCode then begin
+                httpResponse.Content.ReadAs(jsonTxt);
+                jsonResult.ReadFrom(jsonTxt);
+                statusCode := httpResponse.HttpStatusCode;
+                jsonResult.Add(gResponseMsg_StatusCode, statusCode);
+            end else begin
+                statusCode := httpResponse.HttpStatusCode;
+                jsonResult.Add(gResponseMsg_StatusCode, statusCode);
+                jsonResult.Add(gErrorConst, gErrMsg_Post_Fail);
+            end
+        else
             jsonResult.Add(gErrorConst, gErrMsg_Post_Fail);
-
-        if httpResponse.IsSuccessStatusCode then begin
-            httpResponse.Content.ReadAs(jsonTxt);
-            jsonResult.ReadFrom(jsonTxt);
-            statusCode := httpResponse.HttpStatusCode;
-            jsonResult.Add(gResponseMsg_StatusCode, statusCode);
-        end else begin
-            statusCode := httpResponse.HttpStatusCode;
-            jsonResult.Add(gResponseMsg_StatusCode, statusCode);
-            jsonResult.Add(gErrorConst, gErrMsg_Post_Fail);
-        end;
 
         exit(jsonResult);
     end;
