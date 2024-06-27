@@ -15,9 +15,9 @@ codeunit 6184871 "NPR TM TicketToCoupon"
 
         TicketNotFound: Label 'Ticket not found';
         TicketBlocked: Label 'Ticket is blocked';
-        NoCouponProfile: Label 'Ticket type does not have a coupon profile';
-        InvalidProfile: Label 'Coupon profile not found';
-        CouponProfileNotFound: Label 'Coupon profile for ticket type does not define a default coupon';
+        NoCouponProfile: Label 'Ticket type %1 does not have a coupon profile';
+        InvalidProfile: Label 'Coupon profile %1 not found';
+        CouponProfileNotFound: Label 'Coupon profile %1 for ticket type %2 does not define a default coupon';
         NotPaid: Label 'Ticket has not been paid, purchase date is required';
         NotAdmitted: Label 'Ticket has not been used, admission date is required';
         NotRequiredAdmitted: Label 'Ticket has not been used for the required admission, admission date is required';
@@ -34,16 +34,16 @@ codeunit 6184871 "NPR TM TicketToCoupon"
 
         TicketType.Get(Ticket."Ticket Type Code");
         if (TicketType."CouponProfileCode" = '') then
-            exit(ExitWithReason(-20, NoCouponProfile, ReasonCode, ReasonText));
+            exit(ExitWithReason(-20, StrSubstNo(NoCouponProfile, Ticket."Ticket Type Code"), ReasonCode, ReasonText));
 
         if (not CouponProfile.Get(TicketType."CouponProfileCode", CouponAlias)) then begin
             if (CouponAlias <> '') then
-                exit(ExitWithReason(-22, InvalidProfile, ReasonCode, ReasonText));
+                exit(ExitWithReason(-22, StrSubstNo(InvalidProfile, CouponAlias), ReasonCode, ReasonText));
 
             CouponProfile.SetFilter(ProfileCode, '=%1', TicketType."CouponProfileCode");
             CouponProfile.SetFilter(Default, '=%1', true);
             if (not CouponProfile.FindFirst()) then
-                exit(ExitWithReason(-21, CouponProfileNotFound, ReasonCode, ReasonText));
+                exit(ExitWithReason(-21, StrSubstNo(CouponProfileNotFound, TicketType."CouponProfileCode", Ticket."Ticket Type Code"), ReasonCode, ReasonText));
         end;
 
         if (not TicketCoupons.Get(Ticket."No.", CouponProfile."CouponType", CouponProfile.AliasCode)) then begin

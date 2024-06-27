@@ -11,7 +11,8 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         "Pickup Ticket Reservation",
         "Convert To Membership",
         "Register Departure",
-        "Additional Experience"
+        "Additional Experience",
+        "Ticket to Coupon"
     ];
     var inputNames = [
         "Standard",
@@ -99,7 +100,12 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     } else {
         actionSettings.TicketQuantity = ticketQuantity;
         actionSettings.TicketReference = ticketReference;
-        await workflow.respond("DoAction", actionSettings);
+        const actionResponse = await workflow.respond("DoAction", actionSettings);
+
+        if (actionResponse.coupon) {
+            toast.success (`Coupon: ${actionResponse.coupon.reference_no}`, {title: windowTitle});
+            await workflow.run('SCAN_COUPON', { parameters: { ReferenceNo: actionResponse.coupon.reference_no } });
+        }
     }
 
     if (context.Verbose) { 

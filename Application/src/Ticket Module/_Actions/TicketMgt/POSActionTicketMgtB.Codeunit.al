@@ -346,6 +346,29 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         end;
     end;
 
+    internal procedure ExchangeTicketForCoupon(POSSession: Codeunit "NPR POS Session"; ExternalTicketReference: Code[50]; CouponAlias: Code[20]; Response: JsonObject)
+    var
+        TicketToCoupon: Codeunit "NPR TM TicketToCoupon";
+        CouponReferenceNo: Text[50];
+        ExternalTicketNo: Code[30];
+        ReasonCode: Integer;
+        ReasonText: Text;
+        CouponJson: JsonObject;
+    begin
+        if (ExternalTicketReference = '') then
+            Error(ILLEGAL_VALUE, ExternalTicketReference, TICKET_NUMBER);
+
+        if (StrLen(ExternalTicketReference) > 30) then // if > 30 it means it is a token (order number)
+            Error(ILLEGAL_VALUE, ExternalTicketReference, TICKET_NUMBER);
+
+        ExternalTicketNo := CopyStr(ExternalTicketReference, 1, MaxStrLen(ExternalTicketNo));
+        if (not TicketToCoupon.ExchangeTicketForCoupon(ExternalTicketNo, CouponAlias, CouponReferenceNo, ReasonCode, ReasonText)) then
+            Error(ReasonText);
+
+        CouponJson.Add('reference_no', CouponReferenceNo);
+        Response.Add('coupon', CouponJson);
+    end;
+
 
     #endregion
 
