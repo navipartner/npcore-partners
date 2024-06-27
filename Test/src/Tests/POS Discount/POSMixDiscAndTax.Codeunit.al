@@ -7744,6 +7744,1080 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Assert.AreNotEqual(POSSaleLine."Amount Including VAT", 0, 'Total Discount not applied according to scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalAmountPerMinQtyUOMSameOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        TotalAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total amount per min. qty. with same UOM as item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount is applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", TotalAmount, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalAmountPerMinQtyUOMDifferentOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total amount per min. qty. with different UOM than on Item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount is not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount Amount", 0, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalAmountPerMinQtyUOMDiscountWithItemATwoItemsOnPOSSecondNoDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        TotalAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total amount per min. qty. for item A with X UOM, 2 different items on POS Sale with same UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        SecondItem."Base Unit of Measure" := UnitOfMeasure.Code;
+        SecondItem."Unit Price" := 2000;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", TotalAmount, 'Discount Amount not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Discount Amount", 0, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalAmountPerMinQtyUOMTwoItemsOnPOSBothOnDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        TotalAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total amount per min. qty. for Item A with X UOM and Item B with Y UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem."Unit Price" := 2000;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreNearlyEqual(Round(POSSaleLine."Amount Including VAT" + SecondPOSSaleLine."Amount Including VAT"), Round(TotalAmount * (POSSaleLine.Quantity + SecondPOSSaleLine.Quantity)), 0.1, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalAmountPerMinQtyUOMTwoDiscountsTwoItemsDifferentUOMsSameAsOnDiscounts()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        FirstTotalAmount: Decimal;
+        SecondTotalAmount: Decimal;
+        Qty: Decimal;
+        FirstDiscountCode: Code[20];
+        SecondDiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply 2 total amount per min. qty. mix discounts applied on 2 items
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem."Unit Price" := 2000;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        FirstTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = FirstDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Amount Including VAT", FirstTotalAmount, 'Discount Amount not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = SecondDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Amount Including VAT", SecondTotalAmount, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountAmountPerMinQtyUOMSameOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        TotalDiscountAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+        UOM: Code[10];
+    begin
+        // [SCENARIO] Apply mix discount total discount amount per min. qty. with same UOM as item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        if not POSSaleLine."Price Includes VAT" then
+            TotalDiscountAmount := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalDiscountAmount, POSSaleLine."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Verify Discount is applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount Amount", TotalDiscountAmount, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountAmountPerMinQtyUOMDifferentOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount amount per min. qty. with different UOM than Item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount is not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount Amount", 0, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountAmountPerMinQtyUOMDiscountWithItemATwoItemsOnPOSSecondNoDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        TotalDiscountAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount amount per min. qty. for item A X with UOM, 2 different items on POS Sale with same UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := UnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        if not POSSaleLine."Price Includes VAT" then
+            TotalDiscountAmount := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalDiscountAmount, POSSaleLine."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount Amount", TotalDiscountAmount, 'Discount Amount not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Discount Amount", 0, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountAmountPerMinQtyUOMTwoItemsOnPOSBothOnDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        TotalDiscountAmount: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount amount per min. qty. for Item A with X UOM and Item B with Y UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 1000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        if not POSSaleLine."Price Includes VAT" then
+            TotalDiscountAmount := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalDiscountAmount, POSSaleLine."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(Round(POSSaleLine."Discount Amount" + SecondPOSSaleLine."Discount Amount"), TotalDiscountAmount * (POSSaleLine.Quantity + SecondPOSSaleLine.Quantity), 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountAmountPerMinQtyUOMTwoDiscountsTwoItemsDifferentUOMsSameAsOnDiscounts()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        FirstTotalDiscountAmount: Decimal;
+        SecondTotalDiscountAmount: Decimal;
+        Qty: Decimal;
+        FirstDiscountCode: Code[20];
+        SecondDiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply 2 mix discounts total discount amount per min. qty, applied on 2 items
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discounts with items and UOMs
+        FirstTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        if not POSSaleLine."Price Includes VAT" then
+            FirstTotalDiscountAmount := POSSaleTaxCalc.CalcAmountWithoutVAT(FirstTotalDiscountAmount, POSSaleLine."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        if not SecondPOSSaleLine."Price Includes VAT" then
+            SecondTotalDiscountAmount := POSSaleTaxCalc.CalcAmountWithoutVAT(SecondTotalDiscountAmount, SecondPOSSaleLine."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = FirstDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount Amount", FirstTotalDiscountAmount, 'Discount Amount not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = SecondDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Discount Amount", SecondTotalDiscountAmount, 'Discount Amount not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountPercentUOMSameOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        DiscountPct: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount % with same UOM as item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        DiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount is applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount %", DiscountPct, 'Discount % not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountPercentUOMDifferentOnItemAndDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        Qty: Decimal;
+        DiscountCode: Code[20];
+        UOM: Code[10];
+        SecondUOM: Code[10];
+    begin
+        // [SCENARIO] Apply mix discount total discount % with different UOM than on Item on POS Sale
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Item with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        CreateTotalDiscountPctWithUOM(Item, 50, false, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Item to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+
+        // [THEN] Verify Discount is not applied
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount %", 0, 'Discount % not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountPercentUOMDiscountWithItemATwoItemsOnPOSSecondNoDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        DiscountPct: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount % for item A with X UOM, 2 different items on POS Sale with same UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOM
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := UnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        DiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount %", DiscountPct, 'Discount % not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Discount %", 0, 'Discount % not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountPercentUOMTwoItemsOnPOSBothOnDiscount()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        DiscountPct: Decimal;
+        Qty: Decimal;
+        DiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply mix discount total discount % for Item A with X UOM and Item B with Y UOM
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOMs
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 1000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discount with item and UOM
+        DiscountPct := CreateTotalDiscountPctWithUOMTwoItems(Item, SecondItem, 50, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = DiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount %", DiscountPct, 'Discount % not calculated according to scenario.');
+        Assert.AreEqual(SecondPOSSaleLine."Discount %", DiscountPct, 'Discount % not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ApplyMixDiscountTotalDiscountPercentUOMTwoDiscountsTwoItemsDifferentUOMsSameAsOnDiscounts()
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        SecondPOSSaleLine: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        SecondItem: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleUnit: Codeunit "NPR POS Sale";
+        POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        FirstDiscountPct: Decimal;
+        SecondDiscountPct: Decimal;
+        Qty: Decimal;
+        FirstDiscountCode: Code[20];
+        SecondDiscountCode: Code[20];
+    begin
+        // [SCENARIO] Apply 2 total discount % mix discounts which are applied on 2 items on POS
+
+        // [GIVEN] POS, Payment & Tax Setup
+        InitializeData();
+
+        // [GIVEN] Enable discount
+        EnableDiscount();
+
+        // [GIVEN] Items with unit price and UOMs
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        Item."Unit Price" := 2000;
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item.Modify();
+        LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
+        SecondItem."Unit Price" := 2000;
+        SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
+        SecondItem.Modify();
+
+        // [GIVEN] Discounts with items and UOMs
+        FirstDiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondDiscountPct := CreateTotalDiscountPctWithUOM(SecondItem, 60, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+
+        // [GIVEN] Active POS session & sale
+        LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
+
+        POSSaleUnit.GetCurrentSale(POSSale);
+
+        // [GIVEN] Add Items to active sale
+        Qty := 1;
+        LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Qty);
+        LibraryPOSMock.CreateItemLine(POSSession, SecondItem."No.", Qty);
+
+        POSSession.GetSaleLine(POSSaleLineUnit);
+        POSSaleLineUnit.SetFirst();
+        POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
+        POSSaleLineUnit.SetLast();
+        POSSaleLineUnit.GetCurrentSaleLine(SecondPOSSaleLine);
+
+        // [THEN] Verify Discount is applied correctly
+        Assert.IsTrue(POSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(POSSaleLine."Discount Type" = POSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(POSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(POSSaleLine."Discount Code" = FirstDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(POSSaleLine."Discount %", FirstDiscountPct, 'Discount % not calculated according to scenario.');
+        Assert.IsTrue(SecondPOSSaleLine."Allow Line Discount", 'Line Discount not allowed');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Type" = SecondPOSSaleLine."Discount Type"::Mix, 'Mixed Discount not applied to POS Sale Line');
+        Assert.IsFalse(SecondPOSSaleLine."Discount Calculated", 'Discount calculated on POS Sale Line');
+        Assert.IsTrue(SecondPOSSaleLine."Discount Code" = SecondDiscountCode, 'Mixed Discount not applied to POS Sale Line');
+        Assert.AreEqual(SecondPOSSaleLine."Discount %", SecondDiscountPct, 'Discount % not calculated according to scenario.');
+    end;
+
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -7963,6 +9037,31 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         exit(DiscPct);
     end;
 
+    local procedure CreateTotalDiscountPctWithUOM(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscPct: Decimal;
+    begin
+        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
+        DiscountCode := MixedDiscount.Code;
+        MixedDiscount.Modify();
+        exit(DiscPct);
+    end;
+
+    local procedure CreateTotalDiscountPctWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscPct: Decimal;
+    begin
+        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
+        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
+        DiscountCode := MixedDiscount.Code;
+        MixedDiscount.Modify();
+        exit(DiscPct);
+    end;
+
     local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
@@ -7980,6 +9079,52 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
     begin
         DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
         CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        exit(DiscountAmount);
+    end;
+
+    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscountAmount: Decimal;
+    begin
+        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
+        DiscountCode := MixedDiscount.Code;
+        exit(DiscountAmount);
+    end;
+
+    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscountAmount: Decimal;
+    begin
+        DiscountAmount := CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
+        DiscountCode := MixedDiscount.Code;
+        exit(DiscountAmount);
+    end;
+
+    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscountAmount: Decimal;
+    begin
+        DiscountAmount := CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
+        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
+        DiscountCode := MixedDiscount.Code;
+        exit(DiscountAmount);
+    end;
+
+    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+        DiscountAmount: Decimal;
+    begin
+        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
+        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
+        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
+        DiscountCode := MixedDiscount.Code;
         exit(DiscountAmount);
     end;
 
@@ -8044,6 +9189,22 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         MixedDiscountLine."Variant Code" := '';
         MixedDiscountLine.Init();
         MixedDiscountLine.Status := MixedDiscount.Status;
+        MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
+        MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
+        MixedDiscountLine.Insert();
+    end;
+
+    local procedure CreateDiscountLineWithUOM(MixedDiscount: Record "NPR Mixed Discount"; Item: Record Item; DiscGroupType: Enum "NPR Disc. Grouping Type"; UOM: Code[10])
+    var
+        MixedDiscountLine: Record "NPR Mixed Discount Line";
+    begin
+        MixedDiscountLine.Code := MixedDiscount.Code;
+        MixedDiscountLine."Disc. Grouping Type" := DiscGroupType;
+        MixedDiscountLine."No." := Item."No.";
+        MixedDiscountLine."Variant Code" := '';
+        MixedDiscountLine.Init();
+        MixedDiscountLine.Status := MixedDiscount.Status;
+        MixedDiscountLine."Unit of Measure Code" := UOM;
         MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
         MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
         MixedDiscountLine.Insert();
