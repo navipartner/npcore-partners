@@ -545,6 +545,8 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TicketBom: Record "NPR TM Ticket Admission Bom";
         Admission: Record "NPR TM Admission";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
     begin
         _AdmCapacityPriceBuffer.Reset();
         _AdmCapacityPriceBuffer.DeleteAll();
@@ -553,12 +555,13 @@ xmlport 6060112 "NPR TM List Ticket Items"
         TicketBom.SetFilter("Variant Code", '=%1', VariantCode);
         if (TicketBom.FindSet()) then begin
             repeat
+                LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
                 _AdmCapacityPriceBuffer.Init();
                 _AdmCapacityPriceBuffer.EntryNo := 1;
                 _AdmCapacityPriceBuffer.ItemNumber := ItemNumber;
                 _AdmCapacityPriceBuffer.VariantCode := VariantCode;
                 _AdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
-                _AdmCapacityPriceBuffer.ReferenceDate := Today();
+                _AdmCapacityPriceBuffer.ReferenceDate := DT2Date(LocalDateTime);
                 _AdmCapacityPriceBuffer.DefaultAdmission := TicketBom.Default;
                 _AdmCapacityPriceBuffer.AdmissionInclusion := TicketBom."Admission Inclusion";
                 _AdmCapacityPriceBuffer.Quantity := 1;
