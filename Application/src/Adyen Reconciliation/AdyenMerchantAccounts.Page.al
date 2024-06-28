@@ -3,6 +3,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
     ApplicationArea = NPRRetail;
     UsageCategory = Administration;
     Caption = 'Adyen Merchant Accounts';
+    RefreshOnActivate = true;
     PageType = List;
     SourceTable = "NPR Adyen Merchant Account";
     Editable = false;
@@ -46,7 +47,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
                 trigger OnAction()
                 begin
                     if _AdyenManagement.UpdateMerchantList(0) then
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                 end;
             }
         }
@@ -55,7 +56,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
     trigger OnOpenPage()
     begin
         if _AdyenManagement.UpdateMerchantList(0) then
-            CurrPage.Update();
+            CurrPage.Update(false);
     end;
 
     var

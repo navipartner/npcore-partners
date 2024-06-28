@@ -5,6 +5,7 @@ page 6184669 "NPR Adyen Webhook Logs"
     AdditionalSearchTerms = 'adyen logs,adyen webhook logs,webhook logs';
     Caption = 'Adyen Webhook Logs';
     PageType = List;
+    RefreshOnActivate = true;
     SourceTable = "NPR Adyen Webhook Log";
     SourceTableView = sorting("Entry No.") order(descending);
     Editable = false;
@@ -71,7 +72,7 @@ page 6184669 "NPR Adyen Webhook Logs"
                     Window: Dialog;
                 begin
                     Window.Open(RefreshingLbl);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     Window.Close();
                 end;
             }
