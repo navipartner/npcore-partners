@@ -1,7 +1,7 @@
 table 6150880 "NPR Adyen Webhook"
 {
     Access = Internal;
-    Caption = 'Adyen Webhook';
+    Caption = 'Adyen Webhook Request';
     DataClassification = CustomerContent;
 
     fields
@@ -16,16 +16,30 @@ table 6150880 "NPR Adyen Webhook"
         {
             Caption = 'Created Date';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
         field(20; "Event Date"; DateTime)
         {
             Caption = 'Event Date';
             DataClassification = CustomerContent;
         }
+        field(25; "Processed Date"; DateTime)
+        {
+            Caption = 'Processed Date';
+            DataClassification = CustomerContent;
+        }
         field(30; "Event Code"; Enum "NPR Adyen Webhook Event Code")
         {
             Caption = 'Event Code';
             DataClassification = CustomerContent;
+        }
+        field(35; Status; Enum "NPR Adyen Webhook Status")
+        {
+            Caption = 'Status';
+            DataClassification = CustomerContent;
+            InitValue = New;
         }
         field(40; "Merchant Account Name"; Text[80])
         {
@@ -46,6 +60,9 @@ table 6150880 "NPR Adyen Webhook"
         {
             Caption = 'Webhook Data';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(80; Live; Boolean)
         {
@@ -69,6 +86,9 @@ table 6150880 "NPR Adyen Webhook"
         {
             Clustered = true;
         }
+        key(Key2; "Event Code", Status)
+        {
+        }
     }
 
     procedure GetAdyenData(): Text
@@ -78,8 +98,6 @@ table 6150880 "NPR Adyen Webhook"
         InStr: InStream;
 #ENDIF
     begin
-        if not "Request Data".HasValue() then
-            exit('');
 #IF BC17
         GetAdyenDataStream(InStr);
         exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
@@ -97,10 +115,6 @@ table 6150880 "NPR Adyen Webhook"
         if "Webhook Data".HasValue then begin
             CalcFields("Webhook Data");
             "Webhook Data".CreateInStream(InStr, TextEncoding::UTF8);
-        end else begin
-            CalcFields("Request Data");
-            "Request Data".CreateInStream(InStr, TextEncoding::UTF8);
         end;
-
     end;
 }

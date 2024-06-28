@@ -152,12 +152,13 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                 begin
                                     EFTTransaction.FilterGroup(2);
                                     EFTTransaction.SetRange(Reconciled, false);
+                                    EFTTransaction.FilterGroup(0);
                                     EFTTransactions.SetTableView(EFTTransaction);
+                                    EFTTransactions.SetRecord(EFTTransaction);
                                     if (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually") then begin
                                         EFTTransactions.LookupMode := true;
                                         if EFTTransactions.RunModal() = Action::LookupOK then begin
                                             Rec.Status := Rec.Status::"Matched Manually";
-                                            EFTTransaction.Reset();
                                             EFTTransactions.SetSelectionFilter(EFTTransaction);
                                             if EFTTransaction.FindFirst() then
                                                 Rec."Matching Entry System ID" := EFTTransaction.SystemId;
@@ -166,13 +167,14 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                     end else
                                         EFTTransactions.RunModal();
 
-                                    EFTTransaction.FilterGroup(0);
                                 end;
                             Rec."Matching Table Name"::"Magento Payment Line":
                                 begin
                                     MagentoPaymentLine.FilterGroup(2);
                                     MagentoPaymentLine.SetRange(Reconciled, false);
+                                    MagentoPaymentLine.FilterGroup(0);
                                     MagentoPaymentLines.SetTableView(MagentoPaymentLine);
+                                    MagentoPaymentLines.SetRecord(MagentoPaymentLine);
                                     if (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually") then begin
                                         MagentoPaymentLines.LookupMode := true;
                                         if MagentoPaymentLines.RunModal() = Action::LookupOK then begin
@@ -292,6 +294,18 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
                     end;
                 }
+                field("Posting allowed"; Rec."Posting allowed")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Posting is allowed.';
+                    StyleExpr = _StyleExprTxt;
+                    Editable = false;
+
+                    trigger OnValidate()
+                    begin
+                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
+                    end;
+                }
                 field("Posting No."; Rec."Posting No.")
                 {
                     ApplicationArea = NPRRetail;
@@ -337,60 +351,68 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     EFTTransaction: Record "NPR EFT Transaction Request";
                     MagentoPaymentLine: Record "NPR Magento Payment Line";
                     GLEntry: Record "G/L Entry";
-                    EFTTransactions: Page "NPR EFT Transaction Requests";
-                    MagentoPaymentLines: Page "NPR Magento Payment Line List";
-                    GLEntries: Page "General Ledger Entries";
                 begin
-                    case Rec."Matching Table Name" of
-                        Rec."Matching Table Name"::"EFT Transaction":
-                            begin
-                                if (not IsNullGuid(Rec."Matching Entry System ID")) then begin
-                                    EFTTransaction.Reset();
-                                    EFTTransaction.SetRange(SystemId, Rec."Matching Entry System ID");
-                                    if not EFTTransaction.IsEmpty() then begin
-                                        EFTTransactions.SetTableView(EFTTransaction);
-                                        EFTTransactions.RunModal();
-                                    end;
+                    if (not IsNullGuid(Rec."Matching Entry System ID")) then begin
+                        case Rec."Matching Table Name" of
+                            Rec."Matching Table Name"::"EFT Transaction":
+                                begin
+                                    if EFTTransaction.GetBySystemId(Rec."Matching Entry System ID") then
+                                        Page.RunModal(Page::"NPR EFT Transaction Requests", EFTTransaction);
                                 end;
-                            end;
-                        Rec."Matching Table Name"::"G/L Entry":
-                            begin
-                                if (not IsNullGuid(Rec."Matching Entry System ID")) then begin
-                                    GLEntry.Reset();
-                                    GLEntry.SetRange(SystemId, Rec."Matching Entry System ID");
-                                    if not GLEntry.IsEmpty() then begin
-                                        GLEntries.SetTableView(GLEntry);
-                                        GLEntries.RunModal();
-                                    end;
+                            Rec."Matching Table Name"::"G/L Entry":
+                                begin
+                                    if GLEntry.GetBySystemId(Rec."Matching Entry System ID") then
+                                        Page.RunModal(Page::"General Ledger Entries", GLEntry);
                                 end;
-                            end;
-                        Rec."Matching Table Name"::"Magento Payment Line":
-                            begin
-                                if (Rec."Matching Entry System ID" > '') then begin
-                                    MagentoPaymentLine.Reset();
-                                    MagentoPaymentLine.SetRange(SystemId, Rec."Matching Entry System ID");
-                                    if not MagentoPaymentLine.IsEmpty() then begin
-                                        MagentoPaymentLines.SetTableView(MagentoPaymentLine);
-                                        MagentoPaymentLines.RunModal();
-                                    end;
+                            Rec."Matching Table Name"::"Magento Payment Line":
+                                begin
+                                    if MagentoPaymentLine.GetBySystemId(Rec."Matching Entry System ID") then
+                                        Page.RunModal(Page::"NPR Magento Payment Line List", MagentoPaymentLine);
                                 end;
-                            end;
+                        end;
                     end;
                 end;
             }
             action("Find Posted Entries...")
             {
                 ApplicationArea = NPRRetail;
-                Ellipsis = true;
                 Image = Navigate;
                 Caption = 'Show Posted Amounts';
                 ToolTip = 'Running this action will show posted amounts by amount type.';
                 RunObject = Page "NPR Adyen Recon. Line Relation";
-                RunPageLink = "Document No." = FIELD("Document No."),
-                                "Document Line No." = FIELD("Line No.");
+                RunPageLink = "Document No." = field("Document No."),
+                                "Document Line No." = field("Line No.");
+            }
+            action("Confirm awareness")
+            {
+                ApplicationArea = NPRRetail;
+                Enabled = _IsChargeBack;
+                Image = Confirm;
+                Caption = 'Confirm Awareness';
+                ToolTip = 'Running this action will confirm that you are aware of a chargeback entry and unlock it for posting.';
+
+                trigger OnAction()
+                var
+                    ConfirmAwarenessLbl: Label 'Do you wish to proceed with confirming your awareness of the selected Chargeback/Chargebacks?';
+                    Lines: Record "NPR Adyen Recon. Line";
+                begin
+                    CurrPage.SetSelectionFilter(Lines);
+                    Lines.SetRange("Posting allowed", false);
+                    Lines.SetFilter("Transaction Type", '%1|%2|%3', Lines."Transaction Type"::Chargeback, Lines."Transaction Type"::ChargebackExternallyWithInfo, Lines."Transaction Type"::SecondChargeback);
+                    if not Lines.IsEmpty() then
+                        if Confirm(ConfirmAwarenessLbl) then begin
+                            Lines.ModifyAll("Posting allowed", true);
+                            CurrPage.Update(false);
+                        end;
+                end;
             }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        _IsChargeBack := Rec."Transaction Type" in [Rec."Transaction Type"::Chargeback, Rec."Transaction Type"::ChargebackExternallyWithInfo, Rec."Transaction Type"::SecondChargeback];
+    end;
 
     trigger OnAfterGetRecord()
     begin
@@ -400,4 +422,5 @@ page 6184503 "NPR Adyen Reconciliation Lines"
     var
         _StyleExprTxt: Text[50];
         _AdyenManagement: Codeunit "NPR Adyen Management";
+        _IsChargeBack: Boolean;
 }

@@ -1,13 +1,12 @@
 page 6184582 "NPR Adyen Merchant Setup"
 {
     Extensible = false;
-
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Merchant Setup';
+    Caption = 'Adyen Merchant Account Setup';
     PageType = Card;
     SourceTable = "NPR Adyen Merchant Setup";
-    AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup,adyen merchant setup';
+    AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup,adyen merchant setup,adyen merchant,adyen merchant account';
 
     layout
     {
@@ -90,10 +89,20 @@ page 6184582 "NPR Adyen Merchant Setup"
     }
 
     trigger OnOpenPage()
+    var
+        MerchantAccount: Record "NPR Adyen Merchant Account";
+        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         Rec.Reset();
         if not Rec.FindFirst() then begin
             Rec.Init();
+            MerchantAccount.Reset();
+            if not MerchantAccount.FindFirst() then begin
+                if AdyenManagement.UpdateMerchantList(0) then begin
+                    MerchantAccount.FindFirst();
+                end;
+            end;
+            Rec."Merchant Account" := MerchantAccount.Name;
             Rec.Insert();
         end;
     end;

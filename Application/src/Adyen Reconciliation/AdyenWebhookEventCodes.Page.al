@@ -5,6 +5,7 @@ page 6184655 "NPR Adyen Webhook Event Codes"
     Caption = 'Adyen Webhook Event Codes';
     PageType = List;
     SourceTable = "NPR Adyen Webhook Event Code";
+    RefreshOnActivate = true;
     Editable = false;
 
     layout
@@ -27,6 +28,6 @@ page 6184655 "NPR Adyen Webhook Event Codes"
         AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         if AdyenManagement.RefreshWebhookEventCodes() then
-            CurrPage.Update();
+            CurrPage.Update(false);
     end;
 }

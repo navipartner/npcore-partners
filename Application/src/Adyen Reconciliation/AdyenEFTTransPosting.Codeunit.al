@@ -26,11 +26,11 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             exit(true);
     end;
 
-
-    internal procedure PrepareRecords(var RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    [TryFunction]
+    internal procedure PrepareRecords(RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr")
     begin
-        _AdyenSetup.Get();
-        _GLSetup.Get();
+        _AdyenSetup.GetRecordOnce();
+        _GLSetup.GetRecordOnce();
         _AdyenMerchantSetup.Get(RecLine."Merchant Account");
         _AdyenMerchantSetup.TestField("Markup G/L Account");
         _AdyenMerchantSetup.TestField("Other commissions G/L Account");
@@ -44,40 +44,54 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _ReconciliationLine := RecLine;
         _ReconciliationHeader := RecHeader;
         GetOriginAccount();
-        exit(true);
     end;
 
     local procedure GetOriginAccount()
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSPostingSetup: Record "NPR POS Posting Setup";
     begin
-        EFTTransactionRequest.Reset();
-        EFTTransactionRequest.SetRange("PSP Reference", _ReconciliationLine."PSP Reference");
-        EFTTransactionRequest.FindFirst();
-        POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
-        POSPostingSetup.Reset();
-        POSPostingSetup.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
-        POSPostingSetup.FindFirst();
-        case POSPostingSetup."Account Type" of
-            POSPostingSetup."Account Type"::"G/L Account":
-                _PaymentAccountType := _PaymentAccountType::"G/L Account";
-            POSPostingSetup."Account Type"::"Bank Account":
-                _PaymentAccountType := _PaymentAccountType::"Bank Account";
-            POSPostingSetup."Account Type"::Customer:
-                _PaymentAccountType := _PaymentAccountType::Customer;
+        case _ReconciliationLine."Matching Table Name" of
+            _ReconciliationLine."Matching Table Name"::"EFT Transaction":
+                begin
+                    EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+                    POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
+                    POSPostingSetup.Reset();
+                    POSPostingSetup.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
+                    POSPostingSetup.FindFirst();
+                    case POSPostingSetup."Account Type" of
+                        POSPostingSetup."Account Type"::"G/L Account":
+                            _PaymentAccountType := _PaymentAccountType::"G/L Account";
+                        POSPostingSetup."Account Type"::"Bank Account":
+                            _PaymentAccountType := _PaymentAccountType::"Bank Account";
+                        POSPostingSetup."Account Type"::Customer:
+                            _PaymentAccountType := _PaymentAccountType::Customer;
+                    end;
+                    _PaymentAccountNo := POSPostingSetup."Account No.";
+                end;
+            _ReconciliationLine."Matching Table Name"::"Magento Payment Line":
+                begin
+                    MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+                    case MagentoPaymentLine."Account Type" of
+                        MagentoPaymentLine."Account Type"::"G/L Account":
+                            _PaymentAccountType := _PaymentAccountType::"G/L Account";
+                        MagentoPaymentLine."Account Type"::"Bank Account":
+                            _PaymentAccountType := _PaymentAccountType::"Bank Account";
+                    end;
+                    _PaymentAccountNo := MagentoPaymentLine."Account No.";
+                end;
         end;
-        _PaymentAccountNo := POSPostingSetup."Account No.";
     end;
 
     local procedure CreatePostGL(Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
-                                                                   BalAccountType: Enum "Gen. Journal Account Type";
-                                                                   BalAccountNo: Code[20];
-                                                                   DimensionSetID: Integer;
-                                                                   CurrencyCode: Code[20];
-                                                                   Description: Text[100];
-                                                                   ReturnBalancingAccountNo: Boolean): Integer;
+        BalAccountType: Enum "Gen. Journal Account Type";
+        BalAccountNo: Code[20];
+        DimensionSetID: Integer;
+        CurrencyCode: Code[20];
+        Description: Text[100];
+        ReturnBalancingAccountNo: Boolean): Integer;
     var
         GenJnlLine: Record "Gen. Journal Line";
         GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
@@ -130,8 +144,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
     local procedure PostEFT()
     var
-        POSEntry: Record "NPR POS Entry";
         DimensionSetID: Integer;
+        POSEntry: Record "NPR POS Entry";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         ReverseEFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
@@ -148,7 +162,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
 
                     ReversePOSPaymentLine := POSPaymentLine;
-                    POSPaymentLine.SetRange("POS Entry No.", ReversePOSPaymentLine."POS Entry No.");
+                    POSPaymentLine.SetRange("POS Entry No.", POSPaymentLine."POS Entry No.");
                     POSPaymentLine.FindLast();
 
                     ReversePOSPaymentLine."Line No." := POSPaymentLine."Line No." + 10000;
@@ -177,7 +191,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     ReversePOSPaymentLine."Created by Reconciliation" := true;
                     ReversePOSPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
                     ReversePOSPaymentLine.Insert();
-                    // PostReversePOSPaymentLine.Run
+
+                    //TODO PostReversePOSPaymentLine
 
                     ReverseEFTTransactionRequest := EFTTransactionRequest;
                     ReverseEFTTransactionRequest."Entry No." := 0;
@@ -204,17 +219,19 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     ReverseEFTTransactionRequest."Created by Reconciliation" := true;
                     ReverseEFTTransactionRequest."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
                     ReverseEFTTransactionRequest.Insert();
-                    _NewReversedSystemId := ReverseEFTTransactionRequest.SystemId;
+
                     EFTTransactionRequest."Reversed by Entry No." := ReverseEFTTransactionRequest."Entry No.";
                     EFTTransactionRequest.Reversed := true;
                     EFTTransactionRequest.Modify();
+
+                    _NewReversedSystemId := ReverseEFTTransactionRequest.SystemId;
                 end;
         end;
 
         POSEntry.Reset();
-        POSEntry.SetRange("Document No.", _ReconciliationLine."Merchant Reference");
+        POSEntry.SetRange("Document No.", EFTTransactionRequest."Sales Ticket No.");
         if not POSEntry.FindFirst() then
-            Error(NoOriginalDocumentFound, _ReconciliationLine."Merchant Reference");
+            Error(NoOriginalDocumentFound, EFTTransactionRequest."Sales Ticket No.");
 
         SetDimensions(POSEntry, DimensionSetID);
 
@@ -230,6 +247,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         DimensionSetID: Integer;
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         ReverseMagentoPaymentLine: Record "NPR Magento Payment Line";
@@ -279,7 +297,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     end;
                     ReverseMagentoPaymentLine.Insert();
 
-                    // PostReverseMagentoPaymentLine
+                    //TODO PostReverseMagentoPaymentLine
 
                     MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
                     MagentoPaymentLine."Reversed by Entry System ID" := ReverseMagentoPaymentLine.SystemId;
@@ -294,9 +312,13 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         SalesHeader.SetRange("No.", ReverseMagentoPaymentLine."Document No.");
         SalesHeader.SetRange("Document Type", ReverseMagentoPaymentLine."Document Type");
         if not SalesHeader.FindFirst() then begin
-            if not SalesInvHeader.Get(ReverseMagentoPaymentLine."Document No.") then
-                Error(NoOriginalDocumentFound, _ReconciliationLine."Merchant Reference");
-            SetDimensions(SalesInvHeader, DimensionSetID);
+            if not SalesInvHeader.Get(ReverseMagentoPaymentLine."Document No.") then begin
+                if not SalesCrMemoHeader.Get(ReverseMagentoPaymentLine."Document No.") then
+                    Error(NoOriginalSalesDocumentFound, ReverseMagentoPaymentLine."Document No.")
+                else
+                    SetDimensions(SalesCrMemoHeader, DimensionSetID);
+            end else
+                SetDimensions(SalesInvHeader, DimensionSetID);
         end else
             SetDimensions(SalesHeader, DimensionSetID);
 
@@ -346,6 +368,11 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         DimensionSetID := SalesInvHeader."Dimension Set ID";
     end;
 
+    local procedure SetDimensions(SalesCreditMemo: Record "Sales Cr.Memo Header"; var DimensionSetID: Integer)
+    begin
+        DimensionSetID := SalesCreditMemo."Dimension Set ID";
+    end;
+
     var
         _AdyenSetup: Record "NPR Adyen Setup";
         _GLSetup: Record "General Ledger Setup";
@@ -362,7 +389,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _CommissionsPosted: Boolean;
         _RealizedGainsOrLossesPosted: Boolean;
         _NewReversedSystemId: Guid;
-        NoOriginalDocumentFound: Label 'No document was found with No. %1.';
+        NoOriginalDocumentFound: Label 'No POS Entry was found with No. %1.';
+        NoOriginalSalesDocumentFound: Label 'No Sales Document was found with No. %1.';
         AdyenTransactionLabel: Label 'Adyen: Transaction', MaxLength = 100;
         AdyenMarkupLabel: Label 'Adyen: Markup', MaxLength = 100;
         AdyenOtherCommissionsLabel: Label 'Adyen: Other Commissions (Commission, Markup, Scheme Fees, Interchange)', MaxLength = 100;

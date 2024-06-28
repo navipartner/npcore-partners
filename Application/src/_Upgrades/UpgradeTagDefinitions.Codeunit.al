@@ -191,6 +191,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'UpgradeOSMenuButtonParameterActionCodes'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdatePSPReferenceForEFTTrans'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenSetupCompanyID'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenReconLinePostingAllowed'));
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
 #endif
@@ -730,6 +731,8 @@
                         exit('NPR-UpdatePSPReferenceForEFTTrans-20240603');
                     'UpdateAdyenSetupCompanyID':
                         exit('NPR-UpdateAdyenSetupCompanyID-20240614');
+                    'UpdateAdyenReconLinePostingAllowed':
+                        exit('NPR-UpdateAdyenReconLinePostingAllowed-20240626');
                 end;
 #if not BC17
             Codeunit::"NPR Spfy App Upgrade":

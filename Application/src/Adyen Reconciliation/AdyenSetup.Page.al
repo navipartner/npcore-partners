@@ -1,7 +1,7 @@
 page 6184531 "NPR Adyen Setup"
 {
     Extensible = false;
-
+    RefreshOnActivate = true;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
     Caption = 'Adyen Setup';
@@ -64,6 +64,11 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if Posting is automatically performed during a Reconciliation process.';
                 }
+                field("Post Chargebacks Automatically"; Rec."Post Chargebacks Automatically")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Chargeback Journal Type Reconciliation Lines are posted automatically or are required a confirmation before being able to be posted.';
+                }
                 field("Post with Transaction Date"; Rec."Post with Transaction Date")
                 {
                     ApplicationArea = NPRRetail;
@@ -117,7 +122,7 @@ page 6184531 "NPR Adyen Setup"
                     Caption = 'Create Setup (Admin)';
                     Visible = _IsSaaS;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Creates the Adyen Entra app, with user permissions. Needs Admin.';
+                    ToolTip = 'Creates the Adyen Entra app, with custom permissions. Needs Admin.';
                     Image = Action;
 
                     trigger OnAction()
@@ -128,7 +133,7 @@ page 6184531 "NPR Adyen Setup"
                 action("Upgrade EFT & EC Records")
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'Upgrade EFT & E-Commerce Records';
+                    Caption = 'Upgrade Payment Lines';
                     Image = Setup;
                     ToolTip = 'Running this action will start the EFT Transaction Request and Magento Payment Line tables'' upgrade.';
 

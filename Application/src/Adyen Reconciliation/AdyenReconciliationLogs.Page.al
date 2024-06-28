@@ -4,6 +4,7 @@ page 6184536 "NPR Adyen Reconciliation Logs"
     UsageCategory = History;
     AdditionalSearchTerms = 'adyen logs,adyen reconciliaiton logs,reconciliation logs';
     Caption = 'Adyen Reconciliation Logs';
+    RefreshOnActivate = true;
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Log";
     SourceTableView = sorting(ID) order(descending);
@@ -71,7 +72,7 @@ page 6184536 "NPR Adyen Reconciliation Logs"
                     Window: Dialog;
                 begin
                     Window.Open(RefreshingLbl);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     Window.Close();
                 end;
             }

@@ -142,7 +142,7 @@ page 6184534 "NPR Adyen Reconciliation List"
                     Window: Dialog;
                 begin
                     Window.Open(RefreshingLbl);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     Window.Close();
                 end;
             }
