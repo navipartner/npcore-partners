@@ -25,6 +25,10 @@ enum 6014661 "NPR Adyen Rec. Line Status"
     {
         Caption = 'Reconciled';
     }
+    value(45; "Failed to Post")
+    {
+        Caption = 'Failed to Post';
+    }
     value(50; Posted)
     {
         Caption = 'Posted';

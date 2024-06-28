@@ -2,7 +2,7 @@ table 6150829 "NPR Adyen Merchant Setup"
 {
     Access = Internal;
 
-    Caption = 'Adyen Merchant Setup';
+    Caption = 'Adyen Merchant Account Setup';
     DataClassification = CustomerContent;
 
     fields

@@ -4,11 +4,9 @@ page 6184665 "NPR Adyen Webhooks"
 
     UsageCategory = History;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Webhooks';
+    Caption = 'Adyen Webhook Requests';
     PageType = List;
-    ModifyAllowed = false;
-    InsertAllowed = false;
-    DeleteAllowed = true;
+    Editable = false;
     SourceTable = "NPR Adyen Webhook";
     SourceTableView = sorting("Entry No.") order(descending);
 
@@ -18,7 +16,7 @@ page 6184665 "NPR Adyen Webhooks"
         {
             repeater(General)
             {
-                field("Created Date"; Rec."Created Date")
+                field("Created Date"; Rec.SystemCreatedAt)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Entry Creation Date and Time.';
@@ -28,10 +26,20 @@ page 6184665 "NPR Adyen Webhooks"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Event Date and Time.';
                 }
+                field("Processed Date"; Rec."Processed Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Processed Date and Time.';
+                }
                 field("Event Code"; Rec."Event Code")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Event Code.';
+                }
+                field(Status; Rec.Status)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Status of the Webhook Request.';
                 }
                 field("Merchant Account Name"; Rec."Merchant Account Name")
                 {
@@ -59,12 +67,6 @@ page 6184665 "NPR Adyen Webhooks"
                     Caption = 'Webhook has Data';
                     ToolTip = 'Speficies if the Webhook has Data.';
                 }
-                field("Request Has Data"; _RequestHasData)
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Request has Data';
-                    ToolTip = 'Speficies if the Request has Data.';
-                }
                 field("Webhook Reference"; Rec."Webhook Reference")
                 {
                     ApplicationArea = NPRRetail;
@@ -87,6 +89,32 @@ page 6184665 "NPR Adyen Webhooks"
     {
         area(Processing)
         {
+            action(Cancel)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Cancel';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Cancel;
+                ToolTip = 'Running this action will set the Status to ''Cancel''.';
+
+                trigger OnAction()
+                var
+                    AdyenWebhook: Record "NPR Adyen Webhook";
+                    ConfirmCancelationLbl: Label 'This will cancel the selected Webhook/Webhooks further processing.\\Do you wish to proceed?';
+                begin
+                    CurrPage.SetSelectionFilter(AdyenWebhook);
+                    AdyenWebhook.SetFilter(Status, '%1|%2', AdyenWebhook.Status::New, AdyenWebhook.Status::Error);
+                    if AdyenWebhook.IsEmpty() then
+                        exit;
+                    if not Confirm(ConfirmCancelationLbl) then
+                        exit;
+                    AdyenWebhook.ModifyAll(Status, AdyenWebhook.Status::Canceled);
+                    CurrPage.Update(false);
+                end;
+            }
             action("Show Logs")
             {
                 ApplicationArea = NPRRetail;
@@ -102,9 +130,9 @@ page 6184665 "NPR Adyen Webhooks"
                 var
                     Logs: Record "NPR Adyen Webhook Log";
                 begin
-                    Logs.FilterGroup(0);
-                    Logs.SetRange("Webhook Request Entry No.", Rec."Entry No.");
                     Logs.FilterGroup(2);
+                    Logs.SetRange("Webhook Request Entry No.", Rec."Entry No.");
+                    Logs.FilterGroup(0);
                     Page.Run(Page::"NPR Adyen Webhook Logs", Logs);
                 end;
             }
@@ -125,7 +153,7 @@ page 6184665 "NPR Adyen Webhooks"
                     Window: Dialog;
                 begin
                     Window.Open(RefreshingLbl);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     Window.Close();
                 end;
             }
@@ -135,10 +163,8 @@ page 6184665 "NPR Adyen Webhooks"
     trigger OnAfterGetRecord()
     begin
         _WebhookHasData := Rec."Webhook Data".HasValue();
-        _RequestHasData := Rec."Request Data".HasValue();
     end;
 
     var
         _WebhookHasData: Boolean;
-        _RequestHasData: Boolean;
 }

@@ -123,6 +123,11 @@ table 6150801 "NPR Adyen Setup"
             Caption = 'Post with Transaction Date';
             InitValue = true;
         }
+        field(130; "Post Chargebacks Automatically"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Post Chargebacks Automatically';
+        }
     }
     keys
     {
@@ -131,4 +136,15 @@ table 6150801 "NPR Adyen Setup"
             Clustered = true;
         }
     }
+
+    procedure GetRecordOnce()
+    begin
+        if _RecordHasBeenRead then
+            exit;
+        Get();
+        _RecordHasBeenRead := true;
+    end;
+
+    var
+        _RecordHasBeenRead: Boolean;
 }

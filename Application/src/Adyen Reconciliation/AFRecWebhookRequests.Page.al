@@ -1,14 +1,13 @@
 page 6184519 "NPR AF Rec. Webhook Requests"
 {
     Extensible = false;
-
     UsageCategory = History;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Reconciliation Webhook Requests';
+    Caption = 'Adyen Reconciliation Reports';
     PromotedActionCategories = 'New,Process,Report,Create Reconciliation Document';
     PageType = List;
-    InsertAllowed = false;
-    ModifyAllowed = false;
+    RefreshOnActivate = true;
+    Editable = false;
     DeleteAllowed = true;
     SourceTable = "NPR AF Rec. Webhook Request";
     SourceTableView = sorting(ID) order(descending);
@@ -24,7 +23,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Request ID.';
                 }
-                field("Creation Date"; Rec."Creation Date")
+                field("Creation Date"; Rec.SystemCreatedAt)
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Request Creation Date.';
@@ -81,9 +80,9 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 var
                     Entry: Record "NPR Adyen Webhook";
                 begin
-                    Entry.FilterGroup(0);
-                    Entry.SetRange("Entry No.", Rec."Adyen Webhook Entry No.");
                     Entry.FilterGroup(2);
+                    Entry.SetRange("Entry No.", Rec."Adyen Webhook Entry No.");
+                    Entry.FilterGroup(0);
                     Page.Run(Page::"NPR Adyen Webhooks", Entry);
                 end;
             }
@@ -99,13 +98,8 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 ToolTip = 'Running this action will show Logs.';
 
                 trigger OnAction()
-                var
-                    Logs: Record "NPR Adyen Reconciliation Log";
                 begin
-                    Logs.FilterGroup(0);
-                    Logs.SetRange("Webhook Request ID", Rec.ID);
-                    Logs.FilterGroup(2);
-                    Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
+                    _AdyenManagement.OpenReconciliationLogs(Rec);
                 end;
             }
         }
@@ -191,7 +185,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                         if (ReportName <> '') and (MerchantAccount <> '') then
                             _AdyenManagement.EmulateWebhookRequest(ReportName, MerchantAccount, Live);
 
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -212,7 +206,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                     Window: Dialog;
                 begin
                     Window.Open(RefreshingLbl);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                     Window.Close();
                 end;
             }

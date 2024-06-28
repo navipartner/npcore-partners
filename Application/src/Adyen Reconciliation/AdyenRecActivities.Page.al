@@ -1,6 +1,6 @@
 page 6184535 "NPR Adyen Rec. Activities"
 {
-    Caption = 'Adyen Rec. Activities';
+    Caption = 'Adyen Reconciliation Activities';
     PageType = CardPart;
     SourceTable = "NPR Adyen Reconciliation Cue";
     Extensible = false;

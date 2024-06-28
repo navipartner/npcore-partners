@@ -1,7 +1,6 @@
 page 6184533 "NPR Adyen WH Request Factbox"
 {
     Extensible = false;
-
     Caption = 'Adyen Webhook Data';
     PageType = CardPart;
     SourceTable = "NPR Adyen Webhook";

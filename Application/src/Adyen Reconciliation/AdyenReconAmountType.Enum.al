@@ -4,6 +4,7 @@ enum 6014687 "NPR Adyen Recon. Amount Type"
 #IF NOT BC17
     Access = Internal;
 #ENDIF
+
     value(0; "Transaction")
     {
         Caption = 'Transaction';

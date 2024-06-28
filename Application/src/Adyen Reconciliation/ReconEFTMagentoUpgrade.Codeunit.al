@@ -13,6 +13,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
     begin
         UpdatePSPReferenceForEFTTrans();
         UpdateAdyenSetupCompanyID();
+        UpdateAdyenReconLinePostingAllowed();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -59,6 +60,29 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
 
         AdyenSetup."Company ID" := AdyenSetupCompanyID."Company ID";
         AdyenSetup.Modify(false);
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateAdyenReconLinePostingAllowed()
+    var
+        AdyenSetup: Record "NPR Adyen Setup";
+        AdyenReconLine: Record "NPR Adyen Recon. Line";
+    begin
+        UpgradeStep := 'UpdateAdyenReconLinePostingAllowed';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+
+        if not AdyenSetup.Get() then
+            exit;
+
+        AdyenReconLine.Reset();
+        AdyenReconLine.SetRange("Posting allowed", false);
+        if not AdyenSetup."Post Chargebacks Automatically" then
+            AdyenReconLine.SetFilter("Transaction Type", '<>%1&<>%2&<>%3', AdyenReconLine."Transaction Type"::Chargeback, AdyenReconLine."Transaction Type"::ChargebackExternallyWithInfo, AdyenReconLine."Transaction Type"::SecondChargeback);
+        AdyenReconLine.ModifyAll("Posting allowed", true);
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

@@ -265,6 +265,12 @@ table 6150874 "NPR Adyen Recon. Line"
             Caption = 'Other Commissions (LCY)';
             DataClassification = CustomerContent;
         }
+        field(380; "Posting allowed"; Boolean)
+        {
+            Caption = 'Posting allowed';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
     }
     keys
     {

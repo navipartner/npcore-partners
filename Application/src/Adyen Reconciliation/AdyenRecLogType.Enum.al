@@ -4,6 +4,7 @@ enum 6014668 "NPR Adyen Rec. Log Type"
 #IF NOT BC17
     Access = Internal;
 #ENDIF
+
     value(0; "Get Report")
     {
         Caption = 'Get Report';

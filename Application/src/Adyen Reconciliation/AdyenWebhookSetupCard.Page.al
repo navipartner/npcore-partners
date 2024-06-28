@@ -57,7 +57,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                                 RecRef.GetTable(EventCode);
                                 Rec."Include Events Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, EventCode.FieldNo("Event Code")), 1, MaxStrLen(Rec."Include Events Filter"));
                                 Rec.Modify();
-                                CurrPage.Update();
+                                CurrPage.Update(false);
                             end;
                         end;
                     end;
@@ -152,7 +152,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                     AdyenManagement: Codeunit "NPR Adyen Management";
                 begin
                     AdyenManagement.SuggestAFWebServiceURL(Rec);
-                    CurrPage.Update();
+                    CurrPage.Update(false);
                 end;
             }
             action(Refresh)
@@ -176,7 +176,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 begin
                     Window.Open(RefreshingLbl);
                     if AdyenManagement.RefreshWebhook(Rec) then begin
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                         Message(UpdatedLbl);
                     end else
                         Message(UpToDateLbl);

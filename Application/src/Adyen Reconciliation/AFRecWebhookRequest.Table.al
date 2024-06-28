@@ -2,7 +2,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Webhook Report Ready';
+    Caption = 'Adyen Reconciliation Report';
     DataClassification = CustomerContent;
 
     fields
@@ -49,6 +49,9 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Editable = false;
             DataClassification = CustomerContent;
             Caption = 'Creation Date & Time';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
         field(60; "Report Download URL"; Text[2048])
         {
@@ -60,35 +63,24 @@ table 6150791 "NPR AF Rec. Webhook Request"
         {
             DataClassification = CustomerContent;
             Caption = 'Report Data';
-
-            trigger OnValidate()
-            var
-                AdyenManagement: Codeunit "NPR Adyen Management";
-            begin
-                "PSP Reference" := CopyStr(AdyenManagement.GetPspReference(GetAdyenRequestData()), 1, MaxStrLen("PSP Reference"));
-                if "PSP Reference" <> '' then
-                    "Report Type" := AdyenManagement.DefineReportType("PSP Reference")
-                else
-                    "Report Type" := AdyenManagement.DefineReportType("Report Name");
-            end;
         }
         field(80; "Report Name"; Text[100])
         {
             DataClassification = CustomerContent;
             Caption = 'Report Name';
-        }
-        field(90; "PSP Reference"; Text[100])
-        {
-            DataClassification = CustomerContent;
-            Caption = 'PSP Reference';
 
             trigger OnValidate()
             var
                 AdyenManagement: Codeunit "NPR Adyen Management";
             begin
-                if "PSP Reference" <> '' then
-                    "Report Type" := AdyenManagement.DefineReportType("PSP Reference");
+                if "Report Name" <> '' then
+                    "Report Type" := AdyenManagement.DefineReportType("Report Name");
             end;
+        }
+        field(90; "PSP Reference"; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'PSP Reference';
         }
         field(100; "Report Type"; Enum "NPR Adyen Report Type")
         {
@@ -99,6 +91,9 @@ table 6150791 "NPR AF Rec. Webhook Request"
         {
             DataClassification = CustomerContent;
             Caption = 'Request Data';
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'Not used.';
         }
         field(120; Processed; Boolean)
         {
@@ -119,31 +114,4 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Clustered = true;
         }
     }
-
-    procedure GetAdyenRequestData(): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-#IF BC17
-        InStr: InStream;
-#ENDIF
-    begin
-        if not "Request Data".HasValue() then
-            exit('');
-#IF BC17
-        GetAdyenRequestDataStream(InStr);
-        exit(TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator()));
-#ELSE
-        exit(TypeHelper.ReadAsTextWithSeparator(GetAdyenRequestDataStream(), TypeHelper.LFSeparator()));
-#ENDIF
-    end;
-
-#IF BC17
-    procedure GetAdyenRequestDataStream(var InStr: InStream)
-#ELSE
-    procedure GetAdyenRequestDataStream() InStr: InStream
-#ENDIF
-    begin
-        CalcFields("Request Data");
-        "Request Data".CreateInStream(InStr, TextEncoding::UTF8);
-    end;
 }
