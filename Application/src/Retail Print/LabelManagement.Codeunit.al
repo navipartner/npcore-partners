@@ -403,7 +403,9 @@ codeunit 6184681 "NPR Label Management"
         end;
 
         Commit();
-
+        RetailJnlLine.FilterGroup(2);
+        RetailJnlLine.SetRange("No.", _TmpRetailJnlCode);
+        RetailJnlLine.FilterGroup(0);
         if RetailJnlLine.IsEmpty() then
             exit;
 
