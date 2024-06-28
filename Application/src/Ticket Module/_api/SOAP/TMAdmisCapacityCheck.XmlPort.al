@@ -212,12 +212,21 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         ResolvingTable: Integer;
                         NonWorking: Boolean;
                         BasePrice, AddonPrice : Decimal;
+                        TimeHelper: Codeunit "NPR TM TimeHelper";
+                        LocalDateTime: DateTime;
+                        LocalDate: Date;
+                        LocalTime: Time;
                     begin
 
                         RemainingCapacity := 0;
                         CapacityStatusCode := 1;
                         AdmissionPrice := 0;
-                        TicketPrice.CalculateScheduleEntryPrice(gExternalItemNo, '', TmpAdmScheduleEntryResponse."Admission Code", TmpAdmScheduleEntryResponse."External Schedule Entry No.", Today(), Time(), BasePrice, AddonPrice);
+
+                        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TmpAdmScheduleEntryResponse."Admission Code");
+                        LocalDate := DT2Date(LocalDateTime);
+                        LocalTime := DT2Time(LocalDateTime);
+
+                        TicketPrice.CalculateScheduleEntryPrice(gExternalItemNo, '', TmpAdmScheduleEntryResponse."Admission Code", TmpAdmScheduleEntryResponse."External Schedule Entry No.", LocalDate, LocalTime, BasePrice, AddonPrice);
                         AdmissionPrice := BasePrice + AddonPrice;
 
                         if (TmpAdmScheduleEntryResponse."Admission Code" = '') then
@@ -239,7 +248,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                             TicketRequestManager.TranslateBarcodeToItemVariant(gExternalItemNo, ItemNumber, VariantCode, ResolvingTable);
                         end;
 
-                        if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, Today, Time, ReasonCode, RemainingCapacity)) then begin
+                        if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, LocalDate, LocalTime, ReasonCode, RemainingCapacity)) then begin
                             CapacityStatusCode := -1;
                             if (ReasonCode = ReasonCode::ScheduleExceedTicketDuration) then
                                 currXMLport.Skip();
@@ -261,7 +270,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         Amount := '';
                         Percentage := '';
                         IncludesVAT := '';
-                        if (TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, Today(), 0T, PriceRule)) then begin
+                        if (TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, LocalDate, LocalTime, PriceRule)) then begin
                             case (PriceRule.PricingOption) of
                                 PriceRule.PricingOption::NA:
                                     PriceOption := '';
@@ -326,6 +335,9 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
     local procedure GetEntry(var TmpAdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry" temporary)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
+        LocalDate: Date;
     begin
 
         if (TmpAdmissionScheduleEntry."Admission Code" = '') then begin
@@ -339,12 +351,14 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
             TmpAdmissionScheduleEntry.Insert();
             exit;
         end;
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TmpAdmissionScheduleEntry."Admission Code");
+        LocalDate := DT2Date(LocalDateTime);
 
         AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TmpAdmissionScheduleEntry."Admission Code");
-        AdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', Today);
+        AdmissionScheduleEntry.SetFilter("Admission Start Date", '>=%1', LocalDate);
 
         if (TmpAdmissionScheduleEntry."Admission Start Date" > 0D) then begin
-            if (TmpAdmissionScheduleEntry."Admission Start Date" < Today) then begin
+            if (TmpAdmissionScheduleEntry."Admission Start Date" < LocalDate) then begin
                 CapacityStatusCode := -3;
                 exit;
             end;
