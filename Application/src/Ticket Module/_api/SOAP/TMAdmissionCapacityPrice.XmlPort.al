@@ -256,6 +256,10 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             HavePriceRule: Boolean;
                             BasePrice, AddonPrice : Decimal;
                             CustomerPriceOut: Decimal;
+                            TimeHelper: Codeunit "NPR TM TimeHelper";
+                            LocalDateTime: DateTime;
+                            LocalDate: Date;
+                            LocalTime: Time;
                         begin
 
                             _RemainingCapacity := 0;
@@ -269,23 +273,27 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             xDynamicUnitPriceOut := '';
                             xCustomerPriceOut := '';
 
-                            HavePriceRule := TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, Today(), Time(), PriceRule);
+                            LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(TmpAdmScheduleEntryResponse."Admission Code");
+                            LocalDate := DT2Date(LocalDateTime);
+                            LocalTime := DT2Time(LocalDateTime);
+
+                            HavePriceRule := TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, LocalDate, LocalTime, PriceRule);
                             if (HavePriceRule) then
                                 TicketPrice.EvaluatePriceRule(PriceRule, xAdmCapacityPriceBufferResponse.UnitPrice, xAdmCapacityPriceBufferResponse.UnitPriceIncludesVat, xAdmCapacityPriceBufferResponse.UnitPriceVatPercentage, false, BasePrice, AddonPrice);
 
                             if (TmpAdmScheduleEntryResponse."Admission Is" = TmpAdmScheduleEntryResponse."Admission Is"::CLOSED) then
                                 _CapacityStatusCode := -5;
 
-                            if (TmpAdmScheduleEntryResponse."Admission End Date" < Today()) then
+                            if (TmpAdmScheduleEntryResponse."Admission End Date" < LocalDate) then
                                 _CapacityStatusCode := -5;
 
-                            if ((TmpAdmScheduleEntryResponse."Admission End Date" = Today()) and (TmpAdmScheduleEntryResponse."Admission End Time" < Time())) then
+                            if ((TmpAdmScheduleEntryResponse."Admission End Date" = LocalDate) and (TmpAdmScheduleEntryResponse."Admission End Time" < LocalTime)) then
                                 _CapacityStatusCode := -5;
 
                             if (not TicketManagement.ValidateAdmSchEntryForSales(TmpAdmScheduleEntryResponse,
                                         xAdmCapacityPriceBufferResponse.RequestItemNumber,
                                         xAdmCapacityPriceBufferResponse.RequestVariantCode,
-                                        Today, Time,
+                                        LocalDate, LocalTime,
                                         ReasonCode, _RemainingCapacity)) then begin
                                 _CapacityStatusCode := -1;
                                 if (ReasonCode = ReasonCode::ScheduleExceedTicketDuration) then
