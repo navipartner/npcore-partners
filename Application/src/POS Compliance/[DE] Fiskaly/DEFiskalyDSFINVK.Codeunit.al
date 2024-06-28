@@ -3,113 +3,76 @@
     Access = Internal;
     [TryFunction]
     procedure CreateDSFINVKDocument(var DSFINVKJson: JsonObject; DSFINVKClosing: Record "NPR DSFINVK Closing")
+    var
+        DePosUnit: Record "NPR DE POS Unit Aux. Info";
+        FirstFiscalNo: Text;
+        LastFiscalNo: Text;
     begin
-        FirstFiscalNo := '';
-        LastFiscalNo := '';
-
-        WorkShiftDate := DSFINVKClosing."Closing Date";
-
         DePosUnit.Get(DSFINVKClosing."POS Unit No.");
-        FillTransactionData();
+        FillTransactionData(DSFINVKClosing."Closing Date", FirstFiscalNo, LastFiscalNo);
 
-        DSFINVKJson.Add('head', GetHeader());
+        DSFINVKJson.Add('head', GetHeader(FirstFiscalNo, LastFiscalNo));
         DSFINVKJson.Add('client_id', Format(DePosUnit.SystemId, 0, 4));
         DSFINVKJson.Add('cash_point_closing_export_id', DSFINVKClosing."DSFINVK Closing No.");
         DSFINVKJson.Add('cash_statement', CreateCashStatement());
-        DSFINVKJson.Add('transactions', CreateTransactions());
+        DSFINVKJson.Add('transactions', CreateTransactions(DSFINVKClosing."Closing Date"));
     end;
 
-    local procedure GetHeader() HeadJson: JsonObject
+    local procedure GetHeader(FirstFiscalNo: Text; LastFiscalNo: Text) HeadJson: JsonObject
     begin
         HeadJson.Add('first_transaction_export_id', FirstFiscalNo);
         HeadJson.Add('last_transaction_export_id', LastFiscalNo);
         HeadJson.Add('export_creation_date', GetUnixTime(CurrentDateTime));
     end;
 
-    local procedure FillTransactionData()
+    local procedure FillTransactionData(WorkShiftDate: Date; var FirstFiscalNo: Text; var LastFiscalNo: Text)
     var
-        DeAuditError: Label 'There is De Audit Aux Log with error, No.: %1';
+        POSEntry: Record "NPR POS Entry";
+        DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
+        DeAuditError: Label 'There is DE Audit Aux Log with error, No.: %1', Comment = '%1 - DE POS Unit No.';
     begin
-        PosEntry.Reset();
-        PosEntry.SetRange("Entry Date", WorkShiftDate);
-        PosEntry.FindSet();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+#endif
+        POSEntry.SetRange("Entry Date", WorkShiftDate);
+        POSEntry.FindSet();
         repeat
-            if DeAuditLog.Get(PosEntry."Entry No.") then begin
+            if DeAuditLog.Get(POSEntry."Entry No.") then begin
                 if DeAuditLog."Has Error" then
                     Error(DeAuditError, DeAuditLog."POS Entry No.");
 
                 if FirstFiscalNo = '' then
-                    FirstFiscalNo := PosEntry."Fiscal No.";
-                LastFiscalNo := PosEntry."Fiscal No.";
+                    FirstFiscalNo := POSEntry."Fiscal No.";
+                LastFiscalNo := POSEntry."Fiscal No.";
 
-                FillTmpPayment();
-                FillTmpVat();
+                FillTmpPayment(POSEntry, DeAuditLog);
+                FillTmpVat(POSEntry, DeAuditLog);
             end;
-        until PosEntry.Next() = 0;
+        until POSEntry.Next() = 0;
     end;
 
-    local procedure FillTmpPayment()
+    local procedure FillTmpPayment(POSEntry: Record "NPR POS Entry"; DeAuditLog: Record "NPR DE POS Audit Log Aux. Info")
     var
         PaymentLine: Record "NPR POS Entry Payment Line";
-        PaymentMapper: Record "NPR Payment Method Mapper";
-        GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        GeneralLedgerSetup.Get();
         PaymentLine.Reset();
         PaymentLine.SetCurrentKey("POS Payment Method Code", "Currency Code");
-        PaymentLine.SetRange("POS Entry No.", PosEntry."Entry No.");
+        PaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if PaymentLine.FindSet() then
             repeat
-                PaymentMapper.Get(PaymentLine."POS Payment Method Code");
-                TempPaymentLine.Reset();
-                TempPaymentLine.SetRange("POS Period Register No.", PaymentMapper."DSFINVK Type".AsInteger()); //"POS Period Register No." is used for DSFINVK Type
-                TempPaymentLine.SetRange(Description, DeAuditLog."Transaction ID"); //Description is used for Fiskaly Transaction ID
-                TempPaymentLine.SetRange("Currency Code", PaymentLine."Currency Code");
-                if TempPaymentLine.FindFirst() then begin
-                    TempPaymentLine."Amount (LCY)" += PaymentLine."Amount (LCY)";
-                    TempPaymentLine.Modify();
-                end
-                else begin
-                    TempPaymentLine.Init();
-                    TempPaymentLine := PaymentLine;
-                    if TempPaymentLine."Currency Code" = '' then
-                        TempPaymentLine."Currency Code" := GeneralLedgerSetup."LCY Code";
-                    TempPaymentLine."POS Period Register No." := PaymentMapper."DSFINVK Type".AsInteger(); //"POS Period Register No." is used for DSFINVK Type
-                    TempPaymentLine.Description := DeAuditLog."Transaction ID"; //Description is used for Fiskaly Transaction ID
-                    TempPaymentLine.Insert();
-                end;
+                InsertTempPaymentLine(DeAuditLog, PaymentLine);
             until PaymentLine.Next() = 0;
     end;
 
-    local procedure FillTmpVat()
+    local procedure FillTmpVat(POSEntry: Record "NPR POS Entry"; DeAuditLog: Record "NPR DE POS Audit Log Aux. Info")
     var
         TaxAmountLine: Record "NPR POS Entry Tax Line";
-        TaxMapper: Record "NPR VAT Post. Group Mapper";
     begin
         TaxAmountLine.Reset();
-        TaxAmountLine.SetRange("POS Entry No.", PosEntry."Entry No.");
+        TaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if TaxAmountLine.FindSet() then
             repeat
-                TaxMapper.RESET();
-                TaxMapper.SETRANGE("VAT Identifier", TaxAmountLine."VAT Identifier");
-                TaxMapper.FINDFIRST();
-
-                TempTaxAmountLine.Reset();
-                TempTaxAmountLine.SetRange("Print Order", TaxMapper."DSFINVK ID"); //"Print Order" is used for DSFINVK Vat ID
-                TempTaxAmountLine.SetRange("Print Description", DeAuditLog."Transaction ID"); //"Print Description" is used for Fiskaly Transaction ID
-                if TempTaxAmountLine.FindFirst() then begin
-                    TempTaxAmountLine."Amount Including Tax" += TaxAmountLine."Amount Including Tax";
-                    TempTaxAmountLine."Tax Base Amount" += TaxAmountLine."Tax Base Amount";
-                    TempTaxAmountLine."Tax Amount" += TaxAmountLine."Tax Amount";
-                    TempTaxAmountLine.Modify();
-                end
-                else begin
-                    TempTaxAmountLine.Init();
-                    TempTaxAmountLine := TaxAmountLine;
-                    TempTaxAmountLine."Print Order" := TaxMapper."DSFINVK ID"; //"Print Order" is used for DSFINVK Vat ID
-                    TempTaxAmountLine."Print Description" := DeAuditLog."Transaction ID"; //"Print Description" is used for Fiskaly Transaction ID
-                    TempTaxAmountLine.Insert();
-                end;
+                InsertTempTaxAmountLine(DeAuditLog, TaxAmountLine);
             until TaxAmountLine.Next() = 0;
     end;
 
@@ -119,32 +82,35 @@
         CashStatement.Add('payment', CreatePayment());
     end;
 
-    local procedure CreateTransactions() Transactions: JsonArray
+    local procedure CreateTransactions(WorkShiftDate: Date) Transactions: JsonArray
     var
-        Transaction: JsonObject;
+        POSEntry: Record "NPR POS Entry";
+        DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
         Security: JsonObject;
+        Transaction: JsonObject;
     begin
-        PosEntry.Reset();
-        PosEntry.SetRange("Entry Date", WorkShiftDate);
-        PosEntry.FindSet();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        POSEntry.ReadIsolation := IsolationLevel::ReadCommitted;
+#endif
+        POSEntry.SetRange("Entry Date", WorkShiftDate);
+        POSEntry.FindSet();
         repeat
-            if DeAuditLog.Get(PosEntry."Entry No.") then begin
+            if DeAuditLog.Get(POSEntry."Entry No.") then begin
                 Clear(Security);
                 Clear(Transaction);
                 Security.Add('tss_tx_id', Format(DeAuditLog."Transaction ID", 0, 4));
-                Transaction.Add('head', CreateTransactionHeader());
-                Transaction.Add('data', CreateTransactionData());
+                Transaction.Add('head', CreateTransactionHeader(POSEntry, DeAuditLog));
+                Transaction.Add('data', CreateTransactionData(POSEntry, DeAuditLog));
                 Transaction.Add('security', Security);
                 Transactions.Add(Transaction);
             end;
-        until PosEntry.Next() = 0;
+        until POSEntry.Next() = 0;
     end;
 
     local procedure CreateBusinessCases() BusinessCases: JsonArray
     var
         BusinessCase: JsonObject;
     begin
-        Clear(BusinessCase);
         BusinessCase.Add('type', 'Umsatz'); //We are sendig data only for sales, that is why here is only one Business case
         BusinessCase.Add('amounts_per_vat_id', CreateAmountsPerVatId(''));
         BusinessCases.Add(BusinessCase);
@@ -152,19 +118,19 @@
 
     local procedure CreateAmountsPerVatId(TransactionId: Text) AmountsPerVatId: JsonArray
     var
-        OldVatId: Integer;
-        InclVat: Decimal;
         ExclVat: Decimal;
+        InclVat: Decimal;
         Vat: Decimal;
+        OldVatId: Integer;
     begin
         OldVatId := -1;
         InclVat := 0;
         ExclVat := 0;
         Vat := 0;
         TempTaxAmountLine.Reset();
-        TempTaxAmountLine.SetCurrentKey("Print Order"); //"Print Order" is used for DSFINVK Vat ID
+        //"Print Order" is used for DSFINVK Vat ID
         if TransactionId <> '' then
-            TempTaxAmountLine.SetRange("Print Description", TransactionId);
+            TempTaxAmountLine.SetRange(SystemCreatedBy, TransactionId);
         if not TempTaxAmountLine.FindSet() then
             exit;
         repeat
@@ -199,14 +165,14 @@
     local procedure CreatePayment() Payment: JsonObject
     var
         POSPayment: Record "NPR POS Payment Method";
+        CashAmount: Decimal;
+        FullAmount: Decimal;
+        PaymentAmout: Decimal;
+        DSFINVKPaymentType: Enum "NPR DSFINVK Payment Type";
+        OldType: Integer;
         CashAmountsCurrency: JsonArray;
         PaymentTypes: JsonArray;
-        DSFINVKPaymentType: Enum "NPR DSFINVK Payment Type";
-        FullAmount: Decimal;
-        CashAmount: Decimal;
-        PaymentAmout: Decimal;
-        OldCurrency: Text;
-        OldType: Integer;
+        OldCurrency: Code[10];
     begin
         FullAmount := 0;
         CashAmount := 0;
@@ -230,8 +196,7 @@
                 CashAmountsCurrency.Add(CreatePaymentType(OldCurrency, PaymentAmout, ''));
                 PaymentAmout := TempPaymentLine."Amount (LCY)";
                 OldCurrency := TempPaymentLine."Currency Code";
-            end
-            else
+            end else
                 PaymentAmout += TempPaymentLine."Amount (LCY)";
         until TempPaymentLine.Next() = 0;
 
@@ -271,7 +236,7 @@
         Payment.Add('payment_types', PaymentTypes);
     end;
 
-    local procedure CreatePaymentType(OldCurrency: Text; PaymentAmout: Decimal; Type: Text) CurrencyPayment: JsonObject
+    local procedure CreatePaymentType(OldCurrency: Code[10]; PaymentAmout: Decimal; Type: Text) CurrencyPayment: JsonObject
     begin
         if Type <> '' then
             CurrencyPayment.Add('type', Type);
@@ -279,15 +244,15 @@
         CurrencyPayment.Add('amount', Format(PaymentAmout, 0, '<Precision,2:26><Standard Format,4>'));
     end;
 
-    local procedure CreateTransactionHeader() TransactionHeader: JsonObject
+    local procedure CreateTransactionHeader(POSEntry: Record "NPR POS Entry"; DeAuditLog: Record "NPR DE POS Audit Log Aux. Info") TransactionHeader: JsonObject
     var
         Customer: Record Customer;
-        TransactionHeadUser: JsonObject;
         TransactionHeadBuyer: JsonObject;
+        TransactionHeadUser: JsonObject;
     begin
         TransactionHeadUser.Add('user_export_id', UserId);
 
-        if Customer.Get(PosEntry."Customer No.") then begin
+        if Customer.Get(POSEntry."Customer No.") then begin
             TransactionHeadBuyer.Add('name', Customer.Name);
             TransactionHeadBuyer.Add('buyer_export_id', Customer."No.");
         end
@@ -299,43 +264,43 @@
         TransactionHeadBuyer.Add('type', 'Kunde');
 
         TransactionHeader.Add('type', 'AVRechnung'); //We only use simple sale for now
-        if PosEntry."Amount Incl. Tax" > 0 then
+        if POSEntry."Amount Incl. Tax" > 0 then
             TransactionHeader.Add('storno', false)
         else
             TransactionHeader.Add('storno', true);
-        TransactionHeader.Add('number', PosEntry."Entry No.");
+        TransactionHeader.Add('number', POSEntry."Entry No.");
         TransactionHeader.Add('timestamp_start', GetUnixTime(DeAuditLog."Start Time"));
         TransactionHeader.Add('timestamp_end', GetUnixTime(DeAuditLog."Finish Time"));
         TransactionHeader.Add('user', TransactionHeadUser);
         TransactionHeader.Add('buyer', TransactionHeadBuyer);
         TransactionHeader.Add('tx_id', Format(DeAuditLog."Transaction ID", 0, 4));
-        TransactionHeader.Add('transaction_export_id', PosEntry."Fiscal No.");
+        TransactionHeader.Add('transaction_export_id', POSEntry."Fiscal No.");
         TransactionHeader.Add('closing_client_id', Format(DeAuditLog."Client ID", 0, 4));
     end;
 
-    local procedure CreateTransactionData() TransactionData: JsonObject
+    local procedure CreateTransactionData(POSEntry: Record "NPR POS Entry"; DeAuditLog: Record "NPR DE POS Audit Log Aux. Info") TransactionData: JsonObject
     var
         FullAmount: Decimal;
     begin
-        TransactionData.Add('payment_types', GetTransactionPaymentTypes(FullAmount));
+        TransactionData.Add('payment_types', GetTransactionPaymentTypes(FullAmount, DeAuditLog));
         TransactionData.Add('full_amount_incl_vat', FullAmount);
         TransactionData.Add('amounts_per_vat_id', CreateAmountsPerVatId(DeAuditLog."Transaction ID"));
-        TransactionData.Add('lines', CreateTransactionLines());
+        TransactionData.Add('lines', CreateTransactionLines(POSEntry));
     end;
 
-    local procedure GetTransactionPaymentTypes(var FullAmount: Decimal) TransactionPaymentTypes: JsonArray
+    local procedure GetTransactionPaymentTypes(var FullAmount: Decimal; DeAuditLog: Record "NPR DE POS Audit Log Aux. Info") TransactionPaymentTypes: JsonArray
     var
         POSPayment: Record "NPR POS Payment Method";
-        DSFINVKPaymentType: Enum "NPR DSFINVK Payment Type";
         PaymentAmout: Decimal;
-        OldCurrency: Text;
+        DSFINVKPaymentType: Enum "NPR DSFINVK Payment Type";
         OldType: Integer;
+        OldCurrency: Code[10];
     begin
         FullAmount := 0;
         OldType := -1;
         TempPaymentLine.Reset();
         TempPaymentLine.SetCurrentKey("POS Period Register No.", "Currency Code");
-        TempPaymentLine.SetRange(Description, DeAuditLog."Transaction ID");
+        TempPaymentLine.SetRange(SystemCreatedBy, DeAuditLog."Transaction ID");
         if not TempPaymentLine.FindSet() then
             exit;
         repeat
@@ -360,17 +325,18 @@
             TransactionPaymentTypes.Add(CreatePaymentType(OldCurrency, PaymentAmout, DSFINVKPaymentType.Names.Get((TempPaymentLine."POS Period Register No." + 1))));
     end;
 
-    local procedure CreateTransactionLines() TransactionLines: JsonArray
+    local procedure CreateTransactionLines(POSEntry: Record "NPR POS Entry") TransactionLines: JsonArray
     var
         POSLines: Record "NPR POS Entry Sales Line";
         VatMapper: Record "NPR VAT Post. Group Mapper";
+        AmountsPerVatIdList: JsonArray;
         TransactionLine: JsonObject;
         TransactionLineBusinessCase: JsonObject;
         TransactionLineItem: JsonObject;
-        AmountsPerVatIdList: JsonArray;
     begin
         POSLines.Reset();
-        POSLines.SetRange("POS Entry No.", PosEntry."Entry No.");
+        POSLines.SetLoadFields("VAT Prod. Posting Group", "VAT Bus. Posting Group", "Amount Incl. VAT (LCY)", "Amount Excl. VAT (LCY)", "No.", Quantity, "Unit Price", "Line No.", Description);
+        POSLines.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSLines.SetFilter(Type, '<>%1', POSLines.Type::Comment);
         if not POSLines.FindSet() then
             exit;
@@ -399,11 +365,63 @@
         until POSLines.Next() = 0;
     end;
 
+    local procedure InsertTempPaymentLine(DeAuditLog: Record "NPR DE POS Audit Log Aux. Info"; var PaymentLine: Record "NPR POS Entry Payment Line")
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PaymentMapper: Record "NPR Payment Method Mapper";
+    begin
+        GeneralLedgerSetup.Get();
+        PaymentMapper.Get(PaymentLine."POS Payment Method Code");
+        TempPaymentLine.Reset();
+        TempPaymentLine.SetRange("POS Period Register No.", PaymentMapper."DSFINVK Type".AsInteger()); //"POS Period Register No." is used for DSFINVK Type
+        TempPaymentLine.SetRange(SystemCreatedBy, DeAuditLog."Transaction ID"); //SystemCreatedBy is used for Fiskaly Transaction ID
+        TempPaymentLine.SetRange("Currency Code", PaymentLine."Currency Code");
+        if TempPaymentLine.FindFirst() then begin
+            TempPaymentLine."Amount (LCY)" += PaymentLine."Amount (LCY)";
+            TempPaymentLine.Modify();
+        end
+        else begin
+            TempPaymentLine.Init();
+            TempPaymentLine := PaymentLine;
+            if TempPaymentLine."Currency Code" = '' then
+                TempPaymentLine."Currency Code" := GeneralLedgerSetup."LCY Code";
+            TempPaymentLine."POS Period Register No." := PaymentMapper."DSFINVK Type".AsInteger(); //"POS Period Register No." is used for DSFINVK Type
+            TempPaymentLine.SystemCreatedBy := DeAuditLog."Transaction ID"; //SystemCreatedBy is used for Fiskaly Transaction ID
+            TempPaymentLine.Insert();
+        end;
+    end;
+
+    local procedure InsertTempTaxAmountLine(DeAuditLog: Record "NPR DE POS Audit Log Aux. Info"; var TaxAmountLine: Record "NPR POS Entry Tax Line")
+    var
+        TaxMapper: Record "NPR VAT Post. Group Mapper";
+    begin
+        TaxMapper.Reset();
+        TaxMapper.SetRange("VAT Identifier", TaxAmountLine."VAT Identifier");
+        TaxMapper.FindFirst();
+
+        TempTaxAmountLine.Reset();
+        TempTaxAmountLine.SetRange("Print Order", TaxMapper."DSFINVK ID"); //"Print Order" is used for DSFINVK Vat ID
+        TempTaxAmountLine.SetRange(SystemCreatedBy, DeAuditLog."Transaction ID"); //SystemCreatedBy is used for Fiskaly Transaction ID
+        if TempTaxAmountLine.FindFirst() then begin
+            TempTaxAmountLine."Amount Including Tax" += TaxAmountLine."Amount Including Tax";
+            TempTaxAmountLine."Tax Base Amount" += TaxAmountLine."Tax Base Amount";
+            TempTaxAmountLine."Tax Amount" += TaxAmountLine."Tax Amount";
+            TempTaxAmountLine.Modify();
+        end
+        else begin
+            TempTaxAmountLine.Init();
+            TempTaxAmountLine := TaxAmountLine;
+            TempTaxAmountLine."Print Order" := TaxMapper."DSFINVK ID"; //"Print Order" is used for DSFINVK Vat ID
+            TempTaxAmountLine.SystemCreatedBy := DeAuditLog."Transaction ID"; //SystemCreatedBy is used for Fiskaly Transaction ID
+            TempTaxAmountLine.Insert();
+        end;
+    end;
+
     procedure GetUnixTime(ToDateTime: DateTime): Integer
     var
-        Duration: Duration;
         DurationMs: BigInteger;
         FromDateTime: DateTime;
+        Duration: Duration;
     begin
         Evaluate(FromDateTime, '1970-01-01T00:00:00Z', 9);
         Duration := ToDateTime - FromDateTime;
@@ -412,12 +430,6 @@
     end;
 
     var
-        DePosUnit: Record "NPR DE POS Unit Aux. Info";
-        PosEntry: Record "NPR POS Entry";
-        DeAuditLog: Record "NPR DE POS Audit Log Aux. Info";
         TempPaymentLine: Record "NPR POS Entry Payment Line" temporary;
         TempTaxAmountLine: Record "NPR POS Entry Tax Line" temporary;
-        WorkShiftDate: Date;
-        FirstFiscalNo: Text;
-        LastFiscalNo: Text;
 }
