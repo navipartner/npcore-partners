@@ -2,7 +2,7 @@ codeunit 6184698 "NPR POS Action QRViewDigRcpt B"
 {
     Access = Internal;
 
-    internal procedure PrepareQRCode(POSUnit: Record "NPR POS Unit"; QRCodeLink: Text; var TimeoutIntervalSec: Integer; var QRCode: Text)
+    internal procedure PrepareQRCode(POSUnit: Record "NPR POS Unit"; var TimeoutIntervalSec: Integer)
     var
         POSReceiptProfile: Record "NPR POS Receipt Profile";
     begin
@@ -11,8 +11,6 @@ codeunit 6184698 "NPR POS Action QRViewDigRcpt B"
 
         if (POSReceiptProfile."QRCode Time Interval Enabled") and (POSReceiptProfile."QRCode Timeout Interval(sec.)" > 0) then
             TimeoutIntervalSec := POSReceiptProfile."QRCode Timeout Interval(sec.)";
-
-        QRCode := GenerateQRCodeAZ(QRCodeLink, 'M', 'UTF8', true, true, 2);
     end;
 
     local procedure GenerateQRCodeAZ(DataToEncode: Text; ECCLevel: Text; EciMode: Text; ForceUTF8: Boolean; UTF8BOM: Boolean; PixelsPerModule: Integer): Text
@@ -70,6 +68,4 @@ codeunit 6184698 "NPR POS Action QRViewDigRcpt B"
     begin
         QRCode := GenerateQRCodeAZ(QRCodeLink, 'M', 'UTF8', true, true, 2);
     end;
-
-
 }
