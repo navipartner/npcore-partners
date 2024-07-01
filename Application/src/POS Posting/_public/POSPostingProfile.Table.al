@@ -194,7 +194,7 @@
         }
         field(156; "Posting Compression"; Option)
         {
-            Caption = 'Posting Compression';
+            Caption = 'G/L Posting Compression';
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
             InitValue = "Per POS Entry";
@@ -218,6 +218,13 @@
                                 POSStore.Code, FieldCaption("Posting Compression"));
                     until POSStore.Next() = 0;
             end;
+        }
+        field(158; "Item Ledger Document No."; Option)
+        {
+            Caption = 'Item Ledger Document No.';
+            DataClassification = CustomerContent;
+            OptionCaption = 'POS Period Register,POS Entry';
+            OptionMembers = "POS Period Register","POS Entry";
         }
         field(160; "POS Period Register No. Series"; Code[20])
         {

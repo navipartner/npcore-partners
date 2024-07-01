@@ -1,12 +1,12 @@
 ﻿codeunit 6151007 "NPR POS Entry S.Doc. Link Mgt."
 {
     Access = Internal;
-    procedure InsertPOSEntrySalesDocReference(POSEntry: Record "NPR POS Entry"; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20])
+    procedure InsertPOSEntrySalesDocReference(POSEntryNo: Integer; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20])
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
         POSEntrySalesDocLink.Init();
-        POSEntrySalesDocLink."POS Entry No." := POSEntry."Entry No.";
+        POSEntrySalesDocLink."POS Entry No." := POSEntryNo;
         POSEntrySalesDocLink."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::HEADER;
         POSEntrySalesDocLink."POS Entry Reference Line No." := 0;
         POSEntrySalesDocLink."Sales Document Type" := SalesDocType;
@@ -17,12 +17,12 @@
         POSEntrySalesDocLink.Insert();
     end;
 
-    procedure InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntry: Record "NPR POS Entry"; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20]; ReadyToBePostedIn: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
+    procedure InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntryNo: Integer; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20]; ReadyToBePostedIn: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean)
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
     begin
         POSEntrySalesDocLink.Init();
-        POSEntrySalesDocLink."POS Entry No." := POSEntry."Entry No.";
+        POSEntrySalesDocLink."POS Entry No." := POSEntryNo;
         POSEntrySalesDocLink."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::HEADER;
         POSEntrySalesDocLink."POS Entry Reference Line No." := 0;
         POSEntrySalesDocLink."Sales Document Type" := SalesDocType;
@@ -58,6 +58,14 @@
         POSEntrySalesDocLink."Sales Document Type" := SalesDocType;
         POSEntrySalesDocLink."Sales Document No" := SalesDocNo;
         POSEntrySalesDocLink."Post Sales Invoice Type" := InvoiceType;
+        if POSEntrySalesDocLink."Sales Document Type" in
+           [POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER,
+            POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE,
+            POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO,
+            POSEntrySalesDocLink."Sales Document Type"::SHIPMENT,
+            POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT]
+        then
+            POSEntrySalesDocLink."Post Sales Document Status" := POSEntrySalesDocLink."Post Sales Document Status"::Posted;
         POSEntrySalesDocLink.Insert();
     end;
 

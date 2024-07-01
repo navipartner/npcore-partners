@@ -226,6 +226,9 @@
             Description = 'NPR5.32.10';
             OptionCaption = 'Post On Finalize Sale,Post on Close Register,No Posting';
             OptionMembers = "Post On Finalize Sale","Post on Close Register","No Posting";
+            ObsoleteState = Pending;
+            ObsoleteTag = 'NPR35.0';
+            ObsoleteReason = 'No longer used. All item related POS entry postings are now done via job queue.';
         }
         field(65; "POS Period Register No. Series"; Code[20])
         {

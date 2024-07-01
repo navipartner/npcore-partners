@@ -15,27 +15,19 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         _POSSession: Codeunit "NPR POS Session";
         _POSStore: Record "NPR POS Store";
         _POSSetup: Record "NPR POS Setup";
-        _PosUnitNo1: Text;
-        _PosUnitNo2: Text;
+        _PosUnitNo1: Code[10];
+        _PosUnitNo2: Code[10];
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
     procedure GLPostingPeriodRegisterCompressed()
     var
         PostGLEntriesJQ: Codeunit "NPR POS Post GL Entries JQ";
-        PeriodRegister: Record "NPR POS Period Register";
-        POSEntry: Record "NPR POS Entry";
-        Assert: Codeunit Assert;
-        GLEntry: Record "G/L Entry";
         PostItemEntriesJQ: Codeunit "NPR POS Post Item Entries JQ";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        Line1Amount: Decimal;
-        Line2Amount: Decimal;
     begin
-        exit; //TODO: [Test result: FAIL] Fixing in progress
         // [Given] Completed and item posted pos entries from multiple POS Units        
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", true);
         _PosUnitNo1 := _POSUnit."No.";
         CreateSales(3);
 
@@ -43,7 +35,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         Clear(_POSSession);
         Clear(_Initialized);
 
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", false);
         _PosUnitNo2 := _POSUnit."No.";
         CreateSales(3);
 
@@ -55,35 +47,37 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         PostGLEntriesJQ.Run();
 
         // [Then] POS entry GL is posted per period register
-        POSEntry.SetRange("POS Unit No.", _PosUnitNo1);
-        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Posted);
-        Assert.AreEqual(3, POSEntry.Count(), 'Every entry should have GL posted');
-        POSEntry.FindFirst();
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.FindFirst();
-        Line1Amount := POSEntrySalesLine."Amount Excl. VAT (LCY)";
-        POSEntrySalesLine.Next();
-        Line2Amount := POSEntrySalesLine."Amount Excl. VAT (LCY)";
-        PeriodRegister.SetRange("POS Unit No.", _PosUnitNo1);
-        PeriodRegister.SetRange(Status, PeriodRegister.Status::OPEN);
-        PeriodRegister.FindFirst();
-        GLEntry.SetRange("Document No.", PeriodRegister."Document No.");
-        GLEntry.SetRange(GLEntry."Gen. Posting Type", GLEntry."Gen. Posting Type"::Sale);
-        GLEntry.SetRange(Amount, ((Line1Amount * 3) + (Line2Amount * 3)) * -1);
-        GLEntry.FindFirst();
+        CheckPostingResults(_PosUnitNo1);
+        CheckPostingResults(_PosUnitNo2);
+    end;
 
-        POSEntry.SetRange("POS Unit No.", _PosUnitNo2);
+    local procedure CheckPostingResults(PosUnitNo: Code[10])
+    var
+        GLEntry: Record "G/L Entry";
+        PeriodRegister: Record "NPR POS Period Register";
+        POSEntry: Record "NPR POS Entry";
+        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        Assert: Codeunit Assert;
+        Line1Amount: Decimal;
+        Line2Amount: Decimal;
+    begin
+        POSEntry.SetRange("POS Unit No.", PosUnitNo);
         POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Posted);
         Assert.AreEqual(3, POSEntry.Count(), 'Every entry should have GL posted');
         POSEntry.FindFirst();
+        POSEntry.TestField("POS Period Register No.");
+        POSEntry.SetRange("POS Period Register No.", POSEntry."POS Period Register No.");
+        Assert.AreEqual(3, POSEntry.Count(), 'All POS entries should have been created within the same POS period register No.');
+        PeriodRegister.Get(POSEntry."POS Period Register No.");
+        PeriodRegister.TestField("Document No.");
+
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.FindFirst();
         Line1Amount := POSEntrySalesLine."Amount Excl. VAT (LCY)";
         POSEntrySalesLine.Next();
         Line2Amount := POSEntrySalesLine."Amount Excl. VAT (LCY)";
-        PeriodRegister.SetRange("POS Unit No.", _PosUnitNo2);
-        PeriodRegister.SetRange(Status, PeriodRegister.Status::OPEN);
-        PeriodRegister.FindFirst();
+
         GLEntry.SetRange("Document No.", PeriodRegister."Document No.");
         GLEntry.SetRange(GLEntry."Gen. Posting Type", GLEntry."Gen. Posting Type"::Sale);
         GLEntry.SetRange(Amount, ((Line1Amount * 3) + (Line2Amount * 3)) * -1);
@@ -102,7 +96,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         // [Given] Completed and item posted pos entries from multiple POS Units, compressed for each   
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Entry");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Entry", true);
         _PosUnitNo1 := _POSUnit."No.";
         CreateSales(3);
 
@@ -137,7 +131,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         // [Given] Completed and item posted pos entries from multiple POS Units, compressed for each   
-        InitializeData(POSPostingProfile."Posting Compression"::Uncompressed);
+        InitializeData(POSPostingProfile."Posting Compression"::Uncompressed, true);
         _PosUnitNo1 := _POSUnit."No.";
         CreateSales(3);
 
@@ -174,7 +168,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         // Note: at the moment, item posting is never compressed, hence no test for each compression setting.
 
         // [Given] Completed but unposted sales from multiple POS Units.
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", true);
         _PosUnitNo1 := _POSUnit."No.";
         CreateSales(3);
 
@@ -207,7 +201,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         //TODO: At the moment, item posting is never compressed. This appears to be a design choice.
 
         // [Given] Completed but unposted sales with one of the sales invalid for posting.
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", true);
         CreateSales(3);
 
         POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
@@ -242,7 +236,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         // [Given] Completed POS sales where one of them cannot post for whatever reason.
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", true);
         CreateSales(3);
 
         POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
@@ -278,7 +272,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         //TODO: The behaviour this test shows is that: The other entries in the same period register are left unposted when there is an error in one of them, EVEN when compression is set to POS Entry level. This might be a bug but a low impact one.
 
         // [Given] Completed POS sales where one of them cannot post for whatever reason.
-        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Entry");
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Entry", true);
         CreateSales(3);
 
         POSEntry.SetRange("POS Unit No.", _POSUnit."No.");
@@ -300,6 +294,69 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         POSEntry.TestField("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
         POSEntry.Next();
         POSEntry.TestField("Post Entry Status", POSEntry."Post Entry Status"::"Unposted");
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('PageHandler_POSPaymentBinCheckpoint_LookupOK')]
+    procedure EnsureOnlySelectedEntriesPostedWhenRunningPostingManually()
+    var
+        GLEntry: Record "G/L Entry";
+        POSEntry: Record "NPR POS Entry";
+        POSEndOfDayProfile: Record "NPR POS End of Day Profile";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        Assert: Codeunit Assert;
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSaleWrapper: Codeunit "NPR POS Sale";
+        POSWorkshiftCheckpoint: Codeunit "NPR POS Workshift Checkpoint";
+        POSPostRange: Report "NPR POS Posting Action";
+        BalancingEntryNo: Integer;
+    begin
+        // [Given] Completed 2 POS sales and EOD balancing
+        InitializeData(POSPostingProfile."Posting Compression"::"Per POS Period", true);
+        if not POSEndOfDayProfile.Get('EOD-TEST') then begin
+            POSEndOfDayProfile.Code := 'EOD-TEST';
+            POSEndOfDayProfile.Insert();
+        end;
+        POSEndOfDayProfile."Z-Report UI" := POSEndOfDayProfile."Z-Report UI"::BALANCING;
+        POSEndOfDayProfile.Modify();
+        _POSUnit."POS End of Day Profile" := POSEndOfDayProfile.Code;
+        _POSUnit.Modify();
+
+        CreateSales(2);
+
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSaleWrapper);
+        BalancingEntryNo := POSWorkshiftCheckpoint.EndWorkshift(1, _POSUnit."No.", 0);
+        Commit();
+
+        // [When] Posting GL of pos entry sales
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        Clear(POSPostRange);
+        POSPostRange.SetPOSEntries(POSEntry);
+        POSPostRange.SetGlobalValues(false, true, false, false, false, true);
+        POSPostRange.UseRequestPage := false;
+        POSPostRange.Run();
+
+        // [Then] Balancing entries are left unposted, while direct sale entries are posted
+        Clear(POSEntry);
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Posted);
+        Assert.AreEqual(2, POSEntry.Count(), 'Every direct sale entry should have GL posted');
+
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
+        POSEntry.SetRange("Post Entry Status", POSEntry."Post Entry Status"::Unposted);
+        Assert.AreEqual(1, POSEntry.Count(), 'Balancing entry should not have GL posted');
+        POSEntry.FindFirst();
+        GLEntry.SetRange("Document No.", POSEntry."Document No.");
+        Assert.IsTrue(GLEntry.IsEmpty(), 'Balancing entry should not have GL posted');
+    end;
+
+    [ModalPageHandler]
+    procedure PageHandler_POSPaymentBinCheckpoint_LookupOK(var UIEndOfDay: Page "NPR POS Payment Bin Checkpoint"; var ActionResponse: Action)
+    begin
+        UIEndOfDay.DoOnOpenPageProcessing();
+        UIEndOfDay.DoOnClosePageProcessing();
+        ActionResponse := Action::LookupOK;
     end;
 
     local procedure CreateSales(NoOfSales: Integer)
@@ -333,7 +390,7 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         end;
     end;
 
-    procedure InitializeData(CompressionMethod: Integer)
+    procedure InitializeData(CompressionMethod: Integer; ClearPostedData: Boolean)
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -352,7 +409,8 @@ codeunit 85044 "NPR JQ POS Posting Tests"
         NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
         NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
 
-        DeletePostedEntries();
+        if ClearPostedData then
+            DeletePostedEntries();
 
         _Initialized := true;
 
