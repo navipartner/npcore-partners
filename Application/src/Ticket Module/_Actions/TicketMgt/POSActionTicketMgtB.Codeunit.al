@@ -61,6 +61,8 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         RevokeQuantity: Integer;
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
+        ResponseMessage: Text;
+        ResponseCode: Integer;
     begin
         if (ExternalTicketNumber = '') then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
@@ -93,22 +95,38 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         UnitPrice := SaleLinePOS."Unit Price";
+        if (SaleLinePOS."Price Includes VAT") then
+            if (Ticket.AmountInclVat <> 0) then
+                UnitPrice := Ticket.AmountInclVat;
+
+        if (not SaleLinePOS."Price Includes VAT") then
+            if (Ticket.AmountExclVat <> 0) then
+                UnitPrice := Ticket.AmountExclVat;
 
         if (TicketReservationRequest."Receipt No." <> '') then begin
             PosEntry.SetFilter("Document No.", TicketReservationRequest."Receipt No.");
             if (PosEntry.FindFirst()) then begin
                 PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
                 PosEntrySalesLine.SetFilter("Line No.", '=%1', TicketReservationRequest."Line No.");
-                if (PosEntrySalesLine.FindFirst()) then
-                    UnitPrice := PosEntrySalesLine."Unit Price";
-
+                if (PosEntrySalesLine.FindFirst()) then begin
+                    if (SaleLinePOS."Price Includes VAT") then
+                        UnitPrice := PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity;
+                    if (not SaleLinePOS."Price Includes VAT") then
+                        UnitPrice := PosEntrySalesLine."Amount Excl. VAT" / PosEntrySalesLine.Quantity;
+                end;
             end;
         end;
-        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity);
+
+        ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity, ResponseMessage);
+        if (ResponseCode <= 0) then begin
+            POSSaleLine.DeleteLine();
+            POSSaleLine.RefreshCurrent();
+            Commit();
+            Error(ResponseMessage);
+        end;
 
         POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
         POSSaleLine.SetUnitPrice(UnitPrice);
-
         AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
 
     end;

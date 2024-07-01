@@ -1403,7 +1403,29 @@
         ReservationRequest.Insert();
     end;
 
-    procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer): Boolean
+    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer): Boolean
+    var
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+    begin
+        ResponseCode := POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, RevokeQuantity, ResponseMessage);
+
+        if (ResponseCode = 0) then
+            exit(false);
+
+        if (ResponseCode < 0) then
+            Error(ResponseMessage);
+
+        ResponseMessage := '';
+        exit(true);
+    end;
+
+    internal procedure POS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer; var ResponseMessage: Text): Integer
+    begin
+        exit(POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, RevokeQuantity, ResponseMessage));
+    end;
+
+    local procedure POS_CreateRevokeRequestWorker(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer; var ResponseMessage: Text): Integer
     var
         Ticket: Record "NPR TM Ticket";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1420,12 +1442,16 @@
         UsePctDistribution: Boolean;
         AdmissionCount: Integer;
         UnitPrice: Decimal;
+        AlreadyAsked: Boolean;
+        AllowRevoke: Boolean;
+        TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
     begin
 
         Ticket.Get(TicketNo);
-
-        if (Ticket.Blocked) then
-            exit(false);
+        if (Ticket.Blocked) then begin
+            ResponseMessage := StrSubstNo(TICKET_BLOCKED, TicketNo);
+            exit(0);
+        end;
 
         LockResources('POS_CreateRevokeRequest');
 
@@ -1474,8 +1500,10 @@
                             DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
                             DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
                             DetTicketAccessEntry2.FindFirst();
-                            if (TicketAccessEntry.Quantity >= DetTicketAccessEntry2.Quantity) then
-                                Error(REVOKE_UNUSED_ERROR, TicketNo, Admission.Description, DetTicketAccessEntry."Created Datetime", Ticket."Item No.", TicketAccessEntry."Admission Code");
+                            if (TicketAccessEntry.Quantity >= DetTicketAccessEntry2.Quantity) then begin
+                                ResponseMessage := StrSubstNo(REVOKE_UNUSED_ERROR, TicketNo, Admission.Description, DetTicketAccessEntry."Created Datetime", Ticket."Item No.", TicketAccessEntry."Admission Code");
+                                exit(-20);
+                            end;
 
                             RevokeQuantity := DetTicketAccessEntry2.Quantity - TicketAccessEntry.Quantity;
                             AmountInOut := UnitPrice * RevokeQuantity;
@@ -1508,8 +1536,10 @@
             DetTicketAccessEntry.Reset();
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::CANCELED_ADMISSION);
-            if (DetTicketAccessEntry.FindFirst()) then
-                Error(TICKET_CANCELLED, TicketNo, DetTicketAccessEntry."Created Datetime");
+            if (DetTicketAccessEntry.FindFirst()) then begin
+                ResponseMessage := StrSubstNo(TICKET_CANCELLED, TicketNo, DetTicketAccessEntry."Created Datetime");
+                exit(-10);
+            end;
 
             DetTicketAccessEntry.Reset();
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
@@ -1521,9 +1551,14 @@
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::PREPAID);
             if (DetTicketAccessEntry.FindFirst()) then begin
-                if (AdmissionRefundAmount <> 0) then
-                    if (not Confirm(PREPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.")) then
+                if (AdmissionRefundAmount <> 0) then begin
+                    if (not AlreadyAsked) then begin
+                        AlreadyAsked := true;
+                        AllowRevoke := Confirm(PREPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.");
+                    end;
+                    if (not AllowRevoke) then
                         AdmissionRefundAmount := 0;
+                end;
             end;
 
             // Ticket will be post paid after admission, by claim from us to third party. we will claim ticket if admission was registered.
@@ -1531,9 +1566,14 @@
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::POSTPAID);
             if (DetTicketAccessEntry.FindFirst()) then begin
-                if (AdmissionRefundAmount <> 0) then
-                    if (not Confirm(POSTPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.")) then
+                if (AdmissionRefundAmount <> 0) then begin
+                    if (not AlreadyAsked) then begin
+                        AlreadyAsked := true;
+                        AllowRevoke := Confirm(POSTPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.");
+                    end;
+                    if (not AllowRevoke) then
                         AdmissionRefundAmount := 0;
+                end;
             end;
 
             TotalRefundAmount += AdmissionRefundAmount;
@@ -1577,7 +1617,7 @@
 
         AmountInOut := Round(TotalRefundAmount, 0.01);
 
-        exit(true);
+        exit(10);
     end;
 
     procedure WS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; AuthorizationCode: Code[10]; VAR AmountInclVatInOut: Decimal; VAR RevokeQuantity: Integer)
