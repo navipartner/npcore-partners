@@ -38,7 +38,6 @@ report 6014438 "NPR POS Posting Action"
                         Caption = 'Stop on Error';
                         ToolTip = 'If checked system will stop on first error';
                         ApplicationArea = NPRRetail;
-                        Editable = false;
                     }
                 }
             }
@@ -47,46 +46,26 @@ report 6014438 "NPR POS Posting Action"
 
     trigger OnPreReport()
     var
+        POSEntry: Record "NPR POS Entry";
         POSEntryToPost: Record "NPR POS Entry";
-        GotErrorDuringPosting: Boolean;
     begin
         POSPostEntries.SetPostCompressed(CompressPosting);
         POSPostEntries.SetStopOnError(ShowErrorDuringPosting);
         POSPostEntries.SetPostPerPeriodRegister(PerPeriodRegisterPosting);
+        POSPostEntries.SetPostItemEntries(InventoryPosting);
+        POSPostEntries.SetPostPOSEntries(FinancePosting);
 
-        if (InventoryPosting) then begin
-            POSEntryToPost.Reset();
-            POSEntryToPost.CopyFilters(POSEntryWithFilter);
-            POSPostEntries.SetPostItemEntries(true);
-            POSPostEntries.SetPostPOSEntries(false);
+        POSEntry.CopyFilters(POSEntryWithFilter);
+        POSEntry.SetCurrentKey("POS Period Register No.");
+        if POSEntry.FindFirst() then
             repeat
-                if (POSEntryToPost.FindLast()) then
-                    POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
+                // Send entries to the posting codeunit in chunks by period register
+                POSEntry.SetRange("POS Period Register No.", POSEntry."POS Period Register No.");
+                POSEntry.FindLast();
+                POSEntryToPost.Copy(POSEntry);
                 POSPostEntries.Run(POSEntryToPost);
-                Commit();
-
-                GotErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                POSEntryToPost.SetFilter("POS Period Register No.", POSEntryWithFilter.GetFilter("POS Period Register No."));
-            until (GotErrorDuringPosting or POSEntryToPost.IsEmpty());
-        end;
-
-        if (FinancePosting) then begin
-            POSEntryToPost.Reset();
-            POSEntryToPost.CopyFilters(POSEntryWithFilter);
-            POSPostEntries.SetPostItemEntries(false);
-            POSPostEntries.SetPostPOSEntries(true);
-            repeat
-                if (POSEntryToPost.FindLast()) then
-                    POSEntryToPost.SetFilter("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
-                POSPostEntries.Run(POSEntryToPost);
-                Commit();
-
-                GotErrorDuringPosting := not POSEntryToPost.IsEmpty();
-                POSEntryToPost.SetFilter("POS Period Register No.", POSEntryWithFilter.GetFilter("POS Period Register No."));
-            until (GotErrorDuringPosting or POSEntryToPost.IsEmpty());
-        end;
+                POSEntryWithFilter.CopyFilter("POS Period Register No.", POSEntry."POS Period Register No.");
+            until POSEntry.Next() = 0;
     end;
 
     internal procedure SetGlobalValues(DoInventoryPosting: Boolean; DoFinancePosting: Boolean; DoShowErrorDuringPosting: Boolean; DoCompressPosting: Boolean; IsCompressPostingEditable: Boolean; DoPerPeriodRegisterPosting: Boolean)

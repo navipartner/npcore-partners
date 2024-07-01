@@ -97,7 +97,7 @@
                 }
                 field("Posting Compression"; Rec."Posting Compression")
                 {
-                    ToolTip = 'Defines how G/L entries will be posted. Options: Uncompressed - every POS entry will be posted as a separate document; Per POS entry - the lines are compressed per an account code within the POS entry; Per POS period – All POS entries created during a specific period will be compressed per the same account.';
+                    ToolTip = 'Specifies whether the system should compress G/L entries created from POS entries. Options: "Uncompressed" - no compression is used; "Per POS Entry" - each POS entry is posted separately to the General Ledger, and the resulting G/L entries are consolidated per G/L account; "Per POS period" - all the POS entries created in the same period are posted together to the General Ledger, and the resulting G/L entries are consolidated per G/L account.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }

@@ -10,7 +10,7 @@
     end;
 
     var
-        PostItemEntriesVar, PostPOSEntriesVar, PostCompressedVar, StopOnErrorVar, ShowProgressDialog, PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostSalesDocumentsVar : Boolean;
+        PostItemEntriesVar, PostPOSEntriesVar, PostCompressedVar, StopOnErrorVar, ShowProgressDialog, _ReplaceDates, _ReplacePostingDate, _ReplaceDocumentDate, PostSalesDocumentsVar : Boolean;
         _PostingDate: Date;
         TextErrorMultiple: Label '%3 %1 and %2 cannot be posted together. Only one %3 can be posted at a time.';
         TextErrorSalesTaxCompressed: Label '%1 %2 cannot be posted compressed because it has Sales Tax Lines. Please check the POS posting compression settings.';
@@ -32,7 +32,6 @@
         PostingSaleDocumentLbl: Label 'Posting Sale Documents';
         _POSPostingLogEntryNo, POSItemPostingLogEntryNo, POSSalesDocPostingLogEntryNo : Integer;
         PostingPerPeriodRegister, JobQueuePosting : Boolean;
-        ErrorText: Text;
         PostingPOSEntriesOpenDialogLbl: Label 'Posting POS Entries individually\#1######\@2@@@@@@@@@@@@@\';
         TextPostingSetupMissing: Label '%1 is missing for %2 in %3 %4.\\Values [%5].';
         TextClosingEntryFloat: Label 'Float Amount Closing POS Entry %1';
@@ -44,8 +43,9 @@
 
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
+        ErrorText: Text;
+        Success: Boolean;
     begin
-
         if ((not PostItemEntriesVar) and (not PostPOSEntriesVar) and (not PostSalesDocumentsVar)) or POSEntry.IsEmpty then
             Error(TextNothingToPost);
 
@@ -61,6 +61,9 @@
                     ProgressWindow.Open(PostingSaleDocumentLbl);
             end;
 
+        POSEntry.SetCurrentKey("Entry No.");
+        POSEntry.SetAscending("Entry No.", true);
+
         CheckDimensions(POSEntry);
 
         if PostItemEntriesVar then begin
@@ -73,7 +76,11 @@
             _POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry, 0);
             Commit();
             Clear(_GLPostingErrorEntries);
-            PostPOSEntries(POSEntry);
+            Clear(ErrorText);
+            Success := PostPOSEntries(POSEntry, ErrorText);
+            Commit();
+            if not Success and StopOnErrorVar then
+                Error(ErrorText);
         end;
 
         if PostSalesDocumentsVar then begin
@@ -92,7 +99,7 @@
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    local procedure PostPOSEntries(var POSEntry: Record "NPR POS Entry")
+    local procedure PostPOSEntries(var POSEntry: Record "NPR POS Entry"; var ErrorText: Text) Success: Boolean
     var
         TempPOSPostingBuffer: Record "NPR POS Posting Buffer" temporary;
         TempPOSSalesLineToPost: Record "NPR POS Entry Sales Line" temporary;
@@ -123,11 +130,12 @@
 
         CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
 
-        if (not CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry)) then begin
-            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true);
+        Success := CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry, ErrorText);
+        if not Success then begin
+            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true, ErrorText);
             MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end else begin
-            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false);
+            UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false, '');
             MarkPOSEntries(0, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end;
     end;
@@ -186,16 +194,17 @@
         NoOfRecords: Integer;
         PreviousPOSPeriodRegister: Integer;
     begin
-        if not POSSalesLineToPost.IsTemporary then
+        if not POSSalesLineToPost.IsTemporary() then
             exit;
-        if not POSPaymentLineToPost.IsTemporary then
+        if not POSPaymentLineToPost.IsTemporary() then
             exit;
         if ShowProgressDialog then begin
             NoOfRecords := POSEntry.Count();
             ProgressWindow.Update(2, NoOfRecords);
         end;
 
-        if POSEntry.FindSet(true) then
+        POSEntry.LockTable();
+        if POSEntry.FindSet() then
             repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
@@ -205,19 +214,10 @@
                     OnCheckPostingRestrictions(POSEntry, false);
                     OnBeforePostPOSEntry(POSEntry, false);
 
-                    POSEntry.Recalculate();
+                    POSEntry.Recalculate();  //The POS Entry is modified here
 
                     if (POSEntry."POS Period Register No." <> PreviousPOSPeriodRegister) and (PreviousPOSPeriodRegister <> 0) then
                         Error(TextErrorMultiple, POSEntry."POS Period Register No.", PreviousPOSPeriodRegister, POSPeriodRegister.TableCaption);
-                    if PostingDateExists then begin
-                        if ReplacePostingDate or (POSEntry."Posting Date" = 0D) then begin
-                            POSEntry."Posting Date" := _PostingDate;
-                            POSEntry.Validate("Currency Code");
-                        end;
-                        if ReplaceDocumentDate or (POSEntry."Document Date" = 0D) then begin
-                            POSEntry.Validate("Document Date", _PostingDate);
-                        end;
-                    end;
 
                     POSSalesLine.Reset();
                     POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
@@ -492,8 +492,10 @@
         SuppressPosting: Boolean;
     begin
         POSEntry.Copy(POSEntryIn);
+        POSEntry.FilterGroup(40);  // Use a different filter group to avoid overwriting the filters set by the user for the posting batch job.
         POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
         POSEntry.SetRange(POSEntry."Post Entry Status", POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting");
+        POSEntry.FilterGroup(0);
 
         if POSEntry.FindSet() then
             repeat
@@ -607,9 +609,6 @@
 
     local procedure PostItemEntries(var POSEntry: Record "NPR POS Entry")
     var
-        POSEntryToPost: Record "NPR POS Entry";
-        POSPostItemEntries: Codeunit "NPR POS Post Item Entries";
-        POSPostItemTransaction: Codeunit "NPR POS Post Item Transaction";
         LineCount, LineToProcessCount : Integer;
         NoOfRecords: Integer;
         ItemPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
@@ -635,33 +634,36 @@
                     if JobQueuePosting then
                         DoSkipProcessing := SkipProcessing(2, POSEntry."Entry No.", 1);
                     if not DoSkipProcessing then begin
-                        if PostingDateExists then
-                            POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, _PostingDate);
-
-                        POSEntryToPost.Get(POSEntry."Entry No.");
                         LineToProcessCount += 1;
-                        if StopOnErrorVar then begin
-                            POSPostItemTransaction.Run(POSEntryToPost);
-                        end else begin
-                            if (not POSPostItemTransaction.Run(POSEntryToPost)) then begin
-                                _ItemPostingErrorEntries.Add(POSEntryToPost."Entry No.");
-                                CreateErrorPOSPostingLogEntry(POSEntryToPost, 1, GetLastErrorText(), true);
-                            end;
-                        end;
+                        if not PostPosEntryItems(POSEntry) and StopOnErrorVar then
+                            Error(GetLastErrorText());
                     end;
                 end;
             until POSEntry.Next() = 0;
 
-        Commit();
-        ErrorText := StrSubstNo(ItemPostingErrorMsg, _ItemPostingErrorEntries.Count, LineToProcessCount - _ItemPostingErrorEntries.Count);
-        UpdatePOSPostingLogEntry(POSItemPostingLogEntryNo, _ItemPostingErrorEntries.Count > 0);
-        ErrorText := '';
+        UpdatePOSPostingLogEntry(
+            POSItemPostingLogEntryNo, _ItemPostingErrorEntries.Count() > 0,
+            StrSubstNo(ItemPostingErrorMsg, _ItemPostingErrorEntries.Count(), LineToProcessCount - _ItemPostingErrorEntries.Count()));
+    end;
+
+    local procedure PostPosEntryItems(POSEntry: Record "NPR POS Entry") Success: Boolean
+    var
+        POSPostItemTransaction: Codeunit "NPR POS Post Item Transaction";
+    begin
+        if _ReplaceDates then
+            POSPostItemTransaction.SetPostingDate(_ReplacePostingDate, _ReplaceDocumentDate, _PostingDate);
+        Success := POSPostItemTransaction.Run(POSEntry);
+        if not Success then begin
+            POSEntry.Validate("Post Item Entry Status", POSEntry."Post Item Entry Status"::"Error while Posting");
+            POSEntry.Modify();
+            _ItemPostingErrorEntries.Add(POSEntry."Entry No.");
+            CreateErrorPOSPostingLogEntry(POSEntry, 1, GetLastErrorText(), true);
+            Commit();
+        end;
     end;
 
     local procedure PostSalesDocuments(var POSEntry: Record "NPR POS Entry")
     var
-        POSEntryToPost: Record "NPR POS Entry";
-        POSPostSalesDocTrans: Codeunit "NPR POS Post Sales Doc. Trans.";
         LineToProcessCount: Integer;
         SalesDocPostingErrorMsg: Label '%1 error/s occurred. Successfully processed %2.', Comment = '%1-Errors count, %2-Successfully posted count';
         DoSkipProcessing: Boolean;
@@ -677,27 +679,37 @@
                     if JobQueuePosting then
                         DoSkipProcessing := SkipProcessing(2, POSEntry."Entry No.", 0);
                     if not DoSkipProcessing then begin
-                        POSEntryToPost.Get(POSEntry."Entry No.");
                         LineToProcessCount += 1;
-                        if StopOnErrorVar then begin
-                            POSPostSalesDocTrans.Run(POSEntryToPost);
-                        end else begin
-                            if (not POSPostSalesDocTrans.Run(POSEntryToPost)) then begin
-                                _SalesDocPostingErrorEntries.Add(POSEntryToPost."Entry No.");
-                                CreateErrorPOSPostingLogEntry(POSEntryToPost, 0, GetLastErrorText(), true);
-                            end;
-                        end;
+                        if not PostPosEntrySalesDocuments(POSEntry) and StopOnErrorVar then
+                            Error(GetLastErrorText());
                     end;
                 end;
             until POSEntry.Next() = 0;
 
-        Commit();
-        ErrorText := StrSubstNo(SalesDocPostingErrorMsg, _SalesDocPostingErrorEntries.Count, LineToProcessCount - _SalesDocPostingErrorEntries.Count);
-        UpdatePOSPostingLogEntry(POSSalesDocPostingLogEntryNo, _SalesDocPostingErrorEntries.Count > 0);
-        ErrorText := '';
+        UpdatePOSPostingLogEntry(
+            POSSalesDocPostingLogEntryNo, _SalesDocPostingErrorEntries.Count() > 0,
+            StrSubstNo(SalesDocPostingErrorMsg, _SalesDocPostingErrorEntries.Count(), LineToProcessCount - _SalesDocPostingErrorEntries.Count()));
     end;
 
-    local procedure CheckAndPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"): Boolean
+    local procedure PostPosEntrySalesDocuments(POSEntry: Record "NPR POS Entry") Success: Boolean
+    var
+        POSPostSalesDocTrans: Codeunit "NPR POS Post Sales Doc. Trans.";
+    begin
+        if _ReplaceDates then
+            POSPostSalesDocTrans.SetPostingDate(_ReplacePostingDate, _ReplaceDocumentDate, _PostingDate);
+        Success := POSPostSalesDocTrans.Run(POSEntry);
+        if not Success then begin
+            POSEntry.Validate("Post Sales Document Status", POSEntry."Post Sales Document Status"::"Error while Posting");
+            POSEntry.Modify();
+            _SalesDocPostingErrorEntries.Add(POSEntry."Entry No.");
+            CreateErrorPOSPostingLogEntry(POSEntry, 0, GetLastErrorText(), true);
+            Commit();
+        end;
+    end;
+
+    local procedure CheckAndPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; var ErrorText: Text): Boolean
+    var
+        UnknownErrorTxt: Label 'An error has occurred while checking general journal lines for document No. %1. The system did not provide any details of the error.', Comment = '%1 - document number';
     begin
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
@@ -705,18 +717,18 @@
             exit(true);  //There are no general journal lines to post. The POS entry can be marked as posted
 
         repeat
+            ClearLastError();
             if (not TryCheckJournalLine(GenJournalLine)) then begin
-                if (StopOnErrorVar) then
-                    Error(GetLastErrorText());
+                ErrorText := GetLastErrorText();
+                if ErrorText = '' then
+                    ErrorText := StrSubstNo(UnknownErrorTxt, GenJournalLine."Document No.");
                 exit(false);
             end;
         until GenJournalLine.Next() = 0;
 
-        if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 0) then
+        if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 0, ErrorText) then
             exit(false);
-        if not CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 1) then
-            exit(false);
-        exit(true);
+        exit(CheckOrPostGenJnlPerDocument(GenJournalLine, POSEntry, POSEntryWithError, 1, ErrorText));
     end;
 
     [TryFunction]
@@ -727,7 +739,9 @@
         GenJnlCheckLine.RunCheck(GenJournalLine);
     end;
 
-    local procedure CheckOrPostGenJnlPerDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; Action: Option Check,Post) Success: Boolean
+    local procedure CheckOrPostGenJnlPerDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; Action: Option Check,Post; var ErrorText: Text) Success: Boolean
+    var
+        UnknownErrorTxt: Label 'An error has occurred while posting general journal lines for document No. %1. The system did not provide any details of the error.', Comment = '%1 - document number';
     begin
         if GenJournalLine.FindSet() then begin
             repeat
@@ -735,11 +749,21 @@
                 GenJournalLine.SetRange("Document No.", GenJournalLine."Document No.");
                 case Action of
                     Action::Check:
-                        Success := CheckGenJournalDocument(GenJournalLine, POSEntry);
+                        Success := CheckGenJournalDocument(GenJournalLine, POSEntry, ErrorText);
                     Action::Post:
-                        Success := PostGenJournalDocument(GenJournalLine, POSEntry);
+                        begin
+                            ClearLastError();
+                            Success := PostGenJournalDocument(GenJournalLine, POSEntry);
+                            if not Success then begin
+                                ErrorText := GetLastErrorText();
+                                if ErrorText = '' then
+                                    ErrorText := StrSubstNo(UnknownErrorTxt, GenJournalLine."Document No.");
+                            end;
+                        end;
                 end;
                 if not Success then begin
+                    if StopOnErrorVar then
+                        exit;
                     if GenJournalLine.FindSet() then
                         repeat
                             GenJournalLine.Mark(true); //marking entries that need to be deleted
@@ -762,7 +786,7 @@
         exit(POSEntryWithError.IsEmpty());
     end;
 
-    local procedure CheckGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"): Boolean
+    local procedure CheckGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry"; var ErrorText: Text): Boolean
     var
         DifferenceAmount: Decimal;
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -773,8 +797,6 @@
             if Abs(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)" then begin
                 POSPostingProfile.TestField("POS Posting Diff. Account");
                 ErrorText := StrSubstNo(TextImbalance, GenJournalLine.FieldCaption("Document No."), GenJournalLine."Document No.", GenJournalLine.FieldCaption("Posting Date"), GenJournalLine."Posting Date", DifferenceAmount);
-                if (StopOnErrorVar) then
-                    Error(ErrorText);
                 exit(false);
             end;
         end;
@@ -840,9 +862,9 @@
 
     internal procedure SetPostingDate(NewReplacePostingDate: Boolean; NewReplaceDocumentDate: Boolean; NewPostingDate: Date)
     begin
-        PostingDateExists := true;
-        ReplaceDocumentDate := NewReplaceDocumentDate;
-        ReplaceDocumentDate := NewReplacePostingDate;
+        _ReplaceDates := true;
+        _ReplaceDocumentDate := NewReplaceDocumentDate;
+        _ReplacePostingDate := NewReplacePostingDate;
         _PostingDate := NewPostingDate;
     end;
 
@@ -1163,8 +1185,8 @@
         POSPostingLog."Last POS Entry No. at Posting" := LastPOSEntry."Entry No.";
         POSPostingLog."Posting Type" := PostingType;
         POSPostingLog."Parameter Posting Date" := _PostingDate;
-        POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
-        POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
+        POSPostingLog."Parameter Replace Posting Date" := _ReplacePostingDate;
+        POSPostingLog."Parameter Replace Doc. Date" := _ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
         POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
         POSPostingLog."Parameter Post Sales Documents" := PostSalesDocumentsVar;
@@ -1178,18 +1200,13 @@
         exit(POSPostingLog."Entry No.");
     end;
 
-    local procedure UpdatePOSPostingLogEntry(POSPostingLogEntryNo: Integer; WithError: Boolean)
+    local procedure UpdatePOSPostingLogEntry(POSPostingLogEntryNo: Integer; WithError: Boolean; ErrorText: Text)
     var
         POSPostingLog: Record "NPR POS Posting Log";
     begin
         POSPostingLog.Get(POSPostingLogEntryNo);
-        if WithError then begin
-            POSPostingLog."With Error" := true;
-            POSPostingLog."Error Description" := CopyStr(ErrorText, 1, MaxStrLen(POSPostingLog."Error Description"));
-        end else begin
-            POSPostingLog."With Error" := false;
-            POSPostingLog."Error Description" := '';
-        end;
+        POSPostingLog."With Error" := WithError;
+        POSPostingLog."Error Description" := CopyStr(ErrorText, 1, MaxStrLen(POSPostingLog."Error Description"));
         POSPostingLog."Posting Duration" := CurrentDateTime - POSPostingLog."Posting Timestamp";
         POSPostingLog.Modify(true);
     end;
@@ -1207,8 +1224,8 @@
         POSPostingLog."POS Entry View" := CopyStr(POSEntry.GetView(), 1, MaxStrLen(POSPostingLog."POS Entry View"));
         POSPostingLog."Posting Type" := PostingType;
         POSPostingLog."Parameter Posting Date" := _PostingDate;
-        POSPostingLog."Parameter Replace Posting Date" := ReplacePostingDate;
-        POSPostingLog."Parameter Replace Doc. Date" := ReplaceDocumentDate;
+        POSPostingLog."Parameter Replace Posting Date" := _ReplacePostingDate;
+        POSPostingLog."Parameter Replace Doc. Date" := _ReplaceDocumentDate;
         POSPostingLog."Parameter Post Item Entries" := PostItemEntriesVar;
         POSPostingLog."Parameter Post POS Entries" := PostPOSEntriesVar;
         POSPostingLog."Parameter Post Sales Documents" := PostSalesDocumentsVar;
