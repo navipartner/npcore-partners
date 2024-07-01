@@ -84,6 +84,22 @@ codeunit 6184788 "NPR NO EoD Report Statistics"
         exit(EoDReportStatistics.GetPOSAuditLogCount(SalespersonPurchaserCode, POSUnitNo, CurrentZReportDateTime, PreviousZReportDateTime, ActionType));
     end;
 
+    procedure LoginDateAndSalesPersonName(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; FirstLoginDatetime: DateTime; var PrintTxt2: Text; var PrintTxt3: Text)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+
+    begin
+        POSAuditLog.SetRange(SystemCreatedAt, FirstLoginDatetime, POSWorkshiftCheckpoint.SystemCreatedAt);
+        POSAuditLog.SetRange("Active POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
+        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::SIGN_IN);
+        if POSAuditLog.FindFirst() then begin
+            PrintTxt2 := Format(POSAuditLog.SystemCreatedAt);
+            if SalespersonPurchaser.Get(POSAuditLog."Active Salesperson Code") then
+                PrintTxt3 := SalespersonPurchaser.Name;
+        end;
+    end;
+
+    [Obsolete('This procedure is not used anymore.', 'NPR36.0')]
     procedure GetPOSAuditLogSystemCreatedAt(POSUnitNo: Code[20]; ActionType: Option): DateTime
     begin
         POSAuditLog.SetLoadFields(SystemCreatedAt);
@@ -94,6 +110,7 @@ codeunit 6184788 "NPR NO EoD Report Statistics"
         exit(0DT);
     end;
 
+    [Obsolete('This procedure is not used anymore.', 'NPR36.0')]
     procedure GetPOSAuditLOGActiveSalespersonCode(POSUnitNo: Code[20]; ActionType: Option): Code[20]
     begin
         POSAuditLog.SetLoadFields("Active Salesperson Code");
@@ -103,4 +120,5 @@ codeunit 6184788 "NPR NO EoD Report Statistics"
             exit(POSAuditLog."Active Salesperson Code");
         exit('');
     end;
+
 }
