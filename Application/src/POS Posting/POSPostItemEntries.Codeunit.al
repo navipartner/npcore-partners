@@ -13,17 +13,8 @@
         OnBeforePostPOSEntry(Rec);
 
         POSEntry := Rec;
-        if not PostToEntries(POSEntry) then
-            exit;
 
-        if PostingDateExists and (ReplacePostingDate or (POSEntry."Posting Date" = 0D)) then begin
-            POSEntry."Posting Date" := PostingDate;
-            POSEntry.Validate("Currency Code");
-        end;
-
-        if PostingDateExists and (ReplaceDocumentDate or (POSEntry."Document Date" = 0D)) then
-            POSEntry.Validate("Document Date", PostingDate);
-
+        UpdateDates(POSEntry);
         if GenJnlCheckLine.DateNotAllowed(POSEntry."Posting Date") then
             POSEntry.FieldError("Posting Date", TextDateNotAllowed);
         if POSEntry."Post Item Entry Status" = POSEntry."Post Entry Status"::Posted then
@@ -51,20 +42,20 @@
 
     var
         Location: Record Location;
-        PostingDate: Date;
-        PostingDateExists: Boolean;
-        ReplacePostingDate: Boolean;
-        ReplaceDocumentDate: Boolean;
+        _PostingDate: Date;
+        _ReplaceDates: Boolean;
+        _ReplacePostingDate: Boolean;
+        _ReplaceDocumentDate: Boolean;
         TextCustomerBlocked: Label 'Customer is blocked.';
         TextDateNotAllowed: Label 'is not within your range of allowed posting dates.';
         TextAllreadyPosted: Label 'Item Ledger Entries allready posted for POS Entry %1.';
 
     procedure SetPostingDate(NewReplacePostingDate: Boolean; NewReplaceDocumentDate: Boolean; NewPostingDate: Date)
     begin
-        PostingDateExists := true;
-        ReplacePostingDate := NewReplacePostingDate;
-        ReplaceDocumentDate := NewReplaceDocumentDate;
-        PostingDate := NewPostingDate;
+        _ReplaceDates := true;
+        _ReplacePostingDate := NewReplacePostingDate;
+        _ReplaceDocumentDate := NewReplaceDocumentDate;
+        _PostingDate := NewPostingDate;
     end;
 
     local procedure CheckPostingrestrictions(POSEntryToCheck: Record "NPR POS Entry")
@@ -104,8 +95,11 @@
         ItemJnlLine.Init();
         ItemJnlLine."Posting Date" := POSEntry."Posting Date";
         ItemJnlLine."Document Date" := POSEntry."Document Date";
-        ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
-        if (ItemJnlLine."Document No." = '') then
+        if (POSPostingProfile."Item Ledger Document No." = POSPostingProfile."Item Ledger Document No."::"POS Period Register") and
+           (POSPeriodRegister."Document No." <> '')
+        then
+            ItemJnlLine."Document No." := POSPeriodRegister."Document No."
+        else
             ItemJnlLine."Document No." := POSEntry."Document No.";
         ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
         ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
@@ -266,16 +260,6 @@
         ReservationEntry.Insert();
     end;
 
-    local procedure PostToEntries(POSEntry: Record "NPR POS Entry"): Boolean
-    var
-        POSStore: Record "NPR POS Store";
-    begin
-        POSStore.Get(POSEntry."POS Store Code");
-        if POSStore."Item Posting" in [POSStore."Item Posting"::"Post on Close Register", POSStore."Item Posting"::"Post On Finalize Sale"] then
-            exit(true);
-        exit(false);
-    end;
-
     local procedure ShouldPostWhseJnlLine(POSSalesLine: Record "NPR POS Entry Sales Line") Result: Boolean
     var
         IsHandled: Boolean;
@@ -353,17 +337,16 @@
         WhseTrackingSpecification.DeleteAll();
     end;
 
-    local procedure CheckAndCreateAssemblyOrder(FailOnError: Boolean; POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line"): Boolean
+    local procedure CreateAssemblyOrder(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line")
     var
         AssemblyHeader: Record "Assembly Header";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
-        AssemblyPost: Codeunit "Assembly-Post";
         CreateAssembly: Boolean;
         CreateAssemblyLink: Boolean;
         AssemblyHeaderLbl: Label '%1: %2 - %3', Locked = true;
     begin
         if not IsAsmToOrderRequired(POSSalesLine) then
-            exit(true);
+            exit;
 
         CreateAssembly := true;
         CreateAssemblyLink := true;
@@ -371,22 +354,20 @@
         POSEntrySalesDocLink.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
         POSEntrySalesDocLink.SetFilter("POS Entry Reference Type", '=%1', POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
         POSEntrySalesDocLink.SetFilter("POS Entry Reference Line No.", '=%1', POSSalesLine."Line No.");
+        POSEntrySalesDocLink.SetFilter("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER);
+        if (not POSEntrySalesDocLink.IsEmpty()) then
+            exit; // assembly was already posted for this line
+
         POSEntrySalesDocLink.SetFilter("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::ASSEMBLY_ORDER);
         if (POSEntrySalesDocLink.FindFirst()) then begin
             CreateAssemblyLink := false;
             CreateAssembly := (not AssemblyHeader.Get(AssemblyHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No"));
-
-        end else begin
-            POSEntrySalesDocLink.SetFilter("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER);
-            if (not POSEntrySalesDocLink.IsEmpty()) then
-                exit(true); // assembly was already posted for this line
         end;
 
         if (CreateAssembly) then begin
             AssemblyHeader.Init();
             AssemblyHeader.Validate("Document Type", AssemblyHeader."Document Type"::Order);
             AssemblyHeader.Insert(true);
-            Commit();
 
             AssemblyHeader.Validate("Posting Date", POSEntry."Posting Date");
             AssemblyHeader.Validate("Item No.", POSSalesLine."No.");
@@ -414,25 +395,37 @@
                 POSEntrySalesDocLink.Insert();
             end;
         end;
-
-        // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();
         Commit();
+    end;
+
+    local procedure PostAssemblyOrder(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line")
+    var
+        AssemblyHeader: Record "Assembly Header";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        AssemblyPost: Codeunit "Assembly-Post";
+    begin
+        if not IsAsmToOrderRequired(POSSalesLine) then
+            exit;
+
+        POSEntrySalesDocLink.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetFilter("POS Entry Reference Type", '=%1', POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
+        POSEntrySalesDocLink.SetFilter("POS Entry Reference Line No.", '=%1', POSSalesLine."Line No.");
+        POSEntrySalesDocLink.SetFilter("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER);
+        if (not POSEntrySalesDocLink.IsEmpty()) then
+            exit; // assembly was already posted for this line
+
+        POSEntrySalesDocLink.SetFilter("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::ASSEMBLY_ORDER);
+        POSEntrySalesDocLink.FindFirst();
+        AssemblyHeader.Get(AssemblyHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No");
 
         AssemblyPost.SetSuppressCommit(true);
-        if (AssemblyPost.Run(AssemblyHeader)) then begin
-            POSEntrySalesDocLink.Delete();
-            POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER;
-            if (AssemblyHeader."Posting No." <> '') then
-                POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."Posting No.";
-            if (not POSEntrySalesDocLink.Insert()) then;
-            Commit();
-            exit(true);
-        end;
+        AssemblyPost.Run(AssemblyHeader);
 
-        if (FailOnError) then
-            Error(GetLastErrorText);
-
-        exit(false);
+        POSEntrySalesDocLink.Delete();
+        POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER;
+        if (AssemblyHeader."Posting No." <> '') then
+            POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."Posting No.";
+        if (not POSEntrySalesDocLink.Insert()) then;
     end;
 
     local procedure CreateDeleteServiceItem(POSEntry: Record "NPR POS Entry"; POSSalesLine: Record "NPR POS Entry Sales Line")
@@ -442,26 +435,38 @@
         CreateServiceItem.CreateDeleteServiceItem(POSEntry, POSSalesLine);
     end;
 
-    procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry"; FailOnError: Boolean): Boolean
+    procedure CreateAssemblyOrders(POSEntry: Record "NPR POS Entry")
     var
         POSSalesLine: Record "NPR POS Entry Sales Line";
     begin
-        if not PostToEntries(POSEntry) then
-            exit;
+        Asm_FilterPOSSalesLine(POSEntry, POSSalesLine);
+        if POSSalesLine.FindSet() then
+            repeat
+                // Assembly order creation is committed
+                CreateAssemblyOrder(POSEntry, POSSalesLine);
+            until (POSSalesLine.Next() = 0);
+    end;
+
+    procedure PostAssemblyOrders(POSEntry: Record "NPR POS Entry")
+    var
+        POSSalesLine: Record "NPR POS Entry Sales Line";
+    begin
+        Asm_FilterPOSSalesLine(POSEntry, POSSalesLine);
+        if POSSalesLine.FindSet() then
+            repeat
+                PostAssemblyOrder(POSEntry, POSSalesLine);
+            until (POSSalesLine.Next() = 0);
+    end;
+
+    local procedure Asm_FilterPOSSalesLine(var POSEntry: Record "NPR POS Entry"; var POSSalesLine: Record "NPR POS Entry Sales Line")
+    begin
+        UpdateDates(POSEntry);
 
         POSSalesLine.Reset();
         POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
         POSSalesLine.SetFilter(Quantity, '>%1', 0);
         POSSalesLine.SetRange("Exclude from Posting", false);
-        if POSSalesLine.FindSet() then
-            repeat
-                // Assembly posting does alot of commits in posting codeunit 900
-                if (not CheckAndCreateAssemblyOrder(FailOnError, POSEntry, POSSalesLine)) then
-                    exit(false);
-            until (POSSalesLine.Next() = 0);
-
-        exit(true);
     end;
 
     local procedure IsAsmToOrderRequired(POSSalesLine: Record "NPR POS Entry Sales Line"): Boolean
@@ -496,6 +501,18 @@
         exit(
             (Item."Replenishment System" = Item."Replenishment System"::Assembly) and
             (Item."Assembly Policy" = Item."Assembly Policy"::"Assemble-to-Order"));
+    end;
+
+    local procedure UpdateDates(var POSEntry: Record "NPR POS Entry")
+    begin
+        if not _ReplaceDates or (_PostingDate = 0D) then
+            exit;
+        if _ReplacePostingDate or (POSEntry."Posting Date" = 0D) then begin
+            POSEntry."Posting Date" := _PostingDate;
+            POSEntry.Validate("Currency Code");
+        end;
+        if _ReplaceDocumentDate or (POSEntry."Document Date" = 0D) then
+            POSEntry.Validate("Document Date", _PostingDate);
     end;
 
 #IF NOT (BC17 or BC18 or BC19 or BC20)

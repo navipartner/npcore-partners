@@ -165,13 +165,13 @@
         POSEntry."Sales Document No." := SalesHeader."No.";
 
         if AsyncPosting then begin
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntry, SalesHeader."Document Type", SalesHeader."No.", ReadyToBePosted(SalesHeader), Print, Send, Pdf2Nav);
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReferenceAsyncPosting(POSEntry."Entry No.", SalesHeader."Document Type", SalesHeader."No.", ReadyToBePosted(SalesHeader), Print, Send, Pdf2Nav);
             if POSAsyncPosting.ReadyToBePosted(SalesHeader) then begin
                 POSEntry."Post Sales Document Status" := POSEntry."Post Sales Document Status"::Unposted;
                 POSAsyncPosting.InsertPOSEntrySalesLineHeaderRelation(POSEntry, SalesHeader);
             end;
         end else
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, SalesHeader."Document Type", SalesHeader."No.");
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", SalesHeader."Document Type", SalesHeader."No.");
 
         if Posted then
             SetPostedSalesDocInfo(POSEntry, SalesHeader);
@@ -1539,7 +1539,7 @@
                     end;
             end;
 
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
             if POSEntry.Description = '' then
                 POSEntry.Description := StrSubstNo(POSEntryDescLbl, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
@@ -1547,13 +1547,13 @@
         if SalesHeader.Ship then begin
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::SHIPMENT;
             PostedDocumentNo := SalesHeader."Last Shipping No.";
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
         if SalesHeader.Receive then begin
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT;
             PostedDocumentNo := SalesHeader."Last Return Receipt No.";
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
         if POSEntry.Description = '' then
