@@ -3,7 +3,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
                 tabledata "Value Entry" = rimd,
-                tabledata "Item Ledger Entry" = rimd;
+                tabledata "Item Ledger Entry" = rimd,
+                tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Transfer Recieve Posting Behaviour
@@ -18,7 +19,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if TempTransferLine.IsEmpty() then
             exit;
 
-        if (not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
+        if(not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
             PostAdditionalRetailEntries(TransferReceiptHeader);
     end;
 

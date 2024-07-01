@@ -3,7 +3,8 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
                 tabledata "Value Entry" = rimd,
-                tabledata "Item Ledger Entry" = rimd;
+                tabledata "Item Ledger Entry" = rimd,
+                tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
     #region Eventsubscribers - RS Undo Transfer Shipment Posting Behaviour
