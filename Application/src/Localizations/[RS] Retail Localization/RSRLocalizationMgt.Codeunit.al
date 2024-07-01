@@ -1,6 +1,8 @@
 codeunit 6151490 "NPR RS R Localization Mgt."
 {
     Access = Internal;
+    Permissions = tabledata "G/L Register" = rimd;
+
     internal procedure IsRSLocalizationActive(): Boolean
     var
         RSRetLocalizationSetup: Record "NPR RS R Localization Setup";

@@ -3,7 +3,8 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
                   tabledata "Item Ledger Entry" = rimd,
-                  tabledata "Value Entry" = rimd;
+                  tabledata "Value Entry" = rimd,
+                  tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Purchase Posting Behaviour
