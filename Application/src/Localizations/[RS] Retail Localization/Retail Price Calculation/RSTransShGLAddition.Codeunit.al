@@ -3,7 +3,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     Access = Internal;
     Permissions = tabledata "G/L Entry" = rimd,
                 tabledata "Value Entry" = rimd,
-                tabledata "Item Ledger Entry" = rimd;
+                tabledata "Item Ledger Entry" = rimd,
+                tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
     #region Eventsubscribers - RS Transfer Shipment Posting Behaviour
@@ -26,7 +27,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TempTransferLine.FindSet();
         repeat
             FindPriceListLine(TransferHeader."Transfer-from Code");
-            PostTransitValueEntry(TransferHeader);
+        PostTransitValueEntry(TransferHeader);
         until TempTransferLine.Next() = 0;
     end;
     #endregion
