@@ -58,7 +58,8 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
         FiskalyAPI.CreatePOSSaleDigitalReceiptEntry(TempPOSSaleDigitalReceiptEntry);
 
         DigitalReceiptLink := TempPOSSaleDigitalReceiptEntry."QR Code Link";
-        FooterText := SetFooterText();
+        if FooterText = '' then
+            FooterText := SetFooterText();
     end;
 
     internal procedure SetFooterText() FooterText: Text
