@@ -483,6 +483,7 @@
     var
         POSEntry: Record "NPR POS Entry";
         POSBalancingLine: Record "NPR POS Balancing Line";
+        POSPaymentBinCheckp: Record "NPR POS Payment Bin Checkp.";
         POSPostingSetup: Record "NPR POS Posting Setup";
         POSPostingSetupNewBin: Record "NPR POS Posting Setup";
         POSBin: Record "NPR POS Payment Bin";
@@ -502,14 +503,17 @@
                 POSBalancingLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                 if POSBalancingLine.FindSet() then
                     repeat
-
                         SuppressPosting := false;
                         if (POSBin.Get(POSBalancingLine."Deposit-To Bin Code")) then
                             if (POSBin."Bin Type" = POSBin."Bin Type"::VIRTUAL) then
                                 SuppressPosting := POSBin."Suppress EOD Posting";
 
-                        if (not SuppressPosting) then begin
+                        if not SuppressPosting then
+                            if POSPaymentBinCheckp.Get(POSBalancingLine."POS Bin Checkpoint Entry No.") then
+                                if POSPaymentBinCheckp.Type = POSPaymentBinCheckp.Type::TRANSFER then
+                                    SuppressPosting := (POSBalancingLine."Move-To Bin Amount" = 0) and (POSBalancingLine."Deposit-To Bin Amount" = 0);
 
+                        if (not SuppressPosting) then begin
                             TotalLineAmountLCY := 0;
                             GetPostingSetupFromBalancingLine(POSBalancingLine, POSPostingSetup);
                             POSPostingSetup.TestField("Account No.");
