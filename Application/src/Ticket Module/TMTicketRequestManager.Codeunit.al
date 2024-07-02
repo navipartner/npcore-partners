@@ -42,19 +42,11 @@
         MessageTextLbl: Label '%1: (%2)', Locked = true;
     begin
 
-        case Source of
-            'MakeTicketReservation': // Test show not to lock at this point in time.
-                DurationMs := -1;
-
-            else begin
-                StartTime := Time();
-                TMTicket.LockTable(true);
-                if (TMTicket.FindFirst()) then;
-                EndTime := Time();
-                DurationMs := EndTime - StartTime;
-            end;
-        end;
-
+        StartTime := Time();
+        TMTicket.LockTable(true);
+        if (TMTicket.FindFirst()) then;
+        EndTime := Time();
+        DurationMs := EndTime - StartTime;
 
         if (not ActiveSession.Get(ServiceInstanceId(), SessionId())) then
             Clear(ActiveSession);
@@ -883,11 +875,12 @@
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
     begin
 
-        // Perforance enhancement
+        // Performance enhancement
         TicketReservationRequest.SetCurrentKey("Request Status");
         TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
         if (not TicketReservationRequest.IsEmpty()) then begin
+            LockResources('ExpireReservationRequests-1');
             if (TicketReservationRequest.FindSet()) then begin
                 repeat
                     DeleteReservationRequest(TicketReservationRequest."Session Token ID", false);
@@ -905,7 +898,7 @@
                 until (TicketReservationRequest.Next() = 0);
 
                 Commit();
-                LockResources('ExpireReservationRequests-1');
+                LockResources('ExpireReservationRequests-1a');
             end;
         end;
 
@@ -913,14 +906,15 @@
         TicketReservationRequest.SetCurrentKey("Request Status");
         TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
-        if (TicketReservationRequest.FindFirst()) then begin
+        if (not TicketReservationRequest.IsEmpty()) then begin
+            LockResources('ExpireReservationRequests-2');
             if (TicketReservationRequest.FindSet()) then begin
                 repeat
                     DeleteReservationRequest(TicketReservationRequest."Session Token ID", true);
                 until (TicketReservationRequest.Next() = 0);
 
                 Commit();
-                LockResources('ExpireReservationRequests-2');
+                LockResources('ExpireReservationRequests-2a');
             end;
         end;
     end;
