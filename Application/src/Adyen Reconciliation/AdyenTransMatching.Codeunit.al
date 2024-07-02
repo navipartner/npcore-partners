@@ -1121,8 +1121,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Interchange (LCY)" := Round(_CurrExchRate.ExchangeAmtFCYToLCY(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code", ReconciliationLine."Interchange (NC)", _CurrExchRate.ExchangeRate(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code")));
         if ReconciliationLine."Other Commissions (NC)" <> 0 then
             ReconciliationLine."Other Commissions (LCY)" := Round(_CurrExchRate.ExchangeAmtFCYToLCY(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code", ReconciliationLine."Other Commissions (NC)", _CurrExchRate.ExchangeRate(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code")));
-
-        ReconciliationLine.Modify();
     end;
 
     local procedure CopyAACtoLCYAmounts(var ReconciliationLine: Record "NPR Adyen Recon. Line")

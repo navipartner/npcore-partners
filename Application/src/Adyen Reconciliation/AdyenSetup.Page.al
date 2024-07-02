@@ -153,6 +153,8 @@ page 6184531 "NPR Adyen Setup"
         Rec.Reset();
         if not Rec.Get() then begin
             Rec.Init();
+            if not EnvironmentInformation.IsSandbox() then
+                Rec."Environment Type" := Rec."Environment Type"::Live;
             Rec.Insert();
         end else
             if Rec."Company ID" = '' then begin
