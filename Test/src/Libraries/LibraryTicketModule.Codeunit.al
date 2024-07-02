@@ -304,6 +304,11 @@ codeunit 85011 "NPR Library - Ticket Module"
     end;
 
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
+    begin
+        exit(CreateItem('', VariantCode, TicketTypeCode, UnitPrice));
+    end;
+
+    procedure CreateItem(ItemCode: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
@@ -311,12 +316,21 @@ codeunit 85011 "NPR Library - Ticket Module"
         LibraryInventory: Codeunit "NPR Library - Inventory";
         VatPostingSetup: Record "VAT Posting Setup";
     begin
-        LibraryInventory.CreateItem(TicketItem);
+
+        if (not TicketItem.Get(ItemCode)) then begin
+            LibraryInventory.CreateItem(TicketItem);
+
+            if (ItemCode <> '') then begin
+                TicketItem."No." := ItemCode;
+                if (TicketItem.Insert()) then
+                    TicketItem.Get(ItemCode);
+            end;
+        end;
 
         TicketItem."Unit Price" := UnitPrice;
         TicketItem.Blocked := false;
         TicketItem."NPR Group sale" := false;
-        TicketItem.VALIDATE("NPR Ticket Type", TicketTypeCode);
+        TicketItem.Validate("NPR Ticket Type", TicketTypeCode);
 
         VatPostingSetup.SetFilter("VAT Bus. Posting Group", '<>%1', '');
         VatPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', TicketItem."VAT Prod. Posting Group");
@@ -337,7 +351,7 @@ codeunit 85011 "NPR Library - Ticket Module"
             ItemVariant.Modify();
         end;
 
-        ItemReference.INIT();
+        ItemReference.Init();
         ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
         ItemReference.SetFilter("Reference No.", '=%1', StrSubstNo('IXRF-%1', TicketItem."No."));
         if (VariantCode <> '') then
@@ -358,7 +372,9 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(TicketItem."No.");
     end;
 
-    internal procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Enum "NPR TM CapacityLimit"; DefaultSchedule: Option; AdmissionBaseCalendarCode: Code[10]; TicketBaseCalendarCode: Code[10]): code[20]
+    internal procedure CreateAdmissionCode(AdmissionCode: Code[20]; AdmissionType: Option; CapacityLimit: Enum "NPR TM CapacityLimit"; DefaultSchedule: Option;
+                                                                                                              AdmissionBaseCalendarCode: Code[10];
+                                                                                                              TicketBaseCalendarCode: Code[10]): code[20]
     var
         Admission: Record "NPR TM Admission";
     begin
@@ -407,7 +423,8 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(AdmissionCode);
     end;
 
-    procedure CreateTicketType(TicketTypeCode: Code[10]; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Enum "NPR TM ActivationMethod_Type"; EntryValidation: Option; ConfigurationSource: Option): Code[10]
+    procedure CreateTicketType(TicketTypeCode: Code[10]; DurationFormula: Text[30]; MaxNumberOfEntries: Integer; AdmissionRegistration: Option; ActivationMethod: Enum "NPR TM ActivationMethod_Type"; EntryValidation: Option;
+                                                                                                                                                                      ConfigurationSource: Option): Code[10]
     var
         TicketType: Record "NPR TM Ticket Type";
     begin
@@ -578,7 +595,8 @@ codeunit 85011 "NPR Library - Ticket Module"
         TicketBom.Modify();
     end;
 
-    procedure CreateTicketBOMDynamic(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Enum "NPR TM ActivationMethod_Bom"; EntryValidation: Option; AdmissionInclusion: Option)
+    procedure CreateTicketBOMDynamic(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; TicketBaseCalendarCode: Code[10]; Quantity: Integer; Default: Boolean; DurationFormula: Text[30]; MaxNoOfEntries: Integer; ActivationMethod: Enum "NPR TM ActivationMethod_Bom"; EntryValidation: Option;
+                                                                                                                                                                                                                                                        AdmissionInclusion: Option)
     var
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
