@@ -64,9 +64,11 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
 
     internal procedure SetFooterText() FooterText: Text
     var
-        FooterTextLabel: Label '<div style="text-align: center; margin-top: 10px">By using the digital receipt you agree to Fiskaly''s <a href="https://www.fiskaly.com/legal-terms-of-use" target="_blank">terms</a> and conditions.</div>', Locked = true;
+        FooterTextPlaceholderLabel: Label '<div style="text-align: center; margin-top: 10px">%1<a href="https://www.fiskaly.com/legal-terms-of-use" target="_blank">%2</a>%3</div>', Comment = '%1 - Main text placeholder, %2 - Terms placeholder, %3 - Conditons placeholder', Locked = true;
+        FooterTextLbl: Label 'By using the digital receipt you agree to Fiskaly''s ';
+        FooterTermsLbl: Label 'terms';
+        FooterConditionsLbl: Label ' and conditions.';
     begin
-        FooterText := FooterTextLabel;
+        FooterText := StrSubstNo(FooterTextPlaceholderLabel, FooterTextLbl, FooterTermsLbl, FooterConditionsLbl);
     end;
-
 }
