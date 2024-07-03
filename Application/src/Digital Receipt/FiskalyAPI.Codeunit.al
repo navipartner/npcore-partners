@@ -285,6 +285,7 @@ codeunit 6184663 "NPR Fiskaly API"
         POSPaymentMethod: Record "NPR POS Payment Method";
         PaymentTypeJsonObject: JsonObject;
         PaymentTransactionDetailsObject: JsonObject;
+        CashPaymentLbl: Label 'CASH', Locked = true;
         OtherPaymentLbl: Label 'OTHER', Locked = true;
     begin
         PaymentAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
@@ -298,7 +299,7 @@ codeunit 6184663 "NPR Fiskaly API"
                 if POSPaymentMethod.Get(PaymentAmountLine."POS Payment Method Code") then;
                 case POSPaymentMethod."Processing Type" of
                     Enum::"NPR Payment Processing Type"::CASH:
-                        PaymentTypeJsonObject.Add('name', Format(POSPaymentMethod."Processing Type").ToUpper());
+                        PaymentTypeJsonObject.Add('name', CashPaymentLbl);
                     Enum::"NPR Payment Processing Type"::EFT:
                         CreateEFTPaymentInformation(POSEntry, PaymentAmountLine, PaymentTypeJsonObject, PaymentTransactionDetailsObject);
                     else
