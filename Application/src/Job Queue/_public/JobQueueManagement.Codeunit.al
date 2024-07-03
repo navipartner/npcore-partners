@@ -514,7 +514,7 @@
             JobQueueDescrLbl,
             NowWithDelayInSeconds(360),
             230000T,
-            000000T,
+            235959T,
             NextRunDateFormula,
             CreateAndAssignJobQueueCategory(),
             JobQueueEntry)
