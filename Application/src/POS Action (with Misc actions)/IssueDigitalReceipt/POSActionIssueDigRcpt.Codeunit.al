@@ -33,6 +33,7 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
         FooterText: Text;
         SalesTicketNoText: Text;
         TimeoutIntervalSec: Integer;
+        ScanReceiptText: Label 'Scan your receipt';
     begin
         if not Context.GetStringParameter('salesTicketNo', SalesTicketNoText) then
             Clear(SalesTicketNoText);
@@ -51,13 +52,14 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
         Response.Add('footerText', FooterText);
         Response.Add('digitalReceiptLink', DigitalReceiptLink);
         Response.Add('timeoutIntervalSec', TimeoutIntervalSec);
+        Response.Add('scanReceiptText', ScanReceiptText);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionIssueDigRcpt.js###
-'let main=async({workflow:t})=>{debugger;let{digitalReceiptLink:e,footerText:a,timeoutIntervalSec:i}=await t.respond();e&&await popup.qr({caption:a,qrData:e,timeoutInSeconds:i},"Scan your receipt")};'
+'let main=async({workflow:t})=>{debugger;let{digitalReceiptLink:e,footerText:a,timeoutIntervalSec:i,scanReceiptText:n}=await t.respond();e&&await popup.qr({caption:a,qrData:e,timeoutInSeconds:i},n)};'
         );
     end;
 }

@@ -1,6 +1,6 @@
 let main = async ({ workflow }) => {
   debugger;
-  let { digitalReceiptLink, footerText, timeoutIntervalSec } = await workflow.respond();
+  let { digitalReceiptLink, footerText, timeoutIntervalSec, scanReceiptText } = await workflow.respond();
   if (digitalReceiptLink) {
     await popup.qr(
       {
@@ -8,7 +8,7 @@ let main = async ({ workflow }) => {
         qrData: digitalReceiptLink,
         timeoutInSeconds: timeoutIntervalSec
       },
-      "Scan your receipt"
+      scanReceiptText
     );
   };
 };
