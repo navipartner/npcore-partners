@@ -3,6 +3,7 @@ page 6184584 "NPR AT Organization List"
     ApplicationArea = NPRATFiscal;
     Caption = 'AT Organizations';
     CardPageId = "NPR AT Organization Card";
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Editable = false;
     Extensible = false;
     PageType = List;

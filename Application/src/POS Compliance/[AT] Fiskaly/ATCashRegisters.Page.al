@@ -2,6 +2,7 @@ page 6184596 "NPR AT Cash Registers"
 {
     ApplicationArea = NPRATFiscal;
     Caption = 'AT Cash Registers';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR AT Cash Register";

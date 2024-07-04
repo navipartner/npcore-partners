@@ -2,6 +2,7 @@ page 6184633 "NPR AT POS Payment Method Map"
 {
     ApplicationArea = NPRATFiscal;
     Caption = 'AT POS Payment Method Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR AT POS Payment Method Map";

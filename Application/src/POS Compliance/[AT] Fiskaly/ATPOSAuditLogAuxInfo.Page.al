@@ -2,6 +2,7 @@ page 6184638 "NPR AT POS Audit Log Aux. Info"
 {
     ApplicationArea = NPRATFiscal;
     Caption = 'AT POS Audit Log Aux. Info';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Editable = false;
     Extensible = false;
     PageType = List;

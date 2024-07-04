@@ -2,6 +2,7 @@ page 6184578 "NPR AT Fiscalization Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'AT Fiscalization Setup';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     DeleteAllowed = false;
     Extensible = false;
     InsertAllowed = false;

@@ -2,6 +2,7 @@ page 6184632 "NPR AT VAT Posting Setup Map"
 {
     ApplicationArea = NPRATFiscal;
     Caption = 'AT VAT Posting Setup Mapping';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR AT VAT Posting Setup Map";

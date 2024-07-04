@@ -1,6 +1,7 @@
 ﻿page 6184583 "NPR AT Organization Card"
 {
     Caption = 'AT Organization Card';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Extensible = false;
     PageType = Card;
     SourceTable = "NPR AT Organization";

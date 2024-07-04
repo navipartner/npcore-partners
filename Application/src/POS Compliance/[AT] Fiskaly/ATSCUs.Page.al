@@ -2,6 +2,7 @@ page 6184589 "NPR AT SCUs"
 {
     ApplicationArea = NPRATFiscal;
     Caption = 'AT Signature Creation Units';
+    ContextSensitiveHelpPage = 'docs/fiscalization/austria/how-to/setup/';
     Extensible = false;
     PageType = List;
     SourceTable = "NPR AT SCU";
