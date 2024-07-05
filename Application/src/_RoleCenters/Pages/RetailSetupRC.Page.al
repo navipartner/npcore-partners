@@ -443,6 +443,14 @@ page 6151245 "NPR Retail Setup RC"
                     Tooltip = 'View Job Queue Entries';
                     ApplicationArea = NPRRetail;
                 }
+                action("Job Queue Refresh Setup")
+                {
+                    Caption = 'Job Queue Refresh Setup';
+                    RunObject = page "NPR Job Queue Refresh Setup";
+
+                    Tooltip = 'View Job Queue Refresh Setup';
+                    ApplicationArea = NPRRetail;
+                }
                 action("Retention Policy Setup List")
                 {
                     Caption = 'Retention Policy Setup List';
