@@ -1,0 +1,456 @@
+﻿codeunit 6014569 "NPR RegEx"
+{
+    Access = Internal;
+
+    var
+#if BC17
+        RegEx: Codeunit DotNet_Regex;
+#else
+        RegEx: Codeunit Regex;
+#endif
+
+    procedure GetSingleMatchValue(Input: Text; Pattern: Text; var Output: Text): Boolean;
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+#else
+        TempMatch: Record Matches temporary;
+#endif
+    begin
+        Clear(RegEx);
+#if BC17
+        Regex.Regex(Pattern);
+        Regex.Match(Input, Match);
+        if Match.Success() then begin
+            Output := Match.Value();
+            exit(true);
+        end;
+#else
+        Regex.Match(Input, Pattern, 0, TempMatch);
+        TempMatch.SetRange(Success, true);
+        if TempMatch.FindFirst() then begin
+            Output := TempMatch.ReadValue();
+            exit(true);
+        end;
+#endif
+        exit(false);
+    end;
+
+    procedure RegExReplaceAN(Input: Text) Output: Text
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
+#else
+        TempMatches: Record Matches temporary;
+        TempGroups: Record Groups temporary;
+#endif
+        Pattern: Text;
+        ReplaceString: Text;
+        RandomQty: Integer;
+        i: Integer;
+    begin
+        Clear(RegEx);
+        Pattern := '(?<RandomStart>\[AN\*?)' +
+                   '(?<RandomQty>\d?)' +
+                   '(?<RandomEnd>\])';
+#if BC17
+        Regex.Regex(Pattern);
+
+        Regex.Match(Input, Match);
+        while Match.Success() do begin
+            ReplaceString := '';
+            RandomQty := 1;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
+            for i := 1 to RandomQty do
+                ReplaceString += Format(GenerateRandomChar());
+            Input := Regex.Replace(Input, ReplaceString, 1);
+
+            Regex.Match(Input, Match);
+        end;
+#else
+        Regex.Match(Input, Pattern, 0, TempMatches);
+        if TempMatches.FindSet() then
+            repeat
+                if TempMatches.Success then begin
+                    TempGroups.Reset();
+                    TempGroups.DeleteAll();
+                    Regex.Groups(TempMatches, TempGroups);
+                    TempGroups.SetRange(TempGroups.Name, 'RandomQty');
+                    ReplaceString := '';
+                    RandomQty := 1;
+                    if TempGroups.FindFirst() then begin
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then;
+                        for i := 1 to RandomQty do
+                            ReplaceString += Format(GenerateRandomChar());
+                        Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
+                    end;
+                end;
+            until TempMatches.Next() = 0;
+#endif
+        Output := Input;
+    end;
+
+    procedure Replace(Input: Text; Pattern: Text; Replacement: Text; Count: Integer): Text
+    begin
+        Clear(RegEx);
+#if BC17
+        RegEx.Regex(Pattern);
+        exit(RegEx.Replace(Input, Replacement));
+#else
+        exit(RegEx.Replace(Input, Pattern, Replacement, Count));
+#endif
+    end;
+
+    procedure Replace(Input: Text; Pattern: Text; Replacement: Text): Text
+    begin
+        Clear(RegEx);
+#if BC17
+        RegEx.Regex(Pattern);
+        exit(RegEx.Replace(Input, Replacement));
+#else
+        exit(RegEx.Replace(Input, Pattern, Replacement, 1));
+#endif
+    end;
+
+    procedure IsMatch(Input: Text; Pattern: Text): Boolean
+    begin
+        exit(RegEx.IsMatch(Input, Pattern));
+    end;
+
+    procedure RegExReplaceSerialNo(Input: Text; AdditionPattern: Text; SerialNo: Text) Output: Text
+    var
+        Pattern: Text;
+    begin
+        Clear(RegEx);
+        Pattern := '(?<SerialNo>' + AdditionPattern + ')';
+#if BC17
+        RegEx.Regex(Pattern);
+        Output := RegEx.Replace(Input, SerialNo);
+#else
+        Output := RegEx.Replace(Input, Pattern, SerialNo);
+#endif
+        exit(Output);
+    end;
+
+    procedure RegExReplaceS(Input: Text; SerialNo: Text) Output: Text
+    begin
+        Output := RegExReplaceSerialNo(Input, '\[S\]', SerialNo);
+    end;
+
+    procedure RegExReplaceN(Input: Text) Output: Text
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+        GroupCollection: Codeunit DotNet_GroupCollection;
+        DotNetGroup: Codeunit DotNet_Group;
+#else
+        TempMatches: Record Matches temporary;
+        TempGroups: Record Groups temporary;
+#endif
+        Pattern: Text;
+        ReplaceString: Text;
+        RandomQty: Integer;
+        i: Integer;
+    begin
+        Pattern := '(?<RandomStart>\[N\*?)' +
+                   '(?<RandomQty>\d?)' +
+                   '(?<RandomEnd>\])';
+#if BC17
+        Regex.Regex(Pattern);
+
+        Regex.Match(Input, Match);
+        while Match.Success() do begin
+            ReplaceString := '';
+            RandomQty := 1;
+            Match.Groups(GroupCollection);
+            GroupCollection.ItemGroupName('RandomQty', DotNetGroup);
+            if Evaluate(RandomQty, Format(DotNetGroup.Value())) then;
+            for i := 1 to RandomQty do
+                ReplaceString += Format(Random(9));
+            Input := Regex.Replace(Input, ReplaceString, 1);
+
+            Regex.Match(Input, Match);
+        end;
+#else
+        Regex.Match(Input, Pattern, 1, TempMatches);
+        if TempMatches.FindSet() then
+            repeat
+                if TempMatches.Success then begin
+                    TempGroups.Reset();
+                    TempGroups.DeleteAll();
+                    Regex.Groups(TempMatches, TempGroups);
+                    TempGroups.SetRange(TempGroups.Name, 'RandomQty');
+                    if TempGroups.FindFirst() then begin
+                        RandomQty := 1;
+                        ReplaceString := '';
+                        if Evaluate(RandomQty, TempGroups.ReadValue()) then;
+                        for i := 1 to RandomQty do
+                            ReplaceString += Format(Random(9));
+                        Input := Regex.Replace(Input, Pattern, ReplaceString, 1);
+                    end;
+                end;
+            until TempMatches.Next() = 0;
+#endif
+        Output := Input;
+    end;
+
+    procedure RegExReplacePS(Input: Text; PosStoreCode: Text) Output: Text
+    begin
+        Output := RegExReplaceSerialNo(Input, '\[PS\]', PosStoreCode);
+    end;
+
+    procedure RegExReplacePU(Input: Text; PosUnitNo: Text) Output: Text
+    begin
+        Output := RegExReplaceSerialNo(Input, '\[PU\]', PosUnitNo);
+    end;
+
+    procedure RegExReplaceL(Input: Text; LineNo: Text) Output: Text
+    begin
+        Output := RegExReplaceSerialNo(Input, '\[L\]', LineNo);
+    end;
+
+    procedure RegExReplaceNL(Input: Text; NaturalLineNo: Text) Output: Text
+    begin
+        Output := RegExReplaceSerialNo(Input, '\[NL\]', NaturalLineNo);
+    end;
+
+    procedure GenerateRandomChar() RandomChar: Char
+    var
+        RandomInt: Integer;
+        AllowedChars: Text;
+    begin
+        AllowedChars := 'QWERTYUPASDFGHJKZXCVBNM';
+        RandomInt := Random(StrLen(AllowedChars));
+        RandomChar := CopyStr(AllowedChars, RandomInt, 1) [1];
+        exit(RandomChar);
+    end;
+
+    procedure FindVariables(var TempVariable: Record "NPR Smart Email Variable" temporary; CodeString: Text)
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+#else
+        TempMatch: Record Matches temporary;
+#endif
+        i: Integer;
+        OffSet: Integer;
+        VariableName: Text;
+        VariabelNameTooLongErr: Label 'Variablename %1 is longer than the max. supported lenght (%2 characters)';
+    begin
+        if CodeString = '' then
+            exit;
+        Clear(RegEx);
+#if BC17
+        RegEx.Regex('(\*\|)(.*?)(\|\*)');
+        RegEx.Match(CodeString, Match);
+        while Match.Success() do begin
+            TempVariable.Init();
+            TempVariable."Line No." := i;
+            VariableName := Match.Value();
+            VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+            if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+            TempVariable."Variable Name" := VariableName;
+# pragma warning restore
+            TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
+            TempVariable.Insert();
+            i += 1;
+            OffSet := i + 1;
+            Match.NextMatch(Match);
+        end;
+
+        RegEx.Regex('({{)(.*?)(}})');
+        RegEx.Match(CodeString, Match);
+        i := 0;
+        while Match.Success() do begin
+            TempVariable.Init();
+            TempVariable."Line No." := i + OffSet;
+            VariableName := Match.Value();
+            VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+            if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+            TempVariable."Variable Name" := VariableName;
+# pragma warning restore
+            TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
+            TempVariable.Insert();
+            i += 1;
+            Match.NextMatch(Match);
+        end;
+#else
+        Regex.Match(CodeString, '(\*\|)(.*?)(\|\*)', 1, TempMatch);
+        i := 0;
+        if TempMatch.FindSet() then
+            repeat
+                if TempMatch.Success then begin
+                    TempVariable.Init();
+                    TempVariable."Line No." := i;
+                    VariableName := TempMatch.ReadValue();
+                    VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+                    if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                        Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+                    TempVariable."Variable Name" := VariableName;
+# pragma warning restore
+                    TempVariable."Variable Type" := TempVariable."Variable Type"::Mailchimp;
+                    TempVariable.Insert();
+                    i += 1;
+                    OffSet := i + 1;
+                end;
+            until TempMatch.Next() = 0;
+
+        RegEx.Match(CodeString, '({{)(.*?)(}})', TempMatch);
+        i := 0;
+        if TempMatch.FindSet() then
+            repeat
+                if TempMatch.Success then begin
+                    TempVariable.Init();
+                    TempVariable."Line No." := i + OffSet;
+                    VariableName := TempMatch.ReadValue();
+                    VariableName := CopyStr(VariableName, 3, StrLen(VariableName) - 4);
+                    if StrLen(VariableName) > MaxStrLen(TempVariable."Variable Name") then
+                        Error(VariabelNameTooLongErr, VariableName, MaxStrLen(TempVariable."Variable Name"));
+# pragma warning disable AA0139
+                    TempVariable."Variable Name" := VariableName;
+# pragma warning restore
+                    TempVariable."Variable Type" := TempVariable."Variable Type"::Handlebars;
+                    TempVariable.Insert();
+                end;
+            until TempMatch.Next() = 0;
+#endif
+    end;
+
+    procedure MergeDataFields(TextLine: Text; var RecRef: RecordRef; ReportID: Integer; AFReportLinkTag: Text) ResultText: Text
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+#else
+        TempMatch: Record Matches temporary;
+#endif
+    begin
+        Clear(RegEx);
+        ResultText := '';
+#if BC17
+        repeat
+            RegEx.Regex('{\d+}');
+            RegEx.Match(TextLine, Match);
+            if Match.Success() then begin
+                ResultText += CopyStr(TextLine, 1, Match.Index());
+                ResultText += ConvertToValue(Match.Value(), RecRef);
+                TextLine := CopyStr(TextLine, Match.Index() + Match.Length() + 1);
+            end;
+        until not Match.Success();
+
+        ResultText += TextLine;
+        TextLine := ResultText;
+        ResultText := '';
+        repeat
+            RegEx.Regex(StrSubstNo(AFReportLinkTag, '.*?'));
+            RegEx.Match(TextLine, Match);
+            if Match.Success() then begin
+                ResultText += CopyStr(TextLine, 1, Match.Index());
+                TextLine := CopyStr(TextLine, Match.Index() + Match.Length() + 1);
+            end;
+        until not Match.Success();
+#else
+        while RegEx.IsMatch(TextLine, '{\d+}', 0) do begin
+            RegEx.Match(TextLine, '{\d+}', TempMatch);
+            if TempMatch.FindFirst() then begin
+                ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                ResultText += ConvertToValue(TempMatch.ReadValue(), RecRef);
+                TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
+            end;
+        end;
+
+        ResultText += TextLine;
+        TextLine := ResultText;
+        ResultText := '';
+        while RegEx.IsMatch(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), 0) do begin
+            RegEx.Match(TextLine, StrSubstNo(AFReportLinkTag, '.*?'), TempMatch);
+            if TempMatch.FindFirst() then begin
+                ResultText += CopyStr(TextLine, 1, TempMatch.Index);
+                TextLine := CopyStr(TextLine, TempMatch.Index + TempMatch.Length + 1);
+            end;
+        end;
+#endif
+        ResultText += TextLine;
+    end;
+
+    local procedure ConvertToValue(FieldNoText: Text; RecRef: RecordRef): Text
+    var
+        AutoFormat: Codeunit "Auto Format";
+        FldRef: FieldRef;
+        FieldNumber: Integer;
+        OptionString: Text;
+        OptionNo: Integer;
+    begin
+        if not Evaluate(FieldNumber, DelChr(FieldNoText, '<>', '{}')) then
+            exit(FieldNoText);
+        if not RecRef.FieldExist(FieldNumber) then
+            exit(FieldNoText);
+        FldRef := RecRef.Field(FieldNumber);
+        if FldRef.Class = FieldClass::FlowField then
+            FldRef.CalcField();
+
+        if FldRef.Type = FieldType::Option then begin
+            OptionString := Format(FldRef.OptionCaption);
+            Evaluate(OptionNo, Format(FldRef.Value, 0, 9));
+            exit(SelectStr(OptionNo + 1, OptionString));
+        end else
+            exit(Format(FldRef.Value, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format".FromInteger(1), '')));
+    end;
+
+    procedure ExtractMagentoPicture(DataUri: Text; PictureName: Text; PictureSize: Integer; PictureType: Integer;
+        var TempMagentoPicture: Record "NPR Magento Picture" temporary) Base64Image: Text
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+        Groups: Codeunit DotNet_GroupCollection;
+        Group1: Codeunit DotNet_Group;
+        Group2: Codeunit DotNet_Group;
+#else
+        TempMatch: Record Matches temporary;
+        TempGroups: Record Groups temporary;
+#endif
+    begin
+        Clear(RegEx);
+#if BC17
+        RegEx.Regex('data\:image/(.*?);base64,(.*)');
+        RegEx.Match(DataUri, Match);
+        if Match.Success() then begin
+            Match.Groups(Groups);
+            Groups.Item(1, Group1);
+            Groups.Item(2, Group2);
+            TempMagentoPicture.Init();
+            TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
+            TempMagentoPicture.Name := CopyStr(PictureName, 1, MaxStrLen(TempMagentoPicture.Name));
+            TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
+            TempMagentoPicture."Mime Type" := CopyStr(Group1.Value(), 1, MaxStrLen(TempMagentoPicture."Mime Type"));
+            TempMagentoPicture.Insert(false);
+            Base64Image := Group2.Value();
+        end;
+#else
+        RegEx.Match(DataUri, 'data\:image/(.*?);base64,(.*)', TempMatch);
+        if TempMatch.FindFirst() then
+            if TempMatch.Success then begin
+                TempGroups.Reset();
+                TempGroups.DeleteAll();
+                RegEx.Groups(TempMatch, TempGroups);
+                TempMagentoPicture.Init();
+                TempMagentoPicture.Type := "NPR Magento Picture Type".FromInteger(PictureType);
+                TempMagentoPicture.Name := CopyStr(PictureName, 1, MaxStrLen(TempMagentoPicture.Name));
+                TempMagentoPicture."Size (kb)" := Round(PictureSize / 1000, 1);
+                TempGroups.Get(1);
+                TempMagentoPicture."Mime Type" := CopyStr(TempGroups.ReadValue(), 1, MaxStrLen(TempMagentoPicture."Mime Type"));
+                TempGroups.Get(2);
+                Base64Image := TempGroups.ReadValue();
+                TempMagentoPicture.Insert(false);
+            end;
+#endif
+    end;
+}

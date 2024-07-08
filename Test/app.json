@@ -1,0 +1,53 @@
+{
+  "id": "51104d36-8375-4914-9e14-ee07a10ff455",
+  "name": "NP Retail Tests",
+  "publisher": "NaviPartner",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "992c2309-cca4-43cb-9e41-911f482ec088",
+      "publisher": "NaviPartner",
+      "name": "NP Retail",
+      "version": "1700.9.228.0"
+    },
+    {
+      "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
+      "publisher": "Microsoft",
+      "name": "Tests-TestLibraries",
+      "version": "17.0.16993.0"
+    },
+    {
+      "id": "40860557-a18d-42ad-aecb-22b7dd80dc80",
+      "publisher": "Microsoft",
+      "name": "Permissions Mock",
+      "version": "17.0.0.0"
+    },
+    {
+      "id": "23de40a6-dfe8-4f80-80db-d70f83ce8caf",
+      "publisher": "Microsoft",
+      "name": "Test Runner",
+      "version": "17.0.0.0"
+    }
+  ],
+  "screenshots": [],
+  "platform": "17.0.0.0",
+  "application": "17.0.0.0",
+  "idRanges": [
+    {
+      "from": 85000,
+      "to": 86000
+    }
+  ],
+  "contextSensitiveHelpUrl": "https://Test.com/help/",
+  "showMyCode": true,
+  "runtime": "6.0",
+  "keyVaultUrls": ["https://npcore.vault.azure.net/"],
+  "preprocessorSymbols": ["BC17"]
+}

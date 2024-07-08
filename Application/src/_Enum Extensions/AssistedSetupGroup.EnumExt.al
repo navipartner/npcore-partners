@@ -1,0 +1,39 @@
+enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
+{
+    value(6014400; NPRetail)
+    {
+        Caption = 'NP Retail';
+    }
+    value(6014401; NPRestaurant)
+    {
+        Caption = 'NP Restaurant';
+    }
+    value(6014402; NPRAttraction)
+    {
+        Caption = 'NP Attraction';
+    }
+    value(6014403; NPRCROFiscal)
+    {
+        Caption = 'NP CRO Fiscalization';
+    }
+    value(6014404; NPRRSFiscal)
+    {
+        Caption = 'NP RS Fiscalization';
+    }
+    value(6014405; NPRBGSISFiscal)
+    {
+        Caption = 'NP BG SIS Fiscalization';
+    }
+    value(6014406; NPRSIFiscal)
+    {
+        Caption = 'NP SI Fiscalization';
+    }
+    value(6014407; NPRITFiscal)
+    {
+        Caption = 'NP IT Fiscalization';
+    }
+    value(6014408; NPRATFiscal)
+    {
+        Caption = 'NP AT Fiscalization';
+    }
+}

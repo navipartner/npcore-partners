@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="No">
+          <DataField>No</DataField>
+        </Field>
+        <Field Name="ApplyDiscountModule">
+          <DataField>ApplyDiscountModule</DataField>
+        </Field>
+        <Field Name="ArchNo">
+          <DataField>ArchNo</DataField>
+        </Field>
+        <Field Name="CouponType">
+          <DataField>CouponType</DataField>
+        </Field>
+        <Field Name="CustomerNo">
+          <DataField>CustomerNo</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="DiscountAmountTxt">
+          <DataField>DiscountAmountTxt</DataField>
+        </Field>
+        <Field Name="DiscountAmount">
+          <DataField>DiscountAmount</DataField>
+        </Field>
+        <Field Name="DiscountAmountFormat">
+          <DataField>DiscountAmountFormat</DataField>
+        </Field>
+        <Field Name="DiscountType">
+          <DataField>DiscountType</DataField>
+        </Field>
+        <Field Name="InuseQuantity">
+          <DataField>InuseQuantity</DataField>
+        </Field>
+        <Field Name="InuseQuantityExternal">
+          <DataField>InuseQuantityExternal</DataField>
+        </Field>
+        <Field Name="IssueCouponModule">
+          <DataField>IssueCouponModule</DataField>
+        </Field>
+        <Field Name="MaxUseperSale">
+          <DataField>MaxUseperSale</DataField>
+        </Field>
+        <Field Name="MaxDiscountAmount">
+          <DataField>MaxDiscountAmount</DataField>
+        </Field>
+        <Field Name="MaxDiscountAmountFormat">
+          <DataField>MaxDiscountAmountFormat</DataField>
+        </Field>
+        <Field Name="NoSeries">
+          <DataField>NoSeries</DataField>
+        </Field>
+        <Field Name="Open">
+          <DataField>Open</DataField>
+        </Field>
+        <Field Name="POSStoreGroup">
+          <DataField>POSStoreGroup</DataField>
+        </Field>
+        <Field Name="PrintTemplateCode">
+          <DataField>PrintTemplateCode</DataField>
+        </Field>
+        <Field Name="ReferenceNo">
+          <DataField>ReferenceNo</DataField>
+        </Field>
+        <Field Name="RemainingQuantity">
+          <DataField>RemainingQuantity</DataField>
+        </Field>
+        <Field Name="RemainingQuantityFormat">
+          <DataField>RemainingQuantityFormat</DataField>
+        </Field>
+        <Field Name="ValidateCouponModule">
+          <DataField>ValidateCouponModule</DataField>
+        </Field>
+        <Field Name="StartingDate_DateFormat">
+          <DataField>StartingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="Issued_DateFormat">
+          <DataField>Issued_DateFormat</DataField>
+        </Field>
+        <Field Name="EndingDate_DateFormat">
+          <DataField>EndingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="Barcode_NpDcCoupon">
+          <DataField>Barcode_NpDcCoupon</DataField>
+        </Field>
+        <Field Name="CouponTypeDescription">
+          <DataField>CouponTypeDescription</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

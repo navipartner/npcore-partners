@@ -1,0 +1,9 @@
+#npr-imageviewer-img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: none;
+    max-width: 400px;
+    max-height: 250px;
+    object-fit: contain;
+}

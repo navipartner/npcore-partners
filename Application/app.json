@@ -1,0 +1,69 @@
+{
+  "id": "992c2309-cca4-43cb-9e41-911f482ec088",
+  "name": "NP Retail",
+  "publisher": "NaviPartner",
+  "version": "9999.9999.9999.9999",
+  "brief": "Get an all-in-one app for checkout, payments, inventory management, and reports.",
+  "description": "NP Retail is a POS solution seamlessly integrated into Business Central.",
+  "privacyStatement": "https://www.navipartner.com/privacy-cookie-policy/",
+  "EULA": "https://www.navipartner.com/wp-content/uploads/NaviPartner-license-agreement-NLA.pdf",
+  "help": "https://docs.navipartner.com/",
+  "url": "https://www.navipartner.com/pos-system/",
+  "logo": "./media/NP-small-logo.png",
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "17.0.0.0",
+  "application": "17.0.0.0",
+  "idRanges": [
+    {
+      "from": 6014400,
+      "to": 6014699
+    },
+    {
+      "from": 6059767,
+      "to": 6060166
+    },
+    {
+      "from": 6150613,
+      "to": 6151612
+    },
+    {
+      "from": 6184471,
+      "to": 6185130
+    }
+ 
+  ],
+  "internalsVisibleTo": [
+    {
+      "id": "51104d36-8375-4914-9e14-ee07a10ff455",
+      "name": "NP Retail Tests",
+      "publisher": "NaviPartner"
+    },
+    {
+      "id": "ef12bed6-ad9b-4460-b8ee-be8dc0e6fb6c",
+      "name": "NP Retail Performance Toolkit",
+      "publisher": "NaviPartner"
+    },
+    {
+      "id": "e1436b1a-ab41-4719-89c3-f3a703607dbf",
+      "name": "NP Retail Integration Test toolkit",
+      "publisher": "NaviPartner"
+    },
+    {
+      "id": "cac9b4fc-1c84-4e7d-ada8-cf5b2d7a5107",
+      "name": "DataUpgrade",
+      "publisher": "NaviPartner"
+    }
+  ],
+  "contextSensitiveHelpUrl": "https://docs.navipartner.com/",
+  "showMyCode": true,
+  "runtime": "6.0",
+  "target": "OnPrem",
+  "features": [ "TranslationFile", "NoImplicitWith" ],
+  "keyVaultUrls": ["https://npcore.vault.azure.net/"],
+  "applicationInsightsKey": "c65c1bf1-dc3d-47a1-9789-f4334605dd0c",
+  "preprocessorSymbols": [
+    "BC17",
+    "BC1700"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "hardware-connector-modal-client",
+  "version": "1.0.0",
+  "description": "Controladdin for interfacing with the hardware connector service",
+  "author": "NaviPartner",
+  "type": "module",
+  "scripts": {
+    "deploy": "npm-run-all lint vitebuild prepareprod",
+    "dev": "npm-run-all --parallel lint vite preparedev",
+    "lint": "npx eslint ./src/*",
+    "vitebuild": "vite build",
+    "preparedev": "node prepare.js dev",
+    "prepareprod": "node prepare.js prod",
+    "vite": "vite"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.49",
+    "@tsconfig/svelte": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "svelte": "^3.48.0",
+    "svelte-check": "^2.7.2",
+    "svelte-preprocess": "^4.10.7",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4",
+    "vite": "^2.9.12"
+  },
+  "dependencies": {
+    "np-hwc": "file:src/dependencies/np-hwc-1.1.8.tgz"
+  }
+}
