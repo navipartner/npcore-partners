@@ -59,10 +59,12 @@ codeunit 6151058 "NPR Job Queue User Handler"
     end;
 
     local procedure ShouldRefreshJobQueueEntries(JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup") ShouldRefresh: Boolean
+    var
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         ShouldRefresh := true;
         if JobQueueRefreshSetup."Last Refreshed" <> 0DT then
-            ShouldRefresh := DT2Date(JobQueueRefreshSetup."Last Refreshed") < Today(); // refresh should happen when the date is changed
+            ShouldRefresh := JobQueueRefreshSetup."Last Refreshed" + JobQueueManagement.MinutesToDuration(60) < CurrentDateTime();  //Refresh every hour
     end;
 
     procedure CanUserRefreshJobQueueEntries(): Boolean

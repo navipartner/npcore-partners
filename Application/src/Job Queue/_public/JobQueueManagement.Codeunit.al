@@ -298,17 +298,18 @@
         exit(true);
     end;
 
-    local procedure UpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
+    local procedure UpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         xJobQueueEntry: Record "Job Queue Entry";
     begin
         xJobQueueEntry := JobQueueEntry;
         SetJobQueueEntryParams(Parameters, JobQueueEntry);
         OnBeforeModifyUpdatedJobQueueEntry(JobQueueEntry);
-        if Format(xJobQueueEntry) <> Format(JobQueueEntry) then begin
-            JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
-            JobQueueEntry.Modify(true);
-        end;
+        if Format(xJobQueueEntry) = Format(JobQueueEntry) then
+            exit(false);
+        JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
+        JobQueueEntry.Modify(true);
+        exit(true);
     end;
 
     local procedure SetJobQueueEntryParams(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
@@ -349,6 +350,7 @@
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
+        SelectLatestVersion();
         JobQueueEntry.LockTable(true);
         JobQueueEntry.SetRange("Object Type to Run", Parameters."Object Type to Run");
         JobQueueEntry.SetRange("Object ID to Run", Parameters."Object ID to Run");
@@ -395,18 +397,22 @@
         Activated := false;
         if not TaskScheduler.CanCreateTask() then
             exit;
-        if (JobQueueEntry.Status = JobQueueEntry.Status::"In Process") or JobQueueEntry."NPR Manually Set On Hold" then
-            exit;
+        case JobQueueEntry.Status of
+            JobQueueEntry.Status::"In Process":
+                if not IsStale(JobQueueEntry) then
+                    exit;
+            JobQueueEntry.Status::"On Hold":
+                if JobQueueEntry."NPR Manually Set On Hold" then
+                    exit;
+        end;
         if EnvironmentInformation.IsSaaS() then
             if GetCurrentModuleExecutionContext() <> ExecutionContext::Normal then
                 exit;
 
         ValidStartDT := HasValidStartDT(JobQueueEntry, NotBeforeDateTime);
-        if ValidStartDT and (JobQueueEntry.Status = JobQueueEntry.Status::Ready) then begin
-            JobQueueEntry.CalcFields(Scheduled);
-            if JobQueueEntry.Scheduled then
+        if ValidStartDT and (JobQueueEntry.Status = JobQueueEntry.Status::Ready) then
+            if not IsStale(JobQueueEntry) then
                 exit;
-        end;
 
         if not ValidStartDT then begin
             JobQueueEntry.LockTable();
@@ -918,6 +924,11 @@
     local procedure HasNeverBeenRunDT(): DateTime
     begin
         exit(CreateDateTime(DMY2Date(1, 1, 2000), 0T));
+    end;
+
+    local procedure IsStale(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    begin
+        exit(not TaskScheduler.TaskExists(JobQueueEntry."System Task ID"));
     end;
 
     internal procedure SetStoreCode(NewStoreCode: Code[20])
