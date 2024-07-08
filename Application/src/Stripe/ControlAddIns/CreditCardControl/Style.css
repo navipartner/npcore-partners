@@ -1,0 +1,45 @@
+html * {
+  font-family: "Segoe UI", "Segoe WP", Segoe, device-segoe, Tahoma, Helvetica, Arial, sans-serif !important;
+  font-size: 10pt;
+  font-weight: 400;
+  color: #212121;
+}
+
+.StripeElement {
+    background-color: #00B7C3;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 3px 0 #e6ebf1;
+    -webkit-transition: box-shadow 150ms ease;
+    transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #E11414;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+#card-errors {
+  color: #E11414;
+}
+
+.stripe-logo-div {
+  display: inline-block;
+  vertical-align: top;
+  max-width: 30%;
+}
+
+.stripe-logo {
+  max-height: 80px;
+  max-width: 80px;
+  width: 100%; 
+  margin-top: 10px; 
+}

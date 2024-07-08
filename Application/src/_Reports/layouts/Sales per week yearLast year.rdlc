@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="Period_LY_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Period_LY_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Period_LY_Caption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Period_Sales_CaptionLY">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Period_Sales_CaptionLY</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Period_Sales_CaptionLY</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Period_Sales_CaptionCM">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Period_Sales_CaptionCM</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Period_Sales_CaptionCM</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Period_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Period_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Period_Caption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Increase_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Increase_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Increase_Caption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Month_Total">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Month_Total</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Month_Total</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Page_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Page_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Page_Caption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="text3">
+          <DataField>text3</DataField>
+        </Field>
+        <Field Name="Valgt_Date_Integer">
+          <DataField>Valgt_Date_Integer</DataField>
+        </Field>
+        <Field Name="Valgt_Dim_Integer">
+          <DataField>Valgt_Dim_Integer</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="LastWeekText_Integer">
+          <DataField>LastWeekText_Integer</DataField>
+        </Field>
+        <Field Name="Week_Integer">
+          <DataField>Week_Integer</DataField>
+        </Field>
+        <Field Name="Curr_Date_LY_WD_Integer">
+          <DataField>Curr_Date_LY_WD_Integer</DataField>
+        </Field>
+        <Field Name="Curr_Date_LY_Month_Integer">
+          <DataField>Curr_Date_LY_Month_Integer</DataField>
+        </Field>
+        <Field Name="Sales_LY_Integer">
+          <DataField>Sales_LY_Integer</DataField>
+        </Field>
+        <Field Name="Sales_LY_IntegerFormat">
+          <DataField>Sales_LY_IntegerFormat</DataField>
+        </Field>
+        <Field Name="TotalOutput_LY_Integer">
+          <DataField>TotalOutput_LY_Integer</DataField>
+        </Field>
+        <Field Name="TotalOutput_LY_IntegerFormat">
+          <DataField>TotalOutput_LY_IntegerFormat</DataField>
+        </Field>
+        <Field Name="Curr_Date_WD_Integer">
+          <DataField>Curr_Date_WD_Integer</DataField>
+        </Field>
+        <Field Name="Curr_Date_Month_Integer">
+          <DataField>Curr_Date_Month_Integer</DataField>
+        </Field>
+        <Field Name="Sales_Integer">
+          <DataField>Sales_Integer</DataField>
+        </Field>
+        <Field Name="Sales_IntegerFormat">
+          <DataField>Sales_IntegerFormat</DataField>
+        </Field>
+        <Field Name="TotalOutput_Integer">
+          <DataField>TotalOutput_Integer</DataField>
+        </Field>
+        <Field Name="TotalOutput_IntegerFormat">
+          <DataField>TotalOutput_IntegerFormat</DataField>
+        </Field>
+        <Field Name="Index_Integer">
+          <DataField>Index_Integer</DataField>
+        </Field>
+        <Field Name="Index_IntegerFormat">
+          <DataField>Index_IntegerFormat</DataField>
+        </Field>
+        <Field Name="MonthTotal_LY_Integer">
+          <DataField>MonthTotal_LY_Integer</DataField>
+        </Field>
+        <Field Name="MonthTotal_LY_IntegerFormat">
+          <DataField>MonthTotal_LY_IntegerFormat</DataField>
+        </Field>
+        <Field Name="MonthTotal_Integer">
+          <DataField>MonthTotal_Integer</DataField>
+        </Field>
+        <Field Name="MonthTotal_IntegerFormat">
+          <DataField>MonthTotal_IntegerFormat</DataField>
+        </Field>
+        <Field Name="IsDisplay">
+          <DataField>IsDisplay</DataField>
+        </Field>
+        <Field Name="Number_Totals">
+          <DataField>Number_Totals</DataField>
+        </Field>
+        <Field Name="GrandTotal_Totals">
+          <DataField>GrandTotal_Totals</DataField>
+        </Field>
+        <Field Name="GrandTotal_TotalsFormat">
+          <DataField>GrandTotal_TotalsFormat</DataField>
+        </Field>
+        <Field Name="MonthTotalLastYear_Totals">
+          <DataField>MonthTotalLastYear_Totals</DataField>
+        </Field>
+        <Field Name="MonthTotalLastYear_TotalsFormat">
+          <DataField>MonthTotalLastYear_TotalsFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

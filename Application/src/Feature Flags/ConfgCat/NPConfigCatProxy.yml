@@ -1,0 +1,13 @@
+services:
+  configcat_proxy:
+    image: configcat/proxy:latest
+    environment:
+      - CONFIGCAT_SDKS={"npcore_staging_npcoreconfig":"YZ7bCMi3F02DzR37u3KhDw/Hh13hBTVsEa9Kk7CZgvBdA", "npcore_production_npcoreconfig":"YZ7bCMi3F02DzR37u3KhDw/T1PNOgt9L0uRmSG_43Wcwg"}
+      - CONFIGCAT_npcore_staging_npcoreconfig_INTERVAL=30
+      - CONFIGCAT_npcore_staging_npcoreconfig_GOVERNANCE=global
+      - CONFIGCAT_npcore_production_npcoreconfig_POLL_INTERVAL=30
+      - CONFIGCAT_npcore_production_npcoreconfig_GOVERNANCE=global
+    ports:
+      - "8050:8050"
+      - "8051:8051"
+      - "50051:50051"

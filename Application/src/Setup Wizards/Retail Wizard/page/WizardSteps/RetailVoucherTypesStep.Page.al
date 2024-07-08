@@ -1,0 +1,290 @@
+page 6150793 "NPR Retail Voucher Types Step"
+{
+    Caption = 'Retail Voucher Types';
+    Extensible = false;
+    InsertAllowed = false;
+    PageType = ListPart;
+    UsageCategory = None;
+
+    layout
+    {
+        area(content)
+        {
+            group(NoOfRetailVoucherTypesToCreateGroup)
+            {
+                Caption = 'Retail Vouucher Types';
+
+                field(NoOfVoucherTypesToCreateFld; NoOfVoucherTypesToCreate)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'No. of Retail Voucher Types to create:';
+                    MinValue = 1;
+                    ToolTip = 'Specifies how many Retail Vouchers Types will be created.';
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(StartingNoRetailVoucherTypesGroup)
+            {
+                Caption = '';
+                field(StartingNoRetailVoucherTypesFld; StartingNoRetailVoucherTypes)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Starting No.:';
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the code value associated with the Voucher Type';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(VoucherCategoryGroup)
+            {
+                Caption = '';
+                field(VoucherCategoryFld; VoucherCategory)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Voucher Category:';
+                    ShowMandatory = true;
+                    ToolTip = 'Specifies the category which will be assigned to related Retail Vouchers.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(Posting)
+            {
+                Caption = 'Posting Setup';
+
+                field(PostingAccountNoFld; PostingAccountNo)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Posting Account No.:';
+                    ShowMandatory = true;
+                    TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 "Direct Posting" = const(true));
+                    ToolTip = 'Specifies the code of G/L Account on which Retail Voucher transactions will be posted.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(BarcodeReference)
+            {
+                Caption = 'Barcode Reference Setup';
+
+                field(ReferenceNoTypeFld; ReferenceNoType)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Reference No. Type';
+                    ToolTip = 'Specifies the type of the reference which will be used for creation of barcode for Retail Vouchers.';
+                    OptionCaption = 'Pattern,EAN13';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+            group(ReferenceNoPatternGroup)
+            {
+                Caption = '';
+                field(ReferenceNoPatternFld; ReferenceNoPattern)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Reference No. Pattern:';
+                    ShowMandatory = true;
+                    ToolTip = '[S] ~ Voucher No. || [N] ~ Random Number || [N*3] ~ 3 Random Numbers || [AN] ~ Random Char || [AN*3] ~ 3 Random Chars';
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(NoSeriesSetup)
+            {
+                Caption = 'Number Series Setup';
+
+                field(NoSeriesFld; NoSeries)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'No. Series:';
+                    ShowMandatory = true;
+                    TableRelation = "No. Series";
+                    ToolTip = 'Specifies the code of the No. Series field for the Voucher Type.';
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+
+            }
+            group(ArchNoSeriesGroup)
+            {
+                Caption = '';
+                field(ArchNoSeriesFld; ArchNoSeries)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Archivation No. Series:';
+                    ShowMandatory = true;
+                    TableRelation = "No. Series";
+                    ToolTip = 'Specifies the code of the Archivation No. Series field for the Voucher Type.';
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+
+            group(PrinterSetup)
+            {
+                Caption = 'Printer Setup';
+
+                field(PrintTemplateCodeFld; PrintTemplateCode)
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Print Template Code:';
+                    ShowMandatory = true;
+                    TableRelation = "NPR RP Template Header" where("Table ID" = const(6151013));
+                    ToolTip = 'Specifies the code of the Print Template which will be used for printing Retail Vouchers.';
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
+                }
+            }
+        }
+    }
+
+    trigger OnOpenPage()
+    begin
+        if NoOfVoucherTypesToCreate <= 0 then
+            NoOfVoucherTypesToCreate := 1;
+
+        if VoucherCategory = VoucherCategory::" " then
+            VoucherCategory := VoucherCategory::"Gift Voucher";
+    end;
+
+    #region DATA MANIPULATION FUNCTIONS
+
+    internal procedure CreateTempRetailVoucherTypes()
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        HelperFunctions: Codeunit "NPR Wizard Helper Functions";
+        LastNoUsed: Code[20];
+        i: Integer;
+        DesciptionTxtLbl: Label 'Description of Retail Voucher Type %1', Comment = '%1 - specifies Retail Voucher Type Code';
+    begin
+        if not TempNpRvVoucherTypeGlobal.IsEmpty() then
+            TempNpRvVoucherTypeGlobal.DeleteAll();
+
+        TempNpRvVoucherTypeGlobal.Reset();
+        LastNoUsed := StartingNoRetailVoucherTypes;
+
+        for i := 1 to NoOfVoucherTypesToCreate do begin
+            TempNpRvVoucherTypeGlobal.Init();
+            LastNoUsed := CheckIfNoIsAvailable(NpRvVoucherType, LastNoUsed);
+            LastNoUsed := CheckIfNoIsAvailable(TempNpRvVoucherTypeGlobal, LastNoUsed);
+            TempNpRvVoucherTypeGlobal.Code := LastNoUsed;
+            TempNpRvVoucherTypeGlobal."Voucher Category" := VoucherCategory;
+            TempNpRvVoucherTypeGlobal."Account No." := PostingAccountNo;
+            TempNpRvVoucherTypeGlobal."No. Series" := NoSeries;
+            TempNpRvVoucherTypeGlobal."Reference No. Type" := ReferenceNoType;
+            TempNpRvVoucherTypeGlobal."Reference No. Pattern" := ReferenceNoPattern;
+            TempNpRvVoucherTypeGlobal."Arch. No. Series" := ArchNoSeries;
+#pragma warning disable AA0139
+            TempNpRvVoucherTypeGlobal.Description := StrSubstNo(DesciptionTxtLbl, TempNpRvVoucherTypeGlobal.Code);
+#pragma warning restore
+            if PrintTemplateCode <> '' then begin
+                TempNpRvVoucherTypeGlobal."Print Object Type" := TempNpRvVoucherTypeGlobal."Print Object Type"::Template;
+                TempNpRvVoucherTypeGlobal."Print Template Code" := PrintTemplateCode;
+            end;
+            TempNpRvVoucherTypeGlobal.Insert();
+
+            if i = 1 then
+                HelperFunctions.FormatCode20(LastNoUsed)
+            else
+                LastNoUsed := IncStr(LastNoUsed);
+        end;
+    end;
+
+    internal procedure CopyTempRetailVoucherTypes(var TempNpRvVoucherType: Record "NPR NpRv Voucher Type")
+    begin
+        if not TempNpRvVoucherType.IsEmpty() then
+            TempNpRvVoucherType.DeleteAll();
+
+        if TempNpRvVoucherTypeGlobal.FindSet() then
+            repeat
+                TempNpRvVoucherType := TempNpRvVoucherTypeGlobal;
+                TempNpRvVoucherType.Insert();
+            until TempNpRvVoucherTypeGlobal.Next() = 0;
+    end;
+
+    #endregion DATA MANIPULATION FUNCTIONS
+
+    local procedure CheckIfNoIsAvailable(var NpRvVoucherType: Record "NPR NpRv Voucher Type"; var WantedStartingNo: Code[20]) CalculatedNo: Code[20]
+    var
+        HelperFunctions: Codeunit "NPR Wizard Helper Functions";
+    begin
+        CalculatedNo := WantedStartingNo;
+
+        if NpRvVoucherType.Get(WantedStartingNo) then begin
+            WantedStartingNo := HelperFunctions.FormatCode20(WantedStartingNo);
+            CalculatedNo := CheckIfNoIsAvailable(NpRvVoucherType, WantedStartingNo);
+        end;
+    end;
+
+    internal procedure RetailVoucherTypesToCreate(): Boolean
+    begin
+        exit(TempNpRvVoucherTypeGlobal.IsEmpty());
+    end;
+
+    internal procedure MandatoryFieldsPopulated(): Boolean
+    begin
+        if StartingNoRetailVoucherTypes = '' then
+            exit(false);
+
+        if NoSeries = '' then
+            exit(false);
+
+        if ArchNoSeries = '' then
+            exit(false);
+
+        if PostingAccountNo = '' then
+            exit(false);
+
+        if PrintTemplateCode = '' then
+            exit(false);
+
+        if VoucherCategory = VoucherCategory::" " then
+            exit(false);
+
+        exit(true);
+    end;
+
+    var
+        TempNpRvVoucherTypeGlobal: Record "NPR NpRv Voucher Type" temporary;
+        ArchNoSeries: Code[20];
+        NoSeries: Code[20];
+        PostingAccountNo: Code[20];
+        PrintTemplateCode: Code[20];
+        ReferenceNoPattern: Code[20];
+        StartingNoRetailVoucherTypes: Code[20];
+        NoOfVoucherTypesToCreate: Integer;
+        VoucherCategory: Enum "NPR Voucher Category";
+        ReferenceNoType: Option Pattern,EAN13;
+}

@@ -1,0 +1,301 @@
+codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
+{
+    Access = Internal;
+
+    var
+        _ApplyToSaleLine: Option Main,Current,Auto,Ask;
+
+    procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        POSDataMgt: Codeunit "NPR POS Data Management";
+        ActionDescription: Label 'This built-in action inserts Item AddOns for a selected POS Sale Line', MaxLength = 250;
+        ParamApplyTo_Options: Label 'Main,Current,Auto,Ask', MaxLength = 250, Locked = true;
+        ParamApplyTo_OptionCptLbl: Label 'Main line,Current line,Auto,Ask';
+        ParamApplyTo_CptLbl: Label 'Apply To';
+        ParamApplyTo_DescLbl: Label 'Specify the line of the POS sale to which the Item AddOn will be applied when it is unclear.';
+        ParamItemAddOn_CptLbl: Label 'Item AddOn No';
+        ParamItemAddOn_DescLbl: Label 'Specifies Item AddOn No. This value will override Item AddOn selected on Item Cards';
+        ParamSkipItemAvailbCheck_CptLbl: Label 'Skip Item Availability Check';
+        ParamSkipItemAvailbCheck_DescLbl: Label 'Enable/Disable skip Item Availability Check';
+        SelectLineCpt: Label 'Please select the line to apply the Item AddOn to';
+    begin
+        WorkflowConfig.AddJavascript(GetActionScript());
+        WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.AddTextParameter('ItemAddOnNo', '', ParamItemAddOn_CptLbl, ParamItemAddOn_DescLbl);
+        WorkflowConfig.AddOptionParameter('ApplyTo', ParamApplyTo_Options, CopyStr(SelectStr(1, ParamApplyTo_Options), 1, 250), ParamApplyTo_CptLbl, ParamApplyTo_DescLbl, ParamApplyTo_OptionCptLbl);
+        WorkflowConfig.AddBooleanParameter('SkipItemAvailabilityCheck', false, ParamSkipItemAvailbCheck_CptLbl, ParamSkipItemAvailbCheck_DescLbl);
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSaleLine());
+        WorkflowConfig.AddLabel('SelectLine', SelectLineCpt);
+    end;
+
+    procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    begin
+        case Step of
+            'DefineBaseLineNo':
+                FrontEnd.WorkflowResponse(DefineBaseLineNo(Context, SaleLine));
+            'GetSalesLineAddonConfigJson':
+                FrontEnd.WorkflowResponse(GenerateItemAddonConfig(Context, Sale, SaleLine));
+            'SetItemAddons':
+                OnActionRunAddOns(Context);
+        end;
+    end;
+
+    local procedure DefineBaseLineNo(Context: Codeunit "NPR POS JSON Helper"; POSSaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+    var
+        Item: Record Item;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS_Main: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ApplyToDialogOptions: JsonArray;
+        AddOnNo_Param: Code[20];
+        ApplyTo: Integer;
+    begin
+        If GetBaseLineNoFromContext(Context, false) <> 0 then begin
+            FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+            exit;
+        end;
+
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        if not IsChildItemAddOnLine(SaleLinePOS, SaleLinePOSAddOn) then begin
+            Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS));
+            FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+            exit;
+        end;
+
+        If not Context.GetIntegerParameter('ApplyTo', ApplyTo) then
+            ApplyTo := _ApplyToSaleLine::Main;
+        SaleLinePOS_Main.Get(
+            SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Date", SaleLinePOS."Sale Type", SaleLinePOSAddOn."Applies-to Line No.");
+
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"BOM List"]) or (ApplyTo = _ApplyToSaleLine::Main) then begin
+            if ApplyTo = _ApplyToSaleLine::Current then
+                SaleLinePOS.FieldError("Line Type");
+            Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS_Main));
+            FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+            exit;
+        end;
+
+        if ApplyTo = _ApplyToSaleLine::Current then begin
+            Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS));
+            FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+            exit;
+        end;
+
+        AddOnNo_Param := GetItemAddOnNoParam(Context);
+        if ApplyTo = _ApplyToSaleLine::Auto then begin
+            if AddOnNo_Param <> '' then begin
+                SaleLinePOS.TestField("No.");
+                Item.Get(SaleLinePOS."No.");
+                if AddOnNo_Param = Item."NPR Item AddOn No." then begin
+                    Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS));
+                    FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+                    exit;
+                end;
+            end;
+            Context.SetContext('BaseLineNo', FindAppliesToLineNo(SaleLinePOS_Main));
+            FinishApplyToLineResponse(false, ApplyToDialogOptions, Response);
+            exit;
+        end;
+        AddApplyToLineDialogOption(SaleLinePOS_Main, _ApplyToSaleLine::Main, ApplyToDialogOptions);
+        AddApplyToLineDialogOption(SaleLinePOS, _ApplyToSaleLine::Current, ApplyToDialogOptions);
+        FinishApplyToLineResponse(true, ApplyToDialogOptions, Response);
+    end;
+
+    local procedure FinishApplyToLineResponse(AskForApplyToLine: Boolean; ApplyToDialogOptions: JsonArray; var Response: JsonObject)
+    begin
+        Response.Add('AskForApplyToLine', AskForApplyToLine);
+        Response.Add('ApplyToDialogOptions', ApplyToDialogOptions);
+    end;
+
+    local procedure AddApplyToLineDialogOption(SaleLinePOS: Record "NPR POS Sale Line"; "Type": Integer; var ApplyToDialogOptions: JsonArray)
+    var
+        ApplyToDialogOption: JsonObject;
+        LineTypesLbl: Label 'main line,current line';
+    begin
+        ApplyToDialogOption.Add('caption', StrSubstNo('%1<br><i>(%2)</i>', SaleLinePOS.Description, SelectStr("Type" + 1, LineTypesLbl)));
+        ApplyToDialogOption.Add('id', SaleLinePOS."Line No.");
+        ApplyToDialogOptions.Add(ApplyToDialogOption);
+    end;
+
+    local procedure GenerateItemAddonConfig(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+    var
+        Item: Record Item;
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+        AddOnNo: Code[20];
+        ItemAddonConfigAsString: Text;
+        AppliesToLineNo: Integer;
+        CompulsoryAddOn: Boolean;
+    begin
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        AppliesToLineNo := GetBaseLineNoFromContext(Context, true);
+        if AppliesToLineNo <> SaleLinePOS."Line No." then
+            SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"BOM List"]) then
+            SaleLinePOS.FieldError("Line Type");
+
+        AddOnNo := GetItemAddOnNoParam(Context);
+        if AddOnNo = '' then begin
+            Item.Get(SaleLinePOS."No.");
+            AddOnNo := Item."NPR Item Addon No.";
+            CompulsoryAddOn := not ItemAddOnMgt.AttachedIteamAddonLinesExist(SaleLinePOS);
+            Response.Add('CompulsoryAddOn', CompulsoryAddOn);
+        end;
+        if AddOnNo = '' then
+            if not LookupItemAddOn(AddOnNo) then
+                Error('');
+
+        ItemAddOn.Get(AddOnNo);
+        ItemAddOn.TestField(Enabled);
+        Response.Add('ApplyItemAddOnNo', AddOnNo);
+
+        if not ItemAddOnMgt.UserInterfaceIsRequired(ItemAddOn, CompulsoryAddOn) then begin
+            Response.Add('UserSelectionRequired', false);
+            Response.Add('ItemAddonConfigAsString', '');
+            exit;
+        end;
+
+        Response.Add('UserSelectionRequired', true);
+        POSSale.GetCurrentSale(SalePOS);
+        ItemAddOnMgt.GenerateItemAddOnConfigJson(SalePOS, SaleLinePOS, ItemAddOn).WriteTo(ItemAddonConfigAsString);
+        Response.Add('ItemAddonConfigAsString', ItemAddonConfigAsString);
+    end;
+
+    local procedure FindAppliesToLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
+    begin
+        if SaleLinePOS.Accessory then
+            exit(SaleLinePOS."Main Line No.");
+
+        exit(SaleLinePOS."Line No.");
+    end;
+
+    local procedure IsChildItemAddOnLine(SaleLinePOS: Record "NPR POS Sale Line"; var SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn"): Boolean
+    var
+        ItemAddOnMgt: Codeunit "NPR NpIa Item AddOn Mgt.";
+    begin
+        ItemAddOnMgt.FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '<>%1', 0);
+        exit(SaleLinePOSAddOn.FindFirst());
+    end;
+
+    local procedure OnActionRunAddOns(Context: Codeunit "NPR POS JSON Helper")
+    var
+        POSActRunItemAddOnB: Codeunit "NPR POS Action: RunItemAddOn B";
+        POSSession: Codeunit "NPR POS Session";
+        UserSelectionJToken: JsonToken;
+        ApplyItemAddOnNo: Code[20];
+        CompulsoryAddOn: Boolean;
+        SkipItemAvailabilityCheck: Boolean;
+        UserSelectionRequired: Boolean;
+    begin
+        ApplyItemAddOnNo := CopyStr(Context.GetString('ApplyItemAddOnNo'), 1, MaxStrLen(ApplyItemAddOnNo));
+        if not Context.GetBoolean('CompulsoryAddOn', CompulsoryAddOn) then
+            CompulsoryAddOn := false;
+        if not Context.GetBooleanParameter('SkipItemAvailabilityCheck', SkipItemAvailabilityCheck) then
+            SkipItemAvailabilityCheck := false;
+        if not Context.GetBoolean('UserSelectionRequired', UserSelectionRequired) then
+            UserSelectionRequired := false;
+        if UserSelectionRequired then
+            UserSelectionJToken := Context.GetJToken('UserSelectedAddons');
+
+        if POSActRunItemAddOnB.RunItemAddOns(GetBaseLineNoFromContext(Context, true), ApplyItemAddOnNo, CompulsoryAddOn, SkipItemAvailabilityCheck, UserSelectionRequired, UserSelectionJToken) then
+            POSSession.RequestFullRefresh();
+    end;
+
+    local procedure GetBaseLineNoFromContext(Context: Codeunit "NPR POS JSON Helper"; Mandatory: Boolean) Result: Integer
+    begin
+        if Mandatory then
+            Result := Context.GetInteger('BaseLineNo')
+        else
+            If not Context.GetInteger('BaseLineNo', Result) then
+                exit(0);
+        exit(Result);
+    end;
+
+    local procedure GetItemAddOnNoParam(Context: Codeunit "NPR POS JSON Helper"): Code[20]
+    var
+        AddOnNoTxt: Text;
+    begin
+        if not Context.GetStringParameter('ItemAddOnNo', AddOnNoTxt) then
+            exit('');
+        exit(CopyStr(AddOnNoTxt, 1, 20));
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', true, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "NPR POS Parameter Value"; Handled: Boolean);
+    var
+        AddOnNo: Code[20];
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    AddOnNo := CopyStr(POSParameterValue.Value, 1, MaxStrLen(AddOnNo));
+                    if LookupItemAddOn(AddOnNo) then
+                        POSParameterValue.Value := AddOnNo;
+                end;
+        end;
+    end;
+
+    local procedure LookupItemAddOn(var AddOnNo: Code[20]): Boolean
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+    begin
+        ItemAddOn.FilterGroup(2);
+        ItemAddOn.SetRange(Enabled, true);
+        ItemAddOn.FilterGroup(0);
+        if AddOnNo <> '' then begin
+            ItemAddOn."No." := AddOnNo;
+            if ItemAddOn.find('=><') then;
+        end;
+        if Page.RunModal(0, ItemAddOn) = Action::LookupOK then begin
+            AddOnNo := ItemAddOn."No.";
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "NPR POS Parameter Value")
+    var
+        ItemAddOn: Record "NPR NpIa Item AddOn";
+        ItemAddOnLbl: Label '@%1*', Locked = true;
+    begin
+        if POSParameterValue."Action Code" <> ActionCode() then
+            exit;
+
+        case POSParameterValue.Name of
+            'ItemAddOnNo':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+
+                    ItemAddOn.SetRange(Enabled, true);
+                    ItemAddOn."No." := CopyStr(POSParameterValue.Value, 1, MaxStrLen(ItemAddOn."No."));
+                    if not ItemAddOn.Find() then begin
+                        ItemAddOn.SetFilter("No.", CopyStr(StrSubstNo(ItemAddOnLbl, POSParameterValue.Value), 1, MaxStrLen(ItemAddOn."No.")));
+                        ItemAddOn.FindFirst();
+                    end;
+                    POSParameterValue.Value := ItemAddOn."No.";
+                end;
+        end;
+    end;
+
+    local procedure ActionCode(): Code[20]
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::RUN_ITEM_ADDONS));
+    end;
+
+    local procedure GetActionScript(): Text
+    begin
+        exit(
+//###NPR_INJECT_FROM_FILE:POSActionRunItemAddOn.js###
+'let main=async({workflow:e,popup:t,context:s,captions:l})=>{let{AskForApplyToLine:r,ApplyToDialogOptions:A}=await e.respond("DefineBaseLineNo");if(r){let n=await t.optionsMenu({title:l.SelectLine,oneTouch:!0,options:A});if(!n)return;s.BaseLineNo=n.id}let{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d,ItemAddonConfigAsString:a}=await e.respond("GetSalesLineAddonConfigJson");if(d){let n=JSON.parse(a);UserSelectedAddons=await t.configuration(n),await e.respond("SetItemAddons",{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d,UserSelectedAddons})}else await e.respond("SetItemAddons",{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d})};'
+        );
+    end;
+}
