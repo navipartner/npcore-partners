@@ -74,6 +74,16 @@ page 6184582 "NPR Adyen Merchant Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Acquirer Payout Account No.';
                 }
+                field("Missing Transaction Acc. Type"; Rec."Missing Transaction Acc. Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Account Type of Missing Transactions.';
+                }
+                field("Missing Transaction Acc. No."; Rec."Missing Transaction Acc. No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Account No. of Missing Transactions.';
+                }
                 field("Reconciled Payment Acc. Type"; Rec."Reconciled Payment Acc. Type")
                 {
                     ApplicationArea = NPRRetail;

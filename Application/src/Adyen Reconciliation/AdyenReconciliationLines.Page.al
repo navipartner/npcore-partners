@@ -406,12 +406,56 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         end;
                 end;
             }
+            action("Post as Missing")
+            {
+                ApplicationArea = NPRRetail;
+                Enabled = _IsMissing;
+                Image = Post;
+                Caption = 'Post as Missing';
+                ToolTip = 'Running this action will post the Failed to Match transaction skipping the Matching process.';
+
+                trigger OnAction()
+                var
+                    AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+                    Line: Record "NPR Adyen Recon. Line";
+                    Header: Record "NPR Adyen Reconciliation Hdr";
+                    PostedEntries: Integer;
+                    ConfirmPostingLbl: Label 'Do you wish to proceed with posting selected transaction/s skipping the matching process?';
+                    SuccessfullyPostedLbl: Label 'Successfully posted %1 entries bypassing the Matching process.';
+                    NothingToPostLbl: Label 'Nothing to post.';
+                begin
+                    CurrPage.SetSelectionFilter(Line);
+                    Line.FilterGroup(10);
+                    Line.SetRange(Status, Line.Status::"Failed to Match");
+                    Line.FilterGroup(0);
+                    if Line.IsEmpty() then begin
+                        Message(NothingToPostLbl);
+                        exit;
+                    end;
+
+                    Line.FindSet();
+                    if not Header.Get(Line."Document No.") then
+                        exit;
+                    if not Confirm(ConfirmPostingLbl) then
+                        exit;
+
+                    Clear(AdyenTransMatching);
+                    PostedEntries := AdyenTransMatching.PostUnmatchedEntries(Line, Header);
+
+                    if PostedEntries > 0 then begin
+                        Message(SuccessfullyPostedLbl, Format(PostedEntries));
+                        CurrPage.Update(false);
+                    end else
+                        Message(GetLastErrorText());
+                end;
+            }
         }
     }
 
     trigger OnAfterGetCurrRecord()
     begin
         _IsChargeBack := Rec."Transaction Type" in [Rec."Transaction Type"::Chargeback, Rec."Transaction Type"::ChargebackExternallyWithInfo, Rec."Transaction Type"::SecondChargeback];
+        _IsMissing := (Rec.Status = Rec.Status::"Failed to Match") and (IsNullGuid(Rec."Matching Entry System ID"));
     end;
 
     trigger OnAfterGetRecord()
@@ -423,4 +467,5 @@ page 6184503 "NPR Adyen Reconciliation Lines"
         _StyleExprTxt: Text[50];
         _AdyenManagement: Codeunit "NPR Adyen Management";
         _IsChargeBack: Boolean;
+        _IsMissing: Boolean;
 }
