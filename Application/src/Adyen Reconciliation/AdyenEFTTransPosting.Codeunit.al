@@ -331,7 +331,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         GLEntryNo: Integer;
     begin
         if (_ReconciliationLine."Amount (TCY)" <> 0) and (not _TransactionPosted) then begin
-            GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", AdyenTransactionLabel, true);
+            GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", StrSubstNo(AdyenTransactionLabel, _ReconciliationLine."PSP Reference"), true);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
         if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _MarkupPosted) then begin
@@ -391,7 +391,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _NewReversedSystemId: Guid;
         NoOriginalDocumentFound: Label 'No POS Entry was found with No. %1.';
         NoOriginalSalesDocumentFound: Label 'No Sales Document was found with No. %1.';
-        AdyenTransactionLabel: Label 'Adyen: Transaction', MaxLength = 100;
+        AdyenTransactionLabel: Label 'Adyen: Transaction %1', MaxLength = 100;
         AdyenMarkupLabel: Label 'Adyen: Markup', MaxLength = 100;
         AdyenOtherCommissionsLabel: Label 'Adyen: Other Commissions (Commission, Markup, Scheme Fees, Interchange)', MaxLength = 100;
         AdyenRealizedGainsLabel: Label 'Adyen: Realized Gains', MaxLength = 100;

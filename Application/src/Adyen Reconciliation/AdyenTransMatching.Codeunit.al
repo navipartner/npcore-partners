@@ -838,7 +838,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.Status := ReconciliationLine.Status::Posted;
     end;
 
-    local procedure AssignPostingDateAndNo(var RecLine: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr")
+    internal procedure AssignPostingDateAndNo(var RecLine: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr")
     begin
         if _AdyenSetup.Get() and (_AdyenSetup."Posting Document Nos." <> '') then begin
             RecLine."Posting No." := _NoSeriesMgt.GetNextNo(_AdyenSetup."Posting Document Nos.", Today(), true);
@@ -957,6 +957,56 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         WebhookRequest.Processed := true;
         WebhookRequest.Modify();
         exit(true);
+    end;
+
+    internal procedure MarkAsPostedIfPossible(var RecHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+    begin
+        RecLine.SetRange("Document No.", RecHeader."Document No.");
+        if RecLine.IsEmpty() then
+            exit;
+        RecLine.SetFilter(Status, '<>%1', RecLine.Status::Posted);
+        if not RecLine.IsEmpty() then
+            exit;
+        if RecHeader.Posted then
+            exit;
+        RecHeader.Posted := true;
+        RecHeader.Modify(false);
+        exit(true);
+    end;
+
+    internal procedure PostUnmatchedEntries(var Lines: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr") PostedEntries: Integer
+    var
+        Window: Dialog;
+        EntryPosting: Integer;
+        PostMissingTransaction: Codeunit "NPR Adyen Missing Trans. Post";
+        ProcessingLbl: Label 'Posting the Reconciliation Line/s...\\Posting #1 entry out of #2.';
+    begin
+        Window.Open(ProcessingLbl);
+        Window.Update(2, Lines.Count());
+        EntryPosting := 0;
+        repeat
+            EntryPosting += 1;
+            Window.Update(1, Format(EntryPosting));
+            if RecHeader.Get(Lines."Document No.") then begin
+                Lines.LockTable();
+                AssignPostingDateAndNo(Lines, RecHeader);
+            end;
+            Lines.LockTable();
+            Commit();
+            Clear(PostMissingTransaction);
+            if PostMissingTransaction.Run(Lines) then begin
+                Lines."Matching Table Name" := Lines."Matching Table Name"::"G/L Entry";
+                Lines."Matching Entry System ID" := PostMissingTransaction.GetGLSystemID();
+                Lines.Status := Lines.Status::Posted;
+                Lines.Modify();
+                PostedEntries += 1;
+            end;
+        until Lines.Next() = 0;
+        Window.Close();
+
+        MarkAsPostedIfPossible(RecHeader);
     end;
 
     local procedure GetValueAtCell(RowNo: Integer; ColNo: Integer): Text

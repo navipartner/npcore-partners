@@ -866,7 +866,6 @@ codeunit 6184796 "NPR Adyen Management"
         NewDocumentsList: JsonArray;
         JsonToken: JsonToken;
         NewDocumentsFilter: Text;
-        i: Integer;
     begin
         Clear(WebhookRequest);
         WebhookRequest.Init();
@@ -890,8 +889,7 @@ codeunit 6184796 "NPR Adyen Management"
                     begin
                         NewDocumentsList := TransactionMatching.CreateSettlementDocuments(WebhookRequest, false, '');
                         if NewDocumentsList.Count() > 0 then begin
-                            for i := 1 to NewDocumentsList.Count() do begin
-                                NewDocumentsList.Get(i, JsonToken);
+                            foreach JsonToken in NewDocumentsList do begin
                                 NewDocumentsFilter += JsonToken.AsValue().AsCode() + '|';
                             end;
                             ReconciliationHeader.SetFilter("Document No.", DelChr(NewDocumentsFilter, '>', '|'));
