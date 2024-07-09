@@ -8,7 +8,7 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6014401; "NPR POS Unit No."; Code[10])
@@ -84,7 +84,7 @@ tableextension 6014454 "NPR User Setup" extends "User Setup"
             Caption = 'Block Role Center';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
     }

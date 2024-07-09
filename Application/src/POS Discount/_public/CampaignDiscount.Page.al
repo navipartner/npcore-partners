@@ -167,7 +167,7 @@
                 Visible = false;
                 ObsoleteReason = 'Not used';
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
 
                 action(Comment)
                 {
@@ -181,7 +181,7 @@
 
                     ObsoleteReason = 'Not used';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                 }
                 action("Item Card")
                 {
@@ -193,7 +193,7 @@
 
                     ObsoleteReason = 'Not used';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
 
                     trigger OnAction()
                     var

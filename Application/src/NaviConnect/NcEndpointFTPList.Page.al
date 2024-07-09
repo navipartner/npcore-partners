@@ -11,7 +11,7 @@
     UsageCategory = None;
     SourceTable = "NPR Nc Endpoint FTP";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Going ot switch to use Ftp Connection and Sftp Connection.';
 
     layout

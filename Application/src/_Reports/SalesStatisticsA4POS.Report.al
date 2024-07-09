@@ -985,7 +985,7 @@ report 6014462 "NPR Sales Statistics A4 POS"
         Workshiftlbl: Label 'Workshift';
         VarReportTitle: Text;
 
-    [Obsolete('Not used anymore.', 'NPR25.0')]
+    [Obsolete('Not used anymore.', '2023-08-28')]
     procedure Divider("Tal 1": Decimal; "Tal 2": Decimal): Decimal
     begin
         if "Tal 2" = 0 then

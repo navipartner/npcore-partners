@@ -4,7 +4,7 @@
     Caption = 'HC Audit Roll';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used anymore';
     PasteIsValid = false;
 
@@ -173,7 +173,7 @@
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(60; "Credit voucher ref."; Code[20])
@@ -181,7 +181,7 @@
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])
@@ -578,7 +578,7 @@
         key(Key6; "Register No.", Posted, "Sale Date", Type, "Credit voucher ref.")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         key(Key7; "Sale Type", Type, "No.", Posted)
@@ -623,7 +623,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")

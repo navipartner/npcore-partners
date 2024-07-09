@@ -2,7 +2,7 @@ codeunit 6150668 "NPR NPRE POSAction: Split Wa." implements "NPR IPOS Workflow"
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR25.0';
+    ObsoleteTag = '2023-08-28';
     ObsoleteReason = 'Not supported in Dragonglass environment. Please use POS action ''SPLIT_BILL'' instead.';
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")

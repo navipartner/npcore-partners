@@ -29,7 +29,7 @@
             DataClassification = CustomerContent;
             ObsoleteReason = 'This field is not used anymore';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(5; "Last Z Report Time"; Time)
         {
@@ -42,7 +42,7 @@
             DataClassification = CustomerContent;
             ObsoleteReason = 'This field is not used anymore';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(7; Training; Boolean)
         {
@@ -76,7 +76,7 @@
             Description = 'Used to tell where the CleanCashAPI dll is placed (third part application)';
             ObsoleteReason = 'This field is not used anymore';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
     }
 

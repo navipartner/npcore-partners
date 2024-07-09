@@ -72,7 +72,7 @@ table 6150805 "NPR Adyen Webhook Setup"
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter Type';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(90; "Merchant Accounts Filter"; Text[2048])
@@ -80,7 +80,7 @@ table 6150805 "NPR Adyen Webhook Setup"
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(100; Description; Text[150])

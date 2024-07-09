@@ -23,7 +23,7 @@
             OptionMembers = TotalBlockItemIfVariants,SaleBlockItemIfVariants,AllowNonVariants;
 #IF NOT (BC17 or BC18 or BC19 or BC20)            
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Variant Mandatory if Exist" from Inventory Setup and Item';
 #ENDIF            
         }
@@ -34,7 +34,7 @@
             OptionCaption = ' ,EAN8,EAN13';
             OptionMembers = " ",EAN8,EAN13;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(21; "Alt. No. No. Series (I)"; Code[10])
@@ -42,7 +42,7 @@
             Caption = 'Alt. No. No. Series (Item)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(22; "Create Alt. No. automatic"; Boolean)
@@ -50,7 +50,7 @@
             Caption = 'Create Alt. No. automatic';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(23; "Alt. No. No. Series (V)"; Code[20])
@@ -58,7 +58,7 @@
             Caption = 'Alt. No. No. Series (Variant)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(30; "Barcode Type (Item Cross Ref.)"; Option)

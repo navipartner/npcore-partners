@@ -6,7 +6,7 @@
     Caption = 'Item Repair Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Repairs are not supported in core anymore.';
 
     fields

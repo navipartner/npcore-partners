@@ -3,7 +3,7 @@ codeunit 6014409 "NPR POS Action: Customer Card"
     Access = Internal;
     ObsoleteReason = 'Delete when final v1/v2 workflow is gone. Implemented just for customers that are not on version 10. Already exist in CU 6150801';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Action", 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "NPR POS Action")

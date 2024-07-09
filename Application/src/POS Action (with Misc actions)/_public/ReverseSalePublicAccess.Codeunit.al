@@ -1,6 +1,6 @@
 codeunit 6060030 "NPR Reverse Sale Public Access"
 {
-    [Obsolete('New overload created with additional parameter', 'NPR23.0')]
+    [Obsolete('New overload created with additional parameter', '2023-06-28')]
     procedure HandleRequestPOSActionReverseDirectSaleRun(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20])
     var
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";
@@ -9,7 +9,7 @@ codeunit 6060030 "NPR Reverse Sale Public Access"
             SalesTicketNo, ObfucationMethod, CopyHeaderDim, ReturnReasonCode, false, true);
     end;
 
-    [Obsolete('New overload created with new additional parameter', 'NPR23.0')]
+    [Obsolete('New overload created with new additional parameter', '2023-06-28')]
     procedure HandleRequestPOSActionReverseDirectSaleRun(SalesTicketNo: Code[20]; ObfucationMethod: Option "None",MI; CopyHeaderDim: Boolean; ReturnReasonCode: Code[20]; IncludePaymentLines: Boolean)
     var
         POSActionRevDirSaleB: Codeunit "NPR POS Action: Rev.Dir.Sale B";

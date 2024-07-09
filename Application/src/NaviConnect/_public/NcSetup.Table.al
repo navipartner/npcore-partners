@@ -18,7 +18,7 @@
         field(300; "Task Queue Enabled"; Boolean)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
             Caption = 'Task Queue Enabled';
             DataClassification = CustomerContent;

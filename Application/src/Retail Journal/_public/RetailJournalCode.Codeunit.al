@@ -682,7 +682,7 @@
             until RetailJournalLine.Next() = 0;
     end;
 
-    [Obsolete('Was used on one call which was replaced by more standardized procedure.', 'NPR23.0')]
+    [Obsolete('Was used on one call which was replaced by more standardized procedure.', '2023-06-28')]
     internal procedure UpdateDiscount(var RetailJournalLine: Record "NPR Retail Journal Line")
     var
         PeriodDiscountLine: Record "NPR Period Discount Line";
@@ -709,7 +709,7 @@
         end;
     end;
 
-    [Obsolete('Not used anymore.', 'NPR24.0')]
+    [Obsolete('Not used anymore.', '2023-07-28')]
     procedure PrintValidate(RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;

@@ -563,7 +563,7 @@
     #endregion
     #region OnFinishSale Workflow
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -576,7 +576,7 @@
         Rec."Sequence No." := 60;
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR Tax Free Handler Mgt.");

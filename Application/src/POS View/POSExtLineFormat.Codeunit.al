@@ -77,7 +77,7 @@
         end;
     end;
 
-    [Obsolete('Move to OnGetLineFormatting() subscriber with limited control over styling instead', 'NPR23.0')]
+    [Obsolete('Move to OnGetLineFormatting() subscriber with limited control over styling instead', '2023-06-28')]
     [BusinessEvent(false)]
 #pragma warning disable AA0150
     local procedure OnGetLineStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "NPR POS Sale Line"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
@@ -85,7 +85,7 @@
     begin
     end;
 
-    [Obsolete('Move to OnGetLineFormatting() subscriber as the former "Indented" parameter is now part of the core data source as field #6120 of type Integer', 'NPR32.0')]
+    [Obsolete('Move to OnGetLineFormatting() subscriber as the former "Indented" parameter is now part of the core data source as field #6120 of type Integer', '2024-03-28')]
     [IntegrationEvent(false, false)]
     local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     begin

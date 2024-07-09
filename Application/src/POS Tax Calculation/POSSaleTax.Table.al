@@ -135,7 +135,7 @@
             Caption = 'Source Invoice Discount Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used in POS';
         }
         field(22; "Source Allow Invoice Discount"; Boolean)
@@ -144,7 +144,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used in POS';
         }
         field(23; "Source Allow Line Discount"; Boolean)
@@ -235,7 +235,7 @@
             Caption = 'Calculated Inv. Disc. Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used in POS';
         }
         field(112; "Calc. Applied Invoice Discount"; Boolean)
@@ -244,7 +244,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used in POS';
         }
         field(113; "Calc. Applied Line Discount"; Boolean)

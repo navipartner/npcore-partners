@@ -608,7 +608,7 @@
         exit(Round(Amount, POSPaymentMethod."Rounding Precision", POSPaymentMethod.GetRoundingType()));
     end;
 
-    [Obsolete('Replaced by overload procedure ValidateAmountBeforePayment with 3 parameters.', 'NPR23.0')]
+    [Obsolete('Replaced by overload procedure ValidateAmountBeforePayment with 3 parameters.', '2023-06-28')]
     procedure ValidateAmountBeforePayment(POSPaymentMethod: Record "NPR POS Payment Method"; AmountToCapture: Decimal)
     begin
         if POSPaymentMethod.Description = '' then

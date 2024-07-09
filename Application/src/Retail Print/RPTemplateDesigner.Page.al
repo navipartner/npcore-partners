@@ -9,7 +9,7 @@
     SourceTable = "NPR RP Template Header";
     ApplicationArea = NPRRetail;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced by directly opening either line or matrix designer';
 }
 

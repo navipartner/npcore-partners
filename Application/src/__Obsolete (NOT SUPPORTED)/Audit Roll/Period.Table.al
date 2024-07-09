@@ -4,7 +4,7 @@
     Caption = 'Period';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Table is obsolete';
 
     fields
@@ -134,7 +134,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
         }
         field(23; "Net. Gift Voucher Change"; Decimal)
@@ -143,7 +143,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(24; "Net. Terminal Change"; Decimal)
@@ -176,7 +176,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(29; "Credit Voucher issuing"; Decimal)
@@ -185,7 +185,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
         }
         field(30; "Cash Received"; Decimal)
@@ -275,7 +275,7 @@
             Caption = 'Gift Voucher Debit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(51; "Euro Difference"; Decimal)

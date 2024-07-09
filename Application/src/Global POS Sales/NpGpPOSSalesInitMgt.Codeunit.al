@@ -6,7 +6,7 @@
         POSSalePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars';
         POSSaleLinePatternGuideLbl: Label '[PS] ~ POS Store Code\[PU] ~ POS Unit No.\[S] ~ Sales Ticket No.\[N] ~ Random Number\[N*3] ~ 3 Random Numbers\[AN] ~ Random Char\[AN*3] ~ 3 Random Chars\[NL] ~ Natural Line No.\[L] ~ Line No.';
 
-    [Obsolete('Pending removal use InsertPOSSalesEntries instead', 'NPR23.0')]
+    [Obsolete('Pending removal use InsertPOSSalesEntries instead', '2023-06-28')]
     procedure InsertPosSalesEntries(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
     var
         TempNpGpPOSSalesEntry2: Record "NPR NpGp POS Sales Entry" temporary;
@@ -21,7 +21,7 @@
         until TempNpGpPOSSalesEntry2.Next() = 0;
     end;
 
-    [Obsolete('Pending removal use InsertPOSSalesEntry instead', 'NPR23.0')]
+    [Obsolete('Pending removal use InsertPOSSalesEntry instead', '2023-06-28')]
     local procedure InsertPosSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary)
     var
         NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";

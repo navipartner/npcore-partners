@@ -8,7 +8,7 @@ page 6014657 "NPR POS Sales Wfl. Sets Step"
     DelayedInsert = true;
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used anymore. Retail wizard was modified.';
     layout
     {

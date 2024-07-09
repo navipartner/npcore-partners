@@ -78,7 +78,7 @@
                     ApplicationArea = NPRRetail;
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteTag = '2023-10-28';
                     ObsoleteReason = 'Cached via SingleInstance codeunit';
 
                 }
@@ -88,7 +88,7 @@
                     ApplicationArea = NPRRetail;
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteTag = '2023-10-28';
                     ObsoleteReason = 'Cached via SingleInstance codeunit';
 
                 }
@@ -113,7 +113,7 @@
                 ToolTip = 'Generates a Token.';
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR27.0';
+                ObsoleteTag = '2023-10-28';
                 ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
             }
 
@@ -125,7 +125,7 @@
                 ToolTip = 'Clear an existing Token.';
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR27.0';
+                ObsoleteTag = '2023-10-28';
                 ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
             }
             action(ValidateConnection)
@@ -159,7 +159,7 @@
                 ToolTip = 'Reads a Token.';
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR27.0';
+                ObsoleteTag = '2023-10-28';
                 ObsoleteReason = 'Cached via SingleInstance codeunit. No need to cache it with the user from the page.';
                 trigger OnAction()
                 var

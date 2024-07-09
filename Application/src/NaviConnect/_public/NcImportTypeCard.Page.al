@@ -219,7 +219,7 @@
                         ToolTip = 'Specifies the value of the Ftp Backup Path field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using "FTP Backup Dir Path"';
                         Visible = false;
                     }
@@ -229,7 +229,7 @@
                         ToolTip = 'Specifies the value of the Ftp Host field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -239,7 +239,7 @@
                         ToolTip = 'Specifies the value of the Ftp Port field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -249,7 +249,7 @@
                         ToolTip = 'Specifies the value of the Ftp Binary field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -259,7 +259,7 @@
                         ToolTip = 'Specifies the value of the Ftp User field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -269,7 +269,7 @@
                         ToolTip = 'Specifies the value of the Ftp Password field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -279,7 +279,7 @@
                         ToolTip = 'Specifies the value of the Ftp Passive field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -288,7 +288,7 @@
                         ToolTip = 'Specifies which mode of encryption is used between client and server';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
                     }
@@ -298,7 +298,7 @@
                         ToolTip = 'Specifies the value of the Sftp field';
                         ApplicationArea = NPRNaviConnect;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                         Visible = false;
 
@@ -309,7 +309,7 @@
             {
                 Caption = 'XML Stylesheet';
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
                 Visible = false;
                 field(XMLStylesheetData; XMLStylesheetData)

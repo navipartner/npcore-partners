@@ -5,7 +5,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
 
     // The purpose of this function is to detect if there are action codeunits that respond to either OnBeforeWorkflow or OnAction not intended for them.
 
-    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone', 'NPR23.0')]
+    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone', '2023-06-28')]
     internal procedure Initialize(FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSAction: Record "NPR POS Action";
@@ -24,7 +24,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             FrontEnd.ReportBugAndThrowError(StrSubstNo(Text005, 'OnAction'));
     end;
 
-    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone', 'NPR23.0')]
+    [Obsolete('Replaced with workflow v3. Delete when last v1 workflow is gone', '2023-06-28')]
     internal procedure InvokeAction("Action": Text[20]; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         POSAction: Record "NPR POS Action";
@@ -273,7 +273,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
         exit(Workflow30.RunIfAction30(Context, FrontEnd));
     end;
 
-    [Obsolete('Delete when workflow v1 is gone', 'NPR23.0')]
+    [Obsolete('Delete when workflow v1 is gone', '2023-06-28')]
     local procedure Method_AbortWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "NPR POS JSON Management";
@@ -286,13 +286,13 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             FrontEnd.AbortWorkflow(WorkflowID);
     end;
 
-    [Obsolete('Delete when workflow v1 is gone', 'NPR23.0')]
+    [Obsolete('Delete when workflow v1 is gone', '2023-06-28')]
     local procedure Method_AbortAllWorkflows(FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         FrontEnd.AbortWorkflows();
     end;
 
-    [Obsolete('Delete when workflow v1 is gone', 'NPR23.0')]
+    [Obsolete('Delete when workflow v1 is gone', '2023-06-28')]
     local procedure Method_BeforeWorkflow(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; Context: JsonObject; Self: Codeunit "NPR POS JavaScript Interface")
     var
         POSAction: Record "NPR POS Action";
@@ -376,7 +376,7 @@ codeunit 6150701 "NPR POS JavaScript Interface"
             POSSession.ChangeViewSale();
     end;
 
-    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', 'NPR23.0')]
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnAction("Action": Record "NPR POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
@@ -392,19 +392,19 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
     end;
 
-    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', 'NPR23.0')]
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeWorkflow("Action": Record "NPR POS Action"; Parameters: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', 'NPR24.0')]
+    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', '2023-07-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
     end;
 
-    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', 'NPR24.0')]
+    [Obsolete('0 references in core and ZAL. We do not want "overrule everything" event publishers in our 99% scenario path', '2023-07-28')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
@@ -415,13 +415,13 @@ codeunit 6150701 "NPR POS JavaScript Interface"
     begin
     end;
 
-    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', 'NPR23.0')]
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnProtocolUIResponse(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', 'NPR23.0')]
+    [Obsolete('Use workflow v3 instead. Delete when last v1/v2 workflow is gone.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnProtocolUITimer(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; ModelID: Guid; var Handled: Boolean)
     begin

@@ -28,7 +28,7 @@
             ValidateTableRelation = false;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(4; "Register Filter"; Text[250])
         {
@@ -52,7 +52,7 @@
             DataClassification = CustomerContent;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(6; "Ending Date"; Date)
         {
@@ -60,7 +60,7 @@
             DataClassification = CustomerContent;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(7; Monday; Boolean)
         {
@@ -69,7 +69,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(8; Tuesday; Boolean)
         {
@@ -78,7 +78,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(9; Wednesday; Boolean)
         {
@@ -87,7 +87,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(10; Thursday; Boolean)
         {
@@ -96,7 +96,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(11; Friday; Boolean)
         {
@@ -105,7 +105,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(12; Saturday; Boolean)
         {
@@ -114,7 +114,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(13; Sunday; Boolean)
         {
@@ -123,7 +123,7 @@
             InitValue = true;
             ObsoleteReason = 'This is not needed anymore. Removed in Case 508848';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(21; "POS View Code"; Code[10])
         {

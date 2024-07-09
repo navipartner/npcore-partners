@@ -5,7 +5,7 @@
     DrillDownPageID = "NPR Nc Endpoint FTP List";
     LookupPageID = "NPR Nc Endpoint FTP List";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Creating Use "NPR FTP Connection" or "NPR SFTP Connection" ';
 
     fields
@@ -21,7 +21,7 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -34,7 +34,7 @@
             Caption = 'Enabled';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -47,13 +47,13 @@
             Caption = 'Output Nc Task Entry No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
         field(100; Type; Option)
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
             Caption = 'Type';
             DataClassification = CustomerContent;
@@ -66,7 +66,7 @@
             Caption = 'Protocol Type';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -80,7 +80,7 @@
             Caption = 'FTP Server';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -93,7 +93,7 @@
             Caption = 'FTP Username';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -107,7 +107,7 @@
             Caption = 'FTP Password';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
         field(140; Directory; Text[100])
@@ -115,7 +115,7 @@
             Caption = 'FTP Directory';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
 
             trigger OnValidate()
@@ -128,7 +128,7 @@
             Caption = 'Filename';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
         field(150; Port; Integer)
@@ -137,7 +137,7 @@
             DataClassification = CustomerContent;
             MinValue = 0;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving connection info to dedicated tables FTP and SFTP Connection.';
         }
         field(160; Passive; Boolean)
@@ -145,7 +145,7 @@
             Caption = 'FTP Passive';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving connection info to dedicated tables FTP and SFTP Connection.';
         }
         field(161; EncMode; Enum "NPR Nc FTP Encryption mode")
@@ -154,7 +154,7 @@
             InitValue = "None";
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
         field(170; "File Encoding"; Option)
@@ -166,7 +166,7 @@
             OptionCaption = 'ANSI,Unicode,UTF-8';
             OptionMembers = ANSI,Unicode,UTF8;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
         field(175; "File Temporary Extension"; Text[4])
@@ -175,7 +175,7 @@
             DataClassification = CustomerContent;
             CharAllowed = 'az';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaceing Endpoint FTP with FTP and SFTP Connection.';
         }
     }

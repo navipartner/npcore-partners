@@ -180,7 +180,7 @@
                     Image = Sales;
                     ObsoleteReason = 'It will not be used anymore.';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteTag = '2023-09-28';
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;

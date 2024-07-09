@@ -7,7 +7,7 @@ tableextension 6014478 "NPR Country/Region" extends "Country/Region"
             Caption = 'HeyLoyalty Country ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
     }
@@ -17,7 +17,7 @@ tableextension 6014478 "NPR Country/Region" extends "Country/Region"
         key(HLCountryID; "NPR HL Country ID")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
     }

@@ -17,7 +17,7 @@ table 6014696 "NPR Tenant Diagnostic"
             Caption = 'Azure AD Tenant ID';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'We have new set of objects and functions for SaaS environment, so this field is going to be obsoleted.';
         }
         field(10; "POS Stores"; Integer)

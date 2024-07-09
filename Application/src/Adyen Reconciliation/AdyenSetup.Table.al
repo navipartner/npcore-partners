@@ -56,7 +56,7 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             Caption = 'Management Base URL';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with .';
         }
         field(35; "Environment Type"; Enum "NPR Adyen Environment Type")
@@ -109,7 +109,7 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             Caption = 'Report Scheme Docs URL';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(110; "Recon. Integr. Starting Date"; DateTime)

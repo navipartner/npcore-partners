@@ -195,7 +195,7 @@
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
         }
@@ -204,7 +204,7 @@
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
         }

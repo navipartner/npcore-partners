@@ -12,7 +12,7 @@ page 6060078 "NPR MM Membership Kiosk"
     PageType = List;
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Page will be deleted, no longer used.';
 
     layout

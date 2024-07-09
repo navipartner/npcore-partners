@@ -11,7 +11,7 @@
     /// <param name="VariantCode"></param> Variant Code to be used for calculation
     /// <param name="POSSaleLineTemp"></param> Temporary NPR POS Sale Line record used to return calculated values
     /// <returns></returns>
-    [Obsolete('Use CalculateMixedDiscountLine(RetailJournalLine: Record "NPR Retail Journal Line"; var POSSaleLineTemp: Record "NPR POS Sale Line" temporary; CalculationDate: Date) MixedDiscountExists: Boolean', 'NPR23.0')]
+    [Obsolete('Use CalculateMixedDiscountLine(RetailJournalLine: Record "NPR Retail Journal Line"; var POSSaleLineTemp: Record "NPR POS Sale Line" temporary; CalculationDate: Date) MixedDiscountExists: Boolean', '2023-06-28')]
     procedure CalculateMixedDiscountLine(ItemNo: Code[20]; VariantCode: Code[20]; var POSSaleLineTemp: Record "NPR POS Sale Line" temporary; CalculationDate: Date) MixedDiscountExists: Boolean
     begin
 

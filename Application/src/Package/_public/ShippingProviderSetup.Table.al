@@ -16,7 +16,7 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Use Pacsoft integration';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'replaced by "Shipping Provider"';
         }
         field(3; "Send Doc. Immediately(Pacsoft)"; Boolean)
@@ -92,7 +92,7 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Use Consignor';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'replaced by "Shipping Provider"';
         }
         field(150; "Use Pakkelabels"; Boolean)
@@ -100,7 +100,7 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Use Pakkelabels';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'replaced by "Shipping Provider"';
 
         }
@@ -130,7 +130,7 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Package Service Codeunit ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by enum "Shipping Provider"';
         }
         field(157; "Package ServiceCodeunit Name"; Text[249])
@@ -139,7 +139,7 @@ table 6014574 "NPR Shipping Provider Setup"
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by enum "Shipping Provider"';
         }
         field(158; "Use Pakkelable Printer API"; Boolean)
@@ -174,7 +174,7 @@ table 6014574 "NPR Shipping Provider Setup"
             InitValue = true;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used Anymore';
         }
         field(164; "Enable Shipping"; Boolean)

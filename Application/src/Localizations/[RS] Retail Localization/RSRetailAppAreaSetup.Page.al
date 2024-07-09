@@ -6,7 +6,7 @@ page 6150836 "NPR RS Retail App. Area Setup"
     UsageCategory = None;
     ObsoleteReason = 'Not used anymore.';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     Extensible = false;
 
     layout

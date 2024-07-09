@@ -86,7 +86,7 @@
             Caption = 'Generic Setup';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy';
         }
         field(50; "Inventory Location Filter"; Text[100])
@@ -128,7 +128,7 @@
             Caption = 'Api Username Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported anymore. Replaced with Basic or OAuth2.0';
         }
 
@@ -148,7 +148,7 @@
         field(75; "Api Password"; Text[250])
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
             DataClassification = CustomerContent;
@@ -189,7 +189,7 @@
             Caption = 'Managed Nav Modules Enabled';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(85; "Managed Nav Api Url"; Text[250])
@@ -197,7 +197,7 @@
             Caption = 'Managed Nav Api Url';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(90; "Managed Nav Api Username"; Text[100])
@@ -205,7 +205,7 @@
             Caption = 'Managed Nav api brugernavn';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(95; "Managed Nav Api Password"; Text[100])
@@ -214,7 +214,7 @@
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(96; "Managed Nav Api Password Key"; Guid)
@@ -222,7 +222,7 @@
             Caption = 'Managed Nav Api Password Key';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(98; "Version No."; Text[50])
@@ -237,7 +237,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not needed anymore. We moved to Azure Blob Storage deploy.';
         }
         field(100; "Brands Enabled"; Boolean)
@@ -419,7 +419,7 @@
             DataClassification = CustomerContent;
             TableRelation = "Customer Posting Group";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not use anymore.';
         }
         field(515; "Customer Template Code"; Code[20])
@@ -440,7 +440,7 @@
             DataClassification = CustomerContent;
             TableRelation = "Payment Terms";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not use anymore.';
         }
         field(525; "Payment Fee Account No."; Code[20])
@@ -476,7 +476,7 @@
             Caption = 'Replicate to Sales Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with "Replicate to Price Source Type"';
 
         }

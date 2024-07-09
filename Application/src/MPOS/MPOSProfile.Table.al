@@ -5,7 +5,7 @@
     DataClassification = CustomerContent;
     //LookupPageID = "NPR MPOS Profiles";
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = '1. Field "Ticket Admission Web Url" moved to table "NPR TM Ticket Setup"; 2. Use field "POS Type" on POS Unit to identify if the POS is an mPos device.';
 
     fields

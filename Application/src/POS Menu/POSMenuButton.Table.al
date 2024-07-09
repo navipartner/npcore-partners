@@ -137,7 +137,7 @@
             Caption = 'Foreground Color';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used. Removed in case 516268.';
         }
         field(23; "Icon Class"; Text[30])
@@ -153,7 +153,7 @@
         field(25; Bold; Boolean)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Bold';
             DataClassification = CustomerContent;
@@ -161,7 +161,7 @@
         field(26; "Font Size"; Integer)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Field Is not needed anymore. Case 498936';
             Caption = 'Font Size';
             DataClassification = CustomerContent;
@@ -193,7 +193,7 @@
             Caption = 'Blocking UI';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Does not really make sense as it should not be persistent data stored on a per button level. It should be hardcoded by the developer that created the action, whether the action should block the UI';
         }
         field(31; "Background Image Url"; Text[250])
@@ -260,7 +260,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(45; "Available in App"; Boolean)
@@ -269,7 +269,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
     }

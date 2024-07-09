@@ -1,7 +1,7 @@
 ﻿codeunit 6151292 "NPR SS Action: NpRv Apply"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use new action SS-VOUCHER-APPLY-2';
     //this action is a SelfService variant of 'SCAN_VOUCHER' action (codeunit 6151014 "NPR NpRv Scan POSAction Mgt.")
     var

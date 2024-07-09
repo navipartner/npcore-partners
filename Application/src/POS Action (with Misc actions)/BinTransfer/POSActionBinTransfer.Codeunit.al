@@ -100,7 +100,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
             POSSession.ChangeViewLogin();
     end;
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     local procedure RunLegacyAction(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; Setup: Codeunit "NPR POS Setup")
     var
         TransferDirection: Option "",TransferOut,TransferIn;
@@ -114,7 +114,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         end;
     end;
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     local procedure TransferContentsOutFromBin(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale")
     var
         CheckpointEntryNo: Integer;
@@ -155,7 +155,7 @@ codeunit 6150851 "NPR POS Action: Bin Transfer" implements "NPR IPOS Workflow"
         PosUnitNo := POSUnit."No.";
     end;
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     local procedure TransferContentsInToBin(PosSetup: Codeunit "NPR POS Setup"): JsonObject
     var
         BinTransferJournalPage: Page "NPR BinTransferJournalPos";

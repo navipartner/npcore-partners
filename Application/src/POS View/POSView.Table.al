@@ -66,7 +66,7 @@
         OutStream.Write(Text);
     end;
 
-    [Obsolete('Replaced with same function without SalespersonCode. Salesperson is not used anymore on Default View filtering. Case 508848.', 'NPR23.0')]
+    [Obsolete('Replaced with same function without SalespersonCode. Salesperson is not used anymore on Default View filtering. Case 508848.', '2023-06-28')]
     procedure FindViewByType(ViewType: Option; SalespersonCode: Code[20]; RegisterCode: Code[10]): Boolean
     begin
         exit(FindViewByType(ViewType, RegisterCode));

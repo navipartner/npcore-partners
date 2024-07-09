@@ -40,7 +40,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             Caption = 'Codeunit Begin Workshift';
             DataClassification = CustomerContent;
@@ -50,7 +50,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = Field("Codeunit Begin Workshift")));
@@ -62,7 +62,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             Caption = 'Codeunit Transaction';
             DataClassification = CustomerContent;
@@ -72,7 +72,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = Field("Codeunit Transaction")));
@@ -84,7 +84,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             Caption = 'Codeunit End Workshift';
             DataClassification = CustomerContent;
@@ -94,7 +94,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Codeunit),
                                                              "Object ID" = Field("Codeunit End Workshift")));
@@ -106,7 +106,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             Caption = 'Codeunit Auxiliary Functions';
             DataClassification = CustomerContent;
@@ -116,7 +116,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = Field("Codeunit Auxiliary Functions")));
@@ -128,7 +128,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             Caption = 'Codeunit Install';
             DataClassification = CustomerContent;
@@ -138,7 +138,7 @@
         {
             ObsoleteReason = 'Not used.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
 
             CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
                                                              "Object ID" = Field("Codeunit Install")));
