@@ -30,6 +30,9 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
         EnterReceiptNoLbl: Label 'Enter Receipt Number';
         EmailTemplateCodeCptLbl: Label 'Set E-mail Template';
         EmailTemplateCodeDescLbl: Label 'Choose E-mail Template';
+        SelectReceiptToSend_CptLbl: Label 'Select Receipt To Send';
+        SelectReceiptToSend_DescLbl: Label 'Choose which receipt you want to send';
+        SelectReceiptToSend_OptLbl: Label 'Normal Receipt,Digital Receipt';
         EmailAddCptLbl: Label 'E-mail:';
         EmailAddTitLbl: Label 'Please enter the E-mail address';
     begin
@@ -72,6 +75,14 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('EnterReceiptNoLbl', EnterReceiptNoLbl);
         WorkflowConfig.AddLabel('EmailTitle', EmailAddTitLbl);
         WorkflowConfig.AddLabel('EmailCpt', EmailAddCptLbl);
+        WorkflowConfig.AddOptionParameter('SelectReceiptToSend',
+                                           SelectReceiptToSend_OptLbl,
+#pragma warning disable AA0139
+                                           SelectStr(1, SelectReceiptToSend_OptLbl),
+#pragma warning restore 
+                                           SelectReceiptToSend_CptLbl,
+                                           SelectReceiptToSend_DescLbl,
+                                           SelectReceiptToSend_OptLbl);
     end;
 
     local procedure GetActionScript(): Text
@@ -99,6 +110,7 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
         EmailTemplateCode: Code[20];
         ReceiptEmail: Text[80];
         EntryNo: Integer;
+        SelectReceiptToSendParam: Integer;
     begin
         ValidateEmailAddress(Context);
 
@@ -108,7 +120,8 @@ codeunit 6150653 "NPR POS Action: Send Receipt" implements "NPR IPOS Workflow"
         EmailTemplateCode := Context.GetStringParameter('EmailTemplate');
         ReceiptEmail := Context.GetString('receiptAddress');
 #pragma warning restore 
-        Context.SetContext('status', NPOSActionSendRcptB.SendReceipt(EmailTemplateCode, ReceiptEmail, EntryNo));
+        SelectReceiptToSendParam := Context.GetIntegerParameter('SelectReceiptToSend');
+        Context.SetContext('status', NPOSActionSendRcptB.SendReceipt(EmailTemplateCode, ReceiptEmail, EntryNo, SelectReceiptToSendParam));
     end;
 
     local procedure GetReceipt(Context: Codeunit "NPR POS JSON Helper"): JsonObject
