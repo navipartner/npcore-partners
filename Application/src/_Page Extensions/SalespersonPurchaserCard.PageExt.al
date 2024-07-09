@@ -27,7 +27,7 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                     Visible = false;
                     Enabled = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Replaced with POS Unit Group field.';
                 }
                 field("NPR POS Unit Group"; Rec."NPR POS Unit Group")

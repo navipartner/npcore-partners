@@ -135,43 +135,43 @@
     end;
 
     #region Obsolete
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and, if synchronous instead of via workflow, OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and, if synchronous instead of via workflow, OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
     end;
 
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnGetIntegrationRequestWorkflow(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var IntegrationWorkflow: Text; EftJsonRequest: JsonObject)
     begin
     end;
 
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
     end;
 
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
     end;
 
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeLookupPrompt(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var Skip: Boolean)
     begin
     end;
 
-    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', 'NPR23.0')]
+    [Obsolete('Move to workflow v3 and subscribe to OnPrepareRequestSend and/or OnSendRequestSynchronously instead of this', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "NPR EFT Transaction Request"; var DoNotResume: Boolean)
     begin
     end;
 
-    [Obsolete('Use OnEndOfDayCloseEft', 'NPR23.0')]
+    [Obsolete('Use OnEndOfDayCloseEft', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnQueueCloseBeforeRegisterBalance(POSSession: Codeunit "NPR POS Session"; var tmpEFTSetup: Record "NPR EFT Setup" temporary)
     begin

@@ -7,7 +7,7 @@ page 6059859 "NPR Aux Conf. Template Subform"
 #IF BC17 or BC18 or BC19 or BC20
     UsageCategory = None;
 
-    [Obsolete('Only available in cloud version', 'NPR23.0')]
+    [Obsolete('Only available in cloud version', '2023-06-28')]
     procedure SetAuxTableId(_AuxTableId: Integer)
     begin
     end;

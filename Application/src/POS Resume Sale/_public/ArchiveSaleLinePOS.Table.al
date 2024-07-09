@@ -46,7 +46,7 @@
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Line Type field';
         }
         field(6; "No."; Code[20])
@@ -257,7 +257,7 @@
             TableRelation = Customer;
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Not used';
         }
         field(47; "Invoice Discount Amount"; Decimal)
@@ -490,7 +490,7 @@
             Caption = 'Sales Document Sync. Posting';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Enum POS Sales Document Post instead';
         }
         field(148; "Sales Document Print"; Boolean)
@@ -810,7 +810,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6012; "MR Anvendt antal"; Decimal)
@@ -915,7 +915,7 @@
             Caption = 'Gift Certificate Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(6038; "Label Date"; Date)
@@ -1066,7 +1066,7 @@
             MaintainSIFTIndex = false;
             MaintainSQLIndex = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", Type, "No.", "Item Group", Quantity)
@@ -1074,7 +1074,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Key Removed';
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Line No.")
@@ -1094,7 +1094,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key7; "Serial No.")
@@ -1114,7 +1114,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
 
@@ -1123,7 +1123,7 @@
             MaintainSIFTIndex = false;
             SumIndexFields = "Amount Including VAT", Amount, Quantity;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key11; "Register No.", "Sales Ticket No.", Date, "Line Type", "Discount Type", "Line No.")

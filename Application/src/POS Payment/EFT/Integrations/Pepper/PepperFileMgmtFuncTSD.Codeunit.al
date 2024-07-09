@@ -3,6 +3,6 @@
     Access = Internal;
     ObsoleteReason = 'Uses HWC integration now';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
 
 }

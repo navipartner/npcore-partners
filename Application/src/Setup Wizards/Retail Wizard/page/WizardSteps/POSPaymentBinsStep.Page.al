@@ -232,7 +232,7 @@
         exit(Rec.FindSet());
     end;
 
-    [Obsolete('Please use procedure CreatePOSPaymentBinData()', 'NPR23.0')]
+    [Obsolete('Please use procedure CreatePOSPaymentBinData()', '2023-06-28')]
     internal procedure CreatePOSPaymentBinData(var POSPaymentBinToCreate: Record "NPR POS Payment Bin")
     var
         POSPaymentBin: Record "NPR POS Payment Bin";

@@ -92,7 +92,7 @@
             Caption = 'Journal';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Changing field to be Media type. New field: Receipt Content';
         }
         field(17; "Receipt Content"; Media)

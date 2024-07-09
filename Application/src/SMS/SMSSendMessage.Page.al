@@ -176,7 +176,7 @@
         DelayUntil: DateTime;
         Mode: Option Test,SingleRecord,Batch;
 
-    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"', 'NPR23.0')]
+    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"', '2023-06-28')]
     internal procedure SetData(ReceiverPhoneNo: Text; RecRef: RecordRef; Sender: Text; DialogMode: Option Test,SingleRecord,Batch; RecordSelectionText: Text)
     begin
         PhoneNo := ReceiverPhoneNo;
@@ -200,7 +200,7 @@
         RecTypeVisible := RecTypeVis;
     end;
 
-    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"', 'NPR23.0')]
+    [Obsolete('New oveload procedure with Enum "NPR SMS Recipient Type"', '2023-06-28')]
     internal procedure GetData(var ReceiverPhoneNo: Text; var RecRef: RecordRef; var SMSBodyText: Text; var Sender: Text; var SendOption: Option; var SendDelayUntil: DateTime)
     begin
         ReceiverPhoneNo := PhoneNo;

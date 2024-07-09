@@ -449,7 +449,7 @@
         VoucherEntry.Insert();
     end;
 
-    [Obsolete('Replaced with Codeunit.run(Codeunit::"NPR NpRv Voucher Mgt."...)', 'NPR23.0')]
+    [Obsolete('Replaced with Codeunit.run(Codeunit::"NPR NpRv Voucher Mgt."...)', '2023-06-28')]
     internal procedure SendVoucher(Voucher: Record "NPR NpRv Voucher")
     begin
         SendSingleVoucher(Voucher);
@@ -501,7 +501,7 @@
         NpRvSendingLog.Insert(true);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     internal procedure ApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; NpRvSalesLine: Record "NPR NpRv Sales Line"; EndSale: Boolean)
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -1318,7 +1318,7 @@
         NpRvSalesLine.Insert(true);
     end;
 
-    [Obsolete('Delete when final v1/v2 workflow is gone', 'NPR23.0')]
+    [Obsolete('Delete when final v1/v2 workflow is gone', '2023-06-28')]
     internal procedure ApplyVoucherPayment(var VoucherTypeCode: Code[20]; VoucherNumber: Text; var PaymentLine: Record "NPR POS Sale Line"; var SalePOS: Record "NPR POS Sale"; var POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management"; var POSPaymentLine: Codeunit "NPR POS Payment Line"; var POSLine: Record "NPR POS Sale Line"; EndSale: Boolean)
     var
         TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary;

@@ -138,7 +138,7 @@ page 6014691 "NPR APIV1 - Cust. Bank Account"
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

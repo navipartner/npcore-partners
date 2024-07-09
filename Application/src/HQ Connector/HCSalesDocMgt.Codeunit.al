@@ -3,7 +3,7 @@
     Access = Internal;
     TableNo = "NPR Nc Import Entry";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'HQ Connector will no longer be supported';
 
     trigger OnRun()

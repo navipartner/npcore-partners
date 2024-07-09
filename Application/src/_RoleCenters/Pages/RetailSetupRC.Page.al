@@ -71,7 +71,7 @@ page 6151245 "NPR Retail Setup RC"
                     Image = PaymentJournal;
                     ObsoleteReason = 'It will not be used anymore.';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteTag = '2023-09-28';
                     RunObject = Page "NPR POS Menus";
                     ToolTip = 'View or edit the the POS Menus';
                     Visible = false;
@@ -92,7 +92,7 @@ page 6151245 "NPR Retail Setup RC"
                     Image = ViewDocumentLine;
                     ObsoleteReason = 'It will not be used anymore.';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteTag = '2023-09-28';
                     RunObject = Page "NPR POS View List";
                     ToolTip = 'View or edit the POS View List';
                     Visible = false;
@@ -104,7 +104,7 @@ page 6151245 "NPR Retail Setup RC"
                     Image = View;
                     ObsoleteReason = 'It will not be used anymore.';
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteTag = '2023-09-28';
                     RunObject = Page "NPR POS Default Views";
                     ToolTip = 'View or edit the POS Default View';
                     Visible = false;

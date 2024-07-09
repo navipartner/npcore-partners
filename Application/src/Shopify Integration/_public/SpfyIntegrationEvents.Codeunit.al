@@ -43,7 +43,7 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
-    [Obsolete('Use event OnAfterInsertPaymentLines instead', 'NPR33.0')]
+    [Obsolete('Use event OnAfterInsertPaymentLines instead', '2024-04-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnInsertPaymentLines(var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin

@@ -5,7 +5,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         field(6014400; "NPR Sales (LCY)"; Decimal)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (LCY)';
             Description = 'NPR7.100.000';
@@ -14,7 +14,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         field(6014401; "NPR COGS (LCY)"; Decimal)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'COGS (LCY)';
             Description = 'NPR7.100.000';
@@ -26,7 +26,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014403; "NPR Item Category Filter"; Code[20])
@@ -39,7 +39,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         field(6014404; "NPR Sales (Qty.)"; Decimal)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Sales (Qty.)';
             Description = 'NPR7.100.000';
@@ -55,7 +55,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         field(6014406; "NPR Stock"; Decimal)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Aux Value Entry has been removed and this field reimplemented on calculation procedure.';
             Caption = 'Stock';
             Description = 'NPR7.100.000';
@@ -67,7 +67,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Purchase Value (LCY)"; Decimal)
@@ -75,7 +75,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Purchase Value (LCY)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014409; "NPR Change-to No."; Code[20])
@@ -84,13 +84,13 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             DataClassification = CustomerContent;
             Description = 'NPR7.100.000';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Standard field Document Sending Profile is used.';
             Caption = 'Document Processing';
             DataClassification = CustomerContent;
@@ -103,7 +103,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -113,7 +113,7 @@ tableextension 6014424 "NPR Vendor" extends Vendor
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

@@ -191,14 +191,14 @@
             {
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not used';
                 Caption = 'Dimensions';
                 group(Control6150625)
                 {
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Not used';
                     ShowCaption = false;
                 }
@@ -386,7 +386,7 @@
                 action(ImportFromMixedDiscount)
                 {
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Removed';
                     Caption = 'Mixed Discounts';
                     Enabled = false;

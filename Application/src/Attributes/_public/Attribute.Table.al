@@ -125,7 +125,7 @@
             Caption = 'HeyLoyalty Field ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
         field(801; "HeyLoyalty Default Value"; Text[50])
@@ -133,7 +133,7 @@
             Caption = 'Default HeyLoyalty Value';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
         field(802; "HL Auto Create New Values"; Boolean)
@@ -146,7 +146,7 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -159,7 +159,7 @@
         key(Key2; "Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

@@ -92,7 +92,7 @@
                     ToolTip = 'Specifies the value of the Ftp Host field';
                     ApplicationArea = NPRNaviConnect;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                     Visible = false;
                 }
@@ -101,7 +101,7 @@
                     ToolTip = 'Specifies the value of the Sftp field';
                     ApplicationArea = NPRNaviConnect;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Using Sftp and Ftp connections instead.';
                     Visible = false;
                 }

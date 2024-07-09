@@ -397,7 +397,7 @@ page 6150765 "NPR TM Admission Card"
                 Image = CustomerList;
                 RunObject = Report "NPR TM Admission List";
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'NPR TM Admission List is going to be deleted.';
             }
         }

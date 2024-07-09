@@ -932,7 +932,7 @@
         POSSession.RequestRefreshData();
     end;
 
-    [Obsolete('Remove as soon as the frontend supports the new field "Indatation" in the table "POS Sale Line"', 'NPR32.0')]
+    [Obsolete('Remove as soon as the frontend supports the new field "Indatation" in the table "POS Sale Line"', '2024-03-28')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineFormat', '', false, false)]
     local procedure OnGetLineFormat(var Highlighted: Boolean; var Indented: Boolean; SaleLinePOS: Record "NPR POS Sale Line")
     var

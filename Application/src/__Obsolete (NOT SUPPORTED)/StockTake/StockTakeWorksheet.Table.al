@@ -4,7 +4,7 @@
     Caption = 'Stock-Take Worksheet';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Object moved to NP Warehouse App.';
     fields
     {

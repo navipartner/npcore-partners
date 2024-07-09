@@ -2,7 +2,7 @@
 controladdin "NPR Dimensions SearchFocus"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Auto setting focus on fields is not supported. If requested, please inform the customer how BC works and where the MS idea portal is if they wish the behaviour was different. See case 580270.';
 
     RequestedHeight = 1;
@@ -16,11 +16,11 @@ controladdin "NPR Dimensions SearchFocus"
     HorizontalStretch = true;
     HorizontalShrink = true;
 
-    [Obsolete('The control add-in has been removed. See case 580270.', 'NPR23.0')]
+    [Obsolete('The control add-in has been removed. See case 580270.', '2023-06-28')]
     event SearchDimensions()
-    [Obsolete('The control add-in has been removed. See case 580270.', 'NPR23.0')]
+    [Obsolete('The control add-in has been removed. See case 580270.', '2023-06-28')]
     procedure SetFocusOnField(FieldNo: Text)
-    [Obsolete('The control add-in has been removed. See case 580270.', 'NPR23.0')]
+    [Obsolete('The control add-in has been removed. See case 580270.', '2023-06-28')]
     procedure SetFocusOnFieldPhone(FieldNo: Text)
 }
 #ENDIF

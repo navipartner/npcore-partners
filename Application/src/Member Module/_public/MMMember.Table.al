@@ -164,7 +164,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(33; Image; Media)

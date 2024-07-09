@@ -10,7 +10,7 @@
     ShowFilter = false;
     SourceTable = "NPR EFTType Paym. BLOB Param.";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use integration specific setup tables for cleaner code';
 
     layout

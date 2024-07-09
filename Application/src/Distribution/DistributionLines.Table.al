@@ -102,7 +102,7 @@
             Caption = 'Purchase Order No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(301; "Purchase Order Line"; Integer)
@@ -110,7 +110,7 @@
             Caption = 'Purchase Order Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(302; "Qty On PO"; Decimal)
@@ -130,7 +130,7 @@
             Caption = 'Transfer Order No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(311; "Transfer Order Line"; Integer)
@@ -138,7 +138,7 @@
             Caption = 'Transfer Order Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(312; "Qty On Transfer"; Decimal)

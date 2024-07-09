@@ -28,7 +28,7 @@
             OptionCaption = 'Custom,Password Client,Password Server';
             OptionMembers = Custom,"Password Client","Password Server";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Password Server will be the only choice in the future, implicitly';
         }
     }

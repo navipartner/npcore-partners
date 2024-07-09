@@ -29,7 +29,7 @@
         exit(true);
     end;
 
-    [Obsolete('Replaced with Codeunit.run(Codeunit::"NPR NpXml Process Single Batch"...) or RunSingleBatch function', 'NPR23.0')]
+    [Obsolete('Replaced with Codeunit.run(Codeunit::"NPR NpXml Process Single Batch"...) or RunSingleBatch function', '2023-06-28')]
     procedure RunBatch(var NPXmlTemplate: Record "NPR NpXml Template")
     begin
         RunSingleBatch(NPXmlTemplate);

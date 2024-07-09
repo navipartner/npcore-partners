@@ -116,7 +116,7 @@ page 6014664 "NPR APIV1 - Cust. Post. Groups"
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

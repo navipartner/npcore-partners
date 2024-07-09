@@ -20,7 +20,7 @@
             OptionCaption = 'Active,Planned,Finished,Cancelled';
             OptionMembers = Active,Planned,Finished,Cancelled;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by Enum field 11 "Order Status"';
         }
         field(11; "Order Status"; Enum "NPR NPRE Kitchen Order Status")

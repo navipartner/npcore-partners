@@ -67,7 +67,7 @@
                     ToolTip = 'Specifies the encoding format for Business Central receipts.';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Will be removed when Pepper TSD is removed.';
                 }
                 field("Com Port"; Rec."Com Port")

@@ -67,7 +67,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the company that you will send the invoice to.';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not Used.';
             }
             field("NPR Bill-To Vendor No."; Rec."NPR Bill-To Vendor No.")
@@ -75,7 +75,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 ToolTip = 'Specifies the vendor number to whom you will send the sales invoice.';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not Used.';
             }
             field("NPR Bill-to E-mail"; Rec."NPR Bill-to E-mail")

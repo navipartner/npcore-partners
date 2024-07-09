@@ -5,7 +5,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
     var
         JsonHelper: Codeunit "NPR Json Helper";
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     procedure TransferContentsToBin(POSSession: Codeunit "NPR POS Session"; FromBinNo: Code[10]; CheckpointEntryNo: Integer)
     var
         PaymentBinCheckpoint: Codeunit "NPR POS Payment Bin Checkpoint";
@@ -57,7 +57,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         end;
     end;
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     procedure PrintBinTransfer(CheckpointEntryNo: Integer)
     var
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
@@ -121,7 +121,7 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         exit(POSPaymentBin."No.");
     end;
 
-    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', 'NPR28.0')]
+    [Obsolete('Part of legacy action codebase. Can be deleted once the legacy action is not used anymore.', '2023-11-28')]
     local procedure GetUnitNo(POSSession: Codeunit "NPR POS Session"): Code[10]
     var
         POSSetup: Codeunit "NPR POS Setup";

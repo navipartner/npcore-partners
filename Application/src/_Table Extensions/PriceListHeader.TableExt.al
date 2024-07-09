@@ -7,7 +7,7 @@ tableextension 6014458 "NPR Price List Header" extends "Price List Header"
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
         field(6151480; "NPR Location Code"; Code[10])
@@ -28,7 +28,7 @@ tableextension 6014458 "NPR Price List Header" extends "Price List Header"
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

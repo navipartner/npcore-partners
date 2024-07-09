@@ -1,7 +1,7 @@
 report 6014449 "NPR Vendor Trn. by Item Cat."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Vendor trn. by Item Cat.rdlc';
@@ -10,7 +10,7 @@ report 6014449 "NPR Vendor Trn. by Item Cat."
     UseSystemPrinter = true;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR32.0';
+    ObsoleteTag = '2024-03-28';
     ObsoleteReason = 'Not being used anymore.';
 
     dataset

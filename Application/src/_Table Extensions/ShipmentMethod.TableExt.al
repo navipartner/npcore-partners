@@ -8,7 +8,7 @@ tableextension 6014462 "NPR Shipment Method" extends "Shipment Method"
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -18,7 +18,7 @@ tableextension 6014462 "NPR Shipment Method" extends "Shipment Method"
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

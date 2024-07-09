@@ -5,7 +5,7 @@
     DataClassification = CustomerContent;
 
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Cleanup AF Setup';
 
     fields
@@ -43,7 +43,7 @@
             Caption = 'Spire Barcode - API Key';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(101; "Spire Barcode - Base Url"; Text[100])
@@ -51,7 +51,7 @@
             Caption = 'Spire Barcode - Base Url';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(102; "Spire Barcode - API Routing"; Text[100])
@@ -59,7 +59,7 @@
             Caption = 'Spire Barcode - API Routing';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(200; "Notification - API Key"; Text[100])
@@ -67,7 +67,7 @@
             Caption = 'Notification - API Key';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(201; "Notification - Base Url"; Text[100])
@@ -192,7 +192,7 @@
             Caption = 'OIO Validation - API Key';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(401; "OIO Validation - Base Url"; Text[100])
@@ -200,7 +200,7 @@
             Caption = 'OIO Validation - Base Url';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(402; "OIO Validation - API Routing"; Text[100])
@@ -208,7 +208,7 @@
             Caption = 'OIO Validation - API Routing';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
         field(403; "OIO Validation - Enable"; Boolean)
@@ -216,7 +216,7 @@
             Caption = 'OIO Validation - Enable';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This Field won''t be used anymore';
         }
     }

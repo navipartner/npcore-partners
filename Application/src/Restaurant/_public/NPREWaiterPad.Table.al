@@ -24,7 +24,7 @@
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Ord,Cash;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(11; "Customer No."; Code[20])
@@ -38,7 +38,7 @@
             Caption = 'Start Date';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(15; "Start Time"; Time)
@@ -46,7 +46,7 @@
             Caption = 'Start Time';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
         field(16; "Current Seating FF"; Code[20])
@@ -83,7 +83,7 @@
             Caption = 'Seating Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by procedure GetCurrentSeating(), as the field could contain an outdated value';
         }
         field(22; "Close Reason"; Enum "NPR NPRE W/Pad Closing Reason")

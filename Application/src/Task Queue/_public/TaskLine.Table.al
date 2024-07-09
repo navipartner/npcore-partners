@@ -4,11 +4,11 @@
     DataClassification = CustomerContent;
 #IF BC17
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Task Queue module is about to be removed from NP Retail. We are now using Job Queue instead.';
 #ELSE
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
 #ENDIF
     fields
@@ -394,184 +394,184 @@
     }
 
 #IF BC17
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetUpNewLine(LastTaskLine: Record "NPR Task Line")
     begin
     end;
 #ENDIF
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure LookupNextRunTime(): DateTime
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetNextRuntime(NextRunDateTime: DateTime; AssignTask2Me: Boolean)
     var
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure TaskUsesPrinter(): Boolean
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure TaskGenerateOutput(): Boolean
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetExpectedDuration(): Duration
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure UpdateTaskQueue()
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetLogEntryNo(): Integer
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetFilePathAndName() filename: Text[1024]
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure IncreaseIndentation()
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure DecreaseIndentation()
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure CheckIndentation()
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterText(ParameterName: Text[20]): Text[250]
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterInt(ParameterName: Text[20]): Integer
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterBool(ParameterName: Text[20]): Boolean
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterDate(ParameterName: Text[20]): Date
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterTime(ParameterName: Text[20]): Time
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterDateFormula(ParameterName: Text[20]): Text[100]
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetParameterCalcDate(ParameterName: Text[20]): Date
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterText(ParameterName: Text[20]; Value: Text[1024])
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterInt(ParameterName: Text[20]; Value: Integer)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterBool(ParameterName: Text[20]; Value: Boolean)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterDate(ParameterName: Text[20]; Value: Date)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterTime(ParameterName: Text[20]; Value: Time)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetParameterDateFormula(ParameterName: Text[20]; Value: DateFormula)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure ParametersExists(): Boolean
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure InsertParameter(ParameterName: Code[20]; FieldType: Option Text,Date,Time,DateTime,"Integer",Decimal,Boolean,DateFilter)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     local procedure TableFilter2View(TableNo: Integer; TableFilter: Text[1024]; TableKey: Text[1024]; CurrTableView: Text[1024]): Text[1024]
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetTableView(TableNo: Integer; CurrTableView: Text[1024]): Text[1024]
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure TimeSlotStillValid(): Boolean
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure AddMessageLine2Log(MessageLine: Text[1024])
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure AddMessageLine2OutputLog(MessageLine: Text[1024])
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure DisableAutoParameterCreation()
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure GetReportParameters(): Text
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure SetReportParameters(Params: Text)
     begin
     end;
 
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure RunReportRequestPage()
     begin
     end;

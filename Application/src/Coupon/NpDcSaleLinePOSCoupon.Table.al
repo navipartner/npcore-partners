@@ -125,7 +125,7 @@
         key(Key3; "Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Application Sequence No.")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = '"Sale Type" field in "NPR POS Sale Line" not used anymore';
         }
         key(Key4; "Register No.", "Sales Ticket No.", "Sale Date", "Application Sequence No.")

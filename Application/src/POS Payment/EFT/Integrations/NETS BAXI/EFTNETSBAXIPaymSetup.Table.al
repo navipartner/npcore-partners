@@ -114,7 +114,7 @@
             DataClassification = CustomerContent;
             InitValue = 5;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Force abort no longer supported';
         }
         field(310; "Administration Timeout Seconds"; Integer)

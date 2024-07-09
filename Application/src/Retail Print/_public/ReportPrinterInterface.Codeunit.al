@@ -1,7 +1,7 @@
 ﻿codeunit 6014583 "NPR Report Printer Interface"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Wrapper object is no longer required - our custom report printing logic is subscribing to built in BC print events. Call Report.Run() instead';
     var
         ReportLayoutSelection: Record "Report Layout Selection";

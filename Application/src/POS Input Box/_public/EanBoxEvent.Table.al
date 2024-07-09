@@ -39,7 +39,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Text that should follow user language can not be table data. Change to page variable populated runtime in wokflow v3.';
         }
         field(25; "POS View"; Option)

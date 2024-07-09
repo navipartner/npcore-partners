@@ -4,7 +4,7 @@ page 6014651 "NPR Retail Wizard"
     Caption = 'Retail Wizard';
     PageType = NavigatePage;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used any more. Retail wizard was modified.';
 
     layout

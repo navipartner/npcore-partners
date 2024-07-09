@@ -44,7 +44,7 @@
         field(5; "Api Url"; Text[250])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Api Url';
             DataClassification = CustomerContent;
@@ -52,7 +52,7 @@
         field(6; "Api Username"; Text[100])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Api Username';
             DataClassification = CustomerContent;
@@ -60,7 +60,7 @@
         field(7; "Api Password"; Text[250])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'IsolatedStorage is in use.';
             Caption = 'Api Password';
             DataClassification = CustomerContent;
@@ -68,7 +68,7 @@
         field(8; Token; Text[250])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Token';
             DataClassification = CustomerContent;
@@ -77,7 +77,7 @@
         field(9; "Api Password Key"; Guid)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Api Password Key';
             Editable = false;
@@ -86,7 +86,7 @@
         field(10; "Merchant ID"; Code[20])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Merchant Id';
             DataClassification = CustomerContent;
@@ -94,7 +94,7 @@
         field(15; "Merchant Name"; Text[50])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Merchant Name';
             DataClassification = CustomerContent;
@@ -102,7 +102,7 @@
         field(20; "Currency Code"; Code[10])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx';
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
@@ -111,7 +111,7 @@
         field(25; "Capture Codeunit Id"; Integer)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx and replaced with boolean field [Enable Capture]';
             BlankZero = true;
             Caption = 'Capture codeunit-id';
@@ -121,7 +121,7 @@
         field(30; "Refund Codeunit Id"; Integer)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx and replaced with boolean field [Enable Refund]';
             BlankZero = true;
             Caption = 'Refund codeunit-id';
@@ -131,7 +131,7 @@
         field(35; "Cancel Codeunit Id"; Integer)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved in custom integration table M2PGxxxx and replaced with boolean field [Enable Cancel]';
             BlankZero = true;
             Caption = 'Cancel Codeunit Id';

@@ -19,7 +19,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Part of product line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014407; "NPR Internal"; Boolean)
@@ -27,7 +27,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Internal';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014408; "NPR Salesperson Code"; Code[20])
@@ -35,7 +35,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014409; "NPR Special Price"; Decimal)
@@ -43,7 +43,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Special Price';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014410; "NPR Color"; Code[20])
@@ -51,7 +51,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Color';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014411; "NPR Size"; Code[20])
@@ -59,7 +59,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Size';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014412; "NPR Serial No. not Created"; Code[30])
@@ -67,7 +67,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Serial No. Not Created';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014413; "NPR Hide Line"; Boolean)
@@ -75,7 +75,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Hide Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014414; "NPR Main Line"; Boolean)
@@ -83,7 +83,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Main Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Accessory"; Boolean)
@@ -91,7 +91,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Accessory';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014416; "NPR Belongs to Item"; Code[20])
@@ -99,7 +99,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Belongs to Item';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014417; "NPR Belongs to Line No."; Integer)
@@ -107,7 +107,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Belongs to Line No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014418; "NPR Belongs to Item Group"; Code[10])
@@ -115,7 +115,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Belongs to Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014419; "NPR Belongs 2 Item Disc.Group"; Code[10])
@@ -123,7 +123,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Belongs to Item Disc. Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014420; "NPR MR Anvendt antal"; Decimal)
@@ -131,7 +131,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'MR Used Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6059970; "NPR Is Master"; Boolean)
@@ -140,7 +140,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059971; "NPR Master Line No."; Integer)
@@ -149,7 +149,7 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             DataClassification = CustomerContent;
             Description = 'VRT1.00';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = '"NPR Master Line Map" used instead.';
         }
         field(6059972; "NPR Total Discount Code"; Code[20])

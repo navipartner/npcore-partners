@@ -964,7 +964,7 @@
     begin
     end;
 
-    [Obsolete('Not used anymore.', 'NPR23.0')]
+    [Obsolete('Not used anymore.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestUserOnPOSSessionInitialize(UsingRegularInvoicing: Boolean; var Handled: Boolean)
     begin

@@ -6,7 +6,7 @@
     SourceTable = "NPR POS Web Font";
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'New POS frontend+editor will no longer support customer specific injected web scripts/styling/html/fonts';
 
 

@@ -5,7 +5,7 @@
     DataCaptionFields = Name, Description;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Task Queue module removed from NP Retail. We are now using Job Queue instead.';
 
     fields

@@ -163,7 +163,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(23; "Sales Order No."; Code[20])

@@ -315,7 +315,7 @@ codeunit 6184478 "NPR Pepper Transaction HWC"
         exit(not (StrPos(AdditionalParameter, '<xml></xml>') > 0));
     end;
 
-    [Obsolete('Not required', 'NPR23.0')]
+    [Obsolete('Not required', '2023-06-28')]
     procedure GetTrx_AbandonedTransaction() IsAbandoned: Boolean
     begin
     end;

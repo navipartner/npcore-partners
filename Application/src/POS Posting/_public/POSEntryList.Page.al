@@ -99,7 +99,7 @@
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'It is not used anymore';
                     ToolTip = 'Specifies the person that has been working on this transaction.';
                     ApplicationArea = NPRRetail;
@@ -413,7 +413,7 @@
                 ToolTip = 'Displays the information about POS audit roll.';
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not used';
             }
             action("POS Audit Log")

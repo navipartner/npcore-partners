@@ -340,7 +340,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use systemID instead';
         }
         field(161; "Orig. POS Line No."; Integer)
@@ -349,7 +349,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.32';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
@@ -358,7 +358,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(180; Indentation; Integer)
@@ -427,7 +427,7 @@
             Caption = 'Product Group Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(208; "Planned Delivery Date"; Date)
@@ -666,7 +666,7 @@
         key(Key4; "Serial No.")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by Key7: "Item Entry No.", "Serial No."';
             Enabled = false;
 #if not (BC17 or BC18)
@@ -676,7 +676,7 @@
         key(Key5; "Item Entry No.")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by Key7: "Item Entry No.", "Serial No."';
             Enabled = false;
 #if not (BC17 or BC18)

@@ -1,10 +1,10 @@
 ﻿table 6014641 "NPR Tax Free POS Unit"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'Use "NPR POS Tax Free Profile" instead';
 #IF NOT BC17
-    Access = Internal;      
+    Access = Internal;
 #ENDIF
 
     Caption = 'POS Tax Free POS Unit';
@@ -23,7 +23,7 @@
         field(2; "Handler ID"; Text[30])
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;

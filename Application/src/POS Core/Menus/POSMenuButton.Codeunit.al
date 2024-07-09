@@ -60,13 +60,13 @@
         _backgroundColor := NewBackgroundColor;
     end;
 
-    [Obsolete('Not used. Removed in case 516268.', 'NPR23.0')]
+    [Obsolete('Not used. Removed in case 516268.', '2023-06-28')]
     procedure Color(): Text;
     begin
         exit(_color);
     end;
 
-    [Obsolete('Not used. Removed in case 516268.', 'NPR23.0')]
+    [Obsolete('Not used. Removed in case 516268.', '2023-06-28')]
     procedure SetColor(NewColor: Text);
     begin
         _color := NewColor;

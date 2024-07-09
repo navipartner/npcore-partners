@@ -29,7 +29,7 @@
                     ToolTip = 'Specifies the value of the Opened field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteTag = '2023-08-28';
                     ObsoleteReason = 'Replaced by SystemCreatedAt field.';
                 }
                 field(Description; Rec.Description)

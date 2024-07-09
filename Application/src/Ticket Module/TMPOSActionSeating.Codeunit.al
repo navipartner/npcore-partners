@@ -4,7 +4,7 @@ codeunit 6151132 "NPR TM POS Action - Seating" implements "NPR IPOS Workflow"
     // TM1.43/TSA /20190618 CASE 357359 Initial Version
     // TM1.45/TSA /20191112 CASE 322432 edit reservation
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Version 3 UX missing';
 
 

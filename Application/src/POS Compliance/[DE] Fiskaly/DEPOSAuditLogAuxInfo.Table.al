@@ -122,7 +122,7 @@
             Caption = 'Last Revision';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Incorrect data type. Replaced by integer field "Latest Revision"';
         }
         field(161; "Latest Revision"; Integer)
@@ -138,7 +138,7 @@
         field(180; "Error"; Boolean)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Wrong field name.';
             Caption = 'Error';
             DataClassification = CustomerContent;

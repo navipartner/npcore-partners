@@ -304,7 +304,7 @@
         if Rec.Get(PictureType, PictureName) then;
     end;
 
-    [Obsolete('We are going to use field 60 "Variety Value" from the same table.', 'NPR24.0')]
+    [Obsolete('We are going to use field 60 "Variety Value" from the same table.', '2023-07-28')]
     procedure SetVariantValueCode(NewVariantValueCode: Code[20])
     begin
 #pragma warning disable AA0206

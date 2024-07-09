@@ -3,7 +3,7 @@
     Access = Internal;
 
 #IF BC17    
-    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', 'NPR23.0')]
+    [Obsolete('Task Queue module removed from NP Retail. We are now using Job Queue instead.', '2023-06-28')]
     procedure Update(TaskLine: Record "NPR Task Line"; ImportType: Record "NPR Nc Import Type")
     var
     begin

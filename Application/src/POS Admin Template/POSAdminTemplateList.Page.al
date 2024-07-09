@@ -2,7 +2,7 @@
 {
     Extensible = False;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used.';
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
 

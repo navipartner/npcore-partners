@@ -104,7 +104,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
 
             trigger OnValidate()
@@ -1383,7 +1383,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Using Item Category instead';
 
         }
@@ -1402,7 +1402,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won"t be used anymore';
         }
         field(6014410; "Label Barcode"; Code[20])

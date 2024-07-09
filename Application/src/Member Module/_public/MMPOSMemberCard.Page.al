@@ -79,7 +79,7 @@
                         ToolTip = 'Specifies the value of the Picture field';
                         ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Needs to be in a Card Part, but it is breaking change to delete.';
                     }
                     part(MemberPicture; "NPR MM Member Picture")

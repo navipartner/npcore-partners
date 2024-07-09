@@ -41,7 +41,7 @@ table 6014404 "NPR Report Selection Retail"
             DataClassification = CustomerContent;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(XMLport));
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'No longer supported';
         }
         field(6; "XML Port Name"; Text[249])
@@ -50,7 +50,7 @@ table 6014404 "NPR Report Selection Retail"
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'No longer supported';
         }
         field(7; "Register No."; Code[10])
@@ -89,7 +89,7 @@ table 6014404 "NPR Report Selection Retail"
             Caption = 'Filter Object ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use print template filters instead.';
         }
         field(13; "Record Filter"; TableFilter)
@@ -97,7 +97,7 @@ table 6014404 "NPR Report Selection Retail"
             Caption = 'Record Filter';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use print template filters instead.';
         }
         field(15; Optional; Boolean)

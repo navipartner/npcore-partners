@@ -20,7 +20,7 @@ table 6060005 "NPR POS Tax Free Profile"
         field(2; "Handler ID"; Text[30])
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR24.0';
+            ObsoleteTag = '2023-07-28';
             ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;

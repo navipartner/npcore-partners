@@ -17,7 +17,7 @@ codeunit 6059780 "NPR Scanner Import Mgt."
         Error(CannotFindItemErr, ScannedCode);
     end;
 
-    [Obsolete('Use procedure GetItemAndVariantCodeFromScannedCode instead', 'NPR23.0')]
+    [Obsolete('Use procedure GetItemAndVariantCodeFromScannedCode instead', '2023-06-28')]
     procedure GetItemNoAndVariantCodeFromScannedCode(ScannedCode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[20])
     var
         CannotFindItemErr: Label 'Cannot find item with reference %1.', Comment = '%1 = Item Reference';

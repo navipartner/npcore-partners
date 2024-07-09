@@ -9,7 +9,7 @@ report 6014435 "NPR Vendor/Item Category"
     UsageCategory = None;
     DataAccessIntent = ReadOnly;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR32.0';
+    ObsoleteTag = '2024-03-28';
     ObsoleteReason = 'Not being used anymore.';
 
     dataset

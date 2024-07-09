@@ -10,7 +10,7 @@ tableextension 6151245 "NPR Activities Cue" extends "Activities Cue"
             DataClassification = CustomerContent;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6151242; "NPR Sales CM Last Year"; Decimal)
@@ -22,7 +22,7 @@ tableextension 6151245 "NPR Activities Cue" extends "Activities Cue"
             DataClassification = CustomerContent;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6151243; "NPR Sales This Month"; Integer)
@@ -33,7 +33,7 @@ tableextension 6151245 "NPR Activities Cue" extends "Activities Cue"
             DataClassification = CustomerContent;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6151244; "NPR Sales This Month Last Year"; Decimal)
@@ -45,7 +45,7 @@ tableextension 6151245 "NPR Activities Cue" extends "Activities Cue"
             DataClassification = CustomerContent;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6151245; "NPR Sales This Month ILE"; Decimal)
@@ -57,7 +57,7 @@ tableextension 6151245 "NPR Activities Cue" extends "Activities Cue"
             DataClassification = CustomerContent;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
     }

@@ -133,7 +133,7 @@
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Misplaced button';
             }
             action(LoyaltySetup)
@@ -158,7 +158,7 @@
             separator(Separator6150626)
             {
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not required anymore.';
             }
             action("Process Auto Renew")
@@ -175,7 +175,7 @@
             separator(Separator6014406)
             {
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not required anymore.';
             }
             action(Memberships)
@@ -191,7 +191,7 @@
             separator(Separator6014405)
             {
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Not required anymore.';
             }
             action(Notifications)

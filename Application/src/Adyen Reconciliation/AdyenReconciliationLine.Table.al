@@ -5,7 +5,7 @@ table 6150789 "NPR Adyen Reconciliation Line"
     Caption = 'Adyen Reconciliation Line';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR35.0';
+    ObsoleteTag = '2024-06-28';
     ObsoleteReason = 'Replaced by NPR Adyen Recon. Line.';
 
     fields

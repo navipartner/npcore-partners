@@ -62,7 +62,7 @@
         field(15; "Handler ID"; Text[30])
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with "Enum Handler ID Enum"';
             Caption = 'Handler ID';
             DataClassification = CustomerContent;

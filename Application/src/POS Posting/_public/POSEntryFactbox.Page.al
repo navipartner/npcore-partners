@@ -188,7 +188,7 @@
             {
                 ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ShowCaption = false;
                 Visible = false;
                 field("FR POS Audit Log"; Rec."FR POS Audit Log")

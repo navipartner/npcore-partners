@@ -9,7 +9,7 @@ page 6059843 "NPR POS HC Endpoint Setup List"
     SourceTable = "NPR POS HC Endpoint Setup";
     ApplicationArea = NPRRetail;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'HQ Connector will no longer be supported';
 
 

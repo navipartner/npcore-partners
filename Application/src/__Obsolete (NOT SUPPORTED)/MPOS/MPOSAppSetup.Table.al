@@ -4,7 +4,7 @@
     Caption = 'MPOS App Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'This table won''t be used anymore.';
 
     fields
@@ -19,7 +19,7 @@
             Caption = 'Payment Gateway';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore.';
         }
         field(12; "Web Service Is Published"; Boolean)
@@ -45,7 +45,7 @@
             Caption = 'Custom Web Service URL';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore.';
         }
         field(18; "Receipt Source Type"; Option)
@@ -72,7 +72,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.36';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'We always print mpos EFT receipts from NAV now';
         }
     }

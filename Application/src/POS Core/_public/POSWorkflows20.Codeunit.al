@@ -1,7 +1,7 @@
 ﻿codeunit 6150733 "NPR POS Workflows 2.0"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced with workflow v3. Remove when last v2 is gone';
 
     var

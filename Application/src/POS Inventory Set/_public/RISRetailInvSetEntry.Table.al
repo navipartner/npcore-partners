@@ -75,7 +75,7 @@
             Caption = 'Api Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with Isolated Storage Password Key';
         }
 
@@ -97,7 +97,7 @@
             Caption = 'Api Domain';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(120; "Processing Codeunit ID"; Integer)

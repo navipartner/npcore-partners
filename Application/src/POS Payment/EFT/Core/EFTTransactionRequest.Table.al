@@ -491,7 +491,7 @@
             Caption = 'Access Token';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Access Tokens should not be stored directly on the EFT request';
         }
         field(800; "Matched in Reconciliation"; Boolean)
