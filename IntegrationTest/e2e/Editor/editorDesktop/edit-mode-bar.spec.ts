@@ -7,7 +7,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("user should be able to show/hide sale lines column and update its name", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -65,7 +65,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("user should be able to update Totals columns", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -127,12 +127,17 @@ test.describe("Edit Mode Bar tests", () => {
     await expect(
       page.frameLocator("iframe").getByText("testing amount")
     ).toBeVisible();
+    await page
+    .frameLocator("iframe")
+    .getByRole("contentinfo")
+    .locator('svg[data-icon="gear"]')
+    .click();
     await removeLayout(page, key);
   });
   test("user should be able to show/hide footer columns and update its name", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -181,12 +186,17 @@ test.describe("Edit Mode Bar tests", () => {
     await expect(
       page.frameLocator("iframe").getByText("testing footer")
     ).toBeVisible();
+    await page
+    .frameLocator("iframe")
+    .getByRole("contentinfo")
+    .locator('svg[data-icon="gear"]')
+    .click();
     await removeLayout(page, key);
   });
   test("user should be able to show/hide product panel and update its name", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -313,7 +323,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("user should be able to update product quantity", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -368,7 +378,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("user should be able to update grids columns", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -426,7 +436,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("user should be able to control edit mode bar security", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -450,7 +460,7 @@ test.describe("Edit Mode Bar tests", () => {
 
     await page
       .frameLocator("iframe")
-      .getByText("CUR-SALESP", { exact: true })
+      .getByText("SUPERVISOR", { exact: true })
       .click();
     await page
       .frameLocator("iframe")
@@ -471,7 +481,7 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
-    await page.frameLocator("iframe").getByText("1", { exact: true }).click();
+    await page.frameLocator("iframe").getByText("9", { exact: true }).click();
     await page
       .frameLocator("iframe")
       .locator("span")
@@ -484,7 +494,7 @@ test.describe("Edit Mode Bar tests", () => {
       .locator("div")
       .filter({
         hasText:
-          /^Authorization Password requirements for opening edit mode : CUR-SALESP$/,
+          /^Authorization Password requirements for opening edit mode : SUPERVISOR$/,
       })
       .locator("svg")
       .first()
@@ -503,6 +513,11 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("button", { name: "Overwrite current layout" })
       .click();
     await page.frameLocator("iframe").locator(".ui-modal__body").isHidden();
+    await page
+    .frameLocator("iframe")
+    .getByRole("contentinfo")
+    .locator('svg[data-icon="gear"]')
+    .click();
     await removeLayout(page, key);
   });
 });

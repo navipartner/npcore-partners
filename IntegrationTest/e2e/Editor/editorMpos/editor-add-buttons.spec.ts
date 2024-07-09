@@ -7,7 +7,7 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to mobile items, and drawer, asign it an item action, add item to sale and delete it", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -164,7 +164,7 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to sale item, asign it an item action and execute action on sale item", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -234,18 +234,9 @@ test.describe("Mobile add and remove editable buttons", () => {
       .getByRole("heading", { name: "Variables" })
       .locator("path")
       .click();
-    await page.waitForTimeout(1000);
-    await page
-      .getByRole("textbox", { name: "Open menu for Value TotalDiscountAmount" })
-      .click();
-    await page
-      .getByRole("button", { name: "Choose a value for Value" })
-      .click();
-    await page
-      .getByRole("button", { name: "Open menu for Choice LineAmount" })
-      .click();
-    await page.getByRole("button", { name: "Close" }).click();
-    await page.waitForTimeout(1000);
+    await page.frameLocator('iframe').locator('div').filter({ hasText: /^Discount TypeDiscount TypeOption\.\.\.$/ }).getByRole('button').click();
+    await page.frameLocator('iframe').getByRole('button', { name: '... TotalAmount' }).click();
+    await page.frameLocator('iframe').locator('button.ui-button.ui-button--medium.ui-button--primary:has-text("Save")').click();
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.frameLocator("iframe").locator(".select__indicator").click();
     await page
@@ -335,7 +326,7 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add 5 buttons to items and then clear them", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,

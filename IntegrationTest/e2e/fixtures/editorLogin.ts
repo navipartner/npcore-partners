@@ -3,7 +3,7 @@ import { Page } from "@playwright/test";
 export const login = async (
   page: Page,
   salePersonCode: string,
-  uniqueLayoutKey: number,
+  uniqueLayoutKey: string,
   username?: string,
   password?: string
 ) => {
@@ -73,7 +73,7 @@ export const login = async (
       .getByRole("button", { name: "Yes", exact: true })
       .click();
   }
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(6000);
   const balancingText = page
     .frameLocator("iframe")
     .getByText("Confirm Bin Contents.");
@@ -94,16 +94,23 @@ export const login = async (
   if (await unfinishedBalancingText.isVisible()) {
     await page.waitForTimeout(1000);
     await page.getByRole("button", { name: "Yes" }).click();
+    const textLocator = page.locator('text=There is nothing to count in this payment bin.');
+    await page.waitForTimeout(1000);
+  if (await textLocator.isVisible()) {
+    await page.getByRole('button', { name: 'OK' }).click();
+  } else {
+
     await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Cancel" })
-      .click();
+    .frameLocator("iframe")
+    .getByRole("button", { name: "Cancel" })
+    .click();
     await page
-      .frameLocator("iframe")
-      .locator("span")
-      .filter({ hasText: "Yes" })
-      .first()
-      .click();
+    .frameLocator("iframe")
+    .locator("span")
+    .filter({ hasText: "Yes" })
+    .first()
+    .click();
+  }
     await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
@@ -111,7 +118,6 @@ export const login = async (
       .click();
     await page.frameLocator("iframe").getByText("OK", { exact: true }).click();
   }
-
   if (await agreeOnBalancingQty.isVisible()) {
     await page.frameLocator("iframe").locator("#button-dialog-yes div").click();
   }
