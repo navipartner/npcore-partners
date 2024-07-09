@@ -11,8 +11,8 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       page,
       true,
       "4",
-      process.env?.[`E2E_USER_3_USERNAME`],
-      process.env?.[`E2E_USER_3_PASSWORD`]
+      process.env?.[`E2E_OLD_MPOS_USERNAME`],
+      process.env?.[`E2E_OLD_MPOS_PASSWORD`]
     );
     await page
       .frameLocator("iframe")
@@ -174,9 +174,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")
@@ -210,9 +208,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")

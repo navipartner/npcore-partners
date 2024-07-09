@@ -8,7 +8,7 @@ test.describe("Mobile add and remove item from test", () => {
   test("should be able to add item from popup, open and delete item, add again, swipe and delete item", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -79,7 +79,7 @@ test.describe("Mobile add and remove item from test", () => {
   test("should be able to add customer and remove it", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -124,7 +124,7 @@ test.describe("Mobile add and remove item from test", () => {
   test("should be able to add item, change quantity and remove", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -172,7 +172,7 @@ test.describe("Mobile add and remove item from test", () => {
   test("should be able to search item, add and remove", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -204,9 +204,7 @@ test.describe("Mobile add and remove item from test", () => {
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")
@@ -235,9 +233,7 @@ test.describe("Mobile add and remove item from test", () => {
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")

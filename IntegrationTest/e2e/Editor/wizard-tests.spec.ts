@@ -5,7 +5,7 @@ import { removeLayout } from "../fixtures/removeLayout";
 
 test.describe("Wizard modal tests", () => {
   test("testing wizard modal render", async ({ page }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,

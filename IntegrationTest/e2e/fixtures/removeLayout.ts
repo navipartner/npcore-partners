@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export const removeLayout = async (page: Page, uniqueKey: number) => {
+export const removeLayout = async (page: Page, uniqueKey: string) => {
   if (await page.getByText("does not exist anymore.").isVisible()) {
     await page.getByRole("button", { name: "OK" }).click();
   }
@@ -59,7 +59,7 @@ export const removeLayout = async (page: Page, uniqueKey: number) => {
     .locator(".react-select__indicator")
     .first()
     .click({ timeout: 10000 });
-  await page.frameLocator("iframe").getByText(uniqueKey.toString()).click();
+  await page.frameLocator("iframe").getByText(uniqueKey).click();
   await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Delete Layout" })

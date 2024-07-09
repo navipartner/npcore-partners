@@ -7,7 +7,7 @@ test.describe("Mobile payment flow", () => {
   test("should be able to do single and multy payment", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -28,7 +28,7 @@ test.describe("Mobile payment flow", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page
       .frameLocator("iframe")
@@ -63,7 +63,7 @@ test.describe("Mobile payment flow", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page.waitForTimeout(1000);
     await page
@@ -110,7 +110,7 @@ test.describe("Mobile payment flow", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page
       .frameLocator("iframe")
