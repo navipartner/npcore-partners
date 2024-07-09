@@ -76,7 +76,7 @@
     begin
     end;
 
-    [Obsolete('Please use OnRunApplyPaymentV3 instead.', 'NPR23.0')]
+    [Obsolete('Please use OnRunApplyPaymentV3 instead.', '2023-06-28')]
     [IntegrationEvent(false, false)]
     internal procedure OnRunApplyPayment(FrontEnd: Codeunit "NPR POS Front End Management"; POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean)
     begin

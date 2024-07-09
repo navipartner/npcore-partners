@@ -8,7 +8,7 @@
     Caption = 'Retail Cross Reference';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use systemID instead. (For POS sales, the same systemID is transferred from active sale header/lines to finished pos entry header/lines).';
 
     fields

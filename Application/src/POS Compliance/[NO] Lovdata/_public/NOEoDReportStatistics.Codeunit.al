@@ -99,7 +99,7 @@ codeunit 6184788 "NPR NO EoD Report Statistics"
         end;
     end;
 
-    [Obsolete('This procedure is not used anymore.', 'NPR36.0')]
+    [Obsolete('This procedure is not used anymore.', '2024-07-28')]
     procedure GetPOSAuditLogSystemCreatedAt(POSUnitNo: Code[20]; ActionType: Option): DateTime
     begin
         POSAuditLog.SetLoadFields(SystemCreatedAt);
@@ -110,7 +110,7 @@ codeunit 6184788 "NPR NO EoD Report Statistics"
         exit(0DT);
     end;
 
-    [Obsolete('This procedure is not used anymore.', 'NPR36.0')]
+    [Obsolete('This procedure is not used anymore.', '2024-07-28')]
     procedure GetPOSAuditLOGActiveSalespersonCode(POSUnitNo: Code[20]; ActionType: Option): Code[20]
     begin
         POSAuditLog.SetLoadFields("Active Salesperson Code");

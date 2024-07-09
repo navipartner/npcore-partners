@@ -38,7 +38,7 @@ codeunit 6014573 "NPR Front-End: HWC" implements "NPR Front-End Async Request"
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Once all v1 workflows are moved to v3, any call to HWC from the POS should go via javascript code inside a workflow instead of this object.';
 
     var

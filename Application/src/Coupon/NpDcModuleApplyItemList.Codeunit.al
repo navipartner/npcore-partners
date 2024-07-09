@@ -70,7 +70,7 @@
         until (TempNpDcCouponListItem.Next() = 0) or (DiscountAmt <= 0);
     end;
 
-    [Obsolete('Use ApplyDiscountItemList instead', 'NPR33.0')]
+    [Obsolete('Use ApplyDiscountItemList instead', '2024-04-28')]
     local procedure ApplyDiscountListItem(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountAmt: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; RemainingQty: Decimal)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -109,7 +109,7 @@
         until (CouponSalesLineApplicationOrderBuffer.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
-    [Obsolete('Use ApplyDiscountItemListPercent instead', 'NPR33.0')]
+    [Obsolete('Use ApplyDiscountItemListPercent instead', '2024-04-28')]
     local procedure ApplyDiscountListItemPct(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; DiscountPct: Decimal; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; var RemainingDiscountAmt: Decimal; var RemainingQty: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -249,7 +249,7 @@
         until (CouponSalesLineApplicationOrderBuffer.Next() = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
     end;
 
-    [Obsolete('Use ApplyDiscountSaleLinePOS instead', 'NPR33.0')]
+    [Obsolete('Use ApplyDiscountSaleLinePOS instead', '2024-04-28')]
     local procedure ApplyDiscountSaleLinePOS(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItem: Record "NPR NpDc Coupon List Item"; SaleLinePOS: Record "NPR POS Sale Line"; var AppliedListItemDiscAmt: Decimal; var RemainingDiscountAmt: Decimal; AppliedQty: Decimal; var RemainingQty: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -372,7 +372,7 @@
         RemainingQty -= QtyToApply;
     end;
 
-    [Obsolete('Use CalcAppliedDiscountWithVATFromCouponPriorityBuffer instead', 'NPR33.0')]
+    [Obsolete('Use CalcAppliedDiscountWithVATFromCouponPriorityBuffer instead', '2024-04-28')]
     local procedure CalcAppliedDiscount(SaleLinePOS: Record "NPR POS Sale Line"): Decimal
     var
         SaleLinePOSCouponApply: Record "NPR NpDc SaleLinePOS Coupon";
@@ -735,7 +735,7 @@
         exit(SaleLinePOSCouponApply.FindFirst());
     end;
 
-    [Obsolete('Use GetNextCouponSalesLineNoFromCouponPriorityBuffer instead', 'NPR33.0')]
+    [Obsolete('Use GetNextCouponSalesLineNoFromCouponPriorityBuffer instead', '2024-04-28')]
     local procedure GetNextLineNo(SaleLinePOS: Record "NPR POS Sale Line"): Integer
     var
         SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";

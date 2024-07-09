@@ -4,7 +4,7 @@
     Caption = 'Nc RapidConnect Trigger Table';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used - Inter-company synchronizations will happen via the API replication module';
 
     fields

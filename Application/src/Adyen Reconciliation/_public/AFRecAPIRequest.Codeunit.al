@@ -14,7 +14,7 @@ codeunit 6184771 "NPR AF Rec. API Request"
             exit(ErrorLbl);
     end;
 
-    [Obsolete('Use ProcessReportReadyWebhook(AdyenWebhook: Record "NPR Adyen Webhook") instead.', 'NPR35.0')]
+    [Obsolete('Use ProcessReportReadyWebhook(AdyenWebhook: Record "NPR Adyen Webhook") instead.', '2024-06-28')]
     procedure PostReportReady(statusCode: Text; statusDescription: Text; headersCollection: Text; content: Text; webhookReference: Text): Text
     var
         ObsoleteProcedureLbl: Label 'Procedure PostReportReady is Obsolete. Use ProcessReportReadyWebhook(AdyenWebhook: Record "NPR Adyen Webhook") instead.';

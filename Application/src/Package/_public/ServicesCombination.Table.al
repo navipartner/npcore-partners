@@ -3,7 +3,7 @@
     Access = Public;
     Caption = 'Services Combination';
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Table replaced by table 6014692 NPR Shipping Provider Services';
     fields
     {

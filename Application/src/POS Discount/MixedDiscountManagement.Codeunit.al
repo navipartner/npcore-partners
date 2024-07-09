@@ -36,7 +36,7 @@
             Clear(TempSaleLinePOS);
     end;
 
-    [Obsolete('Not used. Use function ApplyMixedDiscounts instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function ApplyMixedDiscounts instead', '2023-09-28')]
     procedure ApplyMixDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; TriggerRec: Record "NPR POS Sale Line"; RecalculateAllLines: Boolean; CalculateOnly: Boolean; CalculationDate: Date): Boolean
     var
         TempMixedDiscount: Record "NPR Mixed Discount" temporary;
@@ -86,7 +86,7 @@
         TempPOSSaleLine.Reset();
     end;
 
-    [Obsolete('Not used. Use function FindImpactedMixedDiscoutnsAndLines instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function FindImpactedMixedDiscoutnsAndLines instead', '2023-09-28')]
     procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean)
     begin
         FindPotentiallyImpactedMixesAndLines(TempSaleLinePOS, Rec, tmpImpactedMixHeaders, RecalculateAllLines, Today);
@@ -123,7 +123,7 @@
 
     end;
 
-    [Obsolete('Not used. Use function FindImpactedMixedDiscoutnsAndLines instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function FindImpactedMixedDiscoutnsAndLines instead', '2023-09-28')]
     procedure FindPotentiallyImpactedMixesAndLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; Rec: Record "NPR POS Sale Line"; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; RecalculateAllLines: Boolean; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -251,7 +251,7 @@
         until MixedDiscountLine.Next() = 0;
     end;
 
-    [Obsolete('Not used. Use function FindMixDiscountGroupingImpact instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function FindMixDiscountGroupingImpact instead', '2023-09-28')]
     local procedure FindMixGroupingImpact(GroupingType: Enum "NPR Disc. Grouping Type"; No: Code[20]; VariantCode: Code[10]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -273,7 +273,7 @@
             until MixedDiscountLine.Next() = 0;
     end;
 
-    [Obsolete('Not used.', 'NPR26.0')]
+    [Obsolete('Not used.', '2023-09-28')]
     local procedure FindMixHeaderImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscount: Record "NPR Mixed Discount";
@@ -297,7 +297,7 @@
         FindMixGroupingImpact(MixedDiscountLine."Disc. Grouping Type"::"Mix Discount", MixDiscountCode, '', tmpImpactedMixHeaders, tmpImpactedItems, tmpImpactedItemGroups, tmpImpactedItemDiscGroups, CalculationDate);
     end;
 
-    [Obsolete('Not used.', 'NPR26.0')]
+    [Obsolete('Not used.', '2023-09-28')]
     local procedure FindMixLineImpact(MixDiscountCode: Code[20]; var tmpImpactedMixHeaders: Record "NPR Mixed Discount" temporary; var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; CalculationDate: Date)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -333,7 +333,7 @@
         until MixedDiscountLine.Next() = 0;
     end;
 
-    [Obsolete('Not used.', 'NPR26.0')]
+    [Obsolete('Not used.', '2023-09-28')]
     local procedure HasImpact(var tmpImpactedItems: Record "Item Variant" temporary; var tmpImpactedItemGroups: Record "Item Discount Group" temporary; var tmpImpactedItemDiscGroups: Record "Item Discount Group" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
         if tmpImpactedItems.Get(TempSaleLinePOS."No.", TempSaleLinePOS."Variant Code") then
@@ -1301,7 +1301,7 @@
         FoundMatchingDiscounts := not TempImpactedMixedDiscount.IsEmpty();
     end;
 
-    [Obsolete('Not used. Use function MatchImpactedMixedDiscounts instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function MatchImpactedMixedDiscounts instead', '2023-09-28')]
     procedure FindMatchingMixedDiscounts(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
         MatchMixedDiscounts(SalePOS, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS);
@@ -1337,7 +1337,7 @@
         until TempImpactedMixedDiscount.Next() = 0;
     end;
 
-    [Obsolete('Not used. Use function MatchImpactedhMixedDiscounts instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function MatchImpactedhMixedDiscounts instead', '2023-09-28')]
     procedure MatchMixedDiscounts(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     begin
         TempMixedDiscount.Reset();
@@ -1403,7 +1403,7 @@
 
     end;
 
-    [Obsolete('Not used. Use function MatchMixDiscount instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function MatchMixDiscount instead', '2023-09-28')]
     local procedure MatchMixedDiscount(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -1478,7 +1478,7 @@
         until TempImpactedMixedDiscount.Next() = 0;
     end;
 
-    [Obsolete('Not used. Use function MatchImpactedMixedDiscountCominations instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function MatchImpactedMixedDiscountCominations instead', '2023-09-28')]
     procedure MatchMixedDiscountCominations(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     begin
         TempMixedDiscount.Reset();
@@ -1519,7 +1519,7 @@
         MatchedMixedDiscountLine := (MixedDiscountLinesCount = ImpactedMixedDiscountLinesCount);
     end;
 
-    [Obsolete('Not used. Use function MatchMixedDiscountCominationImpact instead', 'NPR31.0')]
+    [Obsolete('Not used. Use function MatchMixedDiscountCominationImpact instead', '2024-02-28')]
     procedure MatchMixedDiscountComination(SalePOS: Record "NPR POS Sale"; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
@@ -1637,7 +1637,7 @@
         exit(DiscAmount);
     end;
 
-    [Obsolete('Not used. Use function CalcTotalAppliedMixDiscounts instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function CalcTotalAppliedMixDiscounts instead', '2023-09-28')]
     local procedure CalcTotalAppliedMixDisc(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) DiscAmount: Decimal
     var
         TempMixedDiscountCopy: Record "NPR Mixed Discount" temporary;
@@ -1860,7 +1860,7 @@
         CurrSaleLinePOS.SetFilter(Quantity, '>%1', 0);
     end;
 
-    [Obsolete('Not used. Use function CalcBesttMixMatch instead', 'NPR26.0')]
+    [Obsolete('Not used. Use function CalcBesttMixMatch instead', '2023-09-28')]
     local procedure FindBestMixMatch(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         TempMixedDiscountCopy: Record "NPR Mixed Discount" temporary;

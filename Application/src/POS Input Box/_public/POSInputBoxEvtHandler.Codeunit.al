@@ -8,7 +8,7 @@
         SelectEanStartTime: DateTime;
         SelectEanEndTime: DateTime;
 
-    [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.', 'NPR23.0')]
+    [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.', '2023-06-28')]
     internal procedure InvokeEanBox(EanBoxValue: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; var FrontEnd: Codeunit "NPR POS Front End Management")
     var
         EanBoxSetup: Record "NPR Ean Box Setup";
@@ -154,7 +154,7 @@
     end;
 
 
-    [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.', 'NPR23.0')]
+    [Obsolete('Only necessary to for v1/v2 workflow. Remove when everything is migrated to v3.', '2023-06-28')]
     internal procedure InvokePOSAction(EanBoxValue: Text; EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"): Boolean
     var
         POSAction: Record "NPR POS Action";

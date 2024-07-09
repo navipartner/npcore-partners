@@ -12,7 +12,7 @@ page 6151116 "NPR VAT EV Entries"
     DeleteAllowed = false;
     ObsoleteReason = 'Replaced by NPR POPDV Records';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR33.0';
+    ObsoleteTag = '2024-04-28';
 
     layout
     {

@@ -287,7 +287,7 @@
             Caption = 'Last Shipping No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(40; "Last Posting No."; Code[20])
@@ -295,7 +295,7 @@
             Caption = 'Last Posting No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(45; "Customer Disc. Group"; Code[20])
@@ -310,7 +310,7 @@
             Caption = 'Drawer Opened';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(60; "Send Receipt Email"; Boolean)
@@ -318,7 +318,7 @@
             Caption = 'Send Receipt Email';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(74; "Gen. Bus. Posting Group"; Code[20])
@@ -339,7 +339,7 @@
             Caption = 'Saved Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(101; "Customer Relations"; Option)
@@ -349,7 +349,7 @@
             OptionCaption = ' ,Customer,Cash Customer';
             OptionMembers = " ",Customer,"Cash Customer";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(102; "Last Sale"; Boolean)
@@ -357,7 +357,7 @@
             Caption = 'Last Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(105; Kontankundenr; Code[20])
@@ -365,7 +365,7 @@
             Caption = 'Cash Customer No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(106; "Customer Type"; Option)
@@ -375,7 +375,7 @@
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Ord,Cash;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(107; "Org. Bonnr."; Code[20])
@@ -383,7 +383,7 @@
             Caption = 'Original Ticket No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(108; "Non-editable sale"; Boolean)
@@ -391,7 +391,7 @@
             Caption = 'Non-Editable Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(109; "Sale type"; Option)
@@ -411,7 +411,7 @@
             Caption = 'Reversesale Ticket No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(112; Parameters; Text[250])
@@ -419,7 +419,7 @@
             Caption = 'Parameters';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(113; "From Quote no."; Code[20])
@@ -427,7 +427,7 @@
             Caption = 'From Quote no.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(115; "Service No."; Code[20])
@@ -435,7 +435,7 @@
             Caption = 'Service No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(116; "Stats - Customer Post Code"; Code[20])
@@ -443,7 +443,7 @@
             Caption = 'Stats - Customer Post Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(117; "Retail Document Type"; Option)
@@ -454,7 +454,7 @@
             OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
             OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(118; "Retail Document No."; Code[20])
@@ -462,7 +462,7 @@
             Caption = 'No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(119; "Payment Terms Code"; Code[10])
@@ -510,7 +510,7 @@
             Caption = 'TouchScreen';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(123; Deposit; Decimal)
@@ -518,7 +518,7 @@
             Caption = 'Deposit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(126; "Alternative Register No."; Code[20])
@@ -526,7 +526,7 @@
             Caption = 'Alternative POS Unit No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(127; "Country Code"; Code[10])
@@ -545,7 +545,7 @@
             Caption = 'Custom Print Object ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(131; "Custom Print Object Type"; Text[10])
@@ -553,7 +553,7 @@
             Caption = 'Custom Print Object Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(140; "Issue Tax Free Voucher"; Boolean)
@@ -592,7 +592,7 @@
             Caption = 'POS Sale ID';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use systemID instead';
         }
         field(170; "Retail ID"; Guid)
@@ -601,7 +601,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.50';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use systemID instead';
         }
         field(180; "Event No."; Code[20])
@@ -628,7 +628,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(201; "Host Name"; Text[100])
@@ -637,7 +637,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(210; "User ID"; Code[50])
@@ -858,7 +858,7 @@
     end;
 #IF BC17 or BC18 or BC19
 
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update document dimensions from default dims starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]). Use CreateDimFromDefaultDim(FieldNo: Integer) to update document dimensions from default dims starting from BC 20.0', '2023-06-28')]
     internal procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20]; Type6: Integer; No6: Code[20])
     var
         TableID: array[10] of Integer;
@@ -1111,7 +1111,7 @@
     end;
 #IF BC17 or BC18 or BC19
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code")) starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code")) starting from BC 20.0', '2023-06-28')]
     local procedure CreateDimensionsFromValidateSalesPersonCode()
     var
         IsHandled: Boolean;
@@ -1130,7 +1130,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Event No.")) starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Event No.")) starting from BC 20.0', '2023-06-28')]
     local procedure CreateDimensionsFromValidateEventNo()
     var
         IsHandled: Boolean;
@@ -1149,7 +1149,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("POS Store Code")) starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("POS Store Code")) starting from BC 20.0', '2023-06-28')]
     local procedure CreateDimensionsFromValidatePOSStoreCode()
     var
         IsHandled: Boolean;
@@ -1168,7 +1168,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Customer No.")) starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Customer No.")) starting from BC 20.0', '2023-06-28')]
     local procedure CreateDimensionsFromValidateCustomerNo()
     var
         IsHandled: Boolean;
@@ -1187,7 +1187,7 @@
             Database::"Responsibility Center", "Responsibility Center");
     end;
 
-    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Responsibility Center")) starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Responsibility Center")) starting from BC 20.0', '2023-06-28')]
     local procedure CreateDimensionsFromValidateResponsibilityCenter()
     var
         IsHandled: Boolean;
@@ -1213,31 +1213,31 @@
     end;
 #IF BC17 or BC18 or BC19
 
-    [Obsolete('New way of dimension handling starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('New way of dimension handling starting from BC 20.0', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateSalesPersonCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
-    [Obsolete('New way of dimension handling starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('New way of dimension handling starting from BC 20.0', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateCustomerNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
-    [Obsolete('New way of dimension handling starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('New way of dimension handling starting from BC 20.0', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidatePOSStoreCode(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
-    [Obsolete('New way of dimension handling starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('New way of dimension handling starting from BC 20.0', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateEventNo(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin
     end;
 
-    [Obsolete('New way of dimension handling starting from BC 20.0', 'NPR23.0')]
+    [Obsolete('New way of dimension handling starting from BC 20.0', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimensionsFromValidateResponsibilityCenter(var POSSale: Record "NPR POS Sale"; var IsHandled: Boolean)
     begin

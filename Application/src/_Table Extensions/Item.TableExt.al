@@ -49,7 +49,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6014401; "NPR Group sale"; Boolean)
@@ -69,7 +69,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Season';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won"t be used anymore';
         }
         field(6014410; "NPR Label Barcode"; Code[50])
@@ -77,7 +77,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Label barcode';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6014418; "NPR Explode BOM auto"; Boolean)
@@ -95,7 +95,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Can''t edit unit price';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014428; "NPR Primary Key Length"; Integer)
@@ -103,7 +103,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Primary Key Length';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014435; "NPR Last Changed at"; DateTime)
@@ -111,7 +111,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Last Changed at';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6014440; "NPR Last Changed by"; Code[50])
@@ -119,7 +119,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Last Changed by';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6014500; "NPR Second-hand number"; Code[20])
@@ -127,7 +127,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Second-hand number';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014502; "NPR Condition"; Option)
@@ -137,7 +137,7 @@ tableextension 6014427 "NPR Item" extends Item
             OptionCaption = 'New,Mint,Mint boxed,A,B,C,D,E,F,B+';
             OptionMembers = New,Mint,"Mint boxed",A,B,C,D,E,F,"B+";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won"t be used anymore';
         }
         field(6014503; "NPR Second-hand"; Boolean)
@@ -145,7 +145,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Second-hand';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014504; "NPR Guarantee Index"; Option)
@@ -155,7 +155,7 @@ tableextension 6014427 "NPR Item" extends Item
             OptionCaption = ' ,Move to Warranty';
             OptionMembers = " ","Flyt til garanti kar.";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014506; "NPR Has Accessories"; Boolean)
@@ -169,7 +169,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Insurance Section';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014509; "NPR Item Brand"; Code[20])
@@ -204,7 +204,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Std. Sales Qty.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6014630; "NPR Blocked on Pos"; Boolean)
@@ -212,7 +212,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Blocked on Pos';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014635; "NPR Sale Blocked"; Boolean)
@@ -220,7 +220,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Sale Blocked';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014640; "NPR Purchase Blocked"; Boolean)
@@ -228,7 +228,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Purchase Blocked';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6014641; "NPR Custom Discount Blocked"; Boolean)
@@ -241,7 +241,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Shelf Label Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6059784; "NPR Ticket Type"; Code[10])
@@ -354,7 +354,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Magento Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(6151416; "NPR Magento Desc."; Media)
@@ -372,7 +372,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Magento Short Description';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(6151426; "NPR Magento Short Desc."; Media)
@@ -529,7 +529,7 @@ tableextension 6014427 "NPR Item" extends Item
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #if not BC17
@@ -586,7 +586,7 @@ tableextension 6014427 "NPR Item" extends Item
             //See details: https://github.com/microsoft/AL/issues/6734
 #ELSE
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
 #ENDIF
         }
@@ -596,14 +596,14 @@ tableextension 6014427 "NPR Item" extends Item
             Enabled = false;
 #ELSE
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
 #ENDIF
         }
         key("NPR Key3"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
@@ -766,12 +766,12 @@ tableextension 6014427 "NPR Item" extends Item
     end;
 
 #pragma warning disable AL0432
-    [Obsolete('Rollback of Auxiliary Item table back to Item table extension', 'NPR23.0')]
+    [Obsolete('Rollback of Auxiliary Item table back to Item table extension', '2023-06-28')]
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item")
     begin
     end;
 
-    [Obsolete('Rollback of Auxiliary Item table back to Item table extension', 'NPR23.0')]
+    [Obsolete('Rollback of Auxiliary Item table back to Item table extension', '2023-06-28')]
     procedure NPR_GetAuxItem(var AuxItem: Record "NPR Auxiliary Item"; Force: Boolean)
     begin
     end;

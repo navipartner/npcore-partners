@@ -11,7 +11,7 @@ report 6014408 "NPR Item Category Overview"
     DataAccessIntent = ReadOnly;
     ObsoleteReason = 'Not used.';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
 
     dataset
     {

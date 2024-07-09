@@ -127,7 +127,7 @@
                     Caption = 'Background Posting';
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteTag = '2023-10-28';
                     ObsoleteReason = 'Background posting setups moved to table 6150632 "NPR POS Sales Document Setup"';
 
                     field("Post POS Sale Documents With Job Queue"; Rec."Post POS Sale Doc. With JQ")
@@ -135,7 +135,7 @@
                         ToolTip = 'Specifies If the POS Sale Document will be scheduled for backgroung posting';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR27.0';
+                        ObsoleteTag = '2023-10-28';
                         ObsoleteReason = 'Background posting setups moved to table 6150632 "NPR POS Sales Document Setup"';
                     }
                 }

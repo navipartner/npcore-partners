@@ -19,7 +19,7 @@ tableextension 6014418 "NPR Location" extends Location
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
         field(6014401; "NPR Retail Location"; Boolean)
@@ -41,7 +41,7 @@ tableextension 6014418 "NPR Location" extends Location
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

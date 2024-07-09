@@ -147,7 +147,7 @@
             OptionCaption = 'Item,Item+Variant,Item+Date,Item+Variant+Date';
             OptionMembers = Item,"Item+Variant","Item+Date","Item+Variant+Date";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Use "Sales Price Handl." instead.';
         }
         field(121; "Sales Price Handl."; Enum "NPR Item Wksht. Price Handling")
@@ -159,7 +159,7 @@
         {
             Caption = 'Sales Price List Code';
             DataClassification = CustomerContent;
-            TableRelation = "Price List Header" where ("Price Type" = const(Sale));
+            TableRelation = "Price List Header" where("Price Type" = const(Sale));
         }
         field(130; "Purchase Price Handling"; Option)
         {
@@ -168,7 +168,7 @@
             OptionCaption = 'Item,Item+Variant,Item+Date,Item+Variant+Date';
             OptionMembers = Item,"Item+Variant","Item+Date","Item+Variant+Date";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Use "Purchase Price Handl." instead.';
         }
         field(131; "Purchase Price Handl."; Enum "NPR Item Wksht. Price Handling")
@@ -180,7 +180,7 @@
         {
             Caption = 'Purchase Price List Code';
             DataClassification = CustomerContent;
-            TableRelation = "Price List Header" where ("Price Type" = const(Purchase));
+            TableRelation = "Price List Header" where("Price Type" = const(Purchase));
         }
         field(140; "Combine Variants to Item by"; Option)
         {

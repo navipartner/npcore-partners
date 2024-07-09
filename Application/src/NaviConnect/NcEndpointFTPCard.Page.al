@@ -8,7 +8,7 @@
     UsageCategory = None;
     SourceTable = "NPR Nc Endpoint FTP";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Going ot switch to use Ftp Connection and Sftp Connection.';
 
     layout
@@ -43,7 +43,7 @@
                 field(Type; Rec.Type)
                 {
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Option type to be removed. Use new enum field "Protocol Type" instead.';
                     Visible = false;
                     ToolTip = 'Specifies the value of the Type field';

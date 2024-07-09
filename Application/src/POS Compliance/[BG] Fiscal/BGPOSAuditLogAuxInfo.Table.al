@@ -4,7 +4,7 @@ table 6060079 "NPR BG POS Audit Log Aux. Info"
     Caption = 'BG POS Audit Log Aux. Info';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR28.0';
+    ObsoleteTag = '2023-11-28';
     ObsoleteReason = 'SIS Integration specific object is introduced.';
 
     fields

@@ -5,7 +5,7 @@ enum 6014583 "NPR CRO POS Payment Method"
 #endif
     Extensible = false;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR28.0';
+    ObsoleteTag = '2023-11-28';
     ObsoleteReason = 'Not used anymore.';
 
     value(0; Other)

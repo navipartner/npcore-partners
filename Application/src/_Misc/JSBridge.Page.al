@@ -9,7 +9,7 @@
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'The concept of a generic harder-to-debug JSBridge made sense in C/SIDE where control addins were verbose and very manual. Now, having the actual needed javascript loaded from proper .js files is the simplest, meaning there is no need for the bridge';
 
     layout

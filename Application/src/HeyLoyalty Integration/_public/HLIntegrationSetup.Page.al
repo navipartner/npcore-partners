@@ -35,7 +35,7 @@ page 6150720 "NPR HL Integration Setup"
                     ToolTip = 'Specifies whether the HeyLoyalty task scheduling routine is executed immediately after a change has been registered in the system. This mode is only allowed in test/sandbox environments.';
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR27.0';
+                    ObsoleteTag = '2023-10-28';
                     ObsoleteReason = 'Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.';
 
                 }

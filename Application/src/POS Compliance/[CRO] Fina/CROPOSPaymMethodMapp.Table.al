@@ -19,7 +19,7 @@ table 6060039 "NPR CRO POS Paym. Method Mapp."
             Caption = 'CRO Payment Method';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR28.0';
+            ObsoleteTag = '2023-11-28';
             ObsoleteReason = 'Replaced by Payment Method field.';
         }
         field(3; "Payment Method"; Enum "NPR CRO Payment Method")

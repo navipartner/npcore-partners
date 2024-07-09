@@ -5,7 +5,7 @@
     PageType = Card;
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'No longer used';
 
 

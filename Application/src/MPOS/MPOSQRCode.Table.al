@@ -6,7 +6,7 @@ table 6059964 "NPR MPOS QR Code"
     DataPerCompany = false;
     ObsoleteReason = 'Replaced with table NPR MPOS QR Codes';
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     fields
     {
         field(1; "User ID"; Code[50])
@@ -38,7 +38,7 @@ table 6059964 "NPR MPOS QR Code"
         field(12; "Client Type"; Option)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Field not used ';
             Caption = 'Client Type';
             DataClassification = CustomerContent;
@@ -80,7 +80,7 @@ table 6059964 "NPR MPOS QR Code"
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(21; "Cash Register Id"; Code[10])

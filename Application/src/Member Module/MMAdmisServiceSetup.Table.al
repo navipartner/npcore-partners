@@ -40,7 +40,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Guest Avatar Image" field';
         }
         field(16; "Web Service Is Published"; Boolean)
@@ -52,7 +52,7 @@
             FieldClass = FlowField;
 
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Web Service is not in use any more by Cloud and Web Service Aggregate is Temp table. This logic is moved on Page Field.';
         }
         field(17; "Validate Scanner Station"; Boolean)
@@ -66,7 +66,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Default Turnstile Image" field';
         }
         field(19; "Turnstile Error Image"; BLOB)
@@ -75,7 +75,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Error Image of Turnstile" field';
         }
         field(20; "Guest Avatar Image"; Media)

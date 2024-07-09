@@ -24,7 +24,7 @@
             Caption = 'Password';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with Token';
         }
         field(30; "Exchange Server Url"; Text[250])

@@ -3,7 +3,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
     Access = Internal;
 
     var
-        [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', 'NPR35.0')]
+        [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', '2024-06-28')]
         _SkipServerIDCheck: Boolean;
 
     internal procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text; lastServerId: Text) Response: JsonObject
@@ -428,7 +428,7 @@ codeunit 6184836 "NPR KDS Frontend Assist. Impl."
         Response.Add('serverId', Format(ServiceInstanceId()));
     end;
 
-    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', 'NPR35.0')]
+    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoints decoupled from Dragonglass', '2024-06-28')]
     internal procedure SetSkipServerIDCheck(Skip: Boolean)
     begin
         _SkipServerIDCheck := Skip;

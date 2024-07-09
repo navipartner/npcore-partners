@@ -246,7 +246,7 @@
         FrontEnd.ConfigureTheme(Theme);
     end;
 
-    [Obsolete('Pending removal, not used', 'NPR23.0')]
+    [Obsolete('Pending removal, not used', '2023-06-28')]
     procedure InitializeAdministrativeTemplates(POSUnit: Record "NPR POS Unit")
     begin
     end;
@@ -1362,7 +1362,7 @@
         Captions.Add(ActionCode + '.' + CaptionId, CaptionText);
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "NPR POS Caption Management")
     begin

@@ -4,7 +4,7 @@
     Caption = 'POS Info Audit Roll';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = '"Audit Roll" related functionality is not used anymore (replaced by POS Entry). This table has been replaced with table 6150647 "NPR POS Info POS Entry"';
 
     fields

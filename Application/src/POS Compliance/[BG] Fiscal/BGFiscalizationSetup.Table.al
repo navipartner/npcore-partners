@@ -18,7 +18,7 @@ table 6060085 "NPR BG Fiscalization Setup"
             Caption = 'Enable BG Fiscalization';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR28.0';
+            ObsoleteTag = '2023-11-28';
             ObsoleteReason = 'SIS Integration specific field is introduced.';
         }
         field(10; "BG SIS Fiscal Enabled"; Boolean)

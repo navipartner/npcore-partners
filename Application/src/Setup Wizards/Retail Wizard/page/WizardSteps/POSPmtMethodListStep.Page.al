@@ -151,7 +151,7 @@
             until POSPaymentMethod.Next() = 0;
     end;
 
-    [Obsolete('Please use procedure POSPaymentMethodsToModify()', 'NPR23.0')]
+    [Obsolete('Please use procedure POSPaymentMethodsToModify()', '2023-06-28')]
     internal procedure POSPaymentMethodsToCreate(): Boolean
     begin
         exit(Rec.FindSet());
@@ -162,7 +162,7 @@
         exit(Rec.FindSet());
     end;
 
-    [Obsolete('Please use procedure ModifyPOSPaymentMethodData()', 'NPR23.0')]
+    [Obsolete('Please use procedure ModifyPOSPaymentMethodData()', '2023-06-28')]
     internal procedure CreatePOSPaymentMethodData()
     var
         POSPaymentMethod: Record "NPR POS Payment Method";

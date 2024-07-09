@@ -54,14 +54,14 @@
 
     #region Workflows 1.0 Coordination
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure WorkflowBackEndStepBegin(WorkflowId: Integer; ActionId: Integer)
     begin
         _WorkflowStack.Push(WorkflowId);
         _ActionStack.Push(ActionId);
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure WorkflowBackEndStepEnd()
     begin
         if _StepToContinueAt <> '' then begin
@@ -79,21 +79,21 @@
             _ActionStack.Pop();
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     local procedure CurrentWorkflowID(): Integer
     begin
         if _WorkflowStack.Count() > 0 then
             exit(_WorkflowStack.Peek());
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     local procedure CurrentActionID(): Integer
     begin
         if _ActionStack.Count() > 0 then
             exit(_ActionStack.Peek());
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure AbortWorkflow(WorkflowID: Integer)
     begin
         if WorkflowID = CurrentWorkflowID() then begin
@@ -104,7 +104,7 @@
             _PausedWorkflowID := 0;
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure AbortWorkflows()
     begin
         _Pausing := false;
@@ -114,7 +114,7 @@
         _POSSession.ClearActionState();
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure ContinueAtStep(Step: Text)
     var
         Text011: Label 'A request was made to continue current workflow at step %1, while no workflow is currently running.';
@@ -125,7 +125,7 @@
         _StepToContinueAt := Step;
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure IsPaused(): Boolean
     begin
         exit(_PausedWorkflowID > 0);
@@ -135,7 +135,7 @@
 
     #region Workflows 2.0 Coordination
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure CloneForWorkflow20(WorkflowIDIn: Integer; var FrontEndIn: Codeunit "NPR POS Front End Management")
     begin
         FrontEndIn.Initialize();
@@ -200,7 +200,7 @@
         exit(StrSubstNo(Text001, Text));
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     local procedure RegisterWorkflowIfNecessary(Name: Code[20])
     var
         POSAction: Record "NPR POS Action";
@@ -495,12 +495,12 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Pending removal, not used', 'NPR23.0')]
+    [Obsolete('Pending removal, not used', '2023-06-28')]
     procedure ApplyAdministrativeTemplates(Templates: JsonArray)
     begin
     end;
 
-    [Obsolete('Action sequences are no longer supported', 'NPR23.0')]
+    [Obsolete('Action sequences are no longer supported', '2023-06-28')]
     procedure ConfigureActionSequences(var TempSessionAction: Record "NPR POS Action" temporary)
     begin
         Error('Action sequences are no longer supported');
@@ -620,7 +620,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Remove the need for this request in frontend and delete this. It is currently a dummy event in backend', 'NPR23.0')]
+    [Obsolete('Remove the need for this request in frontend and delete this. It is currently a dummy event in backend', '2023-06-28')]
     procedure HardwareInitializationComplete()
     var
         Request: Codeunit "NPR Front-End: Generic";
@@ -664,7 +664,7 @@
             exit('Sandbox');
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure InvokeWorkflow(var POSAction: Record "NPR POS Action")
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -686,7 +686,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure PauseWorkflow(): Integer
     var
         Request: Codeunit "NPR Front-End: PauseWorkflow";
@@ -756,7 +756,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     local procedure RequestWorkflowStep(StepId: Text)
     var
         Request: Codeunit "NPR Front-End: WorkflowRequest";
@@ -766,7 +766,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Not supported in workflow v3', 'NPR23.0')]
+    [Obsolete('Not supported in workflow v3', '2023-06-28')]
     procedure ResumeWorkflow()
     var
         Request: Codeunit "NPR Front-End: ResumeWorkflow";
@@ -819,7 +819,7 @@
         InvokeFrontEndAsync(Request);
     end;
 
-    [Obsolete('Delete once all wf 1.0 are gone', 'NPR23.0')]
+    [Obsolete('Delete once all wf 1.0 are gone', '2023-06-28')]
     procedure SetActionContext("Action": Text; Context: Codeunit "NPR POS JSON Management")
     var
         Request: Codeunit "NPR Front-End: ProvideContext";
@@ -852,7 +852,7 @@
         _WorkflowResponseContent := ResponseContent;
     end;
 
-    [Obsolete('Queue workflow is not supported anymore.', 'NPR23.0')]
+    [Obsolete('Queue workflow is not supported anymore.', '2023-06-28')]
     procedure QueueWorkflow(ActionCode: Text; Context: Text)
     begin
         Error('QueueWorkflow method in POSFrontEndManagement codeunit is no longer supported');
@@ -984,7 +984,7 @@
     begin
     end;
 
-    [Obsolete('Only server password secure methods will be supported going forward', 'NPR23.0')]
+    [Obsolete('Only server password secure methods will be supported going forward', '2023-06-28')]
     [BusinessEvent(true)]
     local procedure OnRequestSecureMethodsClientPasswordsRegistration()
     begin

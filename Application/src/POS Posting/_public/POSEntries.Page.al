@@ -416,7 +416,7 @@
                     Caption = 'Send as PDF';
                     Image = SendEmailPDF;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Removed from promoted category.';
                     Visible = false;
                     Promoted = true;

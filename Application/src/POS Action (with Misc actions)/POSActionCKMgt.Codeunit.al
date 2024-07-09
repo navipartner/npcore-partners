@@ -1,7 +1,7 @@
 ﻿codeunit 6150854 "NPR POS Action - CK Mgt."
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used.';
     Access = Internal;
 }

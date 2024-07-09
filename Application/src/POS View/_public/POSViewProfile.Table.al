@@ -23,7 +23,7 @@
             Caption = 'Client Formatting Culture ID';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Client* fields to prepare culture info.';
         }
         field(11; "Client Decimal Separator"; Text[1])
@@ -31,7 +31,7 @@
             Caption = 'Client Decimal Separator';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(12; "Client Thousands Separator"; Text[1])
@@ -39,7 +39,7 @@
             Caption = 'Client Thousands Separator';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(13; "Client Date Separator"; Text[1])
@@ -47,7 +47,7 @@
             Caption = 'Client Date Separator';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(14; "Culture Info (Serialized)"; Blob)
@@ -55,7 +55,7 @@
             Caption = 'Culture Info (Serialized)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type. "NPR POS View Profile"."Culture Info (Serialized)" -> "NPR POS View Profile"."Culture Info (Serializ.)"';
         }
         field(15; "Culture Info (Serializ.)"; Media)
@@ -63,7 +63,7 @@
             Caption = 'Culture Info (Serialized)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Client* fields to prepare culture info.';
         }
         field(20; Picture; Blob)
@@ -72,7 +72,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type. "NPR POS View Profile".Picture -> "NPR POS View Profile".Image';
         }
         field(21; Image; Media)
@@ -85,7 +85,7 @@
             Caption = 'Client Currency Symbol';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(23; "Client Number Decimal Digits"; Integer)
@@ -94,7 +94,7 @@
             DataClassification = CustomerContent;
             MinValue = 0;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(24; "Client Short Date Pattern"; Text[30])
@@ -102,7 +102,7 @@
             Caption = 'Client Short Date Pattern';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(25; "Client Day Names"; Text[250])
@@ -110,7 +110,7 @@
             Caption = 'Client Day Names';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(30; "POS Theme Code"; Code[10])
@@ -119,7 +119,7 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Theme";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
         field(40; "Line Order on Screen"; Option)
@@ -129,7 +129,7 @@
             OptionCaption = 'Normal (new at the end),Reverse (new on top),After Selected Line';
             OptionMembers = Normal,Reverse,AutoSplitKey;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Field is not needed anymore since, values will be hardcoded into code.';
         }
         field(50; "Initial Sales View"; Option)
@@ -151,7 +151,7 @@
             Caption = 'Lock Timeout';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to table 6014601 "NPR POS Security Profile"';
         }
         field(70; "Tax Type"; Option)
@@ -161,7 +161,7 @@
             OptionMembers = VAT,"Sales Tax";
             OptionCaption = 'VAT,Sales Tax';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use ApplicationAreaMgmt.IsSalesTaxEnabled() to identify whether we are in Sales Tax environment';
         }
         field(80; "Show Prices Including VAT"; Boolean)
@@ -174,7 +174,7 @@
             Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to table 6014601 "NPR POS Security Profile"';
         }
         field(6232; "POS - Show discount fields"; Boolean)
@@ -182,7 +182,7 @@
             Caption = 'Show Discount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not supported in new POS editor+layout';
         }
     }

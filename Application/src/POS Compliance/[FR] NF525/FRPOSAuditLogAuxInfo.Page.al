@@ -9,7 +9,7 @@
     PageType = List;
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced with NPR FR POS Audit Log Add. Info';
     SourceTable = "NPR FR POS Audit Log Aux. Info";
 

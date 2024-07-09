@@ -3,7 +3,7 @@
     Caption = 'Retail Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Fields will be spread out to more module specific areas';
 
     fields
@@ -20,7 +20,7 @@
             DataClassification = CustomerContent;
             Description = 'Moms med i salgspriser';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5; "Posting When Balancing"; Option)
@@ -30,7 +30,7 @@
             OptionCaption = 'Total,Per Register';
             OptionMembers = Total,"Per Register";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(14; "Sales Ticket Line Text1"; Code[50])
@@ -39,7 +39,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(15; "Sales Ticket Line Text2"; Code[50])
@@ -48,7 +48,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(16; "Sales Ticket Line Text3"; Code[50])
@@ -57,7 +57,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(17; "Sales Ticket Line Text4"; Code[50])
@@ -66,7 +66,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(18; "Sales Ticket Line Text5"; Code[50])
@@ -75,7 +75,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstratekst til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(20; "Posting Source Code"; Code[10])
@@ -84,7 +84,7 @@
             DataClassification = CustomerContent;
             Description = 'Kildespor til bogf¢ring';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. "NPR NP Retail Setup"."Source Code" used instead.';
         }
         field(51; "Posting No. Management"; Code[20])
@@ -93,7 +93,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til kassebogf¢ring';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(52; "Used Goods No. Management"; Code[20])
@@ -102,7 +102,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til brugtvarer';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(53; "Internal EAN No. Management"; Code[20])
@@ -111,7 +111,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Variety Setup"."Internal EAN No. Series".';
         }
         field(54; "Credit Voucher No. Management"; Code[20])
@@ -120,7 +120,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til tilgodebevis';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
         }
         field(55; "Gift Voucher No. Management"; Code[20])
@@ -129,7 +129,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til gavekort';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(56; "External EAN-No. Management"; Code[20])
@@ -138,7 +138,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til eksterne EAN numre';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Variety Setup"."External EAN No. Series';
         }
         field(57; "EAN Prefix Exhange Label"; Code[2])
@@ -146,7 +146,7 @@
             Caption = 'EAN Prefix Exhange Label';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
         }
         field(60; "EAN-Internal"; Integer)
@@ -157,7 +157,7 @@
             MaxValue = 29;
             MinValue = 27;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Variety Setup"."EAN-Internal';
         }
         field(61; "ISBN Bookland EAN"; Boolean)
@@ -165,7 +165,7 @@
             Caption = 'ISBN Bookland EAN';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(70; "Payment Type By Register"; Boolean)
@@ -174,7 +174,7 @@
             DataClassification = CustomerContent;
             Description = 'Kassestyret betalingsvalg';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(81; "EAN-External"; Integer)
@@ -183,7 +183,7 @@
             DataClassification = CustomerContent;
             Description = 'ekstern eannummer';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Variety Setup"."EAN-External';
         }
         field(83; "Get register no. using"; Option)
@@ -193,7 +193,7 @@
             OptionCaption = 'USERPROFILE,COMPUTERNAME,CLIENTNAME,SESSIONNAME,USERNAME,USERID,USERDOMAINID,USER SETUP TABLE,SALESPERSON TABLE';
             OptionMembers = USERPROFILE,COMPUTERNAME,CLIENTNAME,SESSIONNAME,USERNAME,USERID,USERDOMAINID,"USER SETUP TABLE",SALESPERSON;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. "User Setup"."NPR Backoffice Register No." is used allways.';
         }
         field(90; "Gift and Credit Valid Period"; Integer)
@@ -201,7 +201,7 @@
             Caption = 'Gift And Credit Valid Period';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift and credit voucher won''t be used anymore';
         }
         field(100; "Sales Line Description Code"; Code[20])
@@ -209,7 +209,7 @@
             Caption = 'Sales Line Description Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(105; "Purchase Line Description Code"; Code[20])
@@ -217,7 +217,7 @@
             Caption = 'Purchase Line Description Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(110; "Transfer Line Description Code"; Code[20])
@@ -225,7 +225,7 @@
             Caption = 'Transfer Line Description Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(115; "POS Line Description Code"; Code[20])
@@ -233,7 +233,7 @@
             Caption = 'POS Line Description Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(350; "Sale Doc. Type On Post. Pstv."; Option)
@@ -243,7 +243,7 @@
             OptionCaption = 'Invoice,Order';
             OptionMembers = Invoice,"Order";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. Only order is supported.';
         }
         field(351; "Sale Doc. Type On Post. Negt."; Option)
@@ -253,7 +253,7 @@
             OptionCaption = 'Return Order,Credit Memo';
             OptionMembers = "Return Order","Credit Memo";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. Only order is supported.';
         }
         field(352; "Sale Doc. Post. On Order"; Option)
@@ -263,7 +263,7 @@
             OptionCaption = 'Ask,Ship,Ship and Invoice,Dont Post';
             OptionMembers = Ask,Ship,"Ship and Invoice","Dont Post";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(353; "Sale Doc. Post. On Invoice"; Option)
@@ -273,7 +273,7 @@
             OptionCaption = 'Ask,Yes,No';
             OptionMembers = Ask,Yes,No;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(354; "Sale Doc. Post. On Cred. Memo"; Option)
@@ -283,7 +283,7 @@
             OptionCaption = 'Ask,Yes,No';
             OptionMembers = Ask,Yes,No;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(355; "Sale Doc. Post. On Ret. Order"; Option)
@@ -293,7 +293,7 @@
             OptionCaption = 'Ask,Receive,Receive and Invoice,Dont Post';
             OptionMembers = Ask,Receive,"Receive and Invoice","Dont Post";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(356; "Sale Doc. Print On Post"; Boolean)
@@ -301,7 +301,7 @@
             Caption = 'Send Document On Post';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. Defaults to true.';
         }
         field(450; "Use Adv. dimensions"; Boolean)
@@ -310,7 +310,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore. Defaults to true.';
         }
         field(501; "Variance No. Management"; Code[20])
@@ -320,7 +320,7 @@
             Description = 'nummerstyring til variation';
             InitValue = '0';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(502; "Mixed Discount No. Management"; Code[20])
@@ -329,7 +329,7 @@
             DataClassification = CustomerContent;
             Description = 'nummerstyring til miksrabat';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
         }
         field(503; "Period Discount Management"; Code[20])
@@ -338,7 +338,7 @@
             DataClassification = CustomerContent;
             Description = 'nummerstyring til perioderabat';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
         }
         field(504; "Customer Repair Management"; Code[20])
@@ -347,7 +347,7 @@
             DataClassification = CustomerContent;
             Description = 'nummerstyring til  kunderep.';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Retail Customer Repair Setup"."Customer Repair No. Series"';
         }
         field(505; "Quantity Discount Nos."; Code[20])
@@ -356,7 +356,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerstyring til flerstyksprishoveder';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Discount Priority"."Discount No. Series';
         }
         field(550; "Use NAV Lookup in POS"; Boolean)
@@ -365,7 +365,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.23.01';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(655; "Posting Audit Roll"; Option)
@@ -376,7 +376,7 @@
             OptionCaption = 'Manual,Automatic';
             OptionMembers = Manual,Automatic;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(700; "Selection No. Series"; Code[20])
@@ -385,7 +385,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udlejning';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(701; "Order  No. Series"; Code[20])
@@ -394,7 +394,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til bestilling';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(703; "Rental Contract  No. Series"; Code[20])
@@ -403,7 +403,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(704; "Purchase Contract  No. Series"; Code[20])
@@ -412,7 +412,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(705; "Customization  No. Series"; Code[20])
@@ -421,7 +421,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(706; "Quote  No. Series"; Code[20])
@@ -430,7 +430,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til udk¢rsel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(720; "Exchange Label  No. Series"; Code[20])
@@ -439,7 +439,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie Til Bytte Mærker';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
         }
         field(750; "Variant No. Series"; Code[20])
@@ -448,7 +448,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til 10-code variantkode (ikke EAN)';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Variety Setup"."EAN-External';
         }
         field(800; "Balancing Posting Type"; Option)
@@ -459,7 +459,7 @@
             OptionCaption = 'PER REGISTER,TOTAL';
             OptionMembers = "PER REGISTER",TOTAL;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(998; "Credit Card Extension"; Text[50])
@@ -468,7 +468,7 @@
             DataClassification = CustomerContent;
             Description = 'Parametre til dankortprogram';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(999; "Credit Card Program"; Text[50])
@@ -477,7 +477,7 @@
             DataClassification = CustomerContent;
             Description = 'Lokation af dankortprogram';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(1000; "Credit Card Path"; Text[50])
@@ -486,7 +486,7 @@
             DataClassification = CustomerContent;
             Description = 'Sti til dankortprogram';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(1001; "Create New Customer"; Boolean)
@@ -494,7 +494,7 @@
             Caption = 'Create New Customer';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(1015; "Company No."; Code[20])
@@ -502,7 +502,7 @@
             Caption = 'Company No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(1016; "Use deposit in Retail Doc"; Boolean)
@@ -511,7 +511,7 @@
             DataClassification = CustomerContent;
             Description = 'Benyt depositum ved reservation?';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(1019; "Popup Gift Voucher Quantity"; Boolean)
@@ -520,7 +520,7 @@
             DataClassification = CustomerContent;
             Description = 'Show Quantity And Discount % for giftvoucher Sale';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(2001; "Base for FIK-71"; Option)
@@ -531,7 +531,7 @@
             OptionCaption = 'Invoice,Customer';
             OptionMembers = Invoice,Customer;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(3009; "Item Group on Creation"; Boolean)
@@ -540,7 +540,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om der skal sp¢rges efter vgr. ved oprettelse';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(4001; "Print Register Report"; Boolean)
@@ -549,7 +549,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om der skal printes en kasserapport ved afslutning';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4002; "Sales Ticket Item"; Boolean)
@@ -558,7 +558,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om varenummer skal med på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4003; "Recommended Price"; Boolean)
@@ -567,7 +567,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om vejledende pris skal med på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4004; "Logo on Sales Ticket"; Boolean)
@@ -576,7 +576,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om der skal logo på bon''erne';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4005; "Name on Sales Ticket"; Boolean)
@@ -585,7 +585,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om der skal firma navn på bon''erne';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4009; "Vendor When Creation"; Boolean)
@@ -594,7 +594,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om der skal sp¢rges om leverand¢r ved opret';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(4019; "Item Description at 1 star"; Boolean)
@@ -603,7 +603,7 @@
             DataClassification = CustomerContent;
             Description = 'Overf¢rer varebeskrivelse fra varegruppe ved autoopret';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(4020; "Item Description at 2 star"; Boolean)
@@ -612,7 +612,7 @@
             DataClassification = CustomerContent;
             Description = 'Overf¢rer varebeskrivelse fra varegruppe ved autoopret';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5005; "Salesperson on Sales Ticket"; Boolean)
@@ -621,7 +621,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskrift af ekspedientnavn på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5006; "Print Total Item Quantity"; Boolean)
@@ -629,7 +629,7 @@
             Caption = 'Print Total Quantity Items Sold';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5007; "Print Attributes On Receipt"; Boolean)
@@ -637,7 +637,7 @@
             Caption = 'Print Attributes On Receipt';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5008; "Euro Exchange Rate"; Decimal)
@@ -646,7 +646,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver eurokurs uden brug af valuta modul';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5011; "Create retail order"; Option)
@@ -657,7 +657,7 @@
             OptionCaption = ' ,Before Payment,After Payment';
             OptionMembers = " ","Before payment","After payment";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5016; "Customer No."; Option)
@@ -668,7 +668,7 @@
             OptionCaption = 'Standard,At login,Before payment';
             OptionMembers = Standard,"At login","Before payment";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5018; "Sales Lines from Selection"; Boolean)
@@ -677,7 +677,7 @@
             DataClassification = CustomerContent;
             Description = 'Mulighed for at slette ekspeditionslinier, hvis de er fra udlejning';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5019; "Euro on Sales Ticket"; Boolean)
@@ -686,7 +686,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver om europris skal med på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5020; "Receipt for Debit Sale"; Boolean)
@@ -695,7 +695,7 @@
             DataClassification = CustomerContent;
             Description = 'Afg¢re om rapport valget under salg og faktura skal k¢res ifm. at man laver en faktura';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5022; "Purchace Price Code"; Text[10])
@@ -704,7 +704,7 @@
             DataClassification = CustomerContent;
             Description = 'Angiver det ord k¢bsprisen skal kodes efter på prislabel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
         }
         field(5024; "Bar Code on Sales Ticket Print"; Boolean)
@@ -713,7 +713,7 @@
             DataClassification = CustomerContent;
             Description = 'Stregkode på bonudskrift';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5025; "Post Sale"; Boolean)
@@ -722,7 +722,7 @@
             DataClassification = CustomerContent;
             Description = 'Umiddelbart ikke noget';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5026; "Auto Print Retail Doc"; Boolean)
@@ -731,7 +731,7 @@
             DataClassification = CustomerContent;
             Description = 'Automatisk udskrift af bestillingsseddel';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5029; "Copy of Gift Voucher etc."; Boolean)
@@ -740,7 +740,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskriv kopi af gavekort';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(5030; "FIK No."; Code[10])
@@ -749,7 +749,7 @@
             DataClassification = CustomerContent;
             Description = 'FIKnr af firma';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, it is in standard DK version.';
         }
         field(5031; "Ask for Reference"; Boolean)
@@ -758,7 +758,7 @@
             DataClassification = CustomerContent;
             Description = 'Sp¢rg efter reference ved debetsalg under ekspedition';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5033; "EAN No. at 1 star"; Boolean)
@@ -767,7 +767,7 @@
             DataClassification = CustomerContent;
             Description = 'Lav EAN nummer ved vare autoopret';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5035; "Use Standard Order Document"; Boolean)
@@ -776,7 +776,7 @@
             DataClassification = CustomerContent;
             Description = 'Toggles the use of retail versus sales docs for orders';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5040; "Poste Sales Ticket Immediately"; Boolean)
@@ -785,7 +785,7 @@
             DataClassification = CustomerContent;
             Description = 'Straksbogf¢ring af bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5041; "Copies of Selection"; Boolean)
@@ -794,7 +794,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskriv kopier af bestilling';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5042; "No. of Copies of Selection"; Integer)
@@ -803,7 +803,7 @@
             DataClassification = CustomerContent;
             Description = 'Antal bestillingskopier der skal udskrives';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5043; "Cash Cust. No. Series"; Code[20])
@@ -812,7 +812,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til kontantkunder';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5051; "Exchange Label Exchange Period"; DateFormula)
@@ -821,7 +821,7 @@
             DataClassification = CustomerContent;
             Description = 'Bytteperiode for Byttemærker';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
         }
         field(5056; "Use WIN User Profile"; Boolean)
@@ -830,7 +830,7 @@
             DataClassification = CustomerContent;
             Description = 'Anvend std. Win brugerprofil til kassefil';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5057; "Path Filename to User Profile"; Text[50])
@@ -839,7 +839,7 @@
             DataClassification = CustomerContent;
             Description = 'Alternativ sti til kassefil';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5058; "Open Register Password"; Code[20])
@@ -848,7 +848,7 @@
             DataClassification = CustomerContent;
             Description = 'kode til at åbne kasseskuffen';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(5061; "Unit Cost Control"; Option)
@@ -859,7 +859,7 @@
             OptionCaption = 'Enabled,Disabled,Disabled if Quantity > 0,Disabled if xUnit Cost > Unit Cost,Disabled if Quantity > 0 and xUnit Cost > Unit Cost';
             OptionMembers = Enabled,Disabled,"Disabled if Quantity > 0","Disabled if xUnit Cost > Unit Cost","Disabled if Quantity > 0 and xUnit Cost > Unit Cost";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(5062; "Copy No. on Sales Ticket"; Boolean)
@@ -868,7 +868,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskriv kopinummeret på bonen';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5068; "Transfer SeO Item Entry"; Boolean)
@@ -877,7 +877,7 @@
             DataClassification = CustomerContent;
             Description = 'Overf¢rsel af Serienummer ej oprettet til varepost';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5071; "Register Cnt. Units"; Text[100])
@@ -887,7 +887,7 @@
             Description = 'Opsætning af valutaopdeling til kassen';
             InitValue = '0,25:0,50:1:2:5:10:20:50:100:200:500:1000';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5073; "Post Customer Payment imme."; Boolean)
@@ -896,7 +896,7 @@
             DataClassification = CustomerContent;
             Description = 'Straksbogf¢r debitor indbetalinger';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5076; "Post Payouts imme."; Boolean)
@@ -905,7 +905,7 @@
             DataClassification = CustomerContent;
             Description = 'Straksbogf¢r udbetalinger';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5077; "Auto Replication"; Boolean)
@@ -914,7 +914,7 @@
             DataClassification = CustomerContent;
             Description = 'Aktiver replikering af flere regnskaber';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5092; "Post registers compressed"; Boolean)
@@ -922,7 +922,7 @@
             Caption = 'Post Registers Compressed';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5097; "Rental Msg."; Boolean)
@@ -931,7 +931,7 @@
             DataClassification = CustomerContent;
             Description = 'Send udlejnings SMS';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5099; "EAN-No. at Item Create"; Boolean)
@@ -940,7 +940,7 @@
             DataClassification = CustomerContent;
             Description = 'Autoopret EAN nummer ved vareopret';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5100; "Default Rental"; Option)
@@ -951,7 +951,7 @@
             OptionCaption = 'Ord. Customer,Cash Customer';
             OptionMembers = "Ord. Customer","Cash Customer";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5103; "Prices incl. VAT"; Boolean)
@@ -960,7 +960,7 @@
             DataClassification = CustomerContent;
             Description = 'Salgspriser inkl. moms';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5104; "Repair Msg."; Boolean)
@@ -969,7 +969,7 @@
             DataClassification = CustomerContent;
             Description = 'Send reparations SMS';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Customer Repair Setup".';
         }
         field(5105; "Receive Register Turnover"; Option)
@@ -980,7 +980,7 @@
             OptionCaption = 'None,Per Register,Total Turnover';
             OptionMembers = "None","Per Register","Total Turnover";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5106; "Autocreate EAN-Number"; Boolean)
@@ -989,7 +989,7 @@
             DataClassification = CustomerContent;
             Description = 'Opret EAN nummer  ved ny vare';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5110; "Itemgroup Pre No. Serie"; Code[5])
@@ -998,7 +998,7 @@
             DataClassification = CustomerContent;
             Description = 'Code f¢r automatisk oprettede varegruppe nr. serier';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5116; "Itemgroup No. Serie StartNo."; Code[20])
@@ -1007,7 +1007,7 @@
             DataClassification = CustomerContent;
             Description = 'Startnummer til varegruppe nr. serie';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5117; "Itemgroup No. Serie EndNo."; Code[20])
@@ -1016,7 +1016,7 @@
             DataClassification = CustomerContent;
             Description = 'Slutnummer til varegruppe nr. serie';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5118; "Itemgroup No. Serie Warning"; Code[20])
@@ -1025,7 +1025,7 @@
             DataClassification = CustomerContent;
             Description = 'Advarselsnummer til varegruppe nr. serie';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(5120; "Sales Ticket Line Text6"; Code[50])
@@ -1034,7 +1034,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstralinier til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5121; "Sales Ticket Line Text7"; Code[50])
@@ -1043,7 +1043,7 @@
             DataClassification = CustomerContent;
             Description = 'Ekstralinier til bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5122; "Unit Price on Sales Ticket"; Boolean)
@@ -1052,7 +1052,7 @@
             DataClassification = CustomerContent;
             Description = 'Skriv ápris på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5124; "Show Stored Tickets"; Boolean)
@@ -1061,7 +1061,7 @@
             DataClassification = CustomerContent;
             Description = 'Vis gemte bon''er ved login';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5125; "Reset unit price on neg. sale"; Boolean)
@@ -1070,7 +1070,7 @@
             DataClassification = CustomerContent;
             Description = 'nulstil apris ved neg. salg';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, defaults to false.';
         }
         field(5126; "Navision Shipment Note"; Boolean)
@@ -1079,7 +1079,7 @@
             DataClassification = CustomerContent;
             Description = 'Afg¢re om rapport valget vedr. flgs. skal k¢res når man laver en flgs. i retai l¢sningen';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5129; "Show Create Giftcertificat"; Boolean)
@@ -1088,7 +1088,7 @@
             DataClassification = CustomerContent;
             Description = 'Vis form til oprettelse af gavekort, når disse "k¢bes"';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5130; "Cash Customer Deposit rel."; Code[20])
@@ -1097,7 +1097,7 @@
             DataClassification = CustomerContent;
             Description = 'Depositumsrelation for e.g. bestilling til kontantkunder';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5134; "Immediate postings"; Option)
@@ -1108,7 +1108,7 @@
             OptionCaption = ' ,Serial No.,Always';
             OptionMembers = " ","Serial No.",Always;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5138; "Post to Journal"; Boolean)
@@ -1117,7 +1117,7 @@
             DataClassification = CustomerContent;
             Description = 'Indsæt i finanskladde frem for fuldstændig bogf¢ring';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5139; "Journal Name"; Code[10])
@@ -1126,7 +1126,7 @@
             DataClassification = CustomerContent;
             Description = 'Kladdenavn til finanskladde';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5140; "Show saved expeditions"; Option)
@@ -1137,7 +1137,7 @@
             OptionCaption = 'All,Register,Salesperson,Register+Salesperson';
             OptionMembers = All,Register,Salesperson,"Register+Salesperson";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5141; "Journal Type"; Code[10])
@@ -1146,7 +1146,7 @@
             DataClassification = CustomerContent;
             Description = 'Kladdetype for bogf¢ring';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5144; "Show Create Credit Voucher"; Boolean)
@@ -1155,7 +1155,7 @@
             DataClassification = CustomerContent;
             Description = 'Vis form til oprettelse af tilgodebevis, når disse laves';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift and credit voucher won''t be used anymore';
         }
         field(5145; "Editable eksp. reverse sale"; Boolean)
@@ -1164,7 +1164,7 @@
             DataClassification = CustomerContent;
             Description = 'Ved tilbagef¢r bon, skal det være muligt at lave ændringer';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5146; "Item Unit on Expeditions"; Boolean)
@@ -1173,7 +1173,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskriv vareenheder på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5149; "Rep. Cust. Default"; Option)
@@ -1184,7 +1184,7 @@
             OptionCaption = 'Ord. Customer,Cash Customer';
             OptionMembers = "Ord. Customer","Cash Customer";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Customer Repair Setup".';
         }
         field(5150; "Retail Debitnote"; Boolean)
@@ -1193,7 +1193,7 @@
             DataClassification = CustomerContent;
             Description = 'Afg¢re om rapport valget debetkvittering skal k¢res';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5151; "Navision Creditnote"; Boolean)
@@ -1202,7 +1202,7 @@
             DataClassification = CustomerContent;
             Description = 'Afg¢re om rapport valget vedr. kreditnota skal k¢res når man laver en flgs. i retai l¢sningen';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5152; "Check Purchase Lines if vendor"; Boolean)
@@ -1211,7 +1211,7 @@
             DataClassification = CustomerContent;
             Description = 'Afg¢re om man på k¢bslinie skal checke om vare man taster tilh¢rer leverand¢re som man laver ordre for.';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(5154; "Salespersoncode on Salesdoc."; Option)
@@ -1222,7 +1222,7 @@
             OptionCaption = 'Forced,Free';
             OptionMembers = Forced,Free;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(5156; "Serialno. (Itemno nonexist)"; Option)
@@ -1233,7 +1233,7 @@
             OptionCaption = 'Search,Do not search';
             OptionMembers = Search,"Do Not Search";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5160; "Show vendoe Itemno."; Boolean)
@@ -1242,7 +1242,7 @@
             DataClassification = CustomerContent;
             Description = 'Vis Lev. Varenummer på bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5163; "Profit on Gifvouchers"; Decimal)
@@ -1250,7 +1250,7 @@
             Caption = 'Profit On Gift Vouchers';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(5165; "Copy Sales Ticket on Giftvo."; Boolean)
@@ -1259,7 +1259,7 @@
             DataClassification = CustomerContent;
             Description = 'Printer to bonner ved salg af gavekort';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(5166; "Show Customer info on ticket"; Boolean)
@@ -1268,7 +1268,7 @@
             DataClassification = CustomerContent;
             Description = 'Viser kunde detaljer (kontant- eller debitor) hvis kundenummer er udfyldt';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5167; "Show Counting on Counter Rep."; Boolean)
@@ -1277,7 +1277,7 @@
             DataClassification = CustomerContent;
             Description = 'Viser detaljer omkring kasseoptælling på kasse afslutningsrapporten';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5171; "F9 Statistics When Login"; Option)
@@ -1288,7 +1288,7 @@
             OptionCaption = 'Show All Registers,Show Local Register';
             OptionMembers = "Show all registers","Show local register";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5185; "Item group in Item no."; Boolean)
@@ -1297,7 +1297,7 @@
             DataClassification = CustomerContent;
             Description = 'Skal varegruppe indsættes foran i et automatisk oprettet varenummer';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5186; "Foreign Gift Voucher no.Series"; Code[10])
@@ -1305,7 +1305,7 @@
             Caption = 'Foreign Gift Voucher No. Series';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(5187; "Foreign Credit Voucher No.Seri"; Code[10])
@@ -1313,7 +1313,7 @@
             Caption = 'Foreign Credit Voucher No. Series';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
         }
         field(5188; "Appendix no. eq Sales Ticket"; Boolean)
@@ -1321,7 +1321,7 @@
             Caption = 'Appendix No. Equals Sales Ticket No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(5250; "Shelve module"; Boolean)
@@ -1330,7 +1330,7 @@
             DataClassification = CustomerContent;
             Description = 'Brug reolsystem';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6164; "Ask for Attention Name"; Boolean)
@@ -1339,7 +1339,7 @@
             DataClassification = CustomerContent;
             Description = 'Få attention popup ved debetsalg';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6183; "Reason for Return Mandatory"; Boolean)
@@ -1347,7 +1347,7 @@
             Caption = 'Reason For Return Mandatory';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(6184; "Fixed Price of Mending"; Decimal)
@@ -1355,7 +1355,7 @@
             Caption = 'Fixed Price Of Mending';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Customer Repair Setup".';
         }
         field(6185; "Fixed Price of Denied Mending"; Decimal)
@@ -1363,7 +1363,7 @@
             Caption = 'Fixed Price Of Denied Mending';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Customer Repair Setup".';
         }
         field(6187; "Internal Dept. Code"; Code[20])
@@ -1371,7 +1371,7 @@
             Caption = 'Internal Departement Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6188; "Allow Customer Cash Sale"; Boolean)
@@ -1380,7 +1380,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6189; "Faktura udskrifts valg"; Boolean)
@@ -1388,7 +1388,7 @@
             Caption = 'Invoice Printout Option';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6190; "EAN Price Code"; Code[2])
@@ -1396,7 +1396,7 @@
             Caption = 'EAN Price Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6191; "Use VariaX module"; Boolean)
@@ -1405,7 +1405,7 @@
             DataClassification = CustomerContent;
             Description = 'Der gives kun adgang til VariaX modulet hvis denne er sat';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6192; "Internal Unit Price"; Option)
@@ -1415,7 +1415,7 @@
             OptionCaption = 'Unit Cost,Last Direct Cost';
             OptionMembers = "Unit Cost","Last Direct";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
         }
         field(6193; "Stat. Dimension"; Code[20])
@@ -1424,7 +1424,7 @@
             DataClassification = CustomerContent;
             Description = 'Dimension som bruges til statistik';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6194; "No. of Sales pr. Stat"; Integer)
@@ -1433,7 +1433,7 @@
             DataClassification = CustomerContent;
             Description = 'Antal ekspeditioner pr. statistik popup';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6195; "EAN Mgt. Gift voucher"; Code[2])
@@ -1442,7 +1442,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre for gavekort';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(6196; "EAN Mgt. Credit voucher"; Code[2])
@@ -1451,7 +1451,7 @@
             DataClassification = CustomerContent;
             Description = 'Nummerserie til EAN numre for tilgodebeviser';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
         }
         field(6198; "Dim Stat Method"; Option)
@@ -1461,7 +1461,7 @@
             OptionCaption = 'Global Dim List,Global Dim Dialog,Post Code On Audit roll';
             OptionMembers = "Global Dim List","Global Dim Dialog","Post Code";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6199; "Dim Stat Value"; Option)
@@ -1471,7 +1471,7 @@
             OptionCaption = 'Check,Create';
             OptionMembers = Check,Create;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6209; "Demand Cash Cust on Neg Sale"; Boolean)
@@ -1479,7 +1479,7 @@
             Caption = 'Demand Cash Customer On Neg Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6211; "Password on unblock discount"; Text[4])
@@ -1487,7 +1487,7 @@
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(6214; "Auto edit debit sale"; Boolean)
@@ -1495,7 +1495,7 @@
             Caption = 'Auto Edit Debit Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6215; "Retail Journal No. Management"; Code[20])
@@ -1503,7 +1503,7 @@
             Caption = 'Credit Voucher No. Management';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup"."Retail Journal No. Series"';
         }
         field(6216; "Receipt - Show zero accessory"; Boolean)
@@ -1511,7 +1511,7 @@
             Caption = 'Receipt - Show Zero Accessory';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6217; "Description control"; Option)
@@ -1521,7 +1521,7 @@
             OptionCaption = '<Description>,<Description 2>,<Vendor Name><Item Group><Vendor Item No.>,<Description 2><Item Group Name>,<Description><Variant Info>,<Description Item>:<Description 2 Variant>';
             OptionMembers = "<Description>","<Description 2>","<Vendor Name><Item Group><Vendor Item No.>","<Description 2><Item group name>","<Description><Variant Info>","<Desc Item>:<Desc2 Variant>";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(6222; "Exchange label default date"; Code[10])
@@ -1529,7 +1529,7 @@
             Caption = 'Exchange Label Default Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Exchange Label Setup".';
         }
         field(6224; "Skip Warranty Voucher Dialog"; Text[30])
@@ -1537,7 +1537,7 @@
             Caption = 'Warranty Voucher Dialog';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6225; "Warranty Standard Date"; Date)
@@ -1545,7 +1545,7 @@
             Caption = 'Warranty Standard Date';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6228; "Item No. Shipping"; Code[20])
@@ -1553,7 +1553,7 @@
             Caption = 'Item No. Deposit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6229; "Receipt - Show Variant code"; Boolean)
@@ -1561,7 +1561,7 @@
             Caption = 'Show Variant Code ';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6230; "Staff Disc. Group"; Code[20])
@@ -1569,7 +1569,7 @@
             Caption = 'Staff Disc. Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
         }
         field(6231; "Staff Price Group"; Code[10])
@@ -1577,7 +1577,7 @@
             Caption = 'Staff Price Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
         }
         field(6232; "POS - Show discount fields"; Boolean)
@@ -1585,7 +1585,7 @@
             Caption = 'Show Discount';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to DEFAULT "NPR POS View Profile"';
         }
         field(6233; "Costing Method Standard"; Enum "Costing Method")
@@ -1594,7 +1594,7 @@
             DataClassification = CustomerContent;
             InitValue = Standard;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(6235; "Staff SalesPrice Calc Codeunit"; Integer)
@@ -1602,7 +1602,7 @@
             Caption = 'Staff SalesPrice Calc Codeunit';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to "NPR Staff Setup".';
         }
         field(6237; "Customer type"; Option)
@@ -1612,7 +1612,7 @@
             OptionCaption = 'Customer,Cash';
             OptionMembers = Customer,Cash;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6238; "Warning - Sale with no lines"; Boolean)
@@ -1620,7 +1620,7 @@
             Caption = 'Warning - Sale With No Lines';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6243; "Reason on Discount"; Option)
@@ -1630,7 +1630,7 @@
             OptionCaption = ' ,Check,Create';
             OptionMembers = " ",Check,Create;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6244; "Reason Code No. Series"; Code[20])
@@ -1638,7 +1638,7 @@
             Caption = 'Reason Code No. Series';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6245; "Customer Credit Level Warning"; Boolean)
@@ -1646,7 +1646,7 @@
             Caption = 'Customer Credit Level Warning';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6246; "Global Sale POS"; Boolean)
@@ -1654,7 +1654,7 @@
             Caption = 'Global Sale POS';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6260; "Not use Dim filter SerialNo"; Boolean)
@@ -1663,7 +1663,7 @@
             DataClassification = CustomerContent;
             Description = 'Skip filtering in global Dimension when searching for SerialNo in ItemLedger';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR Retail Item Setup".';
         }
         field(6270; "Margin and Turnover By Shop"; Option)
@@ -1673,7 +1673,7 @@
             OptionCaption = ' ,Dimension1,Dimension2';
             OptionMembers = " ",Dimension1,Dimension2;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, moved to "NPR NP Retail Setup".';
         }
         field(6300; "Auto Changelog Level"; Option)
@@ -1683,7 +1683,7 @@
             OptionCaption = 'Core,Extended,None';
             OptionMembers = Core,Extended,"None";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(6310; "Customer Config. Template"; Code[10])
@@ -1692,7 +1692,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.30';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6320; "Use I-Comm"; Boolean)
@@ -1701,7 +1701,7 @@
             DataClassification = CustomerContent;
             Description = 'Tillad brugen af I-Comm tabellen og lignende kommunikationstabeller';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore, defaults to false.';
         }
         field(6330; SamletBonRabat; Boolean)
@@ -1710,7 +1710,7 @@
             DataClassification = CustomerContent;
             Description = 'Akkumulerer rabatten i bunden, istedet for at printe for hverlinje';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6335; "Automatic inventory posting"; Boolean)
@@ -1719,7 +1719,7 @@
             DataClassification = CustomerContent;
             Description = 'Til automatisk lagerbogf¢ring';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6340; "Automatic Cost Adjustment"; Boolean)
@@ -1728,7 +1728,7 @@
             DataClassification = CustomerContent;
             Description = 'Til automatisk k¢rsel af kostprisefterberegning';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6345; "Signature for Return"; Boolean)
@@ -1737,7 +1737,7 @@
             DataClassification = CustomerContent;
             Description = 'Underskrift ved Returvarer';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6350; "Description 2 on receipt"; Boolean)
@@ -1746,7 +1746,7 @@
             DataClassification = CustomerContent;
             Description = 'Beskrivelse 2 på Bon';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6355; "Return Receipt Positive Amount"; Boolean)
@@ -1755,7 +1755,7 @@
             DataClassification = CustomerContent;
             Description = 'Udskrift af returbon ved positiv amount. sag 57937';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6360; "Show Discount Percent"; Boolean)
@@ -1764,7 +1764,7 @@
             DataClassification = CustomerContent;
             Description = 'Vis Rabat %, sag 62801, bruges på rapport 6014419 og 6060104';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(6370; "Create POS Entries Only"; Boolean)
@@ -1773,7 +1773,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.38';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
         field(10000; "Debug Posting"; Boolean)
@@ -1782,7 +1782,7 @@
             DataClassification = CustomerContent;
             Description = 'Ingen bogf¢ring, men indsætning i kladder';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used anymore.';
         }
     }

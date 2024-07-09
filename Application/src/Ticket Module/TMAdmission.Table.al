@@ -59,7 +59,7 @@
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
         }
         field(43; "Reserved For Members"; Integer)
@@ -67,7 +67,7 @@
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
         }
         field(44; "Capacity Control"; Option)
@@ -87,7 +87,7 @@
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
@@ -95,7 +95,7 @@
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Dependent Admission Code"; Code[20])
@@ -103,7 +103,7 @@
             Caption = 'Dependent Admission Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }
         field(51; "Dependency Type"; Option)
@@ -113,7 +113,7 @@
             OptionCaption = ' ,Within Timeframe,Exclude';
             OptionMembers = NA,TIMEFRAME,EXCLUDE;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }
         field(52; "Dependency Timeframe"; DateFormula)
@@ -121,7 +121,7 @@
             Caption = 'Dependency Timeframe';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replace by NPR TM Adm. Dependency subtables to handle more complex setup';
         }
         field(53; "Dependency Code"; Code[20])

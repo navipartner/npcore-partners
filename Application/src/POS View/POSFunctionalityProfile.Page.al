@@ -6,7 +6,7 @@ page 6151286 "NPR POS Functionality Profile"
     Caption = 'POS Functionality Profile';
     Extensible = false;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR27.0';
+    ObsoleteTag = '2023-10-28';
     ObsoleteReason = 'New parameter SelectCustReq and SelectMemberReq in POS Action Login created, use this instead.';
 
     layout

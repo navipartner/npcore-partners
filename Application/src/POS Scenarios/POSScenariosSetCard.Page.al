@@ -7,7 +7,7 @@
     UsageCategory = None;
     SourceTable = "NPR POS Sales Workflow Set";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
 
 

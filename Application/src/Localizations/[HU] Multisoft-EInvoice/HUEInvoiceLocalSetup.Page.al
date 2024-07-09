@@ -8,7 +8,7 @@ page 6184529 "NPR HU EInvoice Local. Setup"
     SourceTable = "NPR HU EInvoice Local. Setup";
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR34.0';
+    ObsoleteTag = '2024-05-28';
     ObsoleteReason = 'Merged and replaced with page "NPR MS HU Fiscalization Setup".';
     layout
     {

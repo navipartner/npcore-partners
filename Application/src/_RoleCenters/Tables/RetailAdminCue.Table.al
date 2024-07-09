@@ -41,7 +41,7 @@
             Caption = 'Cash Registers';
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use POS Units instead of Cash Registers';
         }
         field(70; "POS Payment Bins"; Integer)

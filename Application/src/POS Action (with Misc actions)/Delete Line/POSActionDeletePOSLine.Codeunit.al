@@ -63,7 +63,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
             POSSaleLine.SetPosition(Position);
     end;
 
-    [Obsolete('Not Used', 'NPR24.0')]
+    [Obsolete('Not Used', '2023-07-28')]
     procedure GetCurrentViewType() Response: JsonObject;
     var
         NPRPOSSession: Codeunit "NPR POS Session";

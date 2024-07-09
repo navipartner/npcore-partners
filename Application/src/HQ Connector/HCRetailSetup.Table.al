@@ -4,7 +4,7 @@
     Caption = 'HC Retail Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields

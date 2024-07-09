@@ -244,14 +244,14 @@
         end;
     end;
 
-    [Obsolete('Automatic in workflow v3', 'NPR23.0')]
+    [Obsolete('Automatic in workflow v3', '2023-06-28')]
     internal procedure GetModified() Result: Boolean
     begin
         Result := _IsModified or (not _Initialized);
         _IsModified := false;
     end;
 
-    [Obsolete('Automatic in workflow v3', 'NPR23.0')]
+    [Obsolete('Automatic in workflow v3', '2023-06-28')]
     procedure SetModified()
     begin
         _IsModified := true;
@@ -942,13 +942,13 @@
 
     #region OnFinishSale Workflow
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     local procedure OnFinishSaleCode(): Code[20]
     begin
         exit('FINISH_SALE');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     var
@@ -957,13 +957,13 @@
         Sender.DiscoverPOSSalesWorkflow(OnFinishSaleCode(), DuringEndSaleLbl, CurrCodeunitId(), 'OnFinishSale');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     local procedure CurrCodeunitId(): Integer
     begin
         exit(CODEUNIT::"NPR POS Sale");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     local procedure InvokeOnFinishSaleSubscribers_OnRun(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step")
     var
         POSAfterSaleExecution: Codeunit "NPR POS After Sale Execution";
@@ -1041,7 +1041,7 @@
         TempExecutionOrderOnSale.Insert();
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR32.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2024-03-28')]
     internal procedure InvokeOnFinishSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var
         NPRPOSUnit: Record "NPR POS Unit";
@@ -1091,7 +1091,7 @@
         LogStopwatch('FINISH_SALE_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
-    [Obsolete('Remove after POS Scenario is removed, use OnAfterEndSale', 'NPR30.0')]
+    [Obsolete('Remove after POS Scenario is removed, use OnAfterEndSale', '2024-01-28')]
 
     [IntegrationEvent(false, false)]
     internal procedure OnFinishSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")

@@ -57,7 +57,7 @@ page 6150760 "NPR OIOUBL Update Document"
         Contact: Text[100];
         VATRegNo: Text[20];
 
-    [Obsolete('Procedure GetDocument with additional parameter will be used instead.', 'NPR26.0')]
+    [Obsolete('Procedure GetDocument with additional parameter will be used instead.', '2023-09-28')]
     procedure GetDocument(CustomerNo: Code[20]; PaymentTermsVisible: Boolean)
     var
         Customer: Record Customer;
@@ -94,7 +94,7 @@ page 6150760 "NPR OIOUBL Update Document"
             CountryRegionCode := Customer."Country/Region Code";
     end;
 
-    [Obsolete('Procedure SetDocument with additional parameter will be used instead.', 'NPR26.0')]
+    [Obsolete('Procedure SetDocument with additional parameter will be used instead.', '2023-09-28')]
     procedure SetDocument(var SetVATRegNo: Text[20]; var SetOIOUBLGLN: Code[13]; var SetPaymentTermsCode: Code[10]; var SetContact: Text[100])
     begin
         SetVATRegNo := VATRegNo;

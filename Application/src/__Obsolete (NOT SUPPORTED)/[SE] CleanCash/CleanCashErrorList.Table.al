@@ -5,7 +5,7 @@
     DataClassification = CustomerContent;
     ObsoleteReason = 'This table is not used anymore';
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
 
     fields
     {

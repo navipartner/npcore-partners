@@ -203,7 +203,7 @@
         RestaurantCode := CopyStr(_JsonHelper.GetJText(Context.AsToken(), 'restaurantId', Required), 1, MaxStrLen(RestaurantCode));
     end;
 
-    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('We will not need it anymore when we have switched to using the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure GetKitchenStationIDFilter(Context: JsonObject): Text
     begin
         exit(_JsonHelper.GetJText(Context.AsToken(), 'stationId', false));
@@ -611,7 +611,7 @@
             until NPREFlowStatus.Next() = 0;
     end;
 
-    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure RefreshCustomerDisplayKitchenOrders(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
@@ -620,7 +620,7 @@
         FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.RefreshCustomerDisplayKitchenOrders(GetRestaurantCode(Context, false), ''), FrontEnd);
     end;
 
-    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure GetSetups(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
@@ -629,7 +629,7 @@
         FrontEnd.RespondToFrontEndMethod(Context, KDSFrontendAssistImpl.GetSetups(''), FrontEnd);
     end;
 
-    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure RefreshKDSData(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
@@ -646,7 +646,7 @@
             FrontEnd);
     end;
 
-    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure RunKitchenAction(Context: JsonObject; ActionToRun: Option)
     var
         KDSFrontendAssistImpl: Codeunit "NPR KDS Frontend Assist. Impl.";
@@ -665,7 +665,7 @@
         KDSFrontendAssistImpl.RunKitchenAction(RestaurantCode, KitchenStationFilter, KitchenRequestId, OrderID, ActionToRun, '');
     end;
 
-    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', 'NPR33.0')]
+    [Obsolete('Use the separate KDS API endpoint (codeunit "NPR KDS Frontend Assistant") decoupled from Dragonglass', '2024-04-28')]
     local procedure CreateOrderReadyNotifications(Context: JsonObject)
     var
         KitchenOrder: Record "NPR NPRE Kitchen Order";

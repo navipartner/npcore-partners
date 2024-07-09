@@ -26,7 +26,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Editable = false;
             Caption = 'Status Code';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(30; "Status Description"; Text[256])
@@ -35,7 +35,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Editable = false;
             Caption = 'Status Description';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(40; Live; Boolean)
@@ -50,7 +50,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Caption = 'Creation Date & Time';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
         field(60; "Report Download URL"; Text[2048])
@@ -92,7 +92,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Caption = 'Request Data';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(120; Processed; Boolean)

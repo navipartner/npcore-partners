@@ -222,7 +222,7 @@
         end;
     end;
 
-    [Obsolete('Please use procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)', 'NPR34.0')]
+    [Obsolete('Please use procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)', '2024-05-28')]
     procedure UpdateSalesPricesForStaff(var Item: Record Item)
     begin
         UpdateSalesPricesForStaff(Item, false);

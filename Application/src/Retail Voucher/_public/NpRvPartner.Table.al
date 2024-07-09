@@ -73,7 +73,7 @@
             Caption = 'Service Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Isolated Storage';
         }
 

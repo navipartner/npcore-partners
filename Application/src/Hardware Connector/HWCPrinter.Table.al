@@ -33,7 +33,7 @@ table 6014668 "NPR HWC Printer"
         field(7; "Paper Height"; Decimal)
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Height.';
             Caption = 'Printer Paper Height';
             DecimalPlaces = 0 : 2;
@@ -42,7 +42,7 @@ table 6014668 "NPR HWC Printer"
         field(8; "Paper Width"; Decimal)
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             Caption = 'Printer Paper Width';
             ObsoleteReason = 'Payload requires integers, hence use new field: Printer Paper Width.';
             DecimalPlaces = 0 : 2;

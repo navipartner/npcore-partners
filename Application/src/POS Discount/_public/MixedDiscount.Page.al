@@ -453,7 +453,7 @@
                     Image = "Action";
                     ToolTip = 'Copy the campaign details to a specific Department Code';
                     ApplicationArea = NPRRetail;
-                    ObsoleteTag = 'NPR24.0';
+                    ObsoleteTag = '2023-07-28';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Not used';
                 }
