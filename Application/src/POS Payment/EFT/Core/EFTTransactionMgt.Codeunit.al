@@ -177,7 +177,7 @@
             Error('EFT Integration %1 is not subscribing to OnSendRequestSynchronously correctly.', EFTTransactionRequest."Integration Type");
     end;
 
-    [Obsolete('Pending Removal due to move to a new function GetEFTReceiptText because this one supports only one sucesfull EFT Transaction, not all of them.', 'NPR32.0')]
+    [Obsolete('Pending Removal due to move to a new function GetEFTReceiptText because this one supports only one sucesfull EFT Transaction, not all of them.', '2024-03-28')]
     procedure GetEFTReceiptText(SalesTicketNo: Code[20]; ReceiptNo: Integer): Text
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -911,7 +911,7 @@
     #endregion
     #region Obsolete
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartPayment(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -933,7 +933,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartVoid(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -953,7 +953,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartReferencedRefund(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; CurrencyCode: Code[10]; AmountToRefund: Decimal; OriginalRequestEntryNo: Integer): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -971,7 +971,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartGiftCardLoad(EFTSetup: Record "NPR EFT Setup"; Amount: Decimal; CurrencyCode: Code[10]; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
@@ -989,7 +989,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartLookup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; EntryNoToLookup: Integer): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1003,7 +1003,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartBeginWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1015,7 +1015,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartEndWorkshift(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1028,7 +1028,7 @@
     end;
 
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartVerifySetup(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1040,7 +1040,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC Version', 'NPR23.0')]
+    [Obsolete('Use HWC Version', '2023-06-28')]
     procedure StartAuxOperation(EFTSetup: Record "NPR EFT Setup"; SalePOS: Record "NPR POS Sale"; AuxFunction: Integer): Integer
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1052,7 +1052,7 @@
         exit(EFTTransactionRequest."Entry No.");
     end;
 
-    [Obsolete('Use HWC', 'NPR23.0')]
+    [Obsolete('Use HWC', '2023-06-28')]
     local procedure SendRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
@@ -1066,7 +1066,7 @@
         EFTFrameworkMgt.SendRequest(EFTTransactionRequest);
     end;
 
-    [Obsolete('Use workflow v3 approach', 'NPR23.0')]
+    [Obsolete('Use workflow v3 approach', '2023-06-28')]
     local procedure StoreActionState(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSSession: Codeunit "NPR POS Session";

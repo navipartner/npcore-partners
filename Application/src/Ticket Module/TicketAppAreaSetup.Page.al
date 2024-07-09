@@ -8,7 +8,7 @@
     AdditionalSearchTerms = 'Ticket Setup';
     ObsoleteReason = 'Replaced by page 6151094 "NPR Feature Management"';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
 
     layout
     {

@@ -4,7 +4,7 @@
     Caption = 'HC Audit Roll Posting';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used anymore';
 
     fields
@@ -169,7 +169,7 @@
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(60; "Credit voucher ref."; Code[20])
@@ -177,7 +177,7 @@
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(70; "Shortcut Dimension 1 Code"; Code[20])

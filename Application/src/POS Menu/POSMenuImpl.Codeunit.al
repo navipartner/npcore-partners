@@ -2,10 +2,10 @@ codeunit 6059848 "NPR POS Menu Impl."
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR27.0';
+    ObsoleteTag = '2023-10-28';
     ObsoleteReason = 'Replaced with data source extension field setup functionality.';
 
-    [Obsolete('The function was a major hack abusing button parameters. It didn’t work in some cases, and it won’t work with the new POS layouts replacing legacy POS menus. Use data source extension field setup functionality. instead.', 'NPR27.0')]
+    [Obsolete('The function was a major hack abusing button parameters. It didn’t work in some cases, and it won’t work with the new POS layouts replacing legacy POS menus. Use data source extension field setup functionality. instead.', '2023-10-28')]
     internal procedure GetPOSMenuButtonLocationFilter(POSSession: Codeunit "NPR POS Session"; ActionCode: Code[20]): Text
     var
         POSStore: Record "NPR POS Store";

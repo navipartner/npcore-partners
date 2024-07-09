@@ -89,7 +89,7 @@
                     ToolTip = 'Specifies the value of the Unit price(Item Card) field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
@@ -105,7 +105,7 @@
                     ToolTip = 'Specifies the value of the Unit cost field';
                     ApplicationArea = NPRRetail;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Already available on Item Details - Invoicing FactBox';
                 }
                 field("Profit % (new)"; Rec."Profit % (new)")
@@ -430,19 +430,19 @@
         LabelManagement.ToggleLine(RecRef);
     end;
 
-    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', '2023-07-28')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnAfterGetRecord(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 
-    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', '2023-07-28')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnNewRecordTrigger(var isHandled: Boolean; var PrintParam: Boolean; var RetailJournalLine: Record "NPR Retail Journal Line")
     begin
     end;
 
-    [Obsolete('Event isnt going to be used anymore and will be deleted.', 'NPR24.0')]
+    [Obsolete('Event isnt going to be used anymore and will be deleted.', '2023-07-28')]
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnNewRecord(var isHandled: Boolean; var PrintParam: Boolean)
     begin

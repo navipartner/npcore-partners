@@ -4,7 +4,7 @@ xmlport 6150904 "NPR HC Customer"
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'HQ Connector will no longer be supported';
 
     schema

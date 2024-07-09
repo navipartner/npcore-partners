@@ -60,7 +60,7 @@ table 6150829 "NPR Adyen Merchant Setup"
             Caption = 'Merchant Payout G/L Account';
             TableRelation = "G/L Account";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with Merchant Payout Account No.';
         }
         field(75; "Merchant Payout Acc. No."; Code[20])

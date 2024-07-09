@@ -182,7 +182,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         exit(Response);
     end;
 
-    [Obsolete('Use the new END_SALE workflow instead', 'NPR28.0')]
+    [Obsolete('Use the new END_SALE workflow instead', '2023-11-28')]
     local procedure TryEndSale(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line"; Setup: Codeunit "NPR POS Setup") Response: JsonObject
     var
         POSActIssueReturnVchrB: Codeunit "NPR POS Act.Issue Return VchrB";

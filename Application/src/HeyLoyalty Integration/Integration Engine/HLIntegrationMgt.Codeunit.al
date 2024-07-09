@@ -387,14 +387,14 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(TableIsIntegrated);
     end;
 
-    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
+    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', '2023-10-28')]
     procedure IsInstantTaskEnqueue(): Boolean
     begin
         _HLSetup.GetRecordOnce(false);
         exit(_HLSetup."Instant Task Enqueue");
     end;
 
-    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', 'NPR27.0')]
+    [Obsolete('Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.', '2023-10-28')]
     procedure ConfirmInstantTaskEnqueue(): Boolean
     var
         AllowedOnlyInTestEnvMsg: Label 'This mode is not recommended on live environments, as it may lead to incorrect data being sent to HeyLoyalty.\Are you sure you want to enable it?';

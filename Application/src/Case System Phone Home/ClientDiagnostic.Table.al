@@ -1,7 +1,7 @@
 table 6014693 "NPR Client Diagnostic"
 {
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'With new callback we have started to track POS logins separately so we need an option to have two lines from the same user. Anc because PK cannot be changed, new table (6059816 "NPR Client Diagnostic v2") was created.';
     Caption = 'Client Diagnostic';
     DataClassification = CustomerContent;

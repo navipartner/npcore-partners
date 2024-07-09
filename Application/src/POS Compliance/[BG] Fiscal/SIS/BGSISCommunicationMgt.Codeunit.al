@@ -803,7 +803,7 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
         BGSISPOSAuditLogAux.Modify();
     end;
 
-    [Obsolete('Replaced by local overload procedure UpdateBGSISAuditLogRequestContent.', 'NPR31.0')]
+    [Obsolete('Replaced by local overload procedure UpdateBGSISAuditLogRequestContent.', '2024-02-28')]
     internal procedure UpdateBGSISAuditLogRequestContent(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; RequestText: Text; ExtendedReceipt: Boolean)
     begin
         BGSISPOSAuditLogAux.SetRequestText(RequestText);

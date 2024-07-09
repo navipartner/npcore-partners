@@ -16,7 +16,7 @@
         gPort, gTimeoutMs : Integer;
         gPassive, gForce : Boolean;
 
-    [Obsolete('New procedure created with new additional parameter', 'NPR28.0')]
+    [Obsolete('New procedure created with new additional parameter', '2023-11-28')]
     procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer; Passive: Boolean; EncMode: Enum "NPR Nc FTP Encryption mode")
     var
         EncModeText: Text;

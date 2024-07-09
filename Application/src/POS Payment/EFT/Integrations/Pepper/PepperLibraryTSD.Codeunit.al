@@ -3,5 +3,5 @@
     Access = Internal;
     ObsoleteReason = 'This codeunit is obsolete and will be deleted, migrate to Hardware Connector version of this library';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
 }

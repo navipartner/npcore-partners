@@ -32,7 +32,7 @@
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Use interface NPR Nc Import List ILookup instead';
         }
         field(20; "Import Codeunit ID"; Integer)
@@ -43,7 +43,7 @@
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = CONST(Codeunit));
             ValidateTableRelation = false;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Use interface NPR Nc Import List IProcess instead';
         }
         field(100; "Webservice Enabled"; Boolean)
@@ -77,7 +77,7 @@
             Caption = 'Sftp';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(205; "Ftp Host"; Text[250])
@@ -85,7 +85,7 @@
             Caption = 'Ftp Host';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(210; "Ftp Port"; Integer)
@@ -93,7 +93,7 @@
             Caption = 'Ftp Port';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(215; "Ftp User"; Text[50])
@@ -101,7 +101,7 @@
             Caption = 'Ftp User';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(220; "Ftp Password"; Text[50])
@@ -109,7 +109,7 @@
             Caption = 'Ftp Password';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(225; "Ftp Passive"; Boolean)
@@ -117,7 +117,7 @@
             Caption = 'Ftp Passive';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(226; "Ftp EncMode"; Enum "NPR Nc FTP Encryption mode")
@@ -126,7 +126,7 @@
             DataClassification = CustomerContent;
             InitValue = "None";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moving Ftp and Sftp connection info to it own dedicated table.';
         }
         field(227; "SFTP Connection"; Code[20])
@@ -152,7 +152,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.01';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Ftp Backup Dir Path" instead';
         }
         field(236; "Ftp Backup Dir Path"; Text[250])
@@ -167,7 +167,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.08';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Note used';
         }
         field(245; "Ftp Filename"; Text[250])
@@ -193,7 +193,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(405; "Server File Path"; Text[250])
@@ -202,7 +202,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field is not going to be used anymore. In Cloud environment we can not store files on server, so we will always store it on Client device. (Field value would always be true).';
         }
         field(500; "XML Stylesheet"; BLOB)
@@ -210,7 +210,7 @@
             Caption = 'XML Stylesheet';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field is not going to be used anymore. Action Show Formatted Source on page NPR Nc Import List will be deleted.';
         }
         field(520; "Max. Retry Count"; Integer)

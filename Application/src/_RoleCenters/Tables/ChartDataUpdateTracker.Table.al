@@ -19,7 +19,7 @@ table 6059831 "NPR Chart Data Update Tracker"
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Replaced by field Chart Codeunit ID';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(3; "Last Computed"; DateTime)
         {

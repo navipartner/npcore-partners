@@ -1741,7 +1741,7 @@
     begin
     end;
 
-    [Obsolete('Replaced by new function OnAfterInsertFromPOSPostingBufferToGenJournal with new additional parameters', 'NPR24.0')]
+    [Obsolete('Replaced by new function OnAfterInsertFromPOSPostingBufferToGenJournal with new additional parameters', '2023-07-28')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSPostingBufferToGenJournal(POSUnitNo: Code[10]; LineType: Option; POSPaymentMethodCode: Code[10]; PostingDate: Date; var GenJournalLine: Record "Gen. Journal Line")
     begin

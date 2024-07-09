@@ -48,7 +48,7 @@
             Caption = 'Is Finance Agreement';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(28; "Account Type"; Enum "NPR POS Pay. Met. Acc. Type")
@@ -56,7 +56,7 @@
             Caption = 'Account Type';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(29; "Account No."; Code[20])
@@ -64,7 +64,7 @@
             Caption = 'Account No.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(30; "Include In Counting"; Option)
@@ -198,7 +198,7 @@
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(319; "Global Dimension 2 Code"; Code[20])
@@ -207,7 +207,7 @@
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(320; "Auto End Sale"; Boolean)
@@ -221,7 +221,7 @@
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(520; "EFT Surcharge Service Item No."; Code[20])
@@ -230,7 +230,7 @@
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by G/L account setup field which is enforced when creating new EFT Setup records';
         }
         field(521; "EFT Surcharge Account No."; Code[20])
@@ -246,7 +246,7 @@
             DataClassification = CustomerContent;
             TableRelation = Item WHERE(Type = CONST(Service));
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by G/L account setup field which is enforced when creating new EFT Setup records';
         }
         field(531; "EFT Tip Account No."; Code[20])

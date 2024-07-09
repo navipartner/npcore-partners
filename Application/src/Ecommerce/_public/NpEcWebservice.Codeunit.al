@@ -106,7 +106,7 @@
         ImportEntry.Insert(true);
     end;
 
-    [Obsolete('Pending removal use Init Import Type with Enum instead', 'NPR27.0')]
+    [Obsolete('Pending removal use Init Import Type with Enum instead', '2023-10-28')]
     procedure InitImportType(WebserviceFunction: Text; ImportTypeCode: Code[20]; ImportTypeDescription: Text; ImportCodeunitID: Integer; LookupCodeunitID: Integer; var NcImportType: Record "NPR Nc Import Type")
     var
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";

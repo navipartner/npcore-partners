@@ -13,28 +13,28 @@ enum 6014540 "NPR NPRE K.Req.L. Prod.Status"
     {
         Caption = 'Started [Obsolete]';
         ObsoleteState = Pending;
-        ObsoleteTag = 'NPR31.0';
+        ObsoleteTag = '2024-02-28';
         ObsoleteReason = 'Replaced by value 10.';
     }
     value(2; "On Hold [Obsolete]")
     {
         Caption = 'On Hold [Obsolete]';
         ObsoleteState = Pending;
-        ObsoleteTag = 'NPR31.0';
+        ObsoleteTag = '2024-02-28';
         ObsoleteReason = 'Replaced by value 20.';
     }
     value(3; "Finished [Obsolete]")
     {
         Caption = 'Finished [Obsolete]';
         ObsoleteState = Pending;
-        ObsoleteTag = 'NPR31.0';
+        ObsoleteTag = '2024-02-28';
         ObsoleteReason = 'Replaced by value 30.';
     }
     value(4; "Cancelled [Obsolete]")
     {
         Caption = 'Cancelled [Obsolete]';
         ObsoleteState = Pending;
-        ObsoleteTag = 'NPR31.0';
+        ObsoleteTag = '2024-02-28';
         ObsoleteReason = 'Replaced by value 40.';
     }
     value(5; Pending)

@@ -55,7 +55,7 @@
             DataClassification = CustomerContent;
             Description = 'NC2.12';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Client Path field is about to be removed because it is not needed anymore.';
         }
         field(110; Filename; Text[250])

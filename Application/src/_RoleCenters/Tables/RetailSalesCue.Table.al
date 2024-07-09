@@ -124,7 +124,7 @@
             FieldClass = FlowField;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(104; "Credit Vouchers"; Integer)
@@ -133,7 +133,7 @@
             FieldClass = FlowField;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
         }
         field(105; "Task List"; Integer)
@@ -164,7 +164,7 @@
             FieldClass = FlowField;
             ObsoleteReason = 'Moved to table 6151247 "NPR POS Entry Cue."';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(109; "Sales Credit Memos"; Integer)
         {

@@ -2,6 +2,6 @@
 {
     ObsoleteReason = 'Use HWC';
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     Access = Internal;
 }

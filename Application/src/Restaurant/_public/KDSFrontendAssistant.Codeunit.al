@@ -5,7 +5,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
     var
         _KitchenAction: Option "Accept Change","Set Production Not Started","Start Production","End Production","Set OnHold","Resume","Set Served","Revoke Serving";
 
-    [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter instead', '2024-06-28')]
     procedure RefreshCustomerDisplayKitchenOrders(restaurantId: Text) Response: Text
     begin
         Response := RefreshCustomerDisplayKitchenOrdersV2(restaurantId, '');
@@ -18,7 +18,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RefreshCustomerDisplayKitchenOrders(restaurantId, lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter instead', '2024-06-28')]
     procedure RefreshKDSData(restaurantId: Text; stationId: Text; includeFinished: Boolean; startingFrom: DateTime) Response: Text
     begin
         Response := RefreshKDSDataV2(restaurantId, stationId, includeFinished, startingFrom, '');
@@ -31,7 +31,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RefreshKDSData(restaurantId, stationId, includeFinished, startingFrom, lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter instead', '2024-06-28')]
     procedure GetFinishedOrders(restaurantId: Text; startingFrom: DateTime) Response: Text
     begin
         Response := GetFinishedOrdersV2(restaurantId, startingFrom, '');
@@ -44,7 +44,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.GetFinishedOrders(restaurantId, startingFrom, lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter instead', '2024-06-28')]
     procedure GetSetups() Response: Text
     begin
         Response := GetSetupsV2('');
@@ -57,7 +57,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.GetSetups(lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure AcceptChange(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         AcceptChangeV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -70,7 +70,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"Accept Change", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure SetProductionNotStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         SetProductionNotStartedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -83,7 +83,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"Set Production Not Started", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure SetProductionStarted(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         SetProductionStartedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -96,7 +96,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"Start Production", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure SetProductionFinished(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         SetProductionFinishedV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -109,7 +109,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"End Production", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure SetOnHold(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         SetOnHoldV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -122,7 +122,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"Set OnHold", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure Resume(restaurantId: Text; stationId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         ResumeV2(restaurantId, stationId, kitchenRequestId, orderId, '');
@@ -135,7 +135,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, stationId, kitchenRequestId, orderId, _KitchenAction::"Resume", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure SetServed(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         SetServedV2(restaurantId, kitchenRequestId, orderId, '');
@@ -148,7 +148,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, '', kitchenRequestId, orderId, _KitchenAction::"Set Served", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure RevokeServing(restaurantId: Text; kitchenRequestId: BigInteger; orderId: BigInteger)
     begin
         RevokeServingV2(restaurantId, kitchenRequestId, orderId, '');
@@ -161,7 +161,7 @@ codeunit 6184835 "NPR KDS Frontend Assistant"
         KDSFrontendAssistImpl.RunKitchenAction(restaurantId, '', kitchenRequestId, orderId, _KitchenAction::"Revoke Serving", lastServerId).WriteTo(Response);
     end;
 
-    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', 'NPR35.0')]
+    [Obsolete('Use the overload with the "lastServerId" parameter and a return value instead', '2024-06-28')]
     procedure CreateOrderReadyNotifications(orderId: BigInteger)
     begin
         CreateOrderReadyNotificationsV2(orderId, '');

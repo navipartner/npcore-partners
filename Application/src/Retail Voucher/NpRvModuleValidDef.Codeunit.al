@@ -62,7 +62,7 @@
         VoucherType.TestField("Payment Type");
     end;
 
-    [Obsolete('Not being used.', 'NPR23.0')]
+    [Obsolete('Not being used.', '2023-06-28')]
     procedure FindVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
     begin
     end;

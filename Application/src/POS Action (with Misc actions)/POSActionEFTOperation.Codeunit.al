@@ -2,7 +2,7 @@ codeunit 6150846 "NPR POS Action: EFT Operation"
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Used only for backwards compatibility. It can be deleted once everything is moved to v3';
 
     var

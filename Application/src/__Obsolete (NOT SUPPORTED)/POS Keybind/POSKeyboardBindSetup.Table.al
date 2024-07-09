@@ -4,7 +4,7 @@
     Caption = 'POS Keyboard Binding Setup';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Almost zero usage since the module was introduced, but caused significant performance issues';
 
     fields

@@ -26,7 +26,7 @@
             Caption = 'Variant Value Code';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR26.0';
+            ObsoleteTag = '2023-09-28';
             ObsoleteReason = 'We are going to use field 60 "Variety Value" from this table.';
         }
         field(15; "Line No."; Integer)
@@ -141,7 +141,7 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -154,13 +154,13 @@
         key(Key2; "Variant Value Code")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR26.0';
+            ObsoleteTag = '2023-09-28';
             ObsoleteReason = 'We are going to use field 60 "Variety Value" from this table.';
         }
         key(Key3; "Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

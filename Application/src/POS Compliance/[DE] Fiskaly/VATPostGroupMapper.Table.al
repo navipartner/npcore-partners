@@ -41,7 +41,7 @@
             Caption = 'Fiscal Name';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by field 11 "Fiskaly VAT Rate Type"';
         }
         field(11; "Fiskaly VAT Rate Type"; Enum "NPR DE Fiskaly VAT Rate")

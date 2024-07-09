@@ -3,7 +3,7 @@
     Access = Internal;
     Caption = 'Connection Profile';
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Table has not been used since NAV2015';
     DataClassification = CustomerContent;
 

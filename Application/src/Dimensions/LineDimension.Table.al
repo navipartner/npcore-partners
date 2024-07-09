@@ -84,7 +84,7 @@
         key(Key2; "Table ID", Date, "Sale Type", "Line No.", "Dimension Code", "Dimension Value Code")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Sale Type field not used anymore';
         }
         key(Key3; "Table ID", Date, "Line No.", "Dimension Code", "Dimension Value Code")

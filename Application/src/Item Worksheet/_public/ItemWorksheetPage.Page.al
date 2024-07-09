@@ -168,7 +168,7 @@
                     ApplicationArea = NPRRetail;
                     Visible = false;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Removing unnecessary - value available in Item Worksheet FactBox';
                 }
                 field("No. of Warnings"; Rec."No. of Warnings")

@@ -4,7 +4,7 @@
     Caption = 'Scanner Service Log';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used.';
 
     fields
@@ -15,7 +15,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(2; "Request Start"; DateTime)
@@ -24,7 +24,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(3; "Request End"; DateTime)
@@ -33,7 +33,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(4; "Request Data"; BLOB)
@@ -41,7 +41,7 @@
             Caption = 'Request Data';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(5; "Request Function"; Text[30])
@@ -50,7 +50,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6; "Response Data"; BLOB)
@@ -58,7 +58,7 @@
             Caption = 'Response Data';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(7; "Internal Request"; Boolean)
@@ -67,7 +67,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(8; "Internal Log No."; Guid)
@@ -76,7 +76,7 @@
             DataClassification = CustomerContent;
             Editable = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(9; "Debug Request Data"; Text[250])
@@ -84,7 +84,7 @@
             Caption = 'Debug Request Data';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(10; "Current User"; Text[250])
@@ -92,7 +92,7 @@
             Caption = 'Current User';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
     }
@@ -102,13 +102,13 @@
         key(Key1; Id)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         key(Key2; "Request Start")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
     }

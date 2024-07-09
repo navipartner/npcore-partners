@@ -79,7 +79,7 @@
                         ToolTip = 'Specifies the value of the FTP Transfer field';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Going to drop Nc Endpoints and this field is going to be removed.';
                         Visible = False;
                     }

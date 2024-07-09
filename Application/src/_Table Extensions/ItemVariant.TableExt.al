@@ -97,7 +97,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Description = 'VRT1.00';
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR31.0';
+            ObsoleteTag = '2024-02-28';
             ObsoleteReason = 'Replaced with standard Microsoft field "Blocked"';
 #ENDIF
         }
@@ -107,7 +107,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -117,7 +117,7 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
         key("NPR Key1"; "NPR Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

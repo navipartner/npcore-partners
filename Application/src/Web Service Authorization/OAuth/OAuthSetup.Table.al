@@ -39,7 +39,7 @@
             Caption = 'Access Token Secret Key';
             DataClassification = EndUserIdentifiableInformation;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
 
@@ -72,7 +72,7 @@
             Editable = false;
             DataClassification = SystemMetadata;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
 
@@ -84,7 +84,7 @@
             MaxValue = 1000;
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Cached via SingleInstance codeunit';
         }
     }

@@ -59,7 +59,7 @@
             Caption = 'Reserved For Web';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
             trigger OnValidate()
@@ -72,7 +72,7 @@
             Caption = 'Reserved For Members';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Never implemented. Use field "Visibility On Web"';
 
             trigger OnValidate()
@@ -112,7 +112,7 @@
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
@@ -120,7 +120,7 @@
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Schedule Generated At"; Date)
@@ -154,7 +154,7 @@
             OptionCaption = ' ,Fixed Amount,Relative Amount,Percentage';
             OptionMembers = NA,"FIXED",RELATIVE,PERCENT;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(81; "Price Scope"; Option)
@@ -164,7 +164,7 @@
             OptionCaption = ' ,API,POS & M2,All';
             OptionMembers = NA,API,POS_M2,API_POS_M2;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(82; Amount; Decimal)
@@ -172,7 +172,7 @@
             Caption = 'Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(83; Percentage; Decimal)
@@ -181,7 +181,7 @@
             DataClassification = CustomerContent;
             MinValue = -100;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(85; "Amount Includes VAT"; Boolean)
@@ -189,7 +189,7 @@
             Caption = 'Amount Includes VAT';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to profile  table, used the field Dynamic Price Profile to specify dynamic pricing.';
         }
         field(86; "Dynamic Price Profile Code"; Code[10])

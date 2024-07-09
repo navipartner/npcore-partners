@@ -250,7 +250,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(306; "Barcode Image"; Media)
@@ -258,7 +258,7 @@
             Caption = 'Barcode';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'We don''t need to store barcode image.';
         }
 #if not BC17

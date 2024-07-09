@@ -7,7 +7,7 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Order)));
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151242; "NPR Pending Inc. Documents"; Integer)
@@ -15,7 +15,7 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             CalcFormula = Count("Incoming Document" WHERE("Document Type" = CONST(" "), "Document No." = CONST('')));
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151243; "NPR Posted Purchase order"; Integer)
@@ -23,7 +23,7 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             CalcFormula = Count("Purch. Inv. Header");
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
         field(6151244; "NPR Purchase Quote"; Integer)
@@ -31,7 +31,7 @@ tableextension 6151240 "NPR Finance Cue" extends "Finance Cue"
             CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Quote)));
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removing unnecesarry table extensions.';
         }
     }

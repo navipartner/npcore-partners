@@ -40,7 +40,7 @@ page 6060014 "NPR APIV1 - MagentoPictureLink"
                 {
                     Caption = 'Variant Value Code', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR26.0';
+                    ObsoleteTag = '2023-09-28';
                     ObsoleteReason = 'We are going to use field 60 "Variety Value" from the same table.';
                 }
                 field(lineNo; Rec."Line No.")
@@ -83,7 +83,7 @@ page 6060014 "NPR APIV1 - MagentoPictureLink"
                 {
                     Caption = 'replicationCounter', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR23.0';
+                    ObsoleteTag = '2023-06-28';
                     ObsoleteReason = 'Replaced by SystemRowVersion';
                 }
 #IF NOT (BC17 or BC18 or BC19 or BC20)

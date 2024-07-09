@@ -190,7 +190,7 @@
         if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);
     end;
 
-    [Obsolete('Replaced by new function InputCodeValue.', 'NPR23.0')]
+    [Obsolete('Replaced by new function InputCodeValue.', '2023-06-28')]
     procedure InputCode(ControlID: Integer; var OutVar: Code[20]): Integer
     begin
         if Evaluate(OutVar, Format(Vars[ControlID])) then exit(ControlID);

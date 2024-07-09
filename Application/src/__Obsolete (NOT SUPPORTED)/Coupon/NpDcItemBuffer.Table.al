@@ -4,7 +4,7 @@
     Caption = 'Discount Item Buffer';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Item Group is obsolete, new table with Item Category Code as part of primary key is created.';
 
     fields

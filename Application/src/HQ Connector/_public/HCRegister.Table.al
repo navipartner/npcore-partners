@@ -5,7 +5,7 @@
     LookupPageID = "NPR HC Register List";
     Permissions =;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'HQ Connector will no longer be supported';
 
     fields
@@ -40,7 +40,7 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(13; "Credit Voucher Account"; Code[20])
@@ -48,7 +48,7 @@
             Caption = 'Credit Voucher Account';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher won''t be used anymore';
         }
         field(14; "Difference Account"; Code[20])
@@ -77,7 +77,7 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(25; Rounding; Code[20])

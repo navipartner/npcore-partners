@@ -7,7 +7,7 @@ page 6014443 "NPR EOD Denomination Count"
     SourceTable = "NPR EOD Denomination";
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced by table "NPR POS Pmt. Bin Checkp. Denom"';
 
     layout

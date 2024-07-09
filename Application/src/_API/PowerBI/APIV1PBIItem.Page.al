@@ -14,7 +14,7 @@ page 6059926 "NPR APIV1 PBIItem"
     Extensible = false;
     Editable = false;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR26.0';
+    ObsoleteTag = '2023-09-28';
     ObsoleteReason = 'version v2.0 created';
 
     layout

@@ -10,7 +10,7 @@ page 6150666 "NPR NPRE Tmp POSWaiterPadLines"
     SourceTable = "NPR NPRE Waiter Pad Line";
     SourceTableTemporary = true;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR25.0';
+    ObsoleteTag = '2023-08-28';
     ObsoleteReason = 'Not supported in Dragonglass environment. Please use POS action ''SPLIT_BILL'' instead.';
 
     layout

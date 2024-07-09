@@ -55,7 +55,7 @@ enum 6014602 "NPR Nc IL Process Handler" implements "NPR Nc Import List IProcess
         Caption = 'HC POS Entry Management';
         Implementation = "NPR Nc Import List IProcess" = "NPR HC POS Entry Management";
         ObsoleteState = Pending;
-        ObsoleteTag = 'NPR24.0';
+        ObsoleteTag = '2023-07-28';
         ObsoleteReason = 'HQ Connector will no longer be supported';
     }
 

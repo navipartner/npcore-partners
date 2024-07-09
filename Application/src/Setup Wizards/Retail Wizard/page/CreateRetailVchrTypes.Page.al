@@ -4,7 +4,7 @@ page 6150792 "NPR Create Retail Vchr. Types"
     PageType = NavigatePage;
     Extensible = false;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'Not used anymore. Retail wizard was modified. Replaced with "NPR Modify Retail Vchr. Types".';
 
     layout

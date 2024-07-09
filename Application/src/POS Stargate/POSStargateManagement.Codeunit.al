@@ -2,6 +2,6 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'Stargate is replaced by hardware connector';
 }

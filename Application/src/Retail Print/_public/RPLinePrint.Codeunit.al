@@ -25,7 +25,7 @@ codeunit 6150960 "NPR RP Line Print"
         RPLinePrintMgt.AddBarcode(BarcodeType, BarcodeValue, BarcodeWidth, HideHRI, BarcodeHeight);
     end;
 
-    [Obsolete('Pending removal, use overload method instead', 'NPR23.0')]
+    [Obsolete('Pending removal, use overload method instead', '2023-06-28')]
     procedure AddLine(Text: Text)
     begin
         RPLinePrintMgt.AddLine(Text, 0);

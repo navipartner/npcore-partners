@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Refractored to old code MCS Face Recognition';
     DataClassification = CustomerContent;
     Caption = 'Facial Recognition';

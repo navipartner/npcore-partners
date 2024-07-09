@@ -2,7 +2,7 @@ codeunit 6059991 "NPR HL HeyLoyalty Webservice"
 {
     Access = Public;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use API page 6150800 "NPR API - HL Webhook Requests" to handle HeyLoyalty webhook requests instead. It accepts json as payload and does not require proxy Azure functions to run.';
 
     var

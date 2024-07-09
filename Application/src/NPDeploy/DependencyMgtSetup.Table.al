@@ -5,7 +5,7 @@
     DataPerCompany = false;
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'No longer used';
 
     fields
@@ -20,7 +20,7 @@
             Caption = 'Managed Dependency OData URL';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(11; Username; Text[30])
@@ -28,7 +28,7 @@
             Caption = 'Managed Dependency Username';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(12; Password; BLOB)
@@ -36,7 +36,7 @@
             Caption = 'Managed Dependency Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(13; Configured; Boolean)
@@ -45,7 +45,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(14; "Accept Statuses"; Option)
@@ -60,7 +60,7 @@
             Caption = 'Tag Filter';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(16; "Tag Filter Comparison Operator"; Option)
@@ -70,7 +70,7 @@
             OptionMembers = Any,All;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(17; "Disable Deployment"; Boolean)

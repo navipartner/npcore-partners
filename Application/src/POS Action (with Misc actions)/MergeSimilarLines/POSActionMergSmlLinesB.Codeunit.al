@@ -92,7 +92,7 @@ codeunit 6059982 "NPR POSAction: Merg.Sml.LinesB"
             NotCollapsedItems += ', ' + ItemNo;
     end;
 
-    [Obsolete('Not used anymore. Use OnBeforeCollapseSaleLine in codenunit NPR POSActMergSimlLinesEvents instead.', 'NPR35.0')]
+    [Obsolete('Not used anymore. Use OnBeforeCollapseSaleLine in codenunit NPR POSActMergSimlLinesEvents instead.', '2024-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCollapseSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var CollapseSupported: Boolean)
     begin

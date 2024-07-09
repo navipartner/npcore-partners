@@ -4,7 +4,7 @@
     Caption = 'Retail Document Line';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used';
 
     fields

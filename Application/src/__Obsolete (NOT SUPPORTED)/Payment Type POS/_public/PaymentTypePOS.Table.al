@@ -4,7 +4,7 @@
     Caption = 'Payment Type';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Is replaced by POS Payment Method';
 
     fields
@@ -21,7 +21,7 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(3; "Processing Type"; Option)
@@ -31,7 +31,7 @@
             OptionCaption = ' ,Cash,Terminal Card,Manual Card,Other Credit Cards,Credit Voucher,Gift Voucher,Electronic Funds Transfer,Foreign Currency,Foreign Credit Voucher,Foreign Gift Voucher,Debit sale,Invoice,Finance Agreement,Payout,DIBS,Loyalty Card';
             OptionMembers = " ",Cash,"Terminal Card","Manual Card","Other Credit Cards","Credit Voucher","Gift Voucher",EFT,"Foreign Currency","Foreign Credit Voucher","Foreign Gift Voucher","Debit sale",Invoice,"Finance Agreement",Payout,DIBS,"Point Card";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(4; "G/L Account No."; Code[20])
@@ -39,7 +39,7 @@
             Caption = 'G/L Account';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(5; Status; Option)
@@ -49,7 +49,7 @@
             OptionCaption = ' ,Active,Passive';
             OptionMembers = " ",Active,Passive;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(6; Prefix; Code[20])
@@ -57,7 +57,7 @@
             Caption = 'Prefix';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(7; "Register No."; Code[10])
@@ -70,7 +70,7 @@
             Caption = 'Cost Account';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
 
         }
@@ -79,7 +79,7 @@
             Caption = 'Sale Line Text';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(23; "Search Description"; Text[50])
@@ -87,7 +87,7 @@
             Caption = 'Search Description';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(24; Posting; Option)
@@ -97,7 +97,7 @@
             OptionCaption = 'Condensed,Single Entry';
             OptionMembers = Condensed,"Single Entry";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(25; "Via Terminal"; Boolean)
@@ -105,7 +105,7 @@
             Caption = 'Via Cash Terminal';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(26; "Date Filter"; Date)
@@ -113,7 +113,7 @@
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(27; "Amount in Audit Roll"; Decimal)
@@ -121,7 +121,7 @@
             Caption = 'Amount in Audit Roll';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(28; "Customer No."; Code[20])
@@ -129,7 +129,7 @@
             Caption = 'Customer';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(29; "Account Type"; Option)
@@ -139,7 +139,7 @@
             OptionCaption = 'G/L Account,Customer,Bank';
             OptionMembers = "G/L Account",Customer,Bank;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(30; "Register Filter"; Code[10])
@@ -147,7 +147,7 @@
             Caption = 'Cash Register Filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(31; "Fixed Rate"; Decimal)
@@ -155,7 +155,7 @@
             Caption = 'Fixed Rate';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(32; "Reference Incoming"; Boolean)
@@ -163,7 +163,7 @@
             Caption = 'Reference Incoming';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(33; "Receipt Filter"; Code[20])
@@ -171,7 +171,7 @@
             Caption = 'Receipt filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(35; "Receipt - Post it Now"; Boolean)
@@ -179,7 +179,7 @@
             Caption = 'Receipt - Post it now';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(36; "Rounding Precision"; Decimal)
@@ -187,7 +187,7 @@
             Caption = 'Rounding precision';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(37; "No. of Sales in Audit Roll"; Integer)
@@ -196,7 +196,7 @@
             Description = 'Tæller kun linier m. linienr=10000,vare, salg';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(38; "Normal Sale in Audit Roll"; Decimal)
@@ -205,7 +205,7 @@
             Description = 'Tæller "bel¢b inkl. moms" hvis salg, vare';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(39; "Debit Sale in Audit Roll"; Decimal)
@@ -214,7 +214,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(40; "No. of Items in Audit Roll"; Decimal)
@@ -223,7 +223,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(41; "Cost Amount in Audit Roll"; Decimal)
@@ -232,7 +232,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(42; "No. of Sale Lines in Aud. Roll"; Integer)
@@ -241,7 +241,7 @@
             Description = 'Tæller alle linier m. type <>Afbrudt &<>Åben/Luk';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(43; "Salesperson Filter"; Code[20])
@@ -249,7 +249,7 @@
             Caption = 'Salesperson filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(44; "No. of Items in Audit Debit"; Decimal)
@@ -258,7 +258,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(45; "No. of Item Lines in Aud. Deb."; Integer)
@@ -267,7 +267,7 @@
             Description = 'Calcformula rettet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(46; "No. of Deb. Sales in Aud. Roll"; Integer)
@@ -276,7 +276,7 @@
             Description = 'Tæller linie debetsalg,linienr=10000';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
 
         }
@@ -285,7 +285,7 @@
             Caption = 'Euro';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
 
         }
@@ -294,7 +294,7 @@
             Caption = 'Bank';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(49; "Fee G/L Acc. No."; Code[20])
@@ -303,7 +303,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(50; "Fee Pct."; Decimal)
@@ -312,7 +312,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(51; "Fixed Fee"; Decimal)
@@ -321,7 +321,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(52; "Fee Item No."; Code[20])
@@ -330,7 +330,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
@@ -338,7 +338,7 @@
             Caption = 'Norm sales in audit ex VAT';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(54; "Maximum Amount"; Decimal)
@@ -346,7 +346,7 @@
             Caption = 'Max amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(55; "Minimum Amount"; Decimal)
@@ -354,7 +354,7 @@
             Caption = 'Min amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(56; "Debit Cost Amount Audit Roll"; Decimal)
@@ -363,7 +363,7 @@
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(57; "Debit Sales in Audit Excl. VAT"; Decimal)
@@ -372,7 +372,7 @@
             Description = 'Calcformula tilf¢jet';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(58; "Cardholder Verification Method"; Option)
@@ -383,7 +383,7 @@
             OptionCaption = 'CVM not forced,Forced Signature,Forced Pin';
             OptionMembers = "CVM not Forced","Forced Signature","Forced Pin";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(59; "Type of Transaction"; Option)
@@ -393,7 +393,7 @@
             OptionCaption = 'Not forced,Forced Online,Forced Offline';
             OptionMembers = "Not Forced","Forced Online","Forced Offline";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(60; "Global Dimension Code 1 Filter"; Code[20])
@@ -402,7 +402,7 @@
             Caption = 'Global Dimension Code 1 Filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(61; "Global Dimension Code 2 Filter"; Code[20])
@@ -411,7 +411,7 @@
             Caption = 'Global Dimension Code 2 Filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(62; "Location Code"; Code[10])
@@ -420,7 +420,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.48';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(65; "Is Check"; Boolean)
@@ -428,7 +428,7 @@
             Caption = 'Check';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(66; "Common Company Clearing"; Boolean)
@@ -436,7 +436,7 @@
             Caption = 'Common Company Clearing';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(67; "Day Clearing Account"; Code[20])
@@ -444,7 +444,7 @@
             Caption = 'Day Clearing Account';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(68; "Forced Amount"; Boolean)
@@ -452,7 +452,7 @@
             Caption = 'Forced amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(70; "To be Balanced"; Boolean)
@@ -460,7 +460,7 @@
             Caption = 'Incl. in balancing';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(71; "Balancing Total"; Decimal)
@@ -469,7 +469,7 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(75; "Match Sales Amount"; Boolean)
@@ -477,7 +477,7 @@
             Caption = 'Match Sales Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(80; "Fixed Amount"; Decimal)
@@ -485,7 +485,7 @@
             Caption = 'Fixed Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(81; "Qty. Per Sale"; Integer)
@@ -493,7 +493,7 @@
             Caption = 'Qty. Per Sale';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(82; "Minimum Sales Amount"; Decimal)
@@ -501,7 +501,7 @@
             Caption = 'Min Sales Amount';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(83; "Human Validation"; Boolean)
@@ -509,7 +509,7 @@
             Caption = 'Validated by user';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(90; "Immediate Posting"; Option)
@@ -519,7 +519,7 @@
             OptionCaption = 'Never,Always,Negative,Positive';
             OptionMembers = Never,Always,Negative,Positive;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(100; "Reverse Unrealized VAT"; Boolean)
@@ -527,7 +527,7 @@
             Caption = 'Reverse Unrealized VAT';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(110; "Open Drawer"; Boolean)
@@ -536,7 +536,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(120; "Allow Refund"; Boolean)
@@ -546,7 +546,7 @@
             Description = 'NPR5.52,NPR5.53';
             InitValue = true;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(130; "Zero as Default on Popup"; Boolean)
@@ -555,7 +555,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(140; "No Min Amount on Web Orders"; Boolean)
@@ -563,7 +563,7 @@
             Caption = 'No Min Amount on Web Orders';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(200; "PBS Gift Voucher"; Boolean)
@@ -572,7 +572,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(201; "PBS Customer ID"; Text[30])
@@ -581,7 +581,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(202; "PBS Gift Voucher Barcode"; Boolean)
@@ -590,7 +590,7 @@
             DataClassification = CustomerContent;
             Description = 'Deprecated';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher won''t be used anymore';
         }
         field(250; "Loyalty Card Type"; Code[20])
@@ -598,7 +598,7 @@
             Caption = 'Loyalty Card Type';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(318; "Global Dimension 1 Code"; Code[20])
@@ -607,7 +607,7 @@
             Caption = 'Only used by Global Dimension 1';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(319; "Global Dimension 2 Code"; Code[20])
@@ -616,7 +616,7 @@
             Caption = 'Only used by Global Dimension 2';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(320; "Auto End Sale"; Boolean)
@@ -625,7 +625,7 @@
             DataClassification = CustomerContent;
             InitValue = true;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(321; "Payment Method Code"; Code[10])
@@ -633,7 +633,7 @@
             Caption = 'Payment Method Code';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(323; "Balancing Type"; Option)
@@ -643,7 +643,7 @@
             OptionCaption = 'Currency,New inventory,Transfer to Bank';
             OptionMembers = Normal,Primo,Bank;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(350; "Validation Codeunit"; Integer)
@@ -652,7 +652,7 @@
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a Sale Line POS with type payment is being inserted.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(351; "On Sale End Codeunit"; Integer)
@@ -661,7 +661,7 @@
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit before a sale is finished. Can interrupt the end of a sale.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(352; "Post Processing Codeunit"; Integer)
@@ -670,7 +670,7 @@
             DataClassification = CustomerContent;
             Description = 'Invokes this codeunit when a sale is finished eg. transferred to the auditroll.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type - Integration cleanup';
         }
         field(501; "Payment Card Type"; Option)
@@ -680,7 +680,7 @@
             OptionCaption = 'Other,Dankort,VisaDankort,Visa,VisaElectron,Mastercard,Maestro,JCB,DinersClub,AmericanExpress';
             OptionMembers = other,dankort,visadankort,visa,visaelectron,mastercard,maestro,jcb,dinersclub,americanexpress;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(505; "End Time Filter"; Time)
@@ -688,7 +688,7 @@
             Caption = 'End time filter';
             FieldClass = FlowFilter;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(510; "Dev Term"; Boolean)
@@ -696,7 +696,7 @@
             Caption = 'Dev Term';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(520; "EFT Surcharge Service Item No."; Code[20])
@@ -704,7 +704,7 @@
             Caption = 'Surcharge Service Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(530; "EFT Tip Service Item No."; Code[20])
@@ -712,7 +712,7 @@
             Caption = 'Tip Service Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(6184471; "MobilePay Merchant ID"; Code[20])
@@ -721,7 +721,7 @@
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(6184472; "MobilePay API Key"; Code[50])
@@ -730,7 +730,7 @@
             DataClassification = CustomerContent;
             Description = 'MbP1.80';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
         field(6184473; "MobilePay Environment"; Option)
@@ -741,7 +741,7 @@
             OptionCaption = 'PROD,DEMO';
             OptionMembers = PROD,DEMO;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Payment Type POS cleanup';
         }
     }

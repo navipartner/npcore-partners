@@ -1,7 +1,7 @@
 ﻿codeunit 6150703 "NPR POS JSON Management"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use "NPR POS JSON Helper" instead';
 
     var

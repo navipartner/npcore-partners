@@ -3,7 +3,7 @@
     Caption = 'Nc Trigger';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'NC Trigger module removed from NpCore. We switched to Job Queue instead of using Task Queue.';
 
     fields

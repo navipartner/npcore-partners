@@ -166,7 +166,7 @@
                 Caption = 'Incoming Documents';
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Moved to page 6151260 "NPR POS Entry Cue"';
 
                 field("My Incoming Documents"; Rec."My Incoming Documents")

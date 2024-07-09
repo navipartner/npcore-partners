@@ -11,7 +11,7 @@ page 6059849 "NPR Replication Setup (Source)"
     SourceTable = "NPR Replication Setup (Source)";
     UsageCategory = Administration;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced by SystemRowVersion';
 
     layout

@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'On February 15, 2018, “Recommendations API is no longer under active development”';
     Caption = 'MCS Recommendations Line';
     DataClassification = CustomerContent;

@@ -94,7 +94,7 @@
             OptionCaption = 'Never,30 Seconds,60 Seconds,90 Seconds,120 Seconds,600 Seconds';
             OptionMembers = NEVER,"30S","60S","90S","120S","600S";
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
         }
         field(50; "Kiosk Mode Unlock PIN"; Text[30])
@@ -103,7 +103,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
         }
         field(60; "POS Type"; Option)
@@ -146,7 +146,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
         }
         field(305; "Item Price Codeunit Name"; Text[30])
@@ -158,7 +158,7 @@
             Editable = false;
             FieldClass = FlowField;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
         }
         field(310; "Item Price Function"; Text[250])
@@ -167,7 +167,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.45';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Move to dedicated POS Unit Profile';
         }
         field(400; "Global POS Sales Setup"; Code[10])
@@ -204,7 +204,7 @@
             Description = 'NPR5.52';
             NotBlank = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to POS Store';
 
         }
@@ -234,7 +234,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Doesn''t have any reference';
         }
         field(570; "POS Restaurant Profile"; Code[20])
@@ -255,7 +255,7 @@
             Caption = 'MPOS Profile';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = '1. Field "Ticket Admission Web Url" moved from MPOS Profile table to table "NPR TM Ticket Setup". 2. Use field "POS Type" to identify if the POS is an mPos device.';
         }
         field(600; "POS Self Service Profile"; Code[20])
@@ -298,7 +298,7 @@
             Caption = 'POS Tax Free Profile';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR24.0';
+            ObsoleteTag = '2023-07-28';
             ObsoleteReason = 'New field "POS Tax Free Prof." created, use this instead.';
         }
         field(640; "POS Tax Free Prof."; Code[10])
@@ -312,7 +312,7 @@
             Caption = 'Require Select Member';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'New parameter SelectMemberReq in POS Action Login created, use this instead.';
         }
         field(660; "Require Select Customer"; Boolean)
@@ -320,7 +320,7 @@
             Caption = 'Require Select Customer';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'New parameter SelectCustReq in POS Action Login created, use this instead.';
 
         }
@@ -330,7 +330,7 @@
             Caption = 'POS Functionality Profile';
             TableRelation = "NPR POS Functionality Profile";
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'New parameter SelectCustReq and SelectMemberReq in POS Action Login created, use this instead.';
         }
         field(680; "POS Receipt Profile"; Code[20])
@@ -363,7 +363,7 @@
             Caption = 'Open POS Unit Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to POS View Profile';
         }
         field(6211; "Password on unblock discount"; Text[4])
@@ -371,7 +371,7 @@
             Caption = 'Administrator Password';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to POS View Profile';
         }
     }

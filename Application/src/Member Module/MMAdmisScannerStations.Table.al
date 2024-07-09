@@ -21,7 +21,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Guest Avatar Image" field';
         }
         field(11; "Turnstile Default Image"; BLOB)
@@ -30,7 +30,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Default Turnstile Image" field';
         }
         field(12; "Turnstile Error Image"; BLOB)
@@ -39,7 +39,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won''t be used anymore. Replaced by "Error Image of Turnstile" field';
         }
         field(13; Activated; Boolean)

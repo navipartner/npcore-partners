@@ -4,7 +4,7 @@
     DataClassification = CustomerContent;
     PasteIsValid = false;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Replaced by POS entry';
 
     fields
@@ -274,7 +274,7 @@
             Caption = 'Gift voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(60; "Credit voucher ref."; Code[20])
@@ -282,7 +282,7 @@
             Caption = 'Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit Voucher table won''t be used anymore.';
         }
         field(61; "Salgspris inkl. moms"; Boolean)
@@ -317,7 +317,7 @@
             Caption = 'Offline - Gift voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         field(73; "Offline - Credit voucher ref."; Code[20])
@@ -325,7 +325,7 @@
             Caption = 'Offline - Credit voucher ref.';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Credit voucher table won''t be used anymore.';
         }
         field(75; "Bin Code"; Code[20])
@@ -943,7 +943,7 @@
             MaintainSQLIndex = false;
             SumIndexFields = "Amount Including VAT", Quantity, "Line Discount Amount", Amount, Cost;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Gift voucher table won''t be used anymore.';
         }
         key(Key15; "Register No.", "Sale Date", "Sale Type", Type, Quantity, "Receipt Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")

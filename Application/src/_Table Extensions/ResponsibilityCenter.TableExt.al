@@ -8,7 +8,7 @@ tableextension 6014475 "NPR Responsibility Center" extends "Responsibility Cente
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type. "NPR Responsibility Center"."NPR Picture" -> "NPR Image"';
         }
         field(6014476; "NPR Image"; Media)

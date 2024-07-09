@@ -73,7 +73,7 @@
                         ToolTip = 'Specifies the value of the Customer Type field';
                         ApplicationArea = NPRRetail;
                         ObsoleteState = Pending;
-                        ObsoleteTag = 'NPR23.0';
+                        ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Not used';
                     }
                     field("Customer No."; POSQuoteEntry."Customer No.")

@@ -32,7 +32,7 @@ codeunit 6059827 "NPR MPOS Data View Mgt."
         exit(IDataViewCategory.GetView(DataViewType, DataViewCategory, DataViewCode, Request));
     end;
 
-    [Obsolete('Use PreviewCategory(Enum "NPR MPOS Data View Category"; Guid)', 'NPR23.0')]
+    [Obsolete('Use PreviewCategory(Enum "NPR MPOS Data View Category"; Guid)', '2023-06-28')]
 #pragma warning disable AL0749
     procedure Preview(Rec: Record "NPR MPOS Data View")
 #pragma warning restore AL0749

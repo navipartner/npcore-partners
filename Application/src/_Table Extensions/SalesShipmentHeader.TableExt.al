@@ -14,13 +14,13 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             Description = 'PN1.00';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014415; "NPR Document Processing"; Option)
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Document Sending Profile from Customer is used.';
             Caption = 'Document Processing';
             Description = 'PN1.00';
@@ -48,7 +48,7 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             OptionMembers = ,"Order",Lending;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(6014450; "NPR Kolli"; Integer)
