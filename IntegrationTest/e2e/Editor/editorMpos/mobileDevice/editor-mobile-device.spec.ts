@@ -9,7 +9,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
   test("should be able to search item, add and remove, do payment", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -48,9 +48,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")
@@ -79,9 +77,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .first()
       .click();
     await page
-      .getByRole("textbox", {
-        name: "Open menu for Description Br:PEANUTS Gm:40",
-      })
+      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
       .click();
     await page
       .frameLocator("iframe")
@@ -243,7 +239,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page
       .frameLocator("iframe")
@@ -278,7 +274,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page.waitForTimeout(1000);
     await page
@@ -325,7 +321,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Select payment option" })
+      .getByRole("button", { name: "Select payment" })
       .click();
     await page
       .frameLocator("iframe")

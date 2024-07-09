@@ -33,7 +33,7 @@
         UserPosUnitMapping.Add('MPOSUSER', '03');
         UserPosUnitMapping.Add('E2EWORKER1', '01');
         UserPosUnitMapping.Add('E2EWORKER2', '02');
-        UserPosUnitMapping.Add('E2EWORKER3', '');
+        UserPosUnitMapping.Add('E2EWORKER3', '05');
         UserPosUnitMapping.Add('E2EWORKER4', '');
         UserPosUnitMapping.Add('E2EWORKER5', '');
         UserPosUnitMapping.Add('E2EWORKER6', '');

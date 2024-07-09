@@ -2,6 +2,18 @@
     "appFolder": "Application",
     "testAppFolder": "",
     "bcptAppFolder": "",
+    "containers": [
+        {
+            "name": "vPrevious_CLOUD"
+        },
+        {
+            "name": "vLatest_CLOUD"
+        },
+        {
+            "name": "Insider_CLOUD",
+            "continueOnError": true
+        }
+    ],
     "runTests": false,
     "playwright": {
         "runTests": true,

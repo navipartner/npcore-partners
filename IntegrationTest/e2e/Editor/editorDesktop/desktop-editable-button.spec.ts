@@ -7,7 +7,7 @@ test.describe("Edit Mode Bar tests", () => {
   test("should be able to create editable button, copy and paste", async ({
     page,
   }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
       page,
@@ -175,7 +175,7 @@ test.describe("Edit Mode Bar tests", () => {
   });
 
   test("should be able to add action", async ({ page }, workerInfo) => {
-    const key = new Date().getTime();
+    const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
 
     await login(
@@ -263,7 +263,7 @@ test.describe("Edit Mode Bar tests", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByText("CUR-SALESP", { exact: true })
+      .getByText("SUPERVISOR", { exact: true })
       .click();
     await page
       .frameLocator("iframe")
@@ -287,7 +287,7 @@ test.describe("Edit Mode Bar tests", () => {
     await page
       .frameLocator("iframe")
       .locator("span")
-      .filter({ hasText: /^1$/ })
+      .filter({ hasText: "9" })
       .first()
       .click();
     await page

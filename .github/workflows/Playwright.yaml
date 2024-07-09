@@ -28,3 +28,4 @@ jobs:
     with:
       pipelineType: other
       pipelineSubType: playwright
+      useFailFast: false
