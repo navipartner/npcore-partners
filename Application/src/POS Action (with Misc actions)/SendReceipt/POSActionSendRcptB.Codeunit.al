@@ -2,18 +2,31 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
 {
     Access = Internal;
 
-    procedure SendReceipt(EmailTemplateCode: Code[20]; ReceiptEmail: text[80]; POSEntryNo: Integer): Text
+    procedure SendReceipt(EmailTemplateCode: Code[20]; ReceiptEmail: text[80]; POSEntryNo: Integer; SelectReceiptToSend: Integer): Text
     var
         POSEntry: Record "NPR POS Entry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
         RecRef: RecordRef;
         EmailManagement: Codeunit "NPR E-mail Management";
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         MailErrorMessage: Text;
     begin
-        POSEntry.Get(POSEntryNo);
+        case SelectReceiptToSend of
+            0:
+                begin
+                    POSEntry.Get(POSEntryNo);
+                    RecRef.GetTable(POSEntry);
+                    RecRef.SetRecFilter();
+                end;
+            1:
+                begin
+                    POSSaleDigitalReceiptEntry.SetRange("POS Entry No.", POSEntryNo);
+                    POSSaleDigitalReceiptEntry.FindLast();
+                    RecRef.GetTable(POSSaleDigitalReceiptEntry);
+                    RecRef.SetRecFilter();
+                end;
+        end;
 
-        RecRef.GetTable(POSEntry);
-        RecRef.SetRecFilter();
         EmailTemplateHeader.Get(EmailTemplateCode);
         EmailTemplateHeader.SetRecFilter();
 
