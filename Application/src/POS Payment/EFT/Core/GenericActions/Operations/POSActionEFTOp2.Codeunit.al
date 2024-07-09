@@ -116,7 +116,7 @@ codeunit 6059799 "NPR POS Action: EFT Op 2" implements "NPR IPOS Workflow"
         exit(WorkflowRequest);
     end;
 
-    [Obsolete('Remove when all workflows are migrated to v3', 'NPR23.0')]
+    [Obsolete('Remove when all workflows are migrated to v3', '2023-06-28')]
     local procedure DoLegacyEftOperation(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management") Response: JsonObject
     var
         POSAction: Record "NPR POS Action";

@@ -2,7 +2,7 @@
 {
     Access = Internal;
 
-    [Obsolete('Breaking lines, in Text Receipt preview, is not used anymore', 'NPR23.0')]
+    [Obsolete('Breaking lines, in Text Receipt preview, is not used anymore', '2023-06-28')]
     procedure SetDefaultBreakLineNumberOfCharacters(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     begin
 
@@ -17,7 +17,7 @@
         exit(not TicketRcptText.IsEmpty());
     end;
 
-    [Obsolete('Splitting text area, in Text Receipt preview, into the Text Receipt Lines is not supported anymore.', 'NPR23.0')]
+    [Obsolete('Splitting text area, in Text Receipt preview, into the Text Receipt Lines is not supported anymore.', '2023-06-28')]
     procedure BreakSalesTicketReceiptText(var POSUnitReceiptTextProfile: Record "NPR POS Unit Rcpt.Txt Profile")
     begin
 

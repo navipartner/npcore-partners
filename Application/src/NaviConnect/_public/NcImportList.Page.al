@@ -266,7 +266,7 @@
                 PromotedCategory = Process;
                 Visible = false;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
 
                 ToolTip = 'Executes the Show Formatted Source action';

@@ -29,7 +29,7 @@ table 6059800 "NPR HL Integration Setup"
             Caption = 'Instant Task Enqueue';
             DataClassification = SystemMetadata;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR27.0';
+            ObsoleteTag = '2023-10-28';
             ObsoleteReason = 'Is not needed anymore with the new way of handling outstanding data log entries we have in BC Saas.';
 
             trigger OnValidate()

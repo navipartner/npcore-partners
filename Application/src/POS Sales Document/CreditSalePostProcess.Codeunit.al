@@ -51,14 +51,14 @@
         OnAfterInsertExecutionOrderOnCreditSale(TempExecutionOrderOnSale);
     end;
 
-    [Obsolete('Use OnAfterFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
+    [Obsolete('Use OnAfterFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', '2023-10-28')]
     procedure SetInvokeOnFinishCreditSaleSubsribers(POSSalesWorkflowStepIn: Record "NPR POS Sales Workflow Step")
     begin
         FunctionToRun := FunctionToRun::"Invoke OnFinishCreditSale Subsribers";
         POSSalesWorkflowStepGlobal := POSSalesWorkflowStepIn;
     end;
 
-    [Obsolete('Use OnAfterFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
+    [Obsolete('Use OnAfterFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', '2023-10-28')]
     [IntegrationEvent(false, false)]
     local procedure OnFinishCreditSale(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SalePOS: Record "NPR POS Sale")
     begin

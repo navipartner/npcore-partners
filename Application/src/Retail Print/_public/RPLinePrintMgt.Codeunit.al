@@ -140,7 +140,7 @@
     end;
     #endregion
 
-    [Obsolete('Will become internal in next version', 'NPR23.0')]
+    [Obsolete('Will become internal in next version', '2023-06-28')]
     procedure ProcessTemplate("Code": Code[20]; RecordVariant: Variant)
     var
         DataTypeManagement: Codeunit "Data Type Management";
@@ -150,7 +150,7 @@
         ProcessTemplate(Code, RecRef);
     end;
 
-    [Obsolete('Will become internal in next version', 'NPR23.0')]
+    [Obsolete('Will become internal in next version', '2023-06-28')]
     procedure ProcessTemplate("Code": Code[20]; RecRef: RecordRef)
     var
         RPTemplateHeader: Record "NPR RP Template Header";
@@ -626,13 +626,13 @@
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with explicit enum usage', 'NPR23.0')]
+    [Obsolete('Replaced with explicit enum usage', '2023-06-28')]
     local procedure OnGetDeviceType(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var DeviceType: Text)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with interface for line printers', 'NPR23.0')]
+    [Obsolete('Replaced with interface for line printers', '2023-06-28')]
     local procedure OnSendPrintJob(TemplateCode: Text; CodeunitId: Integer; ReportId: Integer; var Printer: Codeunit "NPR RP Line Printer Interf."; NoOfPrints: Integer)
     begin
     end;

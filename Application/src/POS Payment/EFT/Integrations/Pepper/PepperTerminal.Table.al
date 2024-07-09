@@ -124,7 +124,7 @@
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";
             ObsoleteReason = 'Hardcoded to UTF-8 with HWC, setup not required.';
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
         }
         field(160; "Add Customer Signature Space"; Boolean)
         {

@@ -7,7 +7,7 @@
     DrillDownPageID = "NPR POS Stargate Packages";
     LookupPageID = "NPR POS Stargate Packages";
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR31.0';
+    ObsoleteTag = '2024-02-28';
     ObsoleteReason = 'Stargate is replaced by hardware connector';
 
     fields

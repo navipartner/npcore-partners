@@ -25,7 +25,7 @@
             OptionCaption = 'Pos Unit,Comment';
             OptionMembers = "Pos Unit",Comment;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(11; "Sales Ticket Line Text1"; Code[50])
@@ -34,7 +34,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(12; "Sales Ticket Line Text2"; Code[50])
@@ -43,7 +43,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(13; "Sales Ticket Line Text3"; Code[50])
@@ -52,7 +52,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(14; "Sales Ticket Line Text4"; Code[50])
@@ -61,7 +61,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(15; "Sales Ticket Line Text5"; Code[50])
@@ -70,7 +70,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(16; "Sales Ticket Line Text6"; Code[50])
@@ -79,7 +79,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(17; "Sales Ticket Line Text7"; Code[50])
@@ -88,7 +88,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(18; "Sales Ticket Line Text8"; Code[50])
@@ -97,7 +97,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(19; "Sales Ticket Line Text9"; Code[50])
@@ -106,7 +106,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         field(20; "Sales Ticket Rcpt. Text"; Text[2048])
@@ -114,7 +114,7 @@
             Caption = 'Sales Ticket Receipt Text';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Text Receipt preview lines to set directly receipt text';
         }
         field(30; "Break Line"; Integer)
@@ -122,7 +122,7 @@
             Caption = 'Break Line';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Text Receipt preview lines to set directly receipt text';
         }       
     }

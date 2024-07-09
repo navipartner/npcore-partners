@@ -477,7 +477,7 @@
         CurrDataSet.Totals().Add('ItemCount', _ItemCountWhenCalculatedBalance);
     end;
 
-    [Obsolete('Zero reference', 'NPR23.0')]
+    [Obsolete('Zero reference', '2023-06-28')]
     procedure GetDepositLine(var LinePOS: Record "NPR POS Sale Line")
     begin
 
@@ -498,7 +498,7 @@
         LinePOS.Quantity := 1;
     end;
 
-    [Obsolete('Zero reference', 'NPR23.0')]
+    [Obsolete('Zero reference', '2023-06-28')]
     procedure InsertDepositLine(var Line: Record "NPR POS Sale Line"; ForeignCurrencyAmount: Decimal) Return: Boolean
     begin
         InitLine();
@@ -707,7 +707,7 @@
     end;
 
     //--- Publishers ---
-    [Obsolete('Not used. Use OnAfterDeletePOSSaleLineBeforeCommit or OnAfterDeletePOSSaleLineAfterCommit instead.', 'NPR30.0')]
+    [Obsolete('Not used. Use OnAfterDeletePOSSaleLineBeforeCommit or OnAfterDeletePOSSaleLineAfterCommit instead.', '2024-01-28')]
     [IntegrationEvent(true, false)]
     internal procedure OnAfterDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin
@@ -734,7 +734,7 @@
     begin
     end;
 
-    [Obsolete('Not used. Use OnAfterSetQuantityBeforeCommit or OnAfterSetQuantityAfterCommit instead.', 'NPR30.0')]
+    [Obsolete('Not used. Use OnAfterSetQuantityBeforeCommit or OnAfterSetQuantityAfterCommit instead.', '2024-01-28')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
@@ -751,7 +751,7 @@
     begin
     end;
 
-    [Obsolete('Not used. Use OnAfterSetUoMBeforeCommit or OnAfterSetUoMAfterCommit instead.', 'NPR30.0')]
+    [Obsolete('Not used. Use OnAfterSetUoMBeforeCommit or OnAfterSetUoMAfterCommit instead.', '2024-01-28')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetUoM(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
@@ -768,7 +768,7 @@
     begin
     end;
 
-    [Obsolete('Not used. Use OnAfterSetLocationBeforeCommit or OnAfterSetLocationAfterCommit instead.', 'NPR30.0')]
+    [Obsolete('Not used. Use OnAfterSetLocationBeforeCommit or OnAfterSetLocationAfterCommit instead.', '2024-01-28')]
     [IntegrationEvent(true, false)]
     procedure OnAfterSetLocation(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
@@ -810,19 +810,19 @@
     begin
     end;
     //--- POS Sales Workflow ---
-    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2023-06-28')]
     local procedure OnBeforeInsertSaleLineCode(): Code[20]
     begin
         exit('BEFORE_INSERT_LINE');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2023-06-28')]
     local procedure OnAfterInsertSaleLineCode(): Code[20]
     begin
         exit('AFTER_INSERT_LINE');
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2023-06-28')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
@@ -835,7 +835,7 @@
         exit(CODEUNIT::"NPR POS Sale Line");
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2023-06-28')]
     procedure InvokeOnBeforeInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -856,7 +856,7 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
-    [Obsolete('Remove after POS Scenario is removed', 'NPR23.0')]
+    [Obsolete('Remove after POS Scenario is removed', '2023-06-28')]
     procedure InvokeOnAfterInsertSaleLineWorkflow(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -877,19 +877,19 @@
         until POSSalesWorkflowStep.Next() = 0;
     end;
 
-    [Obsolete('Use OnBeforeInsertPOSSaleLine', 'NPR23.0')]
+    [Obsolete('Use OnBeforeInsertPOSSaleLine', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [Obsolete('Use OnAfterInsertPOSSaleLine', 'NPR23.0')]
+    [Obsolete('Use OnAfterInsertPOSSaleLine', '2023-06-28')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertSaleLine(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; SaleLinePOS: Record "NPR POS Sale Line")
     begin
     end;
 
-    [Obsolete('Not used. Use OnAfterInsertPOSSaleLineBeforeCommit or OnAfterInsertPOSSaleLineAfterCommit instead.', 'NPR30.0')]
+    [Obsolete('Not used. Use OnAfterInsertPOSSaleLineBeforeCommit or OnAfterInsertPOSSaleLineAfterCommit instead.', '2024-01-28')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
     begin

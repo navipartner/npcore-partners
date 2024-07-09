@@ -1,9 +1,9 @@
-name: 'Monthly Major Release'
+name: 'Weekly Major Release'
 run-name: ${{ github.workflow }}
 
 on:
   schedule:
-    - cron: "0 18 28 * *" # utc - mm HH DD MM DW
+    - cron: "0 18 * * 0" # utc - mm HH DD MM DW
 
 concurrency:
   group: 'ci-${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}'

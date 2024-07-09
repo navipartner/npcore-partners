@@ -182,7 +182,7 @@ table 6150874 "NPR Adyen Recon. Line"
             Caption = 'Intercharge (AAC)';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with "Interchange (NC)"';
         }
         field(245; "Interchange (NC)"; Decimal)

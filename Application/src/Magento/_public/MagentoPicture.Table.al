@@ -25,7 +25,7 @@
             DataClassification = CustomerContent;
             SubType = Bitmap;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Media instead of Blob type.';
         }
         field(101; "Size (kb)"; Decimal)
@@ -68,7 +68,7 @@
             Caption = 'Replication Counter';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
     }
@@ -81,7 +81,7 @@
         key(Key2; "Replication Counter")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
 #IF NOT (BC17 or BC18 or BC19 or BC20)
@@ -145,7 +145,7 @@
         Text000: Label 'Picture Size exceeds max.';
         ErrorCannotAccesUrl: Label 'Cannot access URL %1.\\Failed with HTTP status code %2';
 
-    [Obsolete('Use method with TempBlob instead of using Image media field', 'NPR23.0')]
+    [Obsolete('Use method with TempBlob instead of using Image media field', '2023-06-28')]
     procedure DownloadPicture(var TempMagentoPicture: Record "NPR Magento Picture" temporary): Boolean
     var
         Stream: InStream;

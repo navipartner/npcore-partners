@@ -37,7 +37,7 @@ table 6014580 "NPR Object Output Selection"
             Caption = 'Object Name';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Moved to a flowfield';
         }
         field(8; "Print Template"; Code[20])

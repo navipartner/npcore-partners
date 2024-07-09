@@ -282,7 +282,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(170; "Retail ID"; Guid)
@@ -291,7 +291,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemID';
         }
         field(180; "Event No."; Code[20])
@@ -536,7 +536,7 @@
             Caption = 'FR POS Audit Log Aux. Info';
             FieldClass = FlowField;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced with table NPR FR POS Audit Log Add. Info';
             CalcFormula = exist("NPR FR POS Audit Log Aux. Info" where("POS Entry No." = field("Entry No.")));
         }
@@ -642,13 +642,13 @@
         key(Key2; "Retail ID")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemID';
         }
         key(Key3; "POS Store Code", "POS Unit No.", "Document No.")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         key(Key4; "Document No.")
@@ -661,21 +661,21 @@
         key(Key5; "Customer No.", "Post Entry Status")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
 
         key(Key6; "Salesperson Code", "Post Entry Status")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
         }
         key(Key7; "Posting Date", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code")
         {
             MaintainSqlIndex = false;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'sift performance not worth the locking';
         }
         key(Key8; "Fiscal No.")

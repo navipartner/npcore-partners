@@ -4,7 +4,7 @@
     Caption = 'VAT Product Posting Group Mapper';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'PR Key changed';
 
     fields

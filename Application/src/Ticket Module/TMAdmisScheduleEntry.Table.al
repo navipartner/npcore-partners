@@ -93,7 +93,7 @@
             Caption = 'Unbookable Before Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival From Time"';
         }
         field(48; "Bookable Passed Start (Secs)"; Integer)
@@ -101,7 +101,7 @@
             Caption = 'Bookable Passed Start (Secs)';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use "Event Arrival Until Time"';
         }
         field(50; "Regenerate With"; Option)

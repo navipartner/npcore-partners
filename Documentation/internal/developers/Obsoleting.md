@@ -1,8 +1,7 @@
 # Breaking Changes
 
 ### Obsolete Tags
-Use obsolete tag with syntax 'NPRx.y' where x.y is the next latest version of NP Retail at the time of obsoletion.  
-For example, if you are marking anything as obsolete pending when version 23.0 of NP Retail is the next major release, you would write 'NPR23.0' in the tag.
+Use obsolete tag in 'YYYY-MM-DD' in date format as the next latest version of NP Retail at the time of obsoletion.  
 
 ### Time period
 By default, we use 12 month obsolete pending periods before we can fully remove something.  

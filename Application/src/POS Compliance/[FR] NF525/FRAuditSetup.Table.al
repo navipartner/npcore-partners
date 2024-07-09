@@ -14,7 +14,7 @@
         field(2; "Certification No."; Text[30])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification No.';
             DataClassification = CustomerContent;
@@ -24,7 +24,7 @@
         field(3; "Certification Category"; Text[30])
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Hardcoded instead';
             Caption = 'Certification Category';
             DataClassification = CustomerContent;
@@ -62,7 +62,7 @@
             Caption = 'Last Auto Archived Workshift';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(50; "Auto Archive URL"; Text[250])
@@ -70,7 +70,7 @@
             Caption = 'Auto Archive URL';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(51; "Auto Archive API Key"; Text[250])
@@ -79,7 +79,7 @@
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(52; "Auto Archive SAS"; Text[250])
@@ -87,7 +87,7 @@
             Caption = 'Auto Archive SAS';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Manual archival by customers used instead';
         }
         field(60; "Item VAT Identifier Filter"; Text[250])
@@ -95,7 +95,7 @@
             Caption = 'Item VAT Identifier Filter';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'New Field Item VAT ID Filter BLOB Type';
         }
         field(61; "Item VAT ID Filter"; Blob)

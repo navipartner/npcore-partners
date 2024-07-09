@@ -18,7 +18,7 @@
             OptionMembers = "Both Std. NAV and Pdf2Nav","Std. NAV Only","Pdf2Nav Only";
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Pdf2Nav removed from standard email functions.';
         }
         field(20; "Always Print Ship"; Boolean)

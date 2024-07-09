@@ -1263,20 +1263,20 @@ then
                 Error('');
     end;
 
-    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', '2023-10-28')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, false)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
         Sender.DiscoverPOSSalesWorkflow(OnFinishCreditSaleCode(), OnFinishCreditSaleDescription, Codeunit::"NPR Credit Sale Post-Process", 'OnFinishCreditSale');
     end;
 
-    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', '2023-10-28')]
     local procedure OnFinishCreditSaleCode(): Code[20]
     begin
         exit('FINISH_CREDIT_SALE');
     end;
 
-    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', 'NPR27.0')]
+    [Obsolete('Use OnFinishCreditSale in cdu 6014435 "NPR Credit Sale Post-Process"', '2023-10-28')]
 
     local procedure InvokeOnFinishCreditSaleWorkflow(SalePOS: Record "NPR POS Sale")
     var

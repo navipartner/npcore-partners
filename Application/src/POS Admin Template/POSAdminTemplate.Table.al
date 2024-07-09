@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used.';
     // NPR5.51/JAKUBV/20190903  CASE 352582 Transport NPR5.51 - 3 September 2019
 

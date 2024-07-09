@@ -82,7 +82,7 @@
             Caption = 'Unattended';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR28.0';
+            ObsoleteTag = '2023-11-28';
             ObsoleteReason = 'The EFT module now correctly set "Self Service" field';
         }
         field(14; "Local Key Identifier"; Text[250])

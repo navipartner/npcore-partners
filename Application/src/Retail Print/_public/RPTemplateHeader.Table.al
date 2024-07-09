@@ -25,7 +25,7 @@ table 6014446 "NPR RP Template Header"
             Caption = 'Printer Device';
             DataClassification = CustomerContent;
             ObsoleteState = Pending; //If set to removed, it'll block import of templates exported from previous customers
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by "Matrix Device" and "Line Device" enums';
         }
         field(42; "Matrix Device"; Enum "NPR Matrix Printer Device")
@@ -108,7 +108,7 @@ table 6014446 "NPR RP Template Header"
             IF ("Print Processing Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = FILTER(Report));
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Modules should have a field for report ID if they want to support running a report directly. With newer report print event subscribers there is no need for a custom PDF handler';
         }
         field(73; "Post Processing Codeunit"; Integer)

@@ -36,14 +36,14 @@ page 6060000 "NPR APIV1 PBIWaiterPadLine"
                 {
                     Caption = 'Start Date', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteTag = '2023-08-28';
                     ObsoleteReason = 'Replaced by openedDateTime field';
                 }
                 field(startTime; Rec."Start Time")
                 {
                     Caption = 'Start Time', Locked = true;
                     ObsoleteState = Pending;
-                    ObsoleteTag = 'NPR25.0';
+                    ObsoleteTag = '2023-08-28';
                     ObsoleteReason = 'Replaced by openedDateTime field';
                 }
                 field(openedDateTime; Rec.SystemCreatedAt)

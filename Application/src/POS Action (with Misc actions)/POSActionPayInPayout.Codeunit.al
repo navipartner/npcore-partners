@@ -1,7 +1,7 @@
 ﻿codeunit 6150809 "NPR POSAction: PayIn Payout"
 {
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use new action "NPR POS Action Pay-in Payout"';
     Access = Internal;
 

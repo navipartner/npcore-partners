@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Background sessions are too limited in BC Cloud so we are shifting to page background tasks for EFT requests';
 
     Caption = 'EFT Transaction Async Request';

@@ -135,7 +135,7 @@
         key(Key2; "Posting Per Entry No.", "Posting Per", "Posting Type")
         {
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR25.0';
+            ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Use Key3 ["Posting Per Entry No.", "Posting Per", "Posting Type", "With Error"] instead';
             Enabled = false;
         }

@@ -1,7 +1,7 @@
 enum 6014645 "NPR TM ActivationMethod_Type"
 {
 #IF NOT BC17
-    Access = Internal;       
+    Access = Internal;
 #ENDIF
     Extensible = true;
 
@@ -19,7 +19,7 @@ enum 6014645 "NPR TM ActivationMethod_Type"
     {
         Caption = 'Invoice';
         ObsoleteState = pending;
-        ObsoleteTag = 'NPR32.0';
+        ObsoleteTag = '2024-03-28';
         ObsoleteReason = 'Never implemented.';
     }
     value(3; POS_ALL)

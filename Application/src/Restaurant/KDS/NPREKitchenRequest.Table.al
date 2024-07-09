@@ -86,7 +86,7 @@
             OptionCaption = ',Item,,,,,,,,Comment';
             OptionMembers = ,Item,,,,,,,,Comment;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use Line Type';
         }
         field(101; "Line Type"; Enum "NPR POS Sale Line Type")

@@ -3,7 +3,7 @@
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
 
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'No-cross invocation state in actions going forward, apart from the database! Delete when last workflow v2 is gone';
 
     var

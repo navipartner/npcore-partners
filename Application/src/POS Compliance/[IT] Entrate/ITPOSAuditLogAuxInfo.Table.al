@@ -53,7 +53,7 @@ table 6150738 "NPR IT POS Audit Log Aux Info"
             Caption = 'Payment Method';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR32.0';
+            ObsoleteTag = '2024-03-28';
             ObsoleteReason = 'This field is not used anymore.';
         }
         field(9; "Transaction Type"; Enum "NPR IT Transaction Type")

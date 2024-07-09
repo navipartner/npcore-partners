@@ -170,7 +170,7 @@
         ActionSpecified: Boolean;
         ActionDescription: Text;
 
-    [Obsolete('Delete once all actions are v3. Manual refresh requirement is a bug.', 'NPR23.0')]
+    [Obsolete('Delete once all actions are v3. Manual refresh requirement is a bug.', '2023-06-28')]
     local procedure RefreshActions()
     var
         "Action": Record "NPR POS Action";

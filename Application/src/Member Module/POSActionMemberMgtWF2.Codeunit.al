@@ -2,7 +2,7 @@
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Not used any more, please use MM_MEMBERMGMT_WF3 instead.';
 
     // Code removed in https://linear.app/navipartner/issue/ATTR-239/mm-membermgmt-wf2-removable

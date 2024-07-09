@@ -122,7 +122,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         PreWorkflows.Add('SALE_DIMENSION', ActionParameters);
     end;
 
-    [Obsolete('Use the new END_SALE workflow instead', 'NPR28.0')]
+    [Obsolete('Use the new END_SALE workflow instead', '2023-11-28')]
     local procedure AttemptEndSale(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         Payments: Codeunit "NPR POS Action: Payment WF2 BL";

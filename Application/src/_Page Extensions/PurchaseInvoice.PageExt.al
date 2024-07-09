@@ -39,7 +39,7 @@ pageextension 6014454 "NPR Purchase Invoice" extends "Purchase Invoice"
                 Image = View;
                 ApplicationArea = NPRRetail;
                 ObsoleteState = Pending;
-                ObsoleteTag = 'NPR23.0';
+                ObsoleteTag = '2023-06-28';
                 ObsoleteReason = 'Field XML Stylesheet is not used anymore.';
                 Visible = false;
 

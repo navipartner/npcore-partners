@@ -8,7 +8,7 @@ page 6151268 "NPR BG POS Audit Log Aux. Info"
     SourceTableView = sorting("Audit Entry No.") order(descending);
     UsageCategory = None;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR28.0';
+    ObsoleteTag = '2023-11-28';
     ObsoleteReason = 'Will not be used anymore.';
 
     layout

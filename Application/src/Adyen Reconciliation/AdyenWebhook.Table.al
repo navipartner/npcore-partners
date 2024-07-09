@@ -17,7 +17,7 @@ table 6150880 "NPR Adyen Webhook"
             Caption = 'Created Date';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
         field(20; "Event Date"; DateTime)
@@ -61,7 +61,7 @@ table 6150880 "NPR Adyen Webhook"
             Caption = 'Webhook Data';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR35.0';
+            ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
         field(80; Live; Boolean)

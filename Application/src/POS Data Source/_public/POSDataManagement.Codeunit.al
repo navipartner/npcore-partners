@@ -78,7 +78,7 @@
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
-    [Obsolete('We are slowly moving the concept of a view out of backend, into frontend with data pulled by frontend instead of pushed out of backend depending on a flag backend remembers between requests.', 'NPR23.0')]
+    [Obsolete('We are slowly moving the concept of a view out of backend, into frontend with data pulled by frontend instead of pushed out of backend depending on a flag backend remembers between requests.', '2023-06-28')]
     local procedure OnSetupDataSourcesForView(View: Codeunit "NPR POS View"; Setup: Codeunit "NPR POS Setup")
     begin
     end;

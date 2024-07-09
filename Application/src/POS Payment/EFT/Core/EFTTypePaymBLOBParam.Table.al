@@ -3,7 +3,7 @@ table 6184481 "NPR EFTType Paym. BLOB Param."
 {
     Access = Internal;
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Use integration specific setup tables for cleaner code';
 
     Caption = 'EFT Type Payment BLOB Param.';

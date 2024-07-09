@@ -4,7 +4,7 @@
     Caption = 'Item Category Mapping';
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
-    ObsoleteTag = 'NPR23.0';
+    ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Item Group is obsolete.';
 
     fields
@@ -21,7 +21,7 @@
             DataClassification = CustomerContent;
             NotBlank = true;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Using Item Category instead.';
         }
         field(30; "Item Material"; Code[20])

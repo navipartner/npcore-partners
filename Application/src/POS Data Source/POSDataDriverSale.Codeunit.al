@@ -228,7 +228,7 @@
         exit('CustomerPostingGroup');
     end;
 
-    [Obsolete('Not used.', 'NPR23.0')]
+    [Obsolete('Not used.', '2023-06-28')]
     local procedure GetCustomerTypeString(SalePOS: Record "NPR POS Sale"): Text
     begin
     end;

@@ -39,7 +39,7 @@
             Caption = 'Vendor Item No.';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Removed because we need field length to increase, changed with Vend Item No. field';
         }
         field(8; "Internal Bar Code"; Code[50])
@@ -980,7 +980,7 @@
             Caption = 'Item Group';
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Using Item Category Code instead.';
         }
         field(6014401; "Group sale"; Option)
@@ -998,7 +998,7 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.25';
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'This field won"t be used anymore';
         }
         field(6014410; "Label Barcode"; Code[20])

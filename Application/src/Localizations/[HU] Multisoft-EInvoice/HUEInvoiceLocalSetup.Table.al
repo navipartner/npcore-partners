@@ -6,7 +6,7 @@ table 6150799 "NPR HU EInvoice Local. Setup"
     DrillDownPageId = "NPR HU EInvoice Local. Setup";
     LookupPageId = "NPR HU EInvoice Local. Setup";
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR34.0';
+    ObsoleteTag = '2024-05-28';
     ObsoleteReason = 'Merged and replaced with table "NPR HU MS Fiscalization Setup".';
     fields
     {

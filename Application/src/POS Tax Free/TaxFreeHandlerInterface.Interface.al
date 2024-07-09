@@ -2,9 +2,9 @@
 {
 #IF NOT BC17
     ObsoleteState = Pending;
-    ObsoleteTag = 'NPR24.0';
+    ObsoleteTag = '2023-07-28';
     ObsoleteReason = 'Please use "NPR Tax Free Handler IF"';
-    Access = Internal;      
+    Access = Internal;
 #ENDIF
 
     procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "NPR Tax Free Request"; Silent: Boolean);

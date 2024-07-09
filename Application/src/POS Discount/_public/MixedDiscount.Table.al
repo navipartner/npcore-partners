@@ -207,7 +207,7 @@
             Editable = false;
             DataClassification = CustomerContent;
             ObsoleteState = Removed;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Aux Value Entry has been removed and this field directly reimplemented on references.';
         }
         field(310; "Customer Disc. Group Filter"; Text[250])

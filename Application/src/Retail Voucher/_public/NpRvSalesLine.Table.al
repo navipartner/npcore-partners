@@ -316,7 +316,7 @@
         key(Key4; "Retail ID")
         {
             ObsoleteState = Pending;
-            ObsoleteTag = 'NPR23.0';
+            ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by Key5: "Retail ID", "Document Source", Type';
         }
         key(Key5; "Retail ID", "Document Source", Type)
