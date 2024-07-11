@@ -380,20 +380,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
             DeclaredValueJsonObject.Add('currency_code', PackageCurrencyCode);
     end;
 
-    local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Shipping Provider Document"): Boolean;
+    local procedure PrintAllowed(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Found: Boolean;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
     begin
         if not PackageProviderSetup."Use Pakkelable Printer API" then
             exit(false);
 
-        PakkelabelsPrinter.SetRange("Location Code", PakkelabelsShipment."Location Code");
-        if not PakkelabelsPrinter.FindFirst() then
-            PakkelabelsPrinter.SetRange("Location Code");
-        if PakkelabelsPrinter.FindFirst() then
-            exit(true)
-        else
-            exit(false);
+        Found := FindPackagePrinterLocationAndUserFilters(PakkelabelsPrinter, PakkelabelsShipment."Location Code");
     end;
 
     local procedure BuildPrintAt(var PakkelabelsShipment: Record "NPR Shipping Provider Document") Output: Text;
@@ -403,10 +397,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams2Lbl: label '"printer_name": "%1",', Locked = true;
         QueryParams3Lbl: label '"label_format": "%1"', Locked = true;
     begin
-        PakkelabelsPrinter.SetRange("Location Code", PakkelabelsShipment."Location Code");
-        if not PakkelabelsPrinter.FindFirst() then
-            PakkelabelsPrinter.SetRange("Location Code");
-        if PakkelabelsPrinter.FindFirst() then begin
+        if FindPackagePrinterLocationAndUserFilters(PakkelabelsPrinter, PakkelabelsShipment."Location Code") then begin
             Output := '{';
             Output += StrSubstNo(QueryParamsLbl, PakkelabelsPrinter."Host Name");
             Output += StrSubstNo(QueryParams2Lbl, PakkelabelsPrinter.Printer);
@@ -499,8 +490,9 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         output := '{';
         output += StrSubstNo(QueryParamsLbl, ShipmentDocument."Response Shipment ID");
         output += '"document_type":"shipment"';
-        PakkelabelsPrinter.SetRange("Location Code", ShipmentDocument."Location Code");
-        if PakkelabelsPrinter.FindFirst() then;
+
+        FindPackagePrinterLocationAndUserFilters(PakkelabelsPrinter, ShipmentDocument."Location Code");
+
         output += StrSubstNo(QueryParams2Lbl, PakkelabelsPrinter."Host Name");
         output += StrSubstNo(QueryParams3Lbl, PakkelabelsPrinter.Printer);
         output += StrSubstNo(QueryParams4Lbl, PakkelabelsPrinter."label Format");
@@ -744,6 +736,26 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
                 if PackageProviderSetup."Send Package Doc. Immediately" then
                     CreateShipment(ShipmentDocument, true);
             end;
+        end;
+    end;
+
+    local procedure FindPackagePrinterLocationAndUserFilters(var PackagePrinters: Record "NPR Package Printers"; ShippingDocumentLocationCode: Code[20]) Found: Boolean
+    begin
+        PackagePrinters.SetRange("Location Code", ShippingDocumentLocationCode);
+        PackagePrinters.SetRange("User ID", UserSecurityId());
+        Found := PackagePrinters.FindFirst();
+        if not Found then begin
+            PackagePrinters.SetRange("User ID");
+            Found := PackagePrinters.FindFirst();
+        end;
+        if not Found then begin
+            PackagePrinters.SetRange("Location Code");
+            PackagePrinters.SetRange("User ID", UserSecurityId());
+            Found := PackagePrinters.FindFirst();
+        end;
+        if not Found then begin
+            PackagePrinters.SetRange("User ID");
+            Found := PackagePrinters.FindFirst();
         end;
     end;
 
