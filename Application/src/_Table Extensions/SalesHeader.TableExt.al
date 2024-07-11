@@ -158,4 +158,17 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
         }
 
     }
+
+    internal procedure SetPreviewModePosting(IsPreviewMode: Boolean)
+    begin
+        PreviewModePosting := IsPreviewMode;
+    end;
+
+    internal procedure GetPreviewModePosting(): Boolean
+    begin
+        exit(PreviewModePosting);
+    end;
+
+    var
+        PreviewModePosting: Boolean;
 }
