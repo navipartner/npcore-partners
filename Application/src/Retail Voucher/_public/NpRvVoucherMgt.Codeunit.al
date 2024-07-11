@@ -1509,6 +1509,7 @@
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         TryFindPartnerVoucher: Codeunit "NPR Try Find Partner Voucher";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         NpRvVoucherType.Reset();
         NpRvVoucherType.SetFilter(Code, VoucherType);
@@ -1525,9 +1526,14 @@
         Voucher.SetCurrentKey("Reference No.");
         Voucher.SetRange(Open, true);
         Voucher.SetFilter("Voucher Type", VoucherType);
-        Voucher.SetFilter("Reference No.", VoucherNumber);
+        if FeatureFlagsManagement.IsEnabled('findVoucherTypeByExactReferenceMatch') then
+            Voucher.SetRange("Reference No.", VoucherNumber)
+        else
+            Voucher.SetFilter("Reference No.", VoucherNumber);
 
         if SelectFromList and (VoucherNumber = '') then begin
+            if FeatureFlagsManagement.IsEnabled('findVoucherTypeByExactReferenceMatch') then
+                Voucher.SetRange("Reference No.");
             Found := Page.RunModal(0, Voucher) = Action::LookupOK;
             exit;
         end;
