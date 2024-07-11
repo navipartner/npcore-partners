@@ -93,9 +93,19 @@ codeunit 6151410 "NPR Prepayment Subs."
         PrepaymentMgt.CloseEntriesForCrMemo(GenJnlLine);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostCustomerEntry', '', false, false)]
+    local procedure SalesPost_OnBeforePostCustomerEntry(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    begin
+        if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
+            exit;
+        SalesHeader.SetPreviewModePosting(PreviewMode);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostCustomerEntry', '', false, false)]
     local procedure OnAfterPostCustomerEntry(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line");
     begin
+        if SalesHeader.GetPreviewModePosting() then
+            exit;
         if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
             exit;
         PrepaymentMgt.RebalancePostRefundAndPayment(GenJnlLine, SalesHeader, GenJnlPostLine);
@@ -104,6 +114,8 @@ codeunit 6151410 "NPR Prepayment Subs."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Post Invoice Events", 'OnPostLedgerEntryOnAfterGenJnlPostLine', '', false, false)]
     local procedure OnPostLedgerEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line");
     begin
+        if PreviewMode then
+            exit;
         if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
             exit;
         PrepaymentMgt.RebalancePostRefundAndPayment(GenJnlLine, SalesHeader, GenJnlPostLine);
