@@ -482,14 +482,14 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     local procedure PrintJob(ShipmentDocument: Record "NPR Shipping Provider Document") output: Text;
     var
         PakkelabelsPrinter: Record "NPR Package Printers";
-        QueryParamsLbl: label '"document_id":%1', Locked = true;
+        QueryParamsLbl: label '"document_id": %1,', Locked = true;
         QueryParams2Lbl: label '"host_name": "%1",', Locked = true;
         QueryParams3Lbl: label '"printer_name": "%1",', Locked = true;
         QueryParams4Lbl: label '"label_format": "%1"', Locked = true;
     begin
         output := '{';
         output += StrSubstNo(QueryParamsLbl, ShipmentDocument."Response Shipment ID");
-        output += '"document_type":"shipment"';
+        output += '"document_type":"shipment",';
 
         FindPackagePrinterLocationAndUserFilters(PakkelabelsPrinter, ShipmentDocument."Location Code");
 
