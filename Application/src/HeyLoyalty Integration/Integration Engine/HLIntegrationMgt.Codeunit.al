@@ -550,13 +550,13 @@ codeunit 6059993 "NPR HL Integration Mgt."
 #if not (BC17 or BC18)
     #region clear configuration on company/environment copy
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
-    local procedure SpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
+    local procedure HLOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
     begin
         DisableIntegration(NewCompanyName);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
-    local procedure SpfyOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    local procedure HLOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
     begin
         DisableIntegration(CompanyName);
     end;
