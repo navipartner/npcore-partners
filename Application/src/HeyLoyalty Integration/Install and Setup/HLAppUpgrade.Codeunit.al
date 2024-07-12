@@ -10,6 +10,8 @@ codeunit 6059988 "NPR HL App Upgrade"
         RemoveDeletedCheckmark();
         UpdateHeyLoyaltyDataLogSubscribers();
         SetDataProcessingHandlerID();
+        DisableIntegrationInNonProdutionEnvironments();
+        ResendMissingUnsubscribeRequestsToHL();
     end;
 
     var
@@ -164,6 +166,61 @@ codeunit 6059988 "NPR HL App Upgrade"
                 HLSetup.SetDataProcessingHandlerIDToDefaultValue();
                 HLSetup.Modify();
             end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure DisableIntegrationInNonProdutionEnvironments()
+    var
+        HLSetup: Record "NPR HL Integration Setup";
+        EnvironmentMgt: Codeunit "NPR Environment Mgt.";
+    begin
+        UpgradeStep := 'DisableIntegrationInNonProdutionEnvironments';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
+
+        if not EnvironmentMgt.IsProd() then
+            if HLSetup.Get() and HLSetup."Enable Integration" then begin
+                HLSetup."Enable Integration" := false;
+                HLSetup.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure ResendMissingUnsubscribeRequestsToHL()
+    var
+        Member: Record "NPR MM Member";
+        Member2: Record "NPR MM Member";
+        HLMember: Record "NPR HL HeyLoyalty Member";
+        HLSetup: Record "NPR HL Integration Setup";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        RecRef: RecordRef;
+    begin
+        UpgradeStep := 'ResendMissingUnsubscribeRequestsToHL';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR HL App Upgrade', UpgradeStep);
+
+        if HLSetup.Get() and HLSetup."Enable Integration" and HLSetup."Member Integration" then begin
+            HLMember.SetLoadFields("E-Mail News Letter");
+            Member.SetLoadFields("E-Mail News Letter");
+            Member.SetFilter("E-Mail News Letter", '<>%1', Member."E-Mail News Letter"::YES);
+            if Member.FindSet() then
+                repeat
+                    HLMember.SetRange("Member Entry No.", Member."Entry No.");
+                    if HLMember.FindFirst() and (HLMember."E-Mail News Letter" <> Member."E-Mail News Letter") then begin
+                        Member2.Get(Member."Entry No.");
+                        RecRef.GetTable(Member2);
+                        DataLogMgt.DisableIgnoredFields(true);
+                        DataLogMgt.LogDatabaseModify(RecRef);
+                        DataLogMgt.DisableIgnoredFields(false);
+                    end;
+                until Member.Next() = 0;
+        end;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR HL App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

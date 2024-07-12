@@ -114,6 +114,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'RemoveDeletedCheckmark'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'UpdateHeyLoyaltyDataLogSubscribers'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'SetDataProcessingHandlerID'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'DisableIntegrationInNonProdutionEnvironments'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR HL App Upgrade", 'ResendMissingUnsubscribeRequestsToHL'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'ItemWorksheetLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RegistItemWorkshLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Vend Item No Expansion", 'RetailCampaignItems'));
@@ -485,6 +487,10 @@
                         exit('UpdateHeyLoyaltyDataLogSubscribers_20231024');
                     'SetDataProcessingHandlerID':
                         exit('NPR-HL-SetDataProcessingHandlerID-20240610');
+                    'DisableIntegrationInNonProdutionEnvironments':
+                        exit('NPR-HL-DisableIntegrationInNonProdutionEnvironments-20240712');
+                    'ResendMissingUnsubscribeRequestsToHL':
+                        exit('NPR-HL-ResendMissingUnsubscribeRequestsToHL-20240712');
                 end;
             Codeunit::"NPR UPG Vend Item No Expansion":
                 case UpgradeStep of
