@@ -1226,7 +1226,7 @@
                 "Purch. Unit of Measure" := TempItem."Purch. Unit of Measure";
                 "Costing Method" := TempItem."Costing Method";
                 "No. Series" := TempItem."No. Series";
-                Validate("Variety Group", Item."NPR Variety Group");
+                Validate("Variety Group", TempItem."NPR Variety Group");
             end;
         }
         field(5704; "Product Group Code"; Code[10])
