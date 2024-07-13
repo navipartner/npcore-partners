@@ -28,7 +28,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
         FilterRecordset(BCRecID, ShopifyIDType, ShopifyAssignedID);
         if not ShopifyAssignedID.FindFirst() then begin
             ShopifyAssignedID.Init();
-            ShopifyAssignedID."Table No." := BCRecID.TableNo;
+            ShopifyAssignedID."Table No." := BCRecID.TableNo();
             ShopifyAssignedID."Shopify ID Type" := ShopifyIDType;
             ShopifyAssignedID."BC Record ID" := BCRecID;
             ShopifyAssignedID."Entry No." := 0;
@@ -82,7 +82,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     begin
         ShopifyAssignedID.Reset();
         ShopifyAssignedID.SetCurrentKey("Table No.", "Shopify ID Type", "BC Record ID");
-        ShopifyAssignedID.SetRange("Table No.", BCRecID.TableNo);
+        ShopifyAssignedID.SetRange("Table No.", BCRecID.TableNo());
         ShopifyAssignedID.SetRange("Shopify ID Type", ShopifyIDType);
         ShopifyAssignedID.SetRange("BC Record ID", BCRecID);
     end;
@@ -95,7 +95,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
         if NewShopifyID = '' then
             exit;
 
-        FilterWhereUsedInTable(BCRecID.TableNo, ShopifyIDType, NewShopifyID, ShopifyAssignedID);
+        FilterWhereUsedInTable(BCRecID.TableNo(), ShopifyIDType, NewShopifyID, ShopifyAssignedID);
         ShopifyAssignedID.SetFilter("BC Record ID", '<>%1', BCRecID);
         if ShopifyAssignedID.FindFirst() then
             Error(IDAlreadyAssigned, Format(ShopifyIDType), NewShopifyID, ShopifyAssignedID."BC Record ID");

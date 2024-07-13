@@ -272,6 +272,38 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         SendShopifyRequest(NcTask, 'POST', Url);
     end;
 
+    [TryFunction]
+    procedure GetRegisteredWebhooks(SpfyStoreCode: Code[20]; Topic: Text; var ShopifyResponse: JsonToken)
+    var
+        NcTask: Record "NPR Nc Task";
+        Url: Text;
+    begin
+        NcTask."Store Code" := SpfyStoreCode;
+        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks.json?topic=%1', Topic);
+        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, 'GET', Url));
+    end;
+
+    [TryFunction]
+    procedure DeleteRegisteredWebhook(SpfyStoreCode: Code[20]; SpfyWebhookId: Text[50])
+    var
+        NcTask: Record "NPR Nc Task";
+        Url: Text;
+    begin
+        NcTask."Store Code" := SpfyStoreCode;
+        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks/%1.json', SpfyWebhookId);
+        SendShopifyRequest(NcTask, 'DELETE', Url);
+    end;
+
+    procedure RegisterWebhook(var NcTask: Record "NPR Nc Task") ShopifyResponse: JsonToken
+    var
+        Url: Text;
+    begin
+        CheckRequestContent(NcTask);
+
+        Url := GetShopifyUrl(NcTask."Store Code") + 'webhooks.json';
+        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, 'POST', Url));
+    end;
+
     local procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
     var
         NoRequestBodyErr: Label 'Each request must have a json formatted content attached';
@@ -309,18 +341,60 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     local procedure TrySendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var NextLink: Text; var ResponseText: Text)
     var
         Client: HttpClient;
-        Content: HttpContent;
-        Headers: HttpHeaders;
         RequestMsg: HttpRequestMessage;
         ResponseMsg: HttpResponseMessage;
-        InStr: InStream;
         Links: array[1] of Text;
+        MaxRetries: Integer;
+        RetryCounter: Integer;
+        Retry: Boolean;
+        Success: Boolean;
     begin
         CheckHttpClientRequestsAllowed();
 
         Clear(NextLink);
+        MaxRetries := 3;
+        RetryCounter := 0;
 
-        if NcTask."Data Output".HasValue then begin
+        repeat
+            RetryCounter += 1;
+            Clear(Client);
+            Clear(RequestMsg);
+            Clear(ResponseMsg);
+
+            CreateRequestMsg(NcTask, RestMethod, Url, RequestMsg);
+            if not Client.Send(RequestMsg, ResponseMsg) then
+                Error(GetLastErrorText());
+
+            Success := ResponseMsg.IsSuccessStatusCode();
+            if not Success then
+                if RetryCounter >= MaxRetries then
+                    Retry := false
+                else
+                    Retry := ResponseAllowsRetries(ResponseMsg)
+        until Success or not Retry;
+
+        SaveResponse(NcTask, ResponseMsg);
+
+        if not ResponseMsg.Content().ReadAs(ResponseText) then
+            ResponseText := '';
+        if ResponseText = '' then
+            ResponseText := '{}';
+
+        if not Success then
+            if not TreatAsSuccess(NcTask, ResponseMsg) then
+                Error('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
+
+        if ResponseMsg.Headers().GetValues('Link', Links) then
+            NextLink := ParseNextLink(Links[1]);
+    end;
+
+    local procedure CreateRequestMsg(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var RequestMsg: HttpRequestMessage)
+    var
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        InStr: InStream;
+    begin
+        if NcTask."Data Output".HasValue() then begin
             NcTask."Data Output".CreateInStream(InStr);
             Content.WriteFrom(InStr);
 
@@ -337,27 +411,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         RequestMsg.GetHeaders(Headers);
         Headers.Add('X-Shopify-Access-Token', GetShopifyAccessToken(NcTask."Store Code"));
         Headers.Add('Accept', 'application/json');
-        Headers.Add('User-Agent', 'Dynamics 365');
-
-        if not Client.Send(RequestMsg, ResponseMsg) then
-            Error(GetLastErrorText);
-
-        SaveResponse(NcTask, ResponseMsg);
-
-        if not ResponseMsg.Content.ReadAs(ResponseText) then
-            ResponseText := '';
-        if ResponseText = '' then
-            ResponseText := '{}';
-
-        if not ResponseMsg.IsSuccessStatusCode() then
-            if not TreatAsSuccess(NcTask, ResponseMsg) then
-                Error('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
-
-        Headers := ResponseMsg.Headers();
-        if Headers.Contains('Link') then begin
-            Headers.GetValues('Link', Links);
-            NextLink := ParseNextLink(Links[1]);
-        end;
+        Headers.Add('User-Agent', 'NPRetail-BC');
     end;
 
     local procedure SaveResponse(var NcTask: Record "NPR Nc Task"; var ResponseMsg: HttpResponseMessage)
@@ -374,6 +428,63 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
         NcTask.Response.CreateOutStream(OutStr);
         CopyStream(OutStr, InStr);
+    end;
+
+    local procedure ResponseAllowsRetries(ResponseMsg: HttpResponseMessage): Boolean
+    var
+        Values: array[1] of Text;
+        BucketPerc: Decimal;
+        BucketSize: Integer;
+        BucketUse: Integer;
+        Status: Integer;
+        WaitTime: Integer;
+    begin
+        Status := ResponseMsg.HttpStatusCode();
+        case Status of
+            429:  //Too Many Requests
+                begin
+                    if ResponseMsg.Headers().GetValues('Retry-After', Values) then
+                        if Evaluate(WaitTime, Values[1], 9) then
+                            if WaitTime > 0 then begin
+                                if WaitTime > 10 then
+                                    exit(false);  //Too long wait time
+                                WaitTime := WaitTime * 1000;
+                            end;
+                    if WaitTime <= 0 then
+                        WaitTime := 2000;
+                end;
+
+            500 .. 599:  //Internal Shopify errors
+                WaitTime := 5000;
+
+            else begin
+                WaitTime := -1;
+                if ResponseMsg.Headers().GetValues('X-Shopify-Shop-Api-Call-Limit', Values) then
+                    if Evaluate(BucketUse, Values[1].Split('/').Get(1)) and Evaluate(BucketSize, Values[1].Split('/').Get(2)) then begin
+                        BucketPerc := 100 * BucketUse / BucketSize;
+                        case true of
+                            BucketPerc >= 90:
+                                WaitTime := 1000;
+                            BucketPerc >= 80:
+                                WaitTime := 800;
+                            BucketPerc >= 70:
+                                WaitTime := 600;
+                            BucketPerc >= 60:
+                                WaitTime := 400;
+                            BucketPerc >= 50:
+                                WaitTime := 200;
+                            else
+                                WaitTime := 0;
+                        end;
+                    end;
+                if WaitTime = -1 then
+                    exit(false);
+            end;
+        end;
+
+        if WaitTime > 0 then
+            Sleep(WaitTime);
+        exit(true);
     end;
 
     local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage): Boolean
@@ -474,6 +585,14 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ShopifyStore.TestField("Shopify Access Token");
 
         exit(ShopifyStore."Shopify Access Token");
+    end;
+
+    procedure IsValidShopUrl(ShopUrl: Text): Boolean
+    var
+        Regex: Codeunit Regex;
+        PatternLbl: Label '^(https)\:\/\/[a-zA-Z0-9][a-zA-Z0-9\-]*\.myshopify\.com[\/]*$', Locked = true;
+    begin
+        exit(Regex.IsMatch(ShopUrl, PatternLbl))
     end;
 }
 #endif
