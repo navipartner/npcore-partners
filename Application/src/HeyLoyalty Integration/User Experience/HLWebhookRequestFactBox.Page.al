@@ -11,7 +11,11 @@ page 6150802 "NPR HL Webhook Request FactBox"
     {
         area(content)
         {
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
             usercontrol(HLRequestDataUC; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
+#else
+            usercontrol(HLRequestDataUC; WebPageViewer)
+#endif
             {
                 ApplicationArea = NPRHeyLoyalty;
 

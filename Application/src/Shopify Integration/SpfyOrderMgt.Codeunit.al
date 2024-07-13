@@ -232,7 +232,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
     begin
+        If ShopifySetup.IsEmpty() then
+            exit;
         SetupJobQueues();
     end;
 

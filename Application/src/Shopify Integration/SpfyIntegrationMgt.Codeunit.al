@@ -214,6 +214,22 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", SecretDisplayName());
     end;
 
+    internal procedure RegisterWebhookHandlingAzureEntraApp()
+    var
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+        ClientId: Guid;
+        PermissionSets: List of [Code[20]];
+        ErrorTxt: Text;
+        ClientIdLbl: Label '{cc658235-645e-4fd3-a254-2f777077579a}', Locked = true;
+    begin
+        //Register NaviPartner Shopify Entra application and try to grant permissions
+        Evaluate(ClientId, ClientIdLbl);
+        PermissionSets.Add('NPR Spfy Webhook');
+        AADApplicationMgt.RegisterAzureADApplication(ClientId, 'Shopify Webhooks', PermissionSets);
+        if not AADApplicationMgt.TryGrantConsentToApp(ClientId, 'common', ErrorTxt) then
+            Error(ErrorTxt);
+    end;
+
     local procedure SecretDisplayName(): Text
     var
         SecretDisplayNameLbl: Label 'NaviPartner Shopify integration - %1', Comment = '%1 = today''s date', Locked = true;
@@ -228,12 +244,14 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     local procedure SpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
     begin
         DisableIntegration(NewCompanyName);
+        DeleteWebhookSubscriptions(NewCompanyName);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
     local procedure SpfyOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
     begin
         DisableIntegration(CompanyName);
+        DeleteWebhookSubscriptions(CompanyName);
     end;
 
     local procedure DisableIntegration(NewCompanyName: Text)
@@ -254,6 +272,15 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 ShopifyStore.Enabled := false;
                 ShopifyStore.Modify();
             until ShopifyStore.Next() = 0;
+    end;
+
+    local procedure DeleteWebhookSubscriptions(NewCompanyName: Text)
+    var
+        SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
+    begin
+        if (NewCompanyName <> '') and (NewCompanyName <> CompanyName()) then
+            SpfyWebhookSubscription.ChangeCompany(NewCompanyName);
+        SpfyWebhookSubscription.DeleteAll();
     end;
     #endregion
 #endif

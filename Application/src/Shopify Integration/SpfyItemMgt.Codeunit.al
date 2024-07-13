@@ -514,10 +514,10 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
     procedure ParseItem(ShopifyJToken: JsonToken; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     begin
-        exit(ParseItem_WithSkuKeyPath(ShopifyJToken, 'sku', ItemVariant, Sku));
+        exit(ParseItem(ShopifyJToken, 'sku', ItemVariant, Sku));
     end;
 
-    procedure ParseItem_WithSkuKeyPath(ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
+    procedure ParseItem(ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     var
         Item: Record Item;
         JsonHelper: Codeunit "NPR Json Helper";

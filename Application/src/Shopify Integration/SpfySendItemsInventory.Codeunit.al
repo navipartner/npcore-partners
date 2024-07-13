@@ -57,7 +57,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if not Success then
             Error(GetLastErrorText);
 
-        UpdateItemWithDataFromShopify(NcTask, ShopifyResponse);
+        UpdateItemWithDataFromShopify(NcTask, ShopifyResponse, false);
     end;
 
     local procedure SendItemVariant(var NcTask: Record "NPR Nc Task")
@@ -584,11 +584,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             SpfyStoreItemLink.TestField("Sync. to this Store");
     end;
 
-    local procedure UpdateItemWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken)
+    internal procedure UpdateItemWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken; CalledByWebhook: Boolean)
     var
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        xSpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         DataLogMgt: Codeunit "NPR Data Log Management";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
@@ -597,6 +596,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         OStream: OutStream;
         ShopifyItemID: Text[30];
         ShopifyProductDetailedDescr: Text;
+        ShopifyProductStatus: Text;
         ShopifyProductTitle: Text;
         VariantSku: Text;
         FirstVariant: Boolean;
@@ -607,6 +607,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 #pragma warning restore AA0139
         ShopifyProductTitle := JsonHelper.GetJText(ShopifyResponse, 'product.title', MaxStrLen(SpfyStoreItemLink."Shopify Name"), false);
         ShopifyProductDetailedDescr := JsonHelper.GetJText(ShopifyResponse, 'product.body_html', false);
+        ShopifyProductStatus := JsonHelper.GetJText(ShopifyResponse, 'product.status', false);
         ShopifyResponse.SelectToken('product.variants', ShopifyResponse);
         ShopifyVariants := ShopifyResponse.AsArray();
         BCIsNameDescriptionMaster := SpfyIntegrationMgt.IsSendShopifyNameAndDescription();
@@ -615,14 +616,25 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         foreach ShopifyVariant in ShopifyVariants do begin
             SpfyItemMgt.ParseItem(ShopifyVariant, ItemVariant, VariantSku);
             if FirstVariant then begin
-                SpfyStoreItemLink.Get(SpfyStoreItemLink.Type::Item, ItemVariant."Item No.", '', NcTask."Store Code");
-                xSpfyStoreItemLink := SpfyStoreItemLink;
+                SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
+                SpfyStoreItemLink."Item No." := ItemVariant."Item No.";
+                SpfyStoreItemLink."Variant Code" := '';
+                SpfyStoreItemLink."Shopify Store Code" := NcTask."Store Code";
+                if not SpfyStoreItemLink.Find() then begin
+                    SpfyStoreItemLink.Init();
+                    SpfyStoreItemLink.Insert();
+                end;
                 if NcTask.Type = NcTask.Type::Delete then begin
                     SpfyStoreItemLink."Synchronization Is Enabled" := false;
                     SpfyStoreItemLink."Sync. to this Store" := false;
-                end else
+                end else begin
+                    if CalledByWebhook then
+                        SpfyStoreItemLink."Sync. to this Store" := true;
                     SpfyStoreItemLink."Synchronization Is Enabled" := SpfyStoreItemLink."Sync. to this Store";
+                end;
 
+                if ShopifyProductStatus <> '' then
+                    if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(ShopifyProductStatus)) then;
                 if ((ShopifyProductTitle <> '') or not BCIsNameDescriptionMaster) and (SpfyStoreItemLink."Shopify Name" <> ShopifyProductTitle) then
                     SpfyStoreItemLink."Shopify Name" := CopyStr(ShopifyProductTitle, 1, MaxStrLen(SpfyStoreItemLink."Shopify Name"));
                 if (ShopifyProductDetailedDescr <> '') or not BCIsNameDescriptionMaster then begin

@@ -72,6 +72,13 @@ table 6150811 "NPR Spfy Store-Item Link"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Store".Enabled where(Code = field("Shopify Store Code")));
         }
+        field(140; "Shopify Status"; Option)
+        {
+            Caption = 'Shopify Status';
+            DataClassification = CustomerContent;
+            OptionMembers = " ",DRAFT,ACTIVE,ARCHIVED;
+            OptionCaption = ' ,Draft,Active,Archived';
+        }
     }
     keys
     {

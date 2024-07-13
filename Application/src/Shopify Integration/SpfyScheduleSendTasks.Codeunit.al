@@ -13,6 +13,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
+        if ShopifyStore.IsEmpty() then
+            exit;
         SetupTaskProcessingJobQueues(ShopifyStore);
     end;
 

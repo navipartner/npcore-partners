@@ -4,8 +4,10 @@ page 6184566 "NPR Spfy Stores"
     Extensible = false;
     Caption = 'Shopify Stores';
     PageType = List;
+    CardPageId = "NPR Spfy Store Card";
     SourceTable = "NPR Spfy Store";
-    UsageCategory = None;
+    UsageCategory = Administration;
+    ApplicationArea = NPRShopify;
     Editable = false;
 
     layout

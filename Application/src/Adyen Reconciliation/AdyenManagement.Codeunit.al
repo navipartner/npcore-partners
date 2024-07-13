@@ -473,88 +473,18 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure CreateSaaSSetup()
     var
-        AADApplication: Record "AAD Application";
-    begin
-        CreateAzureADAdyenApplication(AADApplication);
-        TryGrantPermission(AADApplication);
-    end;
-
-    local procedure CreateAzureADAdyenApplication(var AADApplication: Record "AAD Application")
-    var
-        AADApplicationInterface: Codeunit "AAD Application Interface";
-        MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Azure AD Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
-        UserDoestNotExistErr: Label 'The user associated with the Azure AD App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Azure AD App Client ID';
-        AppInfo: ModuleInfo;
-        AccessControl: Record "Access Control";
-        User: Record User;
-        ClientIdLbl: Label '{eb29ef3d-edea-44b1-b5f7-4bd4eb360c29}', Locked = true;
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
         ClientId: Guid;
+        PermissionSets: List of [Code[20]];
+        ErrorTxt: Text;
+        ClientIdLbl: Label '{eb29ef3d-edea-44b1-b5f7-4bd4eb360c29}', Locked = true;
     begin
-        if not (AADApplication.WritePermission() and AccessControl.WritePermission()) then
-            Error(MissingPermissionsErr, AADApplication.TableCaption(), AccessControl.TableCaption());
-
-        NavApp.GetCurrentModuleInfo(AppInfo);
+        //Register Azure AD Adyent Application and Try Grant Permissions
         Evaluate(ClientId, ClientIdLbl);
-        AADApplicationInterface.CreateAADApplication(
-            ClientId,
-            'Adyen Webhook',
-            CopyStr(AppInfo.Publisher, 1, 50),
-            true
-        );
-        AADApplication.Get(ClientId);
-        AADApplication."App ID" := AppInfo.Id;
-        AADApplication."App Name" := CopyStr(AppInfo.Name, 1, MaxStrLen(AADApplication."App Name"));
-        AADApplication.Modify();
-        Commit();
-
-        if (not User.Get(AADApplication."User ID")) then
-            Error(UserDoestNotExistErr, AADApplication."Client Id");
-
-        AddPermissionSet(AADApplication."User ID", 'NPR Adyen Webhook');
-
-        Commit();
-    end;
-
-    local procedure TryGrantPermission(var AADApplication: Record "AAD Application")
-    var
-        OAuth2: Codeunit OAuth2;
-        ErrLbl: Label 'An error occoured while granting access: %1';
-        ClientIdLbl: Label 'eb29ef3d-edea-44b1-b5f7-4bd4eb360c29', Locked = true;
-        ConsentUrlLbl: Label 'https://login.microsoftonline.com/common/adminconsent', Locked = true;
-        ConsentSuccess: Boolean;
-        PermissionError: Text;
-    begin
-        if (OAuth2.RequestClientCredentialsAdminPermissions(ClientIdLbl, ConsentUrlLbl, '', ConsentSuccess, PermissionError)) then begin
-            if (ConsentSuccess) then begin
-                AADApplication."Permission Granted" := True;
-                AADApplication.Modify();
-                exit;
-            end;
-            Error(ErrLbl, PermissionError);
-        end else begin
-            Error(ErrLbl, GetLastErrorText());
-        end;
-    end;
-
-    local procedure AddPermissionSet(UserSecurityId: Guid; PermissionSetId: Code[20])
-    var
-        AccessControl: Record "Access Control";
-        AggregatePermissionSet: Record "Aggregate Permission Set";
-    begin
-        AccessControl.SetRange("User Security ID", UserSecurityId);
-        AccessControl.SetRange("Role ID", PermissionSetId);
-        if (not AccessControl.IsEmpty()) then
-            exit;
-
-        AggregatePermissionSet.SetRange("Role ID", PermissionSetId);
-        AggregatePermissionSet.FindFirst();
-
-        AccessControl.Init();
-        AccessControl."User Security ID" := UserSecurityId;
-        AccessControl."Role ID" := PermissionSetId;
-        AccessControl.Scope := AggregatePermissionSet.Scope;
-        AccessControl."App ID" := AggregatePermissionSet."App ID";
-        AccessControl.Insert(true);
+        PermissionSets.Add('NPR Adyen Webhook');
+        AADApplicationMgt.RegisterAzureADApplication(ClientId, 'Adyen Webhook', PermissionSets);
+        if not AADApplicationMgt.TryGrantConsentToApp(ClientId, 'common', ErrorTxt) then
+            Error(ErrorTxt);
     end;
     #endregion
 

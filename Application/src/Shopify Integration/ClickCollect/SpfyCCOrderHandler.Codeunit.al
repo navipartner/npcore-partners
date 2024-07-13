@@ -233,7 +233,7 @@ codeunit 6184805 "NPR Spfy C&C Order Handler"
         foreach OrderLineJToken in OrderLinesJToken.AsArray() do begin
             TempOrderLines.init();
             TempOrderLines.Type := TempOrderLines.Type::Item;
-            if not SpfyItemMgt.ParseItem_WithSkuKeyPath(OrderLineJToken, 'ProductSKU', ItemVariant, ShopifySku) then
+            if not SpfyItemMgt.ParseItem(OrderLineJToken, 'ProductSKU', ItemVariant, ShopifySku) then
                 Error(UnknownSkuErr, ShopifySku);
             TempOrderLines."No." := ItemVariant."Item No.";
             TempOrderLines."Variant Code" := ItemVariant.Code;
