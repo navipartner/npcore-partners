@@ -301,6 +301,20 @@ page 6184553 "NPR Spfy Integration Setup"
                             SpfyIntegrationMgt.CreateAzureADApplicationSecret();
                         end;
                     }
+                    action("Register Webhook Handler App")
+                    {
+                        Caption = 'Register Webhook Handler App';
+                        ToolTip = 'Running this action will register the NaviPartner Shopify webhook handler Entra app and ask to give an admin concent. The action must be run by a user who is both an Azure Active Directory administrator and a BC administrator. You won’t be able to use Shopify webhooks until this action is completed.';
+                        ApplicationArea = NPRShopify;
+                        Image = Setup;
+
+                        trigger OnAction()
+                        var
+                            SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+                        begin
+                            SpfyIntegrationMgt.RegisterWebhookHandlingAzureEntraApp();
+                        end;
+                    }
                 }
             }
         }

@@ -33,7 +33,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Shopify Api Version';
             DataClassification = CustomerContent;
-            InitValue = '2024-01';
+            InitValue = '2024-04';
 
             trigger OnValidate()
             var

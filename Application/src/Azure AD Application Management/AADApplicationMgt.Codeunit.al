@@ -29,6 +29,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
         BufferToken: JsonToken;
         ApplicationId: Text;
         ApplicationObjectId: Text;
+        ErrorTxt: Text;
         Secret: Text;
         Expires: DateTime;
         AzureADTenant: Codeunit "Azure AD Tenant";
@@ -49,8 +50,8 @@ codeunit 6060060 "NPR AAD Application Mgt."
             Sleep(20000);
             Window.Close();
 
-            if (not TryGrantConsentToApp(ApplicationId)) then
-                Message(ErrorDuringAppConsentErr, GetLastErrorText());
+            if (not TryGrantConsentToApp(ApplicationId, AzureADTenant.GetAadTenantId(), ErrorTxt)) then
+                Message(ErrorDuringAppConsentErr, ErrorTxt);
         end;
 
         if (TryCreateAzureADSecret(ApplicationObjectId, SecretDisplayName, Secret, Expires)) then
@@ -79,19 +80,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
     local procedure CreateAzureADApplication(DisplayName: Text[50]; PermissionSets: List of [Code[20]]) AppJson: JsonObject
     var
-        AADApplicationInterface: Codeunit "AAD Application Interface";
-        AADApplication: Record "AAD Application";
         ClientGuid: Guid;
-        AppInfo: ModuleInfo;
-        AccessControl: Record "Access Control";
         BufferToken: JsonToken;
-        PermSet: Code[20];
-        User: Record User;
     begin
-        if not (AADApplication.WritePermission() and AccessControl.WritePermission()) then
-            Error(MissingPermissionsErr, AADApplication.TableCaption(), AccessControl.TableCaption());
-
-        NavApp.GetCurrentModuleInfo(AppInfo);
+        CheckPermissions();
 
         if (not TryCreateAzureADApplication(DisplayName, AppJson)) then
             Error(CouldNotCreateAADAppErr, GetLastErrorText());
@@ -99,14 +91,28 @@ codeunit 6060060 "NPR AAD Application Mgt."
         AppJson.SelectToken('appId', BufferToken);
         ClientGuid := BufferToken.AsValue().AsText();
 
+        RegisterAzureADApplication(ClientGuid, DisplayName, PermissionSets);
+    end;
+
+    internal procedure RegisterAzureADApplication(ClientID: Guid; DisplayName: Text[50]; PermissionSets: List of [Code[20]])
+    var
+        AADApplication: Record "AAD Application";
+        User: Record User;
+        AADApplicationInterface: Codeunit "AAD Application Interface";
+        AppInfo: ModuleInfo;
+        PermSet: Code[20];
+    begin
+        CheckPermissions();
+        NavApp.GetCurrentModuleInfo(AppInfo);
+
         AADApplicationInterface.CreateAADApplication(
-            ClientGuid,
+            ClientID,
             DisplayName,
             CopyStr(AppInfo.Publisher, 1, 50),
             true
         );
 
-        AADApplication.Get(ClientGuid);
+        AADApplication.Get(ClientID);
         AADApplication."App ID" := AppInfo.Id;
         AADApplication."App Name" := CopyStr(AppInfo.Name, 1, MaxStrLen(AADApplication."App Name"));
         AADApplication.Modify();
@@ -119,6 +125,15 @@ codeunit 6060060 "NPR AAD Application Mgt."
             AddPermissionSet(AADApplication."User ID", PermSet);
 
         Commit();
+    end;
+
+    local procedure CheckPermissions()
+    var
+        AADApplication: Record "AAD Application";
+        AccessControl: Record "Access Control";
+    begin
+        if not (AADApplication.WritePermission() and AccessControl.WritePermission()) then
+            Error(MissingPermissionsErr, AADApplication.TableCaption(), AccessControl.TableCaption());
     end;
 
     [NonDebuggable]
@@ -165,23 +180,30 @@ codeunit 6060060 "NPR AAD Application Mgt."
         AppJson.ReadFrom(ResponseTxt);
     end;
 
-    [TryFunction]
-    local procedure TryGrantConsentToApp(AppId: Text)
+    internal procedure TryGrantConsentToApp(ClientId: Guid; TenantId: Text; var PermissionGrantErrorTxt: Text): Boolean
     var
+        AADApplication: Record "AAD Application";
+        GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         OAuth2: Codeunit OAuth2;
         OAuthAuthorityUrl: Text;
-        AzureADTenant: Codeunit "Azure AD Tenant";
         Success: Boolean;
-        ErrorMsgTxt: Text;
     begin
-        OAuthAuthorityUrl := StrSubstNo('https://login.microsoftonline.com/%1/adminconsent', AzureADTenant.GetAadTenantId());
-        OAuth2.RequestClientCredentialsAdminPermissions(AppId, OAuthAuthorityUrl, '', Success, ErrorMsgTxt);
-
-        if (not Success) then
-            if (ErrorMsgTxt <> '') then
-                Error(ErrorMsgTxt)
-            else
-                Error(ConsentFailedErr);
+        Clear(PermissionGrantErrorTxt);
+        ClearLastError();
+        OAuthAuthorityUrl := StrSubstNo('https://login.microsoftonline.com/%1/adminconsent', TenantId);
+        if not OAuth2.RequestClientCredentialsAdminPermissions(GraphMgtGeneralTools.StripBrackets(Format(ClientId)), OAuthAuthorityUrl, '', Success, PermissionGrantErrorTxt) then
+            PermissionGrantErrorTxt := GetLastErrorText()
+        else
+            if Success then begin
+                if AADApplication.Get(ClientId) then begin
+                    AADApplication."Permission Granted" := True;
+                    AADApplication.Modify();
+                end;
+                exit(true);
+            end;
+        if PermissionGrantErrorTxt = '' then
+            PermissionGrantErrorTxt := ConsentFailedErr;
+        exit(false);
     end;
 
     [NonDebuggable]

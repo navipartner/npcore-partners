@@ -49,6 +49,12 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     ApplicationArea = NPRShopify;
                     Editable = false;
                 }
+                field("Shopify Status"; Rec."Shopify Status")
+                {
+                    ToolTip = 'Specifies the Shopify status of the item.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
                 field("Shopify Name"; Rec."Shopify Name")
                 {
                     ToolTip = 'Specifies the Shopify Name of the item.';
