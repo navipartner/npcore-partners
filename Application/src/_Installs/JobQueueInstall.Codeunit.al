@@ -157,10 +157,9 @@
 
     local procedure AddRSAuditJobQueue()
     var
-        JobQueueEntry: Record "Job Queue Entry";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
     begin
-        RSAuditMgt.AddRSAuditBackgroundJobQueue(JobQueueEntry, RSAuditMgt.IsRSFiscalActive(), true);
+        RSAuditMgt.AddRSAuditBackgroundJobQueue(RSAuditMgt.IsRSFiscalActive(), true);
     end;
 
     local procedure AddATFiscalJobQueues()
