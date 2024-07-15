@@ -20,6 +20,18 @@ codeunit 6151473 "NPR PG Interactions Log Mgt."
         LogStart(Log, PaymentLineSystemId, Log."Interaction Type"::Cancel);
     end;
 
+    internal procedure LogPayByLinkStart(var Log: Record "NPR PG Interaction Log Entry"; PaymentLineSystemId: Guid)
+    begin
+        Clear(Log);
+        LogStart(Log, PaymentLineSystemId, Log."Interaction Type"::"Issue Pay by Link");
+    end;
+
+    internal procedure LogPayByLinkCancelStart(var Log: Record "NPR PG Interaction Log Entry"; PaymentLineSystemId: Guid)
+    begin
+        Clear(Log);
+        LogStart(Log, PaymentLineSystemId, Log."Interaction Type"::"Cancel Pay by Link");
+    end;
+
     local procedure LogStart(var Log: Record "NPR PG Interaction Log Entry"; PaymentLineSystemId: Guid; OperationType: Option)
     begin
         Log.Init();

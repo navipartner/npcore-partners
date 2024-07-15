@@ -50,6 +50,11 @@
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Requested Amount"; Rec."Requested Amount")
+                {
+                    ToolTip = 'Specifies the value of the Requested Amount field';
+                    ApplicationArea = NPRRetail;
+                }
                 field(Amount; Rec.Amount)
                 {
                     ToolTip = 'Specifies the value of the Amount field';
@@ -69,6 +74,21 @@
                 field(Posted; Rec.Posted)
                 {
                     ToolTip = 'Specifies the value of the Posted field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Posting Error"; Rec."Posting Error")
+                {
+                    ToolTip = 'Specifies the value of the Posting Error field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Skip Posting"; Rec."Skip Posting")
+                {
+                    ToolTip = 'Specifies the value of the Skip Posting field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Try Posting Count"; Rec."Try Posting Count")
+                {
+                    ToolTip = 'Specifies the value of the Try Posting Count field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
@@ -100,8 +120,19 @@
                 }
                 field("Date Refunded"; Rec."Date Refunded")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Date Refunded field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Date Canceled"; Rec."Date Canceled")
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the value of the Date Canceled field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Date Authorized"; Rec."Date Authorized")
+                {
+                    Visible = true;
+                    ToolTip = 'Specifies the value of the Date Canceled field.';
                     ApplicationArea = NPRRetail;
                 }
 #if not BC17
@@ -117,6 +148,34 @@
                 {
                     ToolTip = 'Specifies if the payment is Reconciled in an Adyen Reconciliation Document.';
                     ApplicationArea = NPRRetail;
+                }
+                field("Pay by Link URL"; Rec."Pay by Link URL")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Pay by Link URL';
+                    Editable = false;
+                    trigger OnDrillDown()
+                    begin
+                        Hyperlink(Rec."Pay by Link URL");
+                    end;
+                }
+                field("Payment ID"; Rec."Payment ID")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Payment ID field.';
+                    Editable = false;
+                }
+                field("Manually Canceled Link"; Rec."Manually Canceled Link")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Manually Cancelled Link field.';
+                    Editable = false;
+                }
+                field("Expires At"; Rec."Expires At")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Expires At field.';
+                    Editable = false;
                 }
             }
         }
@@ -149,13 +208,16 @@
                 var
                     PaymentLine: Record "NPR Magento Payment Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
                 begin
                     if Rec."Date Captured" <> 0D then begin
                         if not Confirm(CapturePaymentAgainQst, false) then
                             exit;
                         Rec."Date Captured" := 0D;
                         CurrPage.Update(true);
-                    end;
+                    end else
+                        if not ConfirmManagement.GetResponseOrDefault(CapturePaymentQst, true) then
+                            exit;
 
                     PaymentLine := Rec;
                     MagentoPmtMgt.CapturePaymentLine(PaymentLine);
@@ -178,16 +240,52 @@
                 var
                     PaymentLine: Record "NPR Magento Payment Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
                 begin
                     if Rec."Date Refunded" <> 0D then begin
                         if not Confirm(RefundPaymentAgainQst, false) then
                             exit;
                         Rec."Date Refunded" := 0D;
                         CurrPage.Update(true);
-                    end;
+                    end else
+                        if not ConfirmManagement.GetResponseOrDefault(RefundPaymentQst, true) then
+                            exit;
 
                     PaymentLine := Rec;
                     MagentoPmtMgt.RefundPaymentLine(PaymentLine);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Cancel Payment")
+            {
+                Caption = 'Cancel Payment';
+                Image = Cancel;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = RefundEnabled;
+                ToolTip = 'Executes the Cancel Payment action';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    PaymentLine: Record "NPR Magento Payment Line";
+                    MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
+                begin
+                    Rec.TestField("Date Captured", 0D);
+                    if Rec."Date Canceled" <> 0D then begin
+                        if not Confirm(CancelPaymentAgainQst, false) then
+                            exit;
+                        Rec."Date Canceled" := 0D;
+                        CurrPage.Update(true);
+                    end else
+                        if not ConfirmManagement.GetResponseOrDefault(CancelPaymentQst, true) then
+                            exit;
+
+                    PaymentLine := Rec;
+                    MagentoPmtMgt.CancelPaymentLine(PaymentLine);
                     CurrPage.Update(false);
                 end;
             }
@@ -207,9 +305,67 @@
                 var
                     GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
                     MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
                 begin
+                    if not ConfirmManagement.GetResponseOrDefault(PostPaymentQst, true) then
+                        exit;
+
                     MagentoPmtMgt.PostPaymentLine(Rec, GenJnlPostLine);
                     Message(PaymentPostedMsg);
+                end;
+            }
+            action("Reset Posting Error")
+            {
+                Caption = 'Reset posting Error';
+                Image = ResetStatus;
+                Visible = (Rec."Posting Error" = true) OR (Rec."Skip Posting");
+                ToolTip = 'Resets all fields related to posting errors';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                begin
+                    MagentoPmtAdyenMgt.ResetErrorPostingStatus(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Set Skip Posting")
+            {
+                Caption = 'Set Skip Posting';
+                Image = CancelLine;
+                ToolTip = 'Sets field Skip Posting to true.';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                begin
+                    MagentoPmtAdyenMgt.SetSkipPosting(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
+
+            action("Cancel Pay by Link")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Cancel Pay by Link';
+                ToolTip = 'Cancel Pay by Link';
+                Image = Cancel;
+
+                trigger OnAction()
+                var
+                    PaybyLink: Interface "NPR Pay by Link";
+                    PayByLinkSetup: Record "NPR Pay By Link Setup";
+                    MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+                begin
+                    if not Confirm(CancelPayByLinkQst, false) then
+                        exit;
+
+                    PayByLinkSetup.Get();
+                    MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code");
+                    PaybyLink := MagentoPaymentGateway."Integration Type";
+                    PaybyLink.CancelPayByLink(Rec);
                 end;
             }
         }
@@ -254,6 +410,25 @@
                     Page.Run(0, PGInteractionLogEntry);
                 end;
             }
+            action("Show Posting Log")
+            {
+                Caption = 'Show Posting Log';
+                Image = Log;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Shows the posting log entries associated with the currently selected line';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    PGPostingLogEntry: Record "NPR PG Posting Log Entry";
+                begin
+                    PGPostingLogEntry.SetFilter("Payment Line System Id", Rec.SystemId);
+                    Page.Run(0, PGPostingLogEntry);
+                end;
+            }
             action("Document Card")
             {
                 Caption = 'Document Card';
@@ -272,6 +447,54 @@
                     MagentoPmtMgt.ShowDocumentCard(Rec);
                 end;
             }
+            group(PayByLink)
+            {
+                Caption = 'Pay by Link';
+                Image = LinkWeb;
+                action("NPR E-mail log")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Pay by Link E-mail log';
+                    Image = Email;
+                    ToolTip = 'Executes the Pay by Link E-mail log action.';
+                    trigger OnAction()
+                    var
+                        EmailManagement: Codeunit "NPR E-mail Management";
+                        RecRef: RecordRef;
+                    begin
+                        RecRef.GetTable(Rec);
+                        EmailManagement.RunEmailLog(RecRef);
+                    end;
+                }
+                action("NPR Check Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Check Pay by Link Status';
+                    ToolTip = 'Check Pay by Link Status.';
+                    Image = LinkWeb;
+
+                    trigger OnAction()
+                    var
+                        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                    begin
+                        MagentoPmtAdyenMgt.CheckIsPaid(Rec);
+                    end;
+                }
+                action("NPR Resend PayByLink")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Resend Pay by Link';
+                    ToolTip = 'Resend Pay by Link';
+                    Image = SendMail;
+
+                    trigger OnAction()
+                    var
+                        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                    begin
+                        MagentoPmtAdyenMgt.ResendPayByLink(Rec);
+                    end;
+                }
+            }
         }
     }
 
@@ -285,10 +508,16 @@
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #endif
         CapturePaymentAgainQst: Label 'Payment has already been Captured\Capture Again?';
+        CapturePaymentQst: Label 'Do you want to capture the payment?';
         CaptureEnabled: Boolean;
         RefundEnabled: Boolean;
         RefundPaymentAgainQst: Label 'Payment has already been Refunded\Refund Again?';
+        RefundPaymentQst: Label 'Do you want to refund the payment?';
+        CancelPaymentAgainQst: Label 'Payment has already been Canceled\Cancel Again?';
+        CancelPaymentQst: Label 'Do you want to cancel the payment?';
         PaymentPostedMsg: Label 'Payment Posted';
+        PostPaymentQst: Label 'Do you want to post the payment?';
+        CancelPayByLinkQst: Label 'Do you want to cancel the Pay by Link ?';
 
     local procedure SetGatewayEnabled()
     var

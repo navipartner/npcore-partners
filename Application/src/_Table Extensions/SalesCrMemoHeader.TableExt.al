@@ -121,4 +121,11 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
     }
+
+    internal procedure OpenMagentPaymentLines() LookUpOk: Boolean
+    var
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        MagentoPmtMgt.OpenMagentPaymentLinesFromSalesCreditMemoHeader(Rec);
+    end;
 }
