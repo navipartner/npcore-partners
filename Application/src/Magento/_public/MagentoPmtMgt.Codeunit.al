@@ -74,6 +74,14 @@
                     end;
                 _PaymentEventType::Refund:
                     PaymentLine."Date Refunded" := Today();
+                _PaymentEventType::Cancel:
+                    begin
+                        PaymentLine."Date Canceled" := Today();
+                        if PaymentLine."Date Captured" = 0D then begin
+                            PaymentLine.Amount := 0;
+                            PaymentLine."Requested Amount" := PaymentLine.Amount;
+                        end;
+                    end;
             end;
 
         OnAfterProcessingPaymentLine(PaymentLine, _PaymentEventType, Response);
@@ -90,9 +98,9 @@
 
     var
         _PaymentEventType: Option " ",Capture,Refund,Cancel;
-        Text000: Label 'Error during Payment Capture:\%1';
-        Text004: Label 'You may not invoice more than the paid amount %1.';
-        Text005: Label 'Error during Payment Refund:\%1';
+        Text000: Label 'Error during Payment Capture:\%1', Comment = '%1 = error message';
+        Text004: Label 'You may not invoice more than the paid amount %1.', Comment = '%1 = Paid Amount';
+        Text005: Label 'Error during Payment Refund:\%1', Comment = '%1 = error message';
         Text006: Label 'Document not Found';
         ErrorDuringOperationErr: Label 'An error occurred during the payment operation. Error message:\\%1', Comment = '%1 = error message';
 
@@ -149,6 +157,7 @@
             PaymentLine2."Document Type" := ToSalesHeader."Document Type";
             PaymentLine2."Document No." := ToSalesHeader."No.";
             PaymentLine2.Posted := false;
+            PaymentLine2."Last Amount" := 0;
             PaymentLine2."Posting Date" := ToSalesHeader."Posting Date";
             PaymentLine2.Insert(true);
 
@@ -171,6 +180,7 @@
     local procedure SalesHeaderOnDelete(var Rec: Record "Sales Header"; RunTrigger: Boolean)
     var
         PaymentLine: Record "NPR Magento Payment Line";
+        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
     begin
         if Rec.IsTemporary then
             exit;
@@ -183,12 +193,16 @@
         if PaymentLine.IsEmpty then
             exit;
 
-        if RunTrigger then begin
-            PaymentLine.FindSet();
-            repeat
-                CancelPaymentLine(PaymentLine);
-            until PaymentLine.Next() = 0;
-        end;
+        if RunTrigger then
+            if not Rec.IsCreditDocType() then begin
+                PaymentLine.FindSet();
+                repeat
+                    MagentoPmtAdyenMgt.CheckUnproccesedWebhook(PaymentLine);
+                    CancelPaymentLine(PaymentLine);
+                    MagentoPmtAdyenMgt.SetShowCancelMsg(false);
+                    MagentoPmtAdyenMgt.CancelPayByLink(PaymentLine);
+                until PaymentLine.Next() = 0;
+            end;
 
         PaymentLine.DeleteAll(true);
     end;
@@ -230,6 +244,27 @@
             Error(Text004, PaymentAmt);
 
         OnCheckPayment(SalesHeader);
+    end;
+
+    internal procedure OpenMagentPaymentLinesFromSalesHeader(SalesHeade: Record "Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLine.SetRange("Document No.", SalesHeade."No.");
+        PaymentLine.SetRange("Document Type", SalesHeade."Document Type");
+        Page.Run(0, PaymentLine);
+    end;
+
+    internal procedure OpenMagentPaymentLinesFromSalesCreditMemoHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Cr.Memo Header");
+        PaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        Page.Run(0, PaymentLine);
     end;
 
     local procedure HasAllowAdjustAmount(SalesHeader: Record "Sales Header"): Boolean
@@ -627,7 +662,21 @@
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         PaymentLine.Posted := true;
         PaymentLine.Modify();
+        InsertPostingLog(PaymentLine, true);
         Commit();
+    end;
+
+    procedure InsertPostingLog(var MagentoPaymentLine: Record "NPR Magento Payment Line"; Success: Boolean)
+    var
+        PGPostingLogEntry: Record "NPR PG Posting Log Entry";
+    begin
+        PGPostingLogEntry.Init();
+        PGPostingLogEntry."Payment Line System Id" := MagentoPaymentLine.SystemId;
+        PGPostingLogEntry.Success := Success;
+        if not Success then
+            PGPostingLogEntry."Error Description" := CopyStr(GetLastErrorText(), 1, MaxStrLen(PGPostingLogEntry."Error Description"));
+        PGPostingLogEntry."Posting Timestamp" := CurrentDateTime();
+        PGPostingLogEntry.Insert();
     end;
 
     local procedure PostPaymentLines(var SalesHeader: Record "Sales Header"; DocNo: Code[20]; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
@@ -703,6 +752,8 @@
         GenJnlLine."Shortcut Dimension 2 Code" := SalesInvHeader."Shortcut Dimension 2 Code";
         GenJnlLine."Dimension Set ID" := SalesInvHeader."Dimension Set ID";
     end;
+
+
     #endregion
 
     #region Capture
@@ -746,9 +797,6 @@
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
-        if SalesInvoiceHeader."Order No." = '' then
-            exit;
-
         PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
         PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
@@ -879,7 +927,7 @@
     #endregion
 
     #region Cancel
-    local procedure CancelPaymentLine(var PaymentLine: Record "NPR Magento Payment Line")
+    procedure CancelPaymentLine(var PaymentLine: Record "NPR Magento Payment Line")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
@@ -889,8 +937,9 @@
             exit;
         if not PaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             exit;
-        if PaymentLine.Amount = 0 then
+        if PaymentLine.Amount = 0 then begin
             exit;
+        end;
         if (not PaymentGateway."Enable Cancel") then
             exit;
 

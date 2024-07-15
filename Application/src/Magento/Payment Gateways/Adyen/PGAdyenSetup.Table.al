@@ -53,6 +53,8 @@ table 6151466 "NPR PG Adyen Setup"
     var
         UnsupportedEnvironmentErr: Label 'The environment (%1) provided is not supported', Comment = '%1 = environment type';
 
+
+
     [NonDebuggable]
     internal procedure GetApiPassword() PasswordValue: Text
     begin
@@ -96,6 +98,20 @@ table 6151466 "NPR PG Adyen Setup"
                 begin
                     Rec.TestField("API URL Prefix");
                     exit(StrSubstNo('https://%1-pal-live.adyenpayments.com/pal/servlet/Payment/V49/', Rec."API URL Prefix"));
+                end;
+            else
+                Error(UnsupportedEnvironmentErr, Format(Rec.Environment));
+        end;
+    end;
+
+    internal procedure GetAPIPayByLinkUrl(): Text
+    begin
+        case Rec.Environment of
+            Rec.Environment::Test:
+                exit('https://checkout-test.adyen.com/v71/paymentLinks');
+            Rec.Environment::Production:
+                begin
+                    exit('https://checkout.adyen.com/v71/paymentLinks');
                 end;
             else
                 Error(UnsupportedEnvironmentErr, Format(Rec.Environment));

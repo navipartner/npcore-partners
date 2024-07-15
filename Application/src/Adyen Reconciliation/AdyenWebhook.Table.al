@@ -53,7 +53,7 @@ table 6150880 "NPR Adyen Webhook"
         }
         field(60; "PSP Reference"; Text[100])
         {
-            Caption = 'PSP Reference';
+            Caption = 'Event Reference';
             DataClassification = CustomerContent;
         }
         field(70; "Request Data"; Blob)
@@ -79,6 +79,11 @@ table 6150880 "NPR Adyen Webhook"
             Caption = 'Webhook Reference';
             DataClassification = CustomerContent;
         }
+        field(110; "Webhook Type"; enum "NPR Adyen Webhook Request Type")
+        {
+            Caption = 'Webhook Type';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -87,6 +92,9 @@ table 6150880 "NPR Adyen Webhook"
             Clustered = true;
         }
         key(Key2; "Event Code", Status)
+        {
+        }
+        key(Key3; "Event Code", "Webhook Type", Status)
         {
         }
     }
