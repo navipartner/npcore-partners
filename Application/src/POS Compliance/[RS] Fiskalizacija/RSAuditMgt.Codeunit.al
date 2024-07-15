@@ -54,11 +54,11 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         POSEntry: Record "NPR POS Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
-        POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSPaymentLine: Codeunit "NPR POS Payment Line";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         POSUnit: Record "NPR POS Unit";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
         RSPTFPITryPrint: Codeunit "NPR RS Fiscal Thermal Print";
         RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
@@ -66,7 +66,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
-
         if not GetPOSEntryFromSalesTicketNo(SalePOS."Sales Ticket No.", POSEntry) then
             exit;
         if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
@@ -112,7 +111,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
-
         if not GetPOSEntryFromSalesTicketNo(SalePOS."Sales Ticket No.", POSEntry) then
             exit;
         if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
@@ -171,6 +169,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSAuditEnabled(POSAuditProfile.Code) then
             exit;
+
         OnActionShowSetup();
     end;
 
@@ -181,6 +180,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesHeader."NPR RS POS Unit" := SalePOS."Register No.";
         RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
@@ -188,21 +188,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
     local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
-    var
-        Item: Record Item;
     begin
         if not IsRSFiscalActive() then
             exit;
-        if not EanBoxEvent.Get(EventCodeItemGtin()) then begin
-            EanBoxEvent.Init();
-            EanBoxEvent.Code := EventCodeItemGtin();
-            EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
-            EanBoxEvent.Description := CopyStr(Item.FieldCaption(GTIN), 1, MaxStrLen(EanBoxEvent.Description));
-            EanBoxEvent."Action Code" := CopyStr(Format(Enum::"NPR POS Workflow"::ITEM), 1, MaxStrLen(EanBoxEvent."Action Code"));
-            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-            EanBoxEvent."Event Codeunit" := Codeunit::"NPR POS Action: Insert Item";
-            EanBoxEvent.Insert(true);
-        end;
+
+        if EanBoxEvent.Get(EventCodeItemGtin()) then
+            exit;
+        InsertEanBoxEvent();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
@@ -210,6 +202,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+
         case EanBoxEvent.Code of
             EventCodeItemGtin():
                 begin
@@ -282,12 +275,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
-
         if not RetailLocationExistsOnSalesLines then
             exit;
 
         case SalesHeader."Document Type" of
-            SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
+            SalesHeader."Document Type"::Quote,
+            SalesHeader."Document Type"::Order,
+            SalesHeader."Document Type"::Invoice:
                 begin
                     RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
                     if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::" ", RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Refund"] then
@@ -306,8 +300,11 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RetailLocationExistsOnSalesLines then
             exit;
+
         case SalesHeader."Document Type" of
-            SalesHeader."Document Type"::Quote, SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
+            SalesHeader."Document Type"::Quote,
+            SalesHeader."Document Type"::Order,
+            SalesHeader."Document Type"::Invoice:
                 begin
                     RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
                     if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Sales"] then
@@ -326,6 +323,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RetailLocationExistsOnSalesLines then
             exit;
+
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
         if RSAuxSalesHeader."NPR RS Audit Entry" in [RSAuxSalesHeader."NPR RS Audit Entry"::"Proforma Sales"] then
             RSTaxCommunicationMgt.CreateProformaRefund(Rec, false);
@@ -347,6 +345,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         if SalesInvHdrNo <> '' then
             RSTaxCommunicationMgt.CreateNormalSale(SalesInvHdrNo);
+
         if SalesCrMemoHdrNo <> '' then
             RSTaxCommunicationMgt.CreateNormalRefund(SalesCrMemoHdrNo);
     end;
@@ -362,6 +361,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RetailLocationExistsOnSalesLines then
             exit;
+
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvoiceHeader);
         RSAuxSalesHeader.TransferFields(RSAuxSalesInvHeader, false);
@@ -378,6 +378,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+
         Customer.Get(Rec."Sell-to Customer No.");
         if Customer."VAT Registration No." <> '' then begin
             RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
@@ -396,6 +397,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not IsRSFiscalActive() then
             exit;
+
         if RSAuxSalesInvHeader.Get(Rec."No.") then
             RSAuxSalesInvHeader.Delete();
     end;
@@ -410,6 +412,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RetailLocationExistsOnSalesLines then
             exit;
+
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(SalesInvHeader);
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesInvHeader.TransferFields(RSAuxSalesHeader, false);
@@ -426,6 +429,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RetailLocationExistsOnSalesLines then
             exit;
+
         RSAuxSalesCrMemoHeader.ReadRSAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesCrMemoHeader.TransferFields(RSAuxSalesHeader, false);
@@ -439,7 +443,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
-
         if not RetailLocationExistsOnSalesLines then
             exit;
 
@@ -450,10 +453,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post Prepayments", 'OnAfterPostPrepaymentsOnBeforeThrowPreviewModeError', '', false, false)]
     local procedure OnAfterPostPrepaymentsOnBeforeThrowPreviewModeError(var SalesHeader: Record "Sales Header"; var SalesInvHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean);
     var
-        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RSTaxCommunicationMgt: Codeunit "NPR RS Tax Communication Mgt.";
     begin
         CheckSalesLinesRetailLocation(SalesHeader);
         if not RetailLocationExistsOnSalesLines then
@@ -463,17 +466,20 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         RSAuxSalesInvHeader.TransferFields(RSAuxSalesHeader, false);
         RSAuxSalesInvHeader.SaveRSAuxSalesInvHeaderFields();
+
         RSPOSAuditLogAuxInfo.SetRange("Source Document Type", RSPOSAuditLogAuxInfo."Source Document Type"::Invoice);
         RSPOSAuditLogAuxInfo.SetRange("Source Document No.", SalesInvHeader."No.");
         if not RSPOSAuditLogAuxInfo.FindFirst() then
             InsertRSPOSAuditLogAuxInfoFromSalesInvHeader(RSPOSAuditLogAuxInfo, SalesInvHeader);
+
         RSTaxCommunicationMgt.CreatePrepaymentSale(RSPOSAuditLogAuxInfo);
     end;
     #endregion
 
     #region Job Queue
-    procedure AddRSAuditBackgroundJobQueue(var JobQueueEntry: Record "Job Queue Entry"; Enable: Boolean; Silent: Boolean) Success: Boolean
+    procedure AddRSAuditBackgroundJobQueue(Enable: Boolean; Silent: Boolean) Success: Boolean
     var
+        JobQueueEntry: Record "Job Queue Entry";
         OpenJobQueueQst: Label 'A job queue entry to automate fiscalization tasks has been created.\\Do you want to open the Job Queue Entry Setup page now?';
     begin
         Success := InitRSAuditBackgroundJobQueue(JobQueueEntry, Enable);
@@ -532,10 +538,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
     begin
-        AddRSAuditBackgroundJobQueue(JobQueueEntry, IsRSFiscalActive(), true);
+        AddRSAuditBackgroundJobQueue(IsRSFiscalActive(), true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
@@ -543,6 +547,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if Handled then
             exit;
+
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
            (JobQueueEntry."Object ID to Run" = Codeunit::"NPR RS Fiscal BG Comm. Batch")
         then begin
@@ -598,6 +603,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit(false);
         if Initialized then
             exit(Enabled);
+
         Initialized := true;
         Enabled := true;
         exit(true);
@@ -631,10 +637,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
         ShouldCreateRefundFiscalBillCopy: Boolean;
     begin
         if not POSEntry.Get(POSEntryNo) then
-            exit(ShouldCreateRefundFiscalBillCopy);
-
+            exit(false);
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"]) then
-            exit(ShouldCreateRefundFiscalBillCopy);
+            exit(false);
 
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         if POSEntryPaymentLine.FindSet() then
@@ -655,14 +660,17 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit(false);
         if not (RSPaymentMethodMapping."RS Payment Method" in [RSPaymentMethodMapping."RS Payment Method"::Cash]) then
             exit(false);
+
         exit(true);
     end;
 
     local procedure GetPOSEntryFromSalesTicketNo(SalesTicketNo: Code[20]; var POSEntry: Record "NPR POS Entry"): Boolean
     begin
+        POSEntry.SetCurrentKey("Document No.");
         POSEntry.SetFilter("Document No.", '=%1', SalesTicketNo);
         if (POSEntry.IsEmpty()) then
             exit(false);
+
         exit(POSEntry.FindFirst());
     end;
     #endregion
@@ -678,6 +686,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSFiscalizationSetup.Get();
         if RSFiscalizationSetup."Allow Offline Use" then
             exit;
+
         VerifyPinResultTxt := RSTaxCommunicationMgt.VerifyPIN(POSStoreNo);
         if VerifyPinResultTxt <> TaxPINSuccessCode then
             Error(VerifyPinResultTxt);
@@ -738,9 +747,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
-
-        CheckSalesLinesRetailLocation(SalesHeader);
-        if not RetailLocationExistsOnSalesLines then
+        if not CheckSalesLinesRetailLocation(SalesHeader) then
             exit;
 
         SalesHeader.TestField("Salesperson Code");
@@ -750,6 +757,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSUnit.Get(RSAuxSalesHeader."NPR RS POS Unit");
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             Error(NotRSAuditProfileErr, POSUnit."No.");
+
         RSPOSUnitMapping.Get(POSUnit."No.");
         RSPOSUnitMapping.TestField("RS Sandbox JID");
         RSPOSUnitMapping.TestField("RS Sandbox PIN");
@@ -791,6 +799,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit(false);
         if RSAuxSalesInvHeader."NPR RS POS Unit" = '' then
             exit(false);
+
         POSUnit.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
         RSPOSUnitMapping.Get(POSUnit."No.");
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
@@ -838,6 +847,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     begin
         if not IsRSFiscalActive() then
             exit;
+
         RSPOSAuditLogAuxInfo.SetRange("POS Store Code", OldPOSStore.Code);
         if not RSPOSAuditLogAuxInfo.IsEmpty() then
             Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, RSPOSAuditLogAuxInfo.TableCaption());
@@ -906,32 +916,36 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo."POS Entry Type" := POSEntry."Entry Type";
         RSPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
         RSFiscalizationSetup.Get();
+
         case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL;
         end;
+
         case POSEntry."Amount Incl. Tax" > 0 of
             true:
                 RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
             false:
                 RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
         end;
+
         if POSEntry."Customer No." <> '' then begin
             Customer.Get(POSEntry."Customer No.");
             RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
             RSPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
         end;
+
         RSPOSAuditLogAuxInfo.Insert();
     end;
 
     local procedure InsertRSPOSAuditLogAuxInfoFromSalesInvHeader(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         Customer: Record Customer;
-        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
-        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         POSUnit: Record "NPR POS Unit";
+        RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         CustomerVATRegNoRSLabel: Label '10:', Locked = true;
     begin
         RSPOSAuditLogAuxInfo.Init();
@@ -948,23 +962,27 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSAuditLogAuxInfo."POS Entry Type" := RSPOSAuditLogAuxInfo."POS Entry Type"::"Direct Sale";
         RSPOSAuditLogAuxInfo."Prepayment Order No." := SalesInvoiceHeader."Prepayment Order No.";
         RSFiscalizationSetup.Get();
+
         case RSFiscalizationSetup.Training of
             true:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::TRAINING;
             false:
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::ADVANCE;
         end;
+
         case SalesInvoiceHeader."Amount Including VAT" > 0 of
             true:
                 RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
             false:
                 RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND;
         end;
+
         if SalesInvoiceHeader."Sell-to Customer No." <> '' then begin
             Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
             RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
             RSPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
         end;
+
         RSPOSAuditLogAuxInfo.Insert();
     end;
 
@@ -979,6 +997,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not RSPOSSale.Get(SalePOS.SystemId) then
             exit;
+
         if RSPOSSale."RS Customer Identification" <> '' then
             RSPOSAuditLogAuxInfo."Customer Identification" := RSPOSSale."RS Customer Identification";
         RSPOSAuditLogAuxInfo."Additional Customer Field" := RSPOSSale."RS Add. Customer Field";
@@ -988,9 +1007,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
     local procedure GetPOSEntryNoFromAuditLog(Context: Codeunit "NPR POS JSON Helper"): Code[20]
     var
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
-        SalesTicketNo: Text[30];
         SalesTicketPartsList: List of [Text];
         SalesTicketPart: Text;
+        SalesTicketNo: Text[30];
         TextBuilder: TextBuilder;
     begin
         SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
@@ -1020,10 +1039,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSUnit.Get(POSSaleRecord."Register No.");
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
+
         if not GLAccount.Get(TempVoucher."Account No.") then
             Error(VoucherAccountNoNotSetErr);
+
         GLAccount.TestField("VAT Prod. Posting Group");
         GLAccount.TestField("VAT Bus. Posting Group");
+
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS."VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
         SaleLinePOS."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
@@ -1044,33 +1066,50 @@ codeunit 6059942 "NPR RS Audit Mgt."
             Message(AuditLogNotExistingMsg);
             exit;
         end;
+
         if RSPOSAuditLogAuxInfo.Signature = '' then begin
             Message(FiscalNotSentMsg);
             exit;
         end;
+        
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
-    local procedure CheckSalesLinesRetailLocation(SalesHeader: Record "Sales Header")
+    local procedure CheckSalesLinesRetailLocation(SalesHeader: Record "Sales Header"): Boolean
     var
-        SalesLines: Record "Sales Line";
         Location: Record Location;
+        SalesLines: Record "Sales Line";
     begin
         RetailLocationExistsOnSalesLines := false;
         SalesLines.SetCurrentKey("Document Type", "Document No.", "Location Code");
-        SalesLines.SetLoadFields("Document No.", "Location Code", Type);
+        SalesLines.SetLoadFields("Location Code");
         SalesLines.SetFilter(Type, '%1|%2', SalesLines.Type::Item, SalesLines.Type::"Charge (Item)");
         SalesLines.SetRange("Document No.", SalesHeader."No.");
         if not SalesLines.FindSet() then
-            exit;
+            exit(RetailLocationExistsOnSalesLines);
 
         repeat
             if Location.Get(SalesLines."Location Code") then
                 if Location."NPR Retail Location" then begin
                     RetailLocationExistsOnSalesLines := true;
-                    exit;
+                    exit(RetailLocationExistsOnSalesLines);
                 end;
         until SalesLines.Next() = 0;
+        exit(RetailLocationExistsOnSalesLines);
+    end;
+
+    local procedure InsertEanBoxEvent()
+    var
+        EanBoxEvent: Record "NPR Ean Box Event";
+        Item: Record Item;
+    begin
+        EanBoxEvent.Code := EventCodeItemGtin();
+        EanBoxEvent."Module Name" := CopyStr(Item.TableCaption, 1, MaxStrLen(EanBoxEvent."Module Name"));
+        EanBoxEvent.Description := CopyStr(Item.FieldCaption(GTIN), 1, MaxStrLen(EanBoxEvent.Description));
+        EanBoxEvent."Action Code" := CopyStr(Format(Enum::"NPR POS Workflow"::ITEM), 1, MaxStrLen(EanBoxEvent."Action Code"));
+        EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+        EanBoxEvent."Event Codeunit" := Codeunit::"NPR POS Action: Insert Item";
+        EanBoxEvent.Insert(true);
     end;
     #endregion
 }
