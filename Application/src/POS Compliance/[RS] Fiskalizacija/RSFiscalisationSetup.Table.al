@@ -20,11 +20,10 @@ table 6059861 "NPR RS Fiscalisation Setup"
 
             trigger OnValidate()
             var
-                JobQueueEntry: Record "Job Queue Entry";
                 RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
             begin
                 Modify();
-                RSAuditMgt.AddRSAuditBackgroundJobQueue(JobQueueEntry, "Enable RS Fiscal", false)
+                RSAuditMgt.AddRSAuditBackgroundJobQueue("Enable RS Fiscal", false)
             end;
         }
         field(10; "Sandbox URL"; Text[100])
