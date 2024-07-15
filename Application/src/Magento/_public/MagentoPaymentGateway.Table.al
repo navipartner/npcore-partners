@@ -40,6 +40,7 @@
             DataClassification = CustomerContent;
             InitValue = false;
         }
+
         #region Removed fields
         field(5; "Api Url"; Text[250])
         {

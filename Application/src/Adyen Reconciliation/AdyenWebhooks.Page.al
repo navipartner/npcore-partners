@@ -72,6 +72,11 @@ page 6184665 "NPR Adyen Webhooks"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Webhook Reference ID.';
                 }
+                field("Webhook Type"; Rec."Webhook Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Webhook Type';
+                }
             }
         }
         area(factboxes)
@@ -112,6 +117,96 @@ page 6184665 "NPR Adyen Webhooks"
                     if not Confirm(ConfirmCancelationLbl) then
                         exit;
                     AdyenWebhook.ModifyAll(Status, AdyenWebhook.Status::Canceled);
+                    CurrPage.Update(false);
+                end;
+            }
+            action(New)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'New';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = New;
+                ToolTip = 'Running this action will set the selected Webhook/Webhooks Status to ''New''.';
+
+                trigger OnAction()
+                var
+                    AdyenWebhook: Record "NPR Adyen Webhook";
+                    ConfirmStatusNewLbl: Label 'This will set the selected Webhook/Webhooks status to New.\\Do you wish to proceed?';
+                begin
+                    CurrPage.SetSelectionFilter(AdyenWebhook);
+                    AdyenWebhook.SetFilter(Status, '%1|%2', AdyenWebhook.Status::Canceled, AdyenWebhook.Status::Error);
+                    if AdyenWebhook.IsEmpty() then
+                        exit;
+                    if not Confirm(ConfirmStatusNewLbl) then
+                        exit;
+                    AdyenWebhook.ModifyAll(Status, AdyenWebhook.Status::New);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Error")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Error';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Error;
+                ToolTip = 'Running this action will set the selected Webhook/Webhooks Status to ''Error''.';
+
+                trigger OnAction()
+                var
+                    AdyenWebhook: Record "NPR Adyen Webhook";
+                    ConfirmStatusErrorLbl: Label 'This will set the selected Webhook/Webhooks status to Error.\\Do you wish to proceed?';
+                begin
+                    CurrPage.SetSelectionFilter(AdyenWebhook);
+                    AdyenWebhook.SetFilter(Status, '%1|%2', AdyenWebhook.Status::Canceled, AdyenWebhook.Status::New);
+                    if AdyenWebhook.IsEmpty() then
+                        exit;
+                    if not Confirm(ConfirmStatusErrorLbl) then
+                        exit;
+                    AdyenWebhook.ModifyAll(Status, AdyenWebhook.Status::Error);
+                    CurrPage.Update(false);
+                end;
+            }
+
+            action(Process)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Process';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Process;
+                ToolTip = 'Running this action will process the selected Webhook/Webhooks';
+
+                trigger OnAction()
+                var
+                    AdyenWebhook: Record "NPR Adyen Webhook";
+                    ConfirmProcessLbl: Label 'This will process the selected Webhook/Webhooks.\\Do you wish to proceed?';
+                    AdyenWebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
+                    AdyenManagement: Codeunit "NPR Adyen Management";
+                    LogType: enum "NPR Adyen Webhook Log Type";
+                begin
+                    CurrPage.SetSelectionFilter(AdyenWebhook);
+                    AdyenWebhook.SetFilter(Status, '%1|%2|%3', AdyenWebhook.Status::Canceled, AdyenWebhook.Status::New, AdyenWebhook.Status::Error);
+                    if AdyenWebhook.IsEmpty() then
+                        exit;
+                    if not Confirm(ConfirmProcessLbl) then
+                        exit;
+                    if AdyenWebhook.FindSet() then
+                        repeat
+                            if not AdyenWebhookProcessing.Run(AdyenWebhook) then begin
+                                AdyenManagement.CreateGeneralLog(LogType::Error, false, GetLastErrorText(), AdyenWebhook."Entry No.");
+                                AdyenWebhook.Status := AdyenWebhook.Status::Error;
+                                AdyenWebhook.Modify();
+                                Commit();
+                            end;
+                        until AdyenWebhook.Next() = 0;
                     CurrPage.Update(false);
                 end;
             }

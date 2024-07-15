@@ -159,6 +159,13 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
 
     }
 
+    internal procedure OpenMagentPaymentLines() LookUpOk: Boolean
+    var
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+    begin
+        MagentoPmtMgt.OpenMagentPaymentLinesFromSalesHeader(Rec);
+    end;
+
     internal procedure SetPreviewModePosting(IsPreviewMode: Boolean)
     begin
         PreviewModePosting := IsPreviewMode;
@@ -171,4 +178,5 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
 
     var
         PreviewModePosting: Boolean;
+
 }

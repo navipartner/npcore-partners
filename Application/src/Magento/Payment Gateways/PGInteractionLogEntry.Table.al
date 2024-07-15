@@ -24,8 +24,8 @@ table 6151473 "NPR PG Interaction Log Entry"
         {
             Caption = 'Interaction Type';
             DataClassification = CustomerContent;
-            OptionMembers = Capture,Refund,Cancel;
-            OptionCaption = 'Capture,Refund,Cancel';
+            OptionMembers = Capture,Refund,Cancel,"Issue Pay by Link","Cancel Pay by Link";
+            OptionCaption = 'Capture,Refund,Cancel,Issue Pay by Link,Cancel Pay by Link';
         }
         field(5; "In Progress"; Boolean)
         {

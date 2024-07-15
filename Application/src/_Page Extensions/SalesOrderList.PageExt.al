@@ -27,6 +27,61 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
             }
         }
     }
+
+    actions
+    {
+        addlast(navigation)
+        {
+            group("NPR PayByLink Navigation")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+
+                action("NPR Payment Lines")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Payment Lines';
+                    ToolTip = 'View Pay by Link Payment Lines';
+                    Image = PaymentHistory;
+
+                    trigger OnAction()
+                    begin
+                        Rec.OpenMagentPaymentLines();
+                    end;
+                }
+            }
+        }
+        addafter("&Print")
+        {
+            group("NPR PayByLink")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+
+                action("NPR Pay by link")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Pay by Link';
+                    ToolTip = 'Pay by Link.';
+                    Image = LinkWeb;
+
+                    trigger OnAction()
+                    var
+                        PaybyLink: Interface "NPR Pay by Link";
+                        PayByLinkSetup: Record "NPR Pay By Link Setup";
+                        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+                    begin
+                        PayByLinkSetup.Get();
+                        MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code");
+                        PaybyLink := MagentoPaymentGateway."Integration Type";
+                        PaybyLink.SetDocument(Rec);
+                        PaybyLink.SetShowDialog();
+                        PaybyLink.IssuePayByLink();
+                    end;
+                }
+            }
+        }
+    }
     var
         HasNotes: Boolean;
 }

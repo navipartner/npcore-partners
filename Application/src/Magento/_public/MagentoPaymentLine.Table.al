@@ -165,6 +165,56 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR Adyen Recon. Line"."Posting No.";
         }
+        field(290; "Pay by Link URL"; Text[100])
+        {
+            Caption = 'Pay by Link URL';
+            DataClassification = CustomerContent;
+        }
+        field(300; "Payment ID"; Code[20])
+        {
+            Caption = 'Payment ID';
+            DataClassification = CustomerContent;
+        }
+        field(310; "Requested Amount"; Decimal)
+        {
+            Caption = 'Requested Amount';
+            DataClassification = CustomerContent;
+        }
+        field(320; "Date Canceled"; Date)
+        {
+            Caption = 'Date Canceled';
+            DataClassification = CustomerContent;
+        }
+        field(330; "Date Authorized"; Date)
+        {
+            Caption = 'Date Authorized';
+            DataClassification = CustomerContent;
+        }
+        field(340; "Manually Canceled Link"; Boolean)
+        {
+            Caption = 'Manually Canceled Link';
+            DataClassification = CustomerContent;
+        }
+        field(350; "Expires At"; DateTime)
+        {
+            Caption = 'Expires At';
+            DataClassification = CustomerContent;
+        }
+        field(360; "Posting Error"; Boolean)
+        {
+            Caption = 'Posting Error';
+            DataClassification = CustomerContent;
+        }
+        field(370; "Skip Posting"; Boolean)
+        {
+            Caption = 'Skip Posting';
+            DataClassification = CustomerContent;
+        }
+        field(380; "Try Posting Count"; Integer)
+        {
+            Caption = 'Try Posting Count';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

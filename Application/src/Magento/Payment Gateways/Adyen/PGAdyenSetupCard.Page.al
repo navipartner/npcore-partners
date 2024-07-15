@@ -3,8 +3,9 @@ page 6151466 "NPR PG Adyen Setup Card"
     Extensible = False;
     Caption = 'Payment Integration Adyen Setup';
     PageType = Card;
-    UsageCategory = None;
+    UsageCategory = Administration;
     SourceTable = "NPR PG Adyen Setup";
+    ApplicationArea = NPRRetail;
 
     layout
     {
@@ -61,6 +62,7 @@ page 6151466 "NPR PG Adyen Setup Card"
                     end;
                 }
             }
+
         }
     }
 

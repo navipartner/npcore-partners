@@ -154,6 +154,62 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 end;
             }
         }
+        addafter("NPR SendSMS")
+        {
+            group("NPR PayByLink")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+
+                action("NPR Pay by link")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Pay by link';
+                    ToolTip = 'Pay by link.';
+                    Image = LinkWeb;
+
+                    trigger OnAction()
+                    var
+                        PaybyLink: Interface "NPR Pay by Link";
+                        PayByLinkSetup: Record "NPR Pay By Link Setup";
+                        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+                    begin
+                        PayByLinkSetup.Get();
+                        MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code");
+                        PaybyLink := MagentoPaymentGateway."Integration Type";
+                        PaybyLink.SetDocument(Rec);
+                        PaybyLink.SetShowDialog();
+                        PaybyLink.IssuePayByLink();
+                    end;
+                }
+            }
+        }
+        addlast(navigation)
+        {
+            group("NPR PayByLink Navigation")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+                action("NPR Payment Lines")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Payment Lines';
+                    Image = PaymentHistory;
+                    ToolTip = 'View Pay by Link Payment Lines';
+
+
+                    trigger OnAction()
+                    var
+                        MagentoPaymentLine: Record "NPR Magento Payment Line";
+                    begin
+                        MagentoPaymentLine.Reset();
+                        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+                        MagentoPaymentLine.SetRange("Document No.", Rec."No.");
+                        Page.Run(Page::"NPR Magento Payment Line List", MagentoPaymentLine);
+                    end;
+                }
+            }
+        }
     }
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";

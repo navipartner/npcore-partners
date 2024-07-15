@@ -70,6 +70,26 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                 end;
             }
         }
+        addlast(navigation)
+        {
+            group("NPR PayByLink")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+                action("NPR Payment Lines")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Payment Lines';
+                    Image = PaymentHistory;
+                    ToolTip = 'View Pay by Link Payment Lines';
+
+                    trigger OnAction()
+                    begin
+                        Rec.OpenMagentPaymentLines();
+                    end;
+                }
+            }
+        }
     }
 
     var

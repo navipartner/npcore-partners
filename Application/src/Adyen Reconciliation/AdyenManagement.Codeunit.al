@@ -381,6 +381,92 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
+    internal procedure CreateAdyenJob(CodeunitID: Integer; JobDescription: Text; NoOfMinutesBetweenRuns: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID,
+                '', JobDescription,
+                CreateDateTime(Today(), 070000T), NoOfMinutesBetweenRuns,
+                '', JobQueueEntry)
+            then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    internal procedure CreateAutoRescheduleAdyenJob(CodeunitID: Integer; JobDescription: Text; NoOfMinutesBetweenRuns: Integer; AutoRescheduleDelaySec: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
+        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID,
+                '', JobDescription,
+                CreateDateTime(Today(), 070000T), NoOfMinutesBetweenRuns,
+                '', JobQueueEntry)
+            then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshAutoAdyenJob()
+    var
+        ProccessPostPaymentLine: Label 'Process Posting Payment Lines for posted documents.';
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        if not PayByLinkSetup.Get() then
+            exit;
+        if not PayByLinkSetup."Enable Pay by Link" then
+            exit;
+        if not MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code") then
+            exit;
+        if MagentoPaymentGateway."Integration Type" <> MagentoPaymentGateway."Integration Type"::Adyen then
+            exit;
+        if PayByLinkSetup."Enable Automatic Posting" then
+            AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Post Payment Lines", ProccessPostPaymentLine, 1, 600) //Reschedule to run again in 10 minutes on error
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshProcessPayByLinkJob()
+    var
+        ProcessPayByLinkWebhook: Label 'Process Pay by Link Webhook Requests';
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+        PayByLinkSetup: Record "NPR Pay By Link Setup";
+
+    begin
+        if not PayByLinkSetup.Get() then
+            exit;
+        if not PayByLinkSetup."Enable Pay by Link" then
+            exit;
+        if not MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code") then
+            exit;
+        if MagentoPaymentGateway."Integration Type" <> MagentoPaymentGateway."Integration Type"::Adyen then
+            exit;
+        AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen PayByLink Status JQ", ProcessPayByLinkWebhook, 1, 600) //Reschedule to run again in 10 minutes on error
+    end;
+
+    internal procedure CancelAdyenJob(CodeunitID: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID) then
+            JobQueueEntry.Cancel();
+    end;
+
+    internal procedure SetOnHoldJob(CodeunitID: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID) then
+            JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+    end;
+
     local procedure ValidateWebhookReference(json: Text): Boolean
     var
         MerchantAccount: Record "NPR Adyen Merchant Account";
@@ -422,12 +508,12 @@ codeunit 6184796 "NPR Adyen Management"
             until MerchantAccount.Next() = 0;
     end;
 
-    internal procedure InitReportReadyWebhookSetup(var WebhookSetup: Record "NPR Adyen Webhook Setup"; WebhookEventsFilter: Text; MerchantAccount: Text[80])
+    internal procedure InitWebhookSetup(var WebhookSetup: Record "NPR Adyen Webhook Setup"; WebhookEventsFilter: Text; MerchantAccount: Text[80]; AdyenWebhookType: Enum "NPR Adyen Webhook Type")
     begin
         WebhookSetup.Init();
         WebhookSetup."Primary Key" := 0;
         WebhookSetup."Merchant Account" := MerchantAccount;
-        WebhookSetup.Type := Enum::"NPR Adyen Webhook Type"::standard;
+        WebhookSetup.Type := AdyenWebhookType;
         WebhookSetup."Include Events Filter" := CopyStr(WebhookEventsFilter, 1, MaxStrLen(WebhookSetup."Include Events Filter"));
         WebhookSetup.Active := true;
         WebhookSetup.Insert();
@@ -987,6 +1073,7 @@ codeunit 6184796 "NPR Adyen Management"
         EventDate: DateTime;
         MerchantAccountName: Text[80];
         PSPReference: Text[100];
+        PaymentLinkId: Code[20];
     begin
         JsonRequest.Get('WebhookReference', Token);
         WebhookReference := CopyStr(Token.AsValue().AsText(), 1, 80);
@@ -1009,6 +1096,7 @@ codeunit 6184796 "NPR Adyen Management"
         JsonContent.Get('pspReference', ContentToken);
         PSPReference := CopyStr(ContentToken.AsValue().AsText(), 1, 100);
         JsonContent.Get('success', ContentToken);
+        PaymentLinkId := GetPaymentLinkID(JsonContent);
 
         AdyenWebhook."Webhook Data".CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(Token.AsValue().AsText());
@@ -1016,40 +1104,43 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenWebhook."Event Code" := Enum::"NPR Adyen Webhook Event Code".FromInteger(EventCodeEnum.Ordinals.Get(EventCodeEnum.Names.IndexOf(EventCode)));
         AdyenWebhook."Event Date" := EventDate;
         AdyenWebhook."Merchant Account Name" := MerchantAccountName;
-        AdyenWebhook."PSP Reference" := PSPReference;
+        If PaymentLinkId <> '' then
+            AdyenWebhook."PSP Reference" := PaymentLinkId
+        else
+            AdyenWebhook."PSP Reference" := PSPReference;
         AdyenWebhook.Success := true;
         AdyenWebhook."Webhook Reference" := WebhookReference;
-    end;
-    #endregion
-
-    #region Reconciliation Job Queue
-    internal procedure CreateReconciliationJob(CodeunitID: Integer)
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-        ProcessReconciliationWebhookLbl: Label 'Process Reconciliation Webhooks';
-    begin
-        if JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit,
-                CodeunitID,
-                '',
-                ProcessReconciliationWebhookLbl,
-                CurrentDateTime(),
-                070000T,
-                190000T,
-                60,
-                '',
-                JobQueueEntry)
-            then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+        GetAdyenWebhookReqType(AdyenWebhook, PaymentLinkId, PSPReference)
     end;
 
-    internal procedure CancelReconciliationJob(CodeunitID: Integer)
+    local procedure GetAdyenWebhookReqType(var AdyenWebhook: Record "NPR Adyen Webhook"; PaymentLinkId: Code[20]; PSPReference: Text[100])
     var
-        JobQueueEntry: Record "Job Queue Entry";
+        ReconciliationReportLbl: Label 'settlement_details/external_settlement_details', Locked = true;
     begin
-        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID) then
-            JobQueueEntry.Cancel();
+        case AdyenWebhook."Event Code" of
+            AdyenWebhook."Event Code"::REPORT_AVAILABLE:
+                begin
+                    if StrPos(PSPReference, ReconciliationReportLbl) > 0 then
+                        AdyenWebhook."Webhook Type" := AdyenWebhook."Webhook Type"::Reconciliation;
+                end;
+            AdyenWebhook."Event Code"::AUTHORISATION:
+                begin
+                    If PaymentLinkId <> '' then begin
+                        AdyenWebhook."Webhook Type" := AdyenWebhook."Webhook Type"::"Pay by Link";
+                        AdyenWebhook."PSP Reference" := PaymentLinkId;
+                    end;
+                end;
+        end;
+    end;
+
+    local procedure GetPaymentLinkID(JsonContent: JsonObject) PaymentLinkId: Code[20]
+    var
+        ContentToken: JsonToken;
+        JsonValueToken: JsonToken;
+    begin
+        if JsonContent.Get('additionalData', ContentToken) then
+            if ContentToken.AsObject().Get('paymentLinkId', JsonValueToken) then
+                PaymentLinkId := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(PaymentLinkId));
     end;
     #endregion
 

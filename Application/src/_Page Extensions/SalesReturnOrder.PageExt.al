@@ -75,6 +75,26 @@ pageextension 6014443 "NPR Sales Return Order" extends "Sales Return Order"
                 end;
             }
         }
+        addlast(navigation)
+        {
+            group("NPR PayByLink")
+            {
+                Caption = 'Pay by Link';
+                Image = Payment;
+                action("NPR Payment Lines")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Payment Lines';
+                    Image = PaymentHistory;
+                    ToolTip = 'View Pay by Link Payment Lines';
+
+                    trigger OnAction()
+                    begin
+                        Rec.OpenMagentPaymentLines();
+                    end;
+                }
+            }
+        }
     }
     var
         AsyncEnabled: Boolean;
