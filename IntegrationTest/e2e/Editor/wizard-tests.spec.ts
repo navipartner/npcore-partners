@@ -15,7 +15,7 @@ test.describe("Wizard modal tests", () => {
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_PASSWORD`]
     );
     await page.frameLocator("iframe").locator('svg[data-icon="gear"]').click();
-    await page.frameLocator("iframe").locator("button:nth-child(16)").click();
+    await page.frameLocator("iframe").locator("button:nth-child(17)").click();
     await page
       .frameLocator("iframe")
       .locator("div")

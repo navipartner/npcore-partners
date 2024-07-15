@@ -21,16 +21,16 @@ test.describe("Global settings modal tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
-    await page.frameLocator("iframe").locator(".flex > button").first().click();
+    await page.frameLocator('iframe').locator('button:nth-child(16)').click();
     await page.waitForTimeout(2000);
     expect(
       page.frameLocator("iframe").getByText("Global Settings", { exact: true })
     ).toBeVisible();
-    await page.frameLocator("iframe").locator(".flex > button").first().click();
+    await page.frameLocator('iframe').locator('button:nth-child(16)').click();
     expect(
       page.frameLocator("iframe").getByText("Global Settings", { exact: true })
     ).not.toBeVisible();
-    await page.frameLocator("iframe").locator(".flex > button").first().click();
+    await page.frameLocator('iframe').locator('button:nth-child(16)').click();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Close" })

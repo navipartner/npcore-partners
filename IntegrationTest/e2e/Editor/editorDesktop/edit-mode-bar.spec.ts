@@ -450,8 +450,8 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
-    await page.frameLocator("iframe").locator(".flex > button").first().click();
-    await page
+      await page.frameLocator('iframe').locator('button:nth-child(16)').click();
+      await page
       .frameLocator("iframe")
       .locator(
         ".flex > div > .select > .css-b62m3t-container > .react-select__control"
@@ -488,7 +488,7 @@ test.describe("Edit Mode Bar tests", () => {
       .filter({ hasText: "OK" })
       .first()
       .click();
-    await page.frameLocator("iframe").locator(".flex > button").first().click();
+      await page.frameLocator('iframe').locator('button:nth-child(16)').click();
     await page
       .frameLocator("iframe")
       .locator("div")
