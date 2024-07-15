@@ -2,7 +2,7 @@
 report 6060123 "NPR MM Member Card Std Print"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/MM Member Card Std PrintV18.rdl';
@@ -41,6 +41,9 @@ report 6060123 "NPR MM Member Card Std Print"
             {
             }
             column(MemberType; MemberType)
+            {
+            }
+            column(CompNameMember; CompNameMember)
             {
             }
             column(CardType; CardType)
@@ -94,13 +97,16 @@ report 6060123 "NPR MM Member Card Std Print"
                 Clear(MemberItem);
                 Clear(CardType);
                 Clear(CardCustomerType);
+                Clear(CompNameMember);
                 MMMembershipEntry.SetRange("Membership Entry No.", "Membership Entry No.");
                 MMMembershipEntry.SetRange(Blocked, false);
                 if MMMembershipEntry.FindLast() then begin
                     MemberDate := Format(MMMembershipEntry."Valid Until Date", 0, '<Closing><Day,2>-<Month,2>-<Year4>');
                     Clear(MemberType);
-                    if MMMembership.Get(MMMembershipEntry."Membership Entry No.") then
+                    if MMMembership.Get(MMMembershipEntry."Membership Entry No.") then begin
                         MemberType := MMMembership.Description;
+                        CompNameMember := MMMembership."Company Name";
+                    end;
                     if MMMembershipEntry."Item No." <> '' then begin
                         if Item.Get(MMMembershipEntry."Item No.") then
                             MemberItem := Item.Description;
@@ -116,7 +122,7 @@ report 6060123 "NPR MM Member Card Std Print"
             end;
         }
     }
-     requestpage
+    requestpage
     {
         SaveValues = true;
     }
@@ -138,5 +144,6 @@ report 6060123 "NPR MM Member Card Std Print"
         MemberItem: Text;
         MemberName: Text;
         MemberType: Text;
+        CompNameMember: Text;
 }
 #endif
