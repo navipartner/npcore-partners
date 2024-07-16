@@ -8,6 +8,8 @@
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', true, true)]
     local procedure ItemOnAfterModifyEvent(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
+    var
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
         if not RunTrigger then
             exit;
@@ -17,34 +19,41 @@
            (Rec."Standard Cost" = xRec."Standard Cost") and
            (Rec."Item Category Code" = xRec."Item Category Code") then
             exit;
-        UpdateSalesPricesForStaff(Rec, false);
+        UpdateSalesPricesForStaff(Rec, SalesPriceMaintSetup, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Last Direct Cost', true, true)]
     local procedure OnAfterValidateLastDirectCostEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
+    var
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
-        UpdateSalesPricesForStaff(Rec, false);
+        UpdateSalesPricesForStaff(Rec, SalesPriceMaintSetup, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Price/Profit Calculation', true, true)]
     local procedure OnAfterValidatePriceProfitCalcEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
+    var
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
-        UpdateSalesPricesForStaff(Rec, false);
+        UpdateSalesPricesForStaff(Rec, SalesPriceMaintSetup, false);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'Unit Price', true, true)]
     local procedure OnAfterValidateUnitPriceEvent(var Rec: Record Item; var xRec: Record Item; CurrFieldNo: Integer)
+    var
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
-        UpdateSalesPricesForStaff(Rec, false);
+        UpdateSalesPricesForStaff(Rec, SalesPriceMaintSetup, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterPostItemJnlLine', '', true, true)]
     local procedure OnAfterPostItemJournalLine(var ItemJournalLine: Record "Item Journal Line")
     var
         Item: Record Item;
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
         if Item.Get(ItemJournalLine."Item No.") then
-            UpdateSalesPricesForStaff(Item, false);
+            UpdateSalesPricesForStaff(Item, SalesPriceMaintSetup, false);
     end;
 
     local procedure ConvertPriceLCYToFCY(PricesInCurrency: Boolean; ExchRateDate: Date; Currency: Record Currency; var UnitPrice: Decimal; CurrencyFactor: Decimal)
@@ -70,9 +79,8 @@
         end;
     end;
 
-    internal procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)
+    internal procedure UpdateSalesPricesForStaff(var Item: Record Item; var SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup"; FromBackGroundProcessing: Boolean)
     var
-        SalesPriceMaintenanceSetup: Record "NPR Sales Price Maint. Setup";
         PriceListLine: Record "Price List Line";
         PriceListHeader: Record "Price List Header";
         xPriceListHeader: Record "Price List Header";
@@ -105,13 +113,11 @@
             if not TmpItem.Get(Item."No.") then
                 exit;
 
-        if SalesPriceMaintenanceSetup.FindFirst() then begin
-
+        SalesPriceMaintenanceSetup.SetAutoCalcFields("Exclude Item Groups");
+        if SalesPriceMaintenanceSetup.FindSet() then begin
             ExchRateDate := Today();
             GeneralLedgerSetup.Get();
-
             repeat
-                SalesPriceMaintenanceSetup.CalcFields("Exclude Item Groups");
                 BreakLoop := SalesPriceMaintenanceSetup."Exclude All Item Groups";
                 if not BreakLoop then
                     if Item."Item Category Code" <> '' then
@@ -222,12 +228,6 @@
         end;
     end;
 
-    [Obsolete('Please use procedure UpdateSalesPricesForStaff(var Item: Record Item; FromBackGroundProcessing: Boolean)', '2024-05-28')]
-    procedure UpdateSalesPricesForStaff(var Item: Record Item)
-    begin
-        UpdateSalesPricesForStaff(Item, false);
-    end;
-
     internal procedure ExcludeItemGroup(Current_ItemGroup: Code[20]; ItemCategory_To_Exclude: Code[20]): Boolean
     var
         ItemCategory: Record "Item Category";
@@ -333,6 +333,7 @@
         SalesPriceMaintLog: Record "NPR Sales Price Maint. Log";
         SalesPriceMaintLog2: Record "NPR Sales Price Maint. Log";
         Item: Record Item;
+        SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
     begin
         SelectLatestVersion();
         SalesPriceMaintLog.SetRange(Processed, false);
@@ -340,7 +341,7 @@
             repeat
                 SalesPriceMaintLog2 := SalesPriceMaintLog;
                 if Item.Get(SalesPriceMaintLog."Item No.") then begin
-                    UpdateSalesPricesForStaff(Item, true);
+                    UpdateSalesPricesForStaff(Item, SalesPriceMaintSetup, true);
                     SalesPriceMaintLog2.Processed := true;
                     SalesPriceMaintLog2.Modify();
                 end else
