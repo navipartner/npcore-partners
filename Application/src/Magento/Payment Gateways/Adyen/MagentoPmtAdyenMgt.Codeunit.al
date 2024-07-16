@@ -199,64 +199,6 @@
         Response."Response Success" := true;
     end;
 
-    procedure CheckIsPaid(var MagentoPaymentLine: Record "NPR Magento Payment Line")
-    var
-        HttpWebRequest: HttpRequestMessage;
-        JsonO: JsonObject;
-        JsonT: JsonToken;
-        Url: Text;
-        ResponseTxt: Text;
-        ResponseJson: Text;
-        Content: HttpContent;
-        Headers: HttpHeaders;
-        HeadersReq: HttpHeaders;
-        Response: Record "NPR PG Payment Response";
-        JsonValueToken: JsonToken;
-        AdyenPGSetup: Record "NPR PG Adyen Setup";
-    begin
-        GetPayByLinkSetup();
-
-        if not AdyenPGSetup.Get(PayByLinkSetup."Payment Gateaway Code") then
-            exit;
-
-        Url := AdyenPGSetup.GetAPIPayByLinkUrl() + '/' + MagentoPaymentLine."Payment ID";
-
-        HttpWebRequest.GetHeaders(HeadersReq);
-        Content.GetHeaders(Headers);
-
-        if Headers.Contains('Content-Type') then
-            Headers.Remove('Content-Type');
-        Headers.Add('Content-Type', 'application/json');
-        HeadersReq.Add('Authorization', CreateBasicAuth(AdyenPGSetup."API Username", AdyenPGSetup.GetApiPassword()));
-
-        HttpWebRequest.Content(Content);
-        HttpWebRequest.SetRequestUri(Url);
-        HttpWebRequest.Method := 'GET';
-
-        ResponseJson := SendWebRequest(HttpWebRequest, Response);
-
-        if (not JsonO.ReadFrom(ResponseJson)) then
-            Error(ResponseJson);
-
-        JsonO.Get('status', JsonT);
-        ResponseTxt := JsonT.AsValue().AsText();
-        if ResponseTxt = 'completed' then begin
-            if JsonO.Get('amount', JsonT) then
-                if JsonT.IsObject() then
-                    if JsonT.AsObject().Get('value', JsonValueToken) then begin
-                        ResponseTxt := JsonValueToken.AsValue().AsText();
-                        if ConvertFromAdyenPayAmount(ResponseTxt) = MagentoPaymentLine."Requested Amount" then begin
-                            MagentoPaymentLine.Amount := MagentoPaymentLine."Requested Amount";
-                            if JsonO.Get('pspReference', JsonValueToken) then begin
-                                ResponseTxt := JsonValueToken.AsValue().AsText();
-                                MagentoPaymentLine."Transaction ID" := CopyStr(ResponseTxt, 1, MaxStrLen(MagentoPaymentLine."Transaction ID"));
-                            end;
-                            MagentoPaymentLine.Modify();
-                        end;
-                    end;
-        end;
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnAfterPostMagentoPayment', '', true, false)]
     local procedure CancelOutstandingPaymentLines(SalesInvHeader: Record "Sales Invoice Header")
     var

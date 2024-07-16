@@ -325,7 +325,10 @@
                 trigger OnAction()
                 var
                     MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
                 begin
+                    if not ConfirmManagement.GetResponseOrDefault(ResetPostingErrQst, true) then
+                        exit;
                     MagentoPmtAdyenMgt.ResetErrorPostingStatus(Rec);
                     CurrPage.Update(false);
                 end;
@@ -340,7 +343,10 @@
                 trigger OnAction()
                 var
                     MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+                    ConfirmManagement: Codeunit "Confirm Management";
                 begin
+                    if not ConfirmManagement.GetResponseOrDefault(SkipPostingQst, true) then
+                        exit;
                     MagentoPmtAdyenMgt.SetSkipPosting(Rec);
                     CurrPage.Update(false);
                 end;
@@ -466,20 +472,6 @@
                         EmailManagement.RunEmailLog(RecRef);
                     end;
                 }
-                action("NPR Check Status")
-                {
-                    ApplicationArea = NPRRetail;
-                    Caption = 'Check Pay by Link Status';
-                    ToolTip = 'Check Pay by Link Status.';
-                    Image = LinkWeb;
-
-                    trigger OnAction()
-                    var
-                        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
-                    begin
-                        MagentoPmtAdyenMgt.CheckIsPaid(Rec);
-                    end;
-                }
                 action("NPR Resend PayByLink")
                 {
                     ApplicationArea = NPRRetail;
@@ -517,7 +509,9 @@
         CancelPaymentQst: Label 'Do you want to cancel the payment?';
         PaymentPostedMsg: Label 'Payment Posted';
         PostPaymentQst: Label 'Do you want to post the payment?';
+        SkipPostingQst: Label 'Do you want to set Skip Posting?';
         CancelPayByLinkQst: Label 'Do you want to cancel the Pay by Link ?';
+        ResetPostingErrQst: Label 'Do you want to reset posting errors?';
 
     local procedure SetGatewayEnabled()
     var
