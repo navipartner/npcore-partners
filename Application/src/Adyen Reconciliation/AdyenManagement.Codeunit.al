@@ -1115,12 +1115,13 @@ codeunit 6184796 "NPR Adyen Management"
 
     local procedure GetAdyenWebhookReqType(var AdyenWebhook: Record "NPR Adyen Webhook"; PaymentLinkId: Code[20]; PSPReference: Text[100])
     var
-        ReconciliationReportLbl: Label 'settlement_details/external_settlement_details', Locked = true;
+        SettlementDetailsLbl: Label 'settlement_details', Locked = true;
+        SettlementExtDetailsLbl: Label 'external_settlement_details', Locked = true;
     begin
         case AdyenWebhook."Event Code" of
             AdyenWebhook."Event Code"::REPORT_AVAILABLE:
                 begin
-                    if StrPos(PSPReference, ReconciliationReportLbl) > 0 then
+                    if (StrPos(PSPReference, SettlementDetailsLbl) > 0) or (StrPos(PSPReference, SettlementExtDetailsLbl) > 0) then
                         AdyenWebhook."Webhook Type" := AdyenWebhook."Webhook Type"::Reconciliation;
                 end;
             AdyenWebhook."Event Code"::AUTHORISATION:

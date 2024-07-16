@@ -485,6 +485,8 @@
 
         GetPayByLinkSetup();
 
+        PayByLinkSetup.TestField("Enable Pay by Link");
+
         RequestedExpDate := PayByLinkSetup."Pay by Link Exp. Duration";
 
         GetDocument(RecVariant, FullAmount, DocumentTableNo, DocumentNo, SalesDocumentType, CustomerNo);
