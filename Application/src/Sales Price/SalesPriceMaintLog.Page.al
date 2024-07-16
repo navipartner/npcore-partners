@@ -65,9 +65,10 @@ page 6150833 "NPR Sales Price Maint. Log"
                 var
                     Item: Record Item;
                     SalesPriceMaintenance: Codeunit "NPR Sales Price Maint. Event";
+                    SalesPriceMaintSetup: Record "NPR Sales Price Maint. Setup";
                 begin
                     Item.Get(Rec."Item No.");
-                    SalesPriceMaintenance.UpdateSalesPricesForStaff(Item, true);
+                    SalesPriceMaintenance.UpdateSalesPricesForStaff(Item, SalesPriceMaintSetup, true);
                     Rec.Processed := true;
                     Rec.Modify();
                 end;

@@ -78,4 +78,18 @@
             }
         }
     }
+    actions
+    {
+        area(Processing)
+        {
+            action(ProcessExistingItems)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Process Prices for Existing Items';
+                ToolTip = 'Updates Prices for the existing items for one or more Sales Price Maintenance Setup records. Processing should be done in the backround by scheduling the report to run when suitable.';
+                Image = Process;
+                RunObject = Report "NPR Sales Price Maint. Process";
+            }
+        }
+    }
 }
