@@ -504,6 +504,8 @@
         PaymentBinCheckpointPage: Page "NPR POS Payment Bin Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
+        if not Rec.Open or (Rec.Type = Rec.Type::TRANSFER) then
+            exit;
 
         case PageMode of
             PageMode::FINAL:
