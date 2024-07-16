@@ -22,6 +22,7 @@ page 6184709 "NPR Pay By Link Setup Card"
                 {
                     ToolTip = 'Specifies the value of the Code field.';
                     ApplicationArea = NPRRetail;
+                    LookupPageID = "NPR Magento Payment Gateways";
                 }
                 field("Enable Pay by Link"; Rec."Enable Pay by Link")
                 {
