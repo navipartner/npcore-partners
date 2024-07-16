@@ -1579,7 +1579,7 @@
         GenJournalLine."Line No." := _LineNumber;
         GenJournalLine."System-Created Entry" := true;
         GenJournalLine."Account Type" := AccountType;
-        GenJournalLine."Account No." := AccountNo;
+        GenJournalLine.Validate("Account No.", AccountNo);
         if DoPostVAT then
             GenJournalLine."Gen. Posting Type" := GLAccount."Gen. Posting Type";
         GenJournalLine.Validate("Posting Date", POSEntry."Posting Date");
