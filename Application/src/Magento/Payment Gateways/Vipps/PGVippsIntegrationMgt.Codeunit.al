@@ -147,7 +147,7 @@ codeunit 6150920 "NPR PG Vipps Integration Mgt." implements "NPR IPaymentGateway
         if TransactionTxt = '' then
             TransactionTxt := CopyStr(Request."Request Description", 1, MaxStrLen(TransactionTxt));
 
-        Url := GetBaseUrl(VippsSetup.Environment) + StrSubstNo('/ecomm/v2/payments/%1/%2', LowerCase(Request."Transaction ID"), RequestService);
+        Url := GetBaseUrl(VippsSetup.Environment) + StrSubstNo('/ecomm/v2/payments/%1/%2', Request."Transaction ID", RequestService);
     end;
 
     local procedure SendWebRequest(Client: HttpClient; ContentTxt: text; RequestService: text; Url: Text; var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
