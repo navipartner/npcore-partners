@@ -1284,8 +1284,11 @@
     internal procedure GetPostingSetup(POSStoreCode: Code[10]; POSPaymentMethodCode: Code[10]; POSPaymentBinCode: Code[10]; var POSPostingSetup: Record "NPR POS Posting Setup"): Boolean
     var
         LocPOSPostingSetup: Record "NPR POS Posting Setup";
+        POSPaymentBin: Record "NPR POS Payment Bin";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
+        IsBankOrSafe: Boolean;
     begin
+        IsBankOrSafe := POSPaymentBin.Get(POSPaymentBinCode) and (POSPaymentBin."Bin Type" in [POSPaymentBin."Bin Type"::BANK, POSPaymentBin."Bin Type"::SAFE]);
         //All three match
         if LocPOSPostingSetup.Get(POSStoreCode, POSPaymentMethodCode, POSPaymentBinCode) then begin
             POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
@@ -1293,11 +1296,12 @@
             exit(true);
         end;
         //Store and Method
-        if LocPOSPostingSetup.Get(POSStoreCode, POSPaymentMethodCode, '') then begin
-            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-            POSPostingSetup := LocPOSPostingSetup;
-            exit(true);
-        end;
+        if not IsBankOrSafe then
+            if LocPOSPostingSetup.Get(POSStoreCode, POSPaymentMethodCode, '') then begin
+                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+                POSPostingSetup := LocPOSPostingSetup;
+                exit(true);
+            end;
         //Store and Bin
         if LocPOSPostingSetup.Get(POSStoreCode, '', POSPaymentBinCode) then begin
             POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
@@ -1311,11 +1315,12 @@
             exit(true);
         end;
         //Method only
-        if LocPOSPostingSetup.Get('', POSPaymentMethodCode, '') then begin
-            POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
-            POSPostingSetup := LocPOSPostingSetup;
-            exit(true);
-        end;
+        if not IsBankOrSafe then
+            if LocPOSPostingSetup.Get('', POSPaymentMethodCode, '') then begin
+                POSEntryManagement.CheckPostingSetupLine(LocPOSPostingSetup);
+                POSPostingSetup := LocPOSPostingSetup;
+                exit(true);
+            end;
         exit(false);
     end;
 
