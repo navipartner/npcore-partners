@@ -29,7 +29,7 @@
         {
             Caption = 'Start Date';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }
@@ -37,7 +37,7 @@
         {
             Caption = 'Start Time';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2023-08-28';
             ObsoleteReason = 'Replaced by SystemCreatedAt field.';
         }

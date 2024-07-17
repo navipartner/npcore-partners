@@ -23,6 +23,13 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned), "Restaurant Code" = field("Restaurant Filter")));
         }
+        field(12; "Kitchen Orders - Open"; Integer)
+        {
+            Caption = 'Kitchen Orders - Open';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NPRE Kitchen Order" where("Order Status" = filter("Ready for Serving" | "In-Production" | Released | Planned), "Restaurant Code" = field("Restaurant Filter")));
+        }
         field(20; "Turnover (LCY)"; Decimal)
         {
             Caption = 'Turnover';
