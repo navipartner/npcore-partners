@@ -46,6 +46,14 @@
                 ToolTip = 'Open waiter pad list.';
                 ApplicationArea = NPRRetail;
             }
+            action(KitchenOrders)
+            {
+                Caption = 'Kitchen Orders';
+                Image = BlanketOrder;
+                RunObject = Page "NPR NPRE Kitchen Order List";
+                ToolTip = 'View kitchen order list.';
+                ApplicationArea = NPRRetail;
+            }
             action(KitchenRequests)
             {
                 Caption = 'Kitchen Requests (Expedite)';
@@ -113,6 +121,22 @@
                     Image = Log;
                     RunObject = Page "NPR NPRE W.Pad Pr.Log Entries";
                     ToolTip = 'View waiter pad line sending log to kitchen.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(Notifications)
+                {
+                    Caption = 'Restaurant Notifications';
+                    Image = Log;
+                    RunObject = Page "NPR NPRE Notification Entries";
+                    ToolTip = 'View restaurant related notifications sent to customers or restaurant managers.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(KitchenRequestHistory)
+                {
+                    Caption = 'Kitchen Requests';
+                    Image = Log;
+                    RunObject = Page "NPR NPRE Kitchen Req. List";
+                    ToolTip = 'View a history of previous kitchen requests.';
                     ApplicationArea = NPRRetail;
                 }
                 action(POSEntries)
@@ -254,6 +278,14 @@
                         ToolTip = 'Set up when each kitchen station is to be used in production.';
                         ApplicationArea = NPRRetail;
                     }
+                }
+                action(NotificationSetup)
+                {
+                    Caption = 'Restaurant Notification Setup';
+                    Image = CarryOutActionMessage;
+                    RunObject = Page "NPR NPRE Notification Setup";
+                    ToolTip = 'Set up when to send restaurant related notifications, such as when an order is delayed in production or when the customer can pick up the order.';
+                    ApplicationArea = NPRRetail;
                 }
             }
         }

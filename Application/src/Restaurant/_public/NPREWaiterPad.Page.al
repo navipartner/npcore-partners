@@ -21,17 +21,6 @@
                     ToolTip = 'Specifies the date-time the waiter pad was opened at.';
                     ApplicationArea = NPRRetail;
                 }
-                field("Start Time"; Rec."Start Time")
-                {
-                    Caption = 'Opened';
-                    Editable = false;
-                    Visible = false;
-                    ToolTip = 'Specifies the value of the Opened field';
-                    ApplicationArea = NPRRetail;
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '2023-08-28';
-                    ObsoleteReason = 'Replaced by SystemCreatedAt field.';
-                }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies additional optional description of the waiter pad. You can use it to specify main guest name or other information, which can help you distinguish this waiter pad from other ones created for the same seating.';

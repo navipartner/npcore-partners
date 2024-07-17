@@ -30,6 +30,12 @@
                     ToolTip = 'Specifies the order Id this request belongs to.';
                     ApplicationArea = NPRRetail;
                 }
+                field(SeatingNos; SeatingNos)
+                {
+                    Caption = 'Seating No.';
+                    ToolTip = 'Specifies the seating (table) number(s) the request was created for.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Line Type"; Rec."Line Type")
                 {
                     ToolTip = 'Specifies the type of entity for this request line, such as Item, or Comment.';
@@ -137,12 +143,6 @@
                     Caption = 'Seating Code';
                     ToolTip = 'Specifies the seating (table) code(s) the request was created for.';
                     Visible = false;
-                    ApplicationArea = NPRRetail;
-                }
-                field(SeatingNos; SeatingNos)
-                {
-                    Caption = 'Seating No.';
-                    ToolTip = 'Specifies the seating (table) number(s) the request was created for.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AssignedWaiters; AssignedWaiters)

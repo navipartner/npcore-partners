@@ -26,6 +26,21 @@
                         DrillDownWaiterPads();
                     end;
                 }
+                field("Kitchen Orders - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitchen Orders - Open"))))
+                {
+                    ToolTip = 'Specifies the number of currently active kitchen orders (the orders having active kitchen requests).';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Kitchen Orders - Open';
+
+                    trigger OnDrillDown()
+                    var
+                        KitchenOrder: Record "NPR NPRE Kitchen Order";
+                    begin
+                        Rec.CopyFilter("Restaurant Filter", KitchenOrder."Restaurant Code");
+                        KitchenOrder.SetRange("Order Status", KitchenOrder."Order Status"::"Ready for Serving", KitchenOrder."Order Status"::Planned);
+                        Page.Run(0, KitchenOrder);
+                    end;
+                }
                 field("Kitchen Requests - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitchen Requests - Open"))))
                 {
                     ToolTip = 'Specifies the number of currently active kitchen requests (the requests that hasn’t been finished or cancelled so far).';
@@ -37,8 +52,7 @@
                         KitchenRequest: Record "NPR NPRE Kitchen Request";
                     begin
                         Rec.CopyFilter("Restaurant Filter", KitchenRequest."Restaurant Code");
-                        KitchenRequest.SetRange("Line Status", KitchenRequest."Line Status"::"Ready for Serving", KitchenRequest."Line Status"::Planned);
-                        Page.Run(0, KitchenRequest);
+                        Page.Run(Page::"NPR NPRE Kitchen Req.", KitchenRequest);
                     end;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
