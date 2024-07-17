@@ -57,11 +57,15 @@
     var
         ImportType: Record "NPR Nc Import Type";
         NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
         IProcessor: Interface "NPR Nc Import List IProcess";
+        Handled: Boolean;
     begin
         ClearLastError();
         ImportType.Get(ImportEntry."Import Type");
-        CleanupImportType(ImportType);
+        NcImportListProcessing.ProcessImportEntryOnBeforeCleanupImportType(ImportType, Handled);
+        if not Handled then
+            CleanupImportType(ImportType);
         Commit();
 
         if NcDependencyFactory.CreateNCImportListProcessor(IProcessor, ImportType) then

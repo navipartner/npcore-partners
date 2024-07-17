@@ -166,4 +166,9 @@
     begin
         exit('reset_retry_count');
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure ProcessImportEntryOnBeforeCleanupImportType(NcImportType: Record "NPR Nc Import Type"; var IsHandled: Boolean)
+    begin
+    end;
 }
