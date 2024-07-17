@@ -3,6 +3,8 @@
     Access = Internal;
     Caption = 'Kitchen Order';
     DataClassification = CustomerContent;
+    LookupPageId = "NPR NPRE Kitchen Order List";
+    DrillDownPageId = "NPR NPRE Kitchen Order List";
 
     fields
     {
