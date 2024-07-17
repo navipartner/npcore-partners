@@ -130,12 +130,12 @@
             Caption = 'Tax Group Revision';
             DataClassification = CustomerContent;
         }
-        field(24; "Business Name"; Text[300])
+        field(24; "Business Name"; Text[500])
         {
             Caption = 'Business Name';
             DataClassification = CustomerContent;
         }
-        field(25; Tin; Text[12])
+        field(25; Tin; Text[20])
         {
             Caption = 'Tin';
             DataClassification = CustomerContent;
@@ -150,12 +150,12 @@
             Caption = 'Address';
             DataClassification = CustomerContent;
         }
-        field(28; District; Text[25])
+        field(28; District; Text[100])
         {
             Caption = 'District';
             DataClassification = CustomerContent;
         }
-        field(29; Mrc; Text[20])
+        field(29; Mrc; Text[40])
         {
             Caption = 'Mrc';
             DataClassification = CustomerContent;
