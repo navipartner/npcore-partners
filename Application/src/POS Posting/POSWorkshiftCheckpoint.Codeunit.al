@@ -792,6 +792,7 @@
 
         // Number of sales
         POSEntry.SetFilter("Entry Type", '=%1', POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("Is Pay-in Pay-out", false);
         POSWorkshiftCheckpoint."Direct Sales Count" := POSEntry.Count();
 
         // Number of cancelled sales
