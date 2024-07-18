@@ -61,8 +61,8 @@ page 6184709 "NPR Pay By Link Setup Card"
                 }
                 field("Pay by Link Exp. Duration"; Rec."Pay by Link Exp. Duration")
                 {
-                    Caption = 'Pay by Link Expiration Duration';
-                    ToolTip = 'Specifies the value of the Pay by Link Expiration Duration';
+                    Caption = 'Pay by Link Expiration';
+                    ToolTip = 'Specifies the value of the Pay by Link Expiration';
                     ApplicationArea = NPRRetail;
                 }
                 field("Posting Retry Count"; Rec."Posting Retry Count")
