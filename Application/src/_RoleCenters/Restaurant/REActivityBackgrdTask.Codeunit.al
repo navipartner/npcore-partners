@@ -36,12 +36,15 @@
         RestaurantCue.SetRange("Occupied Seating Status Filter", RestaurantSetup."Seat.Status: Occupied");
         RestaurantCue.SetRange("Cleaning R. Seat.Status Filter", RestaurantSetup."Seat.Status: Cleaning Required");
         RestaurantCue.SetRange("Reserved Seating Status Filter", RestaurantSetup."Seat.Status: Reserved");
-        RestaurantCue.CalcFields("Kitchen Orders - Open", "Kitchen Requests - Open", "Seatings: Ready", "Seatings: Occupied", "Seatings: Reserved", "Seatings: Cleaning Required", "Available Seats");
+        RestaurantCue.CalcFields(
+            "Kitchen Orders - Open", "Kitchen Requests - Open", "Kitch. Station Requests - Open",
+            "Seatings: Ready", "Seatings: Occupied", "Seatings: Reserved", "Seatings: Cleaning Required", "Available Seats");
         RecalculateCues(RestaurantCue);
 
         Result.Add(Format(RestaurantCue.FieldNo("Waiter Pads - Open")), Format(RestaurantCue."Waiter Pads - Open", 0, 9));
         Result.Add(Format(RestaurantCue.FieldNo("Kitchen Orders - Open")), Format(RestaurantCue."Kitchen Orders - Open", 0, 9));
         Result.Add(Format(RestaurantCue.FieldNo("Kitchen Requests - Open")), Format(RestaurantCue."Kitchen Requests - Open", 0, 9));
+        Result.Add(Format(RestaurantCue.FieldNo("Kitch. Station Requests - Open")), Format(RestaurantCue."Kitch. Station Requests - Open", 0, 9));
         Result.Add(Format(RestaurantCue.FieldNo("Seatings: Ready")), Format(RestaurantCue."Seatings: Ready", 0, 9));
         Result.Add(Format(RestaurantCue.FieldNo("Seatings: Occupied")), Format(RestaurantCue."Seatings: Occupied", 0, 9));
         Result.Add(Format(RestaurantCue.FieldNo("Seatings: Reserved")), Format(RestaurantCue."Seatings: Reserved", 0, 9));

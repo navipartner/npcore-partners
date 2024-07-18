@@ -43,7 +43,7 @@
                 Caption = 'Waiter Pads';
                 Image = ShowList;
                 RunObject = Page "NPR NPRE Waiter Pad List";
-                ToolTip = 'Open waiter pad list.';
+                ToolTip = 'View a list of all current and past waiter pads registered in the system, regardless of their status. Please note that the list may be periodically purged by a dedicated retention policy running in the background.';
                 ApplicationArea = NPRRetail;
             }
             action(KitchenOrders)
@@ -51,15 +51,23 @@
                 Caption = 'Kitchen Orders';
                 Image = BlanketOrder;
                 RunObject = Page "NPR NPRE Kitchen Order List";
-                ToolTip = 'View kitchen order list.';
+                ToolTip = 'View a list of all current and past kitchen orders registered in the system, regardless of their status. Please note that the list may be periodically purged by a dedicated retention policy running in the background.';
                 ApplicationArea = NPRRetail;
             }
             action(KitchenRequests)
             {
-                Caption = 'Kitchen Requests (Expedite)';
+                Caption = 'Kitchen Requests';
                 Image = BlanketOrder;
                 RunObject = Page "NPR NPRE Kitchen Req.";
-                ToolTip = 'View outstaning kitchen requests (expedite view).';
+                ToolTip = 'View a list of all current and past kitchen requests registered in the system, regardless of their status. Please note that the list may be periodically purged by a dedicated retention policy running in the background.';
+                ApplicationArea = NPRRetail;
+            }
+            action(Notifications)
+            {
+                Caption = 'Restaurant Notifications';
+                Image = Log;
+                RunObject = Page "NPR NPRE Notification Entries";
+                ToolTip = 'View a log of current and past restaurant-related messages intended for sending to customers or restaurant managers, along with their sending status. Please note that the list may be periodically purged by a dedicated retention policy running in the background.';
                 ApplicationArea = NPRRetail;
             }
         }
@@ -121,22 +129,6 @@
                     Image = Log;
                     RunObject = Page "NPR NPRE W.Pad Pr.Log Entries";
                     ToolTip = 'View waiter pad line sending log to kitchen.';
-                    ApplicationArea = NPRRetail;
-                }
-                action(Notifications)
-                {
-                    Caption = 'Restaurant Notifications';
-                    Image = Log;
-                    RunObject = Page "NPR NPRE Notification Entries";
-                    ToolTip = 'View restaurant related notifications sent to customers or restaurant managers.';
-                    ApplicationArea = NPRRetail;
-                }
-                action(KitchenRequestHistory)
-                {
-                    Caption = 'Kitchen Requests';
-                    Image = Log;
-                    RunObject = Page "NPR NPRE Kitchen Req. List";
-                    ToolTip = 'View a history of previous kitchen requests.';
                     ApplicationArea = NPRRetail;
                 }
                 action(POSEntries)

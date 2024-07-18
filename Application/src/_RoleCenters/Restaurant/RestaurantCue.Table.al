@@ -23,7 +23,14 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR NPRE Kitchen Request" where("Line Status" = filter("Ready for Serving" | "Serving Requested" | Planned), "Restaurant Code" = field("Restaurant Filter")));
         }
-        field(12; "Kitchen Orders - Open"; Integer)
+        field(12; "Kitch. Station Requests - Open"; Integer)
+        {
+            Caption = 'Kitch. Station Requests - Open';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NPRE Kitchen Req. Station" where("Production Status" = filter("Not Started" | Pending | Started | "On Hold"), "Production Restaurant Code" = field("Restaurant Filter")));
+        }
+        field(15; "Kitchen Orders - Open"; Integer)
         {
             Caption = 'Kitchen Orders - Open';
             Editable = false;

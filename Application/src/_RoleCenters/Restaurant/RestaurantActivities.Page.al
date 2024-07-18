@@ -43,9 +43,9 @@
                 }
                 field("Kitchen Requests - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitchen Requests - Open"))))
                 {
-                    ToolTip = 'Specifies the number of currently active kitchen requests (the requests that hasn’t been finished or cancelled so far).';
+                    ToolTip = 'Specifies the number of currently active expedite kitchen requests (the requests that haven’t been completed or cancelled yet).';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Kitchen Requests - Open';
+                    Caption = 'Kitchen Requests (Expedite) - Open';
 
                     trigger OnDrillDown()
                     var
@@ -53,6 +53,17 @@
                     begin
                         Rec.CopyFilter("Restaurant Filter", KitchenRequest."Restaurant Code");
                         Page.Run(Page::"NPR NPRE Kitchen Req.", KitchenRequest);
+                    end;
+                }
+                field("Kitch. Station Requests - Open"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Kitch. Station Requests - Open"))))
+                {
+                    ToolTip = 'Specifies the number of currently active production requests to kitchen stations (requests for which production hasn’t been completed or cancelled).';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Kitchen Station Requests - Open';
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowKitchenRequests();
                     end;
                 }
                 field("Pending Reservations"; Rec."Pending Reservations")
@@ -453,6 +464,21 @@
             exit(0);
         if not Evaluate(Result, BackgroundTaskResults.Get(FieldNo), 9) then
             Result := 0;
+    end;
+
+    local procedure ShowKitchenRequests()
+    var
+        KitchenStation: Record "NPR NPRE Kitchen Station";
+        PageAction: Action;
+    begin
+        KitchenStation.FilterGroup(2);
+        Rec.CopyFilter("Restaurant Filter", KitchenStation."Restaurant Code");
+        KitchenStation.FilterGroup(0);
+        if KitchenStation.Count() = 1 then
+            KitchenStation.FindFirst()
+        else
+            PageAction := Page.RunModal(Page::"NPR NPRE Kitchen Stations", KitchenStation);
+        KitchenStation.ShowKitchenRequests();
     end;
 
     var
