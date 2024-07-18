@@ -209,7 +209,7 @@
 
     trigger OnOpenPage()
     begin
-        Rec.SetRange("Item No.", Rec.GetFilter("Item No."));
+        Rec.SetFilter("Item No.", Rec.GetFilter("Item No."));
         if Rec.IsEmpty then begin
             Rec.Init();
             Rec."Main No." := CopyStr(Rec.GetFilter("Item No."), 1, MaxStrLen(Rec."Main No."));
