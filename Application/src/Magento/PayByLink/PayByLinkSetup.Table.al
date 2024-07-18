@@ -15,7 +15,6 @@ table 6150892 "NPR Pay by Link Setup"
         {
             Caption = 'Payment Gateaway Code';
             DataClassification = CustomerContent;
-            NotBlank = true;
             TableRelation = "NPR Magento Payment Gateway";
         }
         field(10; "E-Mail Template"; Code[20])
@@ -55,7 +54,7 @@ table 6150892 "NPR Pay by Link Setup"
         }
         field(50; "Pay by Link Exp. Duration"; Duration)
         {
-            Caption = 'Pay by Link Expiration Duration';
+            Caption = 'Pay by Link Expiration';
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin

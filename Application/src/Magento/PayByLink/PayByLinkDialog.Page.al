@@ -50,18 +50,18 @@ page 6184597 "NPR Pay by Link Dialog"
                     Caption = 'Send E-mail';
                     ToolTip = 'Specifies if e-mail will be sent';
                 }
-                field("Expiration Duration"; ExpirationDuration)
+                field("Link Expiration"; LinkExpiration)
                 {
                     ApplicationArea = NPRRetail;
                     Editable = not ReSending;
-                    Caption = 'Expiration Link Duration';
+                    Caption = 'Link Expiration';
                     ToolTip = 'Specifies the value of the Pay by Link Expiration Duration';
 
                     trigger OnValidate()
                     var
                         PayByLinkSetup: Record "NPR Pay By Link Setup";
                     begin
-                        PayByLinkSetup.CheckExpDuration(ExpirationDuration);
+                        PayByLinkSetup.CheckExpDuration(LinkExpiration);
                     end;
                 }
             }
@@ -74,28 +74,28 @@ page 6184597 "NPR Pay by Link Dialog"
         MobilePhoneNo: Text[30];
         SendSMS: Boolean;
         SendEmail: Boolean;
-        ExpirationDuration: Duration;
+        LinkExpiration: Duration;
         ReSending: Boolean;
 
 
-    procedure SetValues(NewAmount: Decimal; NewEmail: Text[80]; NewPhoneNo: Text[30]; NewSendEmail: Boolean; NewSendSMS: Boolean; NewExpirationDuration: Duration)
+    procedure SetValues(NewAmount: Decimal; NewEmail: Text[80]; NewPhoneNo: Text[30]; NewSendEmail: Boolean; NewSendSMS: Boolean; NewLinkExpiration: Duration)
     begin
         Amount := NewAmount;
         Email := NewEmail;
         MobilePhoneNo := NewPhoneNo;
         SendEmail := NewSendEmail;
         SendSMS := NewSendSMS;
-        ExpirationDuration := NewExpirationDuration;
+        LinkExpiration := NewLinkExpiration;
     end;
 
-    procedure GetValues(var NewAmount: Decimal; var NewEmail: Text[80]; var NewPhoneNo: Text[30]; var NewSendEmail: Boolean; var NewSendSMS: Boolean; var NewExpirationDuration: Duration)
+    procedure GetValues(var NewAmount: Decimal; var NewEmail: Text[80]; var NewPhoneNo: Text[30]; var NewSendEmail: Boolean; var NewSendSMS: Boolean; var NewLinkExpiration: Duration)
     begin
         NewAmount := Amount;
         NewEmail := Email;
         NewPhoneNo := MobilePhoneNo;
         NewSendEmail := SendEmail;
         NewSendSMS := SendSMS;
-        NewExpirationDuration := ExpirationDuration;
+        NewLinkExpiration := LinkExpiration;
     end;
 
     procedure SetResending()
