@@ -3,7 +3,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
     Access = Internal;
 
 
-    local procedure SerialNumberCanBeUsedByItem(ItemNo: Code[20]; var VariantCode: Code[10]; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean) CanBeUsed: Boolean
+    local procedure SerialNumberCanBeUsedByItem(ItemNo: Code[20]; var VariantCode: Code[10]; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean; LocationCode: Code[10]) CanBeUsed: Boolean
     var
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
@@ -40,6 +40,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry.SetRange("Serial No.", SerialNumber);
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
 
         ItemLedgerEntry.SetLoadFields("Variant Code");
         CanBeUsed := ItemLedgerEntry.FindSet(false);
@@ -119,7 +120,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
             SerialNumberInput := '';
 
         AskForSerialNoContinuously := true;
-        while (not SerialNumberCanBeUsedByItem(ItemNo, VariantCode, SerialNumberInput, UserInformationErrorWarning, SerialSelectionFromList)) and AskForSerialNoContinuously do begin
+        while (not SerialNumberCanBeUsedByItem(ItemNo, VariantCode, SerialNumberInput, UserInformationErrorWarning, SerialSelectionFromList, POSStore."Location Code")) and AskForSerialNoContinuously do begin
 
             AskForSerialNoContinuously := SerialSelectionFromList;
             if SerialSelectionFromList then begin
