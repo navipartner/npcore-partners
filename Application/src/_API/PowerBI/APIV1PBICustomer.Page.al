@@ -68,6 +68,10 @@ page 6059914 "NPR APIV1 PBICustomer"
                 {
                     Caption = 'Customer Posting Group', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Time', Locked = true;
+                }
             }
         }
     }

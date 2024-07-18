@@ -96,6 +96,10 @@ page 6059939 "NPR APIV1 PBITicket"
                 {
                     Caption = 'Ticket Reservation Entry No.';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Time', Locked = true;
+                }
             }
         }
     }
