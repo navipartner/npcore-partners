@@ -98,6 +98,9 @@ report 6014418 "NPR Sale Time Report POS"
             column(EndText; Text10600010)
             {
             }
+            column(PayinPayoutLbl; PayinPayoutLbl)
+            {
+            }
         }
         dataitem("Integer"; "Integer")
         {
@@ -146,6 +149,9 @@ report 6014418 "NPR Sale Time Report POS"
             {
             }
             column(Values_Number_12; Values[Number] [12])
+            {
+            }
+            column(Values_Number_13; Values[Number] [13])
             {
             }
 
@@ -437,7 +443,8 @@ report 6014418 "NPR Sale Time Report POS"
         CostAmt: Decimal;
         DebitExcVat: Decimal;
         NoOfPOSSalesLines: Decimal;
-        Values: array[14, 12] of Decimal;
+        PayinPayoutAmt: Decimal;
+        Values: array[14, 13] of Decimal;
         Text10600000: Label 'The Time in File %1 is less than %2';
         Text10600001: Label 'Monday,';
         Text10600002: Label 'Tuesday,';
@@ -466,6 +473,7 @@ report 6014418 "NPR Sale Time Report POS"
         TextCancelled: Label 'Cancelled';
         TextOther: Label 'Other';
         TextSalesAmt: Label 'Sales Amt';
+        PayinPayoutLbl: Label 'Payin/Payout';
         POSSalesline: Record "NPR POS Entry Sales Line";
         NoofSales: Integer;
         Noofdebtsales: Integer;
@@ -546,8 +554,10 @@ report 6014418 "NPR Sale Time Report POS"
             InterruptedAmt := 0;
             NetSalesExcVAT := 0;
             NoOfPOSSalesLines := 0;
+            PayinPayoutAmt := 0;
 
             PosEntry1.SetFilter("Ending Time", '>=%1&<%2', TimeArray[I], TimeArray[I + 1]);
+            PosEntry1.SetRange("Is Pay-in Pay-out", false);
 
             if PosEntry1.FindSet() then begin
                 repeat
@@ -641,6 +651,12 @@ report 6014418 "NPR Sale Time Report POS"
                 InterruptedAmt := PosEntry2.Count;
             end;
 
+            PosEntry2.Reset();
+            PosEntry2.CopyFilters(PosEntry1);
+            PosEntry2.SetRange("Is Pay-in Pay-out", true);
+            PosEntry2.CalcSums("Amount Excl. Tax");
+            PayinPayoutAmt := PosEntry2."Amount Excl. Tax";
+
             db := NetSalesExcVAT - CostAmt;
             ItemAmt := NoofSales + Noofdebtsales;
             Values[I] [1] += ItemAmt;
@@ -657,6 +673,7 @@ report 6014418 "NPR Sale Time Report POS"
             Values[I] [9] += db;
             Values[I] [11] += InterruptedAmt;
             Values[I] [12] += OtherAmt;
+            Values[I] [13] += PayinPayoutAmt;
             Values[14] [1] += ItemAmt;
             Values[14] [3] += NetSalesExcVAT;
             Values[14] [4] += ItemSalesAmt;
@@ -667,6 +684,7 @@ report 6014418 "NPR Sale Time Report POS"
             Values[14] [9] += db;
             Values[14] [11] += InterruptedAmt;
             Values[14] [12] += OtherAmt;
+            Values[14] [13] += PayinPayoutAmt;
         end;
     end;
 }

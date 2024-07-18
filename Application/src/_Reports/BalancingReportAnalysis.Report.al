@@ -722,6 +722,7 @@
                 end;
             end;
             POSEntry2.SetRange("Entry Type", POSEntry2."Entry Type"::"Direct Sale");
+            POSEntry2.SetRange("Is Pay-in Pay-out", false);
             POSEntry2.SetRange("System Entry", false);
             TempWorkshiftCheckpoint."Direct Sales Count" := POSEntry2.Count();
 
