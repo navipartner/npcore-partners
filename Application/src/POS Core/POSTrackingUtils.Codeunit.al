@@ -142,7 +142,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
     end;
     #endregion ValidateSerialNo
 
-    procedure LotCanBeUsedByItem(ItemNo: Code[20]; VariantCode: Code[10]; LotNo: Code[50]; var UserInformationErrorWarning: Text) CanBeUsed: Boolean
+    procedure LotCanBeUsedByItem(ItemNo: Code[20]; VariantCode: Code[10]; LotNo: Code[50]; var UserInformationErrorWarning: Text; LocationCode: Code[10]) CanBeUsed: Boolean
     var
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
@@ -178,6 +178,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetRange("Lot No.", LotNo);
         ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
         ItemLedgerEntry.SetLoadFields("Variant Code", "Remaining Quantity");
 
         CanBeUsed := ItemLedgerEntry.FindSet(false);
@@ -246,7 +247,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
             exit;
 
         RequiresSpecificLotNo := true;
-        if (not LotCanBeUsedByItem(ItemNo, VariantCode, LotInput, UserInformationErrorWarning)) then
+        if (not LotCanBeUsedByItem(ItemNo, VariantCode, LotInput, UserInformationErrorWarning, POSStore."Location Code")) then
             if (LotInput <> '') and (UserInformationErrorWarning <> '') then
                 Error(UserInformationErrorWarning);
 

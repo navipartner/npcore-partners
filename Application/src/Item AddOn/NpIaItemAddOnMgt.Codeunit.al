@@ -1053,7 +1053,7 @@
                 TempItemAddOnLotBuffer.TestField("Lot No.");
                 ItemAddOnLine.Get(TempItemAddOnLotBuffer."AddOn No.", TempItemAddOnLotBuffer."Line No.");
                 if ItemAddOnLine."Lot No." <> TempItemAddOnLotBuffer."Lot No." then
-                    if (not POSTrackingUtils.LotCanBeUsedByItem(TempItemAddOnLotBuffer."Item No.", TempItemAddOnLotBuffer."Variant Code", TempItemAddOnLotBuffer."Lot No.", UserInformationErrorWarning)) then begin
+                    if (not POSTrackingUtils.LotCanBeUsedByItem(TempItemAddOnLotBuffer."Item No.", TempItemAddOnLotBuffer."Variant Code", TempItemAddOnLotBuffer."Lot No.", UserInformationErrorWarning, SalePOS."Location Code")) then begin
                         if (TempItemAddOnLotBuffer."Lot No." <> '') and (UserInformationErrorWarning <> '') then
                             Error(UserInformationErrorWarning)
                     end else begin
