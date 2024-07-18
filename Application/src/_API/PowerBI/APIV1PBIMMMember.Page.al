@@ -55,6 +55,10 @@ page 6150782 "NPR APIV1 PBIMMMember"
                 {
                     Caption = 'External Member No.', Locked = True;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Time', Locked = true;
+                }
             }
         }
     }

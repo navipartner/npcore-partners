@@ -48,6 +48,10 @@ page 6059933 "NPR APIV1 PBIMMMembership"
                 {
                     Caption = 'Blocked', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Time', Locked = true;
+                }
             }
         }
     }

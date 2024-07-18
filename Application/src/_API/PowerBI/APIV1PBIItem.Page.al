@@ -127,6 +127,10 @@ page 6059926 "NPR APIV1 PBIItem"
                 {
                     Caption = 'Description 2', Locked = true;
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date Time', Locked = true;
+                }
             }
         }
     }
