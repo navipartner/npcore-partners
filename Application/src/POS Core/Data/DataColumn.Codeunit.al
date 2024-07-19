@@ -124,6 +124,12 @@
         exit(_isCheckbox.AsValue().AsBoolean());
     end;
 
+    procedure Editable(): Boolean;
+    begin
+        MakeSureIsConstructed();
+        exit(_editable.AsValue().AsBoolean());
+    end;
+
     local procedure Initialize();
     begin
         Clear(_constructed);

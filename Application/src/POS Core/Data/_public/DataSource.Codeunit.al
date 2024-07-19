@@ -176,7 +176,7 @@
     var
         ColumnOutIgnore: Codeunit "NPR Data Column";
     begin
-        AddColumn(FieldNo, Caption, DataType, Visible, ColumnOutIgnore, false);
+        AddColumn(FieldNo, Caption, DataType, Visible, ColumnOutIgnore, true);
     end;
 
     procedure Content(): JsonObject;

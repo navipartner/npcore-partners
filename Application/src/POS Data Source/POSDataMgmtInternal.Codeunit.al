@@ -51,7 +51,8 @@ codeunit 6150790 "NPR POS Data Mgmt. Internal"
                       ExtensionName + '.' + DataColumn.FieldId(),
                       DataColumn.Caption(),
                       DataColumn.DataType(),
-                      DataColumn.Visible());
+                      DataColumn.Visible(),
+                      DataColumn.Editable());
                 end;
             end;
         end;
