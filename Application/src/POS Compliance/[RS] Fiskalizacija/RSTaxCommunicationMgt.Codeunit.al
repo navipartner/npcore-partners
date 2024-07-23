@@ -954,10 +954,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         ItemName: Text;
         JsonBodyTxt: Text;
     begin
-        if IsCopy then
-            JObjectHeader.Add('dateAndTimeOfIssue', PadStr(Format(Today(), 0, '<Year4>-<Month,2>-<Day,2>') + 'T' + Format(Time(), 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>') + 'Z', 20))
-        else
-            JObjectHeader.Add('dateAndTimeOfIssue', PadStr(Format(SalesInvoiceHeader."Order Date", 0, '<Year4>-<Month,2>-<Day,2>') + 'T' + Format(Time(), 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>') + 'Z', 20));
+        if RSPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code") then
+            if (RSPaymentMethodMapping."RS Payment Method" in [RSPaymentMethodMapping."RS Payment Method"::WireTransfer]) and (SalesHeader."Order Date" <> Today()) then
+                JObjectHeader.Add('dateAndTimeOfIssue', PadStr(Format(SalesHeader."Order Date", 0, '<Year4>-<Month,2>-<Day,2>') + 'T' + '13:42:53Z', 20));// Format(Time(), 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>') + 'Z', 20));
         JObjectHeader.Add('cashier', SalesInvoiceHeader."Salesperson Code");
         RSAuxSalesHeader.Get(SalesHeader.SystemId);
         if RSAuxSalesHeader."NPR RS Customer Ident." <> '' then
