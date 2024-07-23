@@ -6,6 +6,7 @@ page 6184707 "NPR Spfy Webhook Notifications"
     Caption = 'Shopify Webhook Notifications';
     PageType = List;
     SourceTable = "NPR Spfy Webhook Notification";
+    SourceTableView = order(descending);
     UsageCategory = Lists;
     Editable = false;
 

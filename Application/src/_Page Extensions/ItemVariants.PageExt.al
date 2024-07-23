@@ -48,6 +48,7 @@ pageextension 6014458 "NPR Item Variants" extends "Item Variants"
     trigger OnAfterGetCurrRecord()
     begin
         CurrPage."NPR ShopifyIDs".Page.SetItemVariant(Rec);
+        CurrPage."NPR ShopifyIDs".Page.Update(false);
     end;
 
     local procedure NPR_UpdateShopifyStoreListGenerated()
