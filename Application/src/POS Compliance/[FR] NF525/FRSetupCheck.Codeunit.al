@@ -193,8 +193,8 @@ codeunit 6184889 "NPR FR Setup Check"
 
         POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
         POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
-        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
         POSAuditProfile.TestField("Allow Zero Amount Sales", false);
+        POSAuditProfile.TestField("Allow Printing Receipt Copy", POSAuditProfile."Allow Printing Receipt Copy"::Always);
         POSAuditProfile.TestField("Require Item Return Reason", true);
 
         POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
