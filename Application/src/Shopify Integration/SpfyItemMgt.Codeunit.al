@@ -551,6 +551,26 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(false);
     end;
 
+    procedure FindItemByShopifyProductID(ProductId: Text[30]; var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link") Found: Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        Clear(SpfyStoreItemLink);
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(
+            Database::"NPR Spfy Store-Item Link", "NPR Spfy ID Type"::"Entry ID", ProductId, ShopifyAssignedID);
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                    RecRef.SetTable(SpfyStoreItemLink);
+                    SpfyStoreItemLink.Mark(SpfyStoreItemLink."Item No." <> '');
+                end;
+            until ShopifyAssignedID.Next() = 0;
+        SpfyStoreItemLink.MarkedOnly(true);
+        Found := not SpfyStoreItemLink.IsEmpty();
+    end;
+
     local procedure UpdateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     begin
         Codeunit.Run(Codeunit::"NPR Spfy Item Recalc.Invt.Lev.", SpfyStoreItemLink);

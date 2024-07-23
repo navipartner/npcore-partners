@@ -37,17 +37,25 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     ToolTip = 'Specifies a Shopify store the linked item is integrated to.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Store Integration Is Enabled"; Rec."Store Integration Is Enabled")
+                {
+                    ToolTip = 'Specifies whether integration with the Shopify store is generally enabled.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    DrillDown = false;
+                }
                 field("Sync. to this Store"; Rec."Sync. to this Store")
                 {
-                    ToolTip = 'Specifies whether it has been requested to integrate the item with the Shopify store.';
+                    ToolTip = 'Specifies whether the item has been requested to be integrated with the Shopify store.';
                     ApplicationArea = NPRShopify;
                     Editable = ItemListIntegrationIsEnabled;
                 }
-                field("Store Integration Is Enabled"; Rec."Store Integration Is Enabled")
+                field("Synchronization Is Enabled"; Rec."Synchronization Is Enabled")
                 {
-                    ToolTip = 'Specifies whether confirmation has been received from the Shopify store that the item has been successfully created on the store.';
+                    ToolTip = 'Specifies whether confirmation has been received from the Shopify store that the associated product has been successfully created in the store.';
                     ApplicationArea = NPRShopify;
                     Editable = false;
+                    DrillDown = false;
                 }
                 field("Shopify Status"; Rec."Shopify Status")
                 {
@@ -60,7 +68,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     ToolTip = 'Specifies the Shopify Name of the item.';
                     ApplicationArea = NPRShopify;
                 }
-                field("Shopify Description"; Format(Rec."Shopify Description".HasValue))
+                field("Shopify Description"; Format(Rec."Shopify Description".HasValue()))
                 {
                     Caption = 'Shopify Description';
                     ToolTip = 'Specifies the Shopify Description of the item.';

@@ -38,7 +38,7 @@ table 6150811 "NPR Spfy Store-Item Link"
         }
         field(100; "Sync. to this Store"; Boolean)
         {
-            Caption = 'Integrate with This Store';
+            Caption = 'Sync. with Store';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
