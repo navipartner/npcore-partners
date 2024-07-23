@@ -23,6 +23,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                 {
                     ToolTip = 'Specifies whether the item is integrated with the Shopify store.';
                     ApplicationArea = NPRShopify;
+                    DrillDown = false;
                 }
                 field("NPR Spfy Variant ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
                 {
@@ -75,7 +76,6 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
 
     procedure SetItemVariant(ItemVariant: Record "Item Variant")
     begin
-        Clear(SpfyStoreItemVariantLink);
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
         SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
         SpfyStoreItemVariantLink."Variant Code" := ItemVariant.Code;

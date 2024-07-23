@@ -37,11 +37,8 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
     procedure NavigateToRelatedBCEntity(SpfyWebhookNotification: Record "NPR Spfy Webhook Notification")
     var
         Item: Record Item;
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
-        Found: Boolean;
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         ItemNotFoundErr: Label 'The Shopify product ID "%1" is not associated with any item in Business Central.', Comment = '%1 - Shopify product identificator';
     begin
         if not (SpfyWebhookNotification.Topic in
@@ -50,21 +47,25 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
              SpfyWebhookNotification.Topic::"products/update"])
         then
             exit;
+
         SpfyWebhookNotification.TestField("Triggered for Source ID");
-        SpfyAssignedIDMgt.FilterWhereUsedInTable(
-            Database::"NPR Spfy Store-Item Link", "NPR Spfy ID Type"::"Entry ID", SpfyWebhookNotification."Triggered for Source ID", ShopifyAssignedID);
-        if ShopifyAssignedID.Find('-') then
-            repeat
-                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                    RecRef.SetTable(SpfyStoreItemLink);
-                    if SpfyStoreItemLink."Item No." <> '' then begin
-                        Item."No." := SpfyStoreItemLink."Item No.";
-                        Found := Item.Find();
-                    end;
-                end;
-            until Found or (ShopifyAssignedID.Next() = 0);
-        if not Found then
+        if not SpfyItemMgt.FindItemByShopifyProductID(SpfyWebhookNotification."Triggered for Source ID", SpfyStoreItemLink) then
             Error(ItemNotFoundErr, SpfyWebhookNotification."Triggered for Source ID");
+        SpfyStoreItemLink.FindSet();
+        repeat
+            Item."No." := SpfyStoreItemLink."Item No.";
+            Item.Mark(true);
+        until SpfyStoreItemLink.Next() = 0;
+
+        Item.MarkedOnly(true);
+        Case Item.Count() of
+            0:
+                Error(ItemNotFoundErr, SpfyWebhookNotification."Triggered for Source ID");
+            1:
+                Page.Run(Page::"Item Card", Item);
+            else
+                Page.Run(Page::"Item List", Item);
+        end;
         Page.Run(Page::"Item Card", Item);
     end;
 }
