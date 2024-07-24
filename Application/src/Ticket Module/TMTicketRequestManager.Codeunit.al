@@ -1439,6 +1439,7 @@
         AlreadyAsked: Boolean;
         AllowRevoke: Boolean;
         TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
+        PrimaryRequestLine: Boolean;
     begin
 
         Ticket.Get(TicketNo);
@@ -1466,6 +1467,7 @@
 
         if (Token = '') then
             Token := GetNewToken();
+        PrimaryRequestLine := true;
 
         repeat
 
@@ -1588,6 +1590,7 @@
             ReservationRequest."External Ticket Number" := Ticket."External Ticket No.";
 
             ReservationRequest."Revoke Ticket Request" := true;
+            ReservationRequest."Primary Request Line" := PrimaryRequestLine;
             ReservationRequest."Revoke Access Entry No." := TicketAccessEntry."Entry No.";
             ReservationRequest.Quantity := RevokeQuantity;
             ReservationRequest.Amount := AdmissionRefundAmount;
@@ -1606,6 +1609,7 @@
             ReservationRequest."Superseeds Entry No." := Ticket."Ticket Reservation Entry No.";
 
             ReservationRequest.Insert();
+            PrimaryRequestLine := false;
 
         until (TicketAccessEntry.Next() = 0);
 
@@ -1967,6 +1971,7 @@
     var
         Token: Text[100];
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        OriginalSaleLine: Record "NPR POS Entry Sales Line";
         ResponseMessage: Text;
         ResponseCode: Integer;
         Ticket: Record "NPR TM Ticket";
@@ -2013,8 +2018,19 @@
 
             // Return sales
             if (SaleLinePOS.Quantity < 0) then begin
-                Ticket.SetFilter("Sales Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
-                Ticket.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+                OriginalSaleLine."Document No." := SaleLinePOS."Return Sale Sales Ticket No.";
+                OriginalSaleLine."Line No." := SaleLinePOS."Line No.";
+
+                // A return sales ticket line number can not be trusted to be the same as the original ticket line number
+                if (not (IsNullGuid(SaleLinePOS."Orig.POS Entry S.Line SystemId"))) then
+                    OriginalSaleLine.GetBySystemId(SaleLinePOS."Orig.POS Entry S.Line SystemId");
+
+                Ticket.SetFilter("Sales Receipt No.", '=%1', OriginalSaleLine."Document No.");
+                Ticket.SetFilter("Line No.", '=%1', OriginalSaleLine."Line No.");
+
+                // Ticket.SetFilter("Sales Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
+                // Ticket.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+
                 if (Ticket.FindSet()) then begin
                     DeleteReservationRequest(Token, true);
                     repeat
