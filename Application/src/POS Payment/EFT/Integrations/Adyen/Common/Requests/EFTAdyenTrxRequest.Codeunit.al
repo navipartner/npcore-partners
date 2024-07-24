@@ -115,6 +115,7 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
             2:
                 exit('wechat');
         end;
+
         exit('');
     end;
 
