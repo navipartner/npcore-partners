@@ -235,7 +235,7 @@
         {
             Caption = 'Entry Type';
             OptionMembers = PRIMARY,CHANGE,REVOKE;
-            OptionCaption = 'Primary,Change';
+            OptionCaption = 'Primary,Change,Revoke';
             DataClassification = CustomerContent;
         }
         field(123; "Superseeds Entry No."; Integer)

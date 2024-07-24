@@ -75,12 +75,15 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         BasePrice: Decimal;
         AddonPrice: Decimal;
+        PreviousTicketNo: Text[30];
     begin
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         if (TicketReservationRequest.FindSet()) then begin
+            PreviousTicketNo := TicketReservationRequest."External Ticket Number";
+
             repeat
                 CalculateScheduleEntryPrice(
                     TicketReservationRequest."Item No.",
@@ -96,8 +99,14 @@ codeunit 6014559 "NPR TM Dynamic Price"
                     AddonPrice
                 );
 
+                if (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::REVOKE) then
+                    if (TicketReservationRequest."External Ticket Number" <> PreviousTicketNo) then
+                        break;
+
                 if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then
                     TicketUnitPrice += BasePrice + AddonPrice;
+
+                PreviousTicketNo := TicketReservationRequest."External Ticket Number";
 
             until (TicketReservationRequest.Next() = 0);
         end;

@@ -546,12 +546,10 @@
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        SeatingUI: Codeunit "NPR TM Seating UI";
-        POSSession: Codeunit "NPR POS Session";
-        FrontEnd: Codeunit "NPR POS Front End Management";
         POSUnit: Record "NPR POS Unit";
         Token: Text[100];
         INVALID_QTY: Label 'Invalid quantity. Old quantity %1, new quantity %2.';
+        QuantityChangeNotAllowedLabel: Label 'You cannot change quantity when revoking a specific ticket.';
     begin
         if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
@@ -584,16 +582,15 @@
 
         if (SaleLinePOS.Quantity > 0) then begin
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
-            if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
-                if (POSSession.IsActiveSession(FrontEnd)) then
-                    SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
-            end;
             exit;
         end;
 
         if (SaleLinePOS.Quantity < 0) then begin
-            if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
-                exit;
+            if (SaleLinePOS."Return Sale Sales Ticket No." = '') then begin
+                if (SaleLinePOS.Quantity = -1) then
+                    exit;
+                Error(QuantityChangeNotAllowedLabel);
+            end;
 
             // when there is a return sales ticket number, there should be a revoke request
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
@@ -768,9 +765,10 @@
         Error(ResponseMessage);
     end;
 
-    local procedure RevokeTicketSales(var SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure RevokeTicketSales(var ReturnSaleLinePOS: Record "NPR POS Sale Line")
     var
         Ticket: Record "NPR TM Ticket";
+        OriginalSaleLine: Record "NPR POS Entry Sales Line";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         UnitPrice: Decimal;
         Token: Text[100];
@@ -778,31 +776,38 @@
         RevokeQuantity: Integer;
 
     begin
-        if (SaleLinePOS."Return Sale Sales Ticket No." = '') then
+        if (ReturnSaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
 
-        Ticket.SetFilter("Sales Receipt No.", '=%1', SaleLinePOS."Return Sale Sales Ticket No.");
-        Ticket.SetFilter("Line No.", '=%1', SaleLinePOS."Line No.");
+        OriginalSaleLine."Document No." := ReturnSaleLinePOS."Return Sale Sales Ticket No.";
+        OriginalSaleLine."Line No." := ReturnSaleLinePOS."Line No.";
+
+        // A return sales ticket line number can not be trusted to be the same as the original ticket line number
+        if (not (IsNullGuid(ReturnSaleLinePOS."Orig.POS Entry S.Line SystemId"))) then
+            OriginalSaleLine.GetBySystemId(ReturnSaleLinePOS."Orig.POS Entry S.Line SystemId");
+
+        Ticket.SetFilter("Sales Receipt No.", '=%1', OriginalSaleLine."Document No.");
+        Ticket.SetFilter("Line No.", '=%1', OriginalSaleLine."Line No.");
 
         if (Ticket.FindSet()) then begin
             Token := '';
 
             repeat
-                UnitPrice := SaleLinePOS."Unit Price";
-                if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
+                UnitPrice := ReturnSaleLinePOS."Unit Price";
+                if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReturnSaleLinePOS."Sales Ticket No.", ReturnSaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
                     TicketCount -= RevokeQuantity;
             until (Ticket.Next() = 0);
 
             // on partial refunds unit price will become altered and qty should be one.
-            if (UnitPrice <> SaleLinePOS."Unit Price") then begin
-                SaleLinePOS.Validate("Unit Price", UnitPrice);
-                SaleLinePOS.Modify();
+            if (UnitPrice <> ReturnSaleLinePOS."Unit Price") then begin
+                ReturnSaleLinePOS.Validate("Unit Price", UnitPrice);
+                ReturnSaleLinePOS.Modify();
             end;
 
-            if (TicketCount <> SaleLinePOS.Quantity) then begin
-                SaleLinePOS.Quantity := TicketCount;
-                SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS.Modify();
+            if (TicketCount <> ReturnSaleLinePOS.Quantity) then begin
+                ReturnSaleLinePOS.Quantity := TicketCount;
+                ReturnSaleLinePOS.UpdateAmounts(ReturnSaleLinePOS);
+                ReturnSaleLinePOS.Modify();
             end;
         end;
     end;
