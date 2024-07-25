@@ -59,6 +59,18 @@ page 6150782 "NPR APIV1 PBIMMMember"
                 {
                     Caption = 'Last Modified Date Time', Locked = true;
                 }
+                field(gender; Rec.Gender)
+                {
+                    Caption = 'Gender', Locked = True;
+                }
+                field(birthday; Rec.Birthday)
+                {
+                    Caption = 'Birthday', Locked = True;
+                }
+                field(newsletter; Rec."E-Mail News Letter")
+                {
+                    Caption = 'Newsletter', Locked = True;
+                }
             }
         }
     }
