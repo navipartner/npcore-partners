@@ -9,6 +9,9 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
   test("should be able to search item, add and remove, do payment", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(

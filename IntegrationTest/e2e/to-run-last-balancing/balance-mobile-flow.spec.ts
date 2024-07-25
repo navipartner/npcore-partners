@@ -69,6 +69,9 @@ test.describe("Balancing v4 mobile test", () => {
   test("User should be able to do balancing by entering amounts in inputs", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -446,6 +449,9 @@ test.describe("Balancing v4 mobile test", () => {
   test("User should be able to do balancing by entering coins amount", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(

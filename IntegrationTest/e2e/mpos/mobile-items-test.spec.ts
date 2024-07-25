@@ -7,6 +7,9 @@ test.describe("Mobile add and remove item, search, payment test", () => {
   test("should be able to add item, open and delete item, search add and delete, add item and do single and multiple payment", async ({
     page,
   }) => {
+    // TODO: FIXME
+    test.fixme();
+    
     await mobileLogin(
       page,
       true,

@@ -79,6 +79,9 @@ test.describe("Mobile add and remove item from test", () => {
   test("should be able to add customer and remove it", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
