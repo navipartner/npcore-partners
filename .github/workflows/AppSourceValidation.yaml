@@ -28,4 +28,4 @@ jobs:
     with:
       pipelineType: other
       useFailFast: false
-      maxParallel: 10
+      maxParallel: 6

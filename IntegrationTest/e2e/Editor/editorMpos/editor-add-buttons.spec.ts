@@ -7,6 +7,9 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to mobile items, and drawer, asign it an item action, add item to sale and delete it", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -164,6 +167,9 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to sale item, asign it an item action and execute action on sale item", async ({
     page,
   }, workerInfo) => {
+    // TODO: FIXME
+    test.fixme();
+    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(

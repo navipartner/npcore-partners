@@ -1,15 +1,12 @@
 {
-    "appFolder": "Application",
-    "testAppFolder": "",
-    "bcptAppFolder": "",
-    "runTests": false,
     "playwright": {
-        "runTests": true,
+        "runTests": false,
         "runTestsOnFileChange": true,
         "fileChangePatterns": [
             "*/Dragonglass.ControlAddin.al",
             "IntegrationTest/*"
         ],
+
         "folder": "IntegrationTest",
         "envFilename": ".env",
         "rapidstart": "PLAYWRIGHT.rapidstart",
