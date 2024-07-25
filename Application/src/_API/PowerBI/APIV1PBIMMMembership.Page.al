@@ -52,6 +52,14 @@ page 6059933 "NPR APIV1 PBIMMMembership"
                 {
                     Caption = 'Last Modified Date Time', Locked = true;
                 }
+                field(autoRenew; Rec."Auto-Renew")
+                {
+                    Caption = 'Auto-Renew', Locked = true;
+                }
+                field(autoRenewPaymentMethodCode; Rec."Auto-Renew Payment Method Code")
+                {
+                    Caption = 'Auto-Renew Payment Method Code', Locked = true;
+                }
             }
         }
     }
