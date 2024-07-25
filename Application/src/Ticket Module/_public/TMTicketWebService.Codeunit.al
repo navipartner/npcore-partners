@@ -316,7 +316,46 @@
 
     end;
 
+    [Obsolete('Pending removal, use RevokeReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke") instead.', '2024-07-24')]
     procedure RevokeTicketReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke")
+    var
+        ImportEntry: Record "NPR Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
+        OutStr: OutStream;
+        FileNameLbl: Label 'RevokeTicketRequest-%1-%2.xml', Locked = true;
+    begin
+        TicketRevoke.Import();
+
+        InsertImportEntry('RevokeTicketRequest', ImportEntry);
+        ImportEntry."Document ID" := TicketRevoke.GetToken();
+        if (ImportEntry."Document ID" = '') then
+            ImportEntry."Document ID" := CreateDocumentId();
+
+        ImportEntry."Document Name" := StrSubstNo(FileNameLbl, ImportEntry."Document ID", TicketRevoke.GetSummary());
+        ImportEntry."Sequence No." := GetDocumentSequence(ImportEntry."Document ID");
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        TicketRevoke.SetDestination(OutStr);
+        TicketRevoke.Export();
+
+        ImportEntry.Modify(true);
+
+        Commit();
+        NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+
+        ImportEntry.Get(ImportEntry."Entry No.");
+        if (not ImportEntry.Imported) then
+            TicketRevoke.SetErrorResult(ImportEntry."Error Message") else
+            TicketRevoke.SetReservationResult(ImportEntry."Document ID", true);
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        TicketRevoke.SetDestination(OutStr);
+        TicketRevoke.Export();
+        ImportEntry.Modify(true);
+        Commit();
+    end;
+
+    procedure RevokeReservation(var TicketRevoke: XmlPort "NPR TM Ticket Revoke")
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NaviConnectSyncMgt: Codeunit "NPR Nc Sync. Mgt.";
