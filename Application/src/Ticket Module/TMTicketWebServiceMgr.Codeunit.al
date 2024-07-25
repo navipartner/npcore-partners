@@ -629,8 +629,11 @@
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
 
-        Item.Get(Ticket."Item No.");
-        Amount := Item."Unit Price";
+        Amount := Ticket.AmountInclVat;
+        if (Amount = 0) then begin
+            Item.Get(Ticket."Item No.");
+            Amount := Item."Unit Price";
+        end;
 
         TicketRequestManager.WS_CreateRevokeRequest(DocumentID, Ticket."No.", PinCode, Amount, RevokeQty);
 
