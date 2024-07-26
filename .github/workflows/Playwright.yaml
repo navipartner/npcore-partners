@@ -27,5 +27,4 @@ jobs:
     secrets: inherit
     with:
       pipelineType: other
-      pipelineSubType: playwright
       useFailFast: false
