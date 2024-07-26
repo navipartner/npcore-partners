@@ -965,9 +965,9 @@
                 end;
             Coupon."Print Object Type"::Report:
                 begin
-                    Coupon.TestField("Print Object ID", Report::"NPR NpDc Coupon");
+                    Coupon.TestField("Print Object ID");
                     Coupon.SetRecFilter();
-                    Report.Run(Report::"NPR NpDc Coupon", true, false, Coupon);
+                    Report.Run(Coupon."Print Object ID", true, false, Coupon);
                 end;
         end;
     end;
