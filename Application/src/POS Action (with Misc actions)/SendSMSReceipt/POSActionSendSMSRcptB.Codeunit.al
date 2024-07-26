@@ -4,11 +4,14 @@ codeunit 6184927 "NPR POS Action: Send SMS RcptB"
     procedure SendReceipt(SMSTemplateCode: Code[20]; ReceiptPhoneNo: text[80]; POSEntryNo: Integer)
     var
         POSEntry: Record "NPR POS Entry";
-        SMSManagement: Codeunit "NPR SMS Management";
         SMSTemplateHeader: Record "NPR SMS Template Header";
+        SMSManagement: Codeunit "NPR SMS Management";
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         SmsBody: Text;
         POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
         Sender: Text;
+        DigitalReceiptLink: Text;
+        FooterText: Text;
     begin
         POSEntry.Get(POSEntryNo);
 
@@ -17,6 +20,10 @@ codeunit 6184927 "NPR POS Action: Send SMS RcptB"
             if Sender = '' then
                 Sender := GetDefaultSender();
             POSSaleDigitalReceiptEntry.SetRange("POS Entry No.", POSEntryNo);
+            if POSSaleDigitalReceiptEntry.IsEmpty() then begin
+                if POSEntry.Get(POSEntryNo) then;
+                POSActionIssueDigRcptB.CheckIfGlobalSetupEnabledAndCreateReceipt(POSEntry."Document No.", DigitalReceiptLink, FooterText);
+            end;
             if POSSaleDigitalReceiptEntry.FindLast() then begin
                 SmsBody := SMSManagement.MakeMessage(SMSTemplateHeader, POSSaleDigitalReceiptEntry);
                 SMSManagement.SendSMS(ReceiptPhoneNo, Sender, SmsBody);

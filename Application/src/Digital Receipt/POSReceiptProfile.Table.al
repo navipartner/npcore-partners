@@ -19,7 +19,7 @@ table 6150742 "NPR POS Receipt Profile"
         }
         field(20; "Enable Digital Receipt"; Boolean)
         {
-            Caption = 'Enable Digital Receipt';
+            Caption = 'Issue Digital Receipt After Sale';
             DataClassification = CustomerContent;
         }
         field(30; "Receipt Discount Information"; Option)
