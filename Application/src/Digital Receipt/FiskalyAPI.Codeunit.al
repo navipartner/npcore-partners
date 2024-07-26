@@ -191,11 +191,12 @@ codeunit 6184663 "NPR Fiskaly API"
     local procedure CreateReceiptBuyerAndSellerInfo(POSEntry: Record "NPR POS Entry"; ReceiptId: Code[20]; HeadJsonObject: JsonObject)
     var
         Customer: Record Customer;
-        CompanyInfo: Record "Company Information";
+        POSStore: Record "NPR POS Store";
         BuyerJsonObject: JsonObject;
         BuyerAddressJsonObject: JsonObject;
         SellerAddressJsonobject: JsonObject;
         SellerJsonObject: JsonObject;
+        AppendedAddressesText: Text;
     begin
         Clear(BuyerAddressJsonObject);
         Clear(BuyerJsonObject);
@@ -214,16 +215,21 @@ codeunit 6184663 "NPR Fiskaly API"
         BuyerJsonObject.Add('name', Customer.Name);
         BuyerJsonObject.Add('tax_number', Customer."Tax Area Code");
 
-        CompanyInfo.SetLoadFields(Name, City, "Post Code", Address, "VAT Registration No.");
-        CompanyInfo.Get();
-        SellerAddressJsonobject.Add('city', CompanyInfo.City);
-        if StrLen(CompanyInfo."Post Code") <= 10 then
-            SellerAddressJsonobject.Add('postal_code', CompanyInfo."Post Code");
-        SellerAddressJsonobject.Add('street', CompanyInfo.Address);
+        POSStore.SetLoadFields(City, "Post Code", Address, "Address 2", Name, "Name 2", "VAT Registration No.");
+        if POSStore.Get(POSEntry."POS Store Code") then;
+        SellerAddressJsonobject.Add('city', POSStore.City);
+        if StrLen(POSStore."Post Code") <= 10 then
+            SellerAddressJsonobject.Add('postal_code', POSStore."Post Code");
+
+        AppendedAddressesText := POSStore.Address + ' ' + POSStore."Address 2";
+        if StrLen(AppendedAddressesText) <= 60 then
+            SellerAddressJsonobject.Add('street', AppendedAddressesText)
+        else
+            SellerAddressJsonobject.Add('street', POSStore.Address);
 
         SellerJsonObject.Add('address', SellerAddressJsonobject);
-        SellerJsonObject.Add('name', CompanyInfo.Name);
-        SellerJsonObject.Add('tax_number', CompanyInfo."VAT Registration No.");
+        SellerJsonObject.Add('name', POSStore.Name + ' ' + POSStore."Name 2");
+        SellerJsonObject.Add('tax_number', POSStore."VAT Registration No.");
 
         HeadJsonObject.Add('_id', ReceiptId);
         HeadJsonObject.Add('buyer', BuyerJsonObject);

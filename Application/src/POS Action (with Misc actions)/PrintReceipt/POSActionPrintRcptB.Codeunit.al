@@ -14,6 +14,8 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
     internal procedure GetDigitalReceiptQRCodeLink(SalesTicketNo: Code[20]) DigitalReceiptQRCodeLink: Text;
     var
         POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
+        FooterText: Text;
     begin
         if SalesTicketNo = '' then
             exit;
@@ -23,9 +25,9 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
         POSSaleDigitalReceiptEntry.SetRange("Sales Ticket No.", SalesTicketNo);
         POSSaleDigitalReceiptEntry.SetLoadFields("Sales Ticket No.", "QR Code Link");
         if not POSSaleDigitalReceiptEntry.FindFirst() then
-            exit;
-
-        DigitalReceiptQRCodeLink := POSSaleDigitalReceiptEntry."QR Code Link";
+            POSActionIssueDigRcptB.CheckIfGlobalSetupEnabledAndCreateReceipt(SalesTicketNo, DigitalReceiptQRCodeLink, FooterText)
+        else
+            DigitalReceiptQRCodeLink := POSSaleDigitalReceiptEntry."QR Code Link";
     end;
 
     internal procedure GetSalesTicketNo(POSSetup: Codeunit "NPR POS Setup"; POSUnit: Record "NPR POS Unit"; SettingOption: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large"; ReceiptListFilterOption: Option "None","POS Store","POS Unit",Salesperson; PresetTableView: Text; SelectionDialogType: Option TextField,List; ManualReceiptNo: Code[20]; ObfuscationMethod: Option None,MI) SalesTicketNo: Code[20];

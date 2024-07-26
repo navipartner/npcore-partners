@@ -8,8 +8,11 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
         POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
         RecRef: RecordRef;
         EmailManagement: Codeunit "NPR E-mail Management";
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         MailErrorMessage: Text;
+        DigitalReceiptLink: Text;
+        FooterText: Text;
     begin
         case SelectReceiptToSend of
             0:
@@ -21,6 +24,10 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
             1:
                 begin
                     POSSaleDigitalReceiptEntry.SetRange("POS Entry No.", POSEntryNo);
+                    if POSSaleDigitalReceiptEntry.IsEmpty() then begin
+                        if POSEntry.Get(POSEntryNo) then;
+                        POSActionIssueDigRcptB.CheckIfGlobalSetupEnabledAndCreateReceipt(POSEntry."Document No.", DigitalReceiptLink, FooterText);
+                    end;
                     POSSaleDigitalReceiptEntry.FindLast();
                     RecRef.GetTable(POSSaleDigitalReceiptEntry);
                     RecRef.SetRecFilter();
