@@ -1584,6 +1584,7 @@
         GenJournalLine."Line No." := _LineNumber;
         GenJournalLine."System-Created Entry" := true;
         GenJournalLine."Account Type" := AccountType;
+        GenJournalLine."Copy VAT Setup to Jnl. Lines" := false;  //Buffered journal lines must not have VAT amount calculated. The calculation is deferred to the general journal posting routine
         GenJournalLine.Validate("Account No.", AccountNo);
         if DoPostVAT then
             GenJournalLine."Gen. Posting Type" := GLAccount."Gen. Posting Type";
