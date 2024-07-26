@@ -98,6 +98,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 SaleLinePOS.Date := SalePOS.Date;
                 SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
                 SaleLinePOS."Line No." := SaleLinePOSLineNo;
+                SaleLinePOS."Manual Item Sales Price" := true;
                 SaleLinePOS.Insert(true);
                 SaleLinePOSLineNo := SaleLinePOSLineNo + 10000;
 
