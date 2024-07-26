@@ -42,6 +42,86 @@
 
     actions
     {
+        area(processing)
+        {
+            group(item)
+            {
+                Caption = 'Item';
+
+                action(UpdateFactDescription_01)
+                {
+                    Caption = 'Set Item Description as "Description"';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Image = Description;
+                    Promoted = false;
+                    Scope = Page;
+                    ToolTip = 'Update the item fact description';
+
+                    trigger OnAction()
+                    var
+                        Fact: Record "NPR TM Ticket Access Fact";
+                        Item: Record "Item";
+                    begin
+                        Fact.SetFilter("Fact Name", '=%1', Rec."Fact Name"::ITEM);
+                        if (Fact.FindSet()) then begin
+                            repeat
+                                if (Item.Get(Fact."Fact Code")) then
+                                    Fact.Description := CopyStr(Item.Description, 1, MaxStrLen(Fact.Description));
+                                Fact.Modify();
+                            until (Fact.Next() = 0);
+                        end;
+                    end;
+                }
+                action(UpdateFactDescription_02)
+                {
+                    Caption = 'Set Item Description as "Description 2"';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Image = Description;
+                    Promoted = false;
+                    Scope = Page;
+                    ToolTip = 'Update the item fact description';
+
+                    trigger OnAction()
+                    var
+                        Fact: Record "NPR TM Ticket Access Fact";
+                        Item: Record "Item";
+                    begin
+                        Fact.SetFilter("Fact Name", '=%1', Rec."Fact Name"::ITEM);
+                        if (Fact.FindSet()) then begin
+                            repeat
+                                if (Item.Get(Fact."Fact Code")) then
+                                    Fact.Description := CopyStr(Item."Description 2", 1, MaxStrLen(Fact.Description));
+                                Fact.Modify();
+                            until (Fact.Next() = 0);
+                        end;
+                    end;
+                }
+                action(UpdateFactDescription_03)
+                {
+                    Caption = 'Set Item Description as "Description / Description 2"';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Image = Description;
+                    Promoted = false;
+                    Scope = Page;
+                    ToolTip = 'Update the item fact description';
+
+                    trigger OnAction()
+                    var
+                        Fact: Record "NPR TM Ticket Access Fact";
+                        Item: Record "Item";
+                    begin
+                        Fact.SetFilter("Fact Name", '=%1', Rec."Fact Name"::ITEM);
+                        if (Fact.FindSet()) then begin
+                            repeat
+                                if (Item.Get(Fact."Fact Code")) then
+                                    Fact.Description := CopyStr(StrSubstNo('%1 / %2', Item.Description, Item."Description 2"), 1, MaxStrLen(Fact.Description));
+                                Fact.Modify();
+                            until (Fact.Next() = 0);
+                        end;
+                    end;
+                }
+            }
+        }
     }
 
     internal procedure GetSelectionFilter(): Text
