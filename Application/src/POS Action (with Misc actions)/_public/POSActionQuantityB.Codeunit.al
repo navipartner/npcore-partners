@@ -22,13 +22,11 @@ codeunit 6059879 "NPR POS Action: Quantity B"
         if SaleLinePOS."EFT Approved" then
             Error(EftApprovedErr);
 
-        if (SaleLinePOS."Return Sale Sales Ticket No." <> '') then begin
-            POSSalesLine.SetRange("Document No.", SaleLinePOS."Return Sale Sales Ticket No.");
-            POSSalesLine.SetRange("Line No.", SaleLinePOS."Line No.");
-            if POSSalesLine.FindFirst() then
-                if Abs(Quantity) > Abs(POSSalesLine.Quantity) then
-                    Error(WrongReturnQuantityErr, POSSalesLine.Description, Abs(POSSalesLine.Quantity));
-        end;
+        if (SaleLinePOS."Return Sale Sales Ticket No." <> '') then
+            if not IsNullGuid(SaleLinePOS."Orig.POS Entry S.Line SystemId") then
+                if POSSalesLine.GetBySystemId(SaleLinePOS."Orig.POS Entry S.Line SystemId") then
+                    if Abs(Quantity) > Abs(POSSalesLine.Quantity) then
+                        Error(WrongReturnQuantityErr, POSSalesLine.Description, Abs(POSSalesLine.Quantity));
 
         case ConstraintOption of
             ConstraintOption::"Positive Quantity Only":
