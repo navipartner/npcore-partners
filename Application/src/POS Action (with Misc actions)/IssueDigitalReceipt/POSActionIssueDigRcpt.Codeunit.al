@@ -28,6 +28,7 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
     var
         LastSalePOSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
         POSActionQRViewDigRcptB: Codeunit "NPR POS Action QRViewDigRcpt B";
         DigitalReceiptLink: Text;
         FooterText: Text;
@@ -44,6 +45,16 @@ codeunit 6184731 "NPR POS Action: IssueDigRcpt" implements "NPR IPOS Workflow"
             Sale.GetLastSalePOSEntry(LastSalePOSEntry);
             SalesTicketNoText := LastSalePOSEntry."Document No.";
         end;
+
+        POSUnit.SetLoadFields("POS Receipt Profile");
+        if not POSUnit.Get(LastSalePOSEntry."POS Unit No.") then
+            exit;
+        POSReceiptProfile.SetLoadFields("Enable Digital Receipt");
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit;
+        if not POSReceiptProfile."Enable Digital Receipt" then
+            exit;
+
 #pragma warning disable AA0139
         POSActionIssueDigRcptB.CreateDigitalReceipt(SalesTicketNoText, DigitalReceiptLink, FooterText);
 #pragma warning restore AA0139

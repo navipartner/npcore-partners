@@ -197,6 +197,7 @@
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
 #endif
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -747,6 +748,11 @@
                         exit('NPR-Spfy-SetDataProcessingHandlerID-20240610');
                 end;
 #endif
+            Codeunit::"NPR UPG Dig. Rcpt. Enable":
+                case UpgradeStep of
+                    'UpgradeDigitalReceiptSetupEnable':
+                        exit('NPR-UpgradeDigitalReceiptSetupEnable-20240724')
+                end;
         end;
     end;
 }

@@ -21,6 +21,11 @@ page 6150797 "NPR Digital Receipt Setup"
                 group(Credentials)
                 {
                     ShowCaption = false;
+                    field("Enable"; Rec."Enable")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if the global digital receipt issuing is enabled.';
+                    }
                     field("Api Key"; Rec."Api Key")
                     {
                         ApplicationArea = NPRRetail;

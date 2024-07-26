@@ -5,8 +5,6 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
     internal procedure CreateDigitalReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text; var FooterText: Text)
     var
         POSEntry: Record "NPR POS Entry";
-        POSUnit: Record "NPR POS Unit";
-        POSReceiptProfile: Record "NPR POS Receipt Profile";
         DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
         TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary;
         FiskalyAPI: Codeunit "NPR Fiskaly API";
@@ -15,25 +13,21 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
         ErrorText: Text;
         TokenExpiresAt: DateTime;
     begin
+        DigitalReceiptSetup.SetLoadFields("Enable", "Bearer Token Value", "Bearer Token Expires At");
+        if not DigitalReceiptSetup.Get() then
+            exit;
+        if not DigitalReceiptSetup."Enable" then
+            exit;
+
         SendAuthRequest := true;
         POSEntry.Reset();
         POSEntry.SetRange("Document No.", SalesTicketNo);
         POSEntry.FindFirst();
 
-        POSUnit.SetLoadFields("POS Receipt Profile");
-        if not POSUnit.Get(POSEntry."POS Unit No.") then
-            exit;
-        POSReceiptProfile.SetLoadFields("Enable Digital Receipt", "QRCode Time Interval Enabled", "QRCode Timeout Interval(sec.)");
-        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
-            exit;
-        if not POSReceiptProfile."Enable Digital Receipt" then
-            exit;
-
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Cancelled Sale"]) then
             exit;
 
-        DigitalReceiptSetup.SetLoadFields("Bearer Token Value", "Bearer Token Expires At");
-        if (DigitalReceiptSetup.Get()) and (DigitalReceiptSetup."Bearer Token Value" <> '') then
+        if DigitalReceiptSetup."Bearer Token Value" <> '' then
             if CurrentDateTime() <= DigitalReceiptSetup."Bearer Token Expires At" then begin
                 SendAuthRequest := false;
                 BearerTokenValue := DigitalReceiptSetup."Bearer Token Value";
@@ -60,6 +54,18 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
         DigitalReceiptLink := TempPOSSaleDigitalReceiptEntry."QR Code Link";
         if FooterText = '' then
             FooterText := SetFooterText();
+    end;
+
+    internal procedure CheckIfGlobalSetupEnabledAndCreateReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text; var FooterText: Text)
+    var
+        DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
+        GlobalDigitalRcptNotEnabledErr: Label 'Global Digital Receipt Setup is not enabled. Please enable it to proceed with receipt generation.';
+    begin
+        DigitalReceiptSetup.SetLoadFields("Enable");
+        DigitalReceiptSetup.Get();
+        if not DigitalReceiptSetup."Enable" then
+            Error(GlobalDigitalRcptNotEnabledErr);
+        CreateDigitalReceipt(SalesTicketNo, DigitalReceiptLink, FooterText);
     end;
 
     internal procedure SetFooterText() FooterText: Text

@@ -12,6 +12,11 @@ table 6059853 "NPR Digital Receipt Setup"
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
+        field(5; "Enable"; Boolean)
+        {
+            Caption = 'Enable';
+            DataClassification = CustomerContent;
+        }
         field(10; "Api Key"; Text[250])
         {
             Caption = 'Api Key';
