@@ -32,57 +32,29 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailReportSelectionMgt: Codeunit "NPR Retail Report Select. Mgt.";
         RecRef: RecordRef;
     begin
-        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
-            if not POSUnit.Get(SalePOS."Register No.") then
-                exit;
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit;
 
-            if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
-                exit;
+        if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+            exit;
 
-            POSEntry.SetCurrentKey("Document No.");
-            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-            if not POSEntry.FindFirst() then
-                exit;
+        POSEntry.SetCurrentKey("Document No.");
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        if not POSEntry.FindFirst() then
+            exit;
 
-            if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-                if ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
-                   ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel")
-                then
-                    exit;
-        end else begin
-            POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-            if not POSEntry.FindFirst() then
+        if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+            if ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
+               ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel")
+            then
                 exit;
-
-            if SkipReceiptPrint(POSEntry) then
-                exit;
-        end;
 
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
         RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Sales Receipt (POS Entry)".AsInteger());
-    end;
-
-    local procedure SkipReceiptPrint(POSEntry: Record "NPR POS Entry"): Boolean
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
-        POSUnit: Record "NPR POS Unit";
-    begin
-        POSUnit.Get(POSEntry."POS Unit No.");
-
-        if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
-            exit(true);
-
-        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-            exit(false);
-
-        exit(
-            ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
-            ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel"));
     end;
 }
 
