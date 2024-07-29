@@ -262,7 +262,10 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         ReceiverAddress1: Text;
         ReceiverAddress2: Text;
     begin
-        CreateAddressFields(PakkelabelsShipment.Address, PakkelabelsShipment."Address 2", ReceiverAddress1, ReceiverAddress2);
+        if PakkelabelsShipment."Ship-to Address" <> '' then
+            CreateAddressFields(PakkelabelsShipment."Ship-to Address", PakkelabelsShipment."Ship-to Address 2", ReceiverAddress1, ReceiverAddress2)
+        else
+            CreateAddressFields(PakkelabelsShipment.Address, PakkelabelsShipment."Address 2", ReceiverAddress1, ReceiverAddress2);
 
         Output := '{';
         Output += StrSubstNo(QueryParamsLbl, PakkelabelsShipment.Name);
