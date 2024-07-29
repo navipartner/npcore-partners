@@ -612,6 +612,8 @@
         Separator := PadStr('', TicketWidth, '-');
 
         POSUnit.Get(EFTTransactionRequest."Register No.");
+        CreditCardTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", "Entry No.");
+        CreditCardTransaction.SetFilter("Register No.", '=%1', POSUnit."No.");
         CreditCardTransaction.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
         if (CreditCardTransaction.FindLast()) then; // Prime entry number field
 
