@@ -16,5 +16,8 @@
         "runCodeunitId": "6060099",
         "runCodeunitMethod": "ImportPosUnitsAndUsers",
         "createUsers": ["RESTUSER", "MPOSUSER", "E2EWORKER1", "E2EWORKER2", "E2EWORKER3", "E2EWORKER4", "E2EWORKER5", "E2EWORKER6"]
-    }
+    },
+    "failedRunTeamsNotificationWebhooks": [
+        "https://prod-58.westeurope.logic.azure.com:443/workflows/8b00f6efbce7436eafbee28dbbb13bca/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIKhzfTOKu2O4l4cFGqPaqAw8K7VRn5ZgxtK_Lz_vdc"
+    ]
 }
