@@ -600,7 +600,6 @@
     procedure CheckFieldValue(RecRef: RecordRef; FieldNo: integer; SourceTxt: Text; WithValidation: Boolean) ValueChanged: Boolean
     var
         ConvertHelper: Codeunit "NPR Convert Helper";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         FRef: FieldRef;
         GenericBool: Boolean;
         GenericBool2: Boolean;
@@ -692,8 +691,7 @@
                 end;
             'enum', 'option':
                 begin
-                    if FeatureFlagsManagement.IsEnabled('decodeReplicaitonEnumUnicodeEscapes') then
-                        SourceTxt := ConvertHelper.DecodeUnicodeEscapes(SourceTxt);
+                    SourceTxt := ConvertHelper.DecodeUnicodeEscapes(SourceTxt);
                     if lowercase(format(FRef)) <> lowercase(SourceTxt) then
                         if Evaluate(FRef, SourceTxt) then
                             ValueChanged := true;
