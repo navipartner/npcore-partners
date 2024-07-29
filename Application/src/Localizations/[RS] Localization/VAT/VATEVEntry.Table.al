@@ -1291,7 +1291,7 @@ table 6060018 "NPR VAT EV Entry"
 
         // Sales
         VATEVEntries.SetRange(Type, "General Posting Type"::Sale);
-        VATEVEntries.SetFilter(Document_Type, '%1|%2', "Gen. Journal Document Type"::" ", "Gen. Journal Document Type"::Payment);
+        VATEVEntries.SetFilter(Document_Type, '%1|%2|%3', "Gen. Journal Document Type"::" ", "Gen. Journal Document Type"::Payment, "Gen. Journal Document Type"::Invoice);
         VATEVEntries.Open();
         while VATEVEntries.Read() do
             if VATReportMapping."VAT Base Full VAT" <> 0 then begin
