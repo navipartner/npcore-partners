@@ -7,17 +7,23 @@ codeunit 6059879 "NPR POS Action: Quantity B"
         SaleLinePOS: Record "NPR POS Sale Line";
         PosItemCheckAvail: Codeunit "NPR POS Item-Check Avail.";
         POSSession: Codeunit "NPR POS Session";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         SaleMustBePositiveErr: Label 'Quantity must be positive on the sales line.';
         SaleMustBeNegativeErr: Label 'Quantity must be negative on the sales line.';
         WrongQuantityErr: Label 'The minimum number of units to sell must be greater than zero.';
         WrongReturnQuantityErr: Label 'The maximum number of units to return for %1 is %2.', Comment = '%1 = item description, %2 = maximal allowed quantity for return';
         EFTApprovedErr: Label 'The quantity cannot be changed because the line has been approved by the EFT device.';
+        RestricredLineTypeErr: Label 'The quantity cannot be changed on POS sale line of type %1', Comment = '%1 - POS Sale Line Type';
     begin
 
         if NegativeInput and (Quantity > 0) then
             Quantity := -Quantity;
 
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if FeatureFlagsManagement.IsEnabled('posActionQuantityRestrictLines') then
+            if SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"Customer Deposit", SaleLinePOS."Line Type"::"GL Payment"] then
+                Error(RestricredLineTypeErr, SaleLinePOS."Line Type");
 
         if SaleLinePOS."EFT Approved" then
             Error(EftApprovedErr);
