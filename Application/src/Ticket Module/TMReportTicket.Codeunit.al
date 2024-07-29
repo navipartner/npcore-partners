@@ -37,7 +37,6 @@
         TMTicketType: Record "NPR TM Ticket Type";
         PosEntry: Record "NPR POS Entry";
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         PrinterLbl: Label '%1 %2', Locked = true;
         PrinterLbl2Lbl: Label '%1 - %2', Locked = true;
     begin
@@ -57,24 +56,12 @@
 
             PosEntry.SetFilter("Document No.", Ticket."Sales Receipt No.");
             if (PosEntry.FindFirst()) then begin
-                if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
-                    if PosEntrySalesLine.Get(PosEntry."Entry No.", Ticket."Line No.") then begin
-                        Printer.AddTextField(2, 2, Format(PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity))
-                    end else begin
-                        if Item."Unit Price" <> 0 then
-                            Printer.AddTextField(2, 2, Format(Item."Unit Price"));
-                    end;
+                if PosEntrySalesLine.Get(PosEntry."Entry No.", Ticket."Line No.") then begin
+                    Printer.AddTextField(2, 2, Format(PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity))
                 end else begin
-                    PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
-                    PosEntrySalesLine.SetFilter("Line No.", '=%1', Ticket."Line No.");
-                    if (PosEntrySalesLine.FindFirst()) then begin
-                        Printer.AddTextField(2, 2, Format(PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity))
-                    end else begin
-                        if Item."Unit Price" <> 0 then
-                            Printer.AddTextField(2, 2, Format(Item."Unit Price"));
-                    end;
+                    if Item."Unit Price" <> 0 then
+                        Printer.AddTextField(2, 2, Format(Item."Unit Price"));
                 end;
-
             end else begin
                 if Item."Unit Price" <> 0 then
                     Printer.AddTextField(2, 2, Format(Item."Unit Price"));

@@ -85,32 +85,18 @@
     procedure CreateCleanCashOnPOSSale(SalePOS: Record "NPR POS Sale")
     var
         PosEntry: Record "NPR POS Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         ResponseText: Text;
     begin
-        if FeatureFlagsManagement.IsEnabled('endSalePerformanceImprovements') then begin
-            if (not IsCleanCashXCCSPComplianceEnabled(SalePOS."Register No.")) then
-                exit;
+        if (not IsCleanCashXCCSPComplianceEnabled(SalePOS."Register No.")) then
+            exit;
 
-            PosEntry.SetCurrentKey("Document No.");
-            PosEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
-            if not PosEntry.FindFirst() then
-                exit;
+        PosEntry.SetCurrentKey("Document No.");
+        PosEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        if not PosEntry.FindFirst() then
+            exit;
 
-            if PosEntry."Entry Type" in [PosEntry."Entry Type"::Other, PosEntry."Entry Type"::"Cancelled Sale"] then
-                exit;
-        end else begin
-            PosEntry.SetFilter("Document No.", '=%1', SalePOS."Sales Ticket No.");
-            PosEntry.SetFilter("POS Unit No.", '%1', SalePOS."Register No.");
-            if (not PosEntry.FindFirst()) then
-                exit;
-
-            if (PosEntry."Entry Type" in [PosEntry."Entry Type"::Other, PosEntry."Entry Type"::"Cancelled Sale"]) then
-                exit;
-
-            if (not IsCleanCashXCCSPComplianceEnabled(PosEntry."POS Unit No.")) then
-                exit;
-        end;
+        if PosEntry."Entry Type" in [PosEntry."Entry Type"::Other, PosEntry."Entry Type"::"Cancelled Sale"] then
+            exit;
 
         if (not IsCleanCashSetupValid(PosEntry."POS Unit No.", ResponseText)) then
             Message(ResponseText);
