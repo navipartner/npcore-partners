@@ -124,6 +124,9 @@
 
         ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, true);
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        POSEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         POSEntry.SetRange("Document No.", ReceiptNo);
         if not POSEntry.IsEmpty() then
             Error(DuplicateReceiptNo, ReceiptNo);
