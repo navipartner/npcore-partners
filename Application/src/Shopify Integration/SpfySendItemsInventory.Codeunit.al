@@ -1045,6 +1045,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         SpfyStoreItemLink."Sync. to this Store" := false;
         SpfyStoreItemLink."Synchronization Is Enabled" := false;
+        SpfyStoreItemLink."Shopify Status" := SpfyStoreItemLink."Shopify Status"::" ";
+        SpfyStoreItemLink."Shopify Name" := '';
+        Clear(SpfyStoreItemLink."Shopify Description");
     end;
 
     local procedure ClearVariantsShopifyIDs(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
