@@ -66,7 +66,6 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
             else
                 Page.Run(Page::"Item List", Item);
         end;
-        Page.Run(Page::"Item Card", Item);
     end;
 }
 #endif
