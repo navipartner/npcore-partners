@@ -587,8 +587,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     internal procedure UpdateItemWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken; CalledByWebhook: Boolean)
     var
+        Item: Record Item;
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        InventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         ShopifyVariant: JsonToken;
@@ -602,6 +604,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         FirstVariant: Boolean;
         BCIsNameDescriptionMaster: Boolean;
         LinkExists: Boolean;
+        xSyncEnabled: Boolean;
     begin
 #pragma warning disable AA0139
         ShopifyItemID := _JsonHelper.GetJText(ShopifyResponse, 'product.id', MaxStrLen(ShopifyItemID), true);
@@ -645,6 +648,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 end;
                 if CalledByWebhook then
                     SpfyStoreItemLink."Sync. to this Store" := true;
+                xSyncEnabled := SpfyStoreItemLink."Synchronization Is Enabled";
                 SpfyStoreItemLink."Synchronization Is Enabled" := SpfyStoreItemLink."Sync. to this Store";
 
                 if ShopifyProductStatus <> '' then
@@ -660,6 +664,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
                 ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
                 SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyItemID, false);
+
+                if CalledByWebhook and not xSyncEnabled then begin
+                    Item.SetRange("No.", SpfyStoreItemLink."Item No.");
+                    InventoryLevelMgt.InitializeInventoryLevels(SpfyStoreItemLink."Shopify Store Code", Item, true);
+                end;
                 FirstVariant := false;
             end;
             UpdateItemVariant(NcTask."Store Code", ShopifyVariant, ItemVariant);
