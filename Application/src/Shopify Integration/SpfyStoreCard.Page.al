@@ -61,6 +61,7 @@ page 6184704 "NPR Spfy Store Card"
                             ToolTip = 'Specifies whether the system should automatically mark/unmark items as Shopify items in Business Central when related products are created/deleted in Shopify. Note that this option is only available in BC Saas environments.';
                             ApplicationArea = NPRShopify;
                             Importance = Additional;
+                            Visible = false;
 
                             trigger OnValidate()
                             begin
@@ -73,6 +74,7 @@ page 6184704 "NPR Spfy Store Card"
                             ToolTip = 'Specifies whether to automatically update item information in Business Central when related product information is changed in Shopify. Note that this option is only available in BC Saas environments.';
                             ApplicationArea = NPRShopify;
                             Importance = Additional;
+                            Visible = false;
 
                             trigger OnValidate()
                             begin
