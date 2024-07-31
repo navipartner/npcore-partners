@@ -294,15 +294,20 @@ codeunit 6151373 "NPR Prepayment Mgt."
     end;
 
     internal procedure SetGLAccountForVATPosting(var GenJournalLine: Record "Gen. Journal Line"; var GLAccNo: Code[20])
-    var
-        RSVATPostingSetup: Record "NPR RS VAT Posting Setup";
-        VATPostingSetup: Record "VAT Posting Setup";
     begin
         if not GenJournalLine.Prepayment then
             exit;
         if GenJournalLine."Gen. Posting Type" <> GenJournalLine."Gen. Posting Type"::Sale then
             exit;
-        if not VATPostingSetup.Get(GenJournalLine."VAT Bus. Posting Group", GenJournalLine."VAT Prod. Posting Group") then
+        SetGLAccountForVATPostingFromSetup(GenJournalLine."VAT Bus. Posting Group", GenJournalLine."VAT Prod. Posting Group", GLAccNo);
+    end;
+
+    internal procedure SetGLAccountForVATPostingFromSetup(VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; var GLAccNo: Code[20])
+    var
+        RSVATPostingSetup: Record "NPR RS VAT Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        if not VATPostingSetup.Get(VATBusPostingGroup, VATProdPostingGroup) then
             exit;
         RSVATPostingSetup.Read(VATPostingSetup.SystemId);
         RSVATPostingSetup.TestField("Sales Prep. VAT Account");
