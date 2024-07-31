@@ -165,6 +165,14 @@ codeunit 6151410 "NPR Prepayment Subs."
         PrepaymentMgt.SetPostingAmountToZero(GenJnlLine);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post Prepayments", 'OnAfterFillInvLineBuffer', '', false, false)]
+    local procedure OnAfterFillInvLineBuffer(var PrepmtInvLineBuf: Record "Prepayment Inv. Line Buffer"; SalesLine: Record "Sales Line"; CommitIsSuppressed: Boolean; SalesHeader: Record "Sales Header")
+    begin
+        if not RSLocalisationMgt.GetLocalisationSetupEnabled() then
+            exit;
+        PrepaymentMgt.SetGLAccountForVATPostingFromSetup(SalesLine."VAT Bus. Posting Group", SalesLine."VAT Prod. Posting Group", PrepmtInvLineBuf."G/L Account No.");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
     local procedure OnBeforePostSalesDoc(var Sender: Codeunit "Sales-Post"; var SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var HideProgressWindow: Boolean; var IsHandled: Boolean);
     begin
