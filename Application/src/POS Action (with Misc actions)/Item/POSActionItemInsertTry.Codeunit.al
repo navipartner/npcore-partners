@@ -5,6 +5,7 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
     var
         _SaleLinePOS: Record "NPR POS Sale Line";
         _SerialSelectionFromList: Boolean;
+        _LotSelectionFromList: Boolean;
         _FunctionToExecute: Text;
         _SerialNoInput: Text[50];
         _LotNoInput: Text[50];
@@ -64,6 +65,20 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
     end;
     #endregion GetSerialSelectionFromList
 
+    #region SetLotSelectionFromList
+    internal procedure SetLotSelectionFromList(LotSelectionFromList: Boolean)
+    begin
+        _LotSelectionFromList := LotSelectionFromList;
+    end;
+    #endregion SetLotSelectionFromList
+
+    #region GetLotSelectionFromList
+    internal procedure GetLotSelectionFromList(var LotSelectionFromList: Boolean)
+    begin
+        LotSelectionFromList := _LotSelectionFromList;
+    end;
+    #endregion GetLotSelectionFromList
+
     #region SetPOSStore
     internal procedure SetPOSStore(POSStore: Record "NPR POS Store")
     begin
@@ -111,7 +126,8 @@ codeunit 6151037 "NPR POS Action Item Insert Try"
     begin
         POSActionInsertItemB.AssignLotNo(_SaleLinePOS,
                                             _LotNoInput,
-                                            _POSStore);
+                                            _POSStore,
+                                            _LotSelectionFromList);
 
     end;
     #endregion AssignLot

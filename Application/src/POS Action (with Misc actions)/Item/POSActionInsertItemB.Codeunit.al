@@ -471,11 +471,11 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS.Modify(true);
     end;
 
-    internal procedure AssignLotNo(var SaleLinePOS: Record "NPR POS Sale Line"; LotNoInput: Text[50]; POSStore: Record "NPR POS Store")
+    internal procedure AssignLotNo(var SaleLinePOS: Record "NPR POS Sale Line"; LotNoInput: Text[50]; POSStore: Record "NPR POS Store"; LotSelectionFromList: Boolean)
     var
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
     begin
-        POSTrackingUtils.ValidateLotNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", LotNoInput, POSStore);
+        POSTrackingUtils.ValidateLotNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", LotNoInput, POSStore, LotSelectionFromList);
 
         SaleLinePOS.Validate("Lot No.", LotNoInput);
         SaleLinePOS.Modify(true);
@@ -504,11 +504,11 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
     end;
 
-    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean; var RequiresLotNoInputPrompt: Boolean; RequiresLotNoInput: Boolean; RequiresSpecificLotNo: Boolean; SelectSerialNoListEmptyInput: Boolean; InputSerial: Text)
+    internal procedure CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput: Boolean; RequiresUnitPriceInput: Boolean; GetSerialNoFromList: Boolean; UsePresetUnitPrice: Boolean; RequiresSpecificSerialNo: Boolean; var RequiresUnitPriceInputPrompt: Boolean; var RequiresSerialNoInputPrompt: Boolean; var ItemRequiresAdditionalInformationInput: Boolean; var RequiresLotNoInputPrompt: Boolean; RequiresLotNoInput: Boolean; RequiresSpecificLotNo: Boolean; SelectSerialNoListEmptyInput: Boolean; InputSerial: Text; LotSelectionFromList: Integer; InputLot: Text)
     begin
         RequiresSerialNoInputPrompt := RequiresSerialNoInput and ((GetSerialNoFromList and not RequiresSpecificSerialNo) or (GetSerialNoFromList and SelectSerialNoListEmptyInput and (InputSerial = '')) or not GetSerialNoFromList);
         RequiresUnitPriceInputPrompt := RequiresUnitPriceInput and not UsePresetUnitPrice;
-        RequiresLotNoInputPrompt := RequiresLotNoInput or RequiresSpecificLotNo;
+        RequiresLotNoInputPrompt := RequiresLotNoInput and (((LotSelectionFromList = 1) and not RequiresSpecificLotNo) or ((LotSelectionFromList = 2) and (InputLot = '')) or not (LotSelectionFromList = 1));
         ItemRequiresAdditionalInformationInput := RequiresUnitPriceInputPrompt or RequiresSerialNoInputPrompt or RequiresLotNoInputPrompt;
     end;
 

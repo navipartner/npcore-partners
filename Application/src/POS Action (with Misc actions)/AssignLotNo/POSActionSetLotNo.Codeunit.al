@@ -7,6 +7,10 @@ codeunit 6184797 "NPR POS Action Set Lot No" implements "NPR IPOS Workflow"
         ItemLotNo_InstrLbl: Label 'Enter Lot No. now and press OK. Press Cancel to enter Lot No. later.';
         ItemLotNo_LeadLbl: Label 'This item requires Lot No., enter Lot No.';
         ItemLotNo_TitleLbl: Label 'Enter Lot No.';
+        ParamSelectLotNo_CaptionLbl: Label 'Select Lot No.';
+        ParamSelectLotNo_DescLbl: Label 'Choose option for selecting Lot No. from the list';
+        ParamSelectLotNoOptionsLbl: Label 'NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput', Locked = true;
+        ParamSelectLotNoOptionsLbl_CaptionLbl: Label 'NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput';
     begin
         WorkflowConfig.SetNonBlockingUI();
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -14,6 +18,14 @@ codeunit 6184797 "NPR POS Action Set Lot No" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('itemLotNo_title', ItemLotNo_TitleLbl);
         WorkflowConfig.AddLabel('itemLotNo_lead', ItemLotNo_LeadLbl);
         WorkflowConfig.AddLabel('itemLotNo_instructions', ItemLotNo_InstrLbl);
+        WorkflowConfig.AddOptionParameter('SelectLotNo',
+                                        ParamSelectLotNoOptionsLbl,
+#pragma warning disable AA0139
+                                        SelectStr(1, ParamSelectLotNoOptionsLbl),
+#pragma warning restore AA0139
+                                        ParamSelectLotNo_CaptionLbl,
+                                        ParamSelectLotNo_DescLbl,
+                                        ParamSelectLotNoOptionsLbl_CaptionLbl);
     end;
 
     procedure RunWorkflow(Step: Text;
@@ -72,8 +84,9 @@ codeunit 6184797 "NPR POS Action Set Lot No" implements "NPR IPOS Workflow"
         NPRPOSActionSetLotNoB: Codeunit "NPR POS Action Set Lot No B";
         LotNoInput: Text[50];
         LotNoSelectionFromList: Boolean;
+        LotSelectionFromListOption: Option NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput;
     begin
-        if Context.GetBooleanParameter('SelectLotNo', LotNoSelectionFromList) then;
+        LotSelectionFromListOption := Context.GetIntegerParameter('SelectLotNo');
 #pragma warning disable AA0139
         if Context.HasProperty('LotNoInput') then
             LotNoInput := Context.GetString('LotNoInput');
@@ -81,17 +94,27 @@ codeunit 6184797 "NPR POS Action Set Lot No" implements "NPR IPOS Workflow"
 
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
+        case LotSelectionFromListOption of
+            LotSelectionFromListOption::NoSelection:
+                    LotNoSelectionFromList := false;
+            LotSelectionFromListOption::SelectLotNoFromList:
+                    LotNoSelectionFromList := true;
+            LotSelectionFromListOption::SelectLotNoFromListAfterInput:
+                    LotNoSelectionFromList := (LotNoInput = '');
+        end;
+
         NPRPOSActionSetLotNoB.AssignLotNo(SalelinePOS,
                                                 LotNoInput,
-                                                Setup);
+                                                Setup,
+                                                LotNoSelectionFromList);
     end;
-    // #endregion AssignSerialNo
+    // #endregion AssignLotNo
 
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSetLotNo.js###
-'let main=async({workflow:t,context:c,scope:r,popup:e,parameters:L,captions:i})=>{const{hasLotNo:n,hasLotNoResponseMessage:a,requiresLotNo:o,useSpecificTracking:s}=await t.respond("CheckLineTracking");if(n&&!await e.confirm(a)||(o||!s)&&(t.context.LotNoInput=await e.input({title:i.itemLotNo_title,caption:i.itemLotNo_lead}),t.context.LotNoInput===null))return"";await t.respond("AssignLotNo")};'
+'let main=async({workflow:t,context:s,scope:L,popup:e,parameters:i,captions:o})=>{const{hasLotNo:n,hasLotNoResponseMessage:a,requiresLotNo:N,useSpecificTracking:c}=await t.respond("CheckLineTracking");if(n&&!await e.confirm(a)||(i.SelectLotNo==0||i.SelectLotNo==2||!c)&&(t.context.LotNoInput=await e.input({title:o.itemLotNo_title,caption:o.itemLotNo_lead}),t.context.LotNoInput===null))return"";await t.respond("AssignLotNo")};'
         )
     end;
 

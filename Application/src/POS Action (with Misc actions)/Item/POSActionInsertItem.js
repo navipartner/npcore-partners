@@ -103,13 +103,22 @@ async function processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWit
                 }
             }
             if (context.bomComponentLineWithoutSerialLotNo.requiresLotNoInput) {
-                context.lotNoInput = await popup.input({ title: captions.ItemTrackingLot_TitleLbl, caption: format(captions.bomItemTrackingLot_Lead, context.bomComponentLineWithoutSerialLotNo.description, context.bomComponentLineWithoutSerialLotNo.parentBOMDescription) })
-
-                if (context.lotNoInput) {
+                if ((parameters.SelectLotNo == 1) && context.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo) {
                     response = await workflow.respond("assignLotNo");
 
                     if (!response.assignLotNoSuccess && response.assignLotNoSuccessErrorText) {
                         if (await popup.confirm({ title: captions.lotNoError_title, caption: response.assignLotNoSuccessErrorText })) continueExecution = true;
+                    }
+                }
+                else {
+                    context.lotNoInput = await popup.input({ title: captions.ItemTrackingLot_TitleLbl, caption: format(captions.bomItemTrackingLot_Lead, context.bomComponentLineWithoutSerialLotNo.description, context.bomComponentLineWithoutSerialLotNo.parentBOMDescription) })
+
+                    if ((context.lotNoInput) || (parameters.SelectLotNo == 2))  {
+                        response = await workflow.respond("assignLotNo");
+    
+                        if (!response.assignLotNoSuccess && response.assignLotNoSuccessErrorText) {
+                            if (await popup.confirm({ title: captions.lotNoError_title, caption: response.assignLotNoSuccessErrorText })) continueExecution = true;
+                        }
                     }
                 }
             }
