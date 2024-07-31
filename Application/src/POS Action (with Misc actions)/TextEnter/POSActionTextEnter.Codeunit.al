@@ -45,6 +45,7 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
         ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin;
         ItemIdentifier: Text;
         UnitOfMeasureCode: Code[10];
+        SelectLotNo: Integer;
         ItemQuantity: Decimal;
         PreSetUnitPrice: Decimal;
         UnitPrice: Decimal;
@@ -115,7 +116,13 @@ codeunit 6150722 "NPR POS Action: Text Enter" implements "NPR IPOS Workflow"
 
         SelectSerialNoListEmptyInput := ValueJsonToken.AsValue().AsBoolean();
 
-        Success := NPRPOSActionInsertItem.SimpleItemInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitOfMeasureCode, UnitPrice, SkipItemAvailabilityCheck, SelectSerialNo, UsePreSetUnitPrice, SelectSerialNoListEmptyInput, Setup, FrontEnd, Response);
+        Clear(ValueJsonToken);
+        if not WorkflowInvocationParameters.Get('SelectLotNo', ValueJsonToken) then
+            exit;
+
+        SelectLotNo := ValueJsonToken.AsValue().AsInteger();
+
+        Success := NPRPOSActionInsertItem.SimpleItemInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitOfMeasureCode, UnitPrice, SkipItemAvailabilityCheck, SelectSerialNo, SelectLotNo, UsePreSetUnitPrice, SelectSerialNoListEmptyInput, Setup, FrontEnd, Response);
     end;
 
     local procedure GetActionScript(): Text

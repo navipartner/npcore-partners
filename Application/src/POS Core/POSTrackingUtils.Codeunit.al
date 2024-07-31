@@ -104,6 +104,29 @@ codeunit 6151032 "NPR POS Tracking Utils"
         VariantCode := SaleLinePOS."Variant Code";
     end;
 
+    local procedure SelectLotNoFromList(ItemNo: Code[20]; var VariantCode: Code[10]; LocationCode: Code[10]; var LotNo: Text[50])
+    var
+        RequiresLotNo: Boolean;
+        RequiresSpecificLotNo: Boolean;
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        ItemRequiresLotNo(ItemNo, RequiresLotNo, RequiresSpecificLotNo);
+        if not RequiresLotNo then
+            exit;
+
+        SaleLinePOS.Init();
+        SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
+        SaleLinePOS."No." := ItemNo;
+        SaleLinePOS."Variant Code" := VariantCode;
+        SaleLinePOS."Location Code" := LocationCode;
+        SaleLinePOS.Quantity := 1;
+        if not SaleLinePOS.LotNoLookup() then
+            exit;
+
+        LotNo := SaleLinePOS."Lot No.";
+        VariantCode := SaleLinePOS."Variant Code";
+    end;
+
     #region ValidateSerialNo
     internal procedure ValidateSerialNo(ItemNo: Code[20]; var VariantCode: Code[10]; var SerialNumberInput: Text[50]; SerialSelectionFromList: Boolean; POSStore: Record "NPR POS Store")
     var
@@ -237,21 +260,41 @@ codeunit 6151032 "NPR POS Tracking Utils"
     end;
 
     #region ValidateLotNo
-    internal procedure ValidateLotNo(ItemNo: Code[20]; VariantCode: Code[10]; LotInput: Text[50]; POSStore: Record "NPR POS Store")
+    internal procedure ValidateLotNo(ItemNo: Code[20]; VariantCode: Code[10]; var LotInput: Text[50]; POSStore: Record "NPR POS Store"; LotSelectionFromList: Boolean)
     var
+        Item: Record Item;
         RequiresLotNo: Boolean;
         RequiresSpecificLotNo: Boolean;
+        AskForLotNoContinuously: Boolean;
         UserInformationErrorWarning: Text;
     begin
-        ItemRequiresLotNo(ItemNo, RequiresLotNo, RequiresSpecificLotNo);
+        if Item.Get(ItemNo) then;
+        RequiresLotNo := ItemRequiresLotNo(Item, RequiresSpecificLotNo);
         if not RequiresLotNo then
             exit;
 
-        RequiresSpecificLotNo := true;
-        if (not LotCanBeUsedByItem(ItemNo, VariantCode, LotInput, UserInformationErrorWarning, POSStore."Location Code")) then
-            if (LotInput <> '') and (UserInformationErrorWarning <> '') then
-                Error(UserInformationErrorWarning);
+        if LotSelectionFromList and RequiresSpecificLotNo then
+            LotInput := '';
 
+        AskForLotNoContinuously := true;
+        while (not LotCanBeUsedByItem(ItemNo, VariantCode, LotInput, UserInformationErrorWarning, POSStore."Location Code")) and AskForLotNoContinuously do begin
+            AskForLotNoContinuously := LotSelectionFromList;
+            if LotSelectionFromList then begin
+
+                if LotInput <> '' then
+                    Message(UserInformationErrorWarning);
+
+                LotInput := '';
+
+                SelectLotNoFromList(ItemNo, VariantCode, POSStore."Location Code", LotInput);
+
+                if LotInput = '' then
+                    Error('');
+
+            end else
+                if (LotInput <> '') and (UserInformationErrorWarning <> '') then
+                    Error(UserInformationErrorWarning);
+        end;
     end;
     #endregion ValidateLotNo
 

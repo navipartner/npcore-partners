@@ -7,7 +7,7 @@ let main = async ({ workflow, context, scope, popup, parameters, captions }) => 
             }
     }
 
-    if (requiresLotNo || !useSpecificTracking) {
+    if ((parameters.SelectLotNo == 0 || parameters.SelectLotNo == 2) || !useSpecificTracking) {
         workflow.context.LotNoInput = await popup.input({ title: captions.itemLotNo_title, caption: captions.itemLotNo_lead })
         if (workflow.context.LotNoInput === null) {
             return ("");

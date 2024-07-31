@@ -22,7 +22,7 @@ codeunit 6184798 "NPR POS Action Set Lot No B"
 
 
     #region AssignLotNo
-    internal procedure AssignLotNo(var SaleLinePOS: Record "NPR POS Sale Line"; LotNoInput: Text[50]; POSSetup: Codeunit "NPR POS Setup")
+    internal procedure AssignLotNo(var SaleLinePOS: Record "NPR POS Sale Line"; LotNoInput: Text[50]; POSSetup: Codeunit "NPR POS Setup"; LotSelectionFromList: Boolean)
     var
         POSStore: Record "NPR POS Store";
         NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
@@ -30,7 +30,7 @@ codeunit 6184798 "NPR POS Action Set Lot No B"
         CheckTrackingOptions(SaleLinePOS);
 
         POSSetup.GetPOSStore(POSStore);
-        NPRPOSTrackingUtils.ValidateLotNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", LotNoInput, POSStore);
+        NPRPOSTrackingUtils.ValidateLotNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", LotNoInput, POSStore, LotSelectionFromList);
 
         SaleLinePOS.Validate("Lot No.", LotNoInput);
         SaleLinePOS.Modify(true);

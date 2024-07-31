@@ -2983,6 +2983,54 @@
         exit(true);
     end;
 
+    procedure LotNoLookup(): Boolean
+    var
+        TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        TestField("Line Type", "Line Type"::Item);
+
+        GetItem();
+        ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Lot No.");
+        ItemLedgerEntry.SetRange(Open, true);
+        ItemLedgerEntry.SetRange(Positive, true);
+        ItemLedgerEntry.SetRange("Item No.", "No.");
+        ItemLedgerEntry.SetFilter("Lot No.", '<> %1', '');
+        ItemLedgerEntry.SetRange("Location Code", "Location Code");
+        if "Variant Code" <> '' then
+            ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
+        ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
+        if ItemLedgerEntry.FindFirst() then
+            repeat
+                ItemLedgerEntry.SetRange("Lot No.", ItemLedgerEntry."Lot No.");
+                ItemLedgerEntry.FindLast();
+                TempItemLedgerEntry := ItemLedgerEntry;
+                TempItemLedgerEntry.Insert();
+                ItemLedgerEntry.SetRange("Lot No.");
+            until ItemLedgerEntry.Next() = 0;
+
+        TempItemLedgerEntry.SetFilter("Expiration Date", '<>%1', 0D);
+        if not TempItemLedgerEntry.IsEmpty then
+            TempItemLedgerEntry.SetCurrentKey("Expiration Date");
+        TempItemLedgerEntry.SetRange("Expiration Date");
+        if "Lot No." <> '' then
+            TempItemLedgerEntry.SetRange("Lot No.", "Lot No.");
+        if TempItemLedgerEntry.FindFirst() then;
+        TempItemLedgerEntry.SetRange("Lot No.");
+        if PAGE.RunModal(PAGE::"NPR Item - Lot Number", TempItemLedgerEntry) <> ACTION::LookupOK then
+            exit(false);
+
+        "Lot No." := TempItemLedgerEntry."Lot No.";
+
+        TempItemLedgerEntry.CalcFields("Cost Amount (Actual)");
+        "Variant Code" := TempItemLedgerEntry."Variant Code";
+        "Unit Cost (LCY)" := TempItemLedgerEntry."Cost Amount (Actual)";
+        "Unit Cost" := "Unit Cost (LCY)";
+        "Custom Cost" := true;
+
+        exit(true);
+    end;
+
     procedure SerialNoValidate()
     var
         SaleLinePOS2: Record "NPR POS Sale Line";
