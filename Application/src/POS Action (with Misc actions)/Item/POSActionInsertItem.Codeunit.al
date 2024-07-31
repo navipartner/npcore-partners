@@ -35,6 +35,10 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ParamPreSetUnitPrice_DescLbl: Label 'Specifies the Preset Unit Price';
         ParamSelectSerialNo_CaptionLbl: Label 'Select Serial No.';
         ParamSelectSerialNo_DescLbl: Label 'Enable/Disable select Serial No. from the list';
+        ParamSelectLotNo_CaptionLbl: Label 'Select Lot No.';
+        ParamSelectLotNo_DescLbl: Label 'Choose option for selecting Lot No. from the list';
+        ParamSelectLotNoOptionsLbl: Label 'NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput', Locked = true;
+        ParamSelectLotNoOptionsLbl_CaptionLbl: Label 'NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput';
         ParamSelectSerialNoListEmptyInput_CaptionLbl: Label 'Select Serial No. List/Input';
         ParamSelectSerialNoListEmptyInput_DescLbl: Label 'Enable/Disable select Serial No. from the list after empty input.';
         ParamSkipItemAvailabilityCheck_CaptionLbl: Label 'Skip Item Availability Check';
@@ -82,6 +86,14 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         WorkflowConfig.AddDecimalParameter('preSetUnitPrice', 0, ParamPreSetUnitPrice_CaptionLbl, ParamPreSetUnitPrice_DescLbl);
         WorkflowConfig.AddBooleanParameter('SelectSerialNo', false, ParamSelectSerialNo_CaptionLbl, ParamSelectSerialNo_DescLbl);
         WorkflowConfig.AddBooleanParameter('SkipItemAvailabilityCheck', false, ParamSkipItemAvailabilityCheck_CaptionLbl, ParamSkipItemAvailabilityCheck_DescLbl);
+        WorkflowConfig.AddOptionParameter('SelectLotNo',
+                                        ParamSelectLotNoOptionsLbl,
+#pragma warning disable AA0139
+                                        SelectStr(1, ParamSelectLotNoOptionsLbl),
+#pragma warning restore AA0139
+                                        ParamSelectLotNo_CaptionLbl,
+                                        ParamSelectLotNo_DescLbl,
+                                        ParamSelectLotNoOptionsLbl_CaptionLbl);
         WorkflowConfig.AddBooleanParameter('SelectSerialNoListEmptyInput', false, ParamSelectSerialNoListEmptyInput_CaptionLbl, ParamSelectSerialNoListEmptyInput_DescLbl);
     end;
 
@@ -163,6 +175,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         RequiresLotNoInput: Boolean;
         RequiresSpecificLotNo: Boolean;
         RequiresLotNoInputPrompt: Boolean;
+        LotSelectionFromList: Boolean;
+        LotSelectionFromListOption: Option NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput;
         InputLotNo: Text;
         TicketToken: Text;
     begin
@@ -189,9 +203,14 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 #pragma warning disable AA0139
         end;
 
+        if RequiresLotNoInput then begin
+            if not Context.GetString('lotNoInput', InputLotNo) then;
+            LotSelectionFromListOption := Context.GetIntegerParameter('SelectLotNo');
+        end;
+
         if not Context.GetBooleanParameter('usePreSetUnitPrice', UsePresetUnitPrice) then;
 
-        POSActionInsertItemB.CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput, RequiresUnitPriceInput, SerialSelectionFromList, UsePresetUnitPrice, RequiresSpecificSerialNo, RequiresUnitPriceInputPrompt, RequiresSerialNoInputPrompt, RequiresAdditionalInformationCollection, RequiresLotNoInputPrompt, RequiresLotNoInput, RequiresSpecificLotNo, SelectSerialNoListEmptyInput, InputSerial);
+        POSActionInsertItemB.CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput, RequiresUnitPriceInput, SerialSelectionFromList, UsePresetUnitPrice, RequiresSpecificSerialNo, RequiresUnitPriceInputPrompt, RequiresSerialNoInputPrompt, RequiresAdditionalInformationCollection, RequiresLotNoInputPrompt, RequiresLotNoInput, RequiresSpecificLotNo, SelectSerialNoListEmptyInput, InputSerial, LotSelectionFromListOption, InputLotNo);
         If RequiresAdditionalInformationCollection then begin
             if not Context.GetBoolean('additionalInformationCollected', AdditionalInformationCollected) then;
 
@@ -203,12 +222,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 exit;
             end;
 
-
             if RequiresUnitPriceInputPrompt then
                 if not Context.GetDecimal('unitPriceInput', UnitPrice) then;
-
-            if RequiresLotNoInputPrompt then
-                if not Context.GetString('lotNoInput', InputLotNo) then;
         end;
 
         ValidateSerialSelectionFromList := (SelectSerialNoListEmptyInput and SerialSelectionFromList and (InputSerial = '')) or (SerialSelectionFromList and not SelectSerialNoListEmptyInput);
@@ -217,9 +232,10 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
             NPRPOSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, ValidateSerialSelectionFromList, NPRPOSStore);
         end;
 
+        LotSelectionFromList := (LotSelectionFromListOption = 1) or ((LotSelectionFromListOption = 2) and (InputLotNo = ''));
         if RequiresLotNoInput then begin
             Setup.GetPOSStore(NPRPOSStore);
-            NPRPOSTrackingUtils.ValidateLotNo(ItemReference."Item No.", ItemReference."Variant Code", InputLotNo, NPRPOSStore);
+            NPRPOSTrackingUtils.ValidateLotNo(ItemReference."Item No.", ItemReference."Variant Code", InputLotNo, NPRPOSStore, LotSelectionFromList);
         end;
 
         EditDesc := Context.GetBooleanParameter('EditDescription');
@@ -377,6 +393,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 CurrJsonObject.Add('parentBOMLineNo', BOMComponentLines."Parent BOM Line No.");
                 CurrJsonObject.Add('parentBOMDescription', ParentItem.Description);
                 CurrJsonObject.Add('useSpecTrackingSerialNo', RequiresSpecificSerialNo);
+                CurrJsonObject.Add('useSpecTrackingLotNo', RequiresSpecificLotNo);
                 CurrJsonObject.Add('requiresSerialNoInput', RequiresSerialNoInput);
                 CurrJsonObject.Add('requiresLotNoInput', RequiresLotNoInput);
                 CurrJsonObject.Add('recordID', Format(BOMComponentLines.RecordId));
@@ -448,6 +465,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSStore: Record "NPR POS Store";
         POSActionItemInsertTry: Codeunit "NPR POS Action Item Insert Try";
         AssignLotNoSuccess: Boolean;
+        LotSelectionFromList: Boolean;
+        LotSelectionFromListOption: Option NoSelection,SelectLotNoFromList,SelectLotNoFromListAfterInput;
         BOMComponentLineJsonObject: JsonObject;
         ResultToken: JsonToken;
         AssignLotNoSuccessErrorText: Text;
@@ -458,6 +477,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 #pragma warning disable AA0139
         InputLot := Context.GetString('lotNoInput');
 #pragma warning restore AA0139
+        LotSelectionFromListOption := Context.GetIntegerParameter('SelectLotNo');
 
         Clear(BOMComponentLineJsonObject);
         BOMComponentLineJsonObject := Context.GetJsonObject('bomComponentLineWithoutSerialLotNo');
@@ -470,10 +490,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         Setup.GetPOSStore(POSStore);
 
+        LotSelectionFromList := (LotSelectionFromListOption in [LotSelectionFromListOption::SelectLotNoFromList]) or ((LotSelectionFromListOption in [LotSelectionFromListOption::SelectLotNoFromListAfterInput]) and (InputLot = ''));
+
         ClearLastError();
         Clear(POSActionItemInsertTry);
         POSActionItemInsertTry.SetSaleLine(SaleLinePOS);
         POSActionItemInsertTry.SetLotNoInput(InputLot);
+        POSActionItemInsertTry.SetLotSelectionFromList(LotSelectionFromList);
         POSActionItemInsertTry.SetPOSStore(POSStore);
         POSActionItemInsertTry.SetFunctionToExecute('AssignLotNo');
 
@@ -490,7 +513,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ResponseJsonObject.Add('assignLotNoSuccessErrorText', AssignLotNoSuccessErrorText);
     end;
 
-    internal procedure SimpleItemInsert(Context: Codeunit "NPR POS JSON Helper"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasureCode: Code[10]; UnitPrice: Decimal; SkipItemAvailabilityCheck: Boolean; SerialSelectionFromList: Boolean; UsePresetUnitPrice: Boolean; SelectSerialNoListEmptyInput: Boolean; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management"; var Response: JsonObject) Success: Boolean
+    internal procedure SimpleItemInsert(Context: Codeunit "NPR POS JSON Helper"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; ItemQuantity: Decimal; UnitOfMeasureCode: Code[10]; UnitPrice: Decimal; SkipItemAvailabilityCheck: Boolean; SerialSelectionFromList: Boolean; LotSelectionFromList: Integer; UsePresetUnitPrice: Boolean; SelectSerialNoListEmptyInput: Boolean; Setup: Codeunit "NPR POS Setup"; FrontEnd: Codeunit "NPR POS Front End Management"; var Response: JsonObject) Success: Boolean
     var
         Item: Record Item;
         ItemReference: Record "Item Reference";
@@ -517,6 +540,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         RequiresLotNoInput: Boolean;
         RequiresSpecificLotNo: Boolean;
         RequiresLotNoInputPrompt: Boolean;
+        ValidateLotSelectionFromList: Boolean;
         InputLot: Text[50];
         TicketPosAction: codeunit "NPR POSAction: Ticket Mgt.";
     begin
@@ -535,12 +559,12 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 exit(false);
 
         POSActionInsertItemB.GetItemAdditionalInformationRequirements(Item, RequiresSerialNoInput, RequiresSpecificSerialNo, RequiresUnitPriceInput, RequiresLotNoInput, RequiresSpecificLotNo);
-        POSActionInsertItemB.CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput, RequiresUnitPriceInput, SerialSelectionFromList, UsePresetUnitPrice, RequiresSpecificSerialNo, RequiresUnitPriceInputPrompt, RequiresSerialNoInputPrompt, RequiresAdditionalInformationCollection, RequiresLotNoInputPrompt, RequiresLotNoInput, RequiresSpecificLotNo, SelectSerialNoListEmptyInput, '');
+        POSActionInsertItemB.CheckItemRequiresAdditionalInformationInput(RequiresSerialNoInput, RequiresUnitPriceInput, SerialSelectionFromList, UsePresetUnitPrice, RequiresSpecificSerialNo, RequiresUnitPriceInputPrompt, RequiresSerialNoInputPrompt, RequiresAdditionalInformationCollection, RequiresLotNoInputPrompt, RequiresLotNoInput, RequiresSpecificLotNo, SelectSerialNoListEmptyInput, '', LotSelectionFromList, '');
 
         if Item."Assembly BOM" and Item."NPR Explode BOM auto" then
             POSActionInsertItemB.CheckBOMComponentsNeedLotNoSerialInput(Item, BOMComponentsNeedLotNoInput, BOMComponentsNeedSerialNoInput);
 
-        SimpleInsertCanBeExecuted := (not PostworkflowSubscriptionExists) and (not RequiresAdditionalInformationCollection) and (not ifAddItemAddOns(Item)) and (not BOMComponentsNeedSerialNoInput) and (not RequiresSpecificLotNo) and (not BOMComponentsNeedLotNoInput);
+        SimpleInsertCanBeExecuted := (not PostworkflowSubscriptionExists) and (not RequiresAdditionalInformationCollection) and (not ifAddItemAddOns(Item)) and (not BOMComponentsNeedSerialNoInput) and (not BOMComponentsNeedLotNoInput);
 
         ItemProcessingEvents.OnBeforeSimpleInsert(Context, ItemIdentifier, ItemIdentifierType, ItemQuantity, UnitPrice, SkipItemAvailabilityCheck, SerialSelectionFromList, UsePresetUnitPrice, Setup, FrontEnd, Response, Success, SimpleInsertCanBeExecuted, Item);
         if not SimpleInsertCanBeExecuted then
@@ -559,6 +583,13 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if RequiresSerialNoInput and not RequiresUnitPriceInputPrompt then begin
             Setup.GetPOSStore(POSStore);
             POSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, SerialSelectionFromList, POSStore);
+        end;
+
+        if RequiresLotNoInput and not RequiresUnitPriceInputPrompt then begin
+            if LotSelectionFromList in [1, 2] then
+                ValidateLotSelectionFromList := true;
+            Setup.GetPOSStore(POSStore);
+            POSTrackingUtils.ValidateLotNo(ItemReference."Item No.", ItemReference."Variant Code", InputLot, POSStore, ValidateLotSelectionFromList);
         end;
 
         POSActionInsertItemB.AddItemLine(Item, ItemReference, ItemIdentifierType, ItemQuantity, UnitOfMeasureCode, UnitPrice, '', '', InputSerial, POSSession, FrontEnd, InputLot);
@@ -861,7 +892,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:r,context:i,popup:e,parameters:n,captions:t})=>{debugger;if(i.additionalInformationCollected=!1,!(n.EditDescription&&(i.desc1=await e.input({title:t.editDesc_title,caption:t.editDesc_lead,value:i.defaultDescription}),i.desc1===null))&&!(n.EditDescription2&&(i.desc2=await e.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:i.defaultDescription}),i.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:o,requiresUnitPriceInputPrompt:s,requiresSerialNoInputPrompt:l,requiresLotNoInputPrompt:a,requiresAdditionalInformationCollection:S,addItemAddOn:c,baseLineNo:m,postAddWorkflows:u,ticketToken:N}=await r.respond("addSalesLine");if(N){const d=await r.run("TM_SCHEDULE_SELECT",{context:{TicketToken:N,EditSchedule:!0}});debugger;if(d.cancel){await r.respond("cancelTicketItemLine");return}}if(S){if(s&&(i.unitPriceInput=await e.numpad({title:t.UnitPriceTitle,caption:t.unitPriceCaption}),i.unitPriceInput===null)||l&&(i.serialNoInput=await e.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),i.serialNoInput===null)||a&&(i.lotNoInput=await e.input({title:t.itemTrackingLotNo_title,caption:t.itemTrackingLot_lead}),i.lotNoInput===null))return;i.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialLotNo:o,addItemAddOn:c,baseLineNo:m,postAddWorkflows:u}=await r.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(o,r,i,n,e,t),c&&(await r.run("RUN_ITEM_ADDONS",{context:{baseLineNo:m},parameters:{SkipItemAvailabilityCheck:!0}}),await r.respond("checkAvailability")),u)for(const d of Object.entries(u)){let[f,L]=d;f&&await r.run(f,{parameters:L})}}};async function processBomComponentLinesWithoutSerialNoLotNo(r,i,e,n,t,o){if(!!r){debugger;for(var s=0;s<r.length;s++){let l=!0,a;for(;l;)l=!1,e.serialNoInput="",e.lotNoInput="",e.bomComponentLineWithoutSerialLotNo=r[s],e.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(a=await i.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await t.confirm({title:o.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(l=!0)):(e.serialNoInput=await t.input({title:o.itemTracking_title,caption:format(o.bomItemTracking_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.serialNoInput||n.SelectSerialNoListEmptyInput)&&(a=await i.respond("assignSerialNo"),!a.assignSerialNoSuccess&&a.assignSerialNoSuccessErrorText&&await t.confirm({title:o.serialNoError_title,caption:a.assignSerialNoSuccessErrorText})&&(l=!0)))),e.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(e.lotNoInput=await t.input({title:o.ItemTrackingLot_TitleLbl,caption:format(o.bomItemTrackingLot_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),e.lotNoInput&&(a=await i.respond("assignLotNo"),!a.assignLotNoSuccess&&a.assignLotNoSuccessErrorText&&await t.confirm({title:o.lotNoError_title,caption:a.assignLotNoSuccessErrorText})&&(l=!0)))}}}function format(r,...i){if(!r.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return r.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(e,n,t)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,o=>o[0]);if(t>=i.length)throw new Error("argument index is out of range in format");return i[t]})}'
+'let main=async({workflow:o,context:i,popup:e,parameters:n,captions:t})=>{debugger;if(i.additionalInformationCollected=!1,!(n.EditDescription&&(i.desc1=await e.input({title:t.editDesc_title,caption:t.editDesc_lead,value:i.defaultDescription}),i.desc1===null))&&!(n.EditDescription2&&(i.desc2=await e.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:i.defaultDescription}),i.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:a,requiresUnitPriceInputPrompt:s,requiresSerialNoInputPrompt:l,requiresLotNoInputPrompt:r,requiresAdditionalInformationCollection:L,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u,ticketToken:m}=await o.respond("addSalesLine");if(m){const c=await o.run("TM_SCHEDULE_SELECT",{context:{TicketToken:m,EditSchedule:!0}});debugger;if(c.cancel){await o.respond("cancelTicketItemLine");return}}if(L){if(s&&(i.unitPriceInput=await e.numpad({title:t.UnitPriceTitle,caption:t.unitPriceCaption}),i.unitPriceInput===null)||l&&(i.serialNoInput=await e.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),i.serialNoInput===null)||r&&(i.lotNoInput=await e.input({title:t.itemTrackingLotNo_title,caption:t.itemTrackingLot_lead}),i.lotNoInput===null))return;i.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialLotNo:a,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u}=await o.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(a,o,i,n,e,t),d&&(await o.run("RUN_ITEM_ADDONS",{context:{baseLineNo:N},parameters:{SkipItemAvailabilityCheck:!0}}),await o.respond("checkAvailability")),u)for(const c of Object.entries(u)){let[S,f]=c;S&&await o.run(S,{parameters:f})}}};async function processBomComponentLinesWithoutSerialNoLotNo(o,i,e,n,t,a){if(!!o){debugger;for(var s=0;s<o.length;s++){let l=!0,r;for(;l;)l=!1,e.serialNoInput="",e.lotNoInput="",e.bomComponentLineWithoutSerialLotNo=o[s],e.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(r=await i.respond("assignSerialNo"),!r.assignSerialNoSuccess&&r.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:r.assignSerialNoSuccessErrorText})&&(l=!0)):(e.serialNoInput=await t.input({title:a.itemTracking_title,caption:format(a.bomItemTracking_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.serialNoInput||n.SelectSerialNoListEmptyInput)&&(r=await i.respond("assignSerialNo"),!r.assignSerialNoSuccess&&r.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:r.assignSerialNoSuccessErrorText})&&(l=!0)))),e.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(n.SelectLotNo==1&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo?(r=await i.respond("assignLotNo"),!r.assignLotNoSuccess&&r.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:r.assignLotNoSuccessErrorText})&&(l=!0)):(e.lotNoInput=await t.input({title:a.ItemTrackingLot_TitleLbl,caption:format(a.bomItemTrackingLot_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.lotNoInput||n.SelectLotNo==2)&&(r=await i.respond("assignLotNo"),!r.assignLotNoSuccess&&r.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:r.assignLotNoSuccessErrorText})&&(l=!0))))}}}function format(o,...i){if(!o.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return o.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(e,n,t)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,a=>a[0]);if(t>=i.length)throw new Error("argument index is out of range in format");return i[t]})}'
     )
     end;
 
