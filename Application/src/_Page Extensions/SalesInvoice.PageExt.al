@@ -126,6 +126,75 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 end;
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        addlast(content)
+        {
+            group("NPR RS E-Invoicing")
+            {
+                Caption = 'RS E-Invoicing';
+
+                field("NPR RS EI Send To SEF"; RSEIAuxSalesHeader."NPR RS EI Send To SEF")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Send To SEF';
+                    ToolTip = 'Specifies the value of the Send To SEF field.';
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+                        IsDocForSendingToSEF := RSEIAuxSalesHeader."NPR RS EI Send To SEF";
+                    end;
+                }
+                field("NPR RS EI Send To CIR"; RSEIAuxSalesHeader."NPR RS EI Send To CIR")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Send To CIR';
+                    ToolTip = 'Specifies the value of the Send To CIR field.';
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR RS EI Tax Liability Method"; RSEIAuxSalesHeader."NPR RS EI Tax Liability Method")
+                {
+                    Caption = 'Tax Liability Method';
+                    ToolTip = 'Specifies the value of the Tax Liability Method field.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR RS EI Model"; RSEIAuxSalesHeader."NPR RS EI Model")
+                {
+                    Caption = 'Model';
+                    ToolTip = 'Specifies the value of the RS Model field.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        IsModelFilled := (RSEIAuxSalesHeader."NPR RS EI Model" <> '');
+                        if IsModelFilled then
+                            RSEIAuxSalesHeader."NPR RS EI Reference Number" := '';
+                        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR RS EI Reference Number"; RSEIAuxSalesHeader."NPR RS EI Reference Number")
+                {
+                    Caption = 'Reference Number';
+                    ToolTip = 'Specifies the value of the RS Reference Number field.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Enabled = IsDocForSendingToSEF;
+                    Editable = IsModelFilled;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+                    end;
+                }
+            }
+        }
+#endif
     }
     actions
     {
@@ -263,7 +332,6 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 end;
             }
         }
-
         addlast(navigation)
         {
             group("NPR PayByLink Navigation")
@@ -285,16 +353,45 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                 }
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        addlast("&Invoice")
+        {
+            action("NPR RS EI Apply Tax Exemption")
+            {
+                Caption = 'Apply Tax Exemption Reason';
+                ToolTip = 'Executes the Apply Tax Exemption Reason action.';
+                ApplicationArea = NPRRSEInvoice;
+                Image = TaxSetup;
+                Promoted = true;
+                PromotedCategory = Category7;
 
+                trigger OnAction()
+                begin
+                    RSEInvoiceMgt.ApplyTaxExemptionReason(Rec);
+                end;
+            }
+        }
+#endif
     }
 
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
+        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+        IsModelFilled: Boolean;
+        IsDocForSendingToSEF: Boolean;
+#endif
 
     trigger OnAfterGetCurrRecord()
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
+        IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader);
+        IsModelFilled := false;
+#endif
     end;
 }

@@ -75,6 +75,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR SE CleanCash" := IsSEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR AT Fiscal" := IsATFiscalizationEnabled();
         TempApplicationAreaSetup."NPR ES Fiscal" := IsESFiscalizationEnabled();
+        TempApplicationAreaSetup."NPR RS EInvoice" := IsRSEInvoiceEnabled();
     end;
 
     local procedure IsFeatureEnabled(FeatureToCheck: Enum "NPR Feature"): Boolean
@@ -213,6 +214,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(ESFiscalizationSetup."ES Fiscal Enabled");
+    end;
+
+    local procedure IsRSEinvoiceEnabled(): Boolean
+    var
+        RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
+    begin
+        if not RSEInvoiceSetup.Get() then
+            exit(false);
+
+        exit(RSEInvoiceSetup."Enable RS E-Invoice");
     end;
 
     internal procedure IsNPRRetailApplicationAreaEnabled(): Boolean

@@ -104,6 +104,61 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                     end;
                 }
             }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            group("NPR RS E-Invoicing")
+            {
+                Caption = 'RS E-Invoicing';
+
+                field("NPR RS E-Invoice Customer"; RSEIAuxCustomer."NPR RS E-Invoice Customer")
+                {
+                    Caption = 'E-Invoice Customer';
+                    ApplicationArea = NPRRSEInvoice;
+                    ToolTip = 'Specifies the value of the E-Invoice Customer field.';
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxCustomer.SaveRSEIAuxCustomerFields();
+                    end;
+                }
+                field("NPR RS EI CIR Customer"; RSEIAuxCustomer."NPR RS EI CIR Customer")
+                {
+                    Caption = 'RS EI CIR Customer';
+                    ApplicationArea = NPRRSEInvoice;
+                    ToolTip = 'Specifies the value of the CIR Customer field.';
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxCustomer.SaveRSEIAuxCustomerFields();
+                    end;
+                }
+                field("NPR RS EI JMBG"; RSEIAuxCustomer."NPR RS EI JMBG")
+                {
+                    Caption = 'RS EI JMBG';
+                    ApplicationArea = NPRRSEInvoice;
+                    ToolTip = 'Specifies the value of the JMBG field.';
+                    Numeric = true;
+                    trigger OnValidate()
+                    var
+                        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+                    begin
+                        RSEInvoiceMgt.CheckJMBGFormatValidity(RSEIAuxCustomer."NPR RS EI JMBG");
+                        RSEIAuxCustomer.SaveRSEIAuxCustomerFields();
+                    end;
+                }
+                field("NPR RS EI JBKJS Code"; RSEIAuxCustomer."NPR RS EI JBKJS Code")
+                {
+                    Caption = 'RS EI JBKJS Code';
+                    ApplicationArea = NPRRSEInvoice;
+                    ToolTip = 'Specifies the value of the JBKJS Code field.';
+                    Numeric = true;
+                    trigger OnValidate()
+                    var
+                        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+                    begin
+                        RSEInvoiceMgt.CheckJKBJSFormatValidity(RSEIAuxCustomer."NPR RS EI JBKJS Code");
+                        RSEIAuxCustomer.SaveRSEIAuxCustomerFields();
+                    end;
+                }
+            }
+#endif
         }
         moveafter("VAT Registration No."; "Tax Liable")
         moveafter("VAT Registration No."; "Tax Area Code")
@@ -278,6 +333,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
         ToAnonymizeEditable: Boolean;
         ITAuxCustomer: Record "NPR IT Aux Customer";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
+#endif
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ShopifyIntegrationIsEnabled: Boolean;
@@ -295,6 +353,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         CustPOSSalesLCY := Customer."NPR Total Sales POS";
 
         ITAuxCustomer.ReadITAuxCustomerFields(Rec);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Rec);
+#endif
     end;
 
     trigger OnOpenPage()
