@@ -81,7 +81,132 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             }
         }
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        addlast(content)
+        {
+            group("NPR RS E-Invoicing")
+            {
+                Caption = 'RS E-Invoicing';
+
+                field("NPR RS EI Send To SEF"; RSEIAuxSalesInvHdr."NPR RS EI Send To SEF")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Send To SEF';
+                    ToolTip = 'Specifies the value of the Send To SEF field.';
+                    Editable = not IsRSEInvoiceSent;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+                        IsDocForSendingToSEF := RSEIAuxSalesInvHdr."NPR RS EI Send To SEF";
+                    end;
+                }
+                field("NPR RS EI Send To CIR"; RSEIAuxSalesInvHdr."NPR RS EI Send To CIR")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Send To CIR';
+                    ToolTip = 'Specifies the value of the Send To CIR field.';
+                    Editable = not IsRSEInvoiceSent;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+                    end;
+                }
+                field("NPR RS EI Tax Liability Method"; RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Tax Liability Method';
+                    ToolTip = 'Specifies the value of the Tax Liability Method field.';
+                    Editable = not IsRSEInvoiceSent;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+                    end;
+                }
+                field("NPR RS EI Model"; RSEIAuxSalesInvHdr."NPR RS EI Model")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Model';
+                    ToolTip = 'Specifies the value of the Model field.';
+                    Editable = not IsRSEInvoiceSent;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        IsModelFilled := (RSEIAuxSalesInvHdr."NPR RS EI Model" <> '');
+                        if IsModelFilled then
+                            RSEIAuxSalesInvHdr."NPR RS EI Reference Number" := '';
+                        RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+                    end;
+                }
+                field("NPR RS EI Reference Number"; RSEIAuxSalesInvHdr."NPR RS EI Reference Number")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Reference Number';
+                    ToolTip = 'Specifies the value of the Reference Number field.';
+                    Editable = (not IsRSEInvoiceSent) and IsModelFilled;
+                    Enabled = IsDocForSendingToSEF;
+                    trigger OnValidate()
+                    begin
+                        RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+                    end;
+                }
+                field("NPR RS EI Sales Invoice ID"; RSEIAuxSalesInvHdr."NPR RS EI Sales Invoice ID")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Sales Invoice ID';
+                    ToolTip = 'Specifies the value of the Sales Invoice ID field.';
+                    Editable = false;
+                }
+                field("NPR RS EI Purchase Invoice ID"; RSEIAuxSalesInvHdr."NPR RS EI Purchase Invoice ID")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Purchase Invoice ID';
+                    ToolTip = 'Specifies the value of the Purchase Invoice ID field.';
+                    Editable = false;
+                }
+                field("NPR RS EI Invoice Status"; RSEIAuxSalesInvHdr."NPR RS EI Invoice Status")
+                {
+                    Caption = 'Invoice Status';
+                    ToolTip = 'Specifies the value of the Invoice Status field.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Editable = false;
+                }
+                field("NPR RS EI Invoice Type Code"; RSEIAuxSalesInvHdr."NPR RS Invoice Type Code")
+                {
+                    Caption = 'Invoice Type Code';
+                    ToolTip = 'Specifies the value of the Invoice Type Code field.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Editable = false;
+                }
+                field("NPR RS EI Creation Date"; RSEIAuxSalesInvHdr."NPR RS EI Creation Date")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Creation Date';
+                    ToolTip = 'Specifies the value of the Creation Date field.';
+                    Editable = false;
+                }
+
+                field("NPR RS EI Sending Date"; RSEIAuxSalesInvHdr."NPR RS EI Sending Date")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Sending Date';
+                    ToolTip = 'Specifies the value of the Sending Date field.';
+                    Editable = false;
+                }
+
+                field("NPR RS EI Request Id"; RSEIAuxSalesInvHdr."NPR RS EI Request ID")
+                {
+                    ApplicationArea = NPRRSEInvoice;
+                    Caption = 'Request Id';
+                    ToolTip = 'Specifies the value of the Request Id field.';
+                    Editable = false;
+                }
+            }
+        }
+#endif
     }
+
     actions
     {
         addafter(AttachAsPDF)
@@ -154,6 +279,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 end;
             }
         }
+
         addafter("NPR SendSMS")
         {
             group("NPR PayByLink")
@@ -210,16 +336,50 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
                 }
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        addlast("&Invoice")
+        {
+            group("NPR RS E-Invoicing Actions")
+            {
+                Caption = 'RS E-Invoicing';
+
+                action("NPR Send E-Invoice")
+                {
+                    Caption = 'Send E-Invoice';
+                    ToolTip = 'Executes the Send E-Invoice action.';
+                    ApplicationArea = NPRRSEInvoice;
+                    Image = SendTo;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        RSEIOutSalesInvMgt: Codeunit "NPR RS EI Out Sales Inv. Mgt.";
+                    begin
+                        RSEIOutSalesInvMgt.CreateRequestAndSendSalesInvoice(Rec);
+                    end;
+                }
+            }
+        }
+#endif
     }
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.";
+#endif
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #endif
         OIOUBLInstalled: Boolean;
 #if not BC17
         ShopifyIntegrationIsEnabled: Boolean;
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        IsRSEInvoiceSent: Boolean;
+        IsModelFilled: Boolean;
+        IsDocForSendingToSEF: Boolean;
 #endif
 
     trigger OnOpenPage()
@@ -236,8 +396,18 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     end;
 
     trigger OnAfterGetCurrRecord()
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    var
+        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+#endif
     begin
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(Rec);
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        RSEIAuxSalesInvHdr.ReadRSEIAuxSalesInvHdrFields(Rec);
+        IsRSEInvoiceSent := RSEInvoiceMgt.CheckIsRSEInvoiceSent(Rec."No.");
+        IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesInvHdr);
+        IsModelFilled := false;
+#endif
     end;
 }

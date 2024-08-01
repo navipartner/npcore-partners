@@ -127,5 +127,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner ES Fiscalization';
             DataClassification = CustomerContent;
         }
+        field(6060123; "NPR RS EInvoice"; Boolean)
+        {
+            Caption = 'NaviPartner RS E-Invoice';
+            DataClassification = CustomerContent;
+        }
     }
 }
