@@ -1464,4 +1464,4314 @@ codeunit 85024 "NPR Retail Voucher Tests"
         // [THEN] Reference is applied on voucher
         Assert.AreEqual(NpRvSalesLineRef."Reference No.", ReferenceNo, 'Reference No. not applied according to scenario.');
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountNoCustomerPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountCustomerWithoutVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountCustomerWithVATPricesNoVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices without VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := false;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatNoDiscountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatNoDiscountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, no discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountPctCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountPctCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherNoVatDiscountAmountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyNoVatDiscountAmountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. No VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] VAT change on voucher - 0% VAT
+        ChangeGLAccountNoVAT(_VoucherTypeDefault."Account No.");
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatNoDiscountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatNoDiscountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, no discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountPctCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountPctCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '1', Qty, VoucherAmount, 50, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", VoucherAmount * Qty * SaleLinePOS."Discount %" / 100, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherWithVatDiscountAmountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 1;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountNoCustomerPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, no customer, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountCustomerWithoutVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer without VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        VoucherAmountExclVAT: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := false;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        VoucherAmountExclVAT := POSSaleTaxCalc.CalcAmountWithoutVAT(VoucherAmount, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmountExclVAT, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueVoucherTwoQtyWithVatDiscountAmountCustomerWithVATPricesWithVAT()
+    // [SCENARIO] Check voucher price and amount including VAT when issue voucher on POS that has POS view profile prices with VAT. 
+    //            Check voucher amount after posting. With VAT, discount, customer with VAT, two quantity on transaction
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSViewProfile: Record "NPR POS View Profile";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Customer: Record Customer;
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        LibrarySales: Codeunit "Library - Sales";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        VoucherAmount: Decimal;
+        DiscountAmount: Decimal;
+        Qty: Integer;
+    begin
+        Initialize();
+        VoucherAmount := 2000;
+
+        // [GIVEN] POS view profile and POS transaction
+        LibraryPOSMasterData.CreatePOSViewProfile(POSViewProfile);
+        POSViewProfile."Show Prices Including VAT" := true;
+        POSViewProfile.Modify(true);
+        LibraryPOSMasterData.AssignPOSViewProfileToPOSUnit(_POSUnit, POSViewProfile.Code);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Sale with customer attached
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Prices Including VAT" := true;
+        Customer.Modify(true);
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, Customer."No.", false);
+
+        // [WHEN] Create line with issue voucher
+        Qty := 2;
+        _POSSession.GetSaleLine(POSSaleLine);
+        DiscountAmount := 500;
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', Qty, VoucherAmount, DiscountAmount, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if voucher price and amount including VAT is calculated correctly
+        Assert.AreNearlyEqual(SaleLinePOS."Unit Price", VoucherAmount, 0.1, 'Issued voucher price not calculated correctly.');
+        Assert.AreNearlyEqual(SaleLinePOS."Amount Including VAT", (VoucherAmount - DiscountAmount) * Qty, 0.1, 'Issued voucher amount including VAT not calculated correctly.');
+
+        EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
+    end;
+
+    local procedure EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS: Record "NPR POS Sale"; VoucherAmount: Decimal; Quantity: Integer)
+    var
+        NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        TransactionEnded: Boolean;
+    begin
+        // [GIVEN] The amount to be paid for transaction
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.CalcSums("Amount Including VAT");
+
+        // [THEN] End sale
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, SaleLinePOS."Amount Including VAT", '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        // [THEN] Retail voucher entry should exist with correct amount
+        NpRvVoucherEntry.SetRange("Voucher Type", _VoucherTypeDefault.Code);
+        NpRvVoucherEntry.SetRange("Entry Type", NpRvVoucherEntry."Entry Type"::"Issue Voucher");
+        NpRvVoucherEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        NpRvVoucherEntry.CalcSums(Amount);
+        Assert.AreNearlyEqual(NpRvVoucherEntry.Amount, VoucherAmount * Quantity, 0.1, 'Voucher Amount not according to test scenario');
+    end;
+
+    local procedure ChangeGLAccountNoVAT(GLAccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        if not GLAccount.Get(GLAccountNo) then
+            exit;
+        if not VATPostingSetup.Get(GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group") then
+            exit;
+        VATPostingSetup.Validate("VAT %", 0);
+        VATPostingSetup.Modify(true);
+    end;
 }
