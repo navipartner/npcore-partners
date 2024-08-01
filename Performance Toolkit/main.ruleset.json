@@ -206,6 +206,11 @@
             "id": "AS0054",
             "action": "Hidden",
             "justification": "Does not matter on a test app"
+        },
+        {
+            "id": "AL0848",
+            "action": "Error",
+            "justification": "'{0}' is a keyword from version '{1}'."
         }
     ]
 }

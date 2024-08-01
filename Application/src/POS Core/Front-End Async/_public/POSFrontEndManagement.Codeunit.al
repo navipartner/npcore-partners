@@ -880,8 +880,8 @@
     /// </summary>
     /// <param name="Context">Original method invocation context</param>
     /// <param name="Response">Response object to send to the front end. Awaitable method invocation will receive this object as response.</param>
-    /// <param name="This">Current instance of Front-end Management.</param>
-    procedure RespondToFrontEndMethod(Context: JsonObject; Response: JsonObject; This: Codeunit "NPR POS Front End Management")
+    /// <param name="_This">Current instance of Front-end Management.</param>
+    procedure RespondToFrontEndMethod(Context: JsonObject; Response: JsonObject; _This: Codeunit "NPR POS Front End Management")
     var
         Request: Codeunit "NPR Front-End: Generic";
         JSON: Codeunit "NPR POS JSON Management";
@@ -893,7 +893,7 @@
         if not HasDragonglassResponseContext(Context) then
             exit;
 
-        JSON.InitializeJObjectParser(Context, This);
+        JSON.InitializeJObjectParser(Context, _This);
         JSON.SetScope(_DragonglassResponseContextLbl);
         Id := JSON.GetStringOrFail('invocationId', RetrievingMethodContextErr);
         Method := JSON.GetStringOrFail('method', RetrievingMethodContextErr);
