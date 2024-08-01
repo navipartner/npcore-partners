@@ -363,6 +363,11 @@
             "justification": "Try method should not specify en explicit return value."
         },
         {
+            "id": "AL0848",
+            "action": "Error",
+            "justification": "'{0}' is a keyword from version '{1}'."
+        },
+        {
             "id": "AL0780",
             "action": "Error",
             "justification": "Value assignment not allowed"
