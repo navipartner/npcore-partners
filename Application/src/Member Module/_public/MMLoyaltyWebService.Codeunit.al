@@ -759,6 +759,12 @@
 
     end;
 
+    procedure Ping(inputTxt: Text[50]): Text
+    var
+    begin
+        exit('Pong:' + inputTxt);
+    end;
+
     local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "NPR Nc Import Entry")
     var
         FileNameLbl: Label '%1-%2.xml', Locked = true;

@@ -24,7 +24,6 @@
         RESERVE_2: Label 'The number of points to reserve must be greater than zero.';
         RESERVE_3: Label 'The number of points to refund must be less than zero.';
         RESERVE_4: Label 'Incorrect type for reserve points.';
-        PAYMENT_1: Label 'Number of points in payment (%1) must not exceed number of points in sales (%2).';
         PAYMENT_2: Label 'The reserved number of points with authorization code %1 does not match points in payment.';
         PAYMENT_3: Label 'Currency code must be equal to company currency code (%1) and not blank.';
         PAYMENT_4: Label 'The attempted reserved number of points (%1), exceed the members current balance (%2).';
@@ -354,7 +353,7 @@
         if (not TmpAuthorizationIn.FindFirst()) then begin
             ResponseMessage := AUTHORIZATION_MISSING;
             ResponseMessageId := '-1100';
-            exit;
+            exit(false);
         end;
 
         if (not StoreSetup.Get(TmpAuthorizationIn."Company Name", TmpAuthorizationIn."POS Store Code", TmpAuthorizationIn."POS Unit Code")) then begin
@@ -461,6 +460,7 @@
         exit(true);
     end;
 
+#pragma warning disable AA0206
     local procedure ValidateRegisterSales(var TmpSaleLines: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLines: Record "NPR MM Reg. Sales Buffer" temporary; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -581,12 +581,6 @@
             until (TmpPaymentLines.Next() = 0);
         end;
 
-        if (Abs(Round(BurnedAmount, 0.01)) > Abs(Round(EarnedAmount, 0.01))) then begin
-            ResponseMessage := StrSubstNo(PAYMENT_1, BurnedPoints, EarnedPoints);
-            ResponseMessageId := '-1190';
-            exit(false);
-        end;
-
         TmpPaymentLines.Reset();
         if (TmpPaymentLines.FindSet()) then begin
             repeat
@@ -605,6 +599,7 @@
 
         exit(true);
     end;
+#pragma warning restore AA0206
 
     local procedure ValidateReservePoints(var TmpReserveLines: Record "NPR MM Reg. Sales Buffer" temporary; MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
     var

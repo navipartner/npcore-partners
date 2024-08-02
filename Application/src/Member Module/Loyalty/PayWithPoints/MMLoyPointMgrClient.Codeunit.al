@@ -49,6 +49,8 @@
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
         ForeignMembership: Codeunit "NPR MM NPR Membership";
+        RetryRequest: Codeunit "NPR MM LoyaltyRetryQueueMgr";
+        loyaltyReceiptRegistrationError: Label 'There was a problem registering the loyalty receipt. The transaction will be automatically reattempted.';
         SoapAction: Text;
         ResponseMessage: Text;
         XmlRequest: Text;
@@ -65,9 +67,15 @@
             XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
             Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
             HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
-            if (not Success) then
-                if (GuiAllowed()) then
-                    Message(ResponseMessage);
+            if (not Success) then begin
+                if (RetryRequest.AddToQueue(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
+                    if (GuiAllowed()) then
+                        Message(loyaltyReceiptRegistrationError);
+                end else begin
+                    if (GuiAllowed()) then
+                        Message(ResponseMessage);
+                end;
+            end;
 
         end else begin
             EFTTransactionRequest.Successful := false;
@@ -122,7 +130,7 @@
         exit(TransformOk);
     end;
 
-    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlResponseDoc: XmlDocument)
+    internal procedure HandleWebServiceResult(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ServiceSuccess: Boolean; ResponseMessage: Text; var XmlResponseDoc: XmlDocument)
     var
         OStream: OutStream;
     begin
@@ -283,7 +291,7 @@
                 TempRegisterPaymentLines."Authorization Code" := EFTTransactionRequest2."Authorisation Number";
 #pragma warning restore
                 TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest2."Currency Code";
-                TempRegisterPaymentLines."Total Points" := EFTTransactionRequest2."Amount Output";
+                TempRegisterPaymentLines."Total Points" := Round(EFTTransactionRequest2."Amount Output", 1);
                 TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest2."Amount Output");
                 TempRegisterPaymentLines."Retail Id" := EFTTransactionRequest2."Sales Line ID";
                 TempRegisterPaymentLines.Insert();
@@ -318,7 +326,7 @@
         end;
         TempRegisterPaymentLines."Currency Code" := EFTTransactionRequest."Currency Code";
         TempRegisterPaymentLines."Total Amount" := BurnPointsToAmount(LoyaltyStoreSetup, EFTTransactionRequest."Amount Input");
-        TempRegisterPaymentLines."Total Points" := EFTTransactionRequest."Amount Input";
+        TempRegisterPaymentLines."Total Points" := Round(EFTTransactionRequest."Amount Input", 1);
         TempRegisterPaymentLines.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(TempRegisterPaymentLines.Description));
         TempRegisterPaymentLines."Retail Id" := EFTTransactionRequest."Sales Line ID";
         TempRegisterPaymentLines.Insert();
