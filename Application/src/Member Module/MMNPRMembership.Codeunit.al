@@ -627,7 +627,7 @@ codeunit 6060147 "NPR MM NPR Membership"
         ResponseText := '<webServiceApi><fault>' +
             StrSubstNo('<endpointCode>%1</endpointCode>', NPRRemoteEndpointSetup.Code) +
             StrSubstNo('<endpoint>%1</endpoint>', NPRRemoteEndpointSetup."Endpoint URI") +
-            StrSubstNo('<reason>%1</reason>', ReasonText) +
+            StrSubstNo('<reason>%1</reason>', WebResponse.ReasonPhrase()) +
             StrSubstNo('<code>%1</code>', WebResponse.HttpStatusCode()) +
             '</fault></webServiceApi>';
         XmlDocument.ReadFrom(ResponseText, XmlDocOut);
@@ -1626,8 +1626,14 @@ codeunit 6060147 "NPR MM NPR Membership"
         InputTxt: Text;
     begin
         InputTxt := 'test';
-        TestEndpointConnectionRequest(SoapAction, InputTxt, XmlDocRequest);
-        if (not WebServiceApi(NPRRemoteEndpointSetup, 'Ping', NotValidReason, XmlDocRequest, XmlDocResponse)) then
+
+        if (NPRRemoteEndpointSetup.Type = NPRRemoteEndpointSetup.Type::MemberServices) then
+            TestMemberEndpointConnectionRequest(SoapAction, InputTxt, XmlDocRequest);
+
+        if (NPRRemoteEndpointSetup.Type = NPRRemoteEndpointSetup.Type::LoyaltyServices) then
+            TestLoyaltyEndpointConnectionRequest(SoapAction, InputTxt, XmlDocRequest);
+
+        if (not WebServiceApi(NPRRemoteEndpointSetup, SoapAction, NotValidReason, XmlDocRequest, XmlDocResponse)) then
             Error(NotValidReason)
         else begin
             if TestEndpointConnectionResponse(XmlDocResponse, InputTxt, NotValidReason) then
@@ -1637,13 +1643,32 @@ codeunit 6060147 "NPR MM NPR Membership"
         end;
     end;
 
-    local procedure TestEndpointConnectionRequest(var SoapAction: Text[50]; InputTxt: Text; var XmlDoc: XmlDocument)
+    local procedure TestMemberEndpointConnectionRequest(var SoapAction: Text[50]; InputTxt: Text; var XmlDoc: XmlDocument)
     var
         XmlRequest: Text;
     begin
         SoapAction := 'Ping';
         XmlRequest :=
           '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services">' +
+          '   <soapenv:Header/>' +
+          '   <soapenv:Body>' +
+          '      <mem:Ping>' +
+          '         <mem:inputTxt>%1</mem:inputTxt>' +
+          '      </mem:Ping>' +
+          '   </soapenv:Body>' +
+          '</soapenv:Envelope>';
+        XmlRequest := StrSubstNo(XmlRequest, InputTxt);
+        XmlDocument.ReadFrom(XmlRequest, XmlDoc);
+        XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
+    end;
+
+    local procedure TestLoyaltyEndpointConnectionRequest(var SoapAction: Text[50]; InputTxt: Text; var XmlDoc: XmlDocument)
+    var
+        XmlRequest: Text;
+    begin
+        SoapAction := 'Ping';
+        XmlRequest :=
+          '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/loyalty_services">' +
           '   <soapenv:Header/>' +
           '   <soapenv:Body>' +
           '      <mem:Ping>' +
