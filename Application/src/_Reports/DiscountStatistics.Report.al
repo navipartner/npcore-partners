@@ -16,7 +16,7 @@
         dataitem(DiscountTypeFilter; "NPR POS Entry Sales Line")
         {
             DataItemTableView = sorting("POS Entry No.");
-            RequestFilterFields = "Discount Type";
+            RequestFilterFields = "Discount Type", "Discount Code";
             RequestFilterHeading = 'Discount Type';
             UseTemporary = true;
         }
@@ -49,7 +49,19 @@
             column(Disc_Structure_Caption; Disc_Structure_Caption_Lbl)
             {
             }
-            column(DiscountFilter; DiscountFilter)
+            column(DiscountFilter; DiscountFilterType)
+            {
+            }
+            column(DiscountCodeFilter; DiscountCodeFilter)
+            {
+            }
+            column(Disc_Code_Caption_Lbl; Disc_Code_Caption_Lbl)
+            {
+            }
+            column(ItemDiscGroupFilter; ItemDiscGroupFilter)
+            {
+            }
+            column(Item_Disc_Group_Caption_Lbl; Item_Disc_Group_Caption_Lbl)
             {
             }
             column(Salesperson_Filter_Caption; Salesperson_Filter_Caption_Lbl)
@@ -159,6 +171,7 @@
                     trigger OnPreDataItem()
                     begin
                         SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
+                        SetFilter("Discount Amount", '<>%1', 0);
                         Item.CopyFilter("Date Filter", ValueEntry."Posting Date");
                     end;
                 }
@@ -169,17 +182,8 @@
                     Total_VE_Sales_Amt := 0;
                     Total_VE_Discount_Amt := 0;
                 end;
-
-                trigger OnPreDataItem()
-                begin
-                end;
             }
-
-            trigger OnPreDataItem()
-            begin
-            end;
         }
-
     }
 
     requestpage
@@ -220,9 +224,11 @@
         DateFilter := Item.GetFilter("Date Filter");
         SupplierFilter := Item.GetFilter("Vendor No.");
         ItemNoFilter := Item.GetFilter("No.");
-        DiscountFilter := DiscountTypeFilter.GetFilter("Discount Type");
-        if DiscountFilter <> '' then
-            ShowDiscountType0 := IsOption0InFilter(DiscountFilter);
+        ItemDiscGroupFilter := Item.GetFilter("Item Disc. Group");
+        DiscountFilterType := DiscountTypeFilter.GetFilter("Discount Type");
+        DiscountCodeFilter := DiscountTypeFilter.GetFilter("Discount Code");
+        if DiscountFilterType <> '' then
+            ShowDiscountType0 := IsOption0InFilter(DiscountFilterType);
     end;
 
     local procedure IsOption0InFilter(FilterString: text): Boolean
@@ -239,11 +245,12 @@
     var
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
-        if DiscountFilter = '' then
+        if (DiscountFilterType = '') and (DiscountCodeFilter = '') then
             exit(true);
         PosEntrySalesLine.SetRange("Item Entry No.", ValueEntry."Item Ledger Entry No.");
         if not PosEntrySalesLine.IsEmpty then begin
-            PosEntrySalesLine.SetFilter("Discount Type", DiscountFilter);
+            PosEntrySalesLine.SetFilter("Discount Type", DiscountFilterType);
+            PosEntrySalesLine.SetFilter("Discount Code", DiscountCodeFilter);
             exit(not PosEntrySalesLine.IsEmpty);
         end else
             exit(ShowDiscountType0 and (ValueEntry."Discount Amount" <> 0));
@@ -253,7 +260,9 @@
         CompanyInformation: Record "Company Information";
         ShowItemLedger: Boolean;
         DateFilter: Text;
-        DiscountFilter: Text;
+        DiscountFilterType: Text;
+        DiscountCodeFilter: Text;
+        ItemDiscGroupFilter: Text;
         ItemNoFilter: Text;
         SalesPersonFilter: Text;
         SupplierFilter: Text;
@@ -263,6 +272,8 @@
         Date_Filter_Caption_Lbl: Label 'Date Filter';
         Description_Caption_Lbl: Label 'Description';
         Disc_Structure_Caption_Lbl: Label 'Disc. Structure';
+        Disc_Code_Caption_Lbl: Label 'Discount Code';
+        Item_Disc_Group_Caption_Lbl: Label 'Item Disc. Group';
         Discount_Amount_Caption_Lbl: Label 'Discount Amount';
         Report_Caption_Lbl: Label 'Discount Sale Statistics';
         Entry_No_Caption_Lbl: Label 'Entry No.';
@@ -276,4 +287,3 @@
         Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
         ShowDiscountType0: Boolean;
 }
-
