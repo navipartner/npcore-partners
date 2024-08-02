@@ -122,6 +122,24 @@
                     MMMembership.TestEndpointConnection(Rec);
                 end;
             }
+
+            action(LoyaltyReattemptQueue)
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Create Loyalty Reattempt Job Queue';
+                Image = Job;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ToolTip = 'Create the Job Queue entry that reattempts failed "RegisterSales" (Earn Loyalty Points).';
+
+                trigger OnAction()
+                var
+                    LoyaltyQueueMgr: Codeunit "NPR MM LoyaltyRetryQueueMgr";
+                begin
+                    LoyaltyQueueMgr.CreateJobQueueEntry();
+                end;
+            }
         }
     }
 
