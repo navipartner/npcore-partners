@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>565eb839-4627-4857-bf80-e61bb0319b30</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -2072,13 +2071,13 @@
             </Style>
           </Line>
         </ReportItems>
-        <Height>5.59427cm</Height>
+        <Height>5.42615cm</Height>
         <Style />
       </Body>
       <Width>27.1083cm</Width>
       <Page>
         <PageHeader>
-          <Height>5.36061cm</Height>
+          <Height>5.62784cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -2247,11 +2246,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.0554in</Top>
-                  <Left>0.06639in</Left>
+                  <Top>0.85728in</Top>
+                  <Left>0.06443in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.47917in</Width>
-                  <ZIndex>7</ZIndex>
+                  <ZIndex>6</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2279,11 +2278,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.23179in</Top>
-                  <Left>0.06835in</Left>
+                  <Top>1.03367in</Top>
+                  <Left>0.06639in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.47917in</Width>
-                  <ZIndex>8</ZIndex>
+                  <ZIndex>7</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2311,11 +2310,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.41651in</Top>
-                  <Left>0.06835in</Left>
-                  <Height>0.15416in</Height>
+                  <Top>1.21839in</Top>
+                  <Left>0.06639in</Left>
+                  <Height>0.13471in</Height>
                   <Width>1.47917in</Width>
-                  <ZIndex>9</ZIndex>
+                  <ZIndex>8</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2343,11 +2342,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.59289in</Top>
-                  <Left>0.06835in</Left>
+                  <Top>1.36699in</Top>
+                  <Left>0.06639in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.47917in</Width>
-                  <ZIndex>10</ZIndex>
+                  <ZIndex>9</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2375,11 +2374,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.76511in</Top>
-                  <Left>0.06835in</Left>
+                  <Top>1.53921in</Top>
+                  <Left>0.06639in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.47917in</Width>
-                  <ZIndex>11</ZIndex>
+                  <ZIndex>10</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2407,11 +2406,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.05679in</Top>
-                  <Left>1.58862in</Left>
+                  <Top>0.85867in</Top>
+                  <Left>1.58666in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.22917in</Width>
-                  <ZIndex>13</ZIndex>
+                  <ZIndex>11</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2439,11 +2438,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.23179in</Top>
-                  <Left>1.58919in</Left>
+                  <Top>1.03367in</Top>
+                  <Left>1.58723in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.22917in</Width>
-                  <ZIndex>14</ZIndex>
+                  <ZIndex>12</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2471,11 +2470,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.41651in</Top>
-                  <Left>1.58919in</Left>
-                  <Height>0.15416in</Height>
+                  <Top>1.21839in</Top>
+                  <Left>1.58723in</Left>
+                  <Height>0.13471in</Height>
                   <Width>1.22917in</Width>
-                  <ZIndex>15</ZIndex>
+                  <ZIndex>13</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2503,11 +2502,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.59289in</Top>
-                  <Left>1.58919in</Left>
+                  <Top>1.36699in</Top>
+                  <Left>1.58723in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.22917in</Width>
-                  <ZIndex>16</ZIndex>
+                  <ZIndex>14</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2535,11 +2534,11 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox90</rd:DefaultName>
-                  <Top>1.76511in</Top>
-                  <Left>1.58919in</Left>
+                  <Top>1.53921in</Top>
+                  <Left>1.58723in</Left>
                   <Height>0.15416in</Height>
                   <Width>1.22917in</Width>
-                  <ZIndex>17</ZIndex>
+                  <ZIndex>15</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
@@ -2574,16 +2573,144 @@
                   <Left>21.46292cm</Left>
                   <Height>0.423cm</Height>
                   <Width>5.41053cm</Width>
-                  <ZIndex>18</ZIndex>
+                  <ZIndex>16</ZIndex>
                   <Style>
                     <Border>
                       <Style>None</Style>
                     </Border>
                   </Style>
                 </Textbox>
+                <Textbox Name="Textbox106">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!Disc_Code_Caption_Lbl.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>1.69337in</Top>
+                  <Left>0.06639in</Left>
+                  <Height>0.15416in</Height>
+                  <Width>1.47917in</Width>
+                  <ZIndex>17</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
+                <Textbox Name="Textbox127">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!DiscountCodeFilter.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>1.69337in</Top>
+                  <Left>1.58723in</Left>
+                  <Height>0.15416in</Height>
+                  <Width>1.22917in</Width>
+                  <ZIndex>18</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
+                <Textbox Name="Textbox107">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!Item_Disc_Group_Caption_Lbl.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>1.84753in</Top>
+                  <Left>0.06443in</Left>
+                  <Height>0.1935in</Height>
+                  <Width>1.47917in</Width>
+                  <ZIndex>19</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
+                <Textbox Name="Textbox128">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!ItemDiscGroupFilter.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>1.84753in</Top>
+                  <Left>1.58527in</Left>
+                  <Height>0.1935in</Height>
+                  <Width>1.22917in</Width>
+                  <ZIndex>20</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
               </ReportItems>
               <KeepTogether>true</KeepTogether>
-              <Height>5.36061cm</Height>
+              <Height>5.57845cm</Height>
               <Width>27cm</Width>
               <Style>
                 <Border>
@@ -2853,6 +2980,18 @@ End Function
         </Field>
         <Field Name="DiscountFilter">
           <DataField>DiscountFilter</DataField>
+        </Field>
+        <Field Name="DiscountCodeFilter">
+          <DataField>DiscountCodeFilter</DataField>
+        </Field>
+        <Field Name="Disc_Code_Caption_Lbl">
+          <DataField>Disc_Code_Caption_Lbl</DataField>
+        </Field>
+        <Field Name="ItemDiscGroupFilter">
+          <DataField>ItemDiscGroupFilter</DataField>
+        </Field>
+        <Field Name="Item_Disc_Group_Caption_Lbl">
+          <DataField>Item_Disc_Group_Caption_Lbl</DataField>
         </Field>
         <Field Name="Salesperson_Filter_Caption">
           <DataField>Salesperson_Filter_Caption</DataField>
