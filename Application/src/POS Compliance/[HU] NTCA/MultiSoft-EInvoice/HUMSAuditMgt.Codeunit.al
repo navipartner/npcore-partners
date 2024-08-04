@@ -17,11 +17,11 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
             exit;
         if not GetPOSEntryFromSalesTicketNo(SalePOS."Sales Ticket No.", POSEntry, POSEntry."Entry Type"::"Direct Sale") then
             exit;
-        if not GetPaymentMethodMapping(POSEntry, HUMSPaymentMethodMap) then
+        if not GetLinkedSalesDocument(POSEntry, POSEntrySalesDocLink) then
+            exit;
+        if not GetPaymentMethodMapping(POSEntry, HUMSPaymentMethodMap, POSEntrySalesDocLink) then
             exit;
         if not HUMSPaymentMethodMap.FindFirst() then
-            exit;
-        if not GetLinkedSalesDocument(POSEntry, POSEntrySalesDocLink) then
             exit;
 
         ModifySalesHaderPaymentMethod(HUMSPaymentMethodMap, POSEntrySalesDocLink);
@@ -70,7 +70,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         POSEntry.SetRange("Entry Type", EntryType);
         if (POSEntry.IsEmpty()) then
             exit(false);
-        exit(POSEntry.FindFirst());
+        exit(POSEntry.FindLast());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
@@ -131,9 +131,9 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     begin
         POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
-        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
         POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::Unposted);
-        if not POSEntrySalesDocLink.FindFirst() then
+        POSEntrySalesDocLink.SetFilter("Sales Document Type", '%1|%2', POSEntrySalesDocLink."Sales Document Type"::ORDER, POSEntrySalesDocLink."Sales Document Type"::CREDIT_MEMO);
+        if not POSEntrySalesDocLink.FindLast() then
             exit(false);
         exit(true);
     end;
@@ -142,20 +142,32 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     var
         SalesHeader: Record "Sales Header";
     begin
-        SalesHeader.Get(SalesHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No");
+        case POSEntrySalesDocLink."Sales Document Type" of
+            POSEntrySalesDocLink."Sales Document Type"::ORDER:
+                SalesHeader.Get(SalesHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No");
+            POSEntrySalesDocLink."Sales Document Type"::CREDIT_MEMO:
+                SalesHeader.Get(SalesHeader."Document Type"::"Credit Memo", POSEntrySalesDocLink."Sales Document No");
+            else
+                exit;
+        end;
         SalesHeader."Payment Method Code" := HUMSPaymentMethodMap."Payment Method";
         SalesHeader.Modify(false);
     end;
 
-    local procedure GetPaymentMethodMapping(var POSEntry: Record "NPR POS Entry"; var HUMSPaymentMethodMap: Record "NPR HU MS Payment Method Map."): Boolean
+    local procedure GetPaymentMethodMapping(var POSEntry: Record "NPR POS Entry"; var HUMSPaymentMethodMap: Record "NPR HU MS Payment Method Map."; POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link"): Boolean
     var
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntryPaymentLine.SetFilter(Amount, '>%1', 0);
-        if POSEntryPaymentLine.IsEmpty() then
-            exit(false);
+        case POSEntrySalesDocLink."Sales Document Type" of
+            POSEntrySalesDocLink."Sales Document Type"::ORDER:
+                POSEntryPaymentLine.SetFilter(Amount, '>%1', 0);
+            POSEntrySalesDocLink."Sales Document Type"::CREDIT_MEMO:
+                POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+            else
+                exit(false);
+        end;
 
         POSEntryPaymentLine.FindSet();
         repeat
