@@ -439,7 +439,6 @@
                     Image = SendTo;
                     ToolTip = 'Send the Mixed Discount to the Retail Journal for accurate tracking and reporting';
                     ApplicationArea = NPRRetail;
-
                     trigger OnAction()
                     var
                         RetailJournalMgt: Codeunit "NPR Retail Journal Code";

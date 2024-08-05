@@ -621,9 +621,12 @@
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         TempSaleLinePOS2: Record "NPR POS Sale Line" temporary;
         POSUnit: Record "NPR POS Unit";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
         PricingProfile: Codeunit "NPR POS Pricing Profile";
     begin
         TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
@@ -651,13 +654,17 @@
         if "Calculation Date" <> 0D then
             TempSalePOS.Date := "Calculation Date";
 
-        TempSalePOS."Prices Including VAT" := true;
+        if not FeatureFlagManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            TempSalePOS."Prices Including VAT" := true;
+
         Item.Get("Item No.");
         TempSaleLinePOS."Customer Price Group" := TempSalePOS."Customer Price Group";
 
         TempSaleLinePOS."Item Disc. Group" := Item."Item Disc. Group";
         TempSaleLinePOS.SetSkipUpdateDependantQuantity(true);
         TempSaleLinePOS.Date := "Calculation Date";
+        if FeatureFlagManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            TempSaleLinePOS.SetPOSHeader(TempSalePOS);
         TempSaleLinePOS.Validate(Quantity, "Quantity for Discount Calc");
 #pragma warning disable AA0139        
         TempSaleLinePOS."Register No." := "Register No.";
@@ -666,6 +673,8 @@
         TempSaleLinePOS."Qty. per Unit of Measure" := UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Rec."Unit of Measure");
         POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
         POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
+        if FeatureFlagManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            TempSaleLinePOS2.SetPOSHeader(TempSalePOS);
         TempSaleLinePOS2 := TempSaleLinePOS;
         TempSaleLinePOS2.Insert();
         TempDiscountPriority.SetCurrentKey(Priority);
@@ -674,21 +683,36 @@
                 repeat
                     POSSalesDiscountCalcMgt.ApplyDiscount(TempDiscountPriority, TempSalePOS, TempSaleLinePOS2, TempSaleLinePOS, TempSaleLinePOS, 0, true);
                     if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
+                        if FeatureFlagManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+                            TempSaleLinePOS2.SetPOSHeader(TempSalePOS);
                         TempSaleLinePOS2.UpdateAmounts(TempSaleLinePOS2);
                         TempSaleLinePOS2.Modify();
                     end;
                 until (TempDiscountPriority.Next() = 0) or (TempSaleLinePOS2."Discount Type" <> TempSaleLinePOS2."Discount Type"::" ");
 
         if TempSaleLinePOS2.Get(TempSaleLinePOS.RecordId) then begin
-            "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
-            "VAT %" := TempSaleLinePOS2."VAT %";
-            "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
-            "Unit Price" := TempSaleLinePOS2."Unit Price";
-            "Discount Type" := TempSaleLinePOS2."Discount Type";
-            "Discount Code" := TempSaleLinePOS2."Discount Code";
-            "Discount Pct." := TempSaleLinePOS2."Discount %";
+            if FeatureFlagManagement.IsEnabled('newRetailJournalDiscountCalculation') then begin
+                if not GeneralLedgerSetup.Get() then
+                    Clear(GeneralLedgerSetup);
+                "Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS."Unit Price", TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                "Discount Price Incl. Vat" := POSSaleTaxCalc.CalcAmountWithVAT(TempSaleLinePOS2.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                "VAT %" := TempSaleLinePOS2."VAT %";
+                "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
+                "Discount Type" := TempSaleLinePOS2."Discount Type";
+                "Discount Code" := TempSaleLinePOS2."Discount Code";
+                "Discount Pct." := TempSaleLinePOS2."Discount %";
+            end else begin
+                "Discount Price Incl. Vat" := TempSaleLinePOS2."Amount Including VAT";
+                "VAT %" := TempSaleLinePOS2."VAT %";
+                "Discount Price Excl. VAT" := TempSaleLinePOS2.Amount;
+                "Unit Price" := TempSaleLinePOS2."Unit Price";
+                "Discount Type" := TempSaleLinePOS2."Discount Type";
+                "Discount Code" := TempSaleLinePOS2."Discount Code";
+                "Discount Pct." := TempSaleLinePOS2."Discount %";
+            end;
         end;
     end;
+
 
     internal procedure CalcProfit()
     var
