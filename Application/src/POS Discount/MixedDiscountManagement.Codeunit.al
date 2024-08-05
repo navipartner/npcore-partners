@@ -791,7 +791,7 @@
         exit(ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, false));
     end;
 
-    local procedure ApplyMixDiscount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; CalculateOnly: Boolean) TotalDiscAmount: Decimal
+    internal procedure ApplyMixDiscount(var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; CalculateOnly: Boolean) TotalDiscAmount: Decimal
     var
         TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary;
         InvQtyDict: Dictionary of [Guid, Decimal];

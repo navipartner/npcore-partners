@@ -206,7 +206,7 @@
             LogStopwatch('DISCOUNT_ON_TOTALPRESSED', CurrentDateTime - StartTime);
     end;
 
-    local procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
+    internal procedure ApplyDiscounts(SalePOS: Record "NPR POS Sale"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete,Total; RecalculateAllLines: Boolean)
     begin
 
         tmpDiscountPriority.SetCurrentKey(Priority);
@@ -346,7 +346,7 @@
         exit(not tmpDiscountPriority.IsEmpty());
     end;
 
-    local procedure FindAllActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary)
+    internal procedure FindAllActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary)
     var
         DiscountPriority: Record "NPR Discount Priority";
     begin

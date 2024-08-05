@@ -277,6 +277,17 @@
 
     procedure CopyMix2RetailJnlLines(var MixedDiscountLine: Record "NPR Mixed Discount Line"; RetailJnlCode: Code[40])
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            CopyMix2RetailJnlLinesV2(MixedDiscountLine, RetailJnlCode)
+        else
+            CopyMix2RetailJnlLinesV1(MixedDiscountLine, RetailJnlCode);
+    end;
+
+    [Obsolete('Not used anymore. Use function CopyMix2RetailJnlLinesV2 instead', '2024-07-28')]
+    local procedure CopyMix2RetailJnlLinesV1(var MixedDiscountLine: Record "NPR Mixed Discount Line"; RetailJnlCode: Code[40])
+    var
         RetailJnlLine: Record "NPR Retail Journal Line";
     begin
         if not SetRetailJnl(RetailJnlCode) then
@@ -296,7 +307,105 @@
         RetailJnlLine.CloseGUI();
     end;
 
-    procedure Quantity2RetailJnl(ItemNo: Code[20]; MainItemNo: Code[20]; RetailJnlCode: Code[40])
+    local procedure CopyMix2RetailJnlLinesV2(var MixedDiscountLine: Record "NPR Mixed Discount Line"; RetailJnlCode: Code[40])
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+
+        TempMixedDiscount: Record "NPR Mixed Discount" temporary;
+        TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary;
+        TempSalePOS: Record "NPR POS Sale" temporary;
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        RetailJnlLine: Record "NPR Retail Journal Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        Item: Record Item;
+        MixedDiscountManagement: Codeunit "NPR Mixed Discount Management";
+        POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
+        SaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        UnitofMeasureManagement: Codeunit "Unit of Measure Management";
+        TotalAmountIncludingVAT: Decimal;
+        TotalAmountIncludingVATAterDiscount: Decimal;
+        TotalAmountAfterDiscount: Decimal;
+        LineDiscountAmountIncludingVAT: Decimal;
+    begin
+        if not SetRetailJnl(RetailJnlCode) then
+            exit;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+        RetailJnlLine.UseGUI(MixedDiscountLine.Count());
+        MixedDiscountLine.SetAutoCalcFields("Unit Price", "Unit price incl. VAT");
+        if MixedDiscountLine.FindSet() then
+            repeat
+                TempMixedDiscount.Reset();
+                if not TempMixedDiscount.IsEmpty then
+                    TempMixedDiscount.DeleteAll();
+
+                MixedDiscount.Get(MixedDiscountLine.Code);
+                TempMixedDiscount := MixedDiscount;
+                TempMixedDiscount.Insert();
+
+                TempMixedDiscountLine.Reset();
+                if not TempMixedDiscountLine.IsEmpty then
+                    TempMixedDiscountLine.DeleteAll();
+
+                TempMixedDiscountLine := MixedDiscountLine;
+                TempMixedDiscountLine.Insert();
+                if not Item.Get(MixedDiscountLine."No.") then
+                    Clear(Item);
+
+                TempSaleLinePOS.Reset();
+                if not TempSaleLinePOS.IsEmpty then
+                    TempSaleLinePOS.DeleteAll();
+
+                TempSalePOS.Reset();
+                if not TempSalePOS.IsEmpty then
+                    TempSalePOS.DeleteAll();
+
+                TempSaleLinePOS.Init();
+                TempSaleLinePOS."Line Type" := TempSaleLinePOS."Line Type"::Item;
+                TempSaleLinePOS."No." := MixedDiscountLine."No.";
+                TempSaleLinePOS."Variant Code" := MixedDiscountLine."Variant Code";
+                TempSaleLinePOS."Unit of Measure Code" := Item."Base Unit of Measure";
+                TempSaleLinePOS."Qty. per Unit of Measure" := UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Item."Base Unit of Measure");
+                TempSaleLinePOS."Price Includes VAT" := true;
+
+                POSSalesPriceCalcMgt.InitTempPOSItemSale(TempSaleLinePOS, TempSalePOS);
+                TempSaleLinePOS.SetPOSHeader(TempSalePOS);
+
+                TempSaleLinePOS.Date := Today;
+                TempSaleLinePOS.Validate(Quantity, MixedDiscountLine.Quantity);
+                TempSaleLinePOS."MR Anvendt antal" := MixedDiscountLine.Quantity;
+                POSSalesPriceCalcMgt.FindItemPrice(TempSalePOS, TempSaleLinePOS);
+                TempSaleLinePOS."Amount Including VAT" := TempSaleLinePOS."Unit price" * TempSaleLinePOS.Quantity;
+                TempSaleLinePOS.Amount := SaleTaxCalc.CalcAmountWithoutVAT(TempSaleLinePOS."Amount Including VAT", TempSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+                TempSaleLinePOS.Insert();
+
+                TotalAmountIncludingVAT := TempSaleLinePOS."Amount Including VAT";
+
+                LineDiscountAmountIncludingVAT := MixedDiscountManagement.ApplyMixDiscount(TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOS, true);
+                TotalAmountIncludingVATAterDiscount := TotalAmountIncludingVAT - LineDiscountAmountIncludingVAT;
+
+                if MixedDiscountLine."Unit price incl. VAT" then
+                    TotalAmountAfterDiscount := TotalAmountIncludingVATAterDiscount
+                else
+                    TotalAmountAfterDiscount := SaleTaxCalc.CalcAmountWithoutVAT(TotalAmountIncludingVATAterDiscount, TempSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+                RetailJnlLine.InitLine();
+                RetailJnlLine.SetItem(MixedDiscountLine."No.", MixedDiscountLine."Variant Code", MixedDiscountLine."Cross-Reference No.");
+                RetailJnlLine.SetDiscountType(2, MixedDiscountLine.Code, TotalAmountAfterDiscount, MixedDiscountLine.Quantity, MixedDiscountLine."Unit price incl. VAT");
+                OnAfterSetDiscountTypeMixDiscount(MixedDiscountLine, RetailJnlLine);
+                RetailJnlLine.Insert();
+
+            until MixedDiscountLine.Next() = 0;
+        RetailJnlLine.CloseGUI();
+    end;
+
+    procedure Quantity2RetailJnl(ItemNo: Code[20];
+        MainItemNo: Code[20];
+        RetailJnlCode: Code[40])
     var
         QuantityDiscountHeader: Record "NPR Quantity Discount Header";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
@@ -438,7 +547,8 @@
         RetailJnlLine.CloseGUI();
     end;
 
-    procedure PurchaseOrder2RetailJnl(DocumentType: Enum "Purchase Document Type"; PurchaseOrderNo: Code[20]; RetailJnlCode: Code[40])
+    procedure PurchaseOrder2RetailJnl(DocumentType: Enum "Purchase Document Type"; PurchaseOrderNo: Code[20];
+                                                        RetailJnlCode: Code[40])
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
