@@ -2,7 +2,7 @@ table 6150875 "NPR Adyen Webhook Event Code"
 {
     Access = Internal;
 
-    Caption = 'Adyen Webhook Event Code';
+    Caption = 'NP Pay Webhook Event Code';
     DataClassification = CustomerContent;
 
     fields

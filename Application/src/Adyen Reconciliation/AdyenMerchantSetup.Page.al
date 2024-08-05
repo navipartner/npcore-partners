@@ -3,10 +3,10 @@ page 6184582 "NPR Adyen Merchant Setup"
     Extensible = false;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Merchant Account Setup';
+    Caption = 'NP Pay Merchant Account Setup';
     PageType = Card;
     SourceTable = "NPR Adyen Merchant Setup";
-    AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup,adyen merchant setup,adyen merchant,adyen merchant account';
+    AdditionalSearchTerms = 'NP Pay setup,NP Pay reconciliation setup,NP Pay merchant setup';
 
     layout
     {
@@ -32,12 +32,12 @@ page 6184582 "NPR Adyen Merchant Setup"
                 field("Fee G/L Account"; Rec."Fee G/L Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Fee G/L Account.';
+                    ToolTip = 'Specifies the Fee G/L Account.';
                 }
                 field("Deposit G/L Account"; Rec."Deposit G/L Account")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Deposit G/L Account.';
+                    ToolTip = 'Specifies the Deposit G/L Account.';
                 }
                 field("Markup G/L Account"; Rec."Markup G/L Account")
                 {

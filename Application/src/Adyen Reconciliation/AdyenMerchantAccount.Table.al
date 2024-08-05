@@ -2,7 +2,7 @@ table 6150806 "NPR Adyen Merchant Account"
 {
     Access = Internal;
 
-    Caption = 'Adyen Merchant Account';
+    Caption = 'NP Pay Merchant Account';
     DataClassification = CustomerContent;
 
     fields

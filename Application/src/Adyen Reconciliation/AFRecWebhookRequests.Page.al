@@ -3,7 +3,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
     Extensible = false;
     UsageCategory = History;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Reconciliation Reports';
+    Caption = 'NP Pay Reconciliation Reports';
     PromotedActionCategories = 'New,Process,Report,Create Reconciliation Document';
     PageType = List;
     RefreshOnActivate = true;
@@ -56,7 +56,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                 field("Adyen Webhook Entry No."; Rec."Adyen Webhook Entry No.")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Webhook Entry No.';
+                    ToolTip = 'Specifies the NP Pay Webhook Entry No.';
                 }
             }
         }
@@ -68,13 +68,13 @@ page 6184519 "NPR AF Rec. Webhook Requests"
             action("Show Adyen Webhook Entry")
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Show Adyen Webhook Entry';
+                Caption = 'Show NP Pay Webhook Entry';
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
                 Image = Log;
-                ToolTip = 'Running this action will show Adyen Webhook Entry.';
+                ToolTip = 'Running this action will show NP Pay Webhook Entry.';
 
                 trigger OnAction()
                 var
@@ -122,7 +122,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
 
                     trigger OnAction()
                     var
-                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to make a Reconciliation Document from is not a valid format. The file must be in .XLSX format.\\Please update your Report Generation configurations in Adyen Customer Area.';
+                        InvalidFileType: Label 'Invalid File Type.\The file you attempted to make a Reconciliation Document from is not a valid format. The file must be in .XLSX format.\\Please update your Report Generation configurations in NP Pay Customer Area.';
                         WebhookRequest: Record "NPR AF Rec. Webhook Request";
                     begin
                         WebhookRequest := Rec;

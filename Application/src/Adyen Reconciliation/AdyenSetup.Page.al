@@ -4,11 +4,11 @@ page 6184531 "NPR Adyen Setup"
     RefreshOnActivate = true;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Setup';
+    Caption = 'NP Pay Setup';
     PageType = Card;
     SourceTable = "NPR Adyen Setup";
-    AdditionalSearchTerms = 'adyen setup,adyen reconciliation setup';
-    ContextSensitiveHelpPage = 'docs/'; // TODO
+    AdditionalSearchTerms = 'NP Pay setup,NP Pay reconciliation setup';
+    ContextSensitiveHelpPage = 'docs/np_pay/how-to/perform_reconciliation/';
     DeleteAllowed = false;
     InsertAllowed = false;
 
@@ -27,7 +27,7 @@ page 6184531 "NPR Adyen Setup"
                 field("Enable Adyen Automation"; Rec."Enable Reconciliation")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Creates/Enables Processing Job Queue and an Adyen Automation Web Service which allows receiving Adyen Webhooks.';
+                    ToolTip = 'Creates/Enables Processing Job Queue and an NP Pay Automation Web Service which allows receiving NP Pay Webhooks.';
                 }
             }
             group(Management)
@@ -51,7 +51,7 @@ page 6184531 "NPR Adyen Setup"
                 field("Recon. Integr. Starting Date"; Rec."Recon. Integr. Starting Date")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Indicates when the Adyen Reconciliation Integration went into operation.';
+                    ToolTip = 'Indicates when the NP Pay Reconciliation Integration went into operation.';
                 }
                 field("Download Report API Key"; Rec."Download Report API Key")
                 {
@@ -122,7 +122,7 @@ page 6184531 "NPR Adyen Setup"
                     Caption = 'Create Setup (Admin)';
                     Visible = _IsSaaS;
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Creates the Adyen Entra app, with custom permissions. Needs Admin.';
+                    ToolTip = 'Creates the NP Pay Entra app, with custom permissions. Needs Admin.';
                     Image = Action;
 
                     trigger OnAction()

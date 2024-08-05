@@ -2,7 +2,7 @@ table 6150800 "NPR Adyen Reconciliation Log"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Log';
+    Caption = 'NP Pay Reconciliation Log';
     DataClassification = CustomerContent;
 
     fields

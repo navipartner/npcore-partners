@@ -1,6 +1,6 @@
 page 6184535 "NPR Adyen Rec. Activities"
 {
-    Caption = 'Adyen Reconciliation Activities';
+    Caption = 'NP Pay Reconciliation Activities';
     PageType = CardPart;
     SourceTable = "NPR Adyen Reconciliation Cue";
     Extensible = false;
@@ -14,14 +14,14 @@ page 6184535 "NPR Adyen Rec. Activities"
         {
             cuegroup("Adyen Reconciliation")
             {
-                Caption = 'Adyen Reconciliation';
+                Caption = 'NP Pay Reconciliation';
                 field("Unposted Documents"; Rec."Unposted Documents")
                 {
                     Caption = 'Unposted Documents';
                     ApplicationArea = NPRRetail;
                     StyleExpr = 'Unfavorable';
                     DrillDownPageID = "NPR Adyen Reconciliation List";
-                    ToolTip = 'Specifies Adyen Reconciliation Documents that have not yet been posted.';
+                    ToolTip = 'Specifies NP Pay Reconciliation Documents that have not yet been posted.';
                 }
                 field("Outstanding EFT Tr. Requests"; Rec."Outstanding EFT Tr. Requests")
                 {

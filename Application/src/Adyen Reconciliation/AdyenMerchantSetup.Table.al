@@ -2,7 +2,7 @@ table 6150829 "NPR Adyen Merchant Setup"
 {
     Access = Internal;
 
-    Caption = 'Adyen Merchant Account Setup';
+    Caption = 'NP Pay Merchant Account Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -59,7 +59,7 @@ table 6150829 "NPR Adyen Merchant Setup"
             DataClassification = CustomerContent;
             Caption = 'Merchant Payout G/L Account';
             TableRelation = "G/L Account";
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with Merchant Payout Account No.';
         }

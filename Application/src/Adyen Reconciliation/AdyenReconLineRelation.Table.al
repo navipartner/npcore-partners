@@ -2,7 +2,7 @@ table 6150876 "NPR Adyen Recon. Line Relation"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Line Relation';
+    Caption = 'NP Pay Reconciliation Line Relation';
     DataClassification = CustomerContent;
 
     fields

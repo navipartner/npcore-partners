@@ -14,7 +14,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         CurrentMerchantAccount: Text;
         CurrentBatchNumber: Integer;
         EntryAmount: Integer;
-        SetupDoesNotExist: Label 'G/L Setup or Adyen Setup does not exist.';
+        SetupDoesNotExist: Label 'G/L Setup or NP Pay Setup does not exist.';
         GLSetupLCYCodeIsEmpty: Label 'LCY Code is not set in General Ledger Setup.';
     begin
         if (not _GLSetup.Get()) or (not _AdyenSetup.Get()) then begin
@@ -168,6 +168,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     end;
 
     local procedure InsertReconciliationLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; BatchNumber: Integer; MerchantAccount: Text; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer; var EntryAmount: Integer): Boolean
+    var
+        TypeHelper: Codeunit "Type Helper";
     begin
         InitReconciliationLine(ReconciliationHeader, ReconciliationLine);
         case ReconciliationHeader."Document Type" of
@@ -193,7 +195,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."PSP Reference" := CopyStr(GetValueAtCell(LineNo, 3), 1, MaxStrLen(ReconciliationLine."PSP Reference"));
         ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, 4), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
 
-        if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 6)) then begin
+        if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 28)) then begin
+            // AMS to UTC (AMS - 2H = UTC)
+            ReconciliationLine."Transaction Date" := TypeHelper.AddHoursToDateTime(ReconciliationLine."Transaction Date", -2);
+
             if ReconciliationHeader."Transactions Date" = 0D then begin
                 ReconciliationHeader."Transactions Date" := DT2Date(ReconciliationLine."Transaction Date");
                 ReconciliationHeader.Modify();
@@ -743,7 +748,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
 
-        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Matched Manually"]) then begin
+        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post"]) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError04, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnPostedEntries += 1;
             exit(UnPostedEntries);
@@ -915,8 +920,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         SchemeColumnNumber: Integer;
         InvalidSchemeError: Label 'Validation Scheme Failed: Report did not meet validation criteria. Column ''%1'' does not exist or has an incorrect placement. Please check report''s configuration.';
         ValidSchemeText: Label 'Validation Success: Report passed all validation criteria.';
-        NoSetupCreated: Label 'Adyen Setup configuration does not exist.';
-        PostingNosEmpty: Label 'Posting Document Nos. is not specified in Adyen Setup.';
+        NoSetupCreated: Label 'NP Pay Setup configuration does not exist.';
+        PostingNosEmpty: Label 'Posting Document Nos. is not specified in NP Pay Setup.';
         Scheme: array[50] of Text[35];
         AdyenSetup: Record "NPR Adyen Setup";
     begin
@@ -1047,7 +1052,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         OutStr: OutStream;
         ErrorLabel: Text;
         DownloadURLMissingLbl: Label 'Webhook request with ID %1 does not have a Report Download URL.\Please contact your System Administrator.';
-        AdyenSetupDoesNotExistLbl: Label 'Adyen Setup does not exist.';
+        AdyenSetupDoesNotExistLbl: Label 'NP Pay Setup does not exist.';
         HttpErrorText: Text;
         FromFile: Boolean;
         LocalFileLbl: Label 'Local File Upload', Locked = true;
@@ -1232,19 +1237,19 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ImportLinesError01: Label 'Report ''%1'' has no entries. Report Data exist - %2';
         ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';
         ImportLinesError03: Label 'Unsupported Journal Type: %1.\Entry was skipped.';
-        ImportLinesSuccess01: Label 'Adyen Reconciliation Document %1 was successfully created with %2 transaction entries.';
+        ImportLinesSuccess01: Label 'NP Pay Reconciliation Document %1 was successfully created with %2 transaction entries.';
         MatchTransactionsError01: Label 'Failed to match with EFT Transaction Request No. %1 because of one of the conditions:\\    Amounts are equal: %2\EFT Transaction Amount:%3, Reconciliation Line Transaction Amount:%4\\Financial Impact: %5';
-        MatchTransactionsError02: Label 'Adyen Reconciliation Document %1 does not contain any transactions within Marchant Account ''%2''.';
-        MatchTransactionsError03: Label 'Couldn''t match %1 entries in Adyen Reconciliation Document %2.';
+        MatchTransactionsError02: Label 'NP Pay Reconciliation Document %1 does not contain any transactions within Marchant Account ''%2''.';
+        MatchTransactionsError03: Label 'Couldn''t match %1 entries in NP Pay Reconciliation Document %2.';
         MatchTransactionsError04: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3).\\    Amounts are not equal:\Magento Payment Line Amount:%4, Reconciliation Line Transaction Amount:%5';
         MatchTransactionsError05: Label 'EFT Transaction Request was found, however the POS Entry Payment Line does not exist. Please check if the Sale is posted.';
         MatchTransactionsError06: Label 'PSP Reference is empty.';
-        MatchTransactionsSuccess01: Label 'Successfully matched entries in Adyen Reconciliation Document %1.';
-        PostTransactionsError01: Label 'Couldn''t find any matched transactions to post in Adyen Reconciliation Document %1.';
+        MatchTransactionsSuccess01: Label 'Successfully matched entries in NP Pay Reconciliation Document %1.';
+        PostTransactionsError01: Label 'Couldn''t find any matched transactions to post in NP Pay Reconciliation Document %1.';
         PostTransactionsEFTError01: Label 'EFT Transaction Request %1 does not exist.';
         PostTransactionsMagentoError01: Label 'Magento Payment Line %1 does not exist.';
-        PostTransactionsError03: Label 'Couldn''t post %1 entries in Adyen Reconciliation Document %2.';
+        PostTransactionsError03: Label 'Couldn''t post %1 entries in NP Pay Reconciliation Document %2.';
         PostTransactionsError04: Label 'Transaction %1 is not matched yet.';
-        PostTransactionsSuccess01: Label 'Successfully posted entries in Adyen Reconciliation Document %1.';
-        NoSeriesError01: Label 'No. Series in Adyen Generic Setup is not specified.';
+        PostTransactionsSuccess01: Label 'Successfully posted entries in NP Pay Reconciliation Document %1.';
+        NoSeriesError01: Label 'No. Series in NP Pay Generic Setup is not specified.';
 }

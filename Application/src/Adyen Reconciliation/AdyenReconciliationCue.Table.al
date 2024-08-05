@@ -2,7 +2,7 @@ table 6150802 "NPR Adyen Reconciliation Cue"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Cue';
+    Caption = 'NP Pay Reconciliation Cue';
     ReplicateData = false;
     DataClassification = CustomerContent;
 

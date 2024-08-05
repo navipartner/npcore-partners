@@ -146,7 +146,7 @@
 #endif
                 field(Reconciled; Rec.Reconciled)
                 {
-                    ToolTip = 'Specifies if the payment is Reconciled in an Adyen Reconciliation Document.';
+                    ToolTip = 'Specifies if the payment is Reconciled in an NP Pay Reconciliation Document.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pay by Link URL"; Rec."Pay by Link URL")

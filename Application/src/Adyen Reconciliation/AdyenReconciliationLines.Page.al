@@ -3,7 +3,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
     Extensible = false;
 
     UsageCategory = None;
-    Caption = 'Adyen Reconciliation Lines';
+    Caption = 'NP Pay Reconciliation Lines';
     SourceTable = "NPR Adyen Recon. Line";
     SourceTableView = sorting(Status) order(ascending);
     AutoSplitKey = true;
@@ -84,7 +84,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 field("Amount (AAC)"; Rec."Amount(AAC)")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Account Currency Amount.';
+                    ToolTip = 'Specifies the Acquirer Account Currency Amount.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
 
@@ -96,7 +96,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 field("Adyen Acc. Currency Code"; Rec."Adyen Acc. Currency Code")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Account Currency Code.';
+                    ToolTip = 'Specifies the Acquirer Account Currency Code.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
 

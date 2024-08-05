@@ -391,14 +391,14 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _NewReversedSystemId: Guid;
         NoOriginalDocumentFound: Label 'No POS Entry was found with No. %1.';
         NoOriginalSalesDocumentFound: Label 'No Sales Document was found with No. %1.';
-        AdyenTransactionLabel: Label 'Adyen: Transaction %1', MaxLength = 100;
-        AdyenMarkupLabel: Label 'Adyen: Markup', MaxLength = 100;
-        AdyenOtherCommissionsLabel: Label 'Adyen: Other Commissions (Commission, Markup, Scheme Fees, Interchange)', MaxLength = 100;
-        AdyenRealizedGainsLabel: Label 'Adyen: Realized Gains', MaxLength = 100;
-        AdyenRealizedLossesLabel: Label 'Adyen: Realized Losses', MaxLength = 100;
-        ChargebackPaymentLineDescription: Label 'Adyen: Chargeback', MaxLength = 50;
-        SecondChargebackPaymentLineDescription: Label 'Adyen: Second Chargeback', MaxLength = 50;
-        ReverseRefundPaymentLineDescription: Label 'Adyen: Refund Reversed', MaxLength = 50;
-        ReverseChargebackPaymentLineDescription: Label 'Adyen: Chargeback Reversed', MaxLength = 50;
-        ReversedExternalChargebackPaymentLineDescription: Label 'Adyen: External Chargeback Reversed', MaxLength = 50;
+        AdyenTransactionLabel: Label 'NP Pay: Transaction %1', MaxLength = 100;
+        AdyenMarkupLabel: Label 'NP Pay: Markup', MaxLength = 100;
+        AdyenOtherCommissionsLabel: Label 'NP Pay: Other Commissions (Commission, Markup, Scheme Fees, Interchange)', MaxLength = 100;
+        AdyenRealizedGainsLabel: Label 'NP Pay: Realized Gains', MaxLength = 100;
+        AdyenRealizedLossesLabel: Label 'NP Pay: Realized Losses', MaxLength = 100;
+        ChargebackPaymentLineDescription: Label 'NP Pay: Chargeback', MaxLength = 50;
+        SecondChargebackPaymentLineDescription: Label 'NP Pay: Second Chargeback', MaxLength = 50;
+        ReverseRefundPaymentLineDescription: Label 'NP Pay: Refund Reversed', MaxLength = 50;
+        ReverseChargebackPaymentLineDescription: Label 'NP Pay: Chargeback Reversed', MaxLength = 50;
+        ReversedExternalChargebackPaymentLineDescription: Label 'NP Pay: External Chargeback Reversed', MaxLength = 50;
 }

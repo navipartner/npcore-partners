@@ -4,7 +4,7 @@ page 6184665 "NPR Adyen Webhooks"
 
     UsageCategory = History;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Webhook Requests';
+    Caption = 'NP Pay Webhook Requests';
     PageType = List;
     Editable = false;
     SourceTable = "NPR Adyen Webhook";

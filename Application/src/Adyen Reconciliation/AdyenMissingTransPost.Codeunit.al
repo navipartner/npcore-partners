@@ -33,7 +33,7 @@ codeunit 6184943 "NPR Adyen Missing Trans. Post"
 #else
         NoSeries: Codeunit NoSeriesManagement;
 #endif
-        AdyenTransactionLabel: Label 'Adyen: Transaction %1', MaxLength = 100;
+        AdyenTransactionLabel: Label 'NP Pay: Transaction %1', MaxLength = 100;
     begin
 
         GenJnlLine.Init();

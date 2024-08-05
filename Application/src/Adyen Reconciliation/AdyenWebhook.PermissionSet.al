@@ -2,7 +2,7 @@
 permissionset 6014406 "NPR Adyen Webhook"
 {
     Assignable = true;
-    Caption = 'Adyen Webhook';
+    Caption = 'NP Pay Webhook';
     IncludedPermissionSets = "D365 AUTOMATION";
     Access = Internal;
 
