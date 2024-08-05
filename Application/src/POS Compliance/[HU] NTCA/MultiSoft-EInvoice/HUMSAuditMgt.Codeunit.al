@@ -168,6 +168,8 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
             else
                 exit(false);
         end;
+        if POSEntryPaymentLine.IsEmpty() then
+            exit(false);
 
         POSEntryPaymentLine.FindSet();
         repeat
