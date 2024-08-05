@@ -2,7 +2,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
 {
     ApplicationArea = NPRRetail;
     UsageCategory = Administration;
-    Caption = 'Adyen Merchant Accounts';
+    Caption = 'NP Pay Merchant Accounts';
     RefreshOnActivate = true;
     PageType = List;
     SourceTable = "NPR Adyen Merchant Account";
@@ -23,7 +23,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Adyen Merchant Account Name.';
+                    ToolTip = 'Specifies the NP Pay Merchant Account Name.';
                 }
             }
         }

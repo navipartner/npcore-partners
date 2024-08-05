@@ -1,7 +1,7 @@
 page 6184502 "NPR Adyen Reconciliation"
 {
     Extensible = false;
-    Caption = 'Adyen Reconciliation Document';
+    Caption = 'NP Pay Reconciliation Document';
     UsageCategory = None;
     PageType = ListPlus;
     SourceTable = "NPR Adyen Reconciliation Hdr";
@@ -68,7 +68,7 @@ page 6184502 "NPR Adyen Reconciliation"
                 }
                 field("Adyen Acc. Currency Code"; Rec."Adyen Acc. Currency Code")
                 {
-                    ToolTip = 'Specifies the Adyen Account Currency Code.';
+                    ToolTip = 'Specifies the Acquirer Account Currency Code.';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
@@ -79,7 +79,7 @@ page 6184502 "NPR Adyen Reconciliation"
 
                     field("Opening Balance"; Rec."Opening Balance")
                     {
-                        ToolTip = 'Specifies the opening balance (in Adyen Account Currency) shown on the Adyen''s statement.';
+                        ToolTip = 'Specifies the opening balance (in Acquirer Account Currency) shown on the NP Pay''s statement.';
                         Editable = false;
                         ApplicationArea = NPRRetail;
                     }
@@ -91,7 +91,7 @@ page 6184502 "NPR Adyen Reconciliation"
 
                     field("Closing Balance"; Rec."Closing Balance")
                     {
-                        ToolTip = 'Specifies the closing balance (in Adyen Account Currency) shown on the Adyen''s statement.';
+                        ToolTip = 'Specifies the closing balance (in Acquirer Account Currency) shown on the NP Pay''s statement.';
                         Editable = false;
                         ApplicationArea = NPRRetail;
                     }
@@ -103,7 +103,7 @@ page 6184502 "NPR Adyen Reconciliation"
 
                     field("Acquirer Commission"; Rec."Acquirer Commission")
                     {
-                        ToolTip = 'Specifies the Aqcuirer Commission from External Settlement Detail Report (in Adyen Account Currency).';
+                        ToolTip = 'Specifies the Aqcuirer Commission from External Settlement Detail Report (in Acquirer Account Currency).';
                         Editable = false;
                         ApplicationArea = NPRRetail;
                     }
@@ -111,13 +111,13 @@ page 6184502 "NPR Adyen Reconciliation"
 
                 field("Total Transactions Amount"; Rec."Total Transactions Amount")
                 {
-                    ToolTip = 'Specifies the Total Transactions Amount (in Adyen Account Currency).';
+                    ToolTip = 'Specifies the Total Transactions Amount (in Acquirer Account Currency).';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
                 field("Total Posted Amount"; Rec."Total Posted Amount")
                 {
-                    ToolTip = 'Specifies the Total Posted Amount (in Adyen Account Currency).';
+                    ToolTip = 'Specifies the Total Posted Amount (in Acquirer Account Currency).';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
@@ -142,7 +142,7 @@ page 6184502 "NPR Adyen Reconciliation"
             }
             part("Reconciliation Lines"; "NPR Adyen Reconciliation Lines")
             {
-                Caption = 'Adyen Reconciliation Lines';
+                Caption = 'NP Pay Reconciliation Lines';
                 SubPageLink = "Document No." = field("Document No.");
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
@@ -251,7 +251,7 @@ page 6184502 "NPR Adyen Reconciliation"
             {
                 Caption = 'Show Logs';
                 Image = Log;
-                ToolTip = 'Running this action will open Adyen Reconciliation Log Journal.';
+                ToolTip = 'Running this action will open NP Pay Reconciliation Log Journal.';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()

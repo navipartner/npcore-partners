@@ -2,7 +2,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Header';
+    Caption = 'NP Pay Reconciliation Header';
     DataClassification = CustomerContent;
 
     fields
@@ -62,7 +62,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         field(70; "Adyen Acc. Currency Code"; Code[10])
         {
             DataClassification = CustomerContent;
-            Caption = 'Adyen Account Currency Code';
+            Caption = 'Acquirer Account Currency Code';
             TableRelation = Currency.Code;
         }
         field(80; "Total Transactions Amount"; Decimal)

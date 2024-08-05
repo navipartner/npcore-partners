@@ -2,8 +2,8 @@ page 6184669 "NPR Adyen Webhook Logs"
 {
     ApplicationArea = NPRRetail;
     UsageCategory = History;
-    AdditionalSearchTerms = 'adyen logs,adyen webhook logs,webhook logs';
-    Caption = 'Adyen Webhook Logs';
+    AdditionalSearchTerms = 'NP Pay logs,NP Pay webhook logs,webhook logs';
+    Caption = 'NP Pay Webhook Logs';
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NPR Adyen Webhook Log";

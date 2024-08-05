@@ -2,7 +2,7 @@ table 6150801 "NPR Adyen Setup"
 {
     Access = Internal;
 
-    Caption = 'Adyen Setup';
+    Caption = 'NP Pay Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -22,7 +22,7 @@ table 6150801 "NPR Adyen Setup"
         field(20; "Enable Reconciliation"; Boolean)
         {
             DataClassification = CustomerContent;
-            Caption = 'Enable Adyen Automation';
+            Caption = 'Enable NP Pay Automation';
 
             trigger OnValidate()
             var
@@ -58,7 +58,7 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Management Base URL';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with .';
         }
@@ -111,7 +111,7 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Report Scheme Docs URL';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }

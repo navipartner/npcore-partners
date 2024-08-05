@@ -2,7 +2,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Report';
+    Caption = 'NP Pay Reconciliation Report';
     DataClassification = CustomerContent;
 
     fields
@@ -25,7 +25,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Editable = false;
             Caption = 'Status Code';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
@@ -34,7 +34,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             DataClassification = CustomerContent;
             Editable = false;
             Caption = 'Status Description';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
@@ -49,7 +49,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Editable = false;
             DataClassification = CustomerContent;
             Caption = 'Creation Date & Time';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
@@ -91,7 +91,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
         {
             DataClassification = CustomerContent;
             Caption = 'Request Data';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
@@ -103,7 +103,7 @@ table 6150791 "NPR AF Rec. Webhook Request"
         field(130; "Adyen Webhook Entry No."; Integer)
         {
             DataClassification = CustomerContent;
-            Caption = 'Adyen Webhook Entry No.';
+            Caption = 'NP Pay Webhook Entry No.';
             TableRelation = "NPR Adyen Webhook"."Entry No.";
         }
     }

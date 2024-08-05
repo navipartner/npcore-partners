@@ -2,7 +2,7 @@ page 6184551 "NPR Adyen Webhook Setup List"
 {
     ApplicationArea = NPRRetail;
     UsageCategory = Administration;
-    Caption = 'Adyen Webhook Setup List';
+    Caption = 'NP Pay Webhook Setup List';
     PageType = List;
     SourceTable = "NPR Adyen Webhook Setup";
     SourceTableView = sorting("Primary Key") order(descending);
@@ -58,13 +58,13 @@ page 6184551 "NPR Adyen Webhook Setup List"
             action("Import Webhooks from Adyen")
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Import Webhooks from Adyen';
+                Caption = 'Import Webhooks from NP Pay';
                 Promoted = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 Image = Import;
-                ToolTip = 'Running this action will import Webhook Setups from Adyen.';
+                ToolTip = 'Running this action will import Webhook Setups from NP Pay.';
 
                 trigger OnAction()
                 var
@@ -94,7 +94,7 @@ page 6184551 "NPR Adyen Webhook Setup List"
 
     trigger OnDeleteRecord(): Boolean
     var
-        ConfirmDelete: Label 'Would you like to delete this webhook from Adyen as well?';
+        ConfirmDelete: Label 'Would you like to delete this webhook from NP Pay as well?';
         AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         if Rec.ID <> '' then

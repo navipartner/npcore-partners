@@ -166,7 +166,7 @@ codeunit 6184796 "NPR Adyen Management"
     var
         RequestUrl: Text;
         DeleteWebhookEndpoint: Label '/merchants/%1/webhooks/%2', Locked = true;
-        SuccessDeleteLbl: Label 'Successfully deleted Webhook %1 from Adyen.';
+        SuccessDeleteLbl: Label 'Successfully deleted Webhook %1 from NP Pay.';
         AlreadyDeletedLbl: Label 'Webhook with ID %1 had already been deleted.';
     begin
         InitiateAdyenManagement();
@@ -528,7 +528,7 @@ codeunit 6184796 "NPR Adyen Management"
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         WebhookBaseurl: Label 'https://adyenreconciliation.azurewebsites.net/api', Locked = true;
         KeyLbl: Label 'NPAdyenAFCode', Locked = True;
-        OnPremLbl: Label 'Adyen BC Integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
+        OnPremLbl: Label 'NP Pay BC Integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
         TypeHelper: Codeunit "Type Helper";
         CompanyName: Text;
     begin
@@ -825,7 +825,8 @@ codeunit 6184796 "NPR Adyen Management"
                     Scheme[25] := 'Scheme Fees (NC)';
                     Scheme[26] := 'Interchange (NC)';
                     Scheme[27] := 'Payment Fees (NC)';
-                    SchemeColumnNumber := 27;
+                    Scheme[28] := 'Creation Date (AMS)';
+                    SchemeColumnNumber := 28;
                 end;
             ReportType::"External Settlement detail (C)":
                 begin

@@ -1,8 +1,9 @@
 page 6184550 "NPR Adyen Webhook Setup Card"
 {
     Extensible = false;
-    Caption = 'Adyen Webhook Setup Card';
+    Caption = 'NP Pay Webhook Setup Card';
     PageType = Document;
+    DataCaptionExpression = Rec.ID;
     RefreshOnActivate = true;
     SourceTable = "NPR Adyen Webhook Setup";
     UsageCategory = None;
@@ -119,7 +120,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 PromotedIsBig = true;
                 PromotedOnly = true;
                 Image = Setup;
-                ToolTip = 'Running this action will create a Webhook in Adyen and retrieve its ID.';
+                ToolTip = 'Running this action will create a Webhook in NP Pay and retrieve its ID.';
 
                 trigger OnAction()
                 var

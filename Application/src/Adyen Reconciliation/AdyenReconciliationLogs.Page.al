@@ -2,8 +2,8 @@ page 6184536 "NPR Adyen Reconciliation Logs"
 {
     ApplicationArea = NPRRetail;
     UsageCategory = History;
-    AdditionalSearchTerms = 'adyen logs,adyen reconciliaiton logs,reconciliation logs';
-    Caption = 'Adyen Reconciliation Logs';
+    AdditionalSearchTerms = 'NP Pay logs,NP Pay reconciliaiton logs,reconciliation logs';
+    Caption = 'NP Pay Reconciliation Logs';
     RefreshOnActivate = true;
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Log";
