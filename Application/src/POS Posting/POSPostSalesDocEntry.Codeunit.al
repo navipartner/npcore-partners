@@ -301,6 +301,18 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
         if not (SalesHeader.Ship or SalesHeader.Invoice or SalesHeader.Receive) then
             exit;
 
+        if SalesHeader.Ship and (SalesHeader."Last Shipping No." <> '') then begin
+            POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::SHIPMENT;
+            PostedDocumentNo := SalesHeader."Last Shipping No.";
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntrySalesDocLink."POS Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+        end;
+
+        if SalesHeader.Receive and (SalesHeader."Last Return Receipt No." <> '') then begin
+            POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT;
+            PostedDocumentNo := SalesHeader."Last Return Receipt No.";
+            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntrySalesDocLink."POS Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
+        end;
+
         if SalesHeader.Invoice then begin
             case SalesHeader."Document Type" of
                 SalesHeader."Document Type"::Invoice:
@@ -331,18 +343,6 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
                     end;
             end;
 
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntrySalesDocLink."POS Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
-        end;
-
-        if SalesHeader.Ship then begin
-            POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::SHIPMENT;
-            PostedDocumentNo := SalesHeader."Last Shipping No.";
-            POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntrySalesDocLink."POS Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
-        end;
-
-        if SalesHeader.Receive then begin
-            POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT;
-            PostedDocumentNo := SalesHeader."Last Return Receipt No.";
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntrySalesDocLink."POS Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
