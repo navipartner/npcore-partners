@@ -3,7 +3,7 @@ report 6014536 "NPR Adyen Simulate Webhook Req"
 #IF NOT BC17
     Extensible = False;
 #ENDIF
-    Caption = 'Adyen Simulate Webhook Request';
+    Caption = 'NP Pay Simulate Webhook Request';
     ProcessingOnly = true;
     UsageCategory = None;
 

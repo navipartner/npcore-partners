@@ -1,6 +1,6 @@
 page 6184534 "NPR Adyen Reconciliation List"
 {
-    Caption = 'Adyen Reconciliation List';
+    Caption = 'NP Pay Reconciliation List';
     PageType = List;
     SourceTable = "NPR Adyen Reconciliation Hdr";
     SourceTableView = sorting("Document No.") order(descending);
@@ -8,7 +8,7 @@ page 6184534 "NPR Adyen Reconciliation List"
     Extensible = false;
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
-    AdditionalSearchTerms = 'Adyen Reconciliation';
+    AdditionalSearchTerms = 'NP Pay Reconciliation';
     Editable = false;
     DeleteAllowed = true;
 

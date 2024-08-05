@@ -420,12 +420,12 @@
                 }
                 field("PSP Reference"; Rec."PSP Reference")
                 {
-                    ToolTip = 'Specifies the Adyen Transaction ID.';
+                    ToolTip = 'Specifies the NP Pay Transaction ID.';
                     ApplicationArea = NPRRetail;
                 }
                 field(Reconciled; Rec.Reconciled)
                 {
-                    ToolTip = 'Specifies if the entry is Reconciled with an Adyen Transaction.';
+                    ToolTip = 'Specifies if the entry is Reconciled with an NP Pay Transaction.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Reconciliation Date"; Rec."Reconciliation Date")

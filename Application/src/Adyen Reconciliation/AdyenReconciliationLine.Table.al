@@ -2,9 +2,9 @@ table 6150789 "NPR Adyen Reconciliation Line"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Line';
+    Caption = 'NP Pay Reconciliation Line';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteTag = '2024-06-28';
     ObsoleteReason = 'Replaced by NPR Adyen Recon. Line.';
 
@@ -130,7 +130,7 @@ table 6150789 "NPR Adyen Reconciliation Line"
         }
         field(160; "Adyen Acc. Currency Code"; Code[10])
         {
-            Caption = 'Adyen Account Currency Code';
+            Caption = 'Acquirer Account Currency Code';
             TableRelation = Currency.Code;
             DataClassification = CustomerContent;
         }

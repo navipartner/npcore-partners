@@ -2,7 +2,7 @@ page 6184657 "NPR Adyen Recon. Line Relation"
 {
     UsageCategory = Lists;
     ApplicationArea = NPRRetail;
-    Caption = 'Adyen Recon. Line Relation';
+    Caption = 'NP Pay Recon. Line Relation';
     PageType = List;
     SourceTable = "NPR Adyen Recon. Line Relation";
     Editable = false;

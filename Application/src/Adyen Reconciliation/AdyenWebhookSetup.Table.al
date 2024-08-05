@@ -2,7 +2,7 @@ table 6150805 "NPR Adyen Webhook Setup"
 {
     Access = Internal;
 
-    Caption = 'Adyen Webhook Setup';
+    Caption = 'NP Pay Webhook Setup';
     DataClassification = CustomerContent;
 
     fields
@@ -71,7 +71,7 @@ table 6150805 "NPR Adyen Webhook Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter Type';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
@@ -79,7 +79,7 @@ table 6150805 "NPR Adyen Webhook Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Accounts Filter';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }
@@ -95,6 +95,9 @@ table 6150805 "NPR Adyen Webhook Setup"
         {
             Clustered = true;
         }
+        key(key1; ID)
+        {
+        }
     }
 
     trigger OnModify()
@@ -108,7 +111,7 @@ table 6150805 "NPR Adyen Webhook Setup"
     trigger OnDelete()
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
-        ConfirmDelete: Label 'Would you like to delete this webhook from Adyen as well?';
+        ConfirmDelete: Label 'Would you like to delete this webhook from NP Pay as well?';
     begin
         if ID <> '' then
             if Confirm(ConfirmDelete) then begin

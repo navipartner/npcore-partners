@@ -2,7 +2,7 @@ table 6150874 "NPR Adyen Recon. Line"
 {
     Access = Internal;
 
-    Caption = 'Adyen Reconciliation Line';
+    Caption = 'NP Pay Reconciliation Line';
     DataClassification = CustomerContent;
 
     fields
@@ -138,7 +138,7 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(160; "Adyen Acc. Currency Code"; Code[10])
         {
-            Caption = 'Adyen Account Currency Code';
+            Caption = 'Acquirer Account Currency Code';
             TableRelation = Currency.Code;
             DataClassification = CustomerContent;
         }
@@ -181,7 +181,7 @@ table 6150874 "NPR Adyen Recon. Line"
         {
             Caption = 'Intercharge (AAC)';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Replaced with "Interchange (NC)"';
         }

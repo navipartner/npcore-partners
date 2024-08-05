@@ -1,7 +1,7 @@
 table 6150880 "NPR Adyen Webhook"
 {
     Access = Internal;
-    Caption = 'Adyen Webhook Request';
+    Caption = 'NP Pay Webhook Request';
     DataClassification = CustomerContent;
 
     fields
@@ -16,7 +16,7 @@ table 6150880 "NPR Adyen Webhook"
         {
             Caption = 'Created Date';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'SystemCreatedAt field is used instead.';
         }
@@ -60,7 +60,7 @@ table 6150880 "NPR Adyen Webhook"
         {
             Caption = 'Webhook Data';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'Not used.';
         }

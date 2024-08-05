@@ -15,8 +15,8 @@ codeunit 6184920 "NPR Adyen Process Report Ready"
         AdyenManagement: Codeunit "NPR Adyen Management";
         LogType: Enum "NPR Adyen Webhook Log Type";
         RecLogType: Enum "NPR Adyen Rec. Log Type";
-        SuccessImportLbl: Label 'Adyen Reconciliation Webhook Request was successfully imported.';
-        WebhookNoDataLbl: Label 'Adyen Webhook %1 has no data.';
+        SuccessImportLbl: Label 'NP Pay Reconciliation Webhook Request was successfully imported.';
+        WebhookNoDataLbl: Label 'NP Pay Webhook %1 has no data.';
     begin
         AdyenWebhook.LockTable();
         AdyenWebhook.Get(AdyenWebhook."Entry No.");

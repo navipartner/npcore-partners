@@ -1,7 +1,7 @@
 table 6150881 "NPR Adyen Webhook Log"
 {
     Access = Internal;
-    Caption = 'Adyen Webhook Log';
+    Caption = 'NP Pay Webhook Log';
     DataClassification = CustomerContent;
 
     fields
