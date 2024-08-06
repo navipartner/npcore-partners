@@ -338,7 +338,7 @@
         JobQueueEntry."Rerun Delay (sec.)" := Parameters."Rerun Delay (sec.)";
         if JobQueueEntry."Rerun Delay (sec.)" <= 0 then
             JobQueueEntry."Rerun Delay (sec.)" := 180;
-        if (Parameters."Parameter String" <> '') and (JobQueueEntry."Parameter String" <> Parameters."Parameter String") then
+        if JobQueueEntry."Parameter String" <> Parameters."Parameter String" then
             JobQueueEntry.Validate("Parameter String", Parameters."Parameter String");
 #IF NOT BC17
         if Parameters."Job Timeout" <> 0 then
