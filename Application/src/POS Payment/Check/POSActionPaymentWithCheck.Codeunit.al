@@ -52,7 +52,7 @@ codeunit 6059938 "NPR POSAction PaymentWithCheck" implements "NPR POS IPaymentWF
     begin
         POSPaymentMethod.Get(Context.GetString('paymentType'));
         AmountToCapture := Context.GetDecimal('amountToCapture');
-        DefaultAmountToCapture := Context.GetDecimal('amountToCapture');
+        DefaultAmountToCapture := Context.GetDecimal('defaultAmountToCapture');
         if Context.GetString('checkNo', CheckNo) then;
 
         POSSale.GetCurrentSale(SalePOS);
@@ -88,7 +88,7 @@ codeunit 6059938 "NPR POSAction PaymentWithCheck" implements "NPR POS IPaymentWF
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWithCheck.Codeunit.js###
-'let main=async({workflow:a,captions:t,context:e})=>{const{askForCheckNo:c}=await a.respond("PrepareWorkflow");return c&&(e.checkNo=await popup.input({title:t.checkTitle,caption:t.checkNoDescription})),await a.respond("CapturePayment",{amountToCapture:e.suggestedAmount,checkNo:e.checkNo})};'
+'const main=async({workflow:a,captions:o,context:e})=>{const{askForCheckNo:t}=await a.respond("PrepareWorkflow");return t&&(e.checkNo=await popup.input({title:o.checkTitle,caption:o.checkNoDescription})),a.respond("CapturePayment",{amountToCapture:e.suggestedAmount,checkNo:e.checkNo,defaultAmountToCapture:e.remainingAmount})};'
         );
     end;
 

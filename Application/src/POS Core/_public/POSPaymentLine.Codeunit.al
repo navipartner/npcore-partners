@@ -98,7 +98,6 @@
     procedure CalculateBalance(POSPaymentMethod: Record "NPR POS Payment Method"; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         POSPaymentMethodItem: Record "NPR POS Payment Method Item";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if not Initialized then
             exit;
@@ -108,10 +107,8 @@
         if POSPaymentMethodItem.IsEmpty() then
             CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal)
         else
-            if FeatureFlagsManagement.IsEnabled('posPaymentMethodsItemsBalanceCalculationFix') then
-                CalculateBalanceV2(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal)
-            else
-                CalculateBalance(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+            CalculateBalanceV2(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+
     end;
 
     //ReturnAmount is LEGACY. Cannot calculate true return amount without knowing payment type that is being paid with, to adjust roundings. If you use this incorrectly you will not have equal transactions in both directions (positive/negative) for nearest rounding.
@@ -152,6 +149,7 @@
             ReturnAmount := Round(ReturnAmount, Setup.AmountRoundingPrecision(), Setup.AmountRoundingDirection());
     end;
 
+    [Obsolete('Not used. Use function CalculateBalanceV2 instead', '2024-08-11')]
     local procedure CalculateBalance(POSPaymentMethodCode: Code[20]; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         POSSaleLine: Record "NPR POS Sale Line";
