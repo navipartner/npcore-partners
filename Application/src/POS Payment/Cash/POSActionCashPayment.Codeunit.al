@@ -31,7 +31,7 @@ codeunit 6059793 "NPR POS Action: Cash Payment" implements "NPR POS IPaymentWFHa
     begin
         POSPaymentMethod.Get(Context.GetString('paymentType'));
         AmountToCapture := Context.GetDecimal('amountToCapture');
-        DefaultAmountToCapture := Context.GetDecimal('amountToCapture');
+        DefaultAmountToCapture := Context.GetDecimal('defaultAmountToCapture');
 
         POSSale.GetCurrentSale(SalePOS);
 
@@ -73,7 +73,7 @@ codeunit 6059793 "NPR POS Action: Cash Payment" implements "NPR POS IPaymentWFHa
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionCashPayment.Codeunit.js###
-'let main=async({workflow:t,context:a})=>await t.respond("CapturePayment",{amountToCapture:a.suggestedAmount});'
+'const main=async({workflow:t,context:n})=>t.respond("CapturePayment",{amountToCapture:n.suggestedAmount,defaultAmountToCapture:n.remainingAmount});'
         );
     end;
 

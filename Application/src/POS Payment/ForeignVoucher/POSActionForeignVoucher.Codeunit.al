@@ -52,7 +52,7 @@ codeunit 6059939 "NPR POSAction ForeignVoucher" implements "NPR POS IPaymentWFHa
     begin
         POSPaymentMethod.Get(Context.GetString('paymentType'));
         AmountToCapture := Context.GetDecimal('amountToCapture');
-        DefaultAmountToCapture := Context.GetDecimal('amountToCapture');
+        DefaultAmountToCapture := Context.GetDecimal('defaultAmountToCapture');
         VoucherNumber := Context.GetString('voucherNumber');
 
         POSSale.GetCurrentSale(SalePOS);
@@ -76,7 +76,7 @@ codeunit 6059939 "NPR POSAction ForeignVoucher" implements "NPR POS IPaymentWFHa
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionForeignVoucher.Codeunit.js###
-'let main=async({workflow:r,context:e,captions:u})=>{if(e.voucherNumber=await popup.input({title:u.VoucherPaymentTitle,caption:u.ReferenceNo}),!!e.voucherNumber)return await r.respond("CapturePayment",{amountToCapture:e.suggestedAmount})};'
+'const main=async({workflow:r,context:e,captions:u})=>(e.voucherNumber=await popup.input({title:u.VoucherPaymentTitle,caption:u.ReferenceNo}),e.voucherNumber?r.respond("CapturePayment",{amountToCapture:e.suggestedAmount,defaultAmountToCapture:e.remainingAmount}):{});'
         );
     end;
 
