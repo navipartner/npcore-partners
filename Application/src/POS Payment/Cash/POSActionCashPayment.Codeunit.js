@@ -1,6 +1,9 @@
 /*
     POSActionCashPayment.Codeunit.js
-*/ 
-let main = async({workflow, context})=> {
-    return await workflow.respond("CapturePayment",{amountToCapture: context.suggestedAmount});
-}
+*/
+const main = async ({ workflow, context }) => {
+  return workflow.respond("CapturePayment", {
+    amountToCapture: context.suggestedAmount,
+    defaultAmountToCapture: context.remainingAmount,
+  });
+};
