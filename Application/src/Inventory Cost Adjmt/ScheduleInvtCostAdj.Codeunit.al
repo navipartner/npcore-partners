@@ -58,20 +58,32 @@
 
     local procedure CreatePostInvCostToGLJobQueue()
     var
+        JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         PostInventoryCosttoGL: Codeunit "NPR Post Inventory Cost to G/L";
         NotBeforeDateTime: DateTime;
         NextRunDateFormula: DateFormula;
+        FoundExisting: Boolean;
+        NoMoreEntries: Boolean;
     begin
         GetTimingParameters(NotBeforeDateTime, NextRunDateFormula);
         if PostInvCostToGLJobQueueExists(NotBeforeDateTime) then
             exit;
 
+        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L") then
+            repeat
+                FoundExisting := not JobQueueEntry.IsExpired(NotBeforeDateTime);
+                if not FoundExisting then
+                    NoMoreEntries := JobQueueEntry.Next() = 0;
+            until FoundExisting or NoMoreEntries;
+        if not FoundExisting then
+            JobQueueEntry."Parameter String" := CopyStr(PostInventoryCosttoGL.ParamSaveToReportInbox(), 1, MaxStrLen(JobQueueEntry."Parameter String"));
+
         if JobQueueMgt.InitRecurringJobQueueEntry(
-            JobQueueEntryGlobal."Object Type to Run"::Codeunit,
+            JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Post Inventory Cost to G/L",
-            PostInventoryCosttoGL.ParamSaveToReportInbox(),
-            JobQueueDescription(JobQueueEntryGlobal."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L"),
+            JobQueueEntry."Parameter String",
+            JobQueueDescription(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L"),
             NotBeforeDateTime,
             020000T,
             040000T,
