@@ -43,8 +43,8 @@ table 6150801 "NPR Adyen Setup"
                     if MerchantAccount.FindSet() then
                         repeat
                             AdyenManagement.InitWebhookSetup(WebhookSetup, ReportReadyEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                            AdyenManagement.CreateWebhook(WebhookSetup);
                         until MerchantAccount.Next() = 0;
-                    AdyenManagement.CreateWebhook(WebhookSetup);
                     "Enable Automatic Posting" := true;
                     Modify();
                 end else begin
