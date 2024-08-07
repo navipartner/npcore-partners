@@ -170,6 +170,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure InsertReconciliationLine(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; BatchNumber: Integer; MerchantAccount: Text; ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; LineNo: Integer; var EntryAmount: Integer): Boolean
     var
         TypeHelper: Codeunit "Type Helper";
+        UTCOffset: Integer;
+        UserTimeZoneOffset: Duration;
     begin
         InitReconciliationLine(ReconciliationHeader, ReconciliationLine);
         case ReconciliationHeader."Document Type" of
@@ -196,8 +198,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, 4), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
 
         if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 28)) then begin
-            // AMS to UTC (AMS - 2H = UTC)
-            ReconciliationLine."Transaction Date" := TypeHelper.AddHoursToDateTime(ReconciliationLine."Transaction Date", -2);
+            // AMS to UTC
+            UTCOffset := -CalculateAmsterdamToUTCOffset(ReconciliationLine."Transaction Date");
+            if not TypeHelper.GetUserTimezoneOffset(UserTimeZoneOffset) then
+                UserTimeZoneOffset := 0;
+            // UTC to Local
+            ReconciliationLine."Transaction Date" := TypeHelper.AddHoursToDateTime(ReconciliationLine."Transaction Date", UTCOffset) + UserTimeZoneOffset;
 
             if ReconciliationHeader."Transactions Date" = 0D then begin
                 ReconciliationHeader."Transactions Date" := DT2Date(ReconciliationLine."Transaction Date");
@@ -1219,6 +1225,31 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         end;
     end;
+
+    internal procedure CalculateAmsterdamToUTCOffset(ParsedDateTime: DateTime): Integer
+    var
+        StandardOffset: Integer;
+        DSTOffset: Integer;
+        StartDST: Date;
+        EndDST: Date;
+        Year: Integer;
+    begin
+        // Define the standard and DST offsets
+        StandardOffset := 1; // UTC+1
+        DSTOffset := 2;      // UTC+2
+
+        // Example: DST starts last Sunday in March, ends last Sunday in October
+        Year := Date2DMY(DT2Date(ParsedDateTime), 3);
+
+        StartDST := CALCDATE('<+1D-WD7>', DMY2Date(31, 3, Year)); // Last Sunday of March
+        EndDST := CALCDATE('<+1D-WD7>', DMY2Date(31, 10, Year)); // Last Sunday of October
+
+        if (ParsedDateTime >= CreateDateTime(StartDST, 020000T)) and (ParsedDateTime < CreateDateTime(EndDST, 030000T)) then
+            exit(DSTOffset)
+        else
+            exit(StandardOffset);
+    end;
+
     #endregion
     var
         _AdyenManagement: Codeunit "NPR Adyen Management";
