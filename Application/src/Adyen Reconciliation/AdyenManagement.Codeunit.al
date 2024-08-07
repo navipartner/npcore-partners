@@ -68,7 +68,7 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure CreateWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup"): Boolean
     var
         CreateWebhookEndpoint: Label '/merchants/%1/webhooks', Locked = true;
-        AFWebServiceURL: Label 'https://adyenreconciliation.azurewebsites.net/api/AdyenCloud', Locked = true;
+        AFWebServiceURL: Label 'https://nppaywebhook.azurewebsites.net/api/NPPayCloud', Locked = true;
         RequestText: Text;
         ResponseText: Text;
         RequestUrl: Text;
@@ -526,8 +526,8 @@ codeunit 6184796 "NPR Adyen Management"
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        WebhookBaseurl: Label 'https://adyenreconciliation.azurewebsites.net/api', Locked = true;
-        KeyLbl: Label 'NPAdyenAFCode', Locked = True;
+        WebhookBaseurl: Label 'https://nppaywebhook.azurewebsites.net/api', Locked = true;
+        KeyLbl: Label 'NPPayAFCode', Locked = True;
         OnPremLbl: Label 'NP Pay BC Integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
         TypeHelper: Codeunit "Type Helper";
         CompanyName: Text;
@@ -537,7 +537,7 @@ codeunit 6184796 "NPR Adyen Management"
 
         CompanyName := CompanyName();
         TypeHelper.UrlEncode(CompanyName);
-        Rec."Web Service URL" := (StrSubstNo('%1/AdyenCloud/%2/%3/%4?code=%5&CompanyName=%6',
+        Rec."Web Service URL" := (StrSubstNo('%1/NPPayCloud/%2/%3/%4?code=%5&CompanyName=%6',
         WebhookBaseurl,
         AzureADTenant.GetAadTenantId(),
         EnvironmentInformation.GetEnvironmentName(),
