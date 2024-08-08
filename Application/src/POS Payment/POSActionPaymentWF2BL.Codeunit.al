@@ -4,6 +4,8 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
     internal procedure PrepareForPayment(PaymentLine: Codeunit "NPR POS Payment Line"; PaymentMethodCode: Code[10]; var WorkflowNameOut: Code[20]; var POSPaymentMethodOut: Record "NPR POS Payment Method"; var AmountOut: Decimal)
     var
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        PaymentLinePOS: Record "NPR POS Sale Line";
+        PaymentProcessingEvents: Codeunit "NPR Payment Processing Events";
         IProcessingType: Interface "NPR POS IPaymentWFHandler";
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -20,6 +22,8 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
 
         PaymentLine.CalculateBalance(POSPaymentMethodOut, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         AmountOut := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, true);
+        PaymentLine.GetPaymentLine(PaymentLinePOS);
+        PaymentProcessingEvents.OnAfterCalculateSuggestionPaymentAmount(PaymentLinePOS."Sales Ticket No.", SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, AmountOut);
     end;
 
     internal procedure AttemptEndCurrentSale(PaymentMethodCode: Code[10]): Boolean
