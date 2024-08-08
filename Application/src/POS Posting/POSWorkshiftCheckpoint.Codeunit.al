@@ -750,6 +750,7 @@
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntry: Record "NPR POS Entry";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        WorkshiftCheckpointPublicAccess: Codeunit "NPR POS Worksh. Checkp. Public";
     begin
         SetGeneralStatistics(POSStoreCode, POSUnitNo, POSWorkshiftCheckpoint, FromPosEntryNo);
         GetTransferStatistics(POSWorkshiftCheckpoint, POSUnitNo, FromPosEntryNo);
@@ -775,6 +776,8 @@
                 SetPayments(POSWorkshiftCheckpoint, POSPaymentLine, GeneralLedgerSetup."LCY Code");
             until (POSPaymentLine.Next() = 0);
         end;
+
+        WorkshiftCheckpointPublicAccess.OnAfterCalculateWorkshiftSummaryOnBeforeFinalizeCheckpoint(POSWorkshiftCheckpoint, POSStoreCode, POSUnitNo, FromPosEntryNo);
 
         FinalizeCheckpoint(POSWorkshiftCheckpoint);
     end;
