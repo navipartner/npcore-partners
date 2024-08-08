@@ -39,6 +39,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
         SalesHeader: Record "Sales Header";
         ConfirmManagement: Codeunit "Confirm Management";
         Prepayment: Decimal;
+        OutstandingAmount: Decimal;
         UpdatePrepaymentLbl: Label 'Do you want to add selected Bank Entry to existing order percentage? In total it will be %1, current prepayment %2', Comment = '%1 = Total Percentage,%2 = Currect Percentage';
         ZeroAmountLbl: Label 'Amount on order is 0';
     begin
@@ -47,12 +48,13 @@ codeunit 6151373 "NPR Prepayment Mgt."
         SalesHeader.GetBySystemId(RSSalesHeader."Table SystemId");
         BankAccountLedgerEntry.Get(RSSalesHeader."Applies-to Bank Entry");
 
-        SalesHeader.CalcFields(Amount);
-        if SalesHeader.Amount = 0 then
+        OutstandingAmount := GetTotalOutstandingAmount(SalesHeader);
+
+        if OutstandingAmount = 0 then
             Error(ZeroAmountLbl);
 
         RSSalesHeader."Prepmt. Amount Incl. VAT" += BankAccountLedgerEntry."Remaining Amount";
-        Prepayment := RSSalesHeader."Prepmt. Amount Incl. VAT" / GetPrepaymentVATPercentage(SalesHeader) / SalesHeader.Amount * 100;
+        Prepayment := RSSalesHeader."Prepmt. Amount Incl. VAT" * 100 / OutstandingAmount;
 
         if Prepayment > 100 then
             Prepayment := 100;
@@ -347,21 +349,30 @@ codeunit 6151373 "NPR Prepayment Mgt."
     internal procedure UpdatePaymentAmountOnSalesHeader(var SalesHeader: Record "Sales Header"; CurrFieldNo: Integer)
     var
         RSSalesHeader: Record "NPR RS Sales Header";
+        OutstandingAmount: Decimal;
     begin
         if CurrFieldNo <> SalesHeader.FieldNo("Prepayment %") then
             exit;
+
+        OutstandingAmount := GetTotalOutstandingAmount(SalesHeader);
+
         RSSalesHeader.Read(SalesHeader.SystemId);
         SalesHeader.CalcFields(Amount);
-        RSSalesHeader."Prepmt. Amount Incl. VAT" := SalesHeader.Amount * GetPrepaymentVATPercentage(SalesHeader) * SalesHeader."Prepayment %" / 100;
+        if SalesHeader."Prices Including VAT" then
+            RSSalesHeader."Prepmt. Amount Incl. VAT" := OutstandingAmount * SalesHeader."Prepayment %" / 100
+        else
+            RSSalesHeader."Prepmt. Amount Incl. VAT" := OutstandingAmount * GetPrepaymentVATPercentage(SalesHeader) * SalesHeader."Prepayment %" / 100;
         RSSalesHeader.Save();
     end;
 
     internal procedure UpdatePaymentPercentageOnSalesHeader(RSSalesHeader: Record "NPR RS Sales Header"; var SalesHeader: Record "Sales Header")
+    var
+        OutstandingAmount: Decimal;
     begin
-        SalesHeader.CalcFields(Amount);
-        SalesHeader.TestField(Amount);
+        OutstandingAmount := GetTotalOutstandingAmount(SalesHeader);
+
         SalesHeader.SetHideValidationDialog(true);
-        SalesHeader.Validate("Prepayment %", RSSalesHeader."Prepmt. Amount Incl. VAT" / GetPrepaymentVATPercentage(SalesHeader) / SalesHeader.Amount * 100);
+        SalesHeader.Validate("Prepayment %", RSSalesHeader."Prepmt. Amount Incl. VAT" * 100 / OutstandingAmount);
         SalesHeader.SetHideValidationDialog(false);
         SalesHeader.Modify();
     end;
@@ -376,6 +387,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
         NewPercentage: Decimal;
         NewPrepaymentAmount: Decimal;
         PrepaymentAmount: Decimal;
+        OutstandingAmount: Decimal;
         LocalDocumentType: Option Invoice,"Credit Memo";
     begin
         if DocumentType <> LocalDocumentType::"Credit Memo" then
@@ -383,24 +395,32 @@ codeunit 6151373 "NPR Prepayment Mgt."
 
         SalesInvoiceHeader.SetRange("Prepayment Invoice", true);
         SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        SalesInvoiceHeader.SetAutoCalcFields(Amount);
+        SalesInvoiceHeader.SetAutoCalcFields(Amount, "Amount Including VAT");
         if SalesInvoiceHeader.FindSet() then
             repeat
-                PrepaymentAmount += SalesInvoiceHeader.Amount;
+                if SalesHeader."Prices Including VAT" then
+                    PrepaymentAmount += SalesInvoiceHeader."Amount Including VAT"
+                else
+                    PrepaymentAmount += SalesInvoiceHeader.Amount;
             until SalesInvoiceHeader.Next() = 0;
 
         SalesCrMemoHeader.SetRange("Prepayment Credit Memo", true);
         SalesCrMemoHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
-        SalesCrMemoHeader.SetAutoCalcFields(Amount);
+        SalesCrMemoHeader.SetAutoCalcFields(Amount, "Amount Including VAT");
         if SalesCrMemoHeader.FindSet() then
             repeat
-                CreditedAmount += SalesCrMemoHeader.Amount;
+                if SalesHeader."Prices Including VAT" then
+                    CreditedAmount += SalesCrMemoHeader."Amount Including VAT"
+                else
+                    CreditedAmount += SalesCrMemoHeader.Amount;
             until SalesCrMemoHeader.Next() = 0;
+
+        OutstandingAmount := GetTotalOutstandingAmount(SalesHeader);
 
         if PrepaymentAmount <> CreditedAmount then begin
             NewPrepaymentAmount := PrepaymentAmount - CreditedAmount;
             SalesHeader.CalcFields(Amount);
-            NewPercentage := NewPrepaymentAmount * 100 / SalesHeader.Amount;
+            NewPercentage := NewPrepaymentAmount * 100 / OutstandingAmount;
         end;
         if PrepaymentAmount = CreditedAmount then
             NewPercentage := 0;
@@ -410,7 +430,11 @@ codeunit 6151373 "NPR Prepayment Mgt."
         SalesHeader."Prepayment %" := NewPercentage;
         SalesHeader.CalcFields(Amount);
         RSSalesHeader.Read(SalesHeader.SystemId);
-        RSSalesHeader."Prepmt. Amount Incl. VAT" := SalesHeader.Amount * GetPrepaymentVATPercentage(SalesHeader) * SalesHeader."Prepayment %" / 100;
+        if SalesHeader."Prices Including VAT" then
+            RSSalesHeader."Prepmt. Amount Incl. VAT" := OutstandingAmount * SalesHeader."Prepayment %" / 100
+        else
+            RSSalesHeader."Prepmt. Amount Incl. VAT" := OutstandingAmount * GetPrepaymentVATPercentage(SalesHeader) * SalesHeader."Prepayment %" / 100;
+
         SalesHeader.Modify();
         RSSalesHeader.Save();
 
@@ -421,7 +445,7 @@ codeunit 6151373 "NPR Prepayment Mgt."
             repeat
                 OriginalSalesLine.SuspendStatusCheck(true);
                 OriginalSalesLine.Validate("Prepayment %", NewPercentage);
-                UpdatePrepaymentFieldsOnSalesLine(OriginalSalesLine, SalesHeader, OriginalSalesLine."Prepmt. Line Amount");
+                UpdatePrepaymentFieldsOnSalesLine(OriginalSalesLine, SalesHeader, NewPrepaymentAmount);
                 OriginalSalesLine.Modify();
                 OriginalSalesLine.SuspendStatusCheck(false);
             until OriginalSalesLine.Next() = 0;
@@ -660,6 +684,17 @@ codeunit 6151373 "NPR Prepayment Mgt."
                 ReturnValue += TotalSalesLine."Prepmt. Line Amount" * TotalSalesLine."Prepayment VAT %" / 100;
         until TotalSalesLine.Next() = 0;
         exit(ReturnValue);
+    end;
+
+    local procedure GetTotalOutstandingAmount(SalesHeader: Record "Sales Header") TotalOutstandingAmount: Decimal
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
+        SalesLine.CalcSums("Outstanding Amount");
+        TotalOutstandingAmount := SalesLine."Outstanding Amount";
     end;
 
     local procedure PostPrepaymentCreditMemo(SalesHeader: Record "Sales Header"; PrepmtDocumentType: Enum "Sales Document Type"): Boolean
