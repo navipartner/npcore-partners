@@ -16,7 +16,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
         TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary;
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -31,7 +31,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetPurchaseInvoiceIdsPathLbl, Format(StartDate, 10, '<Year4>-<Month,2>-<Day,2>'), Format(EndDate, 10, '<Year4>-<Month,2>-<Day,2>')));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessGetPurchInvoiceIdsResponse(PurchInvIdList, ResponseText);
@@ -53,7 +53,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         RSEIInPurchInvMgt: Codeunit "NPR RS EI In Purch. Inv. Mgt.";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -66,7 +66,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetPurchaseInvoiceDocPathLbl, PurchaseInvoiceId));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             RSEIInPurchInvMgt.ProcessGetPurchaseInvoiceDocumentResponse(TempRSEInvoiceDocument, ResponseText, PurchaseInvoiceId);
@@ -75,7 +75,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure RefreshPurchaseDocumentsStatus(DateChange: Date)
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -88,7 +88,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(RefreshPurchaseDocumentStatusPathLbl, Format(DateChange, 10, '<Year4>-<Month,2>-<Day,2>')));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessRefreshPurchaseDocumentStatusResponse(ResponseText);
@@ -97,7 +97,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure GetPurchaseDocumentStatus(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -110,7 +110,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetPurchaseInvoiceStatusPathLbl, RSEInvoiceDocument."Purchase Invoice ID"));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessGetPurchaseDocumentStatusResponse(RSEInvoiceDocument, ResponseText);
@@ -119,7 +119,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure AcceptIncomingPurchaseDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"): Boolean
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         ShouldAcceptInvoiceQst: Label 'Do you want to accept this invoice and send a confirmation to SEF?';
         AcceptingSuccessfullMsg: Label 'You have accepted the invoice successfully.';
         CannotAcceptIfAlreadyRejectedErr: Label 'You cannot accept invoice document if it has already been rejected.';
@@ -147,7 +147,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", AcceptPurchaseDocumentLbl);
 
-        SetRequestMessageContent(RequestMessage, RequestText, HttpMethod::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
+        SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
 
         if not SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(false);
@@ -161,7 +161,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         InputDialog: Page "NPR Input Dialog";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         ShouldRejectInvoiceQst: Label 'Do you want to reject this invoice and send a confirmation to SEF?';
         RejectingSuccessfullMsg: Label 'You have rejected the invoice successfully.';
         CannotRejectIfAlreadyApprovedErr: Label 'You cannot reject invoice document if it has already been approved.';
@@ -200,7 +200,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", RejectPurchaseDocumentLbl);
 
-        SetRequestMessageContent(RequestMessage, RequestText, HttpMethod::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
+        SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             if ProcessRejectIncomingPurchaseDocumentResponse(RSEInvoiceDocument, ResponseText) then
@@ -366,7 +366,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure SendSalesDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         RequestText: Text;
         ResponseText: Text;
@@ -382,7 +382,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(SendSalesDocumentPathLbl, RSEInvoiceDocument."Request ID", RSEInvoiceDocument."CIR Invoice", 'false'));
 
         RequestText := RSEInvoiceDocument.GetRequestContent();
-        SetRequestMessageContent(RequestMessage, RequestText, HttpMethod::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", true);
+        SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", true);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessSendSalesInvoiceDocumentResponse(RSEInvoiceDocument, ResponseText)
@@ -393,7 +393,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure RefreshSalesDocumentStatus(DateChange: Date)
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -406,7 +406,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(RefreshSalesDocumentStatusPathLbl, Format(DateChange, 10, '<Year4>-<Month,2>-<Day,2>')));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessRefreshSalesDocumentStatusResponse(ResponseText);
@@ -415,7 +415,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure GetSalesDocumentStatus(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
@@ -428,7 +428,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetSalesInvoiceDocumentStatusPathLbl, Format(RSEInvoiceDocument."Sales Invoice ID")));
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessGetSalesDocumentStatusResponse(RSEInvoiceDocument, ResponseText);
@@ -444,7 +444,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         InputDialog: Page "NPR Input Dialog";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         JsonObj: JsonObject;
         Url: Text;
@@ -479,7 +479,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", CancelSalesInvoiceDocumentPathLbl);
 
-        SetRequestMessageContent(RequestMessage, RequestText, HttpMethod::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
+        SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/json', Url, RSEInvoiceSetup."API Key", true);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             if ProcessCancelIncomingPurchaseDocumentResponse(RSEInvoiceDocument, ResponseText) then
@@ -584,7 +584,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure GetAllowedUOMs()
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         ResponseText: Text;
         Url: Text;
@@ -597,7 +597,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", GetAllowedUOMsPathLbl);
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::GET, 'application/json', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/json', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillAllowedUOMs(ResponseText);
@@ -665,7 +665,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     internal procedure GetTaxExemptionReasonList()
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
-        HttpMethod: Enum "Http Method";
+        HttpRequestType: Enum "Http Request Type";
         RequestMessage: HttpRequestMessage;
         ResponseText: Text;
         Url: Text;
@@ -678,7 +678,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Url := FormatUrl(RSEInvoiceSetup."API URL", GetTaxExemptionListPathLbl);
 
-        SetRequestMessageContent(RequestMessage, '', HttpMethod::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillTaxExemptionReasonList(ResponseText);
@@ -769,7 +769,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         Headers.Add(HeaderName, HeaderValue);
     end;
 
-    local procedure SetRequestMessageContent(var HttpRequestMessage: HttpRequestMessage; RequestContent: Text; HttpMethod: Enum "Http Method"; ContentType: Text; Url: Text; ApiKey: Text[100]; SetRequestContent: Boolean)
+    local procedure SetRequestMessageContent(var HttpRequestMessage: HttpRequestMessage; RequestContent: Text; HttpRequestType: Enum "Http Request Type"; ContentType: Text; Url: Text; ApiKey: Text[100]; SetRequestContent: Boolean)
     var
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -781,7 +781,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         SetHeader(Headers, 'Apikey', ApiKey);
 
         HttpRequestMessage.SetRequestUri(Url);
-        HttpRequestMessage.Method(Format(HttpMethod));
+        HttpRequestMessage.Method(Format(HttpRequestType));
         HttpRequestMessage.Content(Content);
     end;
 
