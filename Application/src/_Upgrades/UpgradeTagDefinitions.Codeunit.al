@@ -163,6 +163,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'SetPrintOnSaleCancel'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateKitchenRequestProductionStatuses'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateOrderFinishedDT'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", 'UpdateRVNewWaiterPadPosActionParams'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Feature Management Install", 'AddFeatures'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Obsolete Tables Cleanup", 'CleanupAuxGLEntry'));
@@ -610,6 +611,8 @@
                         exit('NPRE_UpdateKitchenRequestProductionStatuses_20240208');
                     'UpdateOrderFinishedDT':
                         exit('NPRE_UpdateOrderFinishedDT_20240528');
+                    'UpdateRVNewWaiterPadPosActionParams':
+                        exit('NPRE_UpdateRVNewWaiterPadPosActionParams_20240808');
                 end;
 
             Codeunit::"NPR Item Upgrade":

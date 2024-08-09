@@ -1,7 +1,9 @@
 let main = async ({ workflow, context }) => {
     await workflow.respond("checkSeating");
-    context.waiterpadInfo = await popup.configuration(context.waiterpadInfoConfig);
-    if (context.waiterpadInfo) {
-        await workflow.respond();
+    if (context.requestCustomerInfo) {
+        context.waiterpadInfo = await popup.configuration(context.waiterpadInfoConfig);
+        if (context.waiterpadInfo) {
+            await workflow.respond();
+        }
     }
 }

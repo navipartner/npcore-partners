@@ -10,6 +10,14 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ActionDescription: Label 'This built-in action creates a new waiter pad for the selected seating code.';
+        ParamAskForNumberOfGuests_CptLbl: Label 'Ask for number of guests';
+        ParamAskForNumberOfGuests_DescLbl: Label 'Ask for number of guests before ne waiter pad is created.';
+        ParamAskForCustomerEmail_CptLbl: Label 'Request customer email';
+        ParamAskForCustomerEmail_DescLbl: Label 'Ask for customer email address.';
+        ParamAskForCustomerName_CptLbl: Label 'Request customer name';
+        ParamAskForCustomerName_DescLbl: Label 'Ask for customer name.';
+        ParamAskForCustomerPhoneNo_CptLbl: Label 'Request customer phone No.';
+        ParamAskForCustomerPhoneNo_DescLbl: Label 'Ask for customer phone number.';
         ParamSeatingCode_CptLbl: Label 'Seating Code';
         ParamSeatingCode_DescLbl: Label 'Selected seating code.';
         ParamSwitchToSaleView_CptLbl: Label 'Switch To Sale View';
@@ -19,6 +27,10 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddTextParameter('SeatingCode', '', ParamSeatingCode_CptLbl, ParamSeatingCode_DescLbl);
         WorkflowConfig.AddBooleanParameter('SwitchToSaleView', false, ParamSwitchToSaleView_CptLbl, ParamSwitchToSaleView_DescLbl);
+        WorkflowConfig.AddBooleanParameter('AskForNumberOfGuests', false, ParamAskForNumberOfGuests_CptLbl, ParamAskForNumberOfGuests_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerName', false, ParamAskForCustomerName_CptLbl, ParamAskForCustomerName_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerPhone', false, ParamAskForCustomerPhoneNo_CptLbl, ParamAskForCustomerPhoneNo_DescLbl);
+        WorkflowConfig.AddBooleanParameter('RequestCustomerEmail', false, ParamAskForCustomerEmail_CptLbl, ParamAskForCustomerEmail_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -32,14 +44,25 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
         CustomerDetails: Dictionary of [Text, Text];
         WaiterpadInfoConfig: JsonObject;
         RestaurantCode: Code[20];
+        AskForNumberOfGuests: Boolean;
+        RequestCustomerName: Boolean;
+        RequestCustomerPhone: Boolean;
+        RequestCustomerEmail: Boolean;
         SwitchToSaleView: Boolean;
     begin
         If Step = 'checkSeating' then begin
             BusinessLogic.CheckSeating(SeatingCode(Context));
             Sale.GetCurrentSale(SalePOS);
-            if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, true, true, true, true, false, WaiterpadInfoConfig) then
+            if Context.GetBooleanParameter('AskForNumberOfGuests', AskForNumberOfGuests) then;
+            if Context.GetBooleanParameter('RequestCustomerName', RequestCustomerName) then;
+            if Context.GetBooleanParameter('RequestCustomerPhone', RequestCustomerPhone) then;
+            if Context.GetBooleanParameter('RequestCustomerEmail', RequestCustomerEmail) then;
+            if WaiterPadPOSMgt.GenerateNewWaiterPadConfig(SalePOS, AskForNumberOfGuests, RequestCustomerName, RequestCustomerPhone, RequestCustomerEmail, false, WaiterpadInfoConfig) then begin
+                Context.SetContext('requestCustomerInfo', true);
                 Context.SetContext('waiterpadInfoConfig', WaiterpadInfoConfig);
-            Exit;
+                Exit;
+            end else
+                Context.SetContext('requestCustomerInfo', false);
         end;
 
         SwitchToSaleView := Context.GetBooleanParameter('SwitchToSaleView');
@@ -104,7 +127,7 @@ codeunit 6150682 "NPR POSAction: RV New WPad" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRVNewWPad.js###
-'let main=async({workflow:i,context:a})=>{await i.respond("checkSeating"),a.waiterpadInfo=await popup.configuration(a.waiterpadInfoConfig),a.waiterpadInfo&&await i.respond()};'
+'let main=async({workflow:i,context:a})=>{await i.respond("checkSeating"),a.requestCustomerInfo&&(a.waiterpadInfo=await popup.configuration(a.waiterpadInfoConfig),a.waiterpadInfo&&await i.respond())};'
         );
     end;
 }
