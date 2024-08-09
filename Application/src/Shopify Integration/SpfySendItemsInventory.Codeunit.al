@@ -587,16 +587,15 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     internal procedure UpdateItemWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken; CalledByWebhook: Boolean)
     var
-        Item: Record Item;
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        InventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         ShopifyVariant: JsonToken;
         ShopifyVariants: JsonToken;
         OStream: OutStream;
         ShopifyItemID: Text[30];
+        xShopifyItemID: Text[30];
         ShopifyProductDetailedDescr: Text;
         ShopifyProductStatus: Text;
         ShopifyProductTitle: Text;
@@ -663,12 +662,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 end;
 
                 ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
+                xShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
                 SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyItemID, false);
 
-                if CalledByWebhook and not xSyncEnabled then begin
-                    Item.SetRange("No.", SpfyStoreItemLink."Item No.");
-                    InventoryLevelMgt.InitializeInventoryLevels(SpfyStoreItemLink."Shopify Store Code", Item, true);
-                end;
+                if (CalledByWebhook and not xSyncEnabled) or ((xShopifyItemID <> '') and (ShopifyItemID <> xShopifyItemID)) then
+                    RecalculateInventoryLevels(SpfyStoreItemLink);
                 FirstVariant := false;
             end;
             UpdateItemVariant(NcTask."Store Code", ShopifyVariant, ItemVariant);
@@ -692,7 +690,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ShopifyInventoryItemID: Text[30];
+        xShopifyInventoryItemID: Text[30];
         ShopifyVariantID: Text[30];
+        xShopifyVariantID: Text[30];
     begin
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
         SpfyStoreItemVariantLink."Item No." := ItemVariant."Item No.";
@@ -703,8 +703,27 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ShopifyVariantID := _JsonHelper.GetJText(ShopifyVariant, 'id', MaxStrLen(ShopifyVariantID), true);
         ShopifyInventoryItemID := _JsonHelper.GetJText(ShopifyVariant, 'inventory_item_id', MaxStrLen(ShopifyVariantID), true);
 #pragma warning restore AA0139
+        xShopifyVariantID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        xShopifyInventoryItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
+
+        if ((xShopifyVariantID <> '') and (ShopifyVariantID <> xShopifyVariantID)) or
+           ((xShopifyInventoryItemID <> '') and (ShopifyInventoryItemID <> xShopifyInventoryItemID))
+        then
+            RecalculateInventoryLevels(SpfyStoreItemVariantLink);
+    end;
+
+    local procedure RecalculateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        Item: Record Item;
+        InventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
+    begin
+        Item.SetRange("No.", SpfyStoreItemLink."Item No.");
+        if SpfyStoreItemLink."Variant Code" <> '' then
+            Item.SetRange("Variant Filter", SpfyStoreItemLink."Variant Code");
+        InventoryLevelMgt.ClearInventoryLevels(SpfyStoreItemLink);
+        InventoryLevelMgt.InitializeInventoryLevels(SpfyStoreItemLink."Shopify Store Code", Item, true);
     end;
 
     procedure SelectShopifyLocation(ShopifyStoreCode: Code[20]; var SelectedLocation: Text): Boolean
