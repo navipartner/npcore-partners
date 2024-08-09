@@ -64,16 +64,18 @@
         InStream: InStream;
         XMLNode: XmlNode;
         XMLNodeList: XmlNodeList;
+        HelperXMLNode: XMLNode;
     begin
         HttpClient.Get(URL, HttpResponseMessage);
         httpResponseMessage.Content.ReadAs(InStream);
         XmlDocument.ReadFrom(InStream, XMLDoc);
 
-        XMLDoc.SelectNodes('//Blob/Metadata/Description', XMLNodeList);
-
-        foreach XMLNode in XMLNodeList do begin
-            Packages.Add(XMLNode.AsXmlElement().InnerText());
-        end;
+        XMLDoc.SelectNodes('//Blob/Metadata', XMLNodeList);
+        foreach XMLNode in XMLNodeList do
+            if XMLNode.SelectSingleNode('Description', HelperXMLNode) then
+                Packages.Add(HelperXMLNode.AsXmlElement().InnerText())
+            else
+                Packages.Add('');
     end;
 
     [NonDebuggable]
