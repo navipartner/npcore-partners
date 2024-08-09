@@ -1776,6 +1776,22 @@
             TableRelation = "NPR Item Benefit List Header".Code;
 
         }
+        field(10021; "Shipment Fee"; Boolean)
+        {
+            Caption = 'Shipment Fee';
+            DataClassification = CustomerContent;
+
+        }
+        field(10022; "Store Ship Profile Code"; Code[20])
+        {
+            Caption = 'Store Ship Profile Code';
+            DataClassification = CustomerContent;
+        }
+        field(10023; "Store Ship Profile Line No."; Integer)
+        {
+            Caption = 'Store Ship Profile Line No.';
+            DataClassification = CustomerContent;
+        }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';
@@ -1925,8 +1941,8 @@
                     end;
             end;
         end;
-
         TicketRequestManager.OnDeleteSaleLinePos(Rec);
+
     end;
 
     trigger OnRename()
@@ -2092,7 +2108,9 @@
         SalesLine.Validate("Unit Price");
         SalesLine."NPR Discount Type" := "Discount Type";
         SalesLine."NPR Discount Code" := "Discount Code";
-
+        SalesLine."NPR Shipment Fee" := Rec."Shipment Fee";
+        SalesLine."NPR Store Ship Profile Code" := Rec."Store Ship Profile Code";
+        SalesLine."NPR Store Ship Prof. Line No." := Rec."Store Ship Profile Line No.";
         OnAfterTransferToSalesLine(Rec, SalesLine);
     end;
 

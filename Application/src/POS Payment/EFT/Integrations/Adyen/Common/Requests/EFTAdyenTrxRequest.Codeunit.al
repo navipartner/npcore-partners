@@ -91,9 +91,12 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
                     Value += '&recurringContract=ONECLICK,RECURRING&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
             end;
 
-            CaptureDelayHours := EFTAdyenIntegration.GetCaptureDelayHours(EFTSetup);
-            if CaptureDelayHours >= 0 then
-                Value += '&captureDelayHours=' + Format(CaptureDelayHours);
+            if not EFTTransactionRequest."Manual Capture" then begin
+                CaptureDelayHours := EFTAdyenIntegration.GetCaptureDelayHours(EFTSetup);
+                if CaptureDelayHours >= 0 then
+                    Value += '&captureDelayHours=' + Format(CaptureDelayHours);
+            end else
+                Value += '&manualCapture=true';
 
         end else
             if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::VOID then begin

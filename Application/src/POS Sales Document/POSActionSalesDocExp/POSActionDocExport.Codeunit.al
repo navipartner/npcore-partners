@@ -82,6 +82,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescSelectCustomer: Label 'Force selection of customer if missing from sale.';
         CaptionBlockEmptySale: Label 'Block Empty Sale';
         DescBlockEmptySale: Label 'Block creation of document if sale is empty';
+        CaptionPOSPaymentReservation: Label 'POS Payment Reservation';
+        DescPOSPaymentReservation: Label 'Make a POS payment reservation.';
+        CaptionSelectShipmentMethod: Label 'Select Shipment Method';
+        DescSelectShipmentMethod: Label 'Select shipment method for the current sale.';
         CaptionDocPaymentMenu: Label 'Show Payment Menu';
         DescDocPaymentMenu: Label 'Prompt with different payment methods for handling in new sale, after export is done.';
         CaptionUseLocationFrom: Label 'Use Location From';
@@ -94,8 +98,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionPaymentMethodCode: Label 'Payment Method Code';
         DescPaymentMethodCode: Label 'Select Payment Method Code to be used for sales document';
         CaptionCustomerTableView: Label 'Customer Table View';
+        CaptionPOSPaymentMethodCode: Label 'POS Payment Method Code';
         CaptionCustomerLookupPage: Label 'Customer Lookup Page';
         DescCustomerTableView: Label 'Pre-filtered customer list';
+        DescPOSPaymentMethodCode: Label 'Select POS Payment Method Code to be used for sales document';
         DescCustomerLookupPage: Label 'Custom customer lookup page';
         CaptionEnforceCustomerFilter: Label 'Enforce Customer Filter';
         DescEnforceCustomerFilter: Label 'Enforce that the selected customer is within the defined filter in "CustomerTableView"';
@@ -167,6 +173,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SelectCustomer', true, CaptionSelectCustomer, DescSelectCustomer);
         WorkflowConfig.AddBooleanParameter('ShowDocumentPaymentMenu', false, CaptionDocPaymentMenu, DescDocPaymentMenu);
         WorkflowConfig.AddBooleanParameter('BlockEmptySale', true, CaptionBlockEmptySale, DescBlockEmptySale);
+        WorkflowConfig.AddBooleanParameter('POSPaymentReservation', false, CaptionPOSPaymentReservation, DescPOSPaymentReservation);
+        WorkflowConfig.AddBooleanParameter('SelectShipmentMethod', false, CaptionSelectShipmentMethod, DescSelectShipmentMethod);
         WorkflowConfig.AddOptionParameter('UseLocationFrom',
                         OptionNameUseLocationFrom,
 #pragma warning disable AA0139
@@ -187,6 +195,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                         OptionCptPaymentMethCodeFrom);
         WorkflowConfig.AddTextParameter('PaymentMethodCode', '', CaptionPaymentMethodCode, DescPaymentMethodCode);
         WorkflowConfig.AddTextParameter('CustomerTableView', '', CaptionCustomerTableView, DescCustomerTableView);
+        WorkflowConfig.AddTextParameter('POSPaymentMethodCode', '', CaptionPOSPaymentMethodCode, DescPOSPaymentMethodCode);
         WorkflowConfig.AddIntegerParameter('CustomerLookupPage', 0, CaptionCustomerLookupPage, DescCustomerLookupPage);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, CaptionEnforceCustomerFilter, DescEnforceCustomerFilter);
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
@@ -208,6 +217,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         case Step of
             'preparePreWorkflows':
                 FrontEnd.WorkflowResponse(PreparePreWorkflows(Context, Sale));
+            'validateSaleBeforeReservation':
+                ValidateSaleBeforeReservation(Context, Sale, SaleLine);
             'exportDocument':
                 FrontEnd.WorkflowResponse(ExportSalesDoc(Context, Sale, SaleLine));
             'endSaleAndDocumentPayment':
@@ -219,7 +230,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
-'let main=async({workflow:r,parameters:t,captions:e})=>{debugger;let y,n,o,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(o=await popup.input(e.ExtDocNo),o===null)||t.AskAttention&&(n=await popup.input(e.Attention),n===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===null))return;const{preWorkflows:u}=await r.respond("preparePreWorkflows");if(u)for(const f of Object.entries(u)){let[m,c]=f;m&&await r.run(m,{parameters:c})}const{createdSalesHeader:l,createdSalesHeaderDocumentType:d,additionalParameters:p}=await r.respond("exportDocument",{extDocNo:o,attention:n,yourref:i});let a;p.prompt_prepayment?p.prepayment_is_amount?a=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):a=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):a=t.FixedPrepaymentValue,await r.respond("endSaleAndDocumentPayment",{additionalParameters:p,createdSalesHeader:l,createdSalesHeaderDocumentType:d,prepaymentAmt:a})};'
+'const main=async({workflow:n,parameters:t,captions:e})=>{let a,r,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(r=await popup.input(e.ExtDocNo),r===null)||t.AskAttention&&(a=await popup.input(e.Attention),a===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===null))return;const{preWorkflows:c,additionalParameters:o}=await n.respond("preparePreWorkflows");if(c)for(const s of Object.entries(c)){const[u,m]=s;if(u){const d=await n.run(u,{parameters:m});if((await processPreWorkflowsResponse(u,d)).stopExecution)return}}if(o.pos_payment_reservation&&(await n.respond("validateSaleBeforeReservation",{extDocNo:r,attention:a,yourref:i,additionalParameters:o}),!(await n.run("PAYMENT_2",{parameters:{paymentNo:t.POSPaymentMethodCode,HideAmountDialog:!0,tryEndSale:!1}})).success))return;const{createdSalesHeader:f,createdSalesHeaderDocumentType:l}=await n.respond("exportDocument",{extDocNo:r,attention:a,yourref:i,additionalParameters:o});let p;o.prompt_prepayment?o.prepayment_is_amount?p=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):p=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):p=t.FixedPrepaymentValue,await n.respond("endSaleAndDocumentPayment",{additionalParameters:o,createdSalesHeader:f,createdSalesHeaderDocumentType:l,prepaymentAmt:p})};async function processPreWorkflowsResponse(n,t){const e={stopExecution:!1};if(!n)return{};if(!t)return{};switch(n){case"CUSTOMER_SELECT":e.stopExecution=!t.success;break;case"SELECT_SHIP_METHOD":e.stopExecution=!t.success;break}return e}'
         )
     end;
 
@@ -250,7 +261,6 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 
         Response.Add('createdSalesHeader', SalesHeader."No.");
         Response.Add('createdSalesHeaderDocumentType', SalesHeader."Document Type".AsInteger());
-        SetPaymentParameters(Context, SalesHeader, Response);
     end;
 
     local procedure DocumentPayment(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject;
@@ -265,6 +275,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PrepaymentValue: Decimal;
         PrintPrepayment: Boolean;
         FullPosting: Boolean;
+        POSPaymentReservation: Boolean;
         SalesHeader: Record "Sales Header";
         SalePOS: Record "NPR POS Sale";
         CreatedSalesHeader: Text;
@@ -280,7 +291,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         if SalesHeader.Get(CreatedDocTypeIndex, CreatedSalesHeader) then;
         PrepaymentValue := Context.GetDecimal('prepaymentAmt');
 
-        ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting);
+        ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting, POSPaymentReservation);
 
         PrepaymentPdf2Nav := Context.GetBooleanParameter('Pdf2NavPrepaymentDocument');
         PrepaymentSend := Context.GetBooleanParameter('SendPrepaymentDocument');
@@ -308,11 +319,60 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     end;
 
     local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject
+    var
+        PaymentParameters: JsonObject;
     begin
-        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context, Sale));
+        PaymentParameters := SetPaymentParameters(Context);
+        ValidatePaymentParameters(PaymentParameters);
+        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context, Sale, PaymentParameters));
+        Response.Add('additionalParameters', PaymentParameters);
     end;
 
-    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") PreWorkflows: JsonObject
+    local procedure ValidatePaymentParameters(PaymentParameters: JsonObject)
+    var
+        POSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup";
+        EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
+        PromptPrepayment: Boolean;
+        PayAndPost: Boolean;
+        FullPosting: Boolean;
+        PaymentReservation: Boolean;
+        CancelWorkflow: Boolean;
+        PayAndPostErrorLbl: Label 'Posting cannot be enabled wile POS Payment Reservation is enabled.';
+        PrepaymentErrorLbl: Label 'Prepayments cannot be enabled while the POS Payment Reservation is enabled.';
+    begin
+        CancelWorkflow := GetValueFromPaymentParameters(PaymentParameters, 'cancel');
+        if CancelWorkflow then
+            Error('');
+
+        PromptPrepayment := GetValueFromPaymentParameters(PaymentParameters, 'prompt_prepayment');
+        PayAndPost := GetValueFromPaymentParameters(PaymentParameters, 'pay_and_post');
+        FullPosting := GetValueFromPaymentParameters(PaymentParameters, 'full_posting');
+        PaymentReservation := GetValueFromPaymentParameters(PaymentParameters, 'pos_payment_reservation');
+
+        if not PaymentReservation then
+            exit;
+
+        POSEFTPayReservSetup.Get();
+        EFTPayReservSetupUtils.CheckPaymentServationSetup(POSEFTPayReservSetup);
+
+        if PayAndPost or FullPosting then
+            Error(PayAndPostErrorLbl);
+
+        if PromptPrepayment then
+            Error(PrepaymentErrorLbl);
+    end;
+
+    local procedure GetValueFromPaymentParameters(PaymentParameters: JsonObject; ParameterName: Text) ResultValue: Boolean;
+    var
+        JsonToken: JsonToken;
+    begin
+        if not PaymentParameters.Get(ParameterName, JsonToken) then
+            exit;
+
+        ResultValue := JsonToken.AsValue().AsBoolean();
+    end;
+
+    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentParameters: JsonObject) PreWorkflows: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
         NPRPOSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
@@ -321,8 +381,11 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         Sale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." = '' then
             AddCustomerWorkflow(Context, PreWorkflows);
-        POSActionPaymentWF2.AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
-        NPRPOSActionDocExpEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
+        AddSelectShipmentMethodWorkflow(Context, PreWorkflows);
+        if not GetValueFromPaymentParameters(PaymentParameters, 'pos_payment_reservation') then
+            POSActionPaymentWF2.AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
+
+        NPRPOSActionDocExpEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows, PaymentParameters);
     end;
 
     local procedure AddCustomerWorkflow(Context: Codeunit "NPR POS JSON Helper"; var PreWorkflows: JsonObject)
@@ -346,73 +409,98 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PreWorkflows.Add('CUSTOMER_SELECT', ActionParameters);
     end;
 
-    local procedure SetPaymentParameters(Context: Codeunit "NPR POS JSON Helper"; SalesHeader: Record "Sales Header"; var Response: JsonObject)
+    local procedure AddSelectShipmentMethodWorkflow(Context: Codeunit "NPR POS JSON Helper"; var PreWorkflows: JsonObject)
+    var
+        ActionParameters: JsonObject;
+    begin
+        if not Context.GetBooleanParameter('SelectShipmentMethod') then
+            exit;
+
+        PreWorkflows.Add('SELECT_SHIP_METHOD', ActionParameters);
+    end;
+
+    local procedure SetPaymentParameters(Context: Codeunit "NPR POS JSON Helper") Parameters: JsonObject
     var
         Choice: Integer;
-        RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
-        PAYMENT_OPTION: Label 'No Payment,Prepayment Percent,Prepayment Amount,Pay & Post';
-        PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post';
+        PAYMENT_OPTION_SPLIT: Label 'No Payment,Prepayment Percent,Prepayment Amount,Split Pay & Post,Full Pay & Post,POS Payment Reservation';
         PAYMENT_OPTION_DESC: Label 'Select document payment';
-        Parameters: JsonObject;
     begin
-        if SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then begin //If document has been posted/deleted, we cannot pay parts of it.
-            if Context.GetBooleanParameter('ShowDocumentPaymentMenu') then begin
-                if RetailSalesDocImpMgt.DocumentIsSetToFullPosting(SalesHeader) then
-                    Choice := StrMenu(PAYMENT_OPTION, 1, PAYMENT_OPTION_DESC)
-                else
-                    Choice := StrMenu(PAYMENT_OPTION_SPLIT, 1, PAYMENT_OPTION_DESC);
+        if Context.GetBooleanParameter('ShowDocumentPaymentMenu') then begin
+            Choice := StrMenu(PAYMENT_OPTION_SPLIT, 1, PAYMENT_OPTION_DESC);
 
-                case Choice of
-                    0,  //Cancelled
-                    1: //None
-                        begin
-                            Parameters.Add('prompt_prepayment', false);
-                            Parameters.Add('prepayment_is_amount', false);
-                            Parameters.Add('pay_and_post', false);
-                            Parameters.Add('full_posting', false);
-                        end;
-                    2: //Prepayment Percent
-                        begin
-                            Parameters.Add('prompt_prepayment', true);
-                            Parameters.Add('prepayment_is_amount', false);
-                            Parameters.Add('pay_and_post', false);
-                            Parameters.Add('full_posting', false);
-                        end;
-                    3: //Prepayment Amount
-                        begin
-                            Parameters.Add('prompt_prepayment', true);
-                            Parameters.Add('prepayment_is_amount', true);
-                            Parameters.Add('pay_and_post', false);
-                            Parameters.Add('full_posting', false);
-                        end;
-                    4: //Payment + post
-                        begin
-                            Parameters.Add('prompt_prepayment', false);
-                            Parameters.Add('prepayment_is_amount', false);
-                            Parameters.Add('pay_and_post', true);
-                            Parameters.Add('full_posting', false);
-                        end;
-                    5: //Full payment + post
-                        begin
-                            Parameters.Add('prompt_prepayment', false);
-                            Parameters.Add('prepayment_is_amount', false);
-                            Parameters.Add('pay_and_post', true);
-                            Parameters.Add('full_posting', true);
-                        end;
-                end;
-            end else begin
-                Parameters.Add('pay_and_post', Context.GetBooleanParameter('PayAndPostInNextSale'));
-                Parameters.Add('prompt_prepayment', Context.GetBooleanParameter('PrepaymentDialog'));
-                Parameters.Add('prepayment_is_amount', Context.GetBooleanParameter('PrepaymentInputIsAmount'));
-                Parameters.Add('full_posting', false);
+            case Choice of
+                0://Cancel
+                    begin
+                        Parameters.Add('cancel', true);
+                        Parameters.Add('prompt_prepayment', false);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', false);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                1: //None
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', false);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', false);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                2: //Prepayment Percent
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', true);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', false);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                3: //Prepayment Amount
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', true);
+                        Parameters.Add('prepayment_is_amount', true);
+                        Parameters.Add('pay_and_post', false);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                4: //Payment + post
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', false);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', true);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                5: //Full payment + post
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', false);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', true);
+                        Parameters.Add('full_posting', true);
+                        Parameters.Add('pos_payment_reservation', false);
+                    end;
+                6: //Payment Reservation
+                    begin
+                        Parameters.Add('cancel', false);
+                        Parameters.Add('prompt_prepayment', false);
+                        Parameters.Add('prepayment_is_amount', false);
+                        Parameters.Add('pay_and_post', false);
+                        Parameters.Add('full_posting', false);
+                        Parameters.Add('pos_payment_reservation', true);
+                    end;
             end;
         end else begin
-            Parameters.Add('prompt_prepayment', false);
-            Parameters.Add('prepayment_is_amount', false);
-            Parameters.Add('pay_and_post', false);
+            Parameters.Add('cancel', false);
+            Parameters.Add('pay_and_post', Context.GetBooleanParameter('PayAndPostInNextSale'));
+            Parameters.Add('prompt_prepayment', Context.GetBooleanParameter('PrepaymentDialog'));
+            Parameters.Add('prepayment_is_amount', Context.GetBooleanParameter('PrepaymentInputIsAmount'));
+            Parameters.Add('pos_payment_reservation', Context.GetBooleanParameter('POSPaymentReservation'));
             Parameters.Add('full_posting', false);
         end;
-        Response.Add('additionalParameters', Parameters);
     end;
 
     local procedure ValidateSale(var SalePOS: Record "NPR POS Sale"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt."; Context: Codeunit "NPR POS JSON Helper"; CustomerTableView: Text)
@@ -429,6 +517,37 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
+    local procedure ValidateSaleBeforeReservation(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line")
+    var
+        SalePOS: Record "NPR POS Sale";
+        RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
+        CustomerTableView: Text;
+        PrepaymentIsAmount: Boolean;
+        PayAndPost: Boolean;
+        FullPosting: Boolean;
+        POSPaymentReservation: Boolean;
+    begin
+        Sale.GetCurrentSale(SalePOS);
+        SalePOS.TestField("Customer No.");
+
+        SetReference(SalePOS, Context);
+        SetPricesInclVAT(SalePOS, Context);
+        SetGroupCode(SalePOS,
+                     Context);
+
+        SetParameters(SaleLine, Context, RetailSalesDocMgt);
+        ValidateSale(SalePOS, RetailSalesDocMgt, Context, CustomerTableView);
+
+        ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting, POSPaymentReservation);
+
+        if POSPaymentReservation then begin
+            POSActionDocExportB.CheckVATSetupsExist(SalePOS);
+            POSActionDocExportB.CheckPaymentLinesReadyForReservation(SalePOS);
+        end;
+
+    end;
+
     local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; Context: Codeunit "NPR POS JSON Helper"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")
     var
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
@@ -442,7 +561,13 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
         SpecificLocationCode: Code[10];
         PaymentMethodCode: Code[10];
+        PrepaymentIsAmount: Boolean;
+        PayAndPost: Boolean;
+        FullPosting: Boolean;
+        POSPaymentReservation: Boolean;
     begin
+        ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting, POSPaymentReservation);
+
         RetailSalesDocMgt.SetAsk(Context.GetBooleanParameter('SetAsk'));
         RetailSalesDocMgt.SetPrint(Context.GetBooleanParameter('SetPrint'));
         RetailSalesDocMgt.SetInvoice(Context.GetBooleanParameter('SetInvoice'));
@@ -461,8 +586,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         RetailSalesDocMgt.SetCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCredit'));
         RetailSalesDocMgt.SetWarningCustomerCreditCheck(Context.GetBooleanParameter('CheckCustomerCreditWarning'));
         RetailSalesDocMgt.SetPrintProformaInvoice(Context.GetBooleanParameter('SetPrintProformaInvoice'));
-
         RetailSalesDocMgt.SetAsyncPosting(POSAsyncPosting.AsyncPostingEnabled());
+        RetailSalesDocMgt.SetSkipPaymentLineCheck(POSPaymentReservation);
 
         if Context.GetBooleanParameter('SetShowCreationMessage') then
             RetailSalesDocMgt.SetShowCreationMessage();
@@ -622,13 +747,23 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         POSActionDocExpEvents.OnAddAttentionLabel(AttentionText);
     end;
 
-    local procedure ReadAdditionalParameters(Context: Codeunit "NPR POS JSON Helper"; var PrepaymentIsAmount: Boolean; var PayAndPost: Boolean; var FullPosting: Boolean)
+    local procedure ReadAdditionalParameters(Context: Codeunit "NPR POS JSON Helper"; var PrepaymentIsAmount: Boolean; var PayAndPost: Boolean; var FullPosting: Boolean; var POSPaymentReservation: Boolean)
     var
+        SalesHeader: Record "Sales Header";
         JSObj: JsonObject;
         ContextObj: JsonObject;
         JToken: JsonToken;
+        SalesHeaderNo: Text;
+        SalesDocumentType: Enum "Sales Document Type";
     begin
         Context.GetJObject(ContextObj);
+
+        if ContextObj.Get('createdSalesHeader', JToken) then
+            SalesHeaderNo := JToken.AsValue().AsText();
+
+        if ContextObj.Get('createdSalesHeaderDocumentType', JToken) then
+            SalesDocumentType := Enum::"Sales Document Type".FromInteger(JToken.AsValue().AsInteger());
+
         if ContextObj.Get('additionalParameters', JToken) then begin
             JSObj := JToken.AsObject();
             if JSObj.Get('prepayment_is_amount', JToken) then
@@ -637,7 +772,17 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
                 PayAndPost := JToken.AsValue().AsBoolean();
             if JSObj.Get('full_posting', JToken) then
                 FullPosting := JToken.AsValue().AsBoolean();
+            if JSObj.Get('pos_payment_reservation', JToken) then
+                POSPaymentReservation := JToken.AsValue().AsBoolean();
         end;
+
+        if not SalesHeader.Get(SalesDocumentType, SalesHeaderNo) then begin
+            PrepaymentIsAmount := false;
+            PayAndPost := false;
+            FullPosting := false;
+            exit;
+        end;
+
     end;
     #region UnpackGroupCodeSetup
     local procedure UnpackGroupCodeSetup(Context: Codeunit "NPR POS JSON Helper";

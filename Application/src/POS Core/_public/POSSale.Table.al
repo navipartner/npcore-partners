@@ -763,7 +763,6 @@
             DataClassification = CustomerContent;
             TableRelation = "Customer Posting Group";
         }
-
         field(5700; "Responsibility Center"; Code[10])
         {
             Caption = 'Responsibility Center';

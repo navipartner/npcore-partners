@@ -21,6 +21,8 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreatePaymentOfGoodsRequest', '', false, false)]
     local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
+    var
+        EFTSetup: Record "NPR EFT Setup";
     begin
         if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
             exit;
@@ -30,6 +32,8 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         RecurringContractCheckPreTransaction(EftTransactionRequest);
 
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
+        EftTransactionRequest."Manual Capture" := GetManualCapture(EFTSetup);
         EftTransactionRequest.Recoverable := true;
         EftTransactionRequest."Auto Voidable" := true;
         EftTransactionRequest."Manual Voidable" := true;
@@ -243,6 +247,14 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     begin
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup."Capture Delay Hours");
+    end;
+
+    procedure GetManualCapture(EFTSetupIn: Record "NPR EFT Setup"): Boolean
+    var
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup."Manual Capture");
     end;
 
     local procedure GetCashbackAllowed(EFTSetupIn: Record "NPR EFT Setup"): Boolean

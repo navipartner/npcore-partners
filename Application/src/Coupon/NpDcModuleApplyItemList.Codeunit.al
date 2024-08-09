@@ -523,6 +523,7 @@
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
 
 
@@ -613,6 +614,7 @@
         SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin
@@ -657,7 +659,7 @@
             exit;
 
         SaleLinePOS.SetAutoCalcFields("Coupon Disc. Amount Incl. VAT", "Coupon Disc. Amount Excl. VAT");
-        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line Type", "Benefit Item", "No.", Quantity, "Amount Including VAT", Amount, Quantity, "No.", "VAT %", "Line No.");
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line Type", "Benefit Item", "Shipment Fee", "No.", Quantity, "Amount Including VAT", Amount, Quantity, "No.", "VAT %", "Line No.");
         if not SaleLinePOS.FindSet() then
             exit;
 

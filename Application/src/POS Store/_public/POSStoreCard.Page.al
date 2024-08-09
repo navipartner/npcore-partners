@@ -143,6 +143,12 @@
                     ToolTip = 'Specifies which General and VAT Posting group this store is using as well as journal definitions etc.';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Shipment Profile"; Rec."POS Shipment Profile")
+                {
+                    ToolTip = 'Specifies the shipment options that can be used for this store.';
+                    ApplicationArea = NPRRetail;
+                }
+
 
             }
             group(Reporting)

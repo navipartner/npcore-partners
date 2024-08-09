@@ -526,6 +526,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR Adyen Recon. Line"."Posting No.";
         }
+        field(860; "Manual Capture"; Boolean)
+        {
+            Caption = 'Manual Capture';
+            DataClassification = CustomerContent;
+        }
         field(10000; "FF Moved to POS Entry"; Boolean)
         {
             CalcFormula = Exist("NPR POS Entry" WHERE("Document No." = FIELD("Sales Ticket No.")));

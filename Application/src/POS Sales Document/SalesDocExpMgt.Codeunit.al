@@ -51,6 +51,7 @@
         WarningCustomerCreditCheck: Boolean;
         PrintProformaInv: Boolean;
         AsyncPosting: Boolean;
+        SkipPaymentLineCheck: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -197,6 +198,11 @@
     procedure SetAsyncPosting(AsyncPostingIn: Boolean)
     begin
         AsyncPosting := AsyncPostingIn;
+    end;
+
+    internal procedure SetSkipPaymentLineCheck(SkipPaymentLineCheckIn: Boolean)
+    begin
+        SkipPaymentLineCheck := SkipPaymentLineCheckIn;
     end;
 
     procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
@@ -468,7 +474,9 @@
         SerialNoInfo: Record "Serial No. Information";
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
+        POSActEFTDocPayRsrvB: Codeunit "NPR POS Act EFT Doc Pay Rsrv B";
         LotNoInfo: Record "Lot No. Information";
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
@@ -480,123 +488,168 @@
 #ENDIF
         if SaleLinePOS.FindSet() then
             repeat
-                SalesLine.Init();
-
                 TestSaleLinePOS(SaleLinePOS);
-
-                SalesLine."Document Type" := SalesHeader."Document Type";
-                SalesLine."Document No." := SalesHeader."No.";
-
                 case SaleLinePOS."Line Type" of
-                    SaleLinePOS."Line Type"::"GL Payment",
-                    SaleLinePOS."Line Type"::"Issue Voucher":
-                        SalesLine.Type := SalesLine.Type::"G/L Account";
-                    SaleLinePOS."Line Type"::Comment:
-                        SalesLine.Type := SalesLine.Type::" ";
-                    else
-                        SalesLine.Type := SalesLine.Type::Item;
-                end;
-                SalesLine."Line No." := SaleLinePOS."Line No.";
-                SalesPriceRecalculated := SaleLinePOS.TransferToSalesLine(SalesLine, TransferPostingSetup);
-                SalesLine.Insert(true);
-                if SalesLine.Type <> SalesLine.Type::" " then begin
-                    if SalesHeader.IsCreditDocType() or (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") then
-                        SalesLine.Validate(Quantity, -SaleLinePOS.Quantity)
-                    else
-                        if SalesLine.Quantity <> SaleLinePOS.Quantity then
-                            SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
+                    SaleLinePOS."Line Type"::"POS Payment":
+                        begin
+                            Clear(MagentoPaymentLine);
+                            if SaleLinePOS."Amount Including VAT" > 0 then
+                                POSActEFTDocPayRsrvB.ReservePOSPaymentLine(SaleLinePOS, SalesHeader, MagentoPaymentLine);
+                        end;
+                    else begin
+                        SalesLine.Init();
 
-                    SalesLine.VAlidate("Qty. to Assemble to Order");
+                        SalesLine."Document Type" := SalesHeader."Document Type";
+                        SalesLine."Document No." := SalesHeader."No.";
 
-                    if (SalesLine."Unit Price" <> SaleLinePOS."Unit Price") and not SalesPriceRecalculated then begin
-                        SalesLine."Line Discount %" := SaleLinePOS."Discount %";
-                        SalesLine.Validate("Unit Price", SaleLinePOS."Unit Price");
-                    end;
-                    if SalesLine."Line Discount %" <> SaleLinePOS."Discount %" then
-                        SalesLine.Validate("Line Discount %", SaleLinePOS."Discount %");
+                        case SaleLinePOS."Line Type" of
+                            SaleLinePOS."Line Type"::"GL Payment",
+                            SaleLinePOS."Line Type"::"Issue Voucher":
+                                SalesLine.Type := SalesLine.Type::"G/L Account";
+                            SaleLinePOS."Line Type"::Comment:
+                                SalesLine.Type := SalesLine.Type::" ";
+                            else
+                                SalesLine.Type := SalesLine.Type::Item;
+                        end;
+                        SalesLine."Line No." := SaleLinePOS."Line No.";
+                        SalesPriceRecalculated := SaleLinePOS.TransferToSalesLine(SalesLine, TransferPostingSetup);
+                        SalesLine.Insert(true);
+                        if SalesLine.Type <> SalesLine.Type::" " then begin
+                            if SalesHeader.IsCreditDocType() or (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") then
+                                SalesLine.Validate(Quantity, -SaleLinePOS.Quantity)
+                            else
+                                if SalesLine.Quantity <> SaleLinePOS.Quantity then
+                                    SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
 
-                    TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
-                    SalesLine.Modify();
-                end;
-                if (SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '') then begin
-                    ReservationEntry.SetCurrentKey("Entry No.", Positive);
-                    ReservationEntry.SetRange(Positive, false);
-                    if ReservationEntry.Find('+') then;
-                    ReservationEntry.Init();
-                    ReservationEntry."Entry No." += 1;
-                    ReservationEntry.Positive := false;
-                    ReservationEntry."Creation Date" := Today();
-                    ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
-                    ReservationEntry."Item No." := SaleLinePOS."No.";
-                    ReservationEntry."Location Code" := SaleLinePOS."Location Code";
-                    ReservationEntry."Quantity (Base)" := -SalesLine."Quantity (Base)";
-                    ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Surplus;
-                    ReservationEntry."Source Type" := 37;
-                    ReservationEntry."Source Subtype" := SalesLine."Document Type".AsInteger();
-                    ReservationEntry."Source ID" := SalesLine."Document No.";
-                    ReservationEntry."Source Batch Name" := '';
-                    ReservationEntry."Source Ref. No." := SalesLine."Line No.";
-                    ReservationEntry."Expected Receipt Date" := 0D;
-                    ReservationEntry."Serial No." := SaleLinePOS."Serial No.";
-                    ReservationEntry."Lot No." := SaleLinePOS."Lot No.";
-                    ReservationEntry."Variant Code" := SaleLinePOS."Variant Code";
-                    ReservationEntry."Qty. per Unit of Measure" := SalesLine.Quantity;
-                    ReservationEntry.Quantity := -SalesLine.Quantity;
-                    ReservationEntry."Qty. to Handle (Base)" := -SalesLine.Quantity;
-                    ReservationEntry."Qty. to Invoice (Base)" := -SalesLine.Quantity;
-                    ReservationEntry.Insert();
-                end;
-                if Item.Get(SaleLinePOS."No.") then begin
-                    if Item."Item Tracking Code" <> '' then begin
-                        ItemTrackingCode.Get(Item."Item Tracking Code");
+                            SalesLine.VAlidate("Qty. to Assemble to Order");
+
+                            if (SalesLine."Unit Price" <> SaleLinePOS."Unit Price") and not SalesPriceRecalculated then begin
+                                SalesLine."Line Discount %" := SaleLinePOS."Discount %";
+                                SalesLine.Validate("Unit Price", SaleLinePOS."Unit Price");
+                            end;
+                            if SalesLine."Line Discount %" <> SaleLinePOS."Discount %" then
+                                SalesLine.Validate("Line Discount %", SaleLinePOS."Discount %");
+
+                            TransferInfoFromSaleLinePOS(SaleLinePOS, SalesLine);
+                            SalesLine.Modify();
+                        end;
+                        if (SaleLinePOS."Serial No." <> '') or (SaleLinePOS."Lot No." <> '') then begin
+                            ReservationEntry.SetCurrentKey("Entry No.", Positive);
+                            ReservationEntry.SetRange(Positive, false);
+                            if ReservationEntry.Find('+') then;
+                            ReservationEntry.Init();
+                            ReservationEntry."Entry No." += 1;
+                            ReservationEntry.Positive := false;
+                            ReservationEntry."Creation Date" := Today();
+                            ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
+                            ReservationEntry."Item No." := SaleLinePOS."No.";
+                            ReservationEntry."Location Code" := SaleLinePOS."Location Code";
+                            ReservationEntry."Quantity (Base)" := -SalesLine."Quantity (Base)";
+                            ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Surplus;
+                            ReservationEntry."Source Type" := 37;
+                            ReservationEntry."Source Subtype" := SalesLine."Document Type".AsInteger();
+                            ReservationEntry."Source ID" := SalesLine."Document No.";
+                            ReservationEntry."Source Batch Name" := '';
+                            ReservationEntry."Source Ref. No." := SalesLine."Line No.";
+                            ReservationEntry."Expected Receipt Date" := 0D;
+                            ReservationEntry."Serial No." := SaleLinePOS."Serial No.";
+                            ReservationEntry."Lot No." := SaleLinePOS."Lot No.";
+                            ReservationEntry."Variant Code" := SaleLinePOS."Variant Code";
+                            ReservationEntry."Qty. per Unit of Measure" := SalesLine.Quantity;
+                            ReservationEntry.Quantity := -SalesLine.Quantity;
+                            ReservationEntry."Qty. to Handle (Base)" := -SalesLine.Quantity;
+                            ReservationEntry."Qty. to Invoice (Base)" := -SalesLine.Quantity;
+                            ReservationEntry.Insert();
+                        end;
+                        if Item.Get(SaleLinePOS."No.") then begin
+                            if Item."Item Tracking Code" <> '' then begin
+                                ItemTrackingCode.Get(Item."Item Tracking Code");
 #IF BC17
                         ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
 #ELSE
-                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
+                                ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
 #endif
-                        if ItemTrackingSetup."Serial No. Required" then begin
-                            if SaleLinePOS."Serial No." = '' then
-                                Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
+                                if ItemTrackingSetup."Serial No. Required" then begin
+                                    if SaleLinePOS."Serial No." = '' then
+                                        Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
+                                end;
+                                if ItemTrackingSetup."Serial No. Info Required" then begin
+                                    SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
+                                    SerialNoInfo.TestField(Blocked, false);
+                                end;
+                                if ItemTrackingSetup."Lot No. Required" then begin
+                                    if SaleLinePOS."Lot No." = '' then
+                                        Error(Text000014, SaleLinePOS."No.", SaleLinePOS.Description);
+                                end;
+                                if ItemTrackingSetup."Lot No. Info Required" then begin
+                                    LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.");
+                                    LotNoInfo.TestField(Blocked, false);
+                                end
+                            end else begin
+                                if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
+                                    SerialNoInfo.TestField(Blocked, false);
+                            end;
                         end;
-                        if ItemTrackingSetup."Serial No. Info Required" then begin
-                            SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.");
-                            SerialNoInfo.TestField(Blocked, false);
-                        end;
-                        if ItemTrackingSetup."Lot No. Required" then begin
-                            if SaleLinePOS."Lot No." = '' then
-                                Error(Text000014, SaleLinePOS."No.", SaleLinePOS.Description);
-                        end;
-                        if ItemTrackingSetup."Lot No. Info Required" then begin
-                            LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.");
-                            LotNoInfo.TestField(Blocked, false);
-                        end
-                    end else begin
-                        if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
-                            SerialNoInfo.TestField(Blocked, false);
+                        NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source");
+                        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
+                        NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
+                        NpRvSalesLine.SetLoadFields("Document Source", "Document Type", "Document No.", "Document Line No.");
+                        if NpRvSalesLine.FindSet(true) then
+                            repeat
+                                NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+                                NpRvSalesLine."Document Type" := SalesLine."Document Type";
+                                NpRvSalesLine."Document No." := SalesLine."Document No.";
+                                NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+                                NpRvSalesLine.Modify(true);
+                            until NpRvSalesLine.Next() = 0;
+
+
+                        UpdateSalesHeaderFromShipmentFeeLine(SaleLinePOS, SalesHeader);
                     end;
                 end;
-                NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source");
-                NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
-                NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
-                NpRvSalesLine.SetLoadFields("Document Source", "Document Type", "Document No.", "Document Line No.");
-                if NpRvSalesLine.FindSet(true) then
-                    repeat
-                        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
-                        NpRvSalesLine."Document Type" := SalesLine."Document Type";
-                        NpRvSalesLine."Document No." := SalesLine."Document No.";
-                        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
-                        NpRvSalesLine.Modify(true);
-                    until NpRvSalesLine.Next() = 0;
             until SaleLinePOS.Next() = 0;
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         UnbindSubscription(ManulBoundEventSubMgt);
 #ENDIF
     end;
 
+    local procedure UpdateSalesHeaderFromShipmentFeeLine(SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header")
+    var
+        StoreShipProfileLine: Record "NPR Store Ship. Profile Line";
+        Modi: Boolean;
+    begin
+        if not SaleLinePOS."Shipment Fee" then
+            exit;
+
+        if not StoreShipProfileLine.Get(SaleLinePOS."Store Ship Profile Code", SaleLinePOS."Store Ship Profile Line No.") then
+            exit;
+
+        if (StoreShipProfileLine."Shipment Method Code" <> '') and (StoreShipProfileLine."Shipment Method Code" <> SalesHeader."Shipment Method Code") then begin
+            SalesHeader.Validate("Shipment Method Code", StoreShipProfileLine."Shipment Method Code");
+            Modi := true;
+        end;
+
+        if (StoreShipProfileLine."Shipping Agent Code" <> '') and (StoreShipProfileLine."Shipping Agent Code" <> SalesHeader."Shipping Agent Code") then begin
+            SalesHeader.Validate("Shipping Agent Code", StoreShipProfileLine."Shipping Agent Code");
+            Modi := true;
+        end;
+
+        if (StoreShipProfileLine."Shipping Agent Service Code" <> '') and (StoreShipProfileLine."Shipping Agent Service Code" <> SalesHeader."Shipping Agent Service Code") then begin
+            SalesHeader.Validate("Shipping Agent Service Code", StoreShipProfileLine."Shipping Agent Service Code");
+            Modi := true;
+        end;
+
+        if not Modi then
+            exit;
+
+        SalesHeader.Modify(true);
+    end;
+
     procedure TestSaleLinePOS(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
-            Error(CannotPostPaymentErr);
+        if not SkipPaymentLineCheck then
+            if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::"POS Payment" then
+                Error(CannotPostPaymentErr);
 
         if SaleLinePOS."Sales Document No." <> '' then
             Error(OneDocPerSalesTicketErr);

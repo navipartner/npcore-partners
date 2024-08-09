@@ -650,6 +650,11 @@
             Caption = 'Return Sale Sales Ticket No.';
             DataClassification = CustomerContent;
         }
+        field(9070; "Shipment Fee"; Boolean)
+        {
+            Caption = 'Shipment Fee';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

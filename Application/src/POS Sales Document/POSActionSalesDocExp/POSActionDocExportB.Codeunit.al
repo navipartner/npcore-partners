@@ -152,4 +152,47 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
         if not HandlePayment.HandlePayAndPostTransactional(POSSession, SalesHeader, Print, Pdf2Nav, Send, FullPosting, HandlePayment, SalePosting) then
             Message(ERR_PAY, GetLastErrorText);
     end;
+
+    internal procedure CheckPaymentLinesReadyForReservation(SalePOS: Record "NPR POS Sale")
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        PaymentLineExistErrorLbl: Label 'Payment lines exist for the current POS sale. Please delete them and try again.';
+    begin
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
+        SaleLinePOS.SetFilter("Amount Including VAT", '<>0');
+        if SaleLinePOS.IsEmpty then
+            exit;
+        Error(PaymentLineExistErrorLbl);
+    end;
+
+    internal procedure CheckVATSetupsExist(SalePOS: Record "NPR POS Sale")
+    var
+        Customer: Record Customer;
+        SaleLinePOS: Record "NPR POS Sale Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        CheckCustomerVATCombination: Boolean;
+    begin
+        CheckCustomerVATCombination := SalePOS."Customer No." <> '';
+        if CheckCustomerVATCombination then begin
+            Customer.SetLoadFields("No.", "VAT Bus. Posting Group");
+            Customer.Get(SalePOS."Customer No.");
+        end;
+
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetFilter("Line Type", '%1|%2', SaleLinePOS."Line Type"::"GL Payment", SaleLinePOS."Line Type"::Item);
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", "Line Type", "VAT Bus. Posting Group", "VAT Prod. Posting Group");
+        if not SaleLinePOS.FindSet() then
+            exit;
+
+        repeat
+            VATPostingSetup.Get(SaleLinePOS."VAT Bus. Posting Group", SaleLinePOS."VAT Prod. Posting Group");
+            if CheckCustomerVATCombination then
+                VATPostingSetup.Get(Customer."VAT Bus. Posting Group", SaleLinePOS."VAT Prod. Posting Group");
+        until SaleLinePOS.Next() = 0;
+    end;
 }

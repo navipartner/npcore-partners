@@ -159,6 +159,11 @@
                     ToolTip = 'Specifies the value of the Serial No. field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Shipment Fee"; Rec."Shipment Fee")
+                {
+                    ToolTip = 'Specifies the value of the Shipment Fee field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }
