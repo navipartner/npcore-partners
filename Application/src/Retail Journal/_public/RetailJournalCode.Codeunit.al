@@ -255,6 +255,9 @@
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(PeriodDiscountLine."Item No.", PeriodDiscountLine."Variant Code", PeriodDiscountLine."Cross-Reference No.");
                 RetailJnlLine.SetDiscountType(1, PeriodDiscountLine.Code, PeriodDiscountLine."Campaign Unit Price", 1, PeriodDiscountLine."Unit Price Incl. VAT");
+
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
+
                 RetailJnlLine.Insert();
             until PeriodDiscountLine.Next() = 0;
         RetailJnlLine.CloseGUI();
@@ -471,6 +474,8 @@
                 RetailJnlLine.SetItem(TransferShipmentLine."Item No.", TransferShipmentLine."Variant Code", '');
                 RetailJnlLine.Validate("Quantity to Print", TransferShipmentLine.Quantity);
 
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
+
                 RetailJnlLine.Insert();
             until TransferShipmentLine.Next() = 0;
         RetailJnlLine.CloseGUI();
@@ -505,6 +510,8 @@
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferReceiptLine."Item No.", TransferReceiptLine."Variant Code", '');
                 RetailJnlLine.Validate("Quantity to Print", TransferReceiptLine.Quantity);
+
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
 
                 RetailJnlLine.Insert();
             until TransferReceiptLine.Next() = 0;
@@ -541,6 +548,8 @@
                 RetailJnlLine.InitLine();
                 RetailJnlLine.SetItem(TransferLine."Item No.", TransferLine."Variant Code", '');
                 RetailJnlLine.Validate("Quantity to Print", TransferLine.Quantity);
+
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
 
                 RetailJnlLine.Insert();
             until TransferLine.Next() = 0;
@@ -606,6 +615,8 @@
                 end;
                 RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
 
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
+
                 ItemWorksheetCU.OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchaseLine.Next() = 0;
@@ -649,6 +660,8 @@
 
                 RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
 
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
+
                 OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchInvLine.Next() = 0;
@@ -689,6 +702,9 @@
                     RetailJnlLine.SetItem(PurchRcptLine."No.", PurchRcptLine."Variant Code", '');
                 RetailJnlLine.Validate("Quantity to Print", PurchRcptLine.Quantity);
                 RetailJnlLine."Last Direct Cost" := PurchRcptLine."Direct Unit Cost";
+
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
+
                 OnBeforeRetJnlLineInsertFromPurchRcptLine(PurchRcptLine, RetailJnlLine);
                 RetailJnlLine.Insert();
             until PurchRcptLine.Next() = 0;
@@ -727,6 +743,8 @@
 
                 RetailJnlLine.SetItem(WarehouseActivityLine."Item No.", WarehouseActivityLine."Variant Code", '');
                 RetailJnlLine.Validate("Quantity to Print", WarehouseActivityLine.Quantity);
+
+                RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
 
                 RetailJnlLine.Insert();
             until WarehouseActivityLine.Next() = 0;
