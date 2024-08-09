@@ -267,7 +267,7 @@ table 6060000 "NPR RS Nivelation Lines"
             exit;
         "New Value" := "New Price" * Quantity;
         "Price Difference" := "New Price" - "Old Price";
-        "Value Difference" := "Price Difference" * Abs(Quantity);
+        "Value Difference" := "Price Difference" * Quantity;
         "Calculated VAT" := "Value Difference" * ((100 * "VAT %") / (100 + "VAT %") / 100);
     end;
 

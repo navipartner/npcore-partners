@@ -584,6 +584,8 @@ codeunit 6151094 "NPR RS Sales GL Addition"
     local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal)
     var
         CalculationValueEntryDescLbl: Label 'Calculation';
+        DiscountPerUnit: Decimal;
+        SumOfStdCostPerUnit: Decimal;
     begin
         Clear(RetailValueEntry);
         RetailValueEntry.Init();
@@ -592,10 +594,12 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
         RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
 
-        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit" - SumOfCOGSCostPerUnit - StdCorrectionValueEntry."Cost per Unit";
+        DiscountPerUnit := TempSalesInvoiceLine."Line Discount Amount" / TempSalesInvoiceLine.Quantity;
+        SumOfStdCostPerUnit := StdValueEntry."Cost per Unit" + SumOfCOGSCostPerUnit + StdCorrectionValueEntry."Cost per Unit";
+        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfStdCostPerUnit - DiscountPerUnit;
 
         if (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then
-            RetailValueEntry."Cost Amount (Actual)" := -Abs((PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) - SumOfCOGSCostAmtAct);
+            RetailValueEntry."Cost Amount (Actual)" := -Abs((PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) - SumOfCOGSCostAmtAct - TempSalesInvoiceLine."Line Discount Amount");
 
         if (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) <> Abs(StdValueEntry."Sales Amount (Actual)") then
             RetailValueEntry."Sales Amount (Actual)" := CalculateRSGLVATAmount();
@@ -638,8 +642,11 @@ codeunit 6151094 "NPR RS Sales GL Addition"
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
+    var
+        CalculatedLineAmount: Decimal;
     begin
-        exit(((PriceListLine."Unit Price" - TempSalesInvoiceLine."Line Discount Amount") * TempSalesInvoiceLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesInvoiceLine."VAT Bus. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group"))
+        CalculatedLineAmount := (PriceListLine."Unit Price" * TempSalesInvoiceLine.Quantity) - TempSalesInvoiceLine."Line Discount Amount";
+        exit(CalculatedLineAmount * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesInvoiceLine."VAT Bus. Posting Group", TempSalesInvoiceLine."VAT Prod. Posting Group"))
     end;
     #endregion
 
