@@ -27,12 +27,8 @@ table 6059998 "NPR RS Nivelation Header"
             DataClassification = CustomerContent;
             trigger OnValidate()
             begin
-                case Type of
-                    "NPR RS Nivelation Type"::"Price Change":
-                        "Source Type" := "NPR RS Nivelation Source Type"::"Sales Price List";
-                    "NPR RS Nivelation Type"::"Promotions & Discounts":
-                        "Source Type" := "NPR RS Nivelation Source Type"::"Posted Sales Invoice";
-                end;
+                if Type in ["NPR RS Nivelation Type"::"Price Change"] then
+                    "Source Type" := "NPR RS Nivelation Source Type"::"Sales Price List";
             end;
         }
         field(3; "Location Code"; Code[10])

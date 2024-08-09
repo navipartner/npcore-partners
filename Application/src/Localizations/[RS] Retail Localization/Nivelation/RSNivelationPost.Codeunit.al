@@ -27,7 +27,7 @@ codeunit 6151343 "NPR RS Nivelation Post"
         LineNo := PostedNivelationLines.GetInitialLine() + 10000;
 
         NivelationLines.SetRange("Document No.", NivelationHeader."No.");
-        NivelationLines.SetFilter(Quantity, '>0');
+        NivelationLines.SetFilter(Quantity, '<>0');
         if not NivelationLines.FindSet() then
             exit(false);
         repeat
