@@ -18,6 +18,7 @@ codeunit 6151316 "NPR NPRE Upgrade"
         SetPrintOnSaleCancel();
         UpdateKitchenRequestProductionStatuses();
         UpdateOrderFinishedDT();
+        UpdateRVNewWaiterPadPosActionParams();
     end;
 
     local procedure RefreshKitchenOrderStatus()
@@ -204,5 +205,44 @@ codeunit 6151316 "NPR NPRE Upgrade"
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateRVNewWaiterPadPosActionParams()
+    var
+        ParamValue: Record "NPR POS Parameter Value";
+        POSAction: Record "NPR POS Action";
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        POSActionRVNewWPad: Codeunit "NPR POSAction: RV New WPad";
+    begin
+        UpgradeStep := 'UpdateRVNewWaiterPadPosActionParams';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR NPRE Upgrade', UpgradeStep);
+
+        POSAction.DiscoverActions();
+        if RestaurantSetup.Get() and (RestaurantSetup."New Waiter Pad Action" = POSActionRVNewWPad.ActionCode()) then begin
+            ParamMgt.RefreshParameters(RestaurantSetup.RecordId(), '', RestaurantSetup.FieldNo("New Waiter Pad Action"), RestaurantSetup."New Waiter Pad Action");
+
+            ParamValue.SetRange("Table No.", Database::"NPR NPRE Restaurant Setup");
+            ParamValue.SetRange("Record ID", RestaurantSetup.RecordId());
+            ParamValue.SetRange(ID, RestaurantSetup.FieldNo("New Waiter Pad Action"));
+            SetParameterValue(ParamValue, 'AskForNumberOfGuests', Format(true, 0, 9));
+            SetParameterValue(ParamValue, 'RequestCustomerName', Format(true, 0, 9));
+            SetParameterValue(ParamValue, 'RequestCustomerPhone', Format(true, 0, 9));
+            SetParameterValue(ParamValue, 'RequestCustomerEmail', Format(true, 0, 9));
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR NPRE Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure SetParameterValue(var ParamValue: Record "NPR POS Parameter Value"; ParameterName: Text[30]; NewValue: Text[250])
+    begin
+        ParamValue.SetRange(Name, ParameterName);
+        if not ParamValue.FindFirst() then
+            exit;
+        ParamValue.Value := NewValue;
+        ParamValue.Modify();
     end;
 }

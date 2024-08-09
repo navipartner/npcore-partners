@@ -24,6 +24,8 @@ codeunit 6150687 "NPR POSAction: RV Select Table" implements "NPR IPOS Workflow"
         Seating: Record "NPR NPRE Seating";
         WaiterPad: Record "NPR NPRE Waiter Pad";
         WaiterPadPOSMgt: Codeunit "NPR NPRE Waiter Pad POS Mgt.";
+        NewWaiterPadActionParams: JsonObject;
+        NewWaiterPadActionCode: Code[20];
         SeatingCode: Code[20];
     begin
         case Step of
@@ -36,6 +38,9 @@ codeunit 6150687 "NPR POSAction: RV Select Table" implements "NPR IPOS Workflow"
                     SeatingWaiterPadLink.SetRange("Seating Code", Seating.Code);
                     SeatingWaiterPadLink.SetRange(Closed, false);
                     if SeatingWaiterPadLink.IsEmpty then begin
+                        GetNewWaiterPadAction(SeatingCode, NewWaiterPadActionCode, NewWaiterPadActionParams);
+                        Context.SetContext('newWaiterPadActionCode', NewWaiterPadActionCode);
+                        Context.SetContext('newWaiterPadActionParams', NewWaiterPadActionParams);
                         FrontEnd.WorkflowResponse(false);
                         exit;
                     end;
@@ -49,11 +54,33 @@ codeunit 6150687 "NPR POSAction: RV Select Table" implements "NPR IPOS Workflow"
         end;
     end;
 
+    local procedure GetNewWaiterPadAction(SeatingCode: Code[20]; var NewWaiterPadActionCode: Code[20]; var NewWaiterPadActionParams: JsonObject)
+    var
+        RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+        ParamMgt: Codeunit "NPR POS Action Param. Mgt.";
+        NewWaiterPadActionParamsJT: JsonToken;
+    begin
+        RestaurantSetup.Get();
+        RestaurantSetup.TestField("New Waiter Pad Action");
+        NewWaiterPadActionCode := RestaurantSetup."New Waiter Pad Action";
+
+        NewWaiterPadActionParams := ParamMgt.GetParametersAsJsonObject(RestaurantSetup.RecordId(), RestaurantSetup.FieldNo("New Waiter Pad Action"));
+        NewWaiterPadActionParams.Get('parameters', NewWaiterPadActionParamsJT);
+        if NewWaiterPadActionParamsJT.AsObject().Contains('SeatingCode') then
+            NewWaiterPadActionParamsJT.AsObject().Remove('SeatingCode');
+        NewWaiterPadActionParamsJT.AsObject().Add('SeatingCode', SeatingCode);
+        if NewWaiterPadActionParamsJT.AsObject().Contains('SwitchToSaleView') then
+            NewWaiterPadActionParamsJT.AsObject().Remove('SwitchToSaleView');
+        NewWaiterPadActionParamsJT.AsObject().Add('SwitchToSaleView', true);
+        Clear(NewWaiterPadActionParams);
+        NewWaiterPadActionParams.Add('parameters', NewWaiterPadActionParamsJT.AsObject());
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionRVSelectTable.js###
-'let main=async({workflow:e,parameters:a,context:t})=>{await e.respond("SelectWaiterPad")?await e.run("RV_GET_WAITER_PAD",{parameters:{WaiterPadCode:t.waiterPadNo}}):await e.run("RV_NEW_WAITER_PAD",{parameters:{SeatingCode:a.SeatingCode,SwitchToSaleView:!0}})};'
+'let main=async({workflow:a,context:e})=>{await a.respond("SelectWaiterPad")?await a.run("RV_GET_WAITER_PAD",{parameters:{WaiterPadCode:e.waiterPadNo}}):await a.run(e.newWaiterPadActionCode,e.newWaiterPadActionParams)};'
         );
     end;
 }
