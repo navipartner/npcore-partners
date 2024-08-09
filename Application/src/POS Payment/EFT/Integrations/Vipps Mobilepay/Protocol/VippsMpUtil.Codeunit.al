@@ -143,12 +143,17 @@ codeunit 6184710 "NPR Vipps Mp Util"
         exit(Format(Guid).Replace('{', '').Replace('}', ''));
     end;
 
-    internal procedure IntegerAmountToDecimal(IntAmount: Integer): Decimal
+    internal procedure IntegerAmountToDecimalAmount(IntAmount: Integer): Decimal
     var
         Dec: Decimal;
     begin
         Dec := IntAmount / 100;
         Exit(Dec);
+    end;
+
+    internal procedure DecimalAmountToIntegerAmount(OrgAmount: Decimal) Int: Integer
+    begin
+        Evaluate(Int, Format(OrgAmount, 0, '<Precision,2:3><Sign><Integer><Decimals><Comma,.>').Replace('.', ''));
     end;
 
     internal procedure EventNameValue(WebhookEvent: Enum "NPR Vipps Mp WebhookEvents"): Text

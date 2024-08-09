@@ -159,8 +159,13 @@ codeunit 6184692 "NPR Vipps Mp Integration"
             Message(StrSubstNo(ErrLbl, GetLastErrorText()));
             EftTransactionRequest."Result Description" := 'LOOKUP FAILED';
             OldEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+#pragma warning disable AA0139
+            EftTransactionRequest."Client Error" := CopyStr(GetLastErrorText(), 1, 250);
+#pragma warning restore AA0139
+            OldEFTTransactionRequest."POS Description" := 'Vipps Mobilepay: Not Found';
             OldEFTTransactionRequest.Recoverable := false;
             OldEFTTransactionRequest.Modify();
+            EFTInterface.EftIntegrationResponse(OldEFTTransactionRequest);
             EFTInterface.EftIntegrationResponse(EftTransactionRequest);
             VippsMpLog.Log(Enum::"NPR Vipps Mp Log Lvl"::Error, EftTransactionRequest, 'Lookup Failed', LookupContent);
         end;
