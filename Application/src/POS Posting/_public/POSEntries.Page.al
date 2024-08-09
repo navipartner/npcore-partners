@@ -260,7 +260,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                Visible = IsMobileClient;
                 ToolTip = 'Open a card view to examine the entry details';
                 ApplicationArea = NPRRetail;
 
@@ -271,7 +270,7 @@
                 begin
                     NPRPOSEntry.SetRange("Entry No.", Rec."Entry No.");
                     NPRPOSEntryCard.SetTableView(NPRPOSEntry);
-                    NPRPOSEntryCard.Runmodal();
+                    NPRPOSEntryCard.RunModal();
                 end;
 
             }
@@ -451,12 +450,5 @@
             }
         }
     }
-    trigger OnOpenPage()
-    begin
-        IsMobileClient := CurrentClientType = ClientType::Phone;
-    end;
-
-    var
-        IsMobileClient: Boolean;
 }
 
