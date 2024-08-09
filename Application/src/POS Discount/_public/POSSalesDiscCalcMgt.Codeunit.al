@@ -293,6 +293,8 @@
             exit;
         if SaleLinePOS."Benefit Item" then
             exit(false);
+        if SaleLinePOS."Shipment Fee" then
+            exit(false);
 
         exit(true);
     end;
@@ -393,6 +395,7 @@
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         if SaleLinePOS.FindSet() then
             repeat
                 SaleLinePOS.TestField("Price Includes VAT", SalePOS."Prices Including VAT");

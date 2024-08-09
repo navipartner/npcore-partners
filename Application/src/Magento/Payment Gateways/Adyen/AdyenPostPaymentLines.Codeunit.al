@@ -8,7 +8,7 @@ codeunit 6184929 "NPR Adyen Post Payment Lines"
     begin
         if not PayByLinkSetup.Get() then
             exit;
-        
+
         if not PayByLinkSetup."Enable Pay by Link" then
             exit;
 

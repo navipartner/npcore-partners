@@ -433,6 +433,11 @@
                     ToolTip = 'Specifies the date of Reconciling current EFT Transaction Request.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Manual Capture"; Rec."Manual Capture")
+                {
+                    ToolTip = 'Specifies the value of the Manual Capture field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(factboxes)

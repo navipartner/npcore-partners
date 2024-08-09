@@ -284,6 +284,7 @@ codeunit 6151077 "NPR Total Discount Management"
                 begin
                     TempCalcTotalDiscountSaleLinePOS.Reset();
                     TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                    TempCalcTotalDiscountSaleLinePOS.SetRange("Shipment Fee", false);
                     CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, true);
                 end;
             NPRTotalDiscountHeader."Step Amount Calculation"::"Discount Filters":
@@ -299,12 +300,14 @@ codeunit 6151077 "NPR Total Discount Management"
                     if not NPRTotalDiscountLine.IsEmpty then begin
                         TempCalcTotalDiscountSaleLinePOS.Reset();
                         TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                        TempCalcTotalDiscountSaleLinePOS.SetRange("Shipment Fee", false);
                         CopySaleLinesPOS(TempCalcTotalDiscountSaleLinePOS, TempTotalDiscountSaleLinePOS, true);
                         exit;
                     end;
 
                     TempCalcTotalDiscountSaleLinePOS.Reset();
                     TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                    TempCalcTotalDiscountSaleLinePOS.SetRange("Shipment Fee", false);
                     if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
                         repeat
                             NPRTotalDiscountLine.Reset();
@@ -377,6 +380,7 @@ codeunit 6151077 "NPR Total Discount Management"
 
                     TempCalcTotalDiscountSaleLinePOS.Reset();
                     TempCalcTotalDiscountSaleLinePOS.SetRange("Benefit Item", false);
+                    TempCalcTotalDiscountSaleLinePOS.SetRange("Shipment Fee", false);
                     if TempCalcTotalDiscountSaleLinePOS.FindSet(false) then
                         repeat
                             NPRTotalDiscountLine.Reset();
@@ -736,11 +740,13 @@ codeunit 6151077 "NPR Total Discount Management"
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter("Total Discount Code", '<>%1', '');
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         SaleLinePOS.SetLoadFields("Register No.",
                                   "Sales Ticket No.",
                                   "Line Type",
                                   "Total Discount Code",
                                   "Benefit Item",
+                                  "Shipment Fee",
                                   "Total Discount Step");
 
         if not SaleLinePOS.FindFirst() then
@@ -1269,6 +1275,7 @@ codeunit 6151077 "NPR Total Discount Management"
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetFilter(Quantity, '>%1', 0);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         if not SaleLinePOS.FindSet(false) then
             exit;
 

@@ -50,6 +50,11 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    begin
+        FrontEnd.WorkflowResponse(ProcessRequest(Context, Sale));
+    end;
+
+    local procedure ProcessRequest(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject;
     var
         SalePOS: Record "NPR POS Sale";
         PosActionBusinessLogic: Codeunit "NPR POS Action: Cust. Select-B";
@@ -60,7 +65,7 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         SpecificCustomerNo: Text;
         CustomerOverdueCheck: Boolean;
         SelectReq: Boolean;
-
+        Success: Boolean;
     begin
         CustomerTableView := Context.GetStringParameter(ParameterCustomerTableView_Name());
         CustomerLookupPage := Context.GetIntegerParameter(ParameterCustomerLookupPage_Name());
@@ -74,13 +79,15 @@ codeunit 6150865 "NPR POS Action: Cust. Select" implements "NPR IPOS Workflow"
         case Operation of
             Operation::Attach:
                 If SelectReq then
-                    PosActionBusinessLogic.AttachCustomerRequired(SalePOS)
+                    Success := PosActionBusinessLogic.AttachCustomerRequired(SalePOS)
                 else
-                    PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo, CustomerOverdueCheck);
+                    Success := PosActionBusinessLogic.AttachCustomer(SalePOS, CustomerTableView, CustomerLookupPage, SpecificCustomerNo, CustomerOverdueCheck);
             Operation::Remove:
-                PosActionBusinessLogic.RemoveCustomer(SalePOS);
+                Success := PosActionBusinessLogic.RemoveCustomer(SalePOS);
         end;
         HtmlDisplay.UpdateHTMLDisplay();
+
+        Response.Add('success', Success);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnLookupValue', '', false, false)]

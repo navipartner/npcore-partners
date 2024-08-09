@@ -2,7 +2,7 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
 {
     Access = Internal;
 
-    procedure AttachCustomer(var SalePOS: Record "NPR POS Sale"; CustomerTableView: Text; CustomerLookupPage: Integer; SpecificCustomerNo: Text; CustomerOverdueCheck: Boolean)
+    procedure AttachCustomer(var SalePOS: Record "NPR POS Sale"; CustomerTableView: Text; CustomerLookupPage: Integer; SpecificCustomerNo: Text; CustomerOverdueCheck: Boolean) Success: Boolean;
     var
         Customer: Record Customer;
         CustomerCreditWarningLbl: Label 'The customer has overdue balance of %1. Do you want to continue?';
@@ -24,11 +24,12 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
 
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
+        Success := true;
 
-        OnAfterAttachCustomer(SalePOS);
+        OnAfterAttachCustomer(SalePOS, Success);
     end;
 
-    procedure AttachCustomerRequired(SalePOS: Record "NPR POS Sale")
+    procedure AttachCustomerRequired(SalePOS: Record "NPR POS Sale") Success: Boolean
     var
         Customer: Record Customer;
         PrevRec: Text;
@@ -50,14 +51,17 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
         if PrevRec <> Format(SalePOS) then
             SalePOS.Modify(true);
 
-        OnAfterAttachCustomer(SalePOS);
+        Success := true;
+        OnAfterAttachCustomer(SalePOS, Success);
     end;
 
 
-    procedure RemoveCustomer(var SalePOS: Record "NPR POS Sale")
+    procedure RemoveCustomer(var SalePOS: Record "NPR POS Sale") Success: Boolean;
     begin
         SalePOS.Validate("Customer No.", '');
         SalePOS.Modify(true);
+
+        Success := true;
     end;
 
     local procedure CheckCustomerBalanceOverDue(CustNo: code[20]; var BalanceAmount: Decimal): Boolean
@@ -72,7 +76,7 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAttachCustomer(SaleHeader: Record "NPR POS Sale")
+    local procedure OnAfterAttachCustomer(SaleHeader: Record "NPR POS Sale"; Success: Boolean)
     begin
     end;
 }

@@ -198,14 +198,14 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
         {
             group("NPR PayByLink")
             {
-                Caption = 'Pay by Link';
+                Caption = 'Payments';
                 Image = Payment;
                 action("NPR Payment Lines")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Payment Lines';
                     Image = PaymentHistory;
-                    ToolTip = 'View Pay by Link Payment Lines';
+                    ToolTip = 'View Payment Lines';
 
                     trigger OnAction()
                     begin
@@ -213,6 +213,7 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
                     end;
                 }
             }
+
         }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         addlast("&Cr. Memo")

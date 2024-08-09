@@ -31,8 +31,8 @@ const main = async ({ workflow, popup, parameters, context }) => {
       caption: amountPrompt,
       value: remainingAmount,
     });
-    if (suggestedAmount === null) return; // user cancelled dialog
-    if (suggestedAmount == 0 && remainingAmount > 0) return; // user paid 0 with remaining amount
+    if (suggestedAmount === null) return {}; // user cancelled dialog
+    if (suggestedAmount == 0 && remainingAmount > 0) return {}; // user paid 0 with remaining amount
   }
 
   if (suggestedAmount == 0 && remainingAmount == 0) {
@@ -42,7 +42,7 @@ const main = async ({ workflow, popup, parameters, context }) => {
         paymentNo: parameters.paymentNo,
       },
     });
-    return;
+    return {};
   }
 
   const paymentResult = await workflow.run(dispatchToWorkflow, {
@@ -56,7 +56,7 @@ const main = async ({ workflow, popup, parameters, context }) => {
   if (paymentResult.legacy) {
     context.fallbackAmount = suggestedAmount;
     await workflow.respond("doLegacyPaymentWorkflow");
-  } else if (paymentResult.tryEndSale) {
+  } else if (paymentResult.tryEndSale && parameters.tryEndSale) {
     await workflow.run("END_SALE", {
       parameters: {
         calledFromWorkflow: "PAYMENT_2",
@@ -64,4 +64,6 @@ const main = async ({ workflow, popup, parameters, context }) => {
       },
     });
   }
+
+  return { success: paymentResult.success };
 };

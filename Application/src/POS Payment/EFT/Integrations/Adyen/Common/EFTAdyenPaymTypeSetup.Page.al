@@ -35,6 +35,12 @@
                     ToolTip = 'Specifies the value of the Capture Delay Hours field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Manual Capture"; Rec."Manual Capture")
+                {
+
+                    ToolTip = 'Specifies the value of the Manual Capture field.';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Cashback Allowed"; Rec."Cashback Allowed")
                 {
 

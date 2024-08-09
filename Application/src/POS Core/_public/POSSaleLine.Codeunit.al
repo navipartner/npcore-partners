@@ -211,7 +211,7 @@
                 if Line."Discount %" > 0 then
                     Rec.Validate("Discount %", Line."Discount %");
         end;
-        if not Line."Benefit Item" then
+        if (not Line."Benefit Item") and (not Line."Shipment Fee") then
             if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
                 ConvertPriceToVAT(Line."Price Includes VAT", Line."VAT Bus. Posting Group", Line."VAT Prod. Posting Group", Rec, Line."Unit Price")
             else
@@ -223,7 +223,7 @@
                     end;
                     ConvertPriceToVAT(Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group", Rec, Line."Unit Price");
                 end;
-        if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" or Line."Benefit Item" then
+        if (Line."Unit Price" <> 0) or Line."Manual Item Sales Price" or Line."Benefit Item" or Line."Shipment Fee" then
             Rec.Validate("Unit Price", Line."Unit Price");
 
         if Line."Serial No." <> '' then
@@ -237,6 +237,10 @@
         Rec."Total Discount Code" := Line."Total Discount Code";
         Rec."Total Discount Step" := Line."Total Discount Step";
         Rec."Benefit List Code" := Line."Benefit List Code";
+
+        Rec."Shipment Fee" := Line."Shipment Fee";
+        Rec."Store Ship Profile Code" := Line."Store Ship Profile Code";
+        Rec."Store Ship Profile Line No." := Line."Store Ship Profile Line No.";
         Rec.Indentation := Line.Indentation;
 
         Return := InsertLineInternal(Rec, true);
@@ -619,7 +623,7 @@
             TempItemVariantBuffer.DeleteAll();
 
         while ItemVariantsQuery.Read() do begin
-            if not TempItemVariantBuffer.Get(ItemVariantsQuery.Code,ItemNo,ItemVariantsQuery.Lot_No_) then begin
+            if not TempItemVariantBuffer.Get(ItemVariantsQuery.Code, ItemNo, ItemVariantsQuery.Lot_No_) then begin
                 TempItemVariantBuffer.Init();
                 TempItemVariantBuffer.Code := ItemVariantsQuery.Code;
                 TempItemVariantBuffer.Description := ItemVariantsQuery.Description;

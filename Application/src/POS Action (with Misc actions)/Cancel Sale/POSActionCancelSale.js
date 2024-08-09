@@ -1,10 +1,13 @@
-let main = async ({workflow,captions,popup}) => {
+const main = async ({ workflow, captions, popup, parameters }) => {
+  if (!parameters.silent)
+    if (
+      !(await popup.confirm({
+        title: captions.title,
+        caption: captions.prompt,
+      }))
+    )
+      return " ";
 
-    if (await popup.confirm({title: captions.title, caption: captions.prompt})) {
-    
-        await workflow.respond("CheckSaleBeforeCancel");
-        await workflow.respond("CancelSale");
-    }
-    else
-        return(" ");      
-    };
+  await workflow.respond("CheckSaleBeforeCancel");
+  await workflow.respond("CancelSale");
+};

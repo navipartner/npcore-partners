@@ -331,6 +331,7 @@ codeunit 6060004 "NPR POSAction Issue DC OnSaleB"
             SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             SaleLinePOS.SetRange("Benefit Item", false);
+            SaleLinePOS.SetRange("Shipment Fee", false);
             SaleLinePOS2DiscBuffer(SaleLinePOS, NpDcItemBuffer);
             exit;
         end;
@@ -343,6 +344,7 @@ codeunit 6060004 "NPR POSAction Issue DC OnSaleB"
             SaleLinePOS.SetFilter("Variant Code", NpDcIssueOnSaleSetupLine."Variant Code");
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             SaleLinePOS.SetRange("Benefit Item", false);
+            SaleLinePOS.SetRange("Shipment Fee", false);
             case NpDcIssueOnSaleSetupLine.Type of
                 NpDcIssueOnSaleSetupLine.Type::Item:
                     SaleLinePOS.SetRange("No.", NpDcIssueOnSaleSetupLine."No.");

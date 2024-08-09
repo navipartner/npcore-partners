@@ -228,15 +228,14 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
         {
             group("NPR PayByLink")
             {
-                Caption = 'Pay by Link';
+                Caption = 'Payments';
                 Image = Payment;
                 action("NPR Payment Lines")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Payment Lines';
                     Image = PaymentHistory;
-                    ToolTip = 'View Pay by Link Payment Lines';
-
+                    ToolTip = 'View Payment Lines';
                     trigger OnAction()
                     begin
                         Rec.OpenMagentPaymentLines();

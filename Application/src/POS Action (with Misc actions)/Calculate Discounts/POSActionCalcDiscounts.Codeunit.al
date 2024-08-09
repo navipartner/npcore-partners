@@ -328,8 +328,12 @@ codeunit 6151310 "NPR POS Action: Calc Discounts" implements "NPR IPOS Workflow"
         ActionParameters: JsonObject;
         TotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
+        if Context.GetBooleanParameter('POSPaymentReservation') then
+            exit;
+
         if not TotalDiscountManagement.ActiveTotalDiscountsExist(Today) then
             exit;
+
         ActionParameters.Add('calculateLineDiscounst', false);
         ActionParameters.Add('calculateTotalDiscounst', true);
         ActionParameters.Add('handleBenefitItems', true);

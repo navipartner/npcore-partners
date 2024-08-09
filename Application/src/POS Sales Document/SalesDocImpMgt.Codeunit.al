@@ -127,6 +127,9 @@
         SaleLinePOS."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
         SaleLinePOS."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
         SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
+        SaleLinePOS."Shipment Fee" := SalesLine."NPR Shipment Fee";
+        SaleLinePOS."Store Ship Profile Code" := SalesLine."NPR Store Ship Profile Code";
+         SaleLinePOS."Store Ship Profile Line No." := SalesLine."NPR Store Ship Prof. Line No.";
         SalesDocImptMgtPublic.OnAfterTransferFromSaleLineToSaleLinePOS(SaleLinePOS, SalesLine);
     end;
 
@@ -195,6 +198,13 @@
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         PaymentAmount: Decimal;
+    begin
+        PaymentAmount := GetTotalAmountToBeInvoiced(SalesHeader);
+        SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, SalePostingIn, PaymentAmount);
+    end;
+
+    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post"; PaymentAmount: Decimal)
+    var
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
@@ -217,7 +227,7 @@
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();
         end;
-        PaymentAmount := GetTotalAmountToBeInvoiced(SalesHeader);
+
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SalesHeader.Invoice := Invoice;
         SalesHeader.Ship := Ship;

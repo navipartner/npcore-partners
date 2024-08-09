@@ -7,11 +7,14 @@ codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
         ActionDescriptionLbl: Label 'Cancel Sale';
         TitleLbl: Label 'Cancel Sale';
         PromptLbl: Label 'Are you sure you want to cancel this sales? All lines will be deleted.';
+        CaptionSilent: Label 'Silent';
+        DescSilent: Label 'Disables the confirmation prompt.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
         WorkflowConfig.AddLabel('title', TitleLbl);
         WorkflowConfig.AddLabel('prompt', PromptLbl);
+        WorkflowConfig.AddBooleanParameter('silent', false, CaptionSilent, DescSilent);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -49,7 +52,7 @@ codeunit 6150797 "NPR POSAction: Cancel Sale" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionCancelSale.js###
-'let main=async({workflow:e,captions:a,popup:t})=>{if(await t.confirm({title:a.title,caption:a.prompt}))await e.respond("CheckSaleBeforeCancel"),await e.respond("CancelSale");else return" "};'
+'const main=async({workflow:e,captions:a,popup:t,parameters:i})=>{if(!i.silent&&!await t.confirm({title:a.title,caption:a.prompt}))return" ";await e.respond("CheckSaleBeforeCancel"),await e.respond("CancelSale")};'
         );
     end;
 }

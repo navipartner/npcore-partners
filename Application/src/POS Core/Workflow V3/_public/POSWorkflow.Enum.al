@@ -1026,6 +1026,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SEND_SMS_RECEIPT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: Send SMS Rcpt";
     }
+    value(300; "EFT_RESERVE_DOC_PAY")
+    {
+        Caption = 'EFT_RESERVE_DOC_PAY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Act EFT Doc Pay Rsrv";
+    }
+    value(310; "SELECT_SHIP_METHOD")
+    {
+        Caption = 'SELECT_SHIP_METHOD', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Sel Ship Method";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;

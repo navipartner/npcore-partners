@@ -351,6 +351,12 @@
 
             end;
         }
+        field(880; "POS Shipment Profile"; Code[20])
+        {
+            Caption = 'POS Shipment Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Store Ship. Profile Header".Code;
+        }
         field(5700; "Responsibility Center"; Code[10])
         {
             Caption = 'Responsibility Center';

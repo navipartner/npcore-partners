@@ -158,7 +158,7 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionEndSale.js###
-'let main=async({workflow:e,popup:o,scope:t,parameters:a,context:r,runtime:s,data:f})=>{debugger;const{preWorkflows:n,postWorkflows:i}=await e.respond("endSaleWithPreWorkflows");if(n){await processWorkflows(n);const{postWorkflows:w}=await e.respond("endSaleWithoutPreWorkflows");await processWorkflows(w)}else await processWorkflows(i)};async function processWorkflows(e){if(e)for(const o of Object.entries(e)){let[t,a]=o;if(t){let{mainParameters:r,customParameters:s}=a;await workflow.run(t,{context:{customParameters:s},parameters:r})}}}'
+'const main=async({workflow:a})=>{let e,o;({preWorkflows:o,postWorkflows:e}=await a.respond("endSaleWithPreWorkflows")),o&&(await processWorkflows(o),{postWorkflows:e}=await a.respond("endSaleWithoutPreWorkflows")),await processWorkflows(e)};async function processWorkflows(a){if(a)for(const[e,{mainParameters:o,customParameters:r}]of Object.entries(a))await workflow.run(e,{context:{customParameters:r},parameters:o})}'
         )
     end;
 }

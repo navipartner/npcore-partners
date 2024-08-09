@@ -314,16 +314,14 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
         {
             group("NPR PayByLink Navigation")
             {
-                Caption = 'Pay by Link';
+                Caption = 'Payments';
                 Image = Payment;
                 action("NPR Payment Lines")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Payment Lines';
                     Image = PaymentHistory;
-                    ToolTip = 'View Pay by Link Payment Lines';
-
-
+                    ToolTip = 'View Payment Lines';
                     trigger OnAction()
                     var
                         MagentoPaymentLine: Record "NPR Magento Payment Line";
