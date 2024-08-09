@@ -79,7 +79,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
             NivelationLines.Validate("Item No.", TempNivSalesCrMemoLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
-            NivelationLines.Quantity := TempNivSalesCrMemoLines.Quantity;
+            NivelationLines.Quantity := -Abs(TempNivSalesCrMemoLines.Quantity);
             NivelationLines.Validate("New Price", TempNivSalesCrMemoLines.GetLineAmountInclVAT() / TempNivSalesCrMemoLines.Quantity);
             NivelationLines.Insert(true);
             LineNo += 10000;
@@ -578,6 +578,8 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal)
     var
         CalculationValueEntryDescLbl: Label 'Calculation';
+        DiscountPerUnit: Decimal;
+        SumOfStdCostPerUnit: Decimal;
     begin
         Clear(RetailValueEntry);
         RetailValueEntry.Init();
@@ -586,10 +588,12 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
 
-        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit" - StdCorrectionValueEntry."Cost per Unit" - SumOfCOGSCostPerUnit;
+        DiscountPerUnit := Abs(TempSalesCrMemoLine."Line Discount Amount" / TempSalesCrMemoLine.Quantity);
+        SumOfStdCostPerUnit := StdValueEntry."Cost per Unit" + StdCorrectionValueEntry."Cost per Unit" + SumOfCOGSCostPerUnit;
+        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfStdCostPerUnit - DiscountPerUnit;
 
         if PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity") <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then
-            RetailValueEntry."Cost Amount (Actual)" := Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) - SumOfCOGSCostAmtAct);
+            RetailValueEntry."Cost Amount (Actual)" := Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) - SumOfCOGSCostAmtAct - Abs(TempSalesCrMemoLine."Line Discount Amount"));
 
         if PriceListLine."Unit Price" * Abs(StdValueEntry."Invoiced Quantity") <> StdValueEntry."Sales Amount (Actual)" then
             RetailValueEntry."Sales Amount (Actual)" := -CalculateRSGLVATAmount();
@@ -662,11 +666,11 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
+    var
+        CalculatedLineAmount: Decimal;
     begin
-        if TempSalesCrMemoLine."Line Discount %" <> 0 then
-            exit(-(Abs(TempSalesCrMemoLine.GetLineAmountInclVAT() * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesCrMemoLine."VAT Bus. Posting Group", TempSalesCrMemoLine."VAT Prod. Posting Group"))))
-        else
-            exit(Abs((PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesCrMemoLine."VAT Bus. Posting Group", TempSalesCrMemoLine."VAT Prod. Posting Group")))
+        CalculatedLineAmount := (PriceListLine."Unit Price" * TempSalesCrMemoLine.Quantity) - TempSalesCrMemoLine."Line Discount Amount";
+        exit(CalculatedLineAmount * RSRLocalizationMgt.CalculateVATBreakDown(TempSalesCrMemoLine."VAT Bus. Posting Group", TempSalesCrMemoLine."VAT Prod. Posting Group"));
     end;
 
     local procedure CalculateRSGLMarginNoVATAmount(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal

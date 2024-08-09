@@ -81,7 +81,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             FindPriceListLine(TempNivelationSalesLines."Location Code", TempNivelationSalesLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines."Posting Date" := POSEntry."Posting Date";
-            NivelationLines.Validate("New Price", Abs(TempNivelationSalesLines."Unit Price") - Abs(TempNivelationSalesLines."Line Discount Amount Incl. VAT"));
+            NivelationLines.Validate("New Price", TempNivelationSalesLines."Amount Incl. VAT" / TempNivelationSalesLines.Quantity);
             if VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", TempNivelationSalesLines."VAT Prod. Posting Group") then
                 NivelationLines."VAT %" := VATSetup."VAT %";
             NivelationLines.Insert(true);
@@ -389,17 +389,19 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         if (ReturnDocumentNo <> '') then begin
             InsertReturnAppliedValueEntryAdjust(StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, ReturnDocumentNo);
-            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, true);
+            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, POSEntry, true);
         end
         else begin
             InsertAppliedValueEntryAdj(StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry);
-            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, false);
+            InsertRetailValueEntry(RetailValueEntry, StdValueEntry, StdCorrectionValueEntry, SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, POSEntry, false);
         end;
     end;
 
-    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal; IsReturnEntry: Boolean)
+    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal; POSEntry: Record "NPR POS Entry"; IsReturnEntry: Boolean)
     var
         CalculationValueEntryDescLbl: Label 'Calculation';
+        DiscountPerUnit: Decimal;
+        SumOfStdCostPerUnit: Decimal;
     begin
         Clear(RetailValueEntry);
         RetailValueEntry.Init();
@@ -408,18 +410,20 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
 
-        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - StdValueEntry."Cost per Unit" - SumOfCOGSCostPerUnit - StdCorrectionValueEntry."Cost per Unit";
+        SumOfStdCostPerUnit := StdValueEntry."Cost per Unit" + SumOfCOGSCostPerUnit + StdCorrectionValueEntry."Cost per Unit";
+        DiscountPerUnit := Abs(TempPOSEntrySalesLines."Line Discount Amount Incl. VAT" / TempPOSEntrySalesLines.Quantity);
+        RetailValueEntry."Cost per Unit" := GetUnitPriceInclVAT(POSEntry) - SumOfStdCostPerUnit - DiscountPerUnit;
 
         if (PriceListLine."Unit Price" * TempPOSEntrySalesLines.Quantity) <> (StdValueEntry."Cost Amount (Actual)" + StdCorrectionValueEntry."Cost Amount (Actual)" + SumOfCOGSCostAmtAct) then
-            RetailValueEntry."Cost Amount (Actual)" := (PriceListLine."Unit Price" * Abs(TempPOSEntrySalesLines.Quantity)) - SumOfCOGSCostAmtAct;
+            RetailValueEntry."Cost Amount (Actual)" := (GetUnitPriceInclVAT(POSEntry) * Abs(TempPOSEntrySalesLines.Quantity)) - SumOfCOGSCostAmtAct - Abs(TempPOSEntrySalesLines."Line Discount Amount Incl. VAT");
 
         if Abs(PriceListLine."Unit Price" * TempPOSEntrySalesLines.Quantity) <> Abs(StdValueEntry."Sales Amount (Actual)") then
-            RetailValueEntry."Sales Amount (Actual)" := CalculateRSGLVATAmount();
+            RetailValueEntry."Sales Amount (Actual)" := CalculateRSGLVATAmount(POSEntry);
 
         if IsReturnEntry then
             RetailValueEntry."Sales Amount (Actual)" := -RetailValueEntry."Sales Amount (Actual)"
         else
-            RetailValueEntry."Cost Amount (Actual)" := -(RetailValueEntry."Cost Amount (Actual)");
+            RetailValueEntry."Cost Amount (Actual)" := -RetailValueEntry."Cost Amount (Actual)";
 
         RetailValueEntry."Cost Posted to G/L" := RetailValueEntry."Cost Amount (Actual)";
         if (RetailValueEntry."Cost Amount (Actual)" = 0) and (RetailValueEntry."Sales Amount (Actual)" = 0) then
@@ -430,6 +434,14 @@ codeunit 6151363 "NPR RS POS GL Addition"
         RetailValueEntry.Insert();
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(RetailValueEntry);
+    end;
+
+    local procedure GetUnitPriceInclVAT(POSEntry: Record "NPR POS Entry"): Decimal
+    begin
+        if POSEntry."Prices Including VAT" then
+            exit(PriceListLine."Unit Price")
+        else
+            exit(PriceListLine."Unit Price" * (100 + TempPOSEntrySalesLines."VAT %") / 100);
     end;
 
     local procedure InsertAppliedValueEntryAdj(var StdCorrectionValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; StdValueEntry: Record "Value Entry")
@@ -773,13 +785,14 @@ codeunit 6151363 "NPR RS POS GL Addition"
         end;
     end;
 
-    local procedure CalculateRSGLVATAmount(): Decimal
+    local procedure CalculateRSGLVATAmount(POSEntry: Record "NPR POS Entry"): Decimal
+    var
+        CalculatedLineAmount: Decimal;
     begin
-        if TempPOSEntrySalesLines."Line Discount %" <> 0 then
-            exit(Abs(TempPOSEntrySalesLines."Amount Incl. VAT") * RSRLocalizationMgt.CalculateVATBreakDown(TempPOSEntrySalesLines."VAT Bus. Posting Group", TempPOSEntrySalesLines."VAT Prod. Posting Group"))
-        else
-            exit((PriceListLine."Unit Price" * Abs(TempPOSEntrySalesLines.Quantity)) * RSRLocalizationMgt.CalculateVATBreakDown(TempPOSEntrySalesLines."VAT Bus. Posting Group", TempPOSEntrySalesLines."VAT Prod. Posting Group"));
+        CalculatedLineAmount := Abs((GetUnitPriceInclVAT(POSEntry) * Abs(TempPOSEntrySalesLines.Quantity)) - Abs(TempPOSEntrySalesLines."Line Discount Amount Incl. VAT"));
+        exit(CalculatedLineAmount * RSRLocalizationMgt.CalculateVATBreakDown(TempPOSEntrySalesLines."VAT Bus. Posting Group", TempPOSEntrySalesLines."VAT Prod. Posting Group"))
     end;
+
     #endregion
 
     #region Helper Procedures
