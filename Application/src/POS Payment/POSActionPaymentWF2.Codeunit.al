@@ -12,12 +12,15 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         PaymentMethodCodeName: Label 'Payment Method Code';
         SwitchToPaymentViewName: Label 'Switch to Payment View';
         SwitchToPaymentViewDesc: Label 'Automatically switch to Payment view, when the POS action is run from Sale view';
+        EndSaleName: Label 'Try End Sale';
+        EndSaleNameDesc: Label 'Try to end the sale after the payment is processed.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddBooleanParameter('HideAmountDialog', false, HideAmountName, HideAmountDesc);
         WorkflowConfig.AddBooleanParameter('HideZeroAmountDialog', false, HideZeroAmountName, HideZeroAmountDesc);
         WorkflowConfig.AddBooleanParameter('SwitchToPaymentView', false, SwitchToPaymentViewName, SwitchToPaymentViewDesc);
+        WorkflowConfig.AddBooleanParameter('tryEndSale', true, EndSaleName, EndSaleNameDesc);
         WorkflowConfig.AddTextParameter('paymentNo', '', PaymentMethodCodeName, PaymentMethodCodeName);
     end;
 
@@ -158,7 +161,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'const main=async({workflow:e,popup:m,parameters:n,context:p})=>{const{HideAmountDialog:s,HideZeroAmountDialog:l}=n,{preWorkflows:o}=await e.respond("preparePreWorkflows");if(o)for(const d of Object.entries(o)){const[i,A]=d;i&&await e.run(i,{parameters:A})}const{dispatchToWorkflow:u,paymentType:c,remainingAmount:t,paymentDescription:y,amountPrompt:f}=await e.respond("preparePaymentWorkflow");let a=t;if(!s&&(!l||t>0)&&(a=await m.numpad({title:y,caption:f,value:t}),a===null||a==0&&t>0))return;if(a==0&&t==0){await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}});return}const r=await e.run(u,{context:{paymentType:c,suggestedAmount:a,remainingAmount:t}});r.legacy?(p.fallbackAmount=a,await e.respond("doLegacyPaymentWorkflow")):r.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}})};'
+'const main=async({workflow:e,popup:s,parameters:n,context:m})=>{const{HideAmountDialog:p,HideZeroAmountDialog:u}=n,{preWorkflows:r}=await e.respond("preparePreWorkflows");if(r)for(const d of Object.entries(r)){const[i,A]=d;i&&await e.run(i,{parameters:A})}const{dispatchToWorkflow:c,paymentType:l,remainingAmount:t,paymentDescription:y,amountPrompt:f}=await e.respond("preparePaymentWorkflow");let a=t;if(!p&&(!u||t>0)){if(a=await s.numpad({title:y,caption:f,value:t}),a===null)return{};if(a==0&&t>0)return{}}if(a==0&&t==0)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{};const o=await e.run(c,{context:{paymentType:l,suggestedAmount:a,remainingAmount:t}});return o.legacy?(m.fallbackAmount=a,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&n.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{success:o.success}};'
         );
     end;
 }

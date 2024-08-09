@@ -417,6 +417,21 @@
         PaymentLine.Amount += AdjustmentAmt;
         PaymentLine.Modify();
     end;
+
+    internal procedure GetMagentoPaymentLineLastLineNo(TableNo: Integer; SalesDocumentType: Enum "Sales Document Type"; SalesDocumentNo: Code[20]) LastLineNo: Integer;
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Document Table No.", TableNo);
+        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLine.SetRange("Document No.", SalesDocumentNo);
+        MagentoPaymentLine.SetLoadFields("Document Table No.", "Document Type", "Document Table No.", "Line No.");
+        if not MagentoPaymentLine.FindLast() then
+            exit;
+
+        LastLineNo := MagentoPaymentLine."Line No."
+    end;
     #endregion
 
     #region Sales Doc posting

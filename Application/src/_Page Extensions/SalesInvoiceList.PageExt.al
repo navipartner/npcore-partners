@@ -37,17 +37,15 @@ pageextension 6014526 "NPR Sales Invoice List" extends "Sales Invoice List"
         {
             group("NPR PayByLink Navigation")
             {
-                Caption = 'Pay by Link';
+                Caption = 'Payments';
                 Image = Payment;
-                ToolTip = 'Pay by Link';
-
+                ToolTip = 'Payments';
                 action("NPR Payment Lines")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Payment Lines';
                     Image = PaymentHistory;
-                    ToolTip = 'View Pay by Link Payment Lines';
-
+                    ToolTip = 'View Payment Lines';
                     trigger OnAction()
                     begin
                         Rec.OpenMagentPaymentLines();
@@ -55,7 +53,6 @@ pageextension 6014526 "NPR Sales Invoice List" extends "Sales Invoice List"
                 }
             }
         }
-
     }
 
 

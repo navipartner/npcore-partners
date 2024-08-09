@@ -34,16 +34,14 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
         {
             group("NPR PayByLink Navigation")
             {
-                Caption = 'Pay by Link';
+                Caption = 'Payments';
                 Image = Payment;
-
                 action("NPR Payment Lines")
                 {
                     ApplicationArea = NPRRetail;
                     Caption = 'Payment Lines';
-                    ToolTip = 'View Pay by Link Payment Lines';
+                    ToolTip = 'View Payment Lines';
                     Image = PaymentHistory;
-
                     trigger OnAction()
                     begin
                         Rec.OpenMagentPaymentLines();

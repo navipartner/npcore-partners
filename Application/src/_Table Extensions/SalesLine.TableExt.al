@@ -189,7 +189,24 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             TableRelation = "NPR Item Benefit List Header".Code;
 
         }
+        field(6059978; "NPR Shipment Fee"; Boolean)
+        {
+            Caption = 'Shipment Fee';
+            DataClassification = CustomerContent;
 
+        }
+        field(6059979; "NPR Store Ship Profile Code"; Code[20])
+        {
+            Caption = 'Store Ship Profile Code';
+            DataClassification = CustomerContent;
+
+        }
+        field(6059980; "NPR Store Ship Prof. Line No."; Integer)
+        {
+            Caption = 'Store Ship Profile Line No.';
+            DataClassification = CustomerContent;
+
+        }
         modify("Location Code")
         {
             trigger OnAfterValidate()

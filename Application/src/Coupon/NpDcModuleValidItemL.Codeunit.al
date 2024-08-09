@@ -145,6 +145,7 @@
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin
@@ -175,6 +176,7 @@
         SaleLinePOS.SetRange(Date, SalePOS.Date);
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
         SaleLinePOS.SetRange("Benefit Item", false);
+        SaleLinePOS.SetRange("Shipment Fee", false);
         case NpDcCouponListItem.Type of
             NpDcCouponListItem.Type::Item:
                 begin

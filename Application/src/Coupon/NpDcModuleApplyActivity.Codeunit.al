@@ -275,6 +275,7 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
             SaleLinePOS.SetRange(Date, SaleLinePOSCoupon."Sale Date");
             SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
             SaleLinePOS.SetRange("Benefit Item", false);
+            SaleLinePOS.SetRange("Shipment Fee", false);
             SaleLinePOS.SetFilter(Quantity, '>%1', 0);
             case CouponListItem.Type of
                 CouponListItem.Type::Item:
@@ -301,6 +302,7 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
                             TempAppliedSaleLinePOS.Reset();
                             TempAppliedSaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::Item);
                             TempAppliedSaleLinePOS.SetRange("Benefit Item", false);
+                            TempAppliedSaleLinePOS.SetRange("Shipment Fee", false);
                             TempAppliedSaleLinePOS.SetRange("No.", SaleLinePOS."No.");
                             TempAppliedSaleLinePOS.SetFilter("Serial No.", SaleLinePOS."Serial No.");
                             CouponCanBeApplied := TempAppliedSaleLinePOS.IsEmpty();
@@ -322,7 +324,7 @@ codeunit 6151609 "NPR Np Dc Module ApplyActivity"
 
     local procedure SetSaleLinePOSLoadFields(var SaleLinePOS: Record "NPR POS Sale Line")
     begin
-        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line Type", "Benefit Item", "No.", "Serial No.", "Item Category Code", "Item Disc. Group", "Magento Brand", Quantity, Amount, "Amount Including VAT", "Unit Price", "Line No.");
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line Type", "Benefit Item", "Shipment Fee", "No.", "Serial No.", "Item Category Code", "Item Disc. Group", "Magento Brand", Quantity, Amount, "Amount Including VAT", "Unit Price", "Line No.");
     end;
 
     local procedure GetPosSalesLinesWithCouponApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; var TempAppliedSaleLinePOS: Record "NPR POS Sale Line" temporary)

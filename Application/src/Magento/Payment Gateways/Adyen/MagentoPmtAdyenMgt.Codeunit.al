@@ -512,7 +512,7 @@
 
     end;
 
-    local procedure GetAmountToPay(FullAmount: Decimal; DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type") AmountToPay: Decimal;
+    internal procedure GetAmountToPay(FullAmount: Decimal; DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type") AmountToPay: Decimal;
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaidAmount: Decimal;
@@ -805,6 +805,50 @@
                     MagentoPaymentLine.Insert(true);
                 end;
         end;
+    end;
+
+    internal procedure CreateMagentoPaymentLineForPOSEFTDocumentRservation(POSPaymentLine: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header"; var MagentoPaymentLine: Record "NPR Magento Payment Line") LineCreated: Boolean
+    var
+        POSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup";
+        EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        LineNo: Integer;
+    begin
+        if POSPaymentLine."Line Type" <> POSPaymentLine."Line Type"::"POS Payment" then
+            exit;
+
+        POSEFTPayReservSetup.Get();
+        EFTPayReservSetupUtils.CheckPaymentServationSetup(POSEFTPayReservSetup);
+
+        EFTTransactionRequest.Reset();
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSPaymentLine."Sales Ticket No.");
+        EFTTransactionRequest.SetRange("Sales Line No.", POSPaymentLine."Line No.");
+        EFTTransactionRequest.SetLoadFields("Sales Ticket No.", "Sales Line No.", "PSP Reference");
+        EFTTransactionRequest.FindFirst();
+
+        LineNo := MagentoPmtMgt.GetMagentoPaymentLineLastLineNo(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") + 10000;
+
+        MagentoPaymentLine.Init();
+        MagentoPaymentLine."Document Table No." := Database::"Sales Header";
+        MagentoPaymentLine."Line No." := LineNo;
+
+        MagentoPaymentLine."Document Type" := SalesHeader."Document Type";
+        MagentoPaymentLine."Document No." := SalesHeader."No.";
+        MagentoPaymentLine."Payment Type" := MagentoPaymentLine."Payment Type"::"Payment Method";
+        MagentoPaymentLine."Posting Date" := SalesHeader."Posting Date";
+        MagentoPaymentLine."External Reference No." := SalesHeader."NPR External Order No.";
+        MagentoPaymentLine."Requested Amount" := POSPaymentLine."Amount Including VAT";
+        MagentoPaymentLine.Amount := POSPaymentLine."Amount Including VAT";
+        MagentoPaymentLine."Date Authorized" := Today;
+        MagentoPaymentLine."Account Type" := POSEFTPayReservSetup."Account Type";
+        MagentoPaymentLine."Account No." := POSEFTPayReservSetup."Account No.";
+        MagentoPaymentLine."Payment Gateway Code" := POSEFTPayReservSetup."Payment Gateway Code";
+        MagentoPaymentLine."Transaction ID" := EFTTransactionRequest."PSP Reference";
+        MagentoPaymentLine.Insert(true);
+
+        LineCreated := true;
     end;
 
     local procedure UpdatePaymentMagentoLine(var MagentoPaymentLine: Record "NPR Magento Payment Line"; var Response: Record "NPR PG Payment Response" temporary; Cancelation: Boolean)

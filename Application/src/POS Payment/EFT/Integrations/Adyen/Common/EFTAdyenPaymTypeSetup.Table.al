@@ -101,6 +101,11 @@
             Caption = 'Local Key Version';
             DataClassification = CustomerContent;
         }
+        field(17; "Manual Capture"; Boolean)
+        {
+            Caption = 'Manual Capture';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
