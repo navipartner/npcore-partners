@@ -479,6 +479,7 @@
             group("NpRv Vouchers")
             {
                 Caption = 'Vouchers';
+                Image = VoucherGroup;
                 action("Voucher Lines")
                 {
                     Caption = 'Voucher Lines';
@@ -516,6 +517,7 @@
             group(EFT)
             {
                 Caption = '&EFT';
+                Image = CreditCard;
                 action("EFT Transaction Requests")
                 {
                     Caption = 'EFT Transaction Requests';
