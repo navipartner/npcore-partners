@@ -16,6 +16,7 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         Request.Add('customerInteraction', CustomerInteraction(true));
         Request.Add('reference', EftTransactionRequest."Reference Number Input");
         Request.Add('userFlow', 'PUSH_MESSAGE');
+        Request.Add('receipt', ReceiptContent());
         Request.Add('paymentDescription', StrSubstNo(LblPurchaseDesc, EftTransactionRequest."Register No."));
         VippsMpUnitSetup.Get(EftTransactionRequest."Register No.");
         VippsMpStore.Get(VippsMpUnitSetup."Merchant Serial Number");
@@ -160,8 +161,13 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
         ContentHeaders: HttpHeaders;
         HttpResponse: HttpResponseMessage;
         HttpResponseTxt: Text;
+        Json: JsonObject;
+        ContentTxt: Text;
     begin
         VippsMpUtil.InitHttpClient(Http, VippsMpStore, True, IdempotencyKey);
+        Json.Add('cancelTransactionOnly', false);
+        Json.WriteTo(ContentTxt);
+        HttpContent.WriteFrom(ContentTxt);
         HttpContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
@@ -211,16 +217,12 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
 
     local procedure AmountJson(OrgAmount: Decimal; Currency: Text) Json: JsonObject
     var
-        Int: Integer;
-        NewAmount: Decimal;
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
     begin
-        //Move decimalpoints to integer part.
-        NewAmount := OrgAmount * 100;
-        //create integer
-        Evaluate(Int, Format(NewAmount).Replace(',', '').Replace('.', ''));
-        Json.Add('value', Int);
+        Json.Add('value', VippsMpUtil.DecimalAmountToIntegerAmount(OrgAmount));
         Json.Add('currency', Currency);
     end;
+
 
     local procedure CustomerTokenJson(Token: Text) Json: JsonObject
     begin
@@ -237,6 +239,61 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
     local procedure PaymentMethodJson(PayType: Text) Json: JsonObject
     begin
         Json.Add('type', PayType);
+    end;
+
+    procedure ReceiptContent(): JsonObject
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleRec: Record "NPR POS Sale";
+        POSSaleLineRec: Record "NPR POS Sale Line";
+        GLSetup: Record "General Ledger Setup";
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
+        ReceiptContentJson: JsonObject;
+        OrderLines: JsonArray;
+        OrderLine: JsonObject;
+        UnitInfo: JsonObject;
+        BottomLine: JsonObject;
+        TaxInt: Integer;
+    begin
+        if not POSSession.IsInitialized() then
+            exit;
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(POSSaleRec);
+        if (POSSaleRec."Sales Ticket No." <> '') and (POSSaleRec."Register No." <> '') then begin
+            POSSaleLineRec.SetRange("Register No.", POSSaleRec."Register No.");
+            POSSaleLineRec.SetRange("Sales Ticket No.", POSSaleRec."Sales Ticket No.");
+            POSSaleLineRec.SetFilter(POSSaleLineRec."Line Type", '<>%1', POSSaleLineRec."Line Type"::"POS Payment");
+            if POSSaleLineRec.FindSet() then
+                repeat
+                    clear(OrderLine);
+                    clear(UnitInfo);
+                    OrderLine.Add('name', POSSaleLineRec.Description);
+                    if ((POSSaleLineRec."Line Type" = POSSaleLineRec."Line Type"::Comment) and (POSSaleLineRec."No." = '')) then
+                        OrderLine.Add('id', 'Comment')
+                    else
+                        OrderLine.Add('id', POSSaleLineRec."No.");
+                    OrderLine.Add('totalAmount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT"));
+                    OrderLine.Add('totalAmountExcludingTax', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec.Amount));
+                    OrderLine.Add('totalTaxAmount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT" - POSSaleLineRec.Amount));
+                    Evaluate(TaxInt, Format(Format(POSSaleLineRec."VAT %")));
+                    OrderLine.Add('taxPercentage', TaxInt);
+                    UnitInfo.Add('unitPrice', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Unit Price"));
+                    UnitInfo.Add('quantity', Format(POSSaleLineRec.Quantity));
+                    OrderLine.Add('unitInfo', UnitInfo);
+                    OrderLine.Add('discount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Discount Amount"));
+                    OrderLines.Add(OrderLine.Clone());
+                until POSSaleLineRec.Next() = 0;
+
+            GLSetup.Get();
+            BottomLine.Add('currency', GLSetup."LCY Code");
+            BottomLine.Add('posId', POSSaleRec."Register No.");
+            BottomLine.Add('receiptNumber', POSSaleRec."Sales Ticket No.");
+
+        end;
+        ReceiptContentJson.Add('orderLines', OrderLines);
+        ReceiptContentJson.Add('bottomLine', BottomLine);
+        exit(ReceiptContentJson);
     end;
 
     #endregion

@@ -118,6 +118,7 @@ codeunit 6184714 "NPR Vipps Mp Webhook Mgt."
         RequestMessageTxt: Text;
         RequestMessage: JsonObject;
         Token: JsonToken;
+        DateTimeCutoff: DateTime;
     begin
         VippsMpStore.Get(UConfig."Merchant Serial Number");
         VippsMpWebhookMsg.SetAutoCalcFields(Message);
@@ -126,6 +127,10 @@ codeunit 6184714 "NPR Vipps Mp Webhook Mgt."
                 Error(_LblNotVerifiedWebhook);
             if (VippsMpWebhookMsg.Error) then
                 Error(_LblErrorWebhook);
+            //If it is older than 10 minutes do not use.
+            DateTimeCutoff := CreateDateTime(Today(), Time() - (1000 * 60 * 10));
+            if (DateTimeCutoff > VippsMpWebhookMsg.ReceivedAt) then
+                exit;
             VippsMpWebhookMsg.Message.CreateInStream(InS);
             InS.ReadText(RequestMessageTxt);
             RequestMessage.ReadFrom(RequestMessageTxt);

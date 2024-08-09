@@ -3,6 +3,11 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
     Access = Internal;
 
     internal procedure AbortRequestBeforeTrxCreated(var EftTransactionRequest: Record "NPR EFT Transaction Request")
+    begin
+        AbortRequestBeforeTrxCreated(EftTransactionRequest, '');
+    end;
+
+    internal procedure AbortRequestBeforeTrxCreated(var EftTransactionRequest: Record "NPR EFT Transaction Request"; ErrMessage: Text)
     var
         EFTInterface: Codeunit "NPR EFT Interface";
         LblAborted: Label 'Vipps Mobilepay: Aborted';
@@ -11,6 +16,9 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
         EftTransactionRequest."External Result Known" := True;
         EftTransactionRequest."Result Amount" := 0.0;
         EftTransactionRequest."Result Description" := 'Aborted';
+#pragma warning disable AA0139
+        EftTransactionRequest."Client Error" := CopyStr(ErrMessage, 1, 250);
+#pragma warning restore AA0139
         EftTransactionRequest."POS Description" := LblAborted;
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
@@ -75,6 +83,47 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
+    internal procedure HandleCancelledResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request"; CancelContent: JsonObject)
+    var
+        EFTInterface: Codeunit "NPR EFT Interface";
+    begin
+        if (not ParseCancelledResponse(EftTransactionRequest, CancelContent)) then begin
+            ParseErrorHandler(EftTransactionRequest, CancelContent);
+        end;
+        EftTransactionRequest.Modify();
+        EFTInterface.EftIntegrationResponse(EftTransactionRequest);
+    end;
+
+    [TryFunction]
+    local procedure ParseCancelledResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request"; CancelContent: JsonObject)
+    var
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
+        Aggregate: JsonToken;
+        CancelledAmount: JsonToken;
+        Amount: JsonToken;
+        DecimalAmount: Decimal;
+        DecimalCancelledAmount: Decimal;
+        Token: JsonToken;
+    begin
+        CancelContent.Get('amount', Amount);
+        Amount.AsObject().Get('value', Token);
+        DecimalAmount := VippsMpUtil.IntegerAmountToDecimalAmount(Token.AsValue().AsInteger());
+
+        CancelContent.Get('aggregate', Aggregate);
+        Aggregate.AsObject().Get('cancelledAmount', CancelledAmount);
+        CancelledAmount.AsObject().Get('value', Token);
+        DecimalCancelledAmount := VippsMpUtil.IntegerAmountToDecimalAmount(Token.AsValue().AsInteger());
+
+        if (DecimalAmount = DecimalCancelledAmount) then begin
+            EftTransactionRequest."POS Description" := 'Vipps Mobilepay Cancelled';
+            EftTransactionRequest."Result Description" := 'Cancelled';
+            EftTransactionRequest."Result Amount" := 0.0;
+            EftTransactionRequest."External Result Known" := true;
+        end else begin
+            Error('Transaction was not cancelled correctly.');
+        end;
+    end;
+
     [TryFunction]
     local procedure ParseResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request"; WebhookContent: JsonObject)
     var
@@ -101,10 +150,10 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
             WebhookContent.Get('amount', WhToken);
             WhToken.AsObject().Get('value', WhToken);
             if (EftTransactionRequest."Result Description".ToUpper() = 'REFUNDED') then begin
-                EftTransactionRequest."Result Amount" := VippsMpUtil.IntegerAmountToDecimal(WhToken.AsValue().AsInteger()) * -1.0;
+                EftTransactionRequest."Result Amount" := VippsMpUtil.IntegerAmountToDecimalAmount(WhToken.AsValue().AsInteger()) * -1.0;
                 EftTransactionRequest."Amount Output" := EftTransactionRequest."Result Amount";
             end else begin
-                EftTransactionRequest."Result Amount" := VippsMpUtil.IntegerAmountToDecimal(WhToken.AsValue().AsInteger());
+                EftTransactionRequest."Result Amount" := VippsMpUtil.IntegerAmountToDecimalAmount(WhToken.AsValue().AsInteger());
                 EftTransactionRequest."Amount Output" := EftTransactionRequest."Result Amount";
             end;
 
@@ -136,11 +185,12 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
             oldEFTTransactionRequest.Recoverable := False;
             oldEFTTransactionRequest.Modify();
         end;
+        EFTInterface.EftIntegrationResponse(oldEFTTransactionRequest);
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
     end;
 
     [TryFunction]
-    local procedure ParseLookupResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request"; OldEftTransactionRequest: Record "NPR EFT Transaction Request"; LookupContent: JsonObject)
+    local procedure ParseLookupResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var OldEftTransactionRequest: Record "NPR EFT Transaction Request"; LookupContent: JsonObject)
     var
         VippsMpePaymentAPI: Codeunit "NPR Vipps Mp ePayment API";
         VippsMpUtil: Codeunit "NPR Vipps Mp Util";
@@ -148,6 +198,8 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
         Token2: JsonToken;
         Token3: JsonToken;
         Json: JsonObject;
+        CapturedAmount: Integer;
+        CancelSuccessLabel: Label 'The transaction was cancelled.';
     begin
 #pragma warning disable AA0139
         LookupContent.Get('pspReference', Token);
@@ -167,11 +219,16 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
                         EftTransactionRequest."Result Amount" := 0.00;
                         EftTransactionRequest."Result Description" := 'ABORTED';
                         EftTransactionRequest."POS Description" := 'Vipps Mobilepay: ABORTED';
+                        OldEftTransactionRequest."Result Description" := 'ABORTED';
+                        OldEftTransactionRequest."POS Description" := 'Vipps Mobilepay: ABORTED';
+                        Message(CancelSuccessLabel);
                     end else begin
                         EftTransactionRequest."External Result Known" := True;
                         EftTransactionRequest."Result Amount" := 0.00;
                         EftTransactionRequest."Result Description" := 'CREATED';
                         EftTransactionRequest."POS Description" := 'Vipps Mobilepay: CREATED';
+                        OldEftTransactionRequest."Result Description" := 'CREATED';
+                        OldEftTransactionRequest."POS Description" := 'Vipps Mobilepay: CREATED';
                     end;
                 end;
             'ABORTED',
@@ -181,6 +238,8 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
                     EftTransactionRequest."External Result Known" := True;
                     EftTransactionRequest."Result Amount" := 0.00;
                     EftTransactionRequest."POS Description" := 'Vipps Mobilepay: ' + Token.AsValue().AsText();
+                    OldEftTransactionRequest."POS Description" := 'Vipps Mobilepay: ' + Token.AsValue().AsText();
+                    Message(CancelSuccessLabel);
                 end;
             'AUTHORIZED':
                 begin
@@ -188,13 +247,34 @@ codeunit 6184765 "NPR Vipps Mp Response Handler"
                     if (OldEftTransactionRequest."Processing Type" = OldEftTransactionRequest."Processing Type"::PAYMENT) then begin
                         Token.AsObject().Get('capturedAmount', Token2);
                         Token2.AsObject().Get('value', Token3);
-                        EftTransactionRequest."Amount Output" := VippsMpUtil.IntegerAmountToDecimal(Token3.AsValue().AsInteger());
-                        EftTransactionRequest."Result Amount" := EftTransactionRequest."Amount Output"
+                        CapturedAmount := Token3.AsValue().AsInteger();
+                        if (VippsMpUtil.IntegerAmountToDecimalAmount(CapturedAmount) = OldEftTransactionRequest."Amount Input") then begin
+                            EftTransactionRequest."Amount Output" := VippsMpUtil.IntegerAmountToDecimalAmount(CapturedAmount);
+                            EftTransactionRequest."Result Amount" := EftTransactionRequest."Amount Output";
+                            EftTransactionRequest."Result Description" := 'Captured';
+                            EftTransactionRequest."POS Description" := 'Vipps Mobilepay: Captured';
+                            OldEftTransactionRequest."Result Description" := 'Captured';
+                            OldEftTransactionRequest."POS Description" := 'Vipps Mobilepay: Captured';
+                        end else begin
+                            if (VippsMpePaymentAPI.CancelPayment(EftTransactionRequest, Json)) then begin
+                                EftTransactionRequest."Result Description" := 'Cancelled';
+                                EftTransactionRequest."POS Description" := 'Vipps Mobilepay: Cancelled';
+                                OldEftTransactionRequest."Result Description" := 'Cancelled';
+                                OldEftTransactionRequest."POS Description" := 'Vipps Mobilepay: Cancelled';
+                                Json.Get('aggregate', Token);
+                                Token.AsObject().Get('capturedAmount', Token2);
+                                Token2.AsObject().Get('value', Token3);
+                                CapturedAmount := Token3.AsValue().AsInteger();
+                                EftTransactionRequest."Amount Output" := VippsMpUtil.IntegerAmountToDecimalAmount(CapturedAmount);
+                                EftTransactionRequest."Result Amount" := EftTransactionRequest."Amount Output";
+                                Message(CancelSuccessLabel);
+                            end;
+                        end;
                     end;
                     if (OldEftTransactionRequest."Processing Type" = OldEftTransactionRequest."Processing Type"::REFUND) then begin
                         Token.AsObject().Get('refundedAmount', Token2);
                         Token2.AsObject().Get('value', Token3);
-                        EftTransactionRequest."Amount Output" := VippsMpUtil.IntegerAmountToDecimal(Token3.AsValue().AsInteger()) * -1;
+                        EftTransactionRequest."Amount Output" := VippsMpUtil.IntegerAmountToDecimalAmount(Token3.AsValue().AsInteger()) * -1;
                         EftTransactionRequest."Result Amount" := EftTransactionRequest."Amount Output"
                     end;
                     EftTransactionRequest."External Result Known" := True;
