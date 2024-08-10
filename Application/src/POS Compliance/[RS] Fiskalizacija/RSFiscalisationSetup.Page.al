@@ -29,6 +29,11 @@ page 6150854 "NPR RS Fiscalisation Setup"
                             EnabledValueChanged := true;
                     end;
                 }
+                field("Fiscal Proforma on Sales Doc."; Rec."Fiscal Proforma on Sales Doc.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if Sales Documents will automatically be issued as Fiscal Proforma.';
+                }
                 field("Allow Offline Use"; Rec."Allow Offline Use")
                 {
                     ApplicationArea = NPRRetail;

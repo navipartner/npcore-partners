@@ -26,6 +26,11 @@ table 6059861 "NPR RS Fiscalisation Setup"
                 RSAuditMgt.AddRSAuditBackgroundJobQueue("Enable RS Fiscal", false)
             end;
         }
+        field(6; "Fiscal Proforma on Sales Doc."; Boolean)
+        {
+            Caption = 'Fiscal Proforma on Sales Documents';
+            DataClassification = CustomerContent;
+        }
         field(10; "Sandbox URL"; Text[100])
         {
             Caption = 'Sandbox URL';
