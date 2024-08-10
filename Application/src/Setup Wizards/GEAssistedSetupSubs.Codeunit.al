@@ -118,8 +118,8 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS VAT Posting", RSVATPostingSetupTxt, AssistedSetupGroup::NPRRSFiscal);
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS POS Unit", RSVATPostingSetupTxt, AssistedSetupGroup::NPRRSFiscal);
     end;
-    
-   local procedure AddSIFiscalizationSetupsWizard()
+
+    local procedure AddSIFiscalizationSetupsWizard()
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
@@ -1377,6 +1377,13 @@
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS Return Reason");
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR BG Fiscalization Setup", 'OnAfterValidateEvent', 'BG SIS Fiscal Enabled', false, false)]
+    local procedure ResetBGFiscalWizard_OnAfterValidateBGSISFiscalEnabled(var Rec: Record "NPR BG Fiscalization Setup"; var xRec: Record "NPR BG Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."BG SIS Fiscal Enabled" <> xRec."BG SIS Fiscal Enabled") and not Rec."BG SIS Fiscal Enabled" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRBGSISFiscal);
+    end;
     #endregion
 
     #region Common Functions
@@ -1674,6 +1681,12 @@
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Paym. Meth.");
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR CRO Fiscalization Setup", 'OnAfterValidateEvent', 'Enable CRO Fiscal', false, false)]
+    local procedure ResetCROFiscalWizard_OnAfterValidateEnableCROFiscal(var Rec: Record "NPR CRO Fiscalization Setup"; var xRec: Record "NPR CRO Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable CRO Fiscal" <> xRec."Enable CRO Fiscal") and not Rec."Enable CRO Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRCROFiscal);
+    end;
     #endregion
 
     #region RS Fiscalization Wizards
@@ -1931,6 +1944,12 @@
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS POS Unit");
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR RS Fiscalisation Setup", 'OnAfterValidateEvent', 'Enable RS Fiscal', false, false)]
+    local procedure ResetRSFiscalWizard_OnAfterValidateEnableRSFiscal(var Rec: Record "NPR RS Fiscalisation Setup"; var xRec: Record "NPR RS Fiscalisation Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable RS Fiscal" <> xRec."Enable RS Fiscal") and not Rec."Enable RS Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRRSFiscal);
+    end;
     #endregion
 
     #region SI Fiscalization Wizard
@@ -2112,6 +2131,13 @@
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup SI POS Store");
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR SI Fiscalization Setup", 'OnAfterValidateEvent', 'Enable SI Fiscal', false, false)]
+    local procedure ResetSIFiscalWizard_OnAfterValidateEnableSIFiscal(var Rec: Record "NPR SI Fiscalization Setup"; var xRec: Record "NPR SI Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable SI Fiscal" <> xRec."Enable SI Fiscal") and not Rec."Enable SI Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRSIFiscal);
+    end;
     #endregion
 
     #region IT Fiscalization Wizards
@@ -2291,6 +2317,13 @@
         GuidedExperience: Codeunit "Guided Experience";
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup IT POS Unit Mapping");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR IT Fiscalization Setup", 'OnAfterValidateEvent', 'Enable IT Fiscal', false, false)]
+    local procedure ResetITFiscalWizard_OnAfterValidateEnableITFiscal(var Rec: Record "NPR IT Fiscalization Setup"; var xRec: Record "NPR IT Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable IT Fiscal" <> xRec."Enable IT Fiscal") and not Rec."Enable IT Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRITFiscal);
     end;
     #endregion
 
@@ -2517,15 +2550,31 @@
     local procedure ResetATFiscalWizard_OnAfterValidateATFiscalEnabled(var Rec: Record "NPR AT Fiscalization Setup"; var xRec: Record "NPR AT Fiscalization Setup"; CurrFieldNo: Integer)
     begin
         if (Rec."AT Fiscal Enabled" <> xRec."AT Fiscal Enabled") and not Rec."AT Fiscal Enabled" then
-            ResetSetupATFiscalWizardStatus();
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRATFiscal);
     end;
+    #endregion
 
-    local procedure ResetSetupATFiscalWizardStatus()
+    #region Helper Procedures
+    local procedure ResetSetupFiscalWizardStatus(AssistedSetupGroup: Enum "Assisted Setup Group")
     var
         GuidedExperience: Codeunit "Guided Experience";
     begin
-        GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup AT Fiscal");
+        case AssistedSetupGroup of
+            AssistedSetupGroup::NPRATFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup AT Fiscal");
+            AssistedSetupGroup::NPRCROFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup CRO Fiscal");
+            AssistedSetupGroup::NPRITFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup IT Fiscal");
+            AssistedSetupGroup::NPRRSFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup RS Fiscal");
+            AssistedSetupGroup::NPRBGSISFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS Fiscal");
+            AssistedSetupGroup::NPRSIFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup SI Fiscal");
+        end;
     end;
+
     #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)

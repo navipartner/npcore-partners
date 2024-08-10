@@ -109,13 +109,14 @@ page 6151397 "NPR RS POS Audit Profile Step"
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if not Rec.FindFirst() then
+        if not Rec.FindSet() then
             exit;
-        if not POSAuditProfile.FindFirst() then
-            POSAuditProfile.Init();
-        POSAuditProfile.TransferFields(Rec);
-        if not POSAuditProfile.Insert() then
-            POSAuditProfile.Modify();
+
+        repeat
+            POSAuditProfile.TransferFields(Rec);
+            if not POSAuditProfile.Insert() then
+                POSAuditProfile.Modify();
+        until Rec.Next() = 0;
     end;
 
     local procedure CheckIsDataSet(): Boolean
