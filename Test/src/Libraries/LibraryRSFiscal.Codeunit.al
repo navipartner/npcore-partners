@@ -76,6 +76,7 @@ codeunit 85065 "NPR Library RS Fiscal"
         RSFiscalizationSetup.DeleteAll();
         RSFiscalizationSetup.Init();
         RSFiscalizationSetup."Enable RS Fiscal" := true;
+        RSFiscalizationSetup."Fiscal Proforma on Sales Doc." := true;
         RSFiscalizationSetup."Report E-Mail Selection" := RSFiscalizationSetup."Report E-Mail Selection"::Both;
         RSFiscalizationSetup."Sandbox URL" := 'http://devesdc.sandbox.suf.purs.gov.rs:8888';
         RSFiscalizationSetup."Configuration URL" := 'https://api.sandbox.suf.purs.gov.rs/';

@@ -207,10 +207,13 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     begin
         if not RSAuditMgt.IsRSFiscalActive() then
             exit;
+        RSFiscalizationSetup.Get();
+        if not RSFiscalizationSetup."Fiscal Proforma on Sales Doc." then
+            exit;
+
         StartTime := CurrentDateTime;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         VerifyPIN(RSAuxSalesHeader."NPR RS POS Unit");
-        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalSale(SalesHeader, false));
 
         Content.GetHeaders(Headers);
@@ -343,10 +346,13 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     begin
         if not RSAuditMgt.IsRSFiscalActive() then
             exit;
+        RSFiscalizationSetup.Get();
+        if not RSFiscalizationSetup."Fiscal Proforma on Sales Doc." then
+            exit;
+
         StartTime := CurrentDateTime;
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
         VerifyPIN(RSAuxSalesHeader."NPR RS POS Unit");
-        RSFiscalizationSetup.Get();
         Content.WriteFrom(CreateJSONBodyForRSFiscalNormalRefund(SalesHeader));
 
         Content.GetHeaders(Headers);
