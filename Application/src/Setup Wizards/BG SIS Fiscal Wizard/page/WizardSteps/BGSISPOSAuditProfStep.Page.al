@@ -125,13 +125,11 @@ page 6151512 "NPR BG SIS POS Audit Prof Step"
         if not Rec.FindSet() then
             exit;
 
-        if not POSAuditProfile.FindFirst() then
-            POSAuditProfile.Init();
-
-        POSAuditProfile.TransferFields(Rec);
-
-        if not POSAuditProfile.Insert() then
-            POSAuditProfile.Modify();
+        repeat
+            POSAuditProfile.TransferFields(Rec);
+            if not POSAuditProfile.Insert() then
+                POSAuditProfile.Modify();
+        until Rec.Next() = 0;
     end;
 
     local procedure CheckIsDataPopulated(): Boolean
