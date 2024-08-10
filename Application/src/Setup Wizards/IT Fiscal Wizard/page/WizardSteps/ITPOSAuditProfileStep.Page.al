@@ -89,6 +89,8 @@ page 6184545 "NPR IT POS Audit Profile Step"
         }
     }
     trigger OnDeleteRecord(): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         POSAuditProfile.SetRange(Code, Rec.Code);
         if not POSAuditProfile.FindFirst() then
@@ -97,6 +99,8 @@ page 6184545 "NPR IT POS Audit Profile Step"
     end;
 
     trigger OnModifyRecord(): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         POSAuditProfile.SetRange(Code, Rec.Code);
         if not POSAuditProfile.FindFirst() then
@@ -106,6 +110,8 @@ page 6184545 "NPR IT POS Audit Profile Step"
     end;
 
     internal procedure CopyRealToTemp()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
         if POSAuditProfile.FindSet() then
             repeat
@@ -121,14 +127,17 @@ page 6184545 "NPR IT POS Audit Profile Step"
     end;
 
     internal procedure CreatePOSAuditProfileData()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if not Rec.FindFirst() then
+        if not Rec.FindSet() then
             exit;
-        if not POSAuditProfile.FindFirst() then
-            POSAuditProfile.Init();
-        POSAuditProfile.TransferFields(Rec);
-        if not POSAuditProfile.Insert() then
-            POSAuditProfile.Modify();
+
+        repeat
+            POSAuditProfile.TransferFields(Rec);
+            if not POSAuditProfile.Insert() then
+                POSAuditProfile.Modify();
+        until Rec.Next() = 0;
     end;
 
     local procedure CheckIsDataSet(): Boolean
@@ -143,7 +152,4 @@ page 6184545 "NPR IT POS Audit Profile Step"
                 exit(true);
         until Rec.Next() = 0;
     end;
-
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
 }
