@@ -83,7 +83,7 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         TempHtmlContent += PreBase64ImageTag + Base64QRCodeImage + AfterBase64ImageTag + NewLineHtml;
 #else
         TempHtmlContent += DoubleNewLineHtml + NewLineHtml + RSPOSAuditLogAuxCopy.GetTextFromJournal().Replace(EndingLineHtmlTags, NewLineHtml).Replace(NonFiscalText + NewLineHtml, '') + NewLineHtml;
-         if TempHtmlContent.Substring(StrLen(TempHtmlContent) - 100).Contains(NotFiscalBillVersion1Lbl) then
+        if TempHtmlContent.Substring(StrLen(TempHtmlContent) - 100).Contains(NotFiscalBillVersion1Lbl) then
             TempHtmlContent := TempHtmlContent.Substring(1, StrLen(TempHtmlContent) - 45);
 #endif
         if (RSPOSAuditLogAuxCopy."RS Invoice Type" in [RSPOSAuditLogAuxCopy."RS Invoice Type"::COPY]) and
@@ -197,6 +197,7 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         if (DiscountAmount <> 0) and not (RSTransactionType in [RSTransactionType::REFUND]) then
             HtmlContent += DoubleNewLineHtml + PrintLineLbl + NewLineHtml + HasDiscountHeadlineLbl + NewLineHtml + TotalDiscountAmountLbl + Format(Round(DiscountAmount)) + NewLineHtml + PrintLineLbl;
 
+        PrintMembershipPointsNonFiscal(HtmlContent, POSEntryNo, RSInvoiceType, RSTransactionType);
         RemoveUnnecessaryFieldsFromJournal(HtmlContent, RSInvoiceType, RSTransactionType);
         DeleteProformaPaymentAmounts(HtmlContent, RSInvoiceType);
         AddReturnPaymentIfExist(HtmlContent, POSEntryNo, RSTransactionType);
@@ -207,6 +208,27 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         EndingHtmlTags: Label '</pre></html>', Locked = true;
     begin
         HtmlContent += EndingHtmlTags;
+    end;
+
+    local procedure PrintMembershipPointsNonFiscal(var HtmlContent: Text; POSEntryNo: Integer; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type")
+    var
+        MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
+        POSEntry: Record "NPR POS Entry";
+        MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
+        TotalMembershipPointsLbl: Label 'Укупно поена: ', Locked = true;
+    begin
+        if not (RSTransactionType in [RSTransactionType::SALE])
+            and not (RSInvoiceType in [RSInvoiceType::NORMAL]) then
+            exit;
+
+        POSEntry.Get(POSEntryNo);
+        MMMembersPointsEntry.SetCurrentKey("Entry No.");
+        MMMembersPointsEntry.SetRange("Customer No.", POSEntry."Customer No.");
+        MMMembersPointsEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        if not MMMembersPointsEntry.FindLast() then
+            exit;
+
+        HtmlContent += DoubleNewLineHtml + PrintLineLbl + NewLineHtml + MembershipHeadlineLbl + NewLineHtml + TotalMembershipPointsLbl + Format(Round(MMMembersPointsEntry.Points)) + NewLineHtml + PrintLineLbl;
     end;
 
     local procedure AddAdvancePaymentInfo(var HtmlContent: Text; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type"; AuditEntryType: Enum "NPR RS Audit Entry Type"; SourceDocumentNo: Code[20])
