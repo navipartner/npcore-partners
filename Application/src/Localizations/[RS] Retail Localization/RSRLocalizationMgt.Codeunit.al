@@ -247,5 +247,32 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         GLRegister."To Entry No." := GLEntry."Entry No.";
         GLRegister.Modify();
     end;
+
+    internal procedure AddTransferGLEntriesToGLRegister(DocumentNo: Code[20])
+    var
+        GLEntry: Record "G/L Entry";
+        GLRegister: Record "G/L Register";
+        SourceCodeSetup: Record "Source Code Setup";
+        FromEntryNo: Integer;
+        ToEntryNo: Integer;
+    begin
+        GLEntry.SetRange("Document No.", DocumentNo);
+        if not GLEntry.FindFirst() then
+            exit;
+        FromEntryNo := GLEntry."Entry No.";
+        GLEntry.FindLast();
+        ToEntryNo := GLEntry."Entry No.";
+
+        GLRegister.Init();
+        SourceCodeSetup.Get();
+        GLRegister."No." := GLRegister.GetLastEntryNo() + 1;
+        GLRegister."Creation Date" := Today();
+        GLRegister."Creation Time" := Time();
+        GLRegister."Source Code" := SourceCodeSetup.Transfer;
+        GLRegister."From Entry No." := FromEntryNo;
+        GLRegister."To Entry No." := ToEntryNo;
+        GLRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLRegister."User ID"));
+        GLRegister.Insert();
+    end;
     #endregion RS Retail Localization Helper Procedures
 }
