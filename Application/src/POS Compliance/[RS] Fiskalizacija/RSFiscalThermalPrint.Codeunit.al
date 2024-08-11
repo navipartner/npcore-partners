@@ -58,6 +58,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
 
         PrintDiscountNonFiscal(RSPOSAuditLogAuxInfo);
+        PrintMembershipPointsNonFiscal(RSPOSAuditLogAuxInfo);
         PrintNonFiscalCopyForNormalRefund(RSPOSAuditLogAuxInfo);
     end;
 
@@ -76,12 +77,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 
     local procedure AddAdvancePaymentSection(Printer: Codeunit "NPR RP Line Print Mgt."; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RSPOSAuditLogAuxInfoReference: Record "NPR RS POS Audit Log Aux. Info";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        LeftToPayForPrepaymentLbl: Label 'Преостало за плаћање:', Locked = true;
         PaidWithPrepaymentLbl: Label 'Плаћено авансом:', Locked = true;
         VATonPrepaymentLbl: Label 'ПДВ на аванс:', Locked = true;
-        LeftToPayForPrepaymentLbl: Label 'Преостало за плаћање:', Locked = true;
     begin
         SalesInvoiceHeader.Get(RSPOSAuditLogAuxInfo."Source Document No.");
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
@@ -105,9 +106,8 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     begin
         SpacesToAdd := 40 - StrLen(CaptionText) - StrLen(AmountText);
         ResultText := CopyStr(CaptionText, 1, MaxStrLen(ResultText));
-        for i := 1 to SpacesToAdd do begin
+        for i := 1 to SpacesToAdd do
             ResultText += ' ';
-        end;
         ResultText += AmountText;
     end;
 
@@ -198,6 +198,42 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
     end;
 
+    local procedure PrintMembershipPointsNonFiscal(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
+    var
+        MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
+        POSEntry: Record "NPR POS Entry";
+        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        Printer: Codeunit "NPR RP Line Print Mgt.";
+        MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
+        TotalMembershipPointsLbl: Label 'Укупно поена: ', Locked = true;
+        begin
+        if not (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE])
+            and not (RSPOSAuditLogAuxInfo."RS Invoice Type" in [RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL]) then
+            exit;
+            
+        POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
+        MMMembersPointsEntry.SetCurrentKey("Entry No.");
+        MMMembersPointsEntry.SetRange("Customer No.", POSEntry."Customer No.");
+        MMMembersPointsEntry.SetRange("Posting Date", POSEntry."Posting Date");
+        if not MMMembersPointsEntry.FindLast() then
+            exit;
+
+        Printer.SetAutoLineBreak(false);
+        PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, MembershipHeadlineLbl, 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, TotalMembershipPointsLbl + Format(Round(MMMembersPointsEntry.Points, 0.01)), 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
+        PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+
+        PrinterDeviceSettings.Init();
+        PrinterDeviceSettings.Name := 'ENCODING';
+        PrinterDeviceSettings.Value := 'Windows-1251';
+        PrinterDeviceSettings.Insert();
+
+        Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+    end;
+
     local procedure PrintNonFiscalCopyForNormalRefund(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
         RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy";
@@ -220,12 +256,10 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
             PrintText.Contains('ИД купца'):
                 exit(RSPOSAuditLogAuxInfo."Customer Identification" = '0');
             PrintText.Contains('ЕСИР време'):
-                begin
-                    if RSPOSAuditLogAuxInfo."Prepayment Order No." <> '' then
-                        exit(false)
-                    else
-                        exit(true);
-                end;
+                if RSPOSAuditLogAuxInfo."Prepayment Order No." <> '' then
+                    exit(false)
+                else
+                    exit(true);
             else
                 exit(false);
         end;
