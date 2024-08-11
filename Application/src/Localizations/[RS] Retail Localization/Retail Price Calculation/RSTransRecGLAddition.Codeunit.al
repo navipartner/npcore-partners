@@ -19,7 +19,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if TempTransferLine.IsEmpty() then
             exit;
 
-        if(not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
+        if (not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
             PostAdditionalRetailEntries(TransferReceiptHeader);
     end;
 
@@ -51,6 +51,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
                     RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
                 until TempRetailValueEntry.Next() = 0;
         until TempTransferLine.Next() = 0;
+
+        RSRLocalizationMgt.AddTransferGLEntriesToGLRegister(TransferReceiptHeader."No.");
     end;
 
     #endregion
@@ -59,17 +61,12 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     local procedure CreateAdditionalGLEntries(TransferReceiptHeader: Record "Transfer Receipt Header"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
-        GLRegister: Record "G/L Register";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
-        SourceCodeSetup: Record "Source Code Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         InitGeneralJournalLine(GenJournalLine, TransferReceiptHeader, RSRetailCalculationType);
-        SourceCodeSetup.Get();
-        GLRegister.SetRange("Source Code", SourceCodeSetup."Inventory Post Cost");
-        GLRegister.FindLast();
-        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
+        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
@@ -92,7 +89,6 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             end;
 
         PostGLAcc(GenJournalLine, GLEntry);
-        RSRLocalizationMgt.ModifyGLRegForRetailCalculationEntries(GLRegister, GLEntry);
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")

@@ -27,7 +27,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TempTransferLine.FindSet();
         repeat
             FindPriceListLine(TransferHeader."Transfer-from Code");
-        PostTransitValueEntry(TransferHeader);
+            PostTransitValueEntry(TransferHeader);
         until TempTransferLine.Next() = 0;
     end;
     #endregion
@@ -37,17 +37,12 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     local procedure CreateAdditionalGLEntries(TransferHeader: Record "Transfer Header"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
-        GLRegister: Record "G/L Register";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
-        SourceCodeSetup: Record "Source Code Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         InitGeneralJournalLine(GenJournalLine, TransferHeader, CalculationValueEntry, RSRetailCalculationType);
-        SourceCodeSetup.Get();
-        GLRegister.SetRange("Source Code", SourceCodeSetup."Inventory Post Cost");
-        GLRegister.FindLast();
-        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
+        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
         GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
@@ -70,7 +65,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             end;
 
         PostGLAcc(GenJournalLine, GLEntry);
-        RSRLocalizationMgt.ModifyGLRegForRetailCalculationEntries(GLRegister, GLEntry);
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")
@@ -214,7 +208,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         if TransferFromItemLedgerEntry.IsEmpty() then
             exit;
 
-        TransitLocationItemLedgerEntries.SetLoadFields("Entry No.", "Invoiced Quantity");
+        TransitLocationItemLedgerEntries.SetLoadFields("Entry No.", "Invoiced Quantity", "Document No.");
         TransitLocationItemLedgerEntries.SetRange("Document Type", TransitLocationItemLedgerEntries."Document Type"::"Transfer Shipment");
         TransitLocationItemLedgerEntries.SetRange("Order No.", TransferHeader."No.");
         TransitLocationItemLedgerEntries.SetRange("Location Code", TransferHeader."In-Transit Code");
@@ -234,6 +228,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
                         InsertCorrectionalValueEntryForTransitLocation(TransferHeader, TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
                 until (TempTransferFromILEAppliedItemLedgerEntries.Next() = 0) and (TransitLocationItemLedgerEntries.Next() = 0);
         until TransferFromItemLedgerEntry.Next() = 0;
+
+        RSRLocalizationMgt.AddTransferGLEntriesToGLRegister(TransitLocationItemLedgerEntries."Document No.");
     end;
 
     local procedure InsertCorrectionalValueEntryForTransitLocation(TransferHeader: Record "Transfer Header"; TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; AppliedEntryCostPerUnit: Decimal; TransitCostPerUnit: Decimal)
