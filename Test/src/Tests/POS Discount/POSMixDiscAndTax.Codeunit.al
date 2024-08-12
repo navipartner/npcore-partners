@@ -10480,7 +10480,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         exit(DiscPct);
     end;
 
-    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
+    internal procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
         DiscountAmount: Decimal;
@@ -10490,7 +10490,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         exit(DiscountAmount);
     end;
 
-    local procedure CreateTotalDiscountAmountTotalAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
+    internal procedure CreateTotalDiscountAmountTotalAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
     var
         MixedDiscount: Record "NPR Mixed Discount";
         DiscountAmount: Decimal;
@@ -10498,6 +10498,16 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
         CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
         exit(DiscountAmount);
+    end;
+
+    internal procedure CreateMultipleDiscountLevels(Item: Record Item; FirstLevelQty: Integer; SecondLevelQty: Integer; FirstLevelAmount: Decimal; SecondLevelAmount: Decimal; TotalAmountExclTax: Boolean): Code[20]
+    var
+        MixedDiscount: Record "NPR Mixed Discount";
+    begin
+        CreateMultipleDiscountLevelsHeader(MixedDiscount, TotalAmountExclTax);
+        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        CreateMixDiscountLevels(MixedDiscount, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount);
+        exit(MixedDiscount.Code);
     end;
 
     local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
@@ -10595,6 +10605,38 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         MixedDiscount."Min. Quantity" := 1;
         MixedDiscount.Insert();
         exit(MixedDiscount."Total Amount");
+    end;
+
+    local procedure CreateMultipleDiscountLevelsHeader(var MixedDiscount: Record "NPR Mixed Discount"; TotalAmtExclTax: Boolean)
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+    begin
+        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), DiscSourceTableId());
+        MixedDiscount.Init();
+        MixedDiscount.Status := MixedDiscount.Status::Active;
+        MixedDiscount."Starting date" := Today() - 7;
+        MixedDiscount."Ending date" := Today() + 7;
+        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Multiple Discount Levels";
+        MixedDiscount."Total Amount Excl. VAT" := TotalAmtExclTax;
+        MixedDiscount."Min. Quantity" := 1;
+        MixedDiscount.Insert();
+    end;
+
+    local procedure CreateMixDiscountLevels(MixedDiscount: Record "NPR Mixed Discount"; FirstLevelQty: Integer; SecondLevelQty: Integer; FirstLevelAmount: Decimal; SecondLevelAmount: Decimal)
+    var
+        MixedDiscountLevel: Record "NPR Mixed Discount Level";
+    begin
+        MixedDiscountLevel.Init();
+        MixedDiscountLevel."Mixed Discount Code" := MixedDiscount.Code;
+        MixedDiscountLevel.Quantity := FirstLevelQty;
+        MixedDiscountLevel."Discount Amount" := FirstLevelAmount;
+        MixedDiscountLevel.Insert();
+
+        MixedDiscountLevel.Init();
+        MixedDiscountLevel."Mixed Discount Code" := MixedDiscount.Code;
+        MixedDiscountLevel.Quantity := SecondLevelQty;
+        MixedDiscountLevel."Discount Amount" := SecondLevelAmount;
+        MixedDiscountLevel.Insert();
     end;
 
     local procedure CreateDiscountLine(MixedDiscount: Record "NPR Mixed Discount"; Item: Record Item; DiscGroupType: Enum "NPR Disc. Grouping Type")
