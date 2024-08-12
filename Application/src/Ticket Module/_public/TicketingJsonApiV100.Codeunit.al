@@ -12,7 +12,12 @@ codeunit 6151003 "NPR TicketingJsonApiV100"
 
     procedure GetAdmissionScheduleEntry(AdmissionCode: Code[20]) JArray: JsonArray
     begin
-        exit(GetAdmissionScheduleEntryData(AdmissionCode));
+        exit(GetAdmissionScheduleEntryData(AdmissionCode, 0D, 0D));
+    end;
+
+    procedure GetAdmissionScheduleEntryWithStartAndEndDate(AdmissionCode: Code[20]; StartDate: Date; EndDate: Date) JArray: JsonArray
+    begin
+        exit(GetAdmissionScheduleEntryData(AdmissionCode, StartDate, EndDate));
     end;
 
     local procedure GetTicketAdmissionBomData(ItemNo: Code[20]; VariantCode: code[10]) JArray: JsonArray
@@ -50,13 +55,20 @@ codeunit 6151003 "NPR TicketingJsonApiV100"
         JObject.Add('description', Admission.Description);
     end;
 
-    local procedure GetAdmissionScheduleEntryData(AdmissionCode: Code[20]) JArray: JsonArray
+    local procedure GetAdmissionScheduleEntryData(AdmissionCode: Code[20]; StartDate: Date; EndDate: Date) JArray: JsonArray
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         JObject: JsonObject;
     begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        AdmissionScheduleEntry.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
         AdmissionScheduleEntry.SetAutoCalcFields("Initial Entry");
         AdmissionScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        if StartDate <> 0D then
+            AdmissionScheduleEntry.SetRange("Admission Start Date", StartDate);
+        if EndDate <> 0D then
+            AdmissionScheduleEntry.SetRange("Admission End Date", EndDate);
         AdmissionScheduleEntry.SetRange(Cancelled, false);
         if AdmissionScheduleEntry.FindSet() then begin
             repeat
