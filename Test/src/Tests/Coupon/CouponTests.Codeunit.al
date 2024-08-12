@@ -22,7 +22,7 @@ codeunit 85074 "NPR Coupon Tests"
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         TransactionEnded: Boolean;
@@ -30,11 +30,11 @@ codeunit 85074 "NPR Coupon Tests"
         Initialize();
         // [GIVEN] POS Transaction
         LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         POSSale.GetCurrentSale(SalePOS);
         // [WHEN]
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
-        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
         // [THEN]
         Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
@@ -47,7 +47,7 @@ codeunit 85074 "NPR Coupon Tests"
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
@@ -58,7 +58,7 @@ codeunit 85074 "NPR Coupon Tests"
         Initialize();
         // [GIVEN] POS Transaction
         CouponQty := Random(10) + 1;
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, CouponQty, TempCoupon);
         Commit();
         // [WHEN]
@@ -76,7 +76,7 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
         Assert.AreEqual(POSSaleLine.Quantity, CouponQty, 'Discount line quantity not according test scenario.');
         // finish transaction
-        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
         Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
@@ -89,7 +89,7 @@ codeunit 85074 "NPR Coupon Tests"
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
@@ -100,7 +100,7 @@ codeunit 85074 "NPR Coupon Tests"
         Initialize();
         // [GIVEN] POS Transaction
         CouponQty := Random(10) + 1;
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, CouponQty, TempCoupon);
         Commit();
         // [WHEN]
@@ -123,27 +123,27 @@ codeunit 85074 "NPR Coupon Tests"
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryRandom: Codeunit "Library - Random";
         TransactionEnded: Boolean;
     begin
         Initialize();
         // [GIVEN] POS Transaction with 1 line
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         CreateItemTransaction(LibraryRandom.RandDecInRange(2, 100, LibraryRandom.RandIntInRange(0, 2)));
         // [WHEN]
         POSSale.GetCurrentSale(SalePOS);
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, '25554380000236153901015'); //3901 - 1 decimal place, 015 = 1.5
 
         // [THEN] Finish transaction with cash payment
-        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, _Item."Unit Price" - 1.5, '');
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, _Item."Unit Price" - 1.5, '');
         Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentDefaultApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountPercentDefaultApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with a default application
     var
         SalePOS: Record "NPR POS Sale";
@@ -155,17 +155,22 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -173,13 +178,13 @@ codeunit 85074 "NPR Coupon Tests"
 
         LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
 
+        // [GIVEN] Item in the POS Sale
+        CreateItemTransaction(1000);
+
         // [GIVEN] Customer without VAT;
         LibrarySales.CreateCustomer(Customer);
         Customer.Validate("Prices Including VAT", false);
         Customer.Modify(true);
-
-        // [GIVEN] Item in the POS Sale
-        CreateItemTransaction(1000);
 
         // [GIVEN] Coupon Scanned in the POS Sale
         _POSSession.GetSale(POSSale);
@@ -210,11 +215,114 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentDefaultApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountPercentDefaultApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with a default application and applied two times
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [GIVEN] Item in the POS Sale
+        CreateItemTransaction(1000);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        // [THEN] Check if coupon entry discount amount is calculated properly
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", SumCouponDiscountPercentForApplicationNumber(TempCoupon."Discount %", 2), 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentDefaultApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with a default application
     var
         SalePOS: Record "NPR POS Sale";
@@ -226,19 +334,24 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -270,7 +383,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
 
         POSSaleLine.SetLast();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -281,12 +394,118 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountDefaultApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountPercentDefaultApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with a default application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Item in the POS Sale
+        CreateItemTransaction(1000);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * SaleLinePOS."Discount %" / 100;
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount %", SumCouponDiscountPercentForApplicationNumber(TempCoupon."Discount %", 2), 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountDefaultApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount amount when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with a default application
     var
         SalePOS: Record "NPR POS Sale";
@@ -298,18 +517,23 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 200, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -353,11 +577,116 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
         Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountDefaultApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountAmountDefaultApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount amount when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with a default application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 200, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [GIVEN] Item in the POS Sale
+        CreateItemTransaction(1000);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount" * 2, SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountDefaultApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount amount when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with default application
     var
         SalePOS: Record "NPR POS Sale";
@@ -369,19 +698,24 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 200, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -412,7 +746,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         POSSaleLine.SetLast();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -422,13 +756,116 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentExtraItemApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountAmountDefaultApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount amount when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with default application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        SaleLinePOSCouponAmount: Decimal;
+        CouponQty: Integer;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 200, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Item in the POS Sale
+        CreateItemTransaction(1000);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount" * 2, SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentExtraItemApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item application
     var
         SalePOS: Record "NPR POS Sale";
@@ -441,18 +878,23 @@ codeunit 85074 "NPR Coupon Tests"
         Item: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -502,11 +944,138 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentExtraItemApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountPercentExtraItemApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        CouponType: Record "NPR NpDc Coupon Type";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        Item: Record Item;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be added to the transaction when the coupon is scanned
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        Item."Unit Price" := 1000;
+        Item.Modify(true);
+
+        LibraryCoupon.SetExtraItemCoupon(CouponType, Item."No.");
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [GIVEN] Coupon Scanned in the POS Sale two times
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(ExtraItemSaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment := ExtraItemSaleLinePOS;
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        ExtraItemSaleLinePOS.Get(ExtraItemSaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Amount Including VAT", ExtraItemSaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(ExtraItemSaleLinePOS."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentExtraItemApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item application
     var
         Item: Record Item;
@@ -519,20 +1088,25 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession,
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession,
                                                            _POSUnit,
                                                            POSSale);
 
@@ -570,7 +1144,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -581,13 +1155,142 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountExtraItemApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountPercentExtraItemApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item application
+    var
+        Item: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
+        SaleLinePOSCouponAmount: Decimal;
+        CouponQty: Integer;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession,
+                                                           _POSUnit,
+                                                           POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be added to the transaction when the coupon is scanned
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        Item."Unit Price" := 1000;
+        Item.Modify(true);
+
+        LibraryCoupon.SetExtraItemCoupon(CouponType, Item."No.");
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(ExtraItemSaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem := NPRPOSSaleTaxCalc.UnitPriceExclTax(ExtraItemSaleLinePOS) * ExtraItemSaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignmentExtraItem, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountExtraItemApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item application
     var
         SalePOS: Record "NPR POS Sale";
@@ -600,18 +1303,23 @@ codeunit 85074 "NPR Coupon Tests"
         Item: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -661,11 +1369,137 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
         Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountExtraItemApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountAmountExtraItemApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        Item: Record Item;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be added to the transaction when the coupon is scanned
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        Item."Unit Price" := 1000;
+        Item.Modify(true);
+
+        LibraryCoupon.SetExtraItemCoupon(CouponType, Item."No.");
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(ExtraItemSaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment := ExtraItemSaleLinePOS;
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        ExtraItemSaleLinePOS.Get(ExtraItemSaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Amount Including VAT", ExtraItemSaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(ExtraItemSaleLinePOS."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountExtraItemApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item application
     var
         Item: Record Item;
@@ -678,20 +1512,25 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -727,7 +1566,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -737,13 +1576,138 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentExtraItemQtyApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountAmountExtraItemApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item application
+    var
+        Item: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be added to the transaction when the coupon is scanned
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+
+        Item."Unit Price" := 1000;
+        Item.Modify(true);
+
+        LibraryCoupon.SetExtraItemCoupon(CouponType, Item."No.");
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(ExtraItemSaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", ExtraItemSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignmentExtraItem, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentExtraItemQtyApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item qty application
     var
         SalePOS: Record "NPR POS Sale";
@@ -757,18 +1721,23 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -793,7 +1762,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Coupon Scanned in the POS Sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetLast();
@@ -825,11 +1794,150 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentExtraItemQtyApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountPercentExtraItemQtyApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item qty application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItem: Record Item;
+        DiscountedItem: Record Item;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+        LineNo: Integer;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be used to trigger the discount
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ExtraItem, _POSUnit, _POSStore);
+
+        ExtraItem."Unit Price" := 500;
+        ExtraItem.Modify(true);
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetExtraQtyItemCoupon(CouponType, ExtraItem, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LineNo := SaleLinePOS."Line No.";
+        ExtraItemSaleLinePOS.SetFilter("Line No.", '<>%1', LineNo);
+        ExtraItemSaleLinePOS.FindLast();
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment := ExtraItemSaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        ExtraItemSaleLinePOS.Get(ExtraItemSaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Amount Including VAT", ExtraItemSaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(ExtraItemSaleLinePOS."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentExtraItemQtyApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item qty application
     var
         SalePOS: Record "NPR POS Sale";
@@ -843,20 +1951,25 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -891,7 +2004,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [When] Coupon Scanned in the POS Sale and extra item added to the pos sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
 
@@ -901,7 +2014,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -912,13 +2025,153 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountExtraItemQtyApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountPercentExtraItemQtyApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item qty application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItem: Record Item;
+        DiscountedItem: Record Item;
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+        LineNo: Integer;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be used to trigger the discount
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ExtraItem, _POSUnit, _POSStore);
+
+        ExtraItem."Unit Price" := 500;
+        ExtraItem.Modify(true);
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetExtraQtyItemCoupon(CouponType, ExtraItem, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+
+        // [When] Coupon Scanned in the POS Sale and extra item added to the pos sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LineNo := SaleLinePOS."Line No.";
+        ExtraItemSaleLinePOS.SetFilter("Line No.", '<>%1', LineNo);
+        ExtraItemSaleLinePOS.FindLast();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem := NPRPOSSaleTaxCalc.UnitPriceExclTax(ExtraItemSaleLinePOS) * ExtraItemSaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignmentExtraItem, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountExtraItemQtyApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item qty application
     var
         SalePOS: Record "NPR POS Sale";
@@ -932,18 +2185,23 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -968,7 +2226,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Coupon Scanned in the POS Sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetLast();
@@ -1001,11 +2259,153 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
         Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountExtraItemQtyApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountAmountExtraItemQtyApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an extra item qty application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItem: Record Item;
+        DiscountedItem: Record Item;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+        LineNo: Integer;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be used to trigger the discount
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ExtraItem, _POSUnit, _POSStore);
+
+        ExtraItem."Unit Price" := 500;
+        ExtraItem.Modify(true);
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetExtraQtyItemCoupon(CouponType, ExtraItem, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LineNo := SaleLinePOS."Line No.";
+        ExtraItemSaleLinePOS.SetFilter("Line No.", '<>%1', LineNo);
+        ExtraItemSaleLinePOS.FindLast();
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+        ExtraItemSaleLinePOSBeforeCustomerAssignment := ExtraItemSaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+        ExtraItemSaleLinePOS.Get(ExtraItemSaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        Assert.AreEqual(ExtraItemSaleLinePOS."Amount Including VAT", ExtraItemSaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(ExtraItemSaleLinePOS."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount", ExtraItemSaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountExtraItemQtyApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item qty application
     var
         ExtraItem: Record Item;
@@ -1019,20 +2419,25 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -1067,7 +2472,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [When] Coupon Scanned and the extra item has been added to the pos sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
 
@@ -1077,7 +2482,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -1087,13 +2492,151 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentItemListApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountAmountExtraItemQtyApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an extra item qty application
+    var
+        ExtraItem: Record Item;
+        DiscountedItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        ExtraItemSaleLinePOS: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SecondNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        SecondNpDcArchCouponEntryAmount: Decimal;
+        LineNo: Integer;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Extra item that is going to be used to trigger the discount
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(ExtraItem, _POSUnit, _POSStore);
+
+        ExtraItem."Unit Price" := 500;
+        ExtraItem.Modify(true);
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetExtraQtyItemCoupon(CouponType, ExtraItem, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+
+        // [When] Coupon Scanned and the extra item has been added to the pos sale
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, ExtraItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        LineNo := SaleLinePOS."Line No.";
+        ExtraItemSaleLinePOS.SetFilter("Line No.", '<>%1', LineNo);
+        ExtraItemSaleLinePOS.FindLast();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignmentExtraItem := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", ExtraItemSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(ExtraItemSaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignmentExtraItem, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", ExtraItemSaleLinePOS.Date, ExtraItemSaleLinePOS."Line No.", ExtraItemSaleLinePOS."Discount Amount", CouponType, SecondNpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+        GetCouponEntryAmountAfterPosting(ExtraItemSaleLinePOS."Register No.", ExtraItemSaleLinePOS."Sales Ticket No.", SecondNpDcArchCouponEntryAmount);
+        SecondNpDcArchCouponEntryAmount := SecondNpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+        Assert.AreEqual(SecondNpDcArchCouponEntryAmount, SecondNpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentItemListApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an item list application
     var
         SalePOS: Record "NPR POS Sale";
@@ -1106,19 +2649,24 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -1137,7 +2685,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Coupon Scanned in the POS Sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetLast();
@@ -1169,11 +2717,123 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntPercentItemListApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountPercentItemListApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an item list application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted Item that is going to get the discount
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %" * 2, 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountPercentItemListApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an item list application
     var
         SalePOS: Record "NPR POS Sale";
@@ -1186,20 +2846,25 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -1228,7 +2893,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [When] Coupon Scanned in the POS Sale and extra item added to the pos sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
 
@@ -1238,7 +2903,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -1249,13 +2914,127 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
         Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 'Discount not calcualted according to test scenario.');
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountItemListApplicationNoVATCustomerAddedAfterCoupon()
+    procedure CheckCouponDiscountPercentItemListApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an item list application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned in the POS Sale and extra item added to the pos sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.UnitPriceExclTax(SaleLinePOS) * SaleLinePOS.Quantity * TempCoupon."Discount %" / 100;
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount %", TempCoupon."Discount %" * 2, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment * 2, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationNoVATCustomerAddedAfterCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an Item List application
     var
         SalePOS: Record "NPR POS Sale";
@@ -1268,18 +3047,23 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountedItem: Record Item;
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -1298,7 +3082,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [GIVEN] Coupon Scanned in the POS Sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.SetLast();
@@ -1331,11 +3115,123 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
         Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure CheckCouponDisocuntAmountItemListApplicationNoVATCustomerAddedBeforeCoupon()
+    procedure CheckCouponDiscountAmountItemListApplicationNoVATCustomerAddedAfterCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale after a coupon has been added with an Item List application
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        Assert.AreEqual(TempCoupon."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount" / 2, 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationNoVATCustomerAddedBeforeCoupon()
     // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an item list application
     var
         DiscountedItem: Record Item;
@@ -1348,20 +3244,25 @@ codeunit 85074 "NPR Coupon Tests"
         CouponType: Record "NPR NpDc Coupon Type";
         LibraryCoupon: Codeunit "NPR Library Coupon";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        DiscountAmountWithVATAftereCouponAssignment: Decimal;
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
         // [GIVEN] POS Transaction
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
 
         // [GIVEN] Coupon with Discount Percent Application
         LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
@@ -1390,7 +3291,7 @@ codeunit 85074 "NPR Coupon Tests"
         // [When] Coupon Scanned and the extra item has been added to the pos sale
         LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
 
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
 
         _POSSession.GetSaleLine(POSSaleLine);
 
@@ -1400,7 +3301,7 @@ codeunit 85074 "NPR Coupon Tests"
         if not GeneralLedgerSetup.Get() then
             Clear(GeneralLedgerSetup);
 
-        DiscountAmountWithVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         POSSaleLine.SetFirst();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
@@ -1410,8 +3311,121 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
 
         // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
-        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment, 'Discount not calcualted according to test scenario.');
 
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationNoVATCustomerAddedBeforeCouponAppliedTwice()
+    // [SCENARIO] Check discount percent when a Customer that doesnt requre VAT has been added to the POS Sale before a coupon has been added with an item list application
+    var
+        DiscountedItem: Record Item;
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [When] Coupon Scanned and the extra item has been added to the pos sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        DiscountAmountWithoutVATAftereCouponAssignment := NPRPOSSaleTaxCalc.CalcAmountWithoutVAT(TempCoupon."Discount Amount", SaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount including VAT should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Discount Amount", DiscountAmountWithoutVATAftereCouponAssignment * 2, 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1423,7 +3437,7 @@ codeunit 85074 "NPR Coupon Tests"
     var
         SalePOS: Record "NPR POS Sale";
         LibraryCoupon: Codeunit "NPR Library Coupon";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
         NPNpDCCouponCheck: Codeunit "NPR POSAction: Coupon Verify B";
@@ -1432,7 +3446,7 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] POS Transaction
         LibraryCoupon.IssueCouponMultipleQuantity(_CouponType, 1, TempCoupon);
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         POSSale.GetCurrentSale(SalePOS);
         //[WHEN] when
         NPNpDCCouponCheck.VerifyCoupon(TempCoupon."Reference No.");
@@ -1455,7 +3469,7 @@ codeunit 85074 "NPR Coupon Tests"
         NpDcModuleIssueOnSaleB: Codeunit "NPR POSAction Issue DC OnSaleB";
         InstantIssue: Boolean;
         LibraryCoupon: Codeunit "NPR Library Coupon";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         DiscountPct: Decimal;
         LibraryUtility: Codeunit "Library - Utility";
         CouponType: Record "NPR NpDc Coupon Type";
@@ -1471,7 +3485,7 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountPct := Random(100);
         InstantIssue := false;
 
-        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
         CouponTypeCode := LibraryUtility.GenerateRandomCode(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type");
         LibraryCoupon.CreateDiscountPctCouponType(CouponTypeCode, DiscountPct);
         Commit();
@@ -1508,6 +3522,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply a discount percentage activity coupon on one item without a serial no that is applicable for an activity coupon discount
         // - Add one item without a serial no that is applicable for an activity coupon discount
@@ -1550,6 +3569,19 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount should be the same which means that the discount % on coupon should be the same as on item
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1569,6 +3601,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply a discount amount activity coupon on one item without a serial no that is applicable for an activity coupon discount
         // - Add one item without a serial no that is applicable for an activity coupon discount
@@ -1611,6 +3648,19 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount should be the same which means that the discount amount on coupon should be the same as on item
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1754,6 +3804,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply one discount percentage activity coupon on two items without a serial no that are applicable for an activity coupon discount
         // - Add two items without a serial no that are applicable for an activity coupon discount
@@ -1799,6 +3855,22 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be the same as first item's discount % and should not be applied on the second item
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.01, 'Discount % not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(0, NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1820,6 +3892,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply one discount amount activity coupon on two items without a serial no that are applicable for an activity coupon discount
         // - Add two items without a serial no that are applicable for an activity coupon discount
@@ -1865,6 +3943,22 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount amount on coupon should be the same as first item's discount amount and should not be applied on the second item
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(0, NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1886,6 +3980,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount percentage activity coupon on two items without a serial no that are applicable for an activity coupon discount
         // - Add two items without a serial no that are applicable for an activity coupon discount
@@ -1907,7 +4007,6 @@ codeunit 85074 "NPR Coupon Tests"
         Item.Modify(true);
         Item1."Unit Price" := 500;
         Item1.Modify(true);
-
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
         CouponQty := 2;
@@ -1933,6 +4032,19 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be the same as on both items on POS sale lines
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
         Assert.AreNearlyEqual(SaleLinePOSSecondItem."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT" + NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -1954,6 +4066,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount amount activity coupon on two items without a serial no that are applicable for an activity coupon discount
         // - Add two items without a serial no that are applicable for an activity coupon discount
@@ -1975,7 +4093,6 @@ codeunit 85074 "NPR Coupon Tests"
         Item.Modify(true);
         Item1."Unit Price" := 500;
         Item1.Modify(true);
-
         LibraryCoupon.SetItemListActivityCouponTwice(CouponType, Item, Item1);
 
         CouponQty := 2;
@@ -2001,6 +4118,19 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount amount on coupon should be the same as on both items on POS sale lines
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT" + NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2022,6 +4152,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount percentage activity coupon on two items without a serial no one of which is applicable for an activity coupon discount, and one is not
         // - Add an item without a serial no that is applicable for an activity coupon discount
@@ -2070,6 +4206,22 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be applied on one item and shold not be applied on other one
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(0, NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2091,6 +4243,12 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecond: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount amount activity coupon on two items without a serial no one of which is applicable for an activity coupon discount, and one is not
         // - Add an item without a serial no that is applicable for an activity coupon discount
@@ -2139,6 +4297,22 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be applied on one item and shold not be applied on other one
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecond);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(0, NpDcSaleLinePOSCouponSecond."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2159,6 +4333,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice discount percentage activity coupon on one item with a serial no that is applicable for an activity coupon discount
         // - Add an item with a serial no that is applicable for an activity coupon discount
@@ -2203,6 +4382,19 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] Only one discount percentage should be applied on item
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2223,6 +4415,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice discount amount activity coupon on one item with a serial no that is applicable for an activity coupon discount
         // - Add an item with a serial no that is applicable for an activity coupon discount
@@ -2267,6 +4464,19 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] Only one discount amount should be applied on item
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2407,6 +4617,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2415,6 +4627,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply one discount percentage activity coupon on two items with a serial no that are applicable for an activity coupon discount
         // - Add two items with a serial no that are applicable for an activity coupon discount
@@ -2461,6 +4678,20 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be the same as first item's discount % and should not be applied on the second item
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2475,6 +4706,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2483,6 +4716,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply one discount amount activity coupon on two items with a serial no that are applicable for an activity coupon discount
         // - Add two items with a serial no that are applicable for an activity coupon discount
@@ -2529,6 +4766,20 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount amount on coupon should be the same as first item's discount amount and should not be applied on the second item
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2543,6 +4794,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2551,6 +4804,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount percentage activity coupon on two items with a serial no that are applicable for an activity coupon discount
         // - Add two items with a serial no that are applicable for an activity coupon discount
@@ -2599,6 +4856,21 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be the same on both POS sale lines
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
         Assert.AreNearlyEqual(SaleLinePOSSecondItem."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2613,6 +4885,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2621,6 +4895,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount amount activity coupon on two items with a serial no that are applicable for an activity coupon discount
         // - Add two items with a serial no that are applicable for an activity coupon discount
@@ -2669,6 +4947,21 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount amount on coupon should be the same on both POS sale lines
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+        NpDcArchCouponEntryAmount := NpDcArchCouponEntryAmount / CouponQty;
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2683,6 +4976,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2691,6 +4986,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount percentage activity coupon on two items with a serial no one of which is applicable for an activity coupon discount, and one is not
         // - Add an item with a serial no that is applicable for an activity coupon discount
@@ -2740,6 +5039,20 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount % on coupon should be applied on first item, but not on second one
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.01, 'Discount % not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount %", 0, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2754,6 +5067,8 @@ codeunit 85074 "NPR Coupon Tests"
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSSecondItem: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcSaleLinePOSCouponSecondItem: Record "NPR NpDc SaleLinePOS Coupon";
         POSSale: Codeunit "NPR POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -2762,6 +5077,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount amount activity coupon on two items with a serial no one of which is applicable for an activity coupon discount, and one is not
         // - Add an item with a serial no that is applicable for an activity coupon discount
@@ -2811,6 +5130,20 @@ codeunit 85074 "NPR Coupon Tests"
         // [THEN] The discount amount on coupon should be applied on first item, but not on second one
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
         Assert.AreEqual(SaleLinePOSSecondItem."Discount Amount", 0, 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+        CheckCouponAmountsBeforePosting(SaleLinePOSSecondItem."Register No.", SaleLinePOSSecondItem."Sales Ticket No.", SaleLinePOSSecondItem.Date, SaleLinePOSSecondItem."Line No.", SaleLinePOSSecondItem."Discount Amount", CouponType, NpDcSaleLinePOSCouponSecondItem);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2830,6 +5163,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount percentage activity coupon on one item without a serial no that is applicable for an activity coupon discount
         // - Add one item without a serial no that is applicable for an activity coupon discount
@@ -2873,6 +5211,19 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount % should only be applied once
         Assert.AreNearlyEqual(SaleLinePOS."Discount %", TempCoupon."Discount %", 0.1, 'Discount % not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
     end;
 
     [Test]
@@ -2892,6 +5243,11 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        NpDcArchCouponEntryAmount: Decimal;
     begin
         // [SCENARIO] Apply twice a discount amount activity coupon on one item without a serial no that is applicable for an activity coupon discount
         // - Add one item without a serial no that is applicable for an activity coupon discount
@@ -2935,6 +5291,733 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [THEN] The discount amount should only be applied once
         Assert.AreEqual(SaleLinePOS."Discount Amount", TempCoupon."Discount Amount", 'Discount amount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponApplicationMultipleCouponsWhenDiscountOnTransactionAndCustomerNoVatAddedAtTheEnd()
+    // [SCENARIO] Check discount when mutliple coupon applied and discount on transaction with customer without VAT added at the end 
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        DiscountAmount: Decimal;
+        DiscountPct: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        LineAmountRemaining: Decimal;
+        NpDcArchCouponEntryAmount: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Item in the POS Sale with discount
+        CreateItemTransaction(1000);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        DiscountType := DiscountType::LineDiscountPercentABS;
+        DiscountPct := 10;
+        POSActionDiscountB.ProcessRequest(DiscountType, DiscountPct, SalePOS, SaleLinePOS, 0);
+        LineAmountRemaining := 1 - DiscountPct / 100;
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LineAmountRemaining *= 1 - TempCoupon."Discount %" / 100;
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LineAmountRemaining *= 1 - TempCoupon."Discount %" / 100;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [Given] Customer added to the POS sale that doesn't require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        // [THEN] Check if coupon entry discount amount is calculated properly
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", 100 * (1 - LineAmountRemaining), 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        DiscountAmount := SaleLinePOS."Unit Price" * DiscountPct / 100;
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount" - DiscountAmount, CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponApplicationMultipleCouponsWhenDiscountOnTransactionAndCustomerNoVatAddedAtStart()
+    var    // [SCENARIO] Check discount when mutliple coupon applied and discount on transaction with customer without VAT added at the start 
+
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        DiscountAmount: Decimal;
+        DiscountPct: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that doesn't require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [GIVEN] Item in the POS Sale with discount
+        CreateItemTransaction(1000);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        DiscountType := DiscountType::LineDiscountPercentABS;
+        DiscountPct := 10;
+        POSActionDiscountB.ProcessRequest(DiscountType, DiscountPct, SalePOS, SaleLinePOS, 0);
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        DiscountAmount := SaleLinePOS."Unit Price" * DiscountPct / 100;
+
+        //[THEN] Check if coupon entry discount amount and discount percent on POS Sales Line is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount" - DiscountAmount, CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponApplicationMultipleCouponsWhenDiscountOnTransactionAndCustomerWithVatAddedAtTheEnd()
+    // [SCENARIO] Check discount when multiple coupons aplied and discount is on transaction with customer with VAT added at the end 
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSCustDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        DiscountAmount: Decimal;
+        DiscountPct: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        LineAmountRemaining: Decimal;
+        NpDcArchCouponEntryAmount: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Item in the POS Sale with discount
+        CreateItemTransaction(1000);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        DiscountType := DiscountType::LineDiscountPercentABS;
+        DiscountPct := 10;
+        POSActionDiscountB.ProcessRequest(DiscountType, DiscountPct, SalePOS, SaleLinePOS, 0);
+        LineAmountRemaining := 1 - DiscountPct / 100;
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LineAmountRemaining *= 1 - TempCoupon."Discount %" / 100;
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LineAmountRemaining *= 1 - TempCoupon."Discount %" / 100;
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [Given] Customer added to the POS sale that require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount %", 100 * (1 - LineAmountRemaining), 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+        DiscountAmount := SaleLinePOS."Unit Price" * DiscountPct / 100;
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount" - DiscountAmount, CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponApplicationMultipleCouponsWhenDiscountOnTransactionAndCustomerWithVatAddedAtStart()
+    // [SCENARIO] Check discount when multiple coupons aplied and discount is on transaction with customer with VAT added at the start 
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSCustDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        DiscountAmount: Decimal;
+        DiscountPct: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+        LineAmountRemaining: Decimal;
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountPctCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 50, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [Given] Customer added to the POS sale that require the prices in the pos sale to have VAT
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        // [GIVEN] Item in the POS Sale with discount
+        CreateItemTransaction(1000);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        DiscountType := DiscountType::LineDiscountPercentABS;
+        DiscountPct := 10;
+        POSActionDiscountB.ProcessRequest(DiscountType, DiscountPct, SalePOS, SaleLinePOS, 0);
+        LineAmountRemaining := 1 - DiscountPct / 100;
+
+        // [When] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        DiscountAmount := SaleLinePOS."Unit Price" * DiscountPct / 100;
+
+        //[THEN] Check if coupon entry discount amount and discount percent on POS Sales Line is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount" - DiscountAmount, CouponType, NpDcSaleLinePOSCoupon);
+
+        AmountToPay := GetAmountToPay();
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, AmountToPay, '');
+        // [THEN] Verify that transaction has ended successfuly
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+
+        GetCouponEntryAmountAfterPosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", NpDcArchCouponEntryAmount);
+
+        // [THEN] Check if coupon entries amount is calculated correctly
+        Assert.AreEqual(NpDcArchCouponEntryAmount, NpDcSaleLinePOSCoupon."Discount Amount Including VAT", 'Amount on coupon entries not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationCouponOverappliedThenDeleted()
+    // [SCENARIO] Check discount amount when coupon has been added with an Item List application and deleted after that
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 600, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount amount after overapplying the coupons should be equal to unit price and amount including VAT 0
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", 0, 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", SaleLinePOS."Unit Price", 'Discount not calcualted according to test scenario.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        // [WHEN] Delete coupons from pos sale
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+
+        // [THEN] Check if sale line with item has discount amount equal to 0 after deleting the coupons
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationNoVATCustomerCouponOverappliedThenDeleted()
+    // [SCENARIO] Check discount amount when a customer that doesnt requre VAT has been added to the POS sale after a coupon has been added with an Item List application and deleted after that
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 600, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", false);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that doesnt require the prices in the pos sale to have VAT
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreNotEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        // [WHEN] Delete coupons from pos sale
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+
+        // [THEN] Check if sale line with item has discount amount equal to 0 after deleting the coupons
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountAmountItemListApplicationWithVATCustomerCouponOverappliedThenDeleted()
+    // [SCENARIO] Check discount amount when a customer that requires VAT has been added to the POS sale after a coupon has been added with an Item List application and deleted after that
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Customer: Record Customer;
+        SaleLinePOSBeforeCustomerAssignment: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        CouponQty: Integer;
+        SaleLinePOSCouponAmount: Decimal;
+        AmountToPay: Decimal;
+        TransactionEnded: Boolean;
+        NpDcArchCouponEntryAmount: Decimal;
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Percent Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 600, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 2;
+        CouponType."Max Use per Sale" := 2;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        SaleLinePOSBeforeCustomerAssignment := SaleLinePOS;
+
+        // [GIVEN] Customer without VAT;
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        // [WHEN] Customer added to the POS sale that requires the prices in the pos sale to have VAT
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Validate("Customer No.", Customer."No.");
+        SalePOS.Modify(true);
+
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] The discount should be the same which means that the amount including vat should be the same as it was before the customer assignment
+        Assert.AreEqual(SaleLinePOS."Amount Including VAT", SaleLinePOSBeforeCustomerAssignment."Amount Including VAT", 'Discount not calcualted according to test scenario.');
+        Assert.AreEqual(SaleLinePOS."Discount Amount", SaleLinePOSBeforeCustomerAssignment."Discount Amount", 'Discount not calcualted propery after customer without VAT assignment.');
+
+        //[THEN] Check if coupon entry discount amount is calculated properly
+        CheckCouponAmountsBeforePosting(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Line No.", SaleLinePOS."Discount Amount", CouponType, NpDcSaleLinePOSCoupon);
+
+        // [WHEN] Delete coupons from pos sale
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+
+        // [THEN] Check if sale line with item has discount amount equal to 0 after deleting the coupons
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
     end;
 
     local procedure Initialize()
@@ -2974,12 +6057,12 @@ codeunit 85074 "NPR Coupon Tests"
     local procedure CreateItemTransaction(ItemPrice: Decimal)
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
     begin
         _Item.Get(_Item."No.");
         _Item."Unit Price" := ItemPrice;
         _Item.Modify();
-        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        LibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
     end;
 
@@ -2997,6 +6080,55 @@ codeunit 85074 "NPR Coupon Tests"
         NpDcCouponType."GS1 Account No." := GLAccountNo;
         NpDcCouponType."Apply Discount Module" := NpDcModuleApplyGS1.ModuleCode();
         NpDcCouponType.Modify();
+    end;
+
+    local procedure CheckCouponAmountsBeforePosting(RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date: Date; LineNo: Integer; SaleLinePOSDiscountAmount: Decimal; CouponType: Record "NPR NpDc Coupon Type"; var NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
+    var
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit Assert;
+        NpDcArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
+        NpDcArchCouponEntryAmount: Decimal;
+        TransactionEnded: Boolean;
+    begin
+        NpDcSaleLinePOSCoupon.Reset();
+        NpDcSaleLinePOSCoupon.SetRange("Register No.", RegisterNo);
+        NpDcSaleLinePOSCoupon.SetRange("Sales Ticket No.", SalesTicketNo);
+        NpDcSaleLinePOSCoupon.SetRange("Sale Type", NpDcSaleLinePOSCoupon."Sale Type"::Sale);
+        NpDcSaleLinePOSCoupon.SetRange("Sale Date", Date);
+        NpDcSaleLinePOSCoupon.SetRange(Type, NpDcSaleLinePOSCoupon.Type::Discount);
+        NpDcSaleLinePOSCoupon.SetRange("Sale Line No.", LineNo);
+        NpDcSaleLinePOSCoupon.CalcSums("Discount Amount", "Discount Amount Including VAT");
+
+        // [THEN] Check if discount amount on coupon line is calculated correct
+        Assert.AreEqual(NpDcSaleLinePOSCoupon."Discount Amount", SaleLinePOSDiscountAmount, 'Discount not calcualted according to test scenario.');
+    end;
+
+    local procedure GetCouponEntryAmountAfterPosting(RegisterNo: Code[10]; SalesTicketNo: Code[20]; var NpDcArchCouponEntryAmount: Decimal)
+    var
+        NpDcArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
+    begin
+        NpDcArchCouponEntry.SetRange("Entry Type", NpDcArchCouponEntry."Entry Type"::"Discount Application");
+        NpDcArchCouponEntry.SetRange("Document No.", SalesTicketNo);
+        NpDcArchCouponEntry.SetRange("Register No.", RegisterNo);
+        NpDcArchCouponEntry.CalcSums(Amount);
+        NpDcArchCouponEntryAmount := -NpDcArchCouponEntry.Amount;
+    end;
+
+    local procedure SumCouponDiscountPercentForApplicationNumber(DiscountPercent: Decimal; NumberOfApplications: Integer) SumCouponDiscountPercent: Decimal
+    var
+    begin
+        SumCouponDiscountPercent := 100 * (1 - Power((1 - DiscountPercent / 100), NumberOfApplications))
+    end;
+
+    local procedure GetAmountToPay() AmountToPay: Decimal
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        PaidAmountOut: Decimal;
+        ChangeAmountOut: Decimal;
+        RoundingAmountOut: Decimal;
+    begin
+        _POSSession.GetSale(POSSale);
+        POSSale.GetTotals(AmountToPay, PaidAmountOut, ChangeAmountOut, RoundingAmountOut);
     end;
 
     procedure CreateGS1CouponType(var CouponType: Record "NPR NpDc Coupon Type"; DiscountType: Option)
