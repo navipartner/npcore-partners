@@ -25,7 +25,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         RetailJournalNo: Text;
     begin
         // [SCENARIO] Test if the price is populated correctly when an item that is not part of any discount is added to the retail journal line.
@@ -69,7 +68,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         RetailJournalNo: Text;
         LineAmtInclTax: Decimal;
     begin
@@ -122,7 +120,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         RetailJournalNo: Text;
         QtyForDiscCalc: Integer;
         LineDiscPct: Decimal;
@@ -182,7 +179,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         RetailJournalNo: Text;
         LineDiscAmt: Decimal;
         LineDiscPct: Decimal;
@@ -239,7 +235,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         RetailJournalNo: Text;
         LineDiscAmt: Decimal;
         LineDiscPct: Decimal;
@@ -296,7 +291,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         RetailJournalNo: Text;
         LineDiscAmt: Decimal;
@@ -346,6 +340,1729 @@ codeunit 85137 "NPR Retail Journal Tests"
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = LineMixDiscPct, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = LineAmtExclTax, 'Unit price after discount application not calculated according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATMixDiscountTotalAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        TotalAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total amount per min qty.
+        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATMixDiscountTotalAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        TotalAmount: Decimal;
+        UnitPriceInclTax: Decimal;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total amount per min qty.
+        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATMixDiscountTotalAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        TotalAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total amount per min qty.
+        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATMixDiscountTotalAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        TotalAmount: Decimal;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total amount per min qty.
+        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATMixDiscountTotalDiscountAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount amount per min qty.
+        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATMixDiscountTotalDiscountAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountAmount: Decimal;
+        UnitPriceInclTax: Decimal;
+        DiscountAmountExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount amount per min qty.
+        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        DiscountAmountExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(UnitPriceInclTax - DiscountAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountAmountExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATMixDiscountTotalDiscountAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount amount per min qty.
+        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATMixDiscountTotalDiscountAmountPerMinQty()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountAmount: Decimal;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount amount per min qty.
+        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" - DiscountAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATMixDiscountTotalDiscountPercent()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount %
+        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATMixDiscountTotalDiscountPercent()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountPct: Decimal;
+        UnitPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount %
+        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATMixDiscountTotalDiscountPercent()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountPct: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount %
+        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATMixDiscountTotalDiscountPercent()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountPct: Decimal;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount total discount %
+        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" * (1 - DiscountPct / 100), VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATMixDiscountMutlipleDiscountLevels()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountCode: Code[20];
+        FirstLevelQty: Integer;
+        SecondLevelQty: Integer;
+        FirstLevelAmount: Decimal;
+        SecondLevelAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount multiple discount levels
+        FirstLevelQty := 2;
+        FirstLevelAmount := 100;
+        SecondLevelQty := 3;
+        SecondLevelAmount := 400;
+        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        // [GIVEN] First level discount quantity on retail journal line
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+
+        // [GIVEN] Second level discount quantity on retail journal line
+        RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATMixDiscountMultipleDiscountLevels()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountCode: Code[20];
+        FirstLevelQty: Integer;
+        SecondLevelQty: Integer;
+        FirstLevelAmount: Decimal;
+        SecondLevelAmount: Decimal;
+        UnitPriceInclTax: Decimal;
+        FirstDiscountPriceExclTax: Decimal;
+        SecondDiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount mutltiple discount levels
+        FirstLevelQty := 2;
+        FirstLevelAmount := 100;
+        SecondLevelQty := 3;
+        SecondLevelAmount := 400;
+        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        FirstDiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(UnitPriceInclTax * FirstLevelQty - FirstLevelAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        SecondDiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(UnitPriceInclTax * SecondLevelQty - SecondLevelAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [GIVEN] First level discount quantity on retail journal line
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = FirstDiscountPriceExclTax, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = UnitPriceInclTax * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+
+        // [GIVEN] Second level discount quantity on retail journal line
+        RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATMixDiscountMultipleDiscountLevels()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountCode: Code[20];
+        FirstLevelQty: Integer;
+        SecondLevelQty: Integer;
+        FirstLevelAmount: Decimal;
+        SecondLevelAmount: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount multiple discount levels
+        FirstLevelQty := 2;
+        FirstLevelAmount := 100;
+        SecondLevelQty := 3;
+        SecondLevelAmount := 400;
+        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        // [GIVEN] First level discount quantity on retail journal line
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+
+        // [GIVEN] Second level discount quantity on retail journal line
+        RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATMixDiscountMultipleDiscountLevels()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountCode: Code[20];
+        FirstLevelQty: Integer;
+        SecondLevelQty: Integer;
+        FirstLevelAmount: Decimal;
+        SecondLevelAmount: Decimal;
+        FirstDiscountPriceExclTax: Decimal;
+        SecondDiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Mixed discount multiple discount levels
+        FirstLevelQty := 2;
+        FirstLevelAmount := 100;
+        SecondLevelQty := 3;
+        SecondLevelAmount := 400;
+        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        FirstDiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" * FirstLevelQty - FirstLevelAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        SecondDiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" * SecondLevelQty - SecondLevelAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [GIVEN] First level discount quantity on retail journal line
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = FirstDiscountPriceExclTax, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+
+        // [GIVEN] Second level discount quantity on retail journal line
+        RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATPeriodDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Period discount
+        POSPeriodDiscandTax.CreateDiscount(Item, 30, PeriodDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATPeriodDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        UnitPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Period discount
+        POSPeriodDiscandTax.CreateDiscount(Item, 30, PeriodDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * (1 - PeriodDiscountLine."Discount %" / 100), 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATPeriodDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Period discount
+        POSPeriodDiscandTax.CreateDiscount(Item, 30, PeriodDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATPeriodDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PeriodDiscountLine: Record "NPR Period Discount Line";
+        POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Period discount
+        POSPeriodDiscandTax.CreateDiscount(Item, 30, PeriodDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" - PeriodDiscountLine."Discount Amount", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATQuantityDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        QtyForDiscCalc: Integer;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceExclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices above when having item on retail journal which has quantity discount. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Quantity discount
+        POSQtyDiscandTax.CreateDiscount(Item, 30, QuantityDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        QtyForDiscCalc := 2;
+        RetailJournalLine.Validate("Quantity for Discount Calc", QtyForDiscCalc);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        LineDiscPct := 100 - QuantityDiscountLine."Unit Price" / Item."Unit Price" * 100;
+        LineDiscAmt := QtyForDiscCalc * Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceExclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATQuantityDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        QtyForDiscCalc: Integer;
+        UnitPriceInclTax: Decimal;
+        DiscountPriceExclTax: Decimal;
+        DiscountPriceInclTax: Decimal;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        //[GIVEN] Quantity discount
+        POSQtyDiscandTax.CreateDiscount(Item, 30, QuantityDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        QtyForDiscCalc := 2;
+        RetailJournalLine.Validate("Quantity for Discount Calc", QtyForDiscCalc);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        LineDiscPct := 100 - QuantityDiscountLine."Unit Price" / Item."Unit Price" * 100;
+        LineDiscAmt := QtyForDiscCalc * Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceExclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
+        DiscountPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(DiscountPriceExclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATQuantityDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        QtyForDiscCalc: Integer;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Quantity discount
+        POSQtyDiscandTax.CreateDiscount(Item, 30, QuantityDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        QtyForDiscCalc := 2;
+        RetailJournalLine.Validate("Quantity for Discount Calc", QtyForDiscCalc);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        LineDiscPct := 100 - QuantityDiscountLine."Unit Price" / Item."Unit Price" * 100;
+        LineDiscAmt := QtyForDiscCalc * Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceInclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATQuantityDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        QtyForDiscCalc: Integer;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceExclTax: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Quantity discount
+        POSQtyDiscandTax.CreateDiscount(Item, 30, QuantityDiscountLine);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        QtyForDiscCalc := 2;
+        RetailJournalLine.Validate("Quantity for Discount Calc", QtyForDiscCalc);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        LineDiscPct := 100 - QuantityDiscountLine."Unit Price" / Item."Unit Price" * 100;
+        LineDiscAmt := QtyForDiscCalc * Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceInclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(DiscountPriceInclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithoutVATPriceListDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Price List discount
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 60);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceInclTax := Item."Unit Price" - LineDiscAmt;
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceNotIncludesVATItemWithVATPriceListDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        UnitPriceInclTax: Decimal;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceExclTax: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = false, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', false);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Price List discount
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 60);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceExclTax := Item."Unit Price" - LineDiscAmt;
+        DiscountPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(DiscountPriceExclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithoutVATPriceListDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item without VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        VATPostingSetup."VAT %" := 0;
+        VATPostingSetup.Modify(true);
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item without VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Price List discount
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 60);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceInclTax := Item."Unit Price" - LineDiscAmt;
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckPricesItemPriceIncludesVATItemWithVATPriceListDiscount()
+    var
+        RetailJournalLine: Record "NPR Retail Journal Line";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        Assert: Codeunit Assert;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        RetailJournalNo: Text;
+        LineDiscPct: Decimal;
+        LineDiscAmt: Decimal;
+        DiscountPriceExclTax: Decimal;
+        DiscountPriceInclTax: Decimal;
+    begin
+        // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item with VAT
+
+        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup
+        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
+        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+
+        // [GIVEN] Item with unit price, price includes vat = true, item with VAT
+        CreateItem(Item, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group", '', true);
+        Item."Unit Price" := 2000;
+        Item.Modify();
+
+        // [GIVEN] Price List discount
+        LineDiscPct := POSCustoDiscandTax.CreateDiscount(Item, 60);
+
+        // [GIVEN] Item added to retail journal
+        RetailJournalNo := Format(CreateGuid());
+        RetailJournalLine.SelectRetailJournal(RetailJournalNo);
+        RetailJournalLine.InitLine();
+        RetailJournalLine.SetItem(Item."No.", '', '');
+        RetailJournalLine.Validate("Quantity to Print", 1);
+        RetailJournalLine.Insert();
+
+        RetailJournalLine.SetRange("No.", RetailJournalNo);
+        RetailJournalLine.FindFirst();
+
+        if not GeneralLedgerSetup.Get() then
+            Clear(GeneralLedgerSetup);
+        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
+        DiscountPriceInclTax := Item."Unit Price" - LineDiscAmt;
+        DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(DiscountPriceInclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+
+        // [THEN] Check if discount and prices are calculated correctly
+        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
 
     local procedure Initialize()
