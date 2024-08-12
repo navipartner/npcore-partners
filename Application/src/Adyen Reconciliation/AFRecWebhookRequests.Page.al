@@ -169,6 +169,7 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                         InvalidFileType: Label 'Invalid File Type.\The file you attempted to upload is not a valid format. Please upload a file in .XLSX format.';
                         InvalidMerchantAccount: Label 'Merchant Account is blank.';
                         ReportDetails: Text;
+                        WebhookRequest: Record "NPR AF Rec. Webhook Request";
                     begin
                         ReportDetails := AdyenSimulateWebhookRequest.RequestReportName();
                         if ReportDetails <> '' then begin
@@ -182,8 +183,10 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                             Error(InvalidFileType);
                         if MerchantAccount = '' then
                             Error(InvalidMerchantAccount);
-                        if (ReportName <> '') and (MerchantAccount <> '') then
-                            _AdyenManagement.EmulateWebhookRequest(ReportName, MerchantAccount, Live);
+                        if (ReportName <> '') and (MerchantAccount <> '') then begin
+                            _AdyenManagement.EmulateWebhookRequest(ReportName, MerchantAccount, Live, WebhookRequest);
+                            _AdyenManagement.CreateDocumentFromWebhookRequest(WebhookRequest);
+                        end;
 
                         CurrPage.Update(false);
                     end;
