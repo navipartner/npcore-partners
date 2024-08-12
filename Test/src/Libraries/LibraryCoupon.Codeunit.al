@@ -211,7 +211,7 @@ codeunit 85051 "NPR Library Coupon"
         LibNoSeries: Codeunit "NPR Library - No. Series";
     begin
         if (CouponSetup.Get()) then
-            CouponSetup.Delete();
+            exit;
 
         CouponSetup.Init();
         CouponSetup."Coupon No. Series" := LibNoSeries.GenerateNoSeries();
