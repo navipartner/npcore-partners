@@ -985,7 +985,7 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
-    internal procedure EmulateWebhookRequest(ReportName: Text[100]; MerchantAccount: Text[80]; Live: Boolean)
+    internal procedure EmulateWebhookRequest(ReportName: Text[100]; MerchantAccount: Text[80]; Live: Boolean; var WebhookRequest: Record "NPR AF Rec. Webhook Request")
     var
         ReportDownloadURL: Label 'https://ca-%2.adyen.com/reports/download/MerchantAccount/%1/', Locked = true;
         ReportDownloadURLString: Text;
@@ -997,7 +997,6 @@ codeunit 6184796 "NPR Adyen Management"
         HttpContent: HttpContent;
         InStr: InStream;
         OutStr: OutStream;
-        WebhookRequest: Record "NPR AF Rec. Webhook Request";
     begin
         InitiateAdyenManagement();
 
