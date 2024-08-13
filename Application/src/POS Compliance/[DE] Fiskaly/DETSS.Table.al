@@ -53,6 +53,11 @@ table 6014687 "NPR DE TSS"
         }
     }
 
+    trigger OnInsert()
+    begin
+        SystemId := CreateGuid();
+    end;
+
     procedure AdminPUKSecretLbl(): Text
     begin
         if IsNullGuid(SystemId) then
