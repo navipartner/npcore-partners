@@ -107,6 +107,40 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     #endregion
 
+    #region SI Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::"Salesperson/Purchaser", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalespersonPurchaser_OnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
+    var
+        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsSIFiscalActive() then
+            exit;
+        if SIAuxSalespPurch.Get(Rec.SystemId) then
+            SIAuxSalespPurch.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSStore_OnAfterDeleteEvent(var Rec: Record "NPR POS Store"; RunTrigger: Boolean)
+    var
+        SIPOSStoreMapping: Record "NPR SI POS Store Mapping";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsSIFiscalActive() then
+            exit;
+        if SIPOSStoreMapping.Get(Rec.Code) then
+            SIPOSStoreMapping.Delete();
+    end;
+
+    #endregion
+
     #region SI Fiscal - Audit Profile Mgt
     local procedure AddSIAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin

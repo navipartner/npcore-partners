@@ -8,9 +8,9 @@ table 6150775 "NPR IT Aux Customer"
     {
         field(1; "No."; Code[20])
         {
-            Caption = 'Salesperson/Purchaser SystemId';
+            Caption = 'No.';
             DataClassification = CustomerContent;
-            TableRelation = Customer."No.";
+            TableRelation = Customer;
         }
         field(2; "NPR IT Customer Lottery Code"; Text[15])
         {

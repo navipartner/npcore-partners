@@ -36,10 +36,14 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure Customer_OnAfterDeleteEvent(var Rec: Record Customer)
+    local procedure Customer_OnAfterDeleteEvent(var Rec: Record Customer; RunTrigger: Boolean)
     var
         RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
     begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
         if not IsRSEInvoiceEnabled() then
             exit;
         if RSEIAuxCustomer.Get(Rec."No.") then
@@ -47,15 +51,20 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Company Information", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure CompanyInformation_OnAfterDeleteEvent(var Rec: Record "Company Information")
+    local procedure CompanyInformation_OnAfterDeleteEvent(var Rec: Record "Company Information"; RunTrigger: Boolean)
     var
         RSEIAuxCompanyInfo: Record "NPR RS EI Aux Company Info";
     begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
         if not IsRSEInvoiceEnabled() then
             exit;
         if RSEIAuxCompanyInfo.Get(Rec.SystemId) then
             RSEIAuxCompanyInfo.Delete();
     end;
+
 #endif
 
     #endregion RS E-Invoice Mgt. Procedures
@@ -129,6 +138,8 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     var
         RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
     begin
+        if Rec.IsTemporary() then
+            exit;
         if not RunTrigger then
             exit;
 
@@ -139,11 +150,29 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEIAuxPurchHeader.Delete();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Purchase Header", 'OnAfterRenameEvent', '', false, false)]
+    local procedure PurchaseHeader_OnAfterRenameEvent(var Rec: Record "Purchase Header"; var xRec: Record "Purchase Header"; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Purch. Inv. Header", 'OnAfterDeleteEvent', '', false, false)]
     local procedure PurchaseInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Purch. Inv. Header"; RunTrigger: Boolean)
     var
         RSEIAuxPurchInvHdr: Record "NPR RS EI Aux Purch. Inv. Hdr.";
     begin
+        if Rec.IsTemporary() then
+            exit;
         if not RunTrigger then
             exit;
 
@@ -156,12 +185,30 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         DeleteRelatedRSEInvoiceDocument(Rec."Order No.");
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Purch. Inv. Header", 'OnAfterRenameEvent', '', false, false)]
+    local procedure PurchaseInvoiceHeader_OnAfterRenameEvent(var Rec: Record "Purch. Inv. Header"; var xRec: Record "Purch. Inv. Header"; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Purch. Cr. Memo Hdr.", 'OnAfterDeleteEvent', '', false, false)]
     local procedure PurchaseCrMemoHeader_OnAfterDeleteEvent(var Rec: Record "Purch. Cr. Memo Hdr."; RunTrigger: Boolean)
     var
         RSEIAuxPurchCrMemHdr: Record "NPR RS EI Aux Purch. CrMem Hdr";
         PurchInvHeader: Record "Purch. Inv. Header";
     begin
+        if Rec.IsTemporary() then
+            exit;
         if not RunTrigger then
             exit;
 
@@ -178,6 +225,22 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             DeleteRelatedRSEInvoiceDocument(PurchInvHeader."Prepayment Order No.")
         else
             DeleteRelatedRSEInvoiceDocument(PurchInvHeader."Order No.");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Purch. Cr. Memo Hdr.", 'OnAfterRenameEvent', '', false, false)]
+    local procedure PurchaseCrMemoHeader_OnAfterRenameEvent(var Rec: Record "Purch. Cr. Memo Hdr."; var xRec: Record "Purch. Cr. Memo Hdr."; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
     end;
 
     #endregion RS E-Invoice Purchase Subscribers
@@ -256,6 +319,22 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEIAuxSalesHeader.Delete();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterRenameEvent', '', false, false)]
+    local procedure SalesHeader_OnAfterRenameEvent(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
     local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
     var
@@ -271,6 +350,22 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxSalesInvHeader.Delete();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterRenameEvent', '', false, false)]
+    local procedure SalesInvoiceHeader_OnAfterRenameEvent(var Rec: Record "Sales Invoice Header"; var xRec: Record "Sales Invoice Header"; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterDeleteEvent', '', false, false)]
     local procedure SalesCrMemoHeader_OnAfterDeleteEvent(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
     var
@@ -284,6 +379,22 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
 
         if RSEIAuxSalesCrMemoHdr.Get(Rec.SystemId) then
             RSEIAuxSalesCrMemoHdr.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterRenameEvent', '', false, false)]
+    local procedure SalesCrMemoHeader_OnAfterRenameEvent(var Rec: Record "Sales Cr.Memo Header"; var xRec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if not IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', false, false)]
@@ -648,8 +759,8 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     begin
         RSEInvoiceDocument.SetRange(Direction, RSEInvoiceDocument.Direction::Incoming);
         RSEInvoiceDocument.SetRange("Document No.", DocumentNo);
-        if RSEInvoiceDocument.FindFirst() then
-            RSEInvoiceDocument.Delete();
+        if not RSEInvoiceDocument.IsEmpty() then
+            RSEInvoiceDocument.DeleteAll();
     end;
 
     local procedure CheckIfPurchaseDocumentIsApproved(PurchaseHeader: Record "Purchase Header"): Boolean
