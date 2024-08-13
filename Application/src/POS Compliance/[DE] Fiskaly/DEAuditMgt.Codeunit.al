@@ -83,14 +83,14 @@
                 begin
                     InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::RECEIPT);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
-                    DeAuditAux.Insert(true, true);
+                    DeAuditAux.Insert(true);
                     DEFiskalyCommunication.SendDocument(DeAuditAux);
                 end;
             POSAuditLog."Action Type"::CANCEL_SALE_END:
                 begin
                     InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::CANCELLATION);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
-                    DeAuditAux.Insert(true, true);
+                    DeAuditAux.Insert(true);
                     DEFiskalyCommunication.SendDocument(DeAuditAux);
                 end;
         end;
