@@ -98,4 +98,8 @@
             Clustered = true;
         }
     }
+    trigger OnInsert()
+    begin
+        SystemId := CreateGuid();
+    end;
 }
