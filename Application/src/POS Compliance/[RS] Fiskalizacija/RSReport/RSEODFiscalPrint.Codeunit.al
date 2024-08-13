@@ -74,6 +74,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         else
             ReportNoCaptionTxt := ZReportEntryNoCaptionLbl;
 
+        PrintThermalLine(Printer, CaptionValueFormat(ReportDateCaptionLbl, Format(POSWorkshiftCheckpoint.SystemCreatedAt)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(ReportNoCaptionTxt, Format(POSWorkshiftCheckpoint."Entry No.")), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(POSUnitNoCaptionLbl, POSUnit."No."), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(POSUnitNameCaptionLbl, POSUnit.Name), 'A11', false, 'LEFT', true, false);
@@ -156,7 +157,6 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
     var
         ItemCategory: Record "Item Category";
         ItemCategoryQuery: Query "NPR RS Sales By Item Category";
-        WithoutItemCategoryProcessed: Boolean;
 
     begin
         ItemCategoryQuery.SetFilter(EntryNo, '%1..%2', FromEntryNo, POSWorkshiftCheckpoint."POS Entry No.");
@@ -165,10 +165,8 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         ItemCategoryQuery.SetRange(POSStoreCode, POSUnit."POS Store Code");
 
         ItemCategoryQuery.Open();
-        while ItemCategoryQuery.Read() do begin
+        while ItemCategoryQuery.Read() do 
             if ItemCategoryQuery.ItemCategoryCode = '' then begin
-                if not WithoutItemCategoryProcessed then
-                    WithoutItemCategoryProcessed := true;
                 if ItemCategoryQuery.Type = ItemCategoryQuery.Type::Item then
                     WithoutItemCategoryQuantity += ItemCategoryQuery.Quantity;
                 WithoutItemCategoryAmount += ItemCategoryQuery.AmountInclVATLCY;
@@ -181,15 +179,15 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
                     PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(ItemCategoryQuery.AmountInclVATLCY)), 'A11', false, 'LEFT', true, false);
                 end;
 
-            if WithoutItemCategoryProcessed then begin
-                PrintThermalLine(Printer, 'N/A', 'A11', true, 'CENTER', true, false);
-                PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(WithoutItemCategoryQuantity)), 'A11', false, 'LEFT', true, false);
-                PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithoutItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
-            end;
-
-            ItemCategoryQuery.Close();
+        if WithoutItemCategoryQuantity > 0 then begin
+            PrintThermalLine(Printer, 'N/A', 'A11', true, 'CENTER', true, false);
+            PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(WithoutItemCategoryQuantity)), 'A11', false, 'LEFT', true, false);
+            PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithoutItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
         end;
+
+        ItemCategoryQuery.Close();
     end;
+    
 
     local procedure PrintSalespersonPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
@@ -229,7 +227,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         PrintThermalLine(Printer, CaptionValueFormat(SalespersonPurchaser.Name, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
     end;
 
-    local procedure PrintPaymentsAmount(var Printer: Codeunit "NPR RP Line Print"; POSEntry: Record "NPR POS Entry")
+    local procedure PrintPaymentsAmount(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry")
     var
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -295,7 +293,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
-    internal procedure PrintSalesTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print"; POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
+    internal procedure PrintSalesTaxAmountsSection(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry"; POSWorkshiftCheckpointEntryNo: Integer)
     var
         POSWorkshTaxCheckp: Record "NPR POS Worksh. Tax Checkp.";
         Printed: Boolean;
@@ -397,6 +395,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
 
     var
         RSReportStatisticsMgt: Codeunit "NPR RS Report Statistics Mgt.";
+        ReportDateCaptionLbl: Label 'Datum', Locked = true;
         BrutoSalesCaptionLbl: Label 'Bruto promet', Locked = true;
         CalculatedAmountInclFloatCaptionLbl: Label 'Izračunati iznos u gotovini', Locked = true;
         CancelledQuantityCaptionLbl: Label 'Broj storniranih racuna', Locked = true;
