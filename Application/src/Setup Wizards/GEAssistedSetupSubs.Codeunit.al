@@ -18,6 +18,7 @@
         AddSIFiscalizationSetupsWizard();
         AddITFiscalizationSetupsWizard();
         AddATFiscalizationSetupsWizard();
+        AddRSEInvoiceSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -174,6 +175,23 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT POS Paym. Meth.", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
     end;
 
+    local procedure AddRSEInvoiceSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        RSEInvoiceSetupTxt: Label 'Welcome to RS E-Invoice Setup';
+        RSEIVATPostingSetupTxt: Label 'Welcome to RS E-Invoice VAT Posting Setup';
+        RSEITaxExReasonsSetupTxt: Label 'Welcome to RS E-Invoice Tax Exemption Reasons Setup';
+        RSEIPaymMethodSetupTxt: Label 'Welcome to RS E-Invoice Payment Method Setup';
+        RSEIUOMMappingSetupTxt: Label 'Welcome to RS E-Invoice UOM Mapping Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS E-Invoice", RSEInvoiceSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI VAT Posting", RSEIVATPostingSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI Tax Ex. Reason", RSEITaxExReasonsSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI Paym. Meth.", RSEIPaymMethodSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI UOM Mapping", RSEIUOMMappingSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -205,6 +223,7 @@
         BGSISFiscalizationSetups();
         ITFiscalizationSetups();
         ATFiscalizationSetups();
+        RSEInvoiceSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
             HideChecklistIfPOSEntryExist();
@@ -1403,7 +1422,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1433,6 +1452,9 @@
             Modul::ATFiscalization:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-ATFiscalization-v1.0');
+            Modul::RSEInvoiceSetup:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-RSEInvoice-v1.0');
         end;
     end;
 
@@ -2572,9 +2594,237 @@
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup BG SIS Fiscal");
             AssistedSetupGroup::NPRSIFiscal:
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup SI Fiscal");
+            AssistedSetupGroup::NPRRSEInvoice:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup RS E-Invoice");
         end;
     end;
 
+    #endregion
+
+    #region RS E-Invoice Wizards
+    local procedure RSEInvoiceSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::RSEInvoiceSetup)) then
+            exit;
+
+        RemoveRSEInvoiceSetupGuidedExperience();
+
+        AddRSEInvoiceSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::RSEInvoiceSetup));
+    end;
+
+    local procedure RemoveRSEInvoiceSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS E-Invoice");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI VAT Posting");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI Tax Ex. Reason");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI Paym. Meth.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI UOM Mapping");
+    end;
+
+    local procedure AddRSEInvoiceSetupsWizard()
+    begin
+        EnableRSEInvoiceSetupWizard();
+        EnableRSEIVATPostingSetupWizard();
+        EnableRSEITaxExReasonWizard();
+        EnableRSEIPaymMethWizard();
+        EnableRSEIUOMMappingWizard();
+    end;
+
+    local procedure EnableRSEInvoiceSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable E-Invoice', Locked = true;
+        SetupDescriptionTxt: Label 'Enable E-Invoice', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS E-Invoice") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS E-Invoice",
+                                                AssistedSetupGroup::NPRRSEInvoice,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSEIVATPostingSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup VAT Posting Setups', Locked = true;
+        SetupDescriptionTxt: Label 'Setup VAT Posting Setups', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI VAT Posting") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS EI VAT Posting",
+                                                AssistedSetupGroup::NPRRSEInvoice,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSEITaxExReasonWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Tax Exemption Reasons', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Tax Exemption Reasons', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI Tax Ex. Reason") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS EI Tax Ex. Reason",
+                                                AssistedSetupGroup::NPRRSEInvoice,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSEIPaymMethWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS EI Paym. Meth.",
+                                                AssistedSetupGroup::NPRRSEInvoice,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableRSEIUOMMappingWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Units of Measure', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Units of Measure', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup RS EI UOM Mapping") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup RS EI UOM Mapping",
+                                                AssistedSetupGroup::NPRRSEInvoice,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS E-Invoice", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSEInvoiceWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSEInvoiceWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS EI VAT Posting", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSEIVATPostingWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSEIVATPostingWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS EI Tax Ex. Reason", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSEITaxExReasonWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSEITaxExReasonWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS EI Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSEIPaymMethWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSEIPaymMethWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup RS EI UOM Mapping", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupRSEIUOMMappingWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupRSEIUOMMappingWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR RS E-Invoice Setup", 'OnAfterValidateEvent', 'Enable RS E-Invoice', false, false)]
+    local procedure ResetRSEInvoiceWizard_OnAfterValidateEnableRSEInvoice(var Rec: Record "NPR RS E-Invoice Setup"; var xRec: Record "NPR RS E-Invoice Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable RS E-Invoice" <> xRec."Enable RS E-Invoice") and not Rec."Enable RS E-Invoice" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRRSEInvoice);
+    end;
+
+    local procedure UpdateSetupRSEInvoiceWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS E-Invoice");
+    end;
+
+    local procedure UpdateSetupRSEIVATPostingWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS EI VAT Posting");
+    end;
+
+    local procedure UpdateSetupRSEITaxExReasonWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS EI Tax Ex. Reason");
+    end;
+
+    local procedure UpdateSetupRSEIPaymMethWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS EI Paym. Meth.");
+    end;
+
+    local procedure UpdateSetupRSEIUOMMappingWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup RS EI UOM Mapping");
+    end;
     #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
@@ -2602,6 +2852,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup;
 #endif
 }
