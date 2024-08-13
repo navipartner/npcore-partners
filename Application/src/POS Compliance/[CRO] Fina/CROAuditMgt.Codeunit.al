@@ -9,7 +9,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
         Enabled: Boolean;
         Initialized: Boolean;
-        RetailLocationExists: Boolean;
+        RetailLocationExistsOnSalesLines: Boolean;
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
@@ -53,32 +53,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     local procedure OnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin
         CheckAreDataSetAndAccordingToCompliance(FrontEnd);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure POSPaymentMethodOnAfterDelete(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
-    var
-        CROPOSPaymentMethod: Record "NPR CRO POS Paym. Method Mapp.";
-    begin
-        if not RunTrigger then
-            exit;
-        if not IsCROFiscalActive() then
-            exit;
-        CROPOSPaymentMethod.Get(Rec."Code");
-        CROPOSPaymentMethod.Delete();
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Salesperson/Purchaser", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure SalespersonPurchaserOnAfterDelete(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
-    var
-        CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
-    begin
-        if not RunTrigger then
-            exit;
-        if not IsCROFiscalActive() then
-            exit;
-        CROAuxSalespPurch.Get(Rec.SystemId);
-        CROAuxSalespPurch.Delete();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterValidateEvent', 'No.', false, false)]
@@ -156,7 +130,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExists then
+        if not RetailLocationExistsOnSalesLines then
             exit;
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvHeader);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
@@ -172,7 +146,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExists then
+        if not RetailLocationExistsOnSalesLines then
             exit;
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
@@ -189,7 +163,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExists then
+        if not RetailLocationExistsOnSalesLines then
             exit;
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
@@ -197,34 +171,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
     end;
 #endif
-
-    [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
-    local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
-    var
-        CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
-    begin
-        if not RunTrigger then
-            exit;
-        if not IsCROFiscalActive() then
-            exit;
-        if not RetailLocationExists then
-            exit;
-        CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
-        CROAuxSalesInvHeader.Delete();
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
-    local procedure OnAfterDeleteAfterPosting(SalesHeader: Record "Sales Header");
-    var
-        CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
-    begin
-        if not IsCROFiscalActive() then
-            exit;
-        if not RetailLocationExists then
-            exit;
-        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
-        CROAuxSalesHeader.Delete();
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
     local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
@@ -237,7 +183,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExists then
+        if not RetailLocationExistsOnSalesLines then
             exit;
 
         if SalesInvHdrNo <> '' then
@@ -253,11 +199,107 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExists then
+        if not RetailLocationExistsOnSalesLines then
             exit;
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesHeader."NPR CRO POS Unit" := SalePOS."Register No.";
         CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
+    end;
+
+    #endregion
+
+    #region CRO Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
+    var
+        CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
+        CROAuxSalesInvHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesCrMemoHeader_OnAfterDeleteEvent(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
+    var
+        CROAuxSalesCrMemoHdr: Record "NPR CRO Aux Sales Cr. Memo Hdr";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        CROAuxSalesCrMemoHdr.ReadCROAuxSalesCrMemoHeaderFields(Rec);
+        CROAuxSalesCrMemoHdr.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
+    local procedure SalesPost_OnAfterDeleteAfterPosting(SalesHeader: Record "Sales Header");
+    var
+        CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
+    begin
+        if not RetailLocationExistsOnSalesLines then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
+        CROAuxSalesHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Salesperson/Purchaser", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalespersonPurchaser_OnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
+    var
+        CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        if CROAuxSalespPurch.Get(Rec.SystemId) then
+            CROAuxSalespPurch.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSPaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        CROPOSPaymentMethod: Record "NPR CRO POS Paym. Method Mapp.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        if CROPOSPaymentMethod.Get(Rec."Code") then
+            CROPOSPaymentMethod.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "Payment Method"; RunTrigger: Boolean)
+    var
+        CROPaymentMethod: Record "NPR CRO Payment Method Mapping";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsCROFiscalActive() then
+            exit;
+        if CROPaymentMethod.Get(Rec."Code") then
+            CROPaymentMethod.Delete();
     end;
 
     #endregion
@@ -610,8 +652,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        CheckSalesHeaderRetailLocation(SalesHeader);
-        if not RetailLocationExists then
+        if not CheckSalesLinesRetailLocation(SalesHeader) then
             exit;
         SalesHeader.TestField("Payment Method Code");
         SalesHeader.TestField("Salesperson Code");
@@ -626,22 +667,27 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             Error(NotCROAuditProfileErr, POSUnit."No.");
     end;
 
-    local procedure CheckSalesHeaderRetailLocation(SalesHeader: Record "Sales Header")
+    local procedure CheckSalesLinesRetailLocation(SalesHeader: Record "Sales Header"): Boolean
     var
         Location: Record Location;
         SalesLines: Record "Sales Line";
     begin
+        RetailLocationExistsOnSalesLines := false;
         SalesLines.SetCurrentKey("Document Type", "Document No.", "Location Code");
+        SalesLines.SetLoadFields("Location Code");
+        SalesLines.SetFilter(Type, '%1|%2', SalesLines.Type::Item, SalesLines.Type::"Charge (Item)");
         SalesLines.SetRange("Document No.", SalesHeader."No.");
-        SalesLines.SetRange(Type, SalesLines.Type::Item, SalesLines.Type::"Charge (Item)");
         if not SalesLines.FindSet() then
-            exit;
+            exit(RetailLocationExistsOnSalesLines);
+
         repeat
-            SalesLines.TestField("Location Code");
-            Location.Get(SalesLines."Location Code");
-            if Location."NPR Retail Location" then
-                RetailLocationExists := true;
+            if Location.Get(SalesLines."Location Code") then
+                if Location."NPR Retail Location" then begin
+                    RetailLocationExistsOnSalesLines := true;
+                    exit(RetailLocationExistsOnSalesLines);
+                end;
         until SalesLines.Next() = 0;
+        exit(RetailLocationExistsOnSalesLines);
     end;
 
     internal procedure FormatDecimal(DecimalValue: Decimal): Text
