@@ -143,6 +143,56 @@ codeunit 6184647 "NPR IT Audit Mgt."
 
     #endregion
 
+    #region IT Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterDeleteEvent', '', false, false)]
+    local procedure Customer_OnAfterDeleteEvent(var Rec: Record Customer; RunTrigger: Boolean)
+    var
+        ITAuxCustomer: Record "NPR IT Aux Customer";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsITFiscalEnabled() then
+            exit;
+        if ITAuxCustomer.Get(Rec."No.") then
+            ITAuxCustomer.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        ITPaymentMethodMapping: Record "NPR IT POS Paym. Method Mapp.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsITFiscalEnabled() then
+            exit;
+        ITPaymentMethodMapping.SetRange("Payment Method Code", Rec.Code);
+        if not ITPaymentMethodMapping.IsEmpty() then
+            ITPaymentMethodMapping.DeleteAll();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSUnit_OnAfterDeleteEvent(var Rec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    var
+        ITPOSUnitMapping: Record "NPR IT POS Unit Mapping";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsITFiscalEnabled() then
+            exit;
+        if ITPOSUnitMapping.Get(Rec."No.") then
+            ITPOSUnitMapping.Delete();
+    end;
+
+    #endregion
+
     #region IT Fiscal - Audit Profile Mgt
     local procedure AddITAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
