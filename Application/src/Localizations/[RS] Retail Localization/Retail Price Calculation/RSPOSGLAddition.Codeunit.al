@@ -15,6 +15,9 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ReturnDocumentNo: Code[20];
         RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
     begin
+        if not (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Posted]) then
+            exit;
+
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
