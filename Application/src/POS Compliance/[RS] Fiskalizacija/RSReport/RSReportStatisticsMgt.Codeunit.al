@@ -1,7 +1,7 @@
 codeunit 6184939 "NPR RS Report Statistics Mgt."
 {
     Access = Internal;
-    
+
     internal procedure FindWorkshiftPaymentLine(WorkshiftCheckpointEntryNo: Integer; var PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."): Boolean
     begin
         PaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpointEntryNo);
