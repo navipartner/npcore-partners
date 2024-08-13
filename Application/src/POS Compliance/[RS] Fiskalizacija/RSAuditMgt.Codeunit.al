@@ -258,13 +258,13 @@ codeunit 6059942 "NPR RS Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeManualReleaseSalesDoc', '', false, false)]
     local procedure OnBeforeManualReleaseSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
     begin
-        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+        VerifyIsDataSetOnSalesDocuments(SalesHeader, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnBeforeManualReOpenSalesDoc', '', false, false)]
     local procedure OnBeforeManualReOpenSalesDoc(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean);
     begin
-        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+        VerifyIsDataSetOnSalesDocuments(SalesHeader, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Sales Document", 'OnAfterManualReleaseSalesDoc', '', false, false)]
@@ -332,7 +332,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
     local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
     begin
-        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+        VerifyIsDataSetOnSalesDocuments(SalesHeader, false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
@@ -738,9 +738,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
         POSStore.TestField("Country/Region Code");
     end;
 
-    local procedure VerifyIsDataSetOnSalesDocuments(SalesHeader: Record "Sales Header")
+    local procedure VerifyIsDataSetOnSalesDocuments(SalesHeader: Record "Sales Header"; Proforma: Boolean)
     var
         POSUnit: Record "NPR POS Unit";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         NotRSAuditProfileErr: Label 'RS Audit Profile is not selected on POS Unit No.: %1', Comment = '%1 - POS Unit No.';
@@ -749,6 +750,11 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not CheckSalesLinesRetailLocation(SalesHeader) then
             exit;
+        if Proforma then begin
+            RSFiscalizationSetup.Get();
+            if not RSFiscalizationSetup."Fiscal Proforma on Sales Doc." then
+                exit;
+        end;
 
         SalesHeader.TestField("Salesperson Code");
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(SalesHeader);
@@ -1071,7 +1077,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             Message(FiscalNotSentMsg);
             exit;
         end;
-        
+
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
