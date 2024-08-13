@@ -140,14 +140,13 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
                     PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(ItemCategoryQuery.Quantity)), 'A11', false, 'LEFT', true, false);
                     PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(ItemCategoryQuery.AmountInclVATLCY)), 'A11', false, 'LEFT', true, false);
                 end;
+        ItemCategoryQuery.Close();
 
         if WithoutItemCategoryQuantity > 0 then begin
             PrintThermalLine(Printer, 'N/A', 'A11', true, 'CENTER', true, false);
             PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(WithoutItemCategoryQuantity)), 'A11', false, 'LEFT', true, false);
             PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithoutItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
         end;
-
-        ItemCategoryQuery.Close();
     end;
 
     local procedure PrintMonthlySalespersonPart(var Printer: Codeunit "NPR RP Line Print"; POSUnit: Record "NPR POS Unit"; StartDate: Date; EndDate: Date)
@@ -183,7 +182,7 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
         PrintThermalLine(Printer, CaptionValueFormat(SalespersonPurchaser.Name, FormatNumber(Amount)), 'A11', false, 'LEFT', true, false);
     end;
 
-    local procedure PrintPaymentsMonthlyAmount(var Printer: Codeunit "NPR RP Line Print"; POSEntry: Record "NPR POS Entry")
+    local procedure PrintPaymentsMonthlyAmount(var Printer: Codeunit "NPR RP Line Print"; var POSEntry: Record "NPR POS Entry")
     var
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
