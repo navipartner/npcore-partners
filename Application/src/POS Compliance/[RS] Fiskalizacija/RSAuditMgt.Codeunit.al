@@ -722,7 +722,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSFiscalizationSetup.Get();
         RSFiscalizationSetup.TestField("Sandbox URL");
         RSPOSUnitMapping.Get(POSUnit."No.");
-        RSPOSUnitMapping.TestField("RS Sandbox Token");
+        if not RSFiscalizationSetup."Exclude Token from URL" then
+            RSPOSUnitMapping.TestField("RS Sandbox Token");
         RSPOSUnitMapping.TestField("RS Sandbox JID");
         RSPOSUnitMapping.TestField("RS Sandbox PIN");
 
@@ -767,7 +768,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSUnitMapping.Get(POSUnit."No.");
         RSPOSUnitMapping.TestField("RS Sandbox JID");
         RSPOSUnitMapping.TestField("RS Sandbox PIN");
-        RSPOSUnitMapping.TestField("RS Sandbox Token");
+        if not RSFiscalizationSetup."Exclude Token from URL" then
+            RSPOSUnitMapping.TestField("RS Sandbox Token");
     end;
 
     local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
@@ -798,6 +800,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
     internal procedure IsDataSetOnSalesInvoiceDoc(RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header"): Boolean
     var
         POSUnit: Record "NPR POS Unit";
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
         RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
@@ -814,8 +817,10 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit(false);
         if RSPOSUnitMapping."RS Sandbox PIN" = 0 then
             exit(false);
-        if RSPOSUnitMapping."RS Sandbox Token" = '' then
-            exit(false);
+        RSFiscalizationSetup.Get();
+        if not RSFiscalizationSetup."Exclude Token from URL" then
+            if RSPOSUnitMapping."RS Sandbox Token" = '' then
+                exit(false);
         SalesInvoiceHeader.Get(RSAuxSalesInvHeader."Sales Invoice Header No.");
         if SalesInvoiceHeader."Salesperson Code" = '' then
             exit(false);
