@@ -35,6 +35,16 @@ table 6059861 "NPR RS Fiscalisation Setup"
         {
             Caption = 'Sandbox URL';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if "Sandbox URL".EndsWith('/') then
+                    "Sandbox URL" := CopyStr("Sandbox URL".TrimEnd('/'), 1, MaxStrLen("Sandbox URL"));
+            end;
+        }
+        field(11; "Exclude Token from URL"; Boolean)
+        {
+            Caption = 'Exclude Token from URL';
+            DataClassification = CustomerContent;
         }
         field(20; "Allow Offline Use"; Boolean)
         {
