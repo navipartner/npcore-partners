@@ -233,6 +233,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         EFTTransactionRequest2: Record "NPR EFT Transaction Request";
         LoyaltyPointsPSPClient: Codeunit "NPR MM Loy. Point PSP (Client)";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
     begin
 
         if (not GetStoreSetup(EFTTransactionRequest."Register No.", ResponseText, LoyaltyStoreSetup)) then
@@ -264,6 +265,7 @@
                 TempRegisterSalesLines."Currency Code" := SaleLinePOS."Currency Code";
 
                 TempRegisterSalesLines."Total Points" := EarnAmountToPoints(LoyaltyStoreSetup, TempRegisterSalesLines."Total Amount");
+                MembershipEvents.OnAfterCalculatePoints(LoyaltyStoreSetup."Loyalty Setup Code", SaleLinePOS, TempRegisterSalesLines."Total Points");
                 TempRegisterSalesLines."Retail Id" := SaleLinePOS.SystemId;
 
                 TempRegisterSalesLines.Insert();

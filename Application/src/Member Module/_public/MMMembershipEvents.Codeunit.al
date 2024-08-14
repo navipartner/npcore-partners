@@ -181,4 +181,9 @@
     internal procedure OnAddMemberScannedToastData(MembershipEntryNo: Integer; MemberEntryNo: Integer; var MemberScannedData: JsonObject)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterCalculatePoints(LoyaltySetupCode: Code[20]; SaleLinePOS: Record "NPR POS Sale Line"; var TotalPoints: Integer)
+    begin
+    end;
 }
