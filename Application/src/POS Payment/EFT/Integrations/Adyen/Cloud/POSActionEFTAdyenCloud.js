@@ -15,8 +15,11 @@ let main = async ({ workflow, context, popup, captions }) => {
         if (startTrxResponse.newEntryNo) {
             context.EntryNo = startTrxResponse.newEntryNo;
         }
-
+        if (startTrxResponse.selfService){
+        _dialogRef && _dialogRef.updateStatus(captions.activeStatusSS);
+        } else {
         _dialogRef && _dialogRef.updateStatus(captions.activeStatus);
+        }
         _dialogRef && _dialogRef.enableAbort(true);
         await trxPromise(context, captions, popup, workflow);
     }
