@@ -120,6 +120,11 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             Caption = 'Reconciliation Integration Starting Date';
         }
+        field(115; "Recon. Posting Starting Date"; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reconciliation Posting Starting Date';
+        }
         field(120; "Post with Transaction Date"; Boolean)
         {
             DataClassification = CustomerContent;
