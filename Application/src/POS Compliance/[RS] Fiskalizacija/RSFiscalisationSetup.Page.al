@@ -67,6 +67,11 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Sandbox URL.';
                 }
+                field("Exclude Token from URL"; Rec."Exclude Token from URL")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Token should be excluded from the URL.';
+                }
             }
             group(SUFConfiguration)
             {

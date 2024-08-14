@@ -26,10 +26,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -73,10 +70,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -121,10 +115,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -171,10 +162,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesInvHeader."NPR RS POS Unit");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -219,10 +207,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesHeader."NPR RS POS Unit");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -262,10 +247,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -310,10 +292,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesCrMemoHeader."NPR RS POS Unit");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -358,10 +337,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSAuxSalesHeader."NPR RS POS Unit");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -423,10 +399,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
         RSPOSUnitMapping.Get(RSPOSAuditLogAuxInfo."POS Unit No.");
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'invoices';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'invoices';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -456,10 +429,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        if RSFiscalizationSetup."Sandbox URL".EndsWith('/') then
-            Url := RSFiscalizationSetup."Sandbox URL" + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin'
-        else
-            Url := RSFiscalizationSetup."Sandbox URL" + '/' + DelChr(Format(RSPOSUnitMapping."RS Sandbox Token"), '=', '{}') + GetApiVersionUrl() + 'pin';
+        Url := RSFiscalizationSetup."Sandbox URL" + GetSandboxToken(RSFiscalizationSetup."Exclude Token from URL", RSPOSUnitMapping."RS Sandbox Token") + GetApiVersionUrl() + 'pin';
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -2319,6 +2289,14 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         ApiVersionUrl: Label '/api/v3/';
     begin
         exit(ApiVersionUrl);
+    end;
+
+    local procedure GetSandboxToken(ExcludeToken: Boolean; SandboxToken: Guid): Text
+    begin
+        if ExcludeToken then
+            exit('');
+
+        exit('/' + DelChr(Format(SandboxToken), '=', '{}'));
     end;
     #endregion
 
