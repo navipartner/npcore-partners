@@ -651,6 +651,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         TotalEntries: Integer;
         ProcessedEntries: Integer;
         PostingEntriesLbl: Label 'Attempting to Post Reconciliation Line entries...\\Posting #1 Entry out of #2';
+        PostingDateIsNotAllowedLbl: Label 'The transaction date of line %1 cannot be earlier than the specified ''%2'' in the NP Pay Setup.', Comment = '%1 - Reconciliation line number, %2 - "Reconciliation Posting Starting Date" from the NP Pay Setup page';
         PostAllowed: Boolean;
     begin
         ReconciliationLine.Reset();
@@ -682,8 +683,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             Handled := false;
             if not Handled then begin
                 PostAllowed := true;
+
                 if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
                     PostAllowed := PostingAllowed(ReconciliationLine);
+                _AdyenSetup.GetRecordOnce();
+                if _AdyenSetup."Recon. Posting Starting Date" > 0DT then
+                    if ReconciliationLine."Transaction Date" < _AdyenSetup."Recon. Posting Starting Date" then begin
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingDateIsNotAllowedLbl, Format(ReconciliationLine."Line No."), _AdyenSetup.FieldCaption("Recon. Posting Starting Date")), ReconciliationHeader."Webhook Request ID");
+                        PostAllowed := false;
+                    end;
 
                 if PostAllowed then begin
                     AssignPostingDateAndNo(ReconciliationLine, ReconciliationHeader);
@@ -864,27 +872,32 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure PostingAllowed(var ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         ChargebackNeedsConfirmationLbl: Label 'It is not allowed to post %1 entry. Chargeback transactions require your confirmation first.';
         PostingNotAllowedLbl: Label 'It is not allowed to post %1 entry.';
         ParkedSaleLbl: Label 'The sale %1 is parked. Please finish the sale and try again.';
         SaleNotFinishedLbl: Label 'The sale %1 has not yet been finished. Please finish the sale and try again.';
         EFTTransactionRequestDoesNotExistLbl: Label 'EFT Transaction Request %1 does not exist anymore.';
+        MagentoPaymentLineDoesNotExistLbl: Label 'Magento Payment Line %1 does not exist anymore.', Comment = '%1 - Magento Payment Line entry''s System ID (GUID).';
         SavedPOSSale: Record "NPR POS Saved Sale Entry";
     begin
+        if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then begin
+            if not ReconciliationLine."Posting allowed" then begin
+                if ReconciliationLine."Transaction Type" in [ReconciliationLine."Transaction Type"::Chargeback, ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo, ReconciliationLine."Transaction Type"::SecondChargeback] then
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(ChargebackNeedsConfirmationLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID")
+                else
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingNotAllowedLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID");
+
+                ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                exit(false);
+            end;
+        end;
+
         case ReconciliationLine."Matching Table Name" of
             ReconciliationLine."Matching Table Name"::"EFT Transaction":
                 begin
                     if not EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
                         _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(EFTTransactionRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
-                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                        exit(false);
-                    end;
-                    if not ReconciliationLine."Posting allowed" then begin
-                        if ReconciliationLine."Transaction Type" in [ReconciliationLine."Transaction Type"::Chargeback, ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo, ReconciliationLine."Transaction Type"::SecondChargeback] then
-                            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(ChargebackNeedsConfirmationLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID")
-                        else
-                            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingNotAllowedLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID");
-
                         ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
                         exit(false);
                     end;
@@ -911,6 +924,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
             ReconciliationLine."Matching Table Name"::"Magento Payment Line":
                 begin
+                    if not MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(MagentoPaymentLineDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                        exit(false);
+                    end;
                 end;
         end;
         exit(true);
