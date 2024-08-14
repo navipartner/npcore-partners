@@ -126,13 +126,21 @@ page 6151399 "NPR RS POS Unit Step"
     end;
 
     local procedure CheckIsDataSet(): Boolean
+    var
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
     begin
         if not Rec.FindSet() then
             exit(false);
         repeat
             if RSPOSUnitMapping.Get(Rec."POS Unit Code") then
-                if (RSPOSUnitMapping."RS Sandbox JID" <> '') and (RSPOSUnitMapping."RS Sandbox PIN" <> 0) and (Format(RSPOSUnitMapping."RS Sandbox Token") <> '') then
-                    exit(true);
+                if (RSPOSUnitMapping."RS Sandbox JID" <> '') and (RSPOSUnitMapping."RS Sandbox PIN" <> 0) then begin
+                    RSFiscalizationSetup.Get();
+                    if RSFiscalizationSetup."Exclude Token from URL" then
+                        exit(true);
+                    if (Format(RSPOSUnitMapping."RS Sandbox Token") <> '') then
+                        exit(true);
+                end;
+            exit(true);
         until Rec.Next() = 0;
     end;
 
