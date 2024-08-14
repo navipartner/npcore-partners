@@ -53,6 +53,11 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Indicates when the NP Pay Reconciliation Integration went into operation.';
                 }
+                field("Recon. Posting Starting Date"; Rec."Recon. Posting Starting Date")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Indicates the date and time when the reconciliation posting process began operation.';
+                }
                 field("Download Report API Key"; Rec."Download Report API Key")
                 {
                     ApplicationArea = NPRRetail;
