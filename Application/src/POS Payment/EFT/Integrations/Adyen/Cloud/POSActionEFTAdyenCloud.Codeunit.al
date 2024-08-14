@@ -13,12 +13,14 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         ActionDescription: Label 'Adyen Cloud EFT Transaction';
         InitialStatusLbl: Label 'Initializing';
         ActiveStatusLbl: Label 'Waiting For Response';
+        ActiveStatusSSLbl: Label 'Continue on the terminal';
         ApproveSignatureLbl: Label 'Approve signature on receipt?';
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddLabel('initialStatus', InitialStatusLbl);
         WorkflowConfig.AddLabel('activeStatus', ActiveStatusLbl);
+        WorkflowConfig.AddLabel('activeStatusSS', ActiveStatusSSLbl);
         WorkflowCOnfig.AddLabel('approveSignature', ApproveSignatureLbl);
     end;
 
@@ -123,6 +125,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         end;
 
         Response.Add('taskId', TaskId);
+        Response.Add('selfService', EftTransactionRequest."Self Service");
         exit(Response);
     end;
 
@@ -400,7 +403,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTAdyenCloud.js###
-'let main=async({workflow:r,context:e,popup:i,captions:s})=>{e.EntryNo=e.request.EntryNo;let a=await i.simplePayment({title:e.request.TypeCaption,initialStatus:s.initialStatus,showStatus:!0,amount:e.request.formattedAmount,onAbort:async()=>{await r.respond("requestAbort")}});try{let n=await r.respond("startTransaction");n.newEntryNo&&(e.EntryNo=n.newEntryNo),a&&a.updateStatus(s.activeStatus),a&&a.enableAbort(!0),await trxPromise(e,s,i,r)}finally{a&&a.close()}return{success:e.success,tryEndSale:e.success}};function trxPromise(r,e,i,s){return new Promise((a,n)=>{let u=async()=>{try{let t=await s.respond("poll");if(t.newEntryNo){debugger;r.EntryNo=t.newEntryNo,setTimeout(u,1e3);return}if(t.signatureRequired){let o=!1;if(!r.request.unattended&&t.signatureType==="Receipt"&&(o=await i.confirm(e.approveSignature)),!r.request.unattended&&t.signatureType==="Bitmap"){debugger;let l=JSON.parse(t.signatureBitmap),g=await i.signatureValidation({signature:l.SignaturePoint});debugger;o=await g.completeAsync()}if(!o){let l=await s.respond("signatureDecline");r.EntryNo=l.newEntryNo,setTimeout(u,1e3);return}}if(t.done){debugger;r.success=t.success,a();return}}catch(t){debugger;try{await s.respond("requestAbort")}catch{}n(t);return}setTimeout(u,1e3)};setTimeout(u,1e3)})}'
+'let main=async({workflow:r,context:e,popup:i,captions:s})=>{e.EntryNo=e.request.EntryNo;let t=await i.simplePayment({title:e.request.TypeCaption,initialStatus:s.initialStatus,showStatus:!0,amount:e.request.formattedAmount,onAbort:async()=>{await r.respond("requestAbort")}});try{let n=await r.respond("startTransaction");n.newEntryNo&&(e.EntryNo=n.newEntryNo),n.selfService?t&&t.updateStatus(s.activeStatusSS):t&&t.updateStatus(s.activeStatus),t&&t.enableAbort(!0),await trxPromise(e,s,i,r)}finally{t&&t.close()}return{success:e.success,tryEndSale:e.success}};function trxPromise(r,e,i,s){return new Promise((t,n)=>{let u=async()=>{try{let a=await s.respond("poll");if(a.newEntryNo){debugger;r.EntryNo=a.newEntryNo,setTimeout(u,1e3);return}if(a.signatureRequired){let l=!1;if(!r.request.unattended&&a.signatureType==="Receipt"&&(l=await i.confirm(e.approveSignature)),!r.request.unattended&&a.signatureType==="Bitmap"){debugger;let o=JSON.parse(a.signatureBitmap),d=await i.signatureValidation({signature:o.SignaturePoint});debugger;l=await d.completeAsync()}if(!l){let o=await s.respond("signatureDecline");r.EntryNo=o.newEntryNo,setTimeout(u,1e3);return}}if(a.done){debugger;r.success=a.success,t();return}}catch(a){debugger;try{await s.respond("requestAbort")}catch{}n(a);return}setTimeout(u,1e3)};setTimeout(u,1e3)})}'
         );
     end;
 }
