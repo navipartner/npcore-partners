@@ -1072,15 +1072,21 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if HasArchVoucherEntry then
             CreateJsonForVoucherBasedOnReferenceDocument(RSPOSAuditLogAuxInfo, NpRvArchVoucherEntry, RSPOSPaymMethMapping, JObjectHeader)
         else begin
-            POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
-            POSEntrySalesLine.FindFirst();
-            OrigPOSEntry := POSEntrySalesLine."Orig.POS Entry S.Line SystemId";
-            POSEntrySalesLine.Reset();
-            POSEntrySalesLine.SetRange(SystemId, OrigPOSEntry);
-            POSEntrySalesLine.FindFirst();
-            RSPOSAuditLogAuxInfoReferent.GetAuditFromPOSEntry(POSEntrySalesLine."POS Entry No.");
-            JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
-            JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+            if (RSPOSAuditLogAuxInfo."Return Reference No." <> '') and (RSPOSAuditLogAuxInfo."Return Reference Date/Time" <> '') then begin
+                JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfo."Return Reference No.");
+                JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfo."Return Reference Date/Time");
+            end
+            else begin
+                POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
+                POSEntrySalesLine.FindFirst();
+                OrigPOSEntry := POSEntrySalesLine."Orig.POS Entry S.Line SystemId";
+                POSEntrySalesLine.Reset();
+                POSEntrySalesLine.SetRange(SystemId, OrigPOSEntry);
+                POSEntrySalesLine.FindFirst();
+                RSPOSAuditLogAuxInfoReferent.GetAuditFromPOSEntry(POSEntrySalesLine."POS Entry No.");
+                JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
+                JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+            end;
             Clear(JObjectLines);
             JObjectLines.Add('omitQRCodeGen', 1);
             JObjectLines.Add('omitTextualRepresentation', 0);
@@ -1175,6 +1181,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxInfoReferent.SetRange("Source Document Type", SalesHeader."Document Type");
         RSPOSAuditLogAuxInfoReferent.SetRange("Source Document No.", SalesHeader."No.");
         RSPOSAuditLogAuxInfoReferent.FindLast();
+
         JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
         JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
         Clear(JObjectLines);
@@ -1937,6 +1944,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPOSAuditLogAuxCopy."Customer Identification" := RSPOSAuditLogAuxInfo."Customer Identification";
         RSPOSAuditLogAuxCopy."Additional Customer Field" := RSPOSAuditLogAuxInfo."Additional Customer Field";
         RSPOSAuditLogAuxCopy."Email-To" := RSPOSAuditLogAuxInfo."Email-To";
+        RSPOSAuditLogAuxCopy."Return Reference No." := RSPOSAuditLogAuxInfo."Return Reference No.";
+        RSPOSAuditLogAuxCopy."Return Reference Date/Time" := RSPOSAuditLogAuxInfo."Return Reference Date/Time";
 
         if not JsonHeader.ReadFrom(ResponseText) then
             Error(JSONReadErr);

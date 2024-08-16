@@ -22,6 +22,16 @@ table 6059824 "NPR RS POS Sale"
             Caption = 'Additional Customer Field';
             DataClassification = CustomerContent;
         }
+        field(20; "Return Reference No."; Code[100])
+        {
+            Caption = 'Return Reference No.';
+            DataClassification = CustomerContent;
+        }
+        field(21; "Return Reference Date/Time"; Text[33])
+        {
+            Caption = 'Return Reference Date/Time';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -673,6 +673,50 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         exit(POSEntry.FindFirst());
     end;
+
+    internal procedure InputReturnReferenceInformation(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
+    var
+        InputDialog: Page "NPR Input Dialog";
+        ReferenceNo: Text;
+        ReferenceDate: Date;
+        ReferenceTime: Time;
+        ReferenceNoLbl: Label 'Reference No.';
+        ReferenceNoDefaultLbl: Label 'XXXXXXXX-XXXXXXXX-000000', Locked = true;
+        ReferenceNoInvalidErr: Label 'Reference No. you inserted is not valid. Please try again';
+        ReferenceDateLbl: Label 'Reference Date';
+        ReferenceTimeLbl: Label 'Reference Time';
+        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Date, %2 = Time';
+    begin
+        if RSPOSAuditLogAuxInfo.Signature <> '' then
+            exit;
+        if (not (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry"]) and
+            (not (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::REFUND]))) then
+            exit;
+
+        Clear(InputDialog);
+
+        ReferenceNo := ReferenceNoDefaultLbl;
+        ReferenceDate := Today();
+        ReferenceTime := Time();
+
+        InputDialog.SetInput(1, ReferenceNo, ReferenceNoLbl);
+        InputDialog.SetInput(2, ReferenceDate, ReferenceDateLbl);
+        InputDialog.SetInput(3, ReferenceTime, ReferenceTimeLbl);
+
+        if InputDialog.RunModal() <> Action::OK then
+            exit;
+
+        InputDialog.InputText(1, ReferenceNo);
+        InputDialog.InputDate(2, ReferenceDate);
+        InputDialog.InputTime(3, ReferenceTime);
+
+        if ReferenceNo = ReferenceNoDefaultLbl then
+            Error(ReferenceNoInvalidErr);
+
+        RSPOSAuditLogAuxInfo."Return Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(RSPOSAuditLogAuxInfo."Return Reference No."));
+        RSPOSAuditLogAuxInfo."Return Reference Date/Time" := CopyStr(StrSubstNo(DateTimeFormatLbl, Format(ReferenceDate, 10, '<Year4>-<Month,2>-<Day,2>').ToUpper(), Format(ReferenceTime, 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>')), 1, MaxStrLen(RSPOSAuditLogAuxInfo."Return Reference Date/Time"));
+        RSPOSAuditLogAuxInfo.Modify();
+    end;
     #endregion
 
     #region Procedures - Validations
@@ -1011,7 +1055,15 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         if RSPOSSale."RS Customer Identification" <> '' then
             RSPOSAuditLogAuxInfo."Customer Identification" := RSPOSSale."RS Customer Identification";
-        RSPOSAuditLogAuxInfo."Additional Customer Field" := RSPOSSale."RS Add. Customer Field";
+
+        if RSPOSSale."RS Add. Customer Field" <> '' then
+            RSPOSAuditLogAuxInfo."Additional Customer Field" := RSPOSSale."RS Add. Customer Field";
+
+        if (RSPOSSale."Return Reference No." <> '') and (RSPOSSale."Return Reference Date/Time" <> '') then begin
+            RSPOSAuditLogAuxInfo."Return Reference No." := RSPOSSale."Return Reference No.";
+            RSPOSAuditLogAuxInfo."Return Reference Date/Time" := RSPOSSale."Return Reference Date/Time";
+        end;
+
         RSPOSAuditLogAuxInfo.Modify();
     end;
 
