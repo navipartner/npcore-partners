@@ -59,6 +59,20 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ToolTip = 'Specifies the subject of the E-Mailed Fiscal Bill.';
                 }
             }
+            group(FiscalPrinting)
+            {
+                Caption = 'Fiscal Receipt Printing';
+                field("Print Item No. on Receipt"; Rec."Print Item No. on Receipt")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether Item No. is printed on a fiscal receipt.';
+                }
+                field("Print Item Desc. 2 on Receipt"; Rec."Print Item Desc. 2 on Receipt")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether Item Description 2 is printed on a fiscal receipt.';
+                }
+            }
             group(LPFRAccess)
             {
                 Caption = 'L-PFR Access Parameters';

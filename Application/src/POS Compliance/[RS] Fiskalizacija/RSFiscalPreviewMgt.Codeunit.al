@@ -197,7 +197,7 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         if (DiscountAmount <> 0) and not (RSTransactionType in [RSTransactionType::REFUND]) then
             HtmlContent += DoubleNewLineHtml + PrintLineLbl + NewLineHtml + HasDiscountHeadlineLbl + NewLineHtml + TotalDiscountAmountLbl + Format(Round(DiscountAmount)) + NewLineHtml + PrintLineLbl;
 
-        PrintMembershipPointsNonFiscal(HtmlContent, POSEntryNo, RSInvoiceType, RSTransactionType);
+        PrintMembershipPointsNonFiscal(HtmlContent, POSEntryNo, RSInvoiceType, RSTransactionType, AuditEntryType);
         RemoveUnnecessaryFieldsFromJournal(HtmlContent, RSInvoiceType, RSTransactionType);
         DeleteProformaPaymentAmounts(HtmlContent, RSInvoiceType);
         AddReturnPaymentIfExist(HtmlContent, POSEntryNo, RSTransactionType);
@@ -210,13 +210,15 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         HtmlContent += EndingHtmlTags;
     end;
 
-    local procedure PrintMembershipPointsNonFiscal(var HtmlContent: Text; POSEntryNo: Integer; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type")
+    local procedure PrintMembershipPointsNonFiscal(var HtmlContent: Text; POSEntryNo: Integer; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type"; AuditEntryType: Enum "NPR RS Audit Entry Type")
     var
         MMMembersPointsEntry: Record "NPR MM Members. Points Entry";
         POSEntry: Record "NPR POS Entry";
         MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
         TotalMembershipPointsLbl: Label 'Укупно поена: ', Locked = true;
     begin
+        if not (AuditEntryType in [AuditEntryType::"POS Entry"]) then
+            exit;
         if not (RSTransactionType in [RSTransactionType::SALE])
             and not (RSInvoiceType in [RSInvoiceType::NORMAL]) then
             exit;
@@ -231,7 +233,9 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         HtmlContent += DoubleNewLineHtml + PrintLineLbl + NewLineHtml + MembershipHeadlineLbl + NewLineHtml + TotalMembershipPointsLbl + Format(Round(MMMembersPointsEntry.Points)) + NewLineHtml + PrintLineLbl;
     end;
 
-    local procedure AddAdvancePaymentInfo(var HtmlContent: Text; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type"; AuditEntryType: Enum "NPR RS Audit Entry Type"; SourceDocumentNo: Code[20])
+    local procedure AddAdvancePaymentInfo(var HtmlContent: Text; RSInvoiceType: Enum "NPR RS Invoice Type"; RSTransactionType: Enum "NPR RS Transaction Type";
+                                                                                    AuditEntryType: Enum "NPR RS Audit Entry Type";
+                                                                                    SourceDocumentNo: Code[20])
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceHeader2: Record "Sales Invoice Header";
