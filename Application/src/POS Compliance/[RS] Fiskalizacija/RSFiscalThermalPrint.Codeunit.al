@@ -18,6 +18,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     local procedure PrintThermalReceipt(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        RetailLogo: Record "NPR Retail Logo";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         i, j : Integer;
         PrintTextList: List of [Text];
@@ -31,7 +32,14 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
         Printer.SetAutoLineBreak(false);
         PrintTextList := PrintRawInputText.Split('\r\n');
-        // PrintThermalLine(Printer, 'INSERT KEYWORD', 'LOGO', false, 'LEFT', true, false);
+
+        RetailLogo.SetRange("Register No.", RSPOSAuditLogAuxInfo."POS Unit No.");
+        if RetailLogo.IsEmpty() then
+            RetailLogo.SetRange("Register No.", '');
+
+        if RetailLogo.FindFirst() then
+            PrintThermalLine(Printer, RetailLogo.Keyword, 'LOGO', false, 'LEFT', true, false);
+
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         for i := 1 to PrintTextList.Count() do begin
             PrintTextList.Get(i, PrintText);
@@ -70,6 +78,7 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
+        RetailLogo: Record "NPR Retail Logo";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         i, j : Integer;
@@ -85,7 +94,14 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
         Printer.SetAutoLineBreak(false);
         PrintTextList := PrintRawInputText.Split('\r\n');
-        // PrintThermalLine(Printer, 'INSERT KEYWORD', 'LOGO', false, 'LEFT', true, false);6
+
+        RetailLogo.SetRange("Register No.", RSPOSAuditLogAuxInfo."POS Unit No.");
+        if RetailLogo.IsEmpty() then
+            RetailLogo.SetRange("Register No.", '');
+
+        if RetailLogo.FindFirst() then
+            PrintThermalLine(Printer, RetailLogo.Keyword, 'LOGO', false, 'LEFT', true, false);
+
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         for i := 1 to PrintTextList.Count() do begin
             PrintTextList.Get(i, PrintText);
