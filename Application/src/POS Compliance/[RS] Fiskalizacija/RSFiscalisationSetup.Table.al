@@ -143,6 +143,16 @@ table 6059861 "NPR RS Fiscalisation Setup"
             Caption = 'E-Mail Subject';
             DataClassification = CustomerContent;
         }
+        field(70; "Print Item No. on Receipt"; Boolean)
+        {
+            Caption = 'Print Item No. on Receipt';
+            DataClassification = CustomerContent;
+        }
+        field(71; "Print Item Desc. 2 on Receipt"; Boolean)
+        {
+            Caption = 'Print Item Description 2 on Receipt';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

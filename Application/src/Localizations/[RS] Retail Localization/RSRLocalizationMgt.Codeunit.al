@@ -59,6 +59,8 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     begin
         if not IsRSLocalizationActive() then
             exit;
+        if PrevPriceListLine."Unit Price" = 0 then
+            exit;
         if PrevPriceListLine.Status = "Price Status"::Active then
             Error(ActivePriceListLineDeleteNotAllowedErr);
     end;

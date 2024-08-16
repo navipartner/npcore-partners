@@ -223,6 +223,16 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(120; "Return Reference No."; Code[100])
+        {
+            Caption = 'Return Reference No.';
+            DataClassification = CustomerContent;
+        }
+        field(121; "Return Reference Date/Time"; Text[33])
+        {
+            Caption = 'Return Reference Date/Time';
+            DataClassification = CustomerContent;
+        }
         field(200; "Fiscal Processing Time"; Duration)
         {
             Caption = 'Fiscal Processing Time';
