@@ -547,6 +547,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
+            if POSEntry."Amount Incl. Tax" = 0 then
+                POSEntry."Amount Incl. Tax" += 0.01;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
@@ -600,6 +602,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                             end;
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    if POSEntrySalesLine."Amount Incl. VAT" = 0 then
+                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -975,6 +979,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
             POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
+            if POSEntry."Amount Incl. Tax" = 0 then
+                POSEntry."Amount Incl. Tax" += 0.01;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
@@ -1087,6 +1093,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
+            if POSEntry."Amount Incl. Tax" = 0 then
+                POSEntry."Amount Incl. Tax" += 0.01;
             JObjectLines.Add('amount', Round(POSEntry."Amount Incl. Tax", 0.01));
             JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::WireTransfer));
             JArray.Add(JObjectLines);
@@ -1148,6 +1156,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                             end;
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    if POSEntrySalesLine."Amount Incl. VAT" = 0 then
+                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -1407,6 +1417,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                             end;
                     end;
                     JObjectLines.Add('quantity', Abs(POSEntrySalesLine.Quantity));
+                    if POSEntrySalesLine."Amount Incl. VAT" = 0 then
+                        POSEntrySalesLine."Amount Incl. VAT" += 0.01;
                     JObjectLines.Add('unitPrice', Abs(Round((POSEntrySalesLine."Amount Incl. VAT" / POSEntrySalesLine.Quantity), 0.01)));
                     RSVATPostSetupMapping.Get(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group");
                     RSAllowedTaxRates.Get(RSVATPostSetupMapping."RS Tax Category Name", RSVATPostSetupMapping."RS Tax Category Label");
@@ -2426,7 +2438,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             until POSEntryPaymentLine.Next() = 0;
 
         TempPOSEntryPaymentLine.Reset();
-        if TempPOSEntryPaymentLine.FindSet() then
+        if TempPOSEntryPaymentLine.FindSet() then begin
             repeat
                 Clear(JObjectLines);
                 JObjectLines.Add('amount', Abs(TempPOSEntryPaymentLine.Amount));
@@ -2437,8 +2449,15 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 JArray.Add(JObjectLines);
             until TempPOSEntryPaymentLine.Next() = 0;
 
-        TempPOSEntryPaymentLine.DeleteAll();
+            TempPOSEntryPaymentLine.DeleteAll();
+        end else begin
+            Clear(JObjectLines);
+            JObjectLines.Add('amount', Abs(0.01));
+            JObjectLines.Add('paymentType', GetEnumValueName(RSPOSPaymMethMapping."RS Payment Method"::Cash));
+            JArray.Add(JObjectLines);
+        end;
     end;
+
     #endregion
 
     #region Telemetry

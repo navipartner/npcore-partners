@@ -84,7 +84,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         end;
 
-        case POSEntry."Amount Incl. Tax" > 0 of
+        case POSEntry."Amount Incl. Tax" >= 0 of
             true:
                 RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
             false:
@@ -116,7 +116,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         if not RSPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
             exit;
 
-        case POSEntry."Amount Incl. Tax" > 0 of
+        case POSEntry."Amount Incl. Tax" >= 0 of
             true:
                 RSTaxCommunicationMgt.CreateNormalSale(RSPOSAuditLogAuxInfo);
             false:
@@ -980,7 +980,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
                 RSPOSAuditLogAuxInfo."RS Invoice Type" := RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL;
         end;
 
-        case POSEntry."Amount Incl. Tax" > 0 of
+        case POSEntry."Amount Incl. Tax" >= 0 of
             true:
                 RSPOSAuditLogAuxInfo."RS Transaction Type" := RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE;
             false:
