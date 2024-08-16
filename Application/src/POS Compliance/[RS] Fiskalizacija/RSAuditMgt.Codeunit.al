@@ -94,7 +94,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
                         RSTaxCommunicationMgt.CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
                 end;
         end;
-
+        Commit();
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
