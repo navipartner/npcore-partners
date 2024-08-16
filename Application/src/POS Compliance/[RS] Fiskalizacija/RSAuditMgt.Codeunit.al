@@ -795,8 +795,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
         if not CheckSalesLinesRetailLocation(SalesHeader) then
             exit;
+
+        RSFiscalizationSetup.Get();
         if Proforma then begin
-            RSFiscalizationSetup.Get();
             if not RSFiscalizationSetup."Fiscal Proforma on Sales Doc." then
                 exit;
         end;
