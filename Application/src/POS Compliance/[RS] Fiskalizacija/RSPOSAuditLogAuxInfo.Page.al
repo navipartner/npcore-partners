@@ -188,6 +188,23 @@
                     end;
                 end;
             }
+            action(InputReturnInfo)
+            {
+                ApplicationArea = NPRRSFiscal;
+                Caption = 'Input Return Reference Info';
+                Image = InsertFromCheckJournal;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Executing this action will give you an option to insert return invoice reference information.';
+                trigger OnAction()
+                var
+                    RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+                begin
+                    RSAuditMgt.InputReturnReferenceInformation(Rec);
+                end;
+            }
             group(Print)
             {
                 Caption = 'Print';
