@@ -20,7 +20,6 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
 
         PrintReceiptHeader(Printer, POSUnit);
         PrintEODPart(Printer, POSUnit, StartDate, EndDate);
-        PrintItemCategoryPart(Printer, POSUnit, StartDate, EndDate);
         PrintMonthlySalespersonPart(Printer, POSUnit, StartDate, EndDate);
         PrintGeneralInfo(Printer, POSUnit, StartDate, EndDate);
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
@@ -90,63 +89,6 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(DirectItemSales + DirectItemsReturns)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
-    end;
-
-    local procedure PrintItemCategoryPart(var Printer: Codeunit "NPR RP Line Print"; POSUnit: Record "NPR POS Unit"; StartDate: Date; EndDate: Date)
-    begin
-        PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
-        PrintThermalLine(Printer, ItemGroupCaptionLbl, 'A11', true, 'CENTER', true, false);
-
-        PrintMonthlyItemCategoriesPart(Printer, POSUnit."No.", StartDate, EndDate);
-    end;
-
-    local procedure PrintMonthlyItemCategoriesPart(var Printer: Codeunit "NPR RP Line Print"; POSUnitNo: Code[20]; StartDate: Date; EndDate: Date)
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        POSUnit.Get(POSUnitNo);
-
-        PrintMonthlyItemCategories(Printer, POSUnitNo, StartDate, EndDate);
-        PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
-    end;
-
-    local procedure PrintMonthlyItemCategories(var Printer: Codeunit "NPR RP Line Print"; POSUnitNo: Code[20]; StartDate: Date; EndDate: Date)
-    var
-        ItemCategory: Record "Item Category";
-        POSUnit: Record "NPR POS Unit";
-        ItemCategoryQuery: Query "NPR RS Sales By Item Category";
-        AlreadyProcessedItemCategories: List of [Code[20]];
-        WithoutItemCategoryAmount: Decimal;
-        WithoutItemCategoryQuantity: Decimal;
-    begin
-        POSUnit.Get(POSUnitNo);
-        ItemCategoryQuery.SetFilter(EntryDate, '%1..%2', StartDate, EndDate);
-        ItemCategoryQuery.SetRange(EntryType, ItemCategoryQuery.EntryType::"Direct Sale");
-        ItemCategoryQuery.SetRange(POSUnitNo, POSUnitNo);
-        ItemCategoryQuery.SetRange(POSStoreCode, POSUnit."POS Store Code");
-        ItemCategoryQuery.Open();
-
-        while ItemCategoryQuery.Read() do
-            if ItemCategoryQuery.ItemCategoryCode = '' then begin
-
-                if ItemCategoryQuery.Type = ItemCategoryQuery.Type::Item then
-                    WithoutItemCategoryQuantity += ItemCategoryQuery.Quantity;
-                WithoutItemCategoryAmount += ItemCategoryQuery.AmountInclVATLCY;
-            end else
-                if not AlreadyProcessedItemCategories.Contains(ItemCategoryQuery.ItemCategoryCode) then begin
-                    AlreadyProcessedItemCategories.Add(ItemCategoryQuery.ItemCategoryCode);
-                    ItemCategory.Get(ItemCategoryQuery.ItemCategoryCode);
-                    PrintThermalLine(Printer, ItemCategory.Description, 'A11', true, 'CENTER', true, false);
-                    PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(ItemCategoryQuery.Quantity)), 'A11', false, 'LEFT', true, false);
-                    PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(ItemCategoryQuery.AmountInclVATLCY)), 'A11', false, 'LEFT', true, false);
-                end;
-        ItemCategoryQuery.Close();
-
-        if WithoutItemCategoryQuantity > 0 then begin
-            PrintThermalLine(Printer, 'N/A', 'A11', true, 'CENTER', true, false);
-            PrintThermalLine(Printer, CaptionValueFormat(ProductsQuantityCaptionLbl, Format(WithoutItemCategoryQuantity)), 'A11', false, 'LEFT', true, false);
-            PrintThermalLine(Printer, CaptionValueFormat(NetoSalesCaptionLbl, FormatNumber(WithoutItemCategoryAmount)), 'A11', false, 'LEFT', true, false);
-        end;
     end;
 
     local procedure PrintMonthlySalespersonPart(var Printer: Codeunit "NPR RP Line Print"; POSUnit: Record "NPR POS Unit"; StartDate: Date; EndDate: Date)
@@ -357,13 +299,10 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
         CancelledQuantityCaptionLbl: Label 'Number of cancelled receipts';
         EndingFloatAmountCaptionLbl: Label 'Total sales amount';
         EndOfDateCaptionLbl: Label 'For the period from %1 to %2', Comment = '%1 - Specifies the start date, %2 - Specifies the end date';
-        ItemGroupCaptionLbl: Label 'By assortment groups';
         LCYCaptionLbl: Label 'RSD';
-        NetoSalesCaptionLbl: Label 'Neto sales';
         PaymentsTypeLbl: Label 'Types of payment';
         POSUnitNameCaptionLbl: Label 'POS Unit name';
         POSUnitNoCaptionLbl: Label 'POS Unit number';
-        ProductsQuantityCaptionLbl: Label 'Number of products';
         ReturnCaptionLbl: Label 'Return';
         SalesPersonInformationLbl: Label 'Total sales amount per cashier';
         SucceedQuantityCaptionLbl: Label 'Number of issued receipts';
