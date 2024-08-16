@@ -183,6 +183,8 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         MembershipHeadlineLbl: Label 'LOYALTY', Locked = true;
         TotalMembershipPointsLbl: Label 'Укупно поена: ', Locked = true;
     begin
+        if not (RSPOSAuditLogAuxInfo."Audit Entry Type" in [RSPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry"]) then
+            exit;
         if not (RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE])
             and not (RSPOSAuditLogAuxInfo."RS Invoice Type" in [RSPOSAuditLogAuxInfo."RS Invoice Type"::NORMAL]) then
             exit;
