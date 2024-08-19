@@ -6,10 +6,13 @@
         GLAccount: Record "G/L Account";
         POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-
         if RoundAmount = 0 then
             exit(0);
+
+        if FeatureFlagsManagement.IsEnabled('doubleRoundingLineFix') then
+            DeleteExistingRoundingLines(SalePOS);
 
         RoundAmount *= -1; //Is out payment line
 
@@ -52,6 +55,18 @@
         SaleLinePOS."Amount Including VAT" := Amount;
         SaleLinePOS."VAT Base Amount" := Amount;
         SaleLinePOS.Insert(true);
+    end;
+
+    local procedure DeleteExistingRoundingLines(POSSale: Record "NPR POS Sale")
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetRange(Date, POSSale.Date);
+        POSSaleLine.SetRange("Line Type", Enum::"NPR POS Sale Line Type"::Rounding);
+        if not POSSaleLine.IsEmpty() then
+            POSSaleLine.DeleteAll();
     end;
 }
 
