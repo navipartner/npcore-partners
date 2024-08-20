@@ -3,9 +3,10 @@ table 6150814 "NPR Spfy C&C Order"
 {
     Access = Internal;
     DataClassification = CustomerContent;
-    LookupPageId = "NPR Spfy C&C Orders";
-    DrillDownPageId = "NPR Spfy C&C Orders";
     Caption = 'Shopify CC Order';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2023-08-18';
+    ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     fields
     {
@@ -109,100 +110,5 @@ table 6150814 "NPR Spfy C&C Order"
         }
         key(Sec1; "Order No.") { }
     }
-
-    trigger OnInsert()
-    var
-        SpfyCCOrder: Record "NPR Spfy C&C Order";
-    begin
-        if "Order ID" = '' then begin
-            LockTable();
-            if SpfyCCOrder.IsEmpty() then
-                SpfyCCOrder."Order No." := 1000
-            else begin
-                SpfyCCOrder.SetCurrentKey("Order No.");
-                SpfyCCOrder.FindLast();
-                "Order No." := SpfyCCOrder."Order No." + 1;
-            end;
-            "Order ID" := StrSubstNo('CC-%1', "Order No.");
-        end;
-        "Received from Shopify at" := CurrentDateTime();
-    end;
-
-    trigger OnModify()
-    var
-        CollectinStoreShopifyIDKeyTxt: Label '''CollectinStoreShopifyID''', Locked = true;
-        CustomerNameKeyTxt: Label '''CustomerName''', Locked = true;
-        CustomerEmailKeyTxt: Label '''CustomerEmail''', Locked = true;
-        CustomerPhoneKeyTxt: Label '''CustomerPhone''', Locked = true;
-        MissingKeyValueErr: Label 'Key %1 value must be specified.';
-        OrTxt: Label '%1 or %2';
-    begin
-        if ("Collect in Store Code" = '') and ("Collect in Store Shopify ID" = '') then
-            Error(MissingKeyValueErr, CollectinStoreShopifyIDKeyTxt);
-        if "Customer Name" = '' then
-            Error(MissingKeyValueErr, CustomerNameKeyTxt);
-        if ("Customer E-Mail" = '') and ("Customer Phone No." = '') then
-            Error(MissingKeyValueErr, StrSubstNo(OrTxt, CustomerEmailKeyTxt, CustomerPhoneKeyTxt));
-
-        if Status = Status::" " then
-            Status := Status::New;
-    end;
-
-    internal procedure SetOrderLines(NewOrderLines: Text)
-    var
-        OutStr: OutStream;
-    begin
-        Clear("Order Lines");
-        if NewOrderLines = '' then
-            exit;
-        "Order Lines".CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(NewOrderLines);
-    end;
-
-    procedure GetOrderLinesStream() InStr: InStream
-    begin
-        CalcFields("Order Lines");
-        "Order Lines".CreateInStream(InStr, TextEncoding::UTF8);
-    end;
-
-    procedure GetOrderLines(): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        if not "Order Lines".HasValue then
-            exit('');
-        exit(TypeHelper.ReadAsTextWithSeparator(GetOrderLinesStream(), TypeHelper.LFSeparator()));
-    end;
-
-    internal procedure SetErrorMessage(NewErrorText: Text)
-    var
-        OutStr: OutStream;
-    begin
-        Clear("Last Error Message");
-        if NewErrorText = '' then
-            exit;
-        "Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(NewErrorText);
-    end;
-
-    procedure GetErrorMessage(): Text
-    var
-        TypeHelper: Codeunit "Type Helper";
-        InStream: InStream;
-        ErrorText: Text;
-        NoErrorMessageTxt: Label 'No details were provided for the error.';
-    begin
-        if Status <> Status::Error then
-            exit('');
-        ErrorText := '';
-        if "Last Error Message".HasValue() then begin
-            CalcFields("Last Error Message");
-            "Last Error Message".CreateInStream(InStream, TextEncoding::UTF8);
-            ErrorText := TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator());
-        end;
-        if ErrorText = '' then
-            ErrorText := NoErrorMessageTxt;
-        exit(ErrorText);
-    end;
 }
 #endif

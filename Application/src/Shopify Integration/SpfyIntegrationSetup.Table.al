@@ -185,22 +185,18 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'CC Order Integration';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                SpfyCCOrderHandler: Codeunit "NPR Spfy C&C Order Handler";
-            begin
-                if "C&C Order Integration" then begin
-                    SpfyCCOrderHandler.RegisterCCOrderListener();
-                    SpfyCCOrderHandler.EnableWebhookRequestRetentionPolicy();
-                end;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2023-08-18';
+            ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
         field(130; "C&C Order Workflow Code"; Code[20])
         {
             Caption = 'CC Order Workflow Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpCs Workflow";
+            ObsoleteState = Pending;
+            ObsoleteTag = '2023-08-18';
+            ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
         field(140; "Data Processing Handler ID"; Code[20])
         {

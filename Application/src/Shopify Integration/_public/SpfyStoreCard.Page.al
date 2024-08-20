@@ -1,7 +1,7 @@
 #if not BC17
 page 6184704 "NPR Spfy Store Card"
 {
-    Extensible = false;
+    Extensible = true;
     Caption = 'Shopify Store';
     PageType = Card;
     SourceTable = "NPR Spfy Store";
