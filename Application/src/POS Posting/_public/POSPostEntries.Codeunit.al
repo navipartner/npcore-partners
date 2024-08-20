@@ -522,7 +522,7 @@
                                 POSPostingSetup.TestField("Difference Acc. No.");
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
-                                        POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
+                                        POSBalancingLine."Balanced Diff. Amount", POSBalancingLine."Currency Code", POSBalancingLine.Description, GenJournalLine);
 
                                 OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                             end;
@@ -530,7 +530,7 @@
                                 POSPostingSetup.TestField("Difference Acc. No. (Neg)");
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                         POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
-                                        POSBalancingLine."Balanced Diff. Amount", POSBalancingLine.Description, GenJournalLine);
+                                        POSBalancingLine."Balanced Diff. Amount", POSBalancingLine."Currency Code", POSBalancingLine.Description, GenJournalLine);
 
                                 OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                             end;
@@ -547,7 +547,7 @@
                                 POSPostingSetupNewBin.TestField("Account No.");
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
-                                    POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Move-To Reference", GenJournalLine);
+                                    POSBalancingLine."Move-To Bin Amount", POSBalancingLine."Currency Code", POSBalancingLine."Move-To Reference", GenJournalLine);
 
                                 OnAfterMakeGenJournalForMoveToBin(POSBalancingLine, GenJournalLine);
                             end;
@@ -563,7 +563,7 @@
                                 POSPostingSetupNewBin.TestField("Account No.");
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                     POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetupNewBin), POSPostingSetupNewBin."Account No.",
-                                    POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Deposit-To Reference", GenJournalLine);
+                                    POSBalancingLine."Deposit-To Bin Amount", POSBalancingLine."Currency Code", POSBalancingLine."Deposit-To Reference", GenJournalLine);
 
                                 OnAfterMakeGenJournalForDepositToBin(POSBalancingLine, GenJournalLine);
                             end;
@@ -571,7 +571,7 @@
                             if POSBalancingLine."New Float Amount" <> 0 then begin
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                             POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
-                                            POSBalancingLine."New Float Amount", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
+                                            POSBalancingLine."New Float Amount", POSBalancingLine."Currency Code", StrSubstNo(TextClosingEntryFloat, POSEntry."Entry No."), GenJournalLine);
 
                                 OnAfterMakeGenJournalForNewFloatAmount(POSBalancingLine, GenJournalLine);
                             end;
@@ -580,7 +580,7 @@
                             if AmountToPostToAccount <> 0 then begin
                                 TotalLineAmountLCY += MakeGenJournalFromPOSBalancingLineWithVatOption(
                                                 POSEntry, POSBalancingLine, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.",
-                                                AmountToPostToAccount, POSBalancingLine.Description, GenJournalLine);
+                                                AmountToPostToAccount, POSBalancingLine."Currency Code", POSBalancingLine.Description, GenJournalLine);
 
                                 OnAfterMakeGenJournalForTotalAmount(POSBalancingLine, GenJournalLine);
                             end;
@@ -592,7 +592,7 @@
                                     POSPostingSetup.TestField("Difference Acc. No.");
                                     MakeGenJournalFromPOSBalancingLineWithVatOption(
                                             POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No.",
-                                            -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+                                            -TotalLineAmountLCY, '', POSBalancingLine.Description, GenJournalLine);
 
                                     OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                                 end;
@@ -600,7 +600,7 @@
                                     POSPostingSetup.TestField("Difference Acc. No. (Neg)");
                                     MakeGenJournalFromPOSBalancingLineWithVatOption(
                                             POSEntry, POSBalancingLine, GetDifferenceAccountType(POSPostingSetup), POSPostingSetup."Difference Acc. No. (Neg)",
-                                            -TotalLineAmountLCY, POSBalancingLine.Description, GenJournalLine);
+                                            -TotalLineAmountLCY, '', POSBalancingLine.Description, GenJournalLine);
 
                                     OnAfterMakeGenJournalForBalancedDifference(POSBalancingLine, GenJournalLine);
                                 end;
@@ -1560,7 +1560,7 @@
         GenJournalLine.Insert();
     end;
 
-    local procedure MakeGenJournalFromPOSBalancingLineWithVatOption(POSEntry: Record "NPR POS Entry"; POSBalancingLine: Record "NPR POS Balancing Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingAmount: Decimal; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line"): Decimal
+    local procedure MakeGenJournalFromPOSBalancingLineWithVatOption(POSEntry: Record "NPR POS Entry"; POSBalancingLine: Record "NPR POS Balancing Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; PostingAmount: Decimal; CurrencyCode: Code[10]; PostingDescription: Text; var GenJournalLine: Record "Gen. Journal Line"): Decimal
     var
         GLAccount: Record "G/L Account";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -1596,24 +1596,25 @@
         if StrLen(PostingDescription) > MaxStrLen(GenJournalLine.Description) then
             GenJournalLine.Comment := CopyStr(PostingDescription, 1, MaxStrLen(GenJournalLine.Comment));
 
-        if (POSPaymentMethod.Get(POSBalancingLine."POS Payment Method Code")) and (POSPaymentMethod."Currency Code" <> '') then
-            if (not POSPaymentMethod."Use Stand. Exc. Rate for Bal.") then begin
+        GenJournalLine."Currency Code" := CurrencyCode;
+        if GenJournalLine."Currency Code" <> '' then begin
+            if POSPaymentMethod.Get(POSBalancingLine."POS Payment Method Code") and
+               (POSPaymentMethod."Currency Code" = GenJournalLine."Currency Code") and
+               not POSPaymentMethod."Use Stand. Exc. Rate for Bal."
+            then begin
                 if POSPaymentMethod."Fixed Rate" = 0 then
-                    POSPaymentMethod."Fixed Rate" := 100;
-                PaymentMethodExchangeRate := 100 / POSPaymentMethod."Fixed Rate";
-            end;
-
-        GenJournalLine."Currency Code" := POSBalancingLine."Currency Code";
-        if GenJournalLine."Currency Code" <> '' then
-            if POSPaymentMethod."Use Stand. Exc. Rate for Bal." then
-                GenJournalLine.Validate("Currency Code")
-            else
+                    PaymentMethodExchangeRate := 1
+                else
+                    PaymentMethodExchangeRate := 100 / POSPaymentMethod."Fixed Rate";
                 GenJournalLine.Validate("Currency Factor", PaymentMethodExchangeRate);
+            end else
+                GenJournalLine.Validate("Currency Code");
+        end;
 
         if PostingAmount <> 0 then
             GenJournalLine.Validate(Amount, PostingAmount);
 
-        GenJournalLine."Source Currency Code" := POSBalancingLine."Currency Code";
+        GenJournalLine."Source Currency Code" := GenJournalLine."Currency Code";
         GenJournalLine."Source Currency Amount" := PostingAmount;
 
         if DoPostVAT then begin
