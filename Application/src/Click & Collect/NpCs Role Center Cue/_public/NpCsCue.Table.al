@@ -1,6 +1,6 @@
 table 6150841 "NPR NpCs Cue"
 {
-    Access = Internal;
+    Access = Public;
     DataClassification = CustomerContent;
     Caption = 'Collect in Store Cue';
 
@@ -39,6 +39,9 @@ table 6150841 "NPR NpCs Cue"
             FieldClass = FlowField;
             CalcFormula = count("NPR Spfy C&C Order" where(Status = const(Error)));
             Editable = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2023-08-18';
+            ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
 #endif
     }

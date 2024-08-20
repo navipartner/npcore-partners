@@ -10,6 +10,7 @@ codeunit 6184869 "NPR NpCs Cue Backgrd Task"
     var
         CollectInStoreCue: Record "NPR NpCs Cue";
         Result: Dictionary of [Text, Text];
+        ClickCollect: Codeunit "NPR Click & Collect";
     begin
         if not CollectInStoreCue.Get() then
             exit;
@@ -18,11 +19,7 @@ codeunit 6184869 "NPR NpCs Cue Backgrd Task"
         Result.Add(Format(CollectInStoreCue.FieldNo("CiS Orders - Pending")), Format(CollectInStoreCue."CiS Orders - Pending", 0, 9));
         Result.Add(Format(CollectInStoreCue.FieldNo("CiS Orders - Confirmed")), Format(CollectInStoreCue."CiS Orders - Confirmed", 0, 9));
         Result.Add(Format(CollectInStoreCue.FieldNo("CiS Orders - Finished")), Format(CollectInStoreCue."CiS Orders - Finished", 0, 9));
-
-#if not BC17
-        CollectInStoreCue.CalcFields("Spfy CC Orders - Unprocessed");
-        Result.Add(Format(CollectInStoreCue.FieldNo("Spfy CC Orders - Unprocessed")), Format(CollectInStoreCue."Spfy CC Orders - Unprocessed", 0, 9));
-#endif
+        ClickCollect.OnBackgroundCalculateNpCsActivities(CollectInStoreCue, Result);
 
         Page.SetBackgroundTaskResult(Result);
     end;

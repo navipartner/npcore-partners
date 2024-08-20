@@ -14,6 +14,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
@@ -81,6 +86,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnModifyPaymentLineAfterCapture(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure LocationCardOnCheckIfShopifyIntegrationIsEnabled(Rec: Record Location; var IsEnabled: Boolean)
     begin
     end;
 }

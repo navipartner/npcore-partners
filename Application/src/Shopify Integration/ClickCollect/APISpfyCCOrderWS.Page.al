@@ -15,6 +15,10 @@ page 6184559 "NPR API Spfy C&C Order WS"
     SourceTable = "NPR Spfy C&C Order";
     ODataKeyFields = SystemId;
     Extensible = false;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2023-08-18';
+    ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
+
 
     layout
     {
@@ -45,11 +49,6 @@ page 6184559 "NPR API Spfy C&C Order WS"
                 field(orderLines; OrderLines)
                 {
                     Caption = 'OrderLines', Locked = true;
-
-                    trigger OnValidate()
-                    begin
-                        Rec.SetOrderLines(OrderLines);
-                    end;
                 }
                 field(systemId; Rec.SystemId)
                 {
@@ -70,11 +69,6 @@ page 6184559 "NPR API Spfy C&C Order WS"
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    begin
-        OrderLines := Rec.GetOrderLines();
-    end;
 
     var
         OrderLines: Text;

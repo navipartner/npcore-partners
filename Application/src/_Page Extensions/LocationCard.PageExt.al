@@ -91,13 +91,13 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
         RetailLocalizationMgt: Codeunit "NPR Retail Localization Mgt.";
 #if not BC17
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
 #endif
     begin
         RetailLocalizationEnabled := RetailLocalizationMgt.IsRetailLocalizationEnabled();
 #if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
-        if not ShopifyIntegrationIsEnabled then
-            ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Click And Collect");
+        SpfyIntegrationEvents.LocationCardOnCheckIfShopifyIntegrationIsEnabled(Rec, ShopifyIntegrationIsEnabled);
 #endif
     end;
 

@@ -7,6 +7,9 @@ page 6184562 "NPR Spfy C&C Ord.Lines FactBox"
     SourceTable = "NPR Spfy C&C Order";
     UsageCategory = None;
     Editable = false;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2023-08-18';
+    ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     layout
     {
@@ -20,11 +23,6 @@ page 6184562 "NPR Spfy C&C Ord.Lines FactBox"
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    begin
-        OrderLines := Rec.GetOrderLines();
-    end;
 
     var
         OrderLines: Text;

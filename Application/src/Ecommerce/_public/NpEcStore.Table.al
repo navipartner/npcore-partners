@@ -64,14 +64,6 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.54';
             InitValue = true;
-
-#if not BC17
-            trigger OnValidate()
-            begin
-                if "Allow Create Customers" then
-                    TestField("Shopify C&C Orders", false);
-            end;
-#endif
         }
         field(170; "Update Customers from S. Order"; Boolean)
         {
@@ -97,12 +89,6 @@
             Caption = 'Customer No.';
             TableRelation = Customer;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if Rec."Spfy Customer No." = '' then
-                    Rec.TestField("Shopify C&C Orders", false);
-            end;
         }
         field(210; "Spfy Country/Region Code"; Code[10])
         {
@@ -125,12 +111,9 @@
         {
             Caption = 'Shopify Click && Collect Orders';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                Rec.TestField("Spfy Customer No.");
-                Rec.TestField("Allow Create Customers", false);
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2023-08-18';
+            ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
 #endif
     }

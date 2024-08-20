@@ -9,6 +9,9 @@ page 6184561 "NPR Spfy C&C Orders"
     UsageCategory = Lists;
     InsertAllowed = false;
     PromotedActionCategories = 'Manage,Process,Report,Navigate';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2023-08-18';
+    ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     layout
     {
@@ -94,12 +97,6 @@ page 6184561 "NPR Spfy C&C Orders"
                     ToolTip = 'Specifies the error message text, if the import process failed.';
                     ApplicationArea = NPRShopify;
                     Editable = false;
-
-                    trigger OnAssistEdit()
-                    begin
-                        Rec.TestField(Status, Rec.Status::Error);
-                        Rec.GetErrorMessage();
-                    end;
                 }
             }
         }
@@ -130,8 +127,6 @@ page 6184561 "NPR Spfy C&C Orders"
 
                 trigger OnAction()
                 begin
-                    Rec.TestField(Status, Rec.Status::Error);
-                    Message(Rec.GetErrorMessage());
                 end;
             }
             action(ReprocessSelectedFailedUpdates)
@@ -145,13 +140,7 @@ page 6184561 "NPR Spfy C&C Orders"
                 PromotedOnly = true;
 
                 trigger OnAction()
-                var
-                    CCOrder: Record "NPR Spfy C&C Order";
-                    SpfyCCOrderImport: Codeunit "NPR Spfy C&C Order - Import";
                 begin
-                    CurrPage.SetSelectionFilter(CCOrder);
-                    SpfyCCOrderImport.ImportBatch(CCOrder, true);
-                    CurrPage.Update(false);
                 end;
             }
         }
@@ -168,21 +157,11 @@ page 6184561 "NPR Spfy C&C Orders"
                 PromotedOnly = true;
 
                 trigger OnAction()
-                var
-                    TempShopifyAssignedID: Record "NPR Spfy Assigned ID" temporary;
-                    SpfyCCOrderHandler: Codeunit "NPR Spfy C&C Order Handler";
                 begin
-                    SpfyCCOrderHandler.FindRelatedDocs(Rec, false, TempShopifyAssignedID);
-                    Page.RunModal(Page::"NPR Spfy Assigned IDs", TempShopifyAssignedID);
                 end;
             }
         }
     }
-
-    trigger OnAfterGetRecord()
-    begin
-        LastErrorMessage := Rec.GetErrorMessage();
-    end;
 
     var
         LastErrorMessage: Text;

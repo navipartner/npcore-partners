@@ -136,5 +136,8 @@ codeunit 6059847 "NPR Click & Collect"
     begin
     end;
 
-
+    [IntegrationEvent(false, false)]
+    internal procedure OnBackgroundCalculateNpCsActivities(var CollectInStoreCue: Record "NPR NpCs Cue"; var Result: Dictionary of [Text, Text])
+    begin
+    end;
 }

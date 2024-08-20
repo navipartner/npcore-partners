@@ -102,6 +102,10 @@
                 {
                     ToolTip = 'Shopify: specifies whether this record is used to import Shopify Click&Collect orders.';
                     ApplicationArea = NPRShopify;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2023-08-18';
+                    ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
                 }
 #endif
             }

@@ -27,7 +27,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         AreaIsEnabled: Boolean;
         Handled: Boolean;
     begin
-        SpfyIntegrationEvents.OnCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
+        SpfyIntegrationEvents.OnBeforeCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
         if Handled then
             exit(AreaIsEnabled);
 
@@ -51,8 +51,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(_ShopifySetup."Send Close Order Requets");
             IntegrationArea::"Retail Vouchers":
                 exit(_ShopifySetup."Retail Voucher Integration");
-            IntegrationArea::"Click And Collect":
-                exit(_ShopifySetup."C&C Order Integration");
+            else begin
+                AreaIsEnabled := false;
+                SpfyIntegrationEvents.OnCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
+                if Handled then
+                    exit(AreaIsEnabled);
+            end;
         end;
     end;
 
@@ -126,13 +130,6 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Include Transfer Orders");
     end;
 
-    procedure GetCCWorkflowCode(): Code[20]
-    begin
-        _ShopifySetup.GetRecordOnce(false);
-        _ShopifySetup.TestField("C&C Order Workflow Code");
-        exit(_ShopifySetup."C&C Order Workflow Code");
-    end;
-
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
     begin
         if not AutoCreate then
@@ -179,41 +176,6 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     end;
 
     #region Azure AD application
-    internal procedure CreateAzureADApplication()
-    var
-        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
-        PermissionSets: List of [Code[20]];
-        AppDisplayNameLbl: Label 'NaviPartner Shopify integration', MaxLength = 50, Locked = true;
-    begin
-        PermissionSets.Add('D365 BUS FULL ACCESS');
-        PermissionSets.Add('NPR NP RETAIL');
-
-        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayNameLbl, SecretDisplayName(), PermissionSets);
-    end;
-
-    internal procedure CreateAzureADApplicationSecret()
-    var
-        AppInfo: ModuleInfo;
-        AADApplication: Record "AAD Application";
-        AADApplicationList: Page "AAD Application List";
-        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
-        NoAppsToManageErr: Label 'No AAD Apps with App Name like %1 to manage.';
-    begin
-        NavApp.GetCurrentModuleInfo(AppInfo);
-
-        AADApplication.SetFilter("App Name", '@' + AppInfo.Name);
-        if AADApplication.IsEmpty() then
-            Error(NoAppsToManageErr, AppInfo.Name);
-
-        AADApplicationList.LookupMode(true);
-        AADApplicationList.SetTableView(AADApplication);
-        if AADApplicationList.RunModal() <> Action::LookupOK then
-            exit;
-
-        AADApplicationList.GetRecord(AADApplication);
-        AADApplicationMgt.CreateAzureADSecret(AADApplication."Client Id", SecretDisplayName());
-    end;
-
     internal procedure RegisterWebhookHandlingAzureEntraApp()
     var
         AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
@@ -228,13 +190,6 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         AADApplicationMgt.RegisterAzureADApplication(ClientId, 'Shopify Webhooks', PermissionSets);
         if not AADApplicationMgt.TryGrantConsentToApp(ClientId, 'common', ErrorTxt) then
             Error(ErrorTxt);
-    end;
-
-    local procedure SecretDisplayName(): Text
-    var
-        SecretDisplayNameLbl: Label 'NaviPartner Shopify integration - %1', Comment = '%1 = today''s date', Locked = true;
-    begin
-        exit(StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
     end;
     #endregion
 
