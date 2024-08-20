@@ -14,6 +14,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
     begin
         UpdateShopifySetup();
         SetDataProcessingHandlerID();
+        PhaseOutShopifyCCIntegration();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -50,5 +51,47 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
+
+    internal procedure PhaseOutShopifyCCIntegration()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        WebServiceAggregate: Record "Web Service Aggregate";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        UpgradeStep := 'PhaseOutShopifyCCIntegration';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+
+        if ShopifySetup.Get() then begin
+            ShopifySetup."C&C Order Integration" := false;
+            ShopifySetup.Modify();
+        end;
+
+        if RetenPolAllowedTables.IsAllowedTable(Database::"NPR Spfy C&C Order") then
+            RetenPolAllowedTables.RemoveAllowedTable(Database::"NPR Spfy C&C Order");
+
+        WebServiceManagement.LoadRecords(WebServiceAggregate);
+        if WebServiceAggregate.Get(WebServiceAggregate."Object Type"::Page, 6184559) then  //Page::"NPR API Spfy C&C Order WS"
+#if BC18 or BC19
+            DeleteWebService(WebServiceAggregate);
+
+#else
+            WebServiceManagement.DeleteWebService(WebServiceAggregate);
+#endif
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+#if BC18 or BC19
+    procedure DeleteWebService(var WebServiceAggregate: Record "Web Service Aggregate")
+    var
+        TenantWebService: Record "Tenant Web Service";
+    begin
+        if TenantWebService.Get(WebServiceAggregate."Object Type", WebServiceAggregate."Service Name") then
+            TenantWebService.Delete();
+    end;
+#endif
 }
 #endif

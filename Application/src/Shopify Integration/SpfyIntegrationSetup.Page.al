@@ -165,27 +165,6 @@ page 6184553 "NPR Spfy Integration Setup"
                         Enabled = IntegrationIsEnabled;
                     }
                 }
-                group(CCOrderIntegrationArea)
-                {
-                    Caption = 'Click && Collect Order Integration Area';
-                    field("C&C Order Integration"; Rec."C&C Order Integration")
-                    {
-                        ToolTip = 'Specifies whether click & collect order integration is enabled. If enabled, system will accept and process incoming Shopify CC orders, received through dedicated BC webservice.';
-                        ApplicationArea = NPRShopify;
-                        Enabled = IntegrationIsEnabled;
-
-                        trigger OnValidate()
-                        begin
-                            UpdateControlVisibility();
-                        end;
-                    }
-                    field("C&C Order Workflow Code"; Rec."C&C Order Workflow Code")
-                    {
-                        ToolTip = 'Specifies the Collect in Store Workflow Code to be used by the order handling engine.';
-                        ApplicationArea = NPRShopify;
-                        Enabled = CCOrderIntegrationIsEnabled;
-                    }
-                }
             }
             part(ShopifyStores; "NPR Spfy Stores Subpage")
             {
@@ -273,34 +252,6 @@ page 6184553 "NPR Spfy Integration Setup"
                     Caption = 'Azure Active Directory OAuth';
                     Image = XMLSetup;
                     Visible = HasAzureADConnection;
-                    action("Create Azure AD App")
-                    {
-                        Caption = 'Create Azure AD App';
-                        ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
-                        ApplicationArea = NPRShopify;
-                        Image = Setup;
-
-                        trigger OnAction()
-                        var
-                            SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-                        begin
-                            SpfyIntegrationMgt.CreateAzureADApplication();
-                        end;
-                    }
-                    action("Create Azure AD App Secret")
-                    {
-                        Caption = 'Create Azure AD App Secret';
-                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
-                        ApplicationArea = NPRShopify;
-                        Image = Setup;
-
-                        trigger OnAction()
-                        var
-                            SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-                        begin
-                            SpfyIntegrationMgt.CreateAzureADApplicationSecret();
-                        end;
-                    }
                     action("Register Webhook Handler App")
                     {
                         Caption = 'Register Webhook Handler App';
@@ -350,7 +301,6 @@ page 6184553 "NPR Spfy Integration Setup"
         ItemListIntegrationIsEnabled := Rec."Enable Integration" and Rec."Item List Integration";
         InventoryIntegrationIsEnabled := Rec."Enable Integration" and Rec."Send Inventory Updates";
         SalesOrderIntegrationIsEnabled := Rec."Enable Integration" and Rec."Sales Order Integration";
-        CCOrderIntegrationIsEnabled := Rec."Enable Integration" and Rec."C&C Order Integration";
     end;
 
     local procedure SelectShopifyStore() StoreCode: Code[20]
@@ -395,7 +345,6 @@ page 6184553 "NPR Spfy Integration Setup"
     var
         xSetup: Record "NPR Spfy Integration Setup";
         TempxShopifyStore: Record "NPR Spfy Store" temporary;
-        CCOrderIntegrationIsEnabled: Boolean;
         HasAzureADConnection: Boolean;
         IntegrationIsEnabled: Boolean;
         InventoryIntegrationIsEnabled: Boolean;

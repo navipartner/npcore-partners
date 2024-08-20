@@ -1,6 +1,6 @@
 page 6184590 "NPR NpCs Activities"
 {
-    Extensible = false;
+    Extensible = true;
     Caption = 'Collect Order - Activities';
     PageType = CardPart;
     RefreshOnActivate = true;
@@ -16,22 +16,6 @@ page 6184590 "NPR NpCs Activities"
                 Caption = '';
                 ShowCaption = false;
 
-#if not BC17
-                field("Spfy CC Orders - Unprocessed"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Spfy CC Orders - Unprocessed"))))
-                {
-                    Caption = 'Unprocessed Shopify CC Orders';
-                    ToolTip = 'Specifies the number of unprocessed Shopify collect in store orders.';
-                    ApplicationArea = NPRShopify;
-
-                    trigger OnDrillDown()
-                    var
-                        SpfyCCOrder: Record "NPR Spfy C&C Order";
-                    begin
-                        SpfyCCOrder.SetRange(Status, SpfyCCOrder.Status::Error);
-                        Page.Run(0, SpfyCCOrder);
-                    end;
-                }
-#endif
                 field("CiS Orders - Pending"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("CiS Orders - Pending"))))
                 {
                     Caption = 'Pending Collect Orders';
@@ -124,7 +108,7 @@ page 6184590 "NPR NpCs Activities"
             BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
-    local procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
+    procedure GetFieldValueFromBackgroundTaskResultSet(FieldNo: Text) Result: Integer
     begin
         if not BackgroundTaskResults.ContainsKey(FieldNo) then
             exit(0);

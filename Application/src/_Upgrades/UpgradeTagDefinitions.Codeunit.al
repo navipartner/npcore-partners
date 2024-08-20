@@ -197,6 +197,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenReconLinePostingAllowed'));
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'PhaseOutShopifyCCIntegration'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
     end;
@@ -749,6 +750,8 @@
                 case UpgradeStep of
                     'SetDataProcessingHandlerID':
                         exit('NPR-Spfy-SetDataProcessingHandlerID-20240610');
+                    'PhaseOutShopifyCCIntegration':
+                        exit('NPR-Spfy-PhaseOutShopifyCCIntegration-20240814');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

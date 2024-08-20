@@ -1,7 +1,7 @@
 #if not BC17
 table 6150810 "NPR Spfy Store"
 {
-    Access = Internal;
+    Access = Public;
     Caption = 'Shopify Store';
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR Spfy Stores";

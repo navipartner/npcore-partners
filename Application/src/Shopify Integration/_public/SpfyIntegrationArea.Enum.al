@@ -35,6 +35,9 @@ enum 6014656 "NPR Spfy Integration Area"
     value(40; "Click And Collect")
     {
         Caption = 'Click & Collect';
+        ObsoleteState = Pending;
+        ObsoleteTag = '2023-08-18';
+        ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
     }
 }
 #endif
