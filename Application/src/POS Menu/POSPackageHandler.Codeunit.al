@@ -48,28 +48,28 @@
         ManagedPackageMgt.ImportFromFile();
     end;
 
-    procedure ExportPOSLayoutsToFile(var POSLayout: Record "NPR POS Layout")
+    procedure ExportPOSLayoutsToFile(var POSLayout: Record "NPR POS Layout"; Encoding: TextEncoding)
     var
         ManagedPackageBuilder: Codeunit "NPR Managed Package Builder";
         POSLayouts: Page "NPR POS Layouts";
         FileName: Text;
     begin
-        ManagedPackageBuilder.AddRecord(POSLayout);
+        ManagedPackageBuilder.AddRecord(POSLayout, Encoding);
 
         if POSLayout.Count() = 1 then
             FileName := StrSubstNo(FileNameLbl, POSLayout.TableCaption(), POSLayout.Code)
         else
             FileName := POSLayouts.Caption();
-        ManagedPackageBuilder.ExportToFile(FileName, '1.0', FileName, Database::"NPR POS Layout");
+        ManagedPackageBuilder.ExportToFile(FileName, '1.0', FileName, Database::"NPR POS Layout", Encoding);
     end;
 
-    procedure ImportPOSLayoutsFromFile()
+    procedure ImportPOSLayoutsFromFile(Encoding: TextEncoding)
     var
         ManagedPackageMgt: Codeunit "NPR Managed Package Mgt.";
         LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
     begin
         ManagedPackageMgt.AddExpectedTableID(Database::"NPR POS Layout");
         ManagedPackageMgt.SetLoadMethod(LoadMethod::InsertOrModify);
-        ManagedPackageMgt.ImportFromFile();
+        ManagedPackageMgt.ImportFromFile(Encoding);
     end;
 }

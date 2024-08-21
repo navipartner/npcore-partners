@@ -48,7 +48,7 @@
         GlobalLoadMethodOverwritten := true;
     end;
 
-    procedure ImportFromFile()
+    procedure ImportFromFile(Encoding: TextEncoding)
     var
         JObject: JsonObject;
         JToken: JsonToken;
@@ -71,7 +71,12 @@
         if Handled then
             exit;
 
-        LoadPackage(JToken);
+        LoadPackage(JToken, Encoding);
+    end;
+
+    procedure ImportFromFile()
+    begin
+        ImportFromFile(TextEncoding::MSDos);
     end;
 
     procedure ImportFromBlob(var TempBlob: Codeunit "Temp Blob")
@@ -144,7 +149,7 @@
         LoadPackage(Jtoken);
     end;
 
-    local procedure LoadPackage(JToken: JsonToken): Boolean
+    local procedure LoadPackage(JToken: JsonToken; Encoding: TextEncoding): Boolean
     var
         Selection: Integer;
         LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
@@ -190,13 +195,18 @@
                 RecRef.Close();
             until TempGlobalTableList.Next() = 0;
 
-        if not LoadRecords(JToken, LoadMethod) then
+        if not LoadRecords(JToken, LoadMethod, Encoding) then
             Error(Error_PackageLoad);
 
         exit(true);
     end;
 
-    local procedure LoadRecords(JToken: JsonToken; LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
+    local procedure LoadPackage(JToken: JsonToken): Boolean
+    begin
+        exit(LoadPackage(JToken, TextEncoding::MSDos));
+    end;
+
+    local procedure LoadRecords(JToken: JsonToken; LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst; Encoding: TextEncoding): Boolean
     var
         RecRef: RecordRef;
         FieldReference: FieldRef;
@@ -241,7 +251,7 @@
             foreach FieldID in FieldIDList do
                 if FieldRefByID(RecRef, FieldID, FieldReference) then begin
                     JObject.Get(FieldID, JToken);
-                    if not ConvertHelper.JValueToFieldRef(JToken.AsValue(), FieldReference) then
+                    if not ConvertHelper.JValueToFieldRef(JToken.AsValue(), FieldReference, Encoding) then
                         exit(false);
                 end;
 

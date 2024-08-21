@@ -64,11 +64,11 @@ codeunit 6060164 "NPR Convert Helper"
         end;
     end;
 
-    procedure FieldRefToVariant(FieldReference: FieldRef; var FieldValue: Variant)
+    procedure FieldRefToVariant(FieldReference: FieldRef; var FieldValue: Variant; Encoding: TextEncoding)
     begin
         case UpperCase(Format(FieldReference.Type())) of
             'BLOB':
-                FieldValue := BLOBToBase64String(FieldReference);
+                FieldValue := BLOBToBase64String(FieldReference, Encoding);
             'DATE', 'TIME', 'DATEFORMULA', 'DURATION', 'RECORDID', 'DATETIME':
                 FieldValue := Format(FieldReference.Value(), 0, 9);
             'TABLEFILTER':
@@ -79,7 +79,14 @@ codeunit 6060164 "NPR Convert Helper"
     end;
 
     [TryFunction]
-    procedure JValueToFieldRef(JValue: JsonValue; FieldReference: FieldRef)
+    procedure FieldRefToVariant(FieldReference: FieldRef; var FieldValue: Variant)
+    begin
+        FieldRefToVariant(FieldReference, FieldValue, TextEncoding::MSDos);
+    end;
+
+
+    [TryFunction]
+    procedure JValueToFieldRef(JValue: JsonValue; FieldReference: FieldRef; Encoding: TextEncoding)
     var
         TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";
@@ -110,8 +117,8 @@ codeunit 6060164 "NPR Convert Helper"
             'BLOB':
                 begin
                     ValueText := JValue.AsText();
-                    TempBlob.CreateOutStream(OutStr);
-                    OutStr.WriteText(Base64Convert.FromBase64(ValueText));
+                    TempBlob.CreateOutStream(OutStr, Encoding);
+                    OutStr.WriteText(Base64Convert.FromBase64(ValueText, Encoding));
                     TempBlob.ToFieldRef(FieldReference);
                 end;
             'DATEFORMULA':
@@ -139,7 +146,13 @@ codeunit 6060164 "NPR Convert Helper"
         end;
     end;
 
-    local procedure BLOBToBase64String(FieldReference: FieldRef) FieldValue: Text
+    [TryFunction]
+    procedure JValueToFieldRef(JValue: JsonValue; FieldReference: FieldRef)
+    begin
+        JValueToFieldRef(JValue, FieldReference, TextEncoding::MSDos);
+    end;
+
+    local procedure BLOBToBase64String(FieldReference: FieldRef; Encoding: TextEncoding) FieldValue: Text
     var
         TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";
@@ -150,9 +163,9 @@ codeunit 6060164 "NPR Convert Helper"
         FieldReference.CalcField();
         TempBlob.FromFieldRef(FieldReference);
         if TempBlob.HasValue() then begin
-            TempBlob.CreateInStream(InStr);
+            TempBlob.CreateInStream(InStr, Encoding);
             InStr.ReadText(StreamContent);
-            FieldValue := Base64Convert.ToBase64(StreamContent);
+            FieldValue := Base64Convert.ToBase64(StreamContent, Encoding);
         end;
     end;
 
