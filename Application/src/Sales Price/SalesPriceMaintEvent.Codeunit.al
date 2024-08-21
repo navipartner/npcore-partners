@@ -176,9 +176,9 @@
                             SalesPriceMaintenanceSetup."Internal Unit Price"::"Unit Price":
                                 begin
                                     if not PriceListHeader."Price Includes VAT" then
-                                        UnitPrice := Item."Unit Price" * SalesPriceMaintenanceSetup.Factor
+                                        UnitPrice := Item.CalcUnitPriceExclVAT() * SalesPriceMaintenanceSetup.Factor
                                     else
-                                        UnitPrice := (Item."Unit Price" * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
+                                        UnitPrice := (Item.CalcUnitPriceExclVAT() * (1 + (VATPct / 100))) * SalesPriceMaintenanceSetup.Factor;
                                 end;
                         end;
 
