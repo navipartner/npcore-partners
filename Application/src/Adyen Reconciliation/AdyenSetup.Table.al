@@ -86,7 +86,7 @@ table 6150801 "NPR Adyen Setup"
         field(70; "Enable Automatic Posting"; Boolean)
         {
             DataClassification = CustomerContent;
-            Caption = 'Enable Automatic Posting';
+            Caption = 'Enable Posting Automation';
             InitValue = true;
         }
         field(80; "Post POS Entries Immediately"; Boolean)
