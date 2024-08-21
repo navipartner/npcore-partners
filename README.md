@@ -10,13 +10,13 @@ The primary .app is in repository NpCore which contains one workspace with 3 imp
 
 ### Development
 New developers should read the intro at:  
-[Developer Intro](./Documentation/internal/developers/DeveloperIntroduction.md)
+[Developer Intro](https://github.com/navipartner/npcore/wiki/Developer-Introduction)
 
 ### Documentation
 New employees should read the contributor guide and technical guide:  
-[Contributor Guide](./Documentation/internal/ContributorGuide.md)  
-[Technical Guide](./Documentation/internal/TechnicalGuide.md)
+[Contributor Guide](https://github.com/navipartner/npcore/wiki/Contributor-Guide)  
+[Technical Guide](https://github.com/navipartner/npcore/wiki/Technical-Guide)
 
 ### Crane Containers
 New employees should read the documentation for creating containers in which they can test the BC and NPRetail application:  
-[Crane Intro](./Documentation/internal/developers/CraneContainers.md)
+[Crane Intro](https://github.com/navipartner/npcore/wiki/Crane-Containers)

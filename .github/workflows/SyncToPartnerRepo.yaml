@@ -1,0 +1,35 @@
+name: 'Sync to partner repository'
+run-name: ${{ github.workflow }}
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  schedule:
+    - cron: "0 4 * * *"
+
+concurrency:
+  group: 'ci-${{ github.repository }}-${{ github.workflow }}'
+
+defaults:
+  run:
+    shell: powershell
+
+permissions:
+  checks: write
+  contents: write
+  packages: write
+  statuses: write
+
+jobs:
+  Run:
+    uses: navipartner/devops/.github/workflows/SyncToRepo.yaml@main
+    secrets: inherit
+    with:
+      sourceRepo: '${{ github.repository }}'
+      destinationRepo: 'navipartner/npcore-partners'
+      defaultBranch: ${{ github.event.repository.default_branch }}
+      additionalBranches: '["releases/*"]'
+      artifactsUrl: 'https://navipartner.visualstudio.com/NpCore/_artifacts/feed/NaviPartner.NavApps/NuGet/NaviPartner.NPRetail/overview/{version}'
+      partnersReadmePath: '.github/partners/readme.md'
