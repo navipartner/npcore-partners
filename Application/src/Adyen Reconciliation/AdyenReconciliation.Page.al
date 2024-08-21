@@ -235,7 +235,11 @@ page 6184502 "NPR Adyen Reconciliation"
                     var
                         PostedSuccessResult: Label 'Successfully posted document.';
                         PostedFailedResult: Label 'Couldn''t post some entries.';
+                        PostingConfirmationLbl: Label 'Are you sure you want to post the Reconciliation lines?';
                     begin
+                        if not Confirm(PostingConfirmationLbl) then
+                            exit;
+
                         if _TransactionMatching.PostEntries(Rec) then
                             Message(PostedSuccessResult)
                         else
