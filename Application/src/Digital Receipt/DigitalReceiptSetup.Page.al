@@ -5,7 +5,7 @@ page 6150797 "NPR Digital Receipt Setup"
     UsageCategory = Administration;
     Caption = 'Digital Receipt Setup';
     PageType = Card;
-    SourceTable = "NPR Digital Receipt Setup";
+    SourceTable = "NPR Digital Rcpt. Setup";
     InsertAllowed = false;
     DeleteAllowed = false;
     ContextSensitiveHelpPage = 'docs/retail/pos_processes/how-to/digital_receipts/';

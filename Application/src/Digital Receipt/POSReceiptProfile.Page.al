@@ -41,7 +41,7 @@ page 6150757 "NPR POS Receipt Profile"
 
                     trigger OnValidate()
                     var
-                        DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
+                        DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
                         CredentialsNotValidLbl: Label 'API Credentials are not valid or not tested.';
                     begin
                         if not Rec."Enable Digital Receipt" then

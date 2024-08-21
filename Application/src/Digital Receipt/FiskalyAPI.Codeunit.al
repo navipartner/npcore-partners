@@ -110,7 +110,7 @@ codeunit 6184663 "NPR Fiskaly API"
 
     local procedure CreateAuthBodyAsJsonObject() AuthBodyJsonObject: JsonObject;
     var
-        DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
+        DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
     begin
         DigitalReceiptSetup.FindFirst();
         DigitalReceiptSetup.TestField("Api Key");
