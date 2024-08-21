@@ -14,7 +14,7 @@
         DialogValues: array[2] of Integer;
         GlobalRecCount: Integer;
 
-    procedure AddRecord("Record": Variant)
+    procedure AddRecord("Record": Variant; Encoding: TextEncoding)
     var
         JObject: JsonObject;
         JObjectRec: JsonObject;
@@ -49,7 +49,7 @@
             clear(JObjectRec);
             for i := 1 to RecRef.FieldCount do
                 if RecRef.FieldIndex(i).Class = RecRef.FieldIndex(i).Class::Normal then begin  //do not include flow fields
-                    ConvertHelper.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue);
+                    ConvertHelper.FieldRefToVariant(RecRef.FieldIndex(i), FieldValue, Encoding);
                     ConvertHelper.AddToJObject(JObjectRec, Format(RecRef.FieldIndex(i).Number), FieldValue);
                 end;
             JObject.Add('Fields', JObjectRec);
@@ -59,6 +59,10 @@
         RecRef.Close();
     end;
 
+    procedure AddRecord("Record": Variant)
+    begin
+        AddRecord(Record, TextEncoding::MSDos);
+    end;
 
     procedure ExportToFile(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer)
     var
@@ -74,6 +78,23 @@
 
         CopyStream(OutStm, InStm);
         FileName := StrSubstNo(PackageFileNameLbl, Name);
+        DownloadFromStream(InStm, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
+    end;
+
+    procedure ExportToFile(Name: Text; Version: Text; Description: Text; PrimaryPackageTable: Integer; Encoding: TextEncoding)
+    var
+        InStm: InStream;
+        OutStm: OutStream;
+        FileName: Variant;
+        TempBlob: Codeunit "Temp Blob";
+        PackageFileNameCaptionLbl: Label '%1 Package.json', Locked = true;
+    begin
+        TempBlob.CreateOutStream(OutStm, Encoding);
+        OutStm.WriteText(CreateManifest(Name, Version, Description, PrimaryPackageTable));
+        TempBlob.CreateInStream(InStm, Encoding);
+
+        CopyStream(OutStm, InStm);
+        FileName := StrSubstNo(PackageFileNameCaptionLbl, Name);
         DownloadFromStream(InStm, 'Save Package Manifest', '', 'JSON File (*.json)|*.json', FileName);
     end;
 

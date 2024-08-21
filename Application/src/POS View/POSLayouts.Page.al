@@ -132,7 +132,7 @@ page 6060102 "NPR POS Layouts"
                 begin
                     CurrPage.SetSelectionFilter(POSLayout);
                     POSLayout := Rec;
-                    POSPackageHandler.ExportPOSLayoutsToFile(POSLayout);
+                    POSPackageHandler.ExportPOSLayoutsToFile(POSLayout, TextEncoding::UTF8);
                 end;
             }
             action(ImportPackage)
@@ -151,7 +151,7 @@ page 6060102 "NPR POS Layouts"
                 var
                     POSPackageHandler: Codeunit "NPR POS Package Handler";
                 begin
-                    POSPackageHandler.ImportPOSLayoutsFromFile();
+                    POSPackageHandler.ImportPOSLayoutsFromFile(TextEncoding::UTF8);
                     CurrPage.Update(false);
                 end;
             }
