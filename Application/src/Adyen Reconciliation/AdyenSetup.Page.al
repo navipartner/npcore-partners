@@ -67,7 +67,7 @@ page 6184531 "NPR Adyen Setup"
                 field("Enable Automatic Posting"; Rec."Enable Automatic Posting")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if Posting is automatically performed during a Reconciliation process.';
+                    ToolTip = 'Specifies whether the System should post Reconciliation document lines during the automatic Reconciliation process. If not enabled, the automatic Reconciliation process ends after the matching stage.';
                 }
                 field("Post Chargebacks Automatically"; Rec."Post Chargebacks Automatically")
                 {
