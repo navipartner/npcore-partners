@@ -5,7 +5,7 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
     internal procedure CreateDigitalReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text; var FooterText: Text)
     var
         POSEntry: Record "NPR POS Entry";
-        DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
+        DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
         TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary;
         FiskalyAPI: Codeunit "NPR Fiskaly API";
         SendAuthRequest: Boolean;
@@ -58,7 +58,7 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
 
     internal procedure CheckIfGlobalSetupEnabledAndCreateReceipt(SalesTicketNo: Code[20]; var DigitalReceiptLink: Text; var FooterText: Text)
     var
-        DigitalReceiptSetup: Record "NPR Digital Receipt Setup";
+        DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
         GlobalDigitalRcptNotEnabledErr: Label 'Global Digital Receipt Setup is not enabled. Please enable it to proceed with receipt generation.';
     begin
         DigitalReceiptSetup.SetLoadFields("Enable");

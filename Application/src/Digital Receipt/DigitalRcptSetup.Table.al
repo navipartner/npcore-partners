@@ -1,12 +1,8 @@
-table 6059853 "NPR Digital Receipt Setup"
+table 6059859 "NPR Digital Rcpt. Setup"
 {
     Access = Internal;
     Caption = 'Digital Receipt Setup';
     DataClassification = CustomerContent;
-    DataPerCompany = false;
-    ObsoleteState = Pending;
-    ObsoleteTag = '2024-08-20';
-    ObsoleteReason = 'Replaced with table 6059859 "NPR Digital Rcpt. Setup" due to change of DataPerCompany property.';
 
     fields
     {
