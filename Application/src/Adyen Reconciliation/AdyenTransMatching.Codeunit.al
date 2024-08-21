@@ -664,7 +664,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit(true);
         end;
 
-        ReconciliationLine.SetRange(Status, ReconciliationLine."Status"::Matched);
+        ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine."Status"::Matched, ReconciliationLine.Status::"Failed to Post");
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
