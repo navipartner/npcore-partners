@@ -70,7 +70,7 @@ table 6150816 "NPR Spfy Inventory Level"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
         If Inventory < 0 then
-            if not SpfyIntegrationMgt.IsSendNegativeInventory() then
+            if not SpfyIntegrationMgt.IsSendNegativeInventory("Shopify Store Code") then
                 exit(0);
         Exit(Inventory);
     end;

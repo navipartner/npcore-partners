@@ -330,7 +330,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     begin
         if ShopifyItemID <> '' then
             ProductJObject.Add('id', ShopifyItemID);
-        if _SpfyIntegrationMgt.IsSendShopifyNameAndDescription() or (NcTaskType = NcTask.Type::Insert) then begin
+        if _SpfyIntegrationMgt.IsSendShopifyNameAndDescription(SpfyStoreItemLink."Shopify Store Code") or (NcTaskType = NcTask.Type::Insert) then begin
             if SpfyStoreItemLink."Shopify Name" <> '' then
                 ProductJObject.Add('title', SpfyStoreItemLink."Shopify Name")
             else
@@ -424,7 +424,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if ShopifyVariantID <> '' then
             VariantJObject.Add('id', ShopifyVariantID);
         VariantJObject.Add('sku', SpfyItemMgt.GetProductVariantSku(ItemVariant."Item No.", ItemVariant.Code));
-        if _SpfyIntegrationMgt.IsSendSalesPrices() then
+        if _SpfyIntegrationMgt.IsSendSalesPrices(ShopifyStoreCode) then
             VariantJObject.Add('price', Item."Unit Price");
         VariantJObject.Add('inventory_management', 'shopify');
         Barcode := GetItemReference(ItemVariant);
@@ -624,7 +624,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ShopifyProductTitle := _JsonHelper.GetJText(ShopifyResponse, 'product.title', MaxStrLen(SpfyStoreItemLink."Shopify Name"), false);
         ShopifyProductDetailedDescr := _JsonHelper.GetJText(ShopifyResponse, 'product.body_html', false);
         ShopifyProductStatus := _JsonHelper.GetJText(ShopifyResponse, 'product.status', false);
-        BCIsNameDescriptionMaster := _SpfyIntegrationMgt.IsSendShopifyNameAndDescription();
+        BCIsNameDescriptionMaster := _SpfyIntegrationMgt.IsSendShopifyNameAndDescription(NcTask."Store Code");
 
         FirstVariant := true;
         foreach ShopifyVariant in ShopifyVariants.AsArray() do begin

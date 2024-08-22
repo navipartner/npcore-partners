@@ -10,7 +10,7 @@ page 6184561 "NPR Spfy C&C Orders"
     InsertAllowed = false;
     PromotedActionCategories = 'Manage,Process,Report,Navigate';
     ObsoleteState = Pending;
-    ObsoleteTag = '2023-08-18';
+    ObsoleteTag = '2024-08-25';
     ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     layout

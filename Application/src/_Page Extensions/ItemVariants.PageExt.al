@@ -41,7 +41,7 @@ pageextension 6014458 "NPR Item Variants" extends "Item Variants"
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items);
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
         NPR_UpdateShopifyStoreListGenerated();
     end;
 

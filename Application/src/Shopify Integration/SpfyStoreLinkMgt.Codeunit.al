@@ -126,8 +126,12 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             until ShopifyStore.Next() = 0;
     end;
 
-    //#region Subscribers
+    #region Subscribers
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Location, 'OnAfterDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Location, OnAfterDeleteEvent, '', false, false)]
+#endif
     local procedure Location_RemoveStoreLinks(var Rec: Record Location; RunTrigger: Boolean)
     var
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
@@ -140,7 +144,11 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             SpfyStoreLocationLink.DeleteAll(true);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Item, OnAfterDeleteEvent, '', false, false)]
+#endif
     local procedure Item_RemoveAssignedShopifyID(var Rec: Record Item; RunTrigger: Boolean)
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
@@ -154,7 +162,11 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             SpfyStoreItemLink.DeleteAll(true);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnAfterDeleteEvent, '', false, false)]
+#endif
     local procedure ItemVariant_RemoveAssignedShopifyID(var Rec: Record "Item Variant"; RunTrigger: Boolean)
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
@@ -168,6 +180,6 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         if not SpfyStoreItemLink.IsEmpty() then
             SpfyStoreItemLink.DeleteAll(true);
     end;
-    //#endregion
+    #endregion
 }
 #endif
