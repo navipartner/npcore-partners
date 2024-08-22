@@ -6,7 +6,7 @@
     PageType = List;
     SourceTable = "NPR POS Menu";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRNewPOSEditor;
 
 #if not BC17
     AboutTitle = 'About POS Menus';

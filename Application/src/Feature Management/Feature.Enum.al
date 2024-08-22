@@ -63,4 +63,14 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Implementation = "NPR Feature Management" = "NPR Spfy Integration Feature";
     }
 #endif
+    value(100; "POS Scenarios Obsoleted")
+    {
+        Caption = 'POS Scenarios Obsoleted', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Scenario Obsoleted Feature";
+    }
+    value(110; "New POS Editor")
+    {
+        Caption = 'New POS Editor', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR New POS Editor Feature";
+    }
 }

@@ -18,6 +18,8 @@ codeunit 6151349 "NPR Enable Application Areas"
 #endif
         EnableLocalizationApplicationAreas(TempApplicationAreaSetup);
         EnableFiscalizationApplicationAreas(TempApplicationAreaSetup);
+        EnableInternalPOSScenariosAndHideOldRelatedPages(TempApplicationAreaSetup);
+        EnableOnlyNewPOSEditorAndHideOldRelatedPages(TempApplicationAreaSetup);
     end;
 
     local procedure EnableRetailApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -76,6 +78,16 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR AT Fiscal" := IsATFiscalizationEnabled();
         TempApplicationAreaSetup."NPR ES Fiscal" := IsESFiscalizationEnabled();
         TempApplicationAreaSetup."NPR RS EInvoice" := IsRSEInvoiceEnabled();
+    end;
+
+    local procedure EnableInternalPOSScenariosAndHideOldRelatedPages(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR Obsolete POS Scenarios" := not IsFeatureEnabled(Feature::"POS Scenarios Obsoleted");
+    end;
+
+    local procedure EnableOnlyNewPOSEditorAndHideOldRelatedPages(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR New POS Editor" := not IsFeatureEnabled(Feature::"New POS Editor");
     end;
 
     local procedure IsFeatureEnabled(FeatureToCheck: Enum "NPR Feature"): Boolean

@@ -201,6 +201,11 @@
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'POSEditorFeatureHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
+
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -761,6 +766,20 @@
                         exit('NPR-UpgradeDigitalReceiptSetupEnable-20240721');
                     'UpdateDigitalReceiptSetupTable':
                         exit('NPR-UpdateDigitalReceiptSetupTable-20240821')
+                end;
+            Codeunit::"NPR New Feature Handler":
+                case UpgradeStep of
+                    'POSEditorFeatureHandle':
+                        exit('NPR-POSEditorFeatureHandle-20240821');
+                    'ScenarioObsoletedFeatureHandle':
+                        exit('NPR-ScenarioObsoletedFeatureHandle-20240821')
+                end;
+            Codeunit::"NPR UPG New Feature Handler":
+                case UpgradeStep of
+                    'POSEditorFeatureHandle':
+                        exit('NPR-POSEditorFeatureHandle-20240821');
+                    'ScenarioObsoletedFeatureHandle':
+                        exit('NPR-ScenarioObsoletedFeatureHandle-20240821')
                 end;
         end;
     end;

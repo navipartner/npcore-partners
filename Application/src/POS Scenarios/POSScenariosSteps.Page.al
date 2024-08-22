@@ -10,7 +10,7 @@
     SourceTable = "NPR POS Sales Workflow Step";
     SourceTableView = SORTING("Sequence No.")
                       ORDER(Ascending);
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRObsoletePOSScenarios;
     ObsoleteState = Pending;
     ObsoleteTag = '2023-06-28';
     ObsoleteReason = 'Scenarios have been moved to hardcoded codeunit calls for internal steps, and event subscribers for PTE steps';
