@@ -112,7 +112,7 @@
             Caption = 'Shopify Click && Collect Orders';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = '2023-08-18';
+            ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
 #endif

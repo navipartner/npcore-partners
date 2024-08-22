@@ -16,7 +16,11 @@ codeunit 6184807 "NPR Spfy Close Order"
         end;
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnRunOnBeforeFinalizePosting, '', true, false)]
+#endif
     local procedure ScheduleCloseShopifyOrder(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         NcTask: Record "NPR Nc Task";
@@ -28,8 +32,6 @@ codeunit 6184807 "NPR Spfy Close Order"
     begin
         if not SalesHeader.Invoice then
             exit;
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Close Order Requests") then
-            exit;
 
         NcTask."Store Code" :=
             CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvoiceHeader.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
@@ -38,8 +40,7 @@ codeunit 6184807 "NPR Spfy Close Order"
             if NcTask."Store Code" <> '' then
                 SpfyAssignedIDMgt.AssignShopifyID(SalesInvoiceHeader.RecordId(), "NPR Spfy ID Type"::"Store Code", NcTask."Store Code", false);
         end;
-
-        if not SpfyIntegrationMgt.ShopifyStoreIsEnabled(NcTask."Store Code") then
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Close Order Requests", NcTask."Store Code") then
             exit;
 
         SpfyOrderId := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");

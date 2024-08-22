@@ -8,7 +8,7 @@ page 6184562 "NPR Spfy C&C Ord.Lines FactBox"
     UsageCategory = None;
     Editable = false;
     ObsoleteState = Pending;
-    ObsoleteTag = '2023-08-18';
+    ObsoleteTag = '2024-08-25';
     ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     layout

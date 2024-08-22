@@ -36,7 +36,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                         IntegrationArea, Database::"NPR Spfy Inventory Level", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR Spfy Store-Item Link", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
-                    if SpfyIntegrationMgt.IncludeTrasferOrders() <> SpfyIntegrationMgt.IncludeTrasferOrders() ::No then
+                    if SpfyIntegrationMgt.IncludeTrasferOrdersAnyStore() then
                         AddDataLogSetupEntity(
                             IntegrationArea, Database::"Transfer Line", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                 end;

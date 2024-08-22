@@ -76,7 +76,7 @@ page 6184564 "NPR Spfy Inventory Levels"
                     FilterPage: FilterPageBuilder;
                     ConfirmQst: Label 'This function will recalculate inventory levels for all or selected Shopify integrated locations and items.';
                 begin
-                    SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+                    SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Inventory Levels", '');
                     if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), false) then
                         exit;
                     FilterPage.AddTable(Item.TableCaption(), Database::Item);
@@ -85,6 +85,7 @@ page 6184564 "NPR Spfy Inventory Levels"
                     FilterPage.AddFieldNo(Item.TableCaption(), Item.FieldNo("Location Filter"));
                     FilterPage.AddTable(ShopifyStore.TableCaption(), Database::"NPR Spfy Store");
                     FilterPage.AddFieldNo(ShopifyStore.TableCaption(), ShopifyStore.FieldNo(Code));
+                    FilterPage.SetView(ShopifyStore.TableCaption(), 'WHERE(Enabled=CONST(true),"Send Inventory Updates"=CONST(true))');
                     if FilterPage.RunModal() then begin
                         Item.SetView(FilterPage.GetView(Item.TableCaption()));
                         ShopifyStore.SetView(FilterPage.GetView(ShopifyStore.TableCaption()));

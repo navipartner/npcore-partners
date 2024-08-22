@@ -52,7 +52,11 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
         exit(Codeunit::"NPR Spfy Webhook Processor JQ");
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RefreshJobQueueEntry()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
@@ -63,7 +67,11 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
         RegisterShopifyWebhookNotificationProcessingJQ(not SpfyWebhookSubscription.IsEmpty());
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
     local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin
         if Handled then

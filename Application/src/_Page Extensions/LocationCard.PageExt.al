@@ -96,7 +96,7 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
     begin
         RetailLocalizationEnabled := RetailLocalizationMgt.IsRetailLocalizationEnabled();
 #if not BC17
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
         SpfyIntegrationEvents.LocationCardOnCheckIfShopifyIntegrationIsEnabled(Rec, ShopifyIntegrationIsEnabled);
 #endif
     end;

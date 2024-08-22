@@ -775,7 +775,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
     begin
         AsyncEnabled := POSAsyncPostingMgt.SetVisibility();
 #if not BC17
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
 #endif
     end;
 }

@@ -15,6 +15,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateShopifySetup();
         SetDataProcessingHandlerID();
         PhaseOutShopifyCCIntegration();
+        StoreSpecificIntegrationSetups();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -93,5 +94,40 @@ codeunit 6184802 "NPR Spfy App Upgrade"
             TenantWebService.Delete();
     end;
 #endif
+
+    internal procedure StoreSpecificIntegrationSetups()
+    var
+        ShopifySetup: Record "NPR Spfy Integration Setup";
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        UpgradeStep := 'StoreSpecificIntegrationSetups';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+
+        if ShopifySetup.Get() then
+            if ShopifyStore.FindSet(true) then
+                repeat
+                    ShopifyStore."Item List Integration" := ShopifySetup."Item List Integration";
+                    ShopifyStore."Do Not Sync. Sales Prices" := ShopifySetup."Do Not Sync. Sales Prices";
+                    ShopifyStore."Set Shopify Name/Descr. in BC" := ShopifySetup."Set Shopify Name/Descr. in BC";
+                    ShopifyStore."Send Inventory Updates" := ShopifySetup."Send Inventory Updates";
+                    ShopifyStore."Include Transfer Orders" := ShopifySetup."Include Transfer Orders";
+                    ShopifyStore."Sales Order Integration" := ShopifySetup."Sales Order Integration";
+                    ShopifyStore."Post on Completion" := ShopifySetup."Post on Completion";
+                    ShopifyStore."Delete on Cancellation" := ShopifySetup."Delete on Cancellation";
+                    ShopifyStore."Get Payment Lines from Shopify" := ShopifySetup."Get Payment Lines From Shopify";
+                    ShopifyStore."Send Order Fulfillments" := ShopifySetup."Send Order Fulfillments";
+                    ShopifyStore."Send Payment Capture Requests" := ShopifySetup."Send Payment Capture Requests";
+                    ShopifyStore."Send Close Order Requets" := ShopifySetup."Send Close Order Requets";
+                    ShopifyStore."Allowed Payment Statuses" := ShopifySetup."Allowed Payment Statuses";
+                    ShopifyStore."Retail Voucher Integration" := ShopifySetup."Retail Voucher Integration";
+                    ShopifyStore."Send Negative Inventory" := ShopifySetup."Send Negative Inventory";
+                    ShopifyStore.Modify();
+                until ShopifyStore.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
 }
 #endif

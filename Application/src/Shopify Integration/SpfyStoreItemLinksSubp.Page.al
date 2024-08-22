@@ -248,7 +248,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items);
+        ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
     end;
 
     trigger OnAfterGetRecord()

@@ -482,7 +482,7 @@
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers");
     end;
 #endif
 

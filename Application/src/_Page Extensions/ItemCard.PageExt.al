@@ -1365,8 +1365,8 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
 #endif
     begin
 #if not BC17
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
-        ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::" ");
+        ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
 #endif
 
         NPR_SetMagentoEnabled();

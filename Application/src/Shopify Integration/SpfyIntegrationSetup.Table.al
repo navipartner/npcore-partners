@@ -50,39 +50,33 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Item List Integration';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Item List Integration" then
-                    SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::Items);
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(41; "Do Not Sync. Sales Prices"; Boolean)
         {
             Caption = 'Do Not Sync. Sales Prices';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(42; "Set Shopify Name/Descr. in BC"; Boolean)
         {
             Caption = 'Set Shopify Name/Descr. in BC';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(50; "Send Inventory Updates"; Boolean)
         {
             Caption = 'Send Inventory Updates';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                EnableItemListIntegrLbl: Label '"%1" is not enabled. Using "%2" is not recommended without it.\Do you want the "%1" be enabled now?', Comment = '%1 - Item List Integration fieldcaption, Send Inventory Updates fieldcaption';
-            begin
-                if "Send Inventory Updates" then begin
-                    if not "Item List Integration" then
-                        if Confirm(EnableItemListIntegrLbl, true, Rec.FieldCaption("Item List Integration"), Rec.FieldCaption("Send Inventory Updates")) then
-                            Rec.Validate("Item List Integration", true);
-                    SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
-                end;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(51; "Include Transfer Orders"; Option)
         {
@@ -90,39 +84,35 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = No,Outbound,All;
             OptionCaption = 'No,Outbound,All';
-
-            trigger OnValidate()
-            begin
-                if "Include Transfer Orders" <> "Include Transfer Orders"::No then begin
-                    Modify();
-                    SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
-                end;
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(60; "Sales Order Integration"; Boolean)
         {
             Caption = 'Sales Order Integration';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            var
-                OrderMgt: Codeunit "NPR Spfy Order Mgt.";
-            begin
-                Modify();
-                OrderMgt.SetupJobQueues();
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(61; "Post on Completion"; Boolean)
         {
             Caption = 'Post on Completion';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(62; "Delete on Cancellation"; Boolean)
         {
             Caption = 'Delete on Cancellation';
             DataClassification = CustomerContent;
             InitValue = true;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(65; "Get Payment Lines From Shopify"; Option)
         {
@@ -130,33 +120,33 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
             OptionCaption = 'Before Capture,On Order Import';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(70; "Send Order Fulfillments"; Boolean)
         {
             Caption = 'Send Order Fulfillments';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Send Order Fulfillments" then
-                    TestField("Sales Order Integration");
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(80; "Send Payment Capture Requests"; Boolean)
         {
             Caption = 'Send Payment Capture Requests';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Send Payment Capture Requests" then
-                    TestField("Sales Order Integration");
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(90; "Send Close Order Requets"; Boolean)
         {
             Caption = 'Send Close Order Requests';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(100; "Allowed Payment Statuses"; Option)
         {
@@ -164,29 +154,32 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = Authorized,Paid,Both;
             OptionCaption = 'Authorized,Paid,Both';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(110; "Retail Voucher Integration"; Boolean)
         {
             Caption = 'Retail Voucher Integration';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                if "Retail Voucher Integration" then
-                    SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Retail Vouchers");
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(120; "Send Negative Inventory"; Boolean)
         {
             Caption = 'Send Negative Inventory';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-25';
+            ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
         field(125; "C&C Order Integration"; Boolean)
         {
             Caption = 'CC Order Integration';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
-            ObsoleteTag = '2023-08-18';
+            ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
         field(130; "C&C Order Workflow Code"; Code[20])
@@ -195,7 +188,7 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR NpCs Workflow";
             ObsoleteState = Pending;
-            ObsoleteTag = '2023-08-18';
+            ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
         field(140; "Data Processing Handler ID"; Code[20])
@@ -248,7 +241,6 @@ table 6150807 "NPR Spfy Integration Setup"
     end;
 
     var
-        SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
         RecordHasBeenRead: Boolean;
 }
 #endif

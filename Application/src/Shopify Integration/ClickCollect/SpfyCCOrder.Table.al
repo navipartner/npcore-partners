@@ -5,7 +5,7 @@ table 6150814 "NPR Spfy C&C Order"
     DataClassification = CustomerContent;
     Caption = 'Shopify CC Order';
     ObsoleteState = Pending;
-    ObsoleteTag = '2023-08-18';
+    ObsoleteTag = '2024-08-25';
     ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
     fields

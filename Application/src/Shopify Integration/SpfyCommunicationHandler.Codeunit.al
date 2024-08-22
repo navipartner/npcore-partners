@@ -60,6 +60,19 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
+    procedure GetShopifyStoreConfiguration(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
+    var
+        NcTask: Record "NPR Nc Task";
+        ResponseText: Text;
+        Url: Text;
+    begin
+        NcTask."Store Code" := ShopifyStoreCode;
+        Url := GetShopifyUrl(NcTask."Store Code", false) + 'shop.json';
+        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
+        ShopifyResponse.ReadFrom(ResponseText);
+    end;
+
+    [TryFunction]
     procedure GetShopifyLocations(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
     var
         NcTask: Record "NPR Nc Task";
@@ -562,13 +575,18 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     local procedure GetShopifyUrl(ShopifyStoreCode: Code[20]) ShopifyUrl: Text
+    begin
+        ShopifyUrl := GetShopifyUrl(ShopifyStoreCode, true);
+    end;
+
+    local procedure GetShopifyUrl(ShopifyStoreCode: Code[20]; CheckIsEnabled: Boolean) ShopifyUrl: Text
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ");
+        if CheckIsEnabled then
+            SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStoreCode);
 
         ShopifyStore.Get(ShopifyStoreCode);
-        ShopifyStore.TestField(Enabled);
         ShopifyStore.TestField("Shopify Url");
 
         ShopifyUrl := StrSubstNo('%1/admin/api/%2/', ShopifyStore."Shopify Url", SpfyIntegrationMgt.ShopifyApiVersion());
@@ -578,7 +596,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ");
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStoreCode);
 
         ShopifyStore.Get(ShopifyStoreCode);
         ShopifyStore.TestField(Enabled);

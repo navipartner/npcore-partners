@@ -16,7 +16,7 @@ page 6184559 "NPR API Spfy C&C Order WS"
     ODataKeyFields = SystemId;
     Extensible = false;
     ObsoleteState = Pending;
-    ObsoleteTag = '2023-08-18';
+    ObsoleteTag = '2024-08-25';
     ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
 
 

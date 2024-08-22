@@ -63,7 +63,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
             begin
                 if WithDialog then begin
                     Window.Close();
-                    if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") and not RegisterInDataLog then begin
+                    if SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels") and not RegisterInDataLog then begin
                         if Confirm(DoneLbl + '\' + UpdateInventoryQst, true) then
                             Page.Run(Page::"NPR Spfy Inventory Levels");
                     end else

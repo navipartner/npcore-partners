@@ -10,7 +10,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     begin
         if not Initialize() then
             exit;
-        if (Rec."Record ID".TableNo = Database::"Transfer Line") and (IncludeTransferOrders = IncludeTransferOrders::No) then
+        if (Rec."Record ID".TableNo = Database::"Transfer Line") and not IncludeTransferOrdersAnyStore then
             exit;
 
         FindTouchedSKUs(Rec, TempInventoryLevel);
@@ -22,13 +22,13 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
 
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        IncludeTransferOrders: Option No,Outbound,All;
+        IncludeTransferOrdersAnyStore: Boolean;
 
     local procedure Initialize(): Boolean
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then
+        if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels") then
             exit(false);
-        IncludeTransferOrders := SpfyIntegrationMgt.IncludeTrasferOrders();
+        IncludeTransferOrdersAnyStore := SpfyIntegrationMgt.IncludeTrasferOrdersAnyStore();
         exit(true);
     end;
 
@@ -69,7 +69,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                 end;
 
             Database::"Transfer Line":
-                if IncludeTransferOrders <> IncludeTransferOrders::No then begin
+                begin
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", false, RecRef) then begin
                         RecRef.SetTable(TransferLine);
                         TouchInventoryLevel(TransferLine, InventoryLevelTemp);
@@ -96,12 +96,11 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     begin
         if (TransferLine."Derived From Line No." <> 0) or
            (TransferLine."Item No." = '') or
-           (IncludeTransferOrders = IncludeTransferOrders::No)
+           not IncludeTransferOrdersAnyStore
         then
             exit;
         TouchInventoryLevel(TransferLine."Transfer-from Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevelTemp);
-        if IncludeTransferOrders = IncludeTransferOrders::All then
-            TouchInventoryLevel(TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevelTemp);
+        TouchInventoryLevel(TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevelTemp);
     end;
 
     local procedure TouchInventoryLevel(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; var InventoryLevelTemp: Record "NPR Spfy Inventory Level")
@@ -116,7 +115,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         SpfyStoreLocationLink.SetRange("Location Code", LocationCode);
         if SpfyStoreLocationLink.FindSet() then
             repeat
-                if SpfyIntegrationMgt.ShopifyStoreIsEnabled(SpfyStoreLocationLink."Shopify Store Code") then begin
+                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreLocationLink."Shopify Store Code") then begin
                     InventoryLevelTemp."Shopify Location ID" := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreLocationLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
                     if InventoryLevelTemp."Shopify Location ID" <> '' then begin
                         InventoryLevelTemp."Shopify Store Code" := SpfyStoreLocationLink."Shopify Store Code";
@@ -145,6 +144,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         StockQty: Decimal;
+        IncludeTransferOrders: Option No,Outbound,All;
     begin
         if not Item.Get(InventoryLevelParam."Item No.") then
             exit(false);
@@ -159,6 +159,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
             if not ItemVariant.IsEmpty() then
                 exit(false);
         end;
+        IncludeTransferOrders := SpfyIntegrationMgt.IncludeTrasferOrders(InventoryLevelParam."Shopify Store Code");
 
         Item.SetRange("Variant Filter", InventoryLevelParam."Variant Code");
         Item.SetFilter("Location Filter", GetLocationFilter(InventoryLevelParam."Shopify Store Code", InventoryLevelParam."Shopify Location ID"));

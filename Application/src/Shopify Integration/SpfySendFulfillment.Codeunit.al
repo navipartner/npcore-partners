@@ -248,7 +248,11 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         JObject.WriteTo(OutStr);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnRunOnBeforeFinalizePosting, '', true, false)]
+#endif
     local procedure ScheduleSendShopifyFulfillment(var SalesHeader: Record "Sales Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var ReturnReceiptHeader: Record "Return Receipt Header")
     var
         NcTask: Record "NPR Nc Task";
@@ -263,11 +267,9 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     begin
         if not (SalesHeader.Ship or SalesHeader.Receive) then
             exit;
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Order Fulfillments") then
-            exit;
         NcTask."Store Code" :=
             CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
-        if not SpfyIntegrationMgt.ShopifyStoreIsEnabled(NcTask."Store Code") then
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Order Fulfillments", NcTask."Store Code") then
             exit;
 
         ShopifyOrderID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");
