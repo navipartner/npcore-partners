@@ -81,7 +81,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if IsHandled then
             exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
-            FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, false)
+            FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, false, true)
         else
             ErrorLogReceiptFiscalisated(ResponseText);
     end;
@@ -173,7 +173,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         // if IsHandled then
         //     exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
-            FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, true)
+            FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, true, true)
         else
             ErrorLogReceiptFiscalisated(ResponseText);
     end;
@@ -283,7 +283,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         StartTime := CurrentDateTime;
         SalesCrMemoHeader.Get(SalesCrMemoNo);
         RSAuxSalesCrMemoHeader.ReadRSAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
-        if RSAuxSalesCrMemoHeader."NPR RS Refund Reference" = '' then
+        if (RSAuxSalesCrMemoHeader."NPR RS Refund Reference" = '') and ((RSAuxSalesCrMemoHeader."NPR RS Referent No." = '') or (RSAuxSalesCrMemoHeader."NPR RS Referent Date/Time" = 0DT)) then
             exit;
         VerifyPIN(RSAuxSalesCrMemoHeader."NPR RS POS Unit");
         RSFiscalizationSetup.Get();
@@ -303,7 +303,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if IsHandled then
             exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
-            FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime)
+            FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime, true)
         else
             ErrorLogReceiptFiscalisated(ResponseText);
     end;
@@ -756,6 +756,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::NORMAL));
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::SALE));
         Clear(JObjectLines);
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        JObjectLines.Add('amount', Round(SalesInvoiceHeader."Amount Including VAT", 0.01));
         if RSPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code") then
             JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
         else
@@ -1309,11 +1311,19 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('payment', JArray);
         RSAuditMgt.FillCertificationData(Certification);
         JObjectHeader.Add('invoiceNumber', Certification.Get('ESIRNo'));
-        RSPOSAuditLogAuxInfoReferent.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfoReferent."Audit Entry Type"::"Sales Invoice Header");
-        RSPOSAuditLogAuxInfoReferent.SetRange("Source Document No.", RSAuxSalesCrMemoHeader."NPR RS Refund Reference");
-        RSPOSAuditLogAuxInfoReferent.FindLast();
-        JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
-        JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+
+        if (RSAuxSalesCrMemoHeader."NPR RS Referent No." <> '') and (RSAuxSalesCrMemoHeader."NPR RS Referent Date/Time" <> 0DT) then begin
+            JObjectHeader.Add('referentDocumentNumber', RSAuxSalesCrMemoHeader."NPR RS Referent No.");
+            JObjectHeader.Add('referentDocumentDT', Format(RSAuxSalesCrMemoHeader."NPR RS Referent Date/Time", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2>:<Minutes,2>:<Seconds,2>'));
+        end
+        else begin
+            RSPOSAuditLogAuxInfoReferent.SetRange("Audit Entry Type", RSPOSAuditLogAuxInfoReferent."Audit Entry Type"::"Sales Invoice Header");
+            RSPOSAuditLogAuxInfoReferent.SetRange("Source Document No.", RSAuxSalesCrMemoHeader."NPR RS Refund Reference");
+            RSPOSAuditLogAuxInfoReferent.FindLast();
+            JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
+            JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
+        end;
+
         Clear(JObjectLines);
         JObjectLines.Add('omitQRCodeGen', 1);
         JObjectLines.Add('omitTextualRepresentation', 0);
@@ -1681,7 +1691,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
     end;
 
-    local procedure FillRSAuditFromNormalSaleAndRefundResponse(var SalesInvoiceHeader: Record "Sales Invoice Header"; ResponseText: Text; StartTime: DateTime; Prepayment: Boolean)
+    local procedure FillRSAuditFromNormalSaleAndRefundResponse(var SalesInvoiceHeader: Record "Sales Invoice Header"; ResponseText: Text; StartTime: DateTime; Prepayment: Boolean; PrintReceipt: Boolean)
     var
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
@@ -1690,6 +1700,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         SalesInvoiceLine: Record "Sales Invoice Line";
+        RSFiscalThermalPrint: Codeunit "NPR RS Fiscal Thermal Print";
         JsonHeader: JsonObject;
         JsonTok: JsonToken;
         TempResult: Text;
@@ -1829,9 +1840,12 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         RSAuxSalesInvHeader."NPR RS Audit Entry No." := RSPOSAuditLogAuxInfo."Audit Entry No.";
         RSAuxSalesInvHeader.Modify();
+
+        if PrintReceipt then
+            RSFiscalThermalPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
-    local procedure FillRSAuditFromNormalSaleAndRefundResponse(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ResponseText: Text; StartTime: DateTime)
+    local procedure FillRSAuditFromNormalSaleAndRefundResponse(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ResponseText: Text; StartTime: DateTime; PrintReceipt: Boolean)
     var
         Customer: Record Customer;
         POSUnit: Record "NPR POS Unit";
@@ -1840,6 +1854,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSPaymentMethodMapping: Record "NPR RS Payment Method Mapping";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        RSFiscalThermalPrint: Codeunit "NPR RS Fiscal Thermal Print";
         JsonHeader: JsonObject;
         JsonTok: JsonToken;
         TempResult: Text;
@@ -1971,6 +1986,9 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             if RSPaymentMethodMapping."RS Payment Method" in [RSPaymentMethodMapping."RS Payment Method"::Cash] then
                 CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
         end;
+
+        if PrintReceipt then
+            RSFiscalThermalPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
     local procedure FillRSAuditFromCopySaleAndRefundResponse(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; ResponseText: Text; StartTime: DateTime)
@@ -2497,7 +2515,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesInvoiceHeader: Record "Sales Invoice Header"; ResponseText: Text; StartTime: DateTime)
     begin
-        FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, false);
+        FillRSAuditFromNormalSaleAndRefundResponse(SalesInvoiceHeader, ResponseText, StartTime, false, false);
     end;
 
     procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesHeader: Record "Sales Header"; ResponseText: Text; Refund: Boolean; ModifySalesHeader: Boolean; StartTime: DateTime)
@@ -2507,7 +2525,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
     procedure TestFillRSAuditFromNormalSaleAndRefundResponse(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ResponseText: Text; StartTime: DateTime)
     begin
-        FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime);
+        FillRSAuditFromNormalSaleAndRefundResponse(SalesCrMemoHeader, ResponseText, StartTime, false);
     end;
 
     procedure TextFillSUFConfigurationSetup(ResponseText: Text)
