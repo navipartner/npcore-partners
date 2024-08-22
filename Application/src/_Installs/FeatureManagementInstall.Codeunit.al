@@ -6,6 +6,7 @@ codeunit 6151434 "NPR Feature Management Install"
     trigger OnInstallAppPerCompany()
     begin
         AddFeatures();
+        HandleNewFeatures();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
@@ -35,11 +36,7 @@ codeunit 6151434 "NPR Feature Management Install"
         FeatureManagement: Interface "NPR Feature Management";
         Feature: Enum "NPR Feature";
     begin
-#if BC17
-        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::HeyLoyalty);
-#else
-        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::Shopify);
-#endif
+        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::"New POS Editor");
         if ExistingFeature.FindSet() then
             repeat
                 TempExistingFeature := ExistingFeature;
@@ -59,6 +56,8 @@ codeunit 6151434 "NPR Feature Management Install"
 #if not BC17
         AddFeature(Feature::Shopify);
 #endif
+        AddFeature(Feature::"POS Scenarios Obsoleted");
+        AddFeature(Feature::"New POS Editor");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -69,6 +68,15 @@ codeunit 6151434 "NPR Feature Management Install"
                         FeatureManagement.SetFeatureEnabled(true);
                 end;
             until ExistingFeature.Next() = 0;
+    end;
+
+    local procedure HandleNewFeatures()
+    var
+        NewFeatureHandler: Codeunit "NPR New Feature Handler";
+    begin
+        NewFeatureHandler.HandlePOSEditorFeature();
+        NewFeatureHandler.HandleScenarioObsoletedFeature();
+        RefreshExperienceTierCurrentCompany();
     end;
 
     local procedure AddFeature(FeatureToAdd: Enum "NPR Feature")

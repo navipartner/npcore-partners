@@ -114,7 +114,7 @@
                 field("POS Sales Workflow Set"; Rec."POS Sales Workflow Set")
                 {
                     ToolTip = 'Specifies the  scenario used by the POS unit. For example, we can define a particular behaviour such as the user being asked to select a Dimension for the transaction when moving from Sales screen to Payment screen.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRObsoletePOSScenarios;
                 }
                 field("Global POS Sales Setup"; Rec."Global POS Sales Setup")
                 {

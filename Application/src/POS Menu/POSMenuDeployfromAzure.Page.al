@@ -5,7 +5,7 @@
 
     UsageCategory = Administration;
     Caption = 'POS Menu Deploy from Azure';
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRNewPOSEditor;
 
     layout
     {

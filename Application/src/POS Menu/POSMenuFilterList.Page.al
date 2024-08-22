@@ -9,7 +9,7 @@
     PageType = List;
     SourceTable = "NPR POS Menu Filter";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRNewPOSEditor;
 
 
     layout
