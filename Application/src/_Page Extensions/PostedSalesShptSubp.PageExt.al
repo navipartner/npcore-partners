@@ -24,7 +24,7 @@ pageextension 6014519 "NPR Posted Sales Shpt. Subp." extends "Posted Sales Shpt.
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
     end;
 }
 #endif

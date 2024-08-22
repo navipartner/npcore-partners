@@ -26,7 +26,7 @@ pageextension 6014520 "NPR Stockkeeping Unit Card" extends "Stockkeeping Unit Ca
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
-        ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+        ShopifyIntegrationIsEnabled_Inventory := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
     end;
 }
 #endif

@@ -18,14 +18,14 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
             Database::"Item Variant":
                 begin
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then
+                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items) then
                         exit;
                     TaskCreated := ProcessItemVariant(DataLogEntry);
                 end;
 
             Database::"Stockkeeping Unit":
                 begin
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then
+                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels") then
                         exit;
                     ProcessStockkeepingUnit(DataLogEntry);
                     TaskCreated := false;
@@ -38,14 +38,14 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
             Database::"NPR Spfy Inventory Level":
                 begin
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then
+                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels") then
                         exit;
                     TaskCreated := UpdateShopifyInventory(DataLogEntry);
                 end;
 
             Database::"Item Reference":
                 begin
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then
+                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items) then
                         exit;
                     TaskCreated := ProcessItemReference(DataLogEntry);
                 end;
@@ -63,6 +63,8 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
         CostIsUpdated: Boolean;
+        ItemIntegrIsEnabled: Boolean;
+        InventoryIntegrIsEnabled: Boolean;
         ProcessRec: Boolean;
         xRecRestored: Boolean;
     begin
@@ -71,7 +73,9 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         then
             exit;  //Renames and deletes of Shopify syncronized items are not allowed; Renames of related tables are not processed
 
-        if not (SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) or SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels")) then
+        ItemIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+        InventoryIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
+        if not (ItemIntegrIsEnabled or InventoryIntegrIsEnabled) then
             exit;
 
         ProcessRec := FindItem(DataLogEntry, Item);
@@ -103,23 +107,25 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             if not Item.Find() then
                 Item := xItem;
 
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then begin
+        if ItemIntegrIsEnabled then begin
             CostIsUpdated := Item."Last Direct Cost" <> xItem."Last Direct Cost";
-
             repeat
-                TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
-                if (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Insert) or
-                   ((DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) and CostIsUpdated)
-                then
-                    TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
+                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then begin
+                    TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
+                    if (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Insert) or
+                       ((DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) and CostIsUpdated)
+                    then
+                        TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
+                end;
             until SpfyStoreItemLink.Next() = 0;
         end;
 
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then begin
+        if InventoryIntegrIsEnabled then begin
             Commit();
             SpfyStoreItemLink.FindSet();
             repeat
-                UpdateInventoryLevels(SpfyStoreItemLink);
+                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code") then
+                    UpdateInventoryLevels(SpfyStoreItemLink);
             until SpfyStoreItemLink.Next() = 0;
         end;
     end;
@@ -215,12 +221,12 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         Item: Record Item;
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         RecRef: RecordRef;
+        ItemIntegrIsEnabled: Boolean;
+        InventoryIntegrIsEnabled: Boolean;
     begin
         if DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Rename, DataLogEntry."Type of Change"::Delete] then
             exit;
 
-        if not (SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) or SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels")) then
-            exit;
 
         RecRef := DataLogEntry."Record ID".GetRecord();
         RecRef.SetTable(SpfyStoreItemLink);
@@ -228,20 +234,21 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit;
         if not (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled") then
             exit;
-        SpfyStoreItemLink.CalcFields("Store Integration Is Enabled");
-        if not SpfyStoreItemLink."Store Integration Is Enabled" then
+        ItemIntegrIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code");
+        InventoryIntegrIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code");
+        if not (ItemIntegrIsEnabled or InventoryIntegrIsEnabled) then
             exit;
         if not TestRequiredFields(Item, false) then
             exit;
 
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then begin
+        if ItemIntegrIsEnabled then begin
             DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Modify;
             TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink);
             if SpfyStoreItemLink."Sync. to this Store" and not SpfyStoreItemLink."Synchronization Is Enabled" then
                 TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
         end;
 
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then begin
+        if InventoryIntegrIsEnabled then begin
             Commit();
             UpdateInventoryLevels(SpfyStoreItemLink);
         end;
@@ -316,7 +323,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
     begin
         if not FindInventoryLevelItem(DataLogEntry, InventoryLevel) then
             exit;
-        if not SpfyIntegrationMgt.ShopifyStoreIsEnabled(InventoryLevel."Shopify Store Code") then
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", InventoryLevel."Shopify Store Code") then
             exit;
 
         VariantSku := GetProductVariantSku(InventoryLevel."Item No.", InventoryLevel."Variant Code");
@@ -588,7 +595,11 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(Item."NPR Spfy Synced Item (Planned)");
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeRenameEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Item, OnBeforeRenameEvent, '', true, false)]
+#endif
     local procedure CheckNotShopifyItemOnRename(var Rec: Record Item)
     var
         RenameNotAllowedErr: Label 'Shopify enabled items cannot be renamed.';
@@ -599,7 +610,11 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             Error(RenameNotAllowedErr);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeDeleteEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Item, OnBeforeDeleteEvent, '', true, false)]
+#endif
     local procedure CheckNotShopifyItemOnDelete(var Rec: Record Item)
     var
         DeleteNotAllowedErr: Label 'Shopify enabled items cannot be deleted.';

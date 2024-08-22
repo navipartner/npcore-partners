@@ -9,7 +9,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
 
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers") then
+        if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers") then
             exit;
 
         case DataLogEntry."Table ID" of
@@ -176,7 +176,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         if not IsShopifyIntegratedVoucherType(VoucherType.Code) then
             exit(false);
         ShopifyStoreCode := VoucherType.GetStoreCode();
-        exit(SpfyIntegrationMgt.ShopifyStoreIsEnabled(ShopifyStoreCode));
+        exit(SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers", ShopifyStoreCode));
     end;
 
     procedure FindAndCopyFromArchivedVoucher(var ArchVoucher: Record "NPR NpRv Arch. Voucher"; var Voucher: Record "NPR NpRv Voucher"): Boolean
@@ -248,7 +248,11 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
                 RecRef.SetTable(NpRvVoucher);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", 'OnBeforeInsertEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", OnBeforeInsertEvent, '', true, false)]
+#endif
     local procedure CheckVoucherOnInsert(var Rec: Record "NPR NpRv Voucher")
     begin
         if Rec.IsTemporary() then
@@ -256,7 +260,11 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         CheckReferenceNo(Rec);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", 'OnBeforeValidateEvent', 'Reference No.', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", OnBeforeValidateEvent, 'Reference No.', true, false)]
+#endif
     local procedure ReferenceNoOnValidate(var Rec: Record "NPR NpRv Voucher")
     begin
         if Rec.IsTemporary() then
@@ -264,7 +272,11 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         CheckReferenceNo(Rec);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", 'OnBeforeRenameEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", OnBeforeRenameEvent, '', true, false)]
+#endif
     local procedure BlockShopifyVoucherRename(var Rec: Record "NPR NpRv Voucher")
     begin
         if Rec.IsTemporary() then
@@ -272,7 +284,11 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         CheckIfShopifyVoucherAndThrowError(Rec.RecordId(), Rec."Voucher Type", 0, false);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", 'OnBeforeDeleteEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Voucher", OnBeforeDeleteEvent, '', true, false)]
+#endif
     local procedure BlockShopifyVoucherDelete(var Rec: Record "NPR NpRv Voucher"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary() or not RunTrigger then
@@ -280,7 +296,11 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         CheckIfShopifyVoucherAndThrowError(Rec.RecordId(), Rec."Voucher Type", 1, true);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Arch. Voucher", 'OnBeforeRenameEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Arch. Voucher", OnBeforeRenameEvent, '', true, false)]
+#endif
     local procedure BlockShopifyArchVoucherRename(var Rec: Record "NPR NpRv Arch. Voucher")
     begin
         if Rec.IsTemporary() then
@@ -328,15 +348,12 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         DialogText4Lbl: Label 'Progress     @3@@@@@@@@';
         DoneLbl: Label 'The operation completed successfully.';
         NothingToDoErr: Label 'There is nothing to do (there are no retail vouchers in the system to be sent to Shopify Store ''%1'').';
-        StoreIntegrNotEnabledErr: Label 'Integration must be enabled for Shopify Store ''%1''.';
         StoreNotSelectedErr: Label 'You must select a Shopify Store Code.';
     begin
-        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
         if ShopifyStore.Count() <> 1 then
             Error(StoreNotSelectedErr);
         ShopifyStore.FindFirst();
-        if not SpfyIntegrationMgt.ShopifyStoreIsEnabled(ShopifyStore.Code) then
-            Error(StoreIntegrNotEnabledErr, ShopifyStore.Code);
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Retail Vouchers", ShopifyStore.Code);
 
         if WithDialog then
             if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), true, ShopifyStore.Code) then

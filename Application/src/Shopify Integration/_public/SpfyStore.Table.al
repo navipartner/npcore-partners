@@ -84,6 +84,147 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Last Orders Imported At';
             DataClassification = CustomerContent;
         }
+        field(60; "Item List Integration"; Boolean)
+        {
+            Caption = 'Item List Integration';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Item List Integration" then
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::Items);
+            end;
+        }
+        field(61; "Do Not Sync. Sales Prices"; Boolean)
+        {
+            Caption = 'Do Not Sync. Sales Prices';
+            DataClassification = CustomerContent;
+        }
+        field(62; "Set Shopify Name/Descr. in BC"; Boolean)
+        {
+            Caption = 'Set Shopify Name/Descr. in BC';
+            DataClassification = CustomerContent;
+        }
+        field(70; "Send Inventory Updates"; Boolean)
+        {
+            Caption = 'Send Inventory Updates';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                EnableItemListIntegrLbl: Label '"%1" is not enabled. Using "%2" is not recommended without it.\Do you want the "%1" be enabled now?', Comment = '%1 - Item List Integration fieldcaption, Send Inventory Updates fieldcaption';
+            begin
+                if "Send Inventory Updates" then begin
+                    if not "Item List Integration" then
+                        if Confirm(EnableItemListIntegrLbl, true, Rec.FieldCaption("Item List Integration"), Rec.FieldCaption("Send Inventory Updates")) then
+                            Rec.Validate("Item List Integration", true);
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
+                end;
+            end;
+        }
+        field(71; "Include Transfer Orders"; Option)
+        {
+            Caption = 'Include Transfer Orders';
+            DataClassification = CustomerContent;
+            OptionMembers = No,Outbound,All;
+            OptionCaption = 'No,Outbound,All';
+
+            trigger OnValidate()
+            begin
+                if "Include Transfer Orders" <> "Include Transfer Orders"::No then begin
+                    Modify();
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Inventory Levels");
+                end;
+            end;
+        }
+        field(72; "Send Negative Inventory"; Boolean)
+        {
+            Caption = 'Send Negative Inventory';
+            DataClassification = CustomerContent;
+        }
+        field(80; "Sales Order Integration"; Boolean)
+        {
+            Caption = 'Sales Order Integration';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+            begin
+                Modify();
+                OrderMgt.SetupJobQueues();
+            end;
+        }
+        field(81; "Post on Completion"; Boolean)
+        {
+            Caption = 'Post on Completion';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(82; "Delete on Cancellation"; Boolean)
+        {
+            Caption = 'Delete on Cancellation';
+            DataClassification = CustomerContent;
+            InitValue = true;
+        }
+        field(85; "Get Payment Lines from Shopify"; Option)
+        {
+            Caption = 'Get Payment Lines from Shopify';
+            DataClassification = CustomerContent;
+            OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
+            OptionCaption = 'Before Capture,On Order Import';
+        }
+        field(90; "Send Order Fulfillments"; Boolean)
+        {
+            Caption = 'Send Order Fulfillments';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Send Order Fulfillments" then
+                    TestField("Sales Order Integration");
+            end;
+        }
+        field(100; "Send Payment Capture Requests"; Boolean)
+        {
+            Caption = 'Send Payment Capture Requests';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Send Payment Capture Requests" then
+                    TestField("Sales Order Integration");
+            end;
+        }
+        field(110; "Send Close Order Requets"; Boolean)
+        {
+            Caption = 'Send Close Order Requests';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Send Close Order Requets" then
+                    TestField("Sales Order Integration");
+            end;
+        }
+        field(120; "Allowed Payment Statuses"; Option)
+        {
+            Caption = 'Allowed Payment Statuses';
+            DataClassification = CustomerContent;
+            OptionMembers = Authorized,Paid,Both;
+            OptionCaption = 'Authorized,Paid,Both';
+        }
+        field(130; "Retail Voucher Integration"; Boolean)
+        {
+            Caption = 'Retail Voucher Integration';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Retail Voucher Integration" then
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Retail Vouchers");
+            end;
+        }
         field(500; "Auto Set as Shopify Item"; Boolean)
         {
             Caption = 'Auto Set as Shopify Item';
@@ -145,6 +286,7 @@ table 6150810 "NPR Spfy Store"
     }
 
     var
+        _SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
         _SpfyWebhookMgt: Codeunit "NPR Spfy Webhook Mgt.";
 
     trigger OnRename()

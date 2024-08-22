@@ -365,7 +365,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 #endif
     begin
 #if not BC17
-        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders");
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
 #endif
         SetMagentoVersion();
         ToAnonymizeEditable := UserSetup.Get(UserId) and UserSetup."NPR Anonymize Customers";

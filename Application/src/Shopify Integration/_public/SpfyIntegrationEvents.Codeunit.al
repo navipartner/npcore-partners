@@ -13,13 +13,25 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    [Obsolete('The setups are now store-specific. Use the "OnBeforeCheckIfStoreIntegrationAreaIsEnabled" event instead', '2024-08-25')]
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20]; var AreaIsEnabled: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [Obsolete('The setups are now store-specific. Use the "OnCheckIfStoreIntegrationAreaIsEnabled" event instead', '2024-08-25')]
+    [IntegrationEvent(false, false)]
     internal procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20]; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
 
@@ -45,12 +57,6 @@ codeunit 6184824 "NPR Spfy Integration Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeInsertPaymentLines(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Use event OnAfterInsertPaymentLines instead', '2024-04-28')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnInsertPaymentLines(var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin
     end;
 

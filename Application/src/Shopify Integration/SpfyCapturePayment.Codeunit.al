@@ -381,7 +381,11 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         exit(PaymentGateway."Enable Capture" and (PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Shopify));
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnRunOnBeforeFinalizePosting, '', true, false)]
+#endif
     local procedure ScheduleCaptureShopifyPayment(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         NcTask: Record "NPR Nc Task";
@@ -392,11 +396,9 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     begin
         if not SalesHeader.Invoice then
             exit;
-        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests") then
-            exit;
         NcTask."Store Code" :=
             CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
-        if not SpfyIntegrationMgt.ShopifyStoreIsEnabled(NcTask."Store Code") then
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests", NcTask."Store Code") then
             exit;
 
         ShopifyOrderID := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID");

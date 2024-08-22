@@ -10,28 +10,26 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShopifyStore: Record "NPR Spfy Store";
         OrderStatus: Option Open,Closed,Cancelled;
         StartedAt: DateTime;
-        CancelledOrderProcessingEnabled: Boolean;
-        ClosedOrderProcessingEnabled: Boolean;
     begin
-        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Sales Orders");
-        CancelledOrderProcessingEnabled := SpfyIntegrationMgt.ProcessCancelledOrders();
-        ClosedOrderProcessingEnabled := SpfyIntegrationMgt.ProcessFinishedOrders();
+        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Sales Orders", '');
 
         ShopifyStore.SetRange(Enabled, true);
         if ShopifyStore.FindSet() then
             repeat
-                GetFromDT(ShopifyStore);
-                StartedAt := RoundDateTime(CurrentDateTime(), 1000, '<');
+                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders", ShopifyStore) then begin
+                    GetFromDT(ShopifyStore);
+                    StartedAt := RoundDateTime(CurrentDateTime(), 1000, '<');
 
-                DownloadOrders(ShopifyStore, OrderStatus::Open);
-                if CancelledOrderProcessingEnabled then
-                    DownloadOrders(ShopifyStore, OrderStatus::Cancelled);
-                if ClosedOrderProcessingEnabled then
-                    DownloadOrders(ShopifyStore, OrderStatus::Closed);
+                    DownloadOrders(ShopifyStore, OrderStatus::Open);
+                    if ShopifyStore."Delete on Cancellation" then
+                        DownloadOrders(ShopifyStore, OrderStatus::Cancelled);
+                    if ShopifyStore."Post on Completion" then
+                        DownloadOrders(ShopifyStore, OrderStatus::Closed);
 
-                ShopifyStore."Last Orders Imported At" := StartedAt;
-                ShopifyStore.Modify();
-                Commit();
+                    ShopifyStore."Last Orders Imported At" := StartedAt;
+                    ShopifyStore.Modify();
+                    Commit();
+                end;
             until ShopifyStore.Next() = 0;
     end;
 
@@ -132,7 +130,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         case OrderStatus of
             OrderStatus::Open:
-                exit(SpfyIntegrationMgt.IsAllowedFinancialStatus(JsonHelper.GetJText(Order, 'financial_status', false)));
+                exit(SpfyIntegrationMgt.IsAllowedFinancialStatus(JsonHelper.GetJText(Order, 'financial_status', false), ShopifyStore));
             OrderStatus::Closed:
                 exit(
                     (JsonHelper.GetJDate(Order, 'closed_at', false) >= DT2Date(GetDefaultFromDT(ShopifyStore))) and
@@ -192,7 +190,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     procedure SetupJobQueues()
     begin
         SpfyIntegrationMgt.SetRereadSetup();
-        SetupJobQueues(SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders"));
+        SetupJobQueues(SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders"));
     end;
 
     local procedure SetupJobQueues(Enable: Boolean)
@@ -230,7 +228,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(CopyStr(SpfyIntegrationMgt.DataProcessingHandlerID(true), 1, 10));
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RefreshJobQueueEntry()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
@@ -240,7 +242,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SetupJobQueues();
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
     local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin
         if Handled then
@@ -1052,7 +1058,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         SpfyIntegrationEvents.OnBeforeInsertPaymentLines(ShopifyStoreCode, Order, SalesHeader, Handled);
         if not Handled then
-            if SpfyIntegrationMgt.CreatePmtLinesOnOrderImport() then begin
+            if SpfyIntegrationMgt.CreatePmtLinesOnOrderImport(ShopifyStoreCode) then begin
                 Clear(NcTask);
                 NcTask."Record ID" := SalesHeader.RecordId();
                 NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
@@ -1061,7 +1067,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             end;
 
         Handled := false;
-        SpfyIntegrationEvents.OnInsertPaymentLines(SalesHeader, Handled);
         SpfyIntegrationEvents.OnAfterInsertPaymentLines(ShopifyStoreCode, Order, SalesHeader, Handled);
     end;
 
@@ -1172,7 +1177,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Codeunit::"NPR Spfy Order Mgt.");
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterCopyFromItem', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", OnAfterCopyFromItem, '', true, false)]
+#endif
     local procedure CopyAdditionalDataFromItem(var SalesLine: Record "Sales Line"; Item: Record Item)
     begin
         SalesLine.Validate("Purchasing Code", Item."NPR Purchasing Code");

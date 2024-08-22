@@ -19,14 +19,11 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     end;
 
     procedure SetupTaskProcessingJobQueues(var ShopifyStore: Record "NPR Spfy Store")
-    var
-        IntegrationIsEnabled: Boolean;
     begin
         SpfyIntegrationMgt.SetRereadSetup();
-        IntegrationIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
         if ShopifyStore.FindSet() then
             repeat
-                SetupTaskProcessingJobQueue(ShopifyStore.Code, IntegrationIsEnabled and ShopifyStore.Enabled);
+                SetupTaskProcessingJobQueue(ShopifyStore.Code, SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ", ShopifyStore));
             until ShopifyStore.Next() = 0;
     end;
 
@@ -180,26 +177,30 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         end;
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", 'OnBeforeProcessTask', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", OnBeforeProcessTask, '', true, false)]
+#endif
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
     begin
         if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
             exit;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) then begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, Task."Store Code") then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::Item);
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Variant");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Reference");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Inventory Buffer");
         end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels") then begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", Task."Store Code") then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Inventory Level");
         end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers") then begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers", Task."Store Code") then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Voucher");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Arch. Voucher");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Voucher Entry");
         end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders") then begin
+        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders", Task."Store Code") then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Sales Shipment Header");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Return Receipt Header");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Sales Invoice Header");
@@ -207,16 +208,24 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         end;
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnBeforeUpdateTasks', '', false, false)]
-    local procedure CheckIfHLIntegrationIsEnabled(TaskProcessor: Record "NPR Nc Task Processor"; var MaxNoOfDataLogRecordsToProcess: Integer; var SkipProcessing: Boolean)
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", OnBeforeUpdateTasks, '', false, false)]
+#endif
+    local procedure CheckIfSpfyIntegrationIsEnabled(TaskProcessor: Record "NPR Nc Task Processor"; var MaxNoOfDataLogRecordsToProcess: Integer; var SkipProcessing: Boolean)
     begin
         if (TaskProcessor.Code = '') or (TaskProcessor.Code <> GetShopifyTaskProcessorCode(false)) then
             exit;
-        SkipProcessing := not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ");
+        SkipProcessing := not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::" ", '');
         MaxNoOfDataLogRecordsToProcess := 0;
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Data Log Sub. Mgt.", 'OnCheckIfDataLogSubscriberIsEnabled', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Data Log Sub. Mgt.", OnCheckIfDataLogSubscriberIsEnabled, '', false, false)]
+#endif
     local procedure CheckIfDataLogSubscriberShouldBeProcessed(DataLogSubscriber: Record "NPR Data Log Subscriber"; var IsEnabled: Boolean)
     begin
         if (DataLogSubscriber.Code = '') or (DataLogSubscriber.Code <> SpfyIntegrationMgt.DataProcessingHandlerID(false)) then
@@ -224,25 +233,32 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         case DataLogSubscriber."Table ID" of
             Database::Item,
             Database::"NPR Spfy Store-Item Link":
-                IsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items) or SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+                begin
+                    IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+                    if not IsEnabled then
+                        IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
+                end;
             Database::"Item Variant",
             Database::"Item Reference":
-                IsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items);
+                IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
             Database::"Stockkeeping Unit",
             Database::"NPR Spfy Inventory Level",
             Database::"Sales Line",
             Database::"Transfer Line",
             Database::"Item Ledger Entry":
-                IsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels");
+                IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
             Database::"NPR NpRv Voucher",
             Database::"NPR NpRv Arch. Voucher",
             Database::"NPR NpRv Voucher Entry":
-                IsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers");
+                IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers");
         end;
-
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'OnUpdateTasksOnAfterGetNewSetOfDataLogRecords', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", OnUpdateTasksOnAfterGetNewSetOfDataLogRecords, '', false, false)]
+#endif
     local procedure ProcessHLDataLogRecords(TaskProcessor: Record "NPR Nc Task Processor"; ProcessCompanyName: Text[30]; var TempDataLogRecord: Record "NPR Data Log Record"; var NewTasksInserted: Boolean; var Handled: Boolean)
     begin
         if (TaskProcessor.Code = '') or (TaskProcessor.Code <> GetShopifyTaskProcessorCode(false)) then
@@ -255,7 +271,11 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             until TempDataLogRecord.Next() = 0;
     end;
 
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RefreshJobQueueEntry()
     begin
         SetupTaskProcessingJobQueues();

@@ -7,64 +7,99 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
 
     var
         _ShopifySetup: Record "NPR Spfy Integration Setup";
+        _ShopifyStore: Record "NPR Spfy Store";
 
-    procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area")
+    procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20])
     var
         IntegrationDisabledErr: Label 'NaviPartner BC-Shopify integration is disabled. Please open the "Shopify Integration Setup" page and enable the integration.';
-        IntegrationAreaDisabledErr: Label 'The "%1" area/option of NaviPartner BC-Shopify integration is disabled.', Comment = '%1 - integration area name';
+        IntegrationDisabledAllStoresErr: Label 'NaviPartner BC-Shopify integration must be enabled for at least one Shopify store. Please open the "Shopify Store" page and enable the integration.';
+        IntegrationDisabledStoreErr: Label 'NaviPartner BC-Shopify integration is disabled for the "%1" Shopify store. Please open the "Shopify Store" page and enable the integration.', Comment = '%1 - Shopify store code';
+        IntegrationAreaDisabledAllStoresErr: Label 'The "%1" area/option of NaviPartner BC-Shopify integration must be enabled for at least one Shopify store.', Comment = '%1 - integration area name';
+        IntegrationAreaDisabledStoreErr: Label 'The "%1" area/option of NaviPartner BC-Shopify integration for the "%2" Shopify store is disabled.', Comment = '%1 - integration area name, %2 - Shopify store code';
     begin
-        if IsEnabled(IntegrationArea) then
+        _ShopifySetup.GetRecordOnce(false);
+        if not _ShopifySetup."Enable Integration" then
+            Error(IntegrationDisabledErr);
+
+        if ShopifyStoreCode = '' then begin
+            if not IsEnabledForAnyStore(IntegrationArea) then
+                exit;
+            if IntegrationArea = IntegrationArea::" " then
+                Error(IntegrationDisabledAllStoresErr)
+            else
+                Error(IntegrationAreaDisabledAllStoresErr, Format(IntegrationArea));
+        end;
+
+        if IsEnabled(IntegrationArea, ShopifyStoreCode) then
             exit;
         if IntegrationArea = IntegrationArea::" " then
-            Error(IntegrationDisabledErr)
+            Error(IntegrationDisabledStoreErr, ShopifyStoreCode)
         else
-            Error(IntegrationAreaDisabledErr)
+            Error(IntegrationAreaDisabledStoreErr, Format(IntegrationArea), ShopifyStoreCode);
     end;
 
-    procedure IsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"): Boolean
+    procedure IsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20]): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(IsEnabled(IntegrationArea, _ShopifyStore));
+    end;
+
+    procedure IsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStore: Record "NPR Spfy Store"): Boolean
     var
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         AreaIsEnabled: Boolean;
         Handled: Boolean;
     begin
-        SpfyIntegrationEvents.OnBeforeCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
+        SpfyIntegrationEvents.OnBeforeCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea, ShopifyStore.Code, AreaIsEnabled, Handled);
         if Handled then
             exit(AreaIsEnabled);
 
         _ShopifySetup.GetRecordOnce(false);
-        if not _ShopifySetup."Enable Integration" then
-            exit(false);
+        if not _ShopifySetup."Enable Integration" or ((ShopifyStore.Code = '') and (IntegrationArea = IntegrationArea::" ")) then
+            exit(_ShopifySetup."Enable Integration");
+
+        if not ShopifyStore.Enabled or (IntegrationArea = IntegrationArea::" ") then
+            exit(ShopifyStore.Enabled);
         case IntegrationArea of
-            IntegrationArea::" ":
-                exit(_ShopifySetup."Enable Integration");
             IntegrationArea::Items:
-                exit(_ShopifySetup."Item List Integration");
+                exit(ShopifyStore."Item List Integration");
             IntegrationArea::"Inventory Levels":
-                exit(_ShopifySetup."Send Inventory Updates");
+                exit(ShopifyStore."Send Inventory Updates");
             IntegrationArea::"Sales Orders":
-                exit(_ShopifySetup."Sales Order Integration");
+                exit(ShopifyStore."Sales Order Integration");
             IntegrationArea::"Order Fulfillments":
-                exit(_ShopifySetup."Send Order Fulfillments");
+                exit(ShopifyStore."Send Order Fulfillments");
             IntegrationArea::"Payment Capture Requests":
-                exit(_ShopifySetup."Send Payment Capture Requests");
+                exit(ShopifyStore."Send Payment Capture Requests");
             IntegrationArea::"Close Order Requests":
-                exit(_ShopifySetup."Send Close Order Requets");
+                exit(ShopifyStore."Send Close Order Requets");
             IntegrationArea::"Retail Vouchers":
-                exit(_ShopifySetup."Retail Voucher Integration");
+                exit(ShopifyStore."Retail Voucher Integration");
             else begin
                 AreaIsEnabled := false;
-                SpfyIntegrationEvents.OnCheckIfIntegrationAreaIsEnabled(IntegrationArea, AreaIsEnabled, Handled);
+                SpfyIntegrationEvents.OnCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea, ShopifyStore.Code, AreaIsEnabled, Handled);
                 if Handled then
                     exit(AreaIsEnabled);
             end;
         end;
     end;
 
-    procedure ShopifyStoreIsEnabled(ShopifyStoreCode: Code[20]): Boolean
+    procedure IsEnabledForAnyStore(IntegrationArea: Enum "NPR Spfy Integration Area"): Boolean
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        exit(ShopifyStore.Get(ShopifyStoreCode) and ShopifyStore.Enabled);
+        _ShopifySetup.GetRecordOnce(false);
+        if not _ShopifySetup."Enable Integration" then
+            exit(false);
+
+#if not (BC18 or BC19 or BC20 or BC21)
+        ShopifyStore.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        if ShopifyStore.Find('-') then
+            repeat
+                if IsEnabled(IntegrationArea, ShopifyStore) then
+                    exit(true);
+            until ShopifyStore.Next() = 0;
     end;
 
     procedure ShopifyApiVersion(): Text
@@ -74,60 +109,55 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Shopify Api Version");
     end;
 
-    procedure IsSendSalesPrices(): Boolean
+    procedure IsSendSalesPrices(ShopifyStoreCode: Code[20]): Boolean
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(not _ShopifySetup."Do Not Sync. Sales Prices");
+        GetStore(ShopifyStoreCode);
+        exit(not _ShopifyStore."Do Not Sync. Sales Prices");
     end;
 
-    procedure IsSendShopifyNameAndDescription(): Boolean
+    procedure IsSendShopifyNameAndDescription(ShopifyStoreCode: Code[20]): Boolean
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Set Shopify Name/Descr. in BC");
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Set Shopify Name/Descr. in BC");
     end;
 
-    procedure IsAllowedFinancialStatus(FinancialStatus: Text): Boolean
+    procedure IsAllowedFinancialStatus(FinancialStatus: Text; ShopifyStore: Record "NPR Spfy Store"): Boolean
     begin
-        _ShopifySetup.GetRecordOnce(false);
         case FinancialStatus of
             'authorized':
-                exit(_ShopifySetup."Allowed Payment Statuses" in
-                    [_ShopifySetup."Allowed Payment Statuses"::Authorized, _ShopifySetup."Allowed Payment Statuses"::Both]);
+                exit(ShopifyStore."Allowed Payment Statuses" in
+                    [ShopifyStore."Allowed Payment Statuses"::Authorized, ShopifyStore."Allowed Payment Statuses"::Both]);
             'paid':
-                exit(_ShopifySetup."Allowed Payment Statuses" in
-                    [_ShopifySetup."Allowed Payment Statuses"::Paid, _ShopifySetup."Allowed Payment Statuses"::Both]);
+                exit(ShopifyStore."Allowed Payment Statuses" in
+                    [ShopifyStore."Allowed Payment Statuses"::Paid, ShopifyStore."Allowed Payment Statuses"::Both]);
         end;
         exit(false);
     end;
 
-    procedure ProcessCancelledOrders(): Boolean
+    procedure CreatePmtLinesOnOrderImport(ShopifyStoreCode: Code[20]): Boolean
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Delete on Cancellation");
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Get Payment Lines from Shopify" = _ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT);
     end;
 
-    procedure ProcessFinishedOrders(): Boolean
+    procedure IsSendNegativeInventory(ShopifyStoreCode: Code[20]): Boolean
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Post on Completion");
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Send Negative Inventory");
     end;
 
-    procedure CreatePmtLinesOnOrderImport(): Boolean
+    procedure IncludeTrasferOrders(ShopifyStoreCode: Code[20]): Option No,Outbound,All
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Get Payment Lines From Shopify" = _ShopifySetup."Get Payment Lines From Shopify"::ON_ORDER_IMPORT);
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Include Transfer Orders");
     end;
 
-    procedure IsSendNegativeInventory(): Boolean
+    procedure IncludeTrasferOrdersAnyStore(): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
     begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Send Negative Inventory");
-    end;
-
-    procedure IncludeTrasferOrders(): Option No,Outbound,All
-    begin
-        _ShopifySetup.GetRecordOnce(false);
-        exit(_ShopifySetup."Include Transfer Orders");
+        ShopifyStore.SetFilter("Include Transfer Orders", '<>%1', ShopifyStore."Include Transfer Orders"::No);
+        exit(not ShopifyStore.IsEmpty());
     end;
 
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
@@ -151,6 +181,57 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     procedure SetRereadSetup()
     begin
         Clear(_ShopifySetup);
+        Clear(_ShopifyStore);
+        SelectLatestVersion();
+    end;
+
+    local procedure GetStore(ShopifyStoreCode: Code[20])
+    begin
+        if ShopifyStoreCode = _ShopifyStore.Code then
+            exit;
+        if ShopifyStoreCode = '' then
+            Clear(_ShopifyStore)
+        else
+            _ShopifyStore.Get(ShopifyStoreCode);
+    end;
+
+    procedure TestShopifyStoreConnection(ShopifyStoreCode: Code[20])
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        xShopifyStore: Record "NPR Spfy Store";
+        JsonHelper: Codeunit "NPR Json Helper";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+        Window: Dialog;
+        RetrievedFieldValue: Text;
+        SuccessLbl: Label 'Connection to Shopify store %1 has been successfully established. Do you want to update the store card with the data received from Shopify?', Comment = '%1 - Shopify store code';
+        QueryingShopifyLbl: Label 'Querying Shopify...';
+    begin
+        Window.Open(QueryingShopifyLbl);
+        ClearLastError();
+        if not SpfyCommunicationHandler.GetShopifyStoreConfiguration(ShopifyStoreCode, ShopifyResponse) then
+            Error(GetLastErrorText());
+        Window.Close();
+        if not Confirm(SuccessLbl, true, ShopifyStoreCode) then
+            exit;
+
+        ShopifyResponse.AsObject().Get('shop', ShopifyResponse);
+        ShopifyStore.Get(ShopifyStoreCode);
+        xShopifyStore := ShopifyStore;
+        RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'name', false);
+        if RetrievedFieldValue <> '' then
+            ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
+        RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currency', false);
+        if RetrievedFieldValue <> '' then
+            ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
+        if Format(ShopifyStore) <> Format(xShopifyStore) then
+            ShopifyStore.Modify();
+        RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'id', false);
+        if RetrievedFieldValue <> '' then begin
+            SpfyAssignedIDMgt.RemoveAssignedShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            SpfyAssignedIDMgt.AssignShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID", CopyStr(RetrievedFieldValue, 1, 30), true);
+        end;
     end;
 
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)
@@ -195,14 +276,22 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
 
 #if not BC18
     #region clear configuration on company/environment copy
+#if BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Report, Report::"Copy Company", OnAfterCreatedNewCompanyByCopyCompany, '', false, false)]
+#endif
     local procedure SpfyOnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
     begin
         DisableIntegration(NewCompanyName);
         DeleteWebhookSubscriptions(NewCompanyName);
     end;
 
+#if BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", OnClearCompanyConfig, '', false, false)]
+#endif
     local procedure SpfyOnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
     begin
         DisableIntegration(CompanyName);
