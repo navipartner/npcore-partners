@@ -67,7 +67,9 @@
         "NPRShopify",
 		"NPRSECleanCash",
 		"NPRATFiscal",
-		"NPRRSEInvoice"],
+		"NPRRSEInvoice",
+        "NPRObsoletePOSScenarios",
+        "NPRNewPOSEditor"],
         "exceptions": [
             {
                 "id": 6151094,
