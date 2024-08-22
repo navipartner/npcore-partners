@@ -56,6 +56,16 @@ table 6059827 "NPR RS Aux Sales CrMemo Header"
             Caption = 'RS Additional Cust. Identification Type';
             DataClassification = CustomerContent;
         }
+        field(60; "NPR RS Referent No."; Code[100])
+        {
+            Caption = 'RS Referent No.';
+            DataClassification = CustomerContent;
+        }
+        field(65; "NPR RS Referent Date/Time"; DateTime)
+        {
+            Caption = 'RS Referent Date/Time';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
