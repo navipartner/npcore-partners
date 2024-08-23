@@ -66,9 +66,9 @@ codeunit 6151003 "NPR TicketingJsonApiV100"
         AdmissionScheduleEntry.SetAutoCalcFields("Initial Entry");
         AdmissionScheduleEntry.SetRange("Admission Code", AdmissionCode);
         if StartDate <> 0D then
-            AdmissionScheduleEntry.SetRange("Admission Start Date", StartDate);
+            AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..', StartDate);
         if EndDate <> 0D then
-            AdmissionScheduleEntry.SetRange("Admission End Date", EndDate);
+            AdmissionScheduleEntry.SetFilter("Admission End Date", '..%1', EndDate);
         AdmissionScheduleEntry.SetRange(Cancelled, false);
         if AdmissionScheduleEntry.FindSet() then begin
             repeat
