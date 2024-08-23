@@ -941,7 +941,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ItemResycnOptions.Run();
     end;
 
-    procedure MarkItemAlreadyOnShopify(Item: Record Item; var ShopifyStore: Record "NPR Spfy Store"; DisableDataLog: Boolean; CreateAtShopify: Boolean)
+    procedure MarkItemAlreadyOnShopify(Item: Record Item; var ShopifyStore: Record "NPR Spfy Store"; DisableDataLog: Boolean; CreateAtShopify: Boolean; WithDialog: Boolean)
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
@@ -953,7 +953,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if ShopifyStore.FindSet() then
             repeat
-                UpdateIntegrationStatusForItem(ShopifyStore.Code, Item, DisableDataLog, CreateAtShopify);
+                UpdateIntegrationStatusForItem(ShopifyStore.Code, Item, DisableDataLog, CreateAtShopify, WithDialog);
             until ShopifyStore.Next() = 0;
         if CreateAtShopify then
             exit;
@@ -985,7 +985,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             SpfyStoreItemLink.DeleteAll(true);
     end;
 
-    local procedure UpdateIntegrationStatusForItem(ShopifyStoreCode: Code[20]; Item: Record Item; DisableDataLog: Boolean; CreateAtShopify: Boolean)
+    local procedure UpdateIntegrationStatusForItem(ShopifyStoreCode: Code[20]; Item: Record Item; DisableDataLog: Boolean; CreateAtShopify: Boolean; WithDialog: Boolean)
     var
         ItemVariant: Record "Item Variant";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
@@ -1005,7 +1005,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if not LinkExists then
             SpfyStoreItemLink.Init();
 
-        ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, true);
+        ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, WithDialog);
         if ShopifyItemID = '' then begin
             if LinkExists and (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled") then begin
                 DisableIntegrationForItem(SpfyStoreItemLink);
