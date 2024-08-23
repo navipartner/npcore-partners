@@ -1431,10 +1431,15 @@
     end;
 
     local procedure IsUniqueDocumentNo(SalePOS: Record "NPR POS Sale"): Boolean
+    begin
+        exit(IsUniqueDocumentNo(SalePOS."Sales Ticket No."));
+    end;
+
+    internal procedure IsUniqueDocumentNo(ReceiptNo: Code[20]): Boolean
     var
         POSEntry: Record "NPR POS Entry";
     begin
-        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.SetRange("Document No.", ReceiptNo);
         exit(POSEntry.IsEmpty());
     end;
 
@@ -1848,11 +1853,8 @@
     end;
 
     local procedure IsUniqueDocumentNoExt(ExtSalePOS: Record "NPR External POS Sale"): Boolean
-    var
-        POSEntry: Record "NPR POS Entry";
     begin
-        POSEntry.SetRange("Document No.", ExtSalePOS."Sales Ticket No.");
-        exit(POSEntry.IsEmpty());
+        exit(IsUniqueDocumentNo(ExtSalePOS."Sales Ticket No."));
     end;
 
     local procedure ValidateSaleHeaderExt(ExtSalePOS: Record "NPR External POS Sale")
