@@ -37,10 +37,13 @@ codeunit 6184822 "NPR Spfy Update Inventory Job"
             Error(RestartNotEnabledErr);
         end;
 
+        ShopifyStore.SetRange(Enabled, true);
         if SpfyStoreCode <> '' then begin
-            ShopifyStore.Get(SpfyStoreCode);
+            ShopifyStore.Code := SpfyStoreCode;
+            ShopifyStore.Find();
             ShopifyStore.SetRecFilter();
-        end;
+        end else
+            ShopifyStore.FindFirst();
 
         repeat
             Counter += 1;
@@ -61,7 +64,7 @@ codeunit 6184822 "NPR Spfy Update Inventory Job"
         InventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
     begin
-        SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false);
+        SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false, false);
 
         InventoryLevel.SetRange("Item No.", Item."No.");
         ShopifyStore.CopyFilter(Code, InventoryLevel."Shopify Store Code");

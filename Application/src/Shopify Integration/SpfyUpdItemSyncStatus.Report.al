@@ -36,6 +36,7 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
     var
         Item: Record Item;
         ShopifyStore: Record "NPR Spfy Store";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
         Window: Dialog;
         RecNo: Integer;
@@ -50,7 +51,10 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
             Error(NothingToImportErr);
 
         ShopifyStore.CopyFilters(ShopifyStoreDataItem);
-        ShopifyStore.FindFirst();
+        ShopifyStore.FindSet();
+        repeat
+            SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStore.Code);
+        until ShopifyStore.Next() = 0;
 
         Window.Open(
             DialogTxt01Lbl +
@@ -62,7 +66,7 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
             RecNo += 1;
             if GetCellValueAsText(RecNo, 1, MaxStrLen(Item."No."), CellValueAsText) then
                 if Item.Get(CellValueAsText) then begin
-                    SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false);
+                    SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false, false);
                     Commit();
                 end;
             Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));

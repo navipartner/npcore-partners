@@ -223,14 +223,23 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
                     Window: Dialog;
                     SyncInProgressLbl: Label 'Updating items sync. status...';
+                    DisabledStoresExist: Label 'There are Shopify stores for which integration is not enabled. The system will not update the item sync status for these stores. Are you sure you want to proceed?';
                 begin
+                    ShopifyStore.SetRange(Enabled, true);
+                    ShopifyStore.FindFirst();
+                    ShopifyStore.SetRange(Enabled, false);
+                    if not ShopifyStore.IsEmpty() then
+                        if not Confirm(DisabledStoresExist, true) then
+                            exit;
+
                     CurrPage.SaveRecord();
                     Rec.TestField("Item No.");
                     Item.Get(Rec."Item No.");
                     SpfyStoreLinkMgt.UpdateStoreItemLinks(Item);
                     Commit();
                     Window.Open(SyncInProgressLbl);
-                    SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false);
+                    ShopifyStore.SetRange(Enabled, true);
+                    SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, false, false, true);
                     Window.Close();
                     CurrPage.Update(false);
                 end;
