@@ -25,6 +25,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
                     Error(StoreNotSelectedErr);
                 ShopifyStore.Get(ShopifyStoreCode);
                 ShopifyStore.SetRecFilter();
+                SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStore.Code);
 
                 if WithDialog then
                     if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), true, ShopifyStore.Code) then
@@ -47,7 +48,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
                 if WithDialog then
                     Window.Update(1, Item."No.");
 
-                SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, not RegisterInDataLog, CreateAtShopify);
+                SendItemAndInventory.MarkItemAlreadyOnShopify(Item, ShopifyStore, not RegisterInDataLog, CreateAtShopify, false);
                 Commit();
 
                 if WithDialog then begin
@@ -84,8 +85,8 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
                     Caption = 'Options';
                     field(CreateShopifyProducts; CreateAtShopify)
                     {
-                        Caption = 'Create products at Shopify';
-                        ToolTip = 'Specifies if you want to create products at Shopify.';
+                        Caption = 'Create products in Shopify';
+                        ToolTip = 'Specifies if you want to create products in Shopify.';
                         ApplicationArea = NPRShopify;
 
                         trigger OnValidate()
@@ -103,7 +104,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
 
                         trigger OnValidate()
                         var
-                            MustBeTrueErr: Label '"Register in Data Log" must be set to ''true'' when you have selected to create products at Shopify.';
+                            MustBeTrueErr: Label '"Register in Data Log" must be set to ''true'' when you have selected to create products in Shopify.';
                         begin
                             if not RegisterInDataLog and CreateAtShopify then
                                 Error(MustBeTrueErr);

@@ -22,7 +22,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             Error(IntegrationDisabledErr);
 
         if ShopifyStoreCode = '' then begin
-            if not IsEnabledForAnyStore(IntegrationArea) then
+            if IsEnabledForAnyStore(IntegrationArea) then
                 exit;
             if IntegrationArea = IntegrationArea::" " then
                 Error(IntegrationDisabledAllStoresErr)
