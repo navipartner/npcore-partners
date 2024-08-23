@@ -111,10 +111,12 @@
 
     internal procedure GetNextReceiptNo(POSUnitNo: Text) ReceiptNo: Code[20]
     var
-        NoSeriesManagement: Codeunit NoSeriesManagement;
         POSAuditProfile: Record "NPR POS Audit Profile";
         NPRPOSUnit: Record "NPR POS Unit";
         POSEntry: Record "NPR POS Entry";
+        NoSeriesManagement: Codeunit NoSeriesManagement;
+        POSCreateEntry: Codeunit "NPR POS Create Entry";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         DuplicateReceiptNo: Label 'Duplicate Receipt Number %1';
     begin
         NPRPOSUnit.Get(POSUnitNo);
@@ -127,9 +129,14 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         POSEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
 #endif
-        POSEntry.SetRange("Document No.", ReceiptNo);
-        if not POSEntry.IsEmpty() then
-            Error(DuplicateReceiptNo, ReceiptNo);
+        if FeatureFlagsManagement.IsEnabled('uniqueDocumentNoCheck') then begin
+            if not POSCreateEntry.IsUniqueDocumentNo(ReceiptNo) then
+                Error(DuplicateReceiptNo, ReceiptNo);
+        end else begin
+            POSEntry.SetRange("Document No.", ReceiptNo);
+            if not POSEntry.IsEmpty() then
+                Error(DuplicateReceiptNo, ReceiptNo);
+        end;
     end;
 
     internal procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")

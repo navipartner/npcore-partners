@@ -30,6 +30,7 @@
         }
         field(5; "Document No."; Code[20])
         {
+            //this field is unique; unique key cannot be added on the field in combination with IncludedFields property
             Caption = 'Document No.';
             Editable = false;
             DataClassification = CustomerContent;
