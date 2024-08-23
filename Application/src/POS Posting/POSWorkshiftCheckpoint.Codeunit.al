@@ -455,7 +455,9 @@
         DenominationMgt: Codeunit "NPR Denomination Mgt.";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         NoSeriesManagement: Codeunit NoSeriesManagement;
+        DuplicateReceiptNo: Label 'Duplicate Receipt Number: %1';
     begin
 
         POSUnit.Get(UnitNo);
@@ -481,6 +483,10 @@
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, true);
             if (Mode = EodWorkshiftMode::CLOSEWORKSHIFT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, true);
+
+            if FeatureFlagsManagement.IsEnabled('uniqueDocumentNoCheck') then
+                if not POSCreateEntry.IsUniqueDocumentNo(SalePOS."Sales Ticket No.") then
+                    Error(DuplicateReceiptNo, SalePOS."Sales Ticket No.");
 
             SalePOS."Salesperson Code" := TryGetSalesperson();
             SalePOS."Start Time" := Time;
