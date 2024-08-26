@@ -92,9 +92,12 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
     local procedure AddPostWorkflowsToRun(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; EndSaleSuccess: Boolean) PostWorkflows: JsonObject
     var
         EndSaleEvents: Codeunit "NPR End Sale Events";
+        DrawerStatus: Codeunit "NPR POS Action: Drawer Status";
     begin
-        if EndSaleSuccess then
+        if EndSaleSuccess then begin
             AddDigitalReceiptWorkflow(Sale, PostWorkflows);
+            DrawerStatus.AddCashDrawerStatusWorkflow(PostWorkflows, Setup);
+        end;
         EndSaleEvents.OnAddPostWorkflowsToRun(Step, Context, FrontEnd, Sale, SaleLine, PaymentLine, Setup, EndSaleSuccess, PostWorkflows);
     end;
 

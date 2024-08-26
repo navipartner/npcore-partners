@@ -72,18 +72,19 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
                 Error(Text001, Type);
         end;
         HandleWorkflowResponse(Response, ActionContext);
-        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context));
+        Response.Add('preWorkflows', AddPreWorkflowsToRun(Context, Setup));
         LoginEvents.OnAfterLogin(POSSession);
 
         exit(Response);
     end;
 
-    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper") PreWorkflows: JsonObject
+    local procedure AddPreWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Setup: Codeunit "NPR POS Setup") PreWorkflows: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         LoginEvents: Codeunit "NPR POS Login Events";
+        DrawerStatus: Codeunit "NPR POS Action: Drawer Status";
         CustRequired: Boolean;
         MemberRequired: Boolean;
     begin
@@ -98,6 +99,7 @@ codeunit 6150721 "NPR POS Action - Login" implements "NPR IPOS Workflow"
             AddMemberWorkflow(PreWorkflows);
         if CustRequired then
             AddCustomerWorkflow(PreWorkflows);
+        DrawerStatus.AddCashDrawerStatusWorkflow(PreWorkflows, Setup);
 
         LoginEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
     end;
