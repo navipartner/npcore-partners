@@ -10,12 +10,12 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Bin Eject Mgt.", 'OnEjectPaymentBin', '', false, false)]
     local procedure OnEjectPaymentBin(POSPaymentBin: Record "NPR POS Payment Bin"; var Ejected: Boolean)
     var
-        POSSession: Codeunit "NPR POS Session";
+        HWCRequest: Codeunit "NPR Front-End: HWC";
         POSFrontEnd: Codeunit "NPR POS Front End Management";
         POSPaymentBinInvokeMgt: Codeunit "NPR POS Payment Bin Eject Mgt.";
-        DeviceName: Text;
-        HWCRequest: Codeunit "NPR Front-End: HWC";
+        POSSession: Codeunit "NPR POS Session";
         RequestBody: JsonObject;
+        DeviceName: Text;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
             exit;
@@ -24,6 +24,7 @@
 
         DeviceName := POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'device_name', '');
 
+        RequestBody.Add('Type', 'EjectDrawer');
         RequestBody.Add('DeviceName', DeviceName);
         RequestBody.Add('TimeoutMs', 2000);
         HWCRequest.SetHandler('OPOSCashDrawer');
@@ -51,6 +52,7 @@
             exit;
 
         POSPaymentBinInvokeMgt.GetTextParameterValue(POSPaymentBin."No.", 'device_name', '');
+        POSPaymentBinInvokeMgt.GetBooleanParameterValue(POSPaymentBin."No.", 'wait_for_cash_drawer_to_close', false);
 
         POSPaymentBinInvokeMgt.ShowGenericParameters(POSPaymentBin);
     end;
@@ -59,6 +61,7 @@
     local procedure OnGetParameterNameCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
+        CashDrawerWaitForClose: Label 'Wait for Cash Drawer to Close';
         NameDevice: Label 'Device Name';
     begin
         if not PaymentBin.Get(PaymentBinInvokeParameter."Bin No.") then
@@ -69,6 +72,8 @@
         case PaymentBinInvokeParameter.Name of
             'device_name':
                 Caption := NameDevice;
+            'wait_for_cash_drawer_to_close':
+                Caption := CashDrawerWaitForClose;
         end;
     end;
 
@@ -76,6 +81,7 @@
     local procedure OnGetParameterDescriptionCaption(PaymentBinInvokeParameter: Record "NPR POS Paym. Bin Eject Param."; var Caption: Text)
     var
         PaymentBin: Record "NPR POS Payment Bin";
+        DescriptionCloseCashDrawer: Label 'Specifies if POS should wait user to close a Cash Drawer before proceeding further';
         DescriptionDevice: Label 'Name of OPOS device to send request to';
     begin
         if not PaymentBin.Get(PaymentBinInvokeParameter."Bin No.") then
@@ -86,6 +92,8 @@
         case PaymentBinInvokeParameter.Name of
             'device_name':
                 Caption := DescriptionDevice;
+            'wait_for_cash_drawer_to_close':
+                Caption := DescriptionCloseCashDrawer;
         end;
     end;
 }
