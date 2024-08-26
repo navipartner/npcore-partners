@@ -1,8 +1,8 @@
 ﻿enum 6150756 "NPR POS Tax Calc. Type" implements "NPR POS ITaxCalc"
 {
-    #IF NOT BC17  
-    Access = Internal;       
-    #ENDIF
+#IF NOT BC17
+    Access = Internal;
+#ENDIF
     Extensible = true;
 
     value(0; "Normal VAT")
@@ -24,5 +24,10 @@
     {
         Caption = 'Sales Tax';
         Implementation = "NPR POS ITaxCalc" = "NPR POS Sales Tax";
+    }
+    value(4; "No Taxable VAT")
+    {
+        Caption = 'No Taxable VAT';
+        Implementation = "NPR POS ITaxCalc" = "NPR No Taxable VAT";
     }
 }

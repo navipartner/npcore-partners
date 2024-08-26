@@ -1,7 +1,7 @@
 ﻿table 6014570 "NPR POS Sale Tax"
 {
 #IF NOT BC17
-    Access = Internal;      
+    Access = Internal;
 #ENDIF
     DataClassification = CustomerContent;
     Caption = 'POS Sale Tax';
@@ -317,25 +317,58 @@
 
     procedure SetTaxCalcTypeFromSource(SaleLinePOS: Record "NPR POS Sale Line")
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        TaxCalculationValueName: Text;
         Handled: Boolean;
         UnknownTaxCalculationTypeErr: Label 'Unknown Tax Calculation Type: %1 %2';
     begin
-        case SaleLinePOS."VAT Calculation Type" of
-            SaleLinePOS."VAT Calculation Type"::"Full VAT":
-                "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Full VAT";
-            SaleLinePOS."VAT Calculation Type"::"Normal VAT":
-                "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Normal VAT";
-            SaleLinePOS."VAT Calculation Type"::"Reverse Charge VAT":
-                "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Reverse Charge VAT";
-            SaleLinePOS."VAT Calculation Type"::"Sales Tax":
-                "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Sales Tax";
-            else begin
-                OnSetTaxCalcType(Handled);
-                if not Handled then
-                    error(UnknownTaxCalculationTypeErr,
-                            FieldCaption("Source Tax Calc. Type"), "Source Tax Calc. Type");
+        if FeatureFlagsManagement.IsEnabled('useTaxCalculationTypeValueNamesForPosVatAssignment') then begin
+            TaxCalculationValueName := GetTaxCaclulationTypeEnumValueName(SaleLinePOS."VAT Calculation Type");
+            case TaxCalculationValueName of
+                'Full VAT':
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Full VAT";
+                'Normal VAT':
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Normal VAT";
+                'Reverse Charge VAT':
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Reverse Charge VAT";
+                'Sales Tax':
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Sales Tax";
+                'No Taxable VAT':
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"No Taxable VAT";
+                else begin
+                    OnSetTaxCalcType(Handled);
+                    if not Handled then
+                        error(UnknownTaxCalculationTypeErr,
+                                FieldCaption("Source Tax Calc. Type"), "Source Tax Calc. Type");
+                end;
+            end;
+        end else begin
+            case SaleLinePOS."VAT Calculation Type" of
+                SaleLinePOS."VAT Calculation Type"::"Full VAT":
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Full VAT";
+                SaleLinePOS."VAT Calculation Type"::"Normal VAT":
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Normal VAT";
+                SaleLinePOS."VAT Calculation Type"::"Reverse Charge VAT":
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Reverse Charge VAT";
+                SaleLinePOS."VAT Calculation Type"::"Sales Tax":
+                    "Source Tax Calc. Type" := "Source Tax Calc. Type"::"Sales Tax";
+                else begin
+                    OnSetTaxCalcType(Handled);
+                    if not Handled then
+                        error(UnknownTaxCalculationTypeErr,
+                                FieldCaption("Source Tax Calc. Type"), "Source Tax Calc. Type");
+                end;
             end;
         end;
+    end;
+
+    local procedure GetTaxCaclulationTypeEnumValueName(TaxCalculationType: Enum "Tax Calculation Type") ValueName: Text
+    var
+        Index: Integer;
+    begin
+        Index := TaxCalculationType.Ordinals.IndexOf(TaxCalculationType.AsInteger());
+        if not TaxCalculationType.Names().Get(Index, ValueName) then
+            exit;
     end;
 
     [IntegrationEvent(true, false)]
