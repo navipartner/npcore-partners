@@ -3,10 +3,8 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
     await workflow.respond("SetValuesToContext");
     
     if (context.showSpinner) {
-        _dialogRef = await popup.simplePayment({
-            showStatus: true,
-            title: captions.workflowTitle,
-            amount: " ",
+        _dialogRef = await popup.simpleSpinner({
+            caption: captions.workflowTitle,
             onAbort: async () => {
                 if (await popup.confirm(captions.confirmAbort)) {
                     _dialogRef.updateStatus(captions.statusAborting);

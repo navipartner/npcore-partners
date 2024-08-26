@@ -51,7 +51,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
                 caption: "<center><font color=red size=72>&#x274C;</font><h3>"+docLXValidation.state.message+"</h3></center>", 
                 title: captions.WindowTitle});
         }
-       
+        
         debugger;
         if (_cityCardRequest.validated) {
             _dialogRef && _dialogRef.updateStatus(captions.RedeemingStatus);
