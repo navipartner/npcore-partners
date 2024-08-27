@@ -211,6 +211,10 @@
         XmlElementLoginInfo.Add(AddElement('last_logon_date', Format(Today(), 0, 9), MethodNS));
         XmlElementLoginInfo.Add(AddElement('last_logon_time', Format(Time(), 0, 9), MethodNS));
         XmlElementLoginInfo.Add(AddElement('full_name', User."Full Name", MethodNS));
+        if IsSaas then begin
+            XmlElementLoginInfo.Add(AddElement('authentication_email', User."Authentication Email", MethodNS));
+            XmlElementLoginInfo.Add(AddElement('contact_email', User."Contact Email", MethodNS));
+        end;
         XmlElementLoginInfo.Add(AddElement('service_server_name', _ActiveSession."Server Computer Name", MethodNS));
         if not IsSaas then
             XmlElementLoginInfo.Add(AddElement('service_instance', _ActiveSession."Server Instance Name", MethodNS));
