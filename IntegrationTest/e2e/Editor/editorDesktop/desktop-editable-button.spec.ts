@@ -31,7 +31,7 @@ test.describe("Edit Mode Bar tests", () => {
 
     await page.frameLocator("iframe").getByText("Edit").click();
     await page.frameLocator("iframe").getByText("Color").click();
-    await page.frameLocator("iframe").getByTitle("#FF0000").click();
+    await page.frameLocator('iframe').locator('.custom-color-picker__palette-color').first().click();
     await page
       .frameLocator("iframe")
       .locator("div")
