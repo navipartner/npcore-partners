@@ -355,6 +355,18 @@ page 6184704 "NPR Spfy Store Card"
                 }
             }
         }
+        area(Navigation)
+        {
+            action(LocationLinks)
+            {
+                Caption = 'Linked Locations';
+                ToolTip = 'View and set up BC-Shopify location links.';
+                ApplicationArea = NPRShopify;
+                Image = LinkWeb;
+                RunObject = Page "NPR Spfy Store-Location Links";
+                RunPageLink = "Shopify Store Code" = field(Code);
+            }
+        }
     }
 
     trigger OnOpenPage()

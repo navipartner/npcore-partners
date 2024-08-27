@@ -596,8 +596,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::" ", ShopifyStoreCode);
-
         ShopifyStore.Get(ShopifyStoreCode);
         ShopifyStore.TestField(Enabled);
         ShopifyStore.TestField("Shopify Access Token");

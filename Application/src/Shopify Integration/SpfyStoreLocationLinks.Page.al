@@ -15,16 +15,16 @@ page 6184558 "NPR Spfy Store-Location Links"
         {
             repeater(General)
             {
-                field("Location Code"; Rec."Location Code")
-                {
-                    ToolTip = 'Specifies a BC location the link to be created for.';
-                    ApplicationArea = NPRShopify;
-                    Visible = false;
-                }
                 field("Shopify Store Code"; Rec."Shopify Store Code")
                 {
                     ToolTip = 'Specifies a Shopify store the linked location is related to.';
                     ApplicationArea = NPRShopify;
+                }
+                field("Location Code"; Rec."Location Code")
+                {
+                    ToolTip = 'Specifies a BC location the link to be created for.';
+                    ApplicationArea = NPRShopify;
+                    Visible = LocationCodeVisible;
                 }
                 field("Line No."; Rec."Line No.")
                 {
@@ -60,7 +60,13 @@ page 6184558 "NPR Spfy Store-Location Links"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        LocationCodeVisible := Rec.GetFilter("Location Code") = '';
+    end;
+
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        LocationCodeVisible: Boolean;
 }
 #endif
