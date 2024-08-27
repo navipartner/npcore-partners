@@ -213,20 +213,21 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         if not SpfyCommunicationHandler.GetShopifyStoreConfiguration(ShopifyStoreCode, ShopifyResponse) then
             Error(GetLastErrorText());
         Window.Close();
-        if not Confirm(SuccessLbl, true, ShopifyStoreCode) then
-            exit;
 
-        ShopifyResponse.AsObject().Get('shop', ShopifyResponse);
-        ShopifyStore.Get(ShopifyStoreCode);
-        xShopifyStore := ShopifyStore;
-        RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'name', false);
-        if RetrievedFieldValue <> '' then
-            ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
-        RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currency', false);
-        if RetrievedFieldValue <> '' then
-            ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
-        if Format(ShopifyStore) <> Format(xShopifyStore) then
-            ShopifyStore.Modify();
+        if Confirm(SuccessLbl, true, ShopifyStoreCode) then begin
+            ShopifyResponse.AsObject().Get('shop', ShopifyResponse);
+            ShopifyStore.Get(ShopifyStoreCode);
+            xShopifyStore := ShopifyStore;
+            RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'name', false);
+            if RetrievedFieldValue <> '' then
+                ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
+            RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currency', false);
+            if RetrievedFieldValue <> '' then
+                ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
+            if Format(ShopifyStore) <> Format(xShopifyStore) then
+                ShopifyStore.Modify();
+        end;
+
         RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'id', false);
         if RetrievedFieldValue <> '' then begin
             SpfyAssignedIDMgt.RemoveAssignedShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID");
