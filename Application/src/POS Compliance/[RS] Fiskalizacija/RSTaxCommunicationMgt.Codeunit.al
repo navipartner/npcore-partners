@@ -1841,8 +1841,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         RSAuxSalesInvHeader."NPR RS Audit Entry No." := RSPOSAuditLogAuxInfo."Audit Entry No.";
         RSAuxSalesInvHeader.Modify();
 
-        if PrintReceipt then
+        if PrintReceipt then begin
+            Commit();
             RSFiscalThermalPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+        end
     end;
 
     local procedure FillRSAuditFromNormalSaleAndRefundResponse(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; ResponseText: Text; StartTime: DateTime; PrintReceipt: Boolean)
@@ -1987,8 +1989,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 CreateCopyFiscalReceipt(RSPOSAuditLogAuxInfo);
         end;
 
-        if PrintReceipt then
+        if PrintReceipt then begin
+            Commit();
             RSFiscalThermalPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
+        end;
     end;
 
     local procedure FillRSAuditFromCopySaleAndRefundResponse(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; ResponseText: Text; StartTime: DateTime)
