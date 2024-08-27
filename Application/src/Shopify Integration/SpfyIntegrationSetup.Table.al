@@ -50,7 +50,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Item List Integration';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -58,7 +58,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Do Not Sync. Sales Prices';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -66,7 +66,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Set Shopify Name/Descr. in BC';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -74,7 +74,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Send Inventory Updates';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -84,7 +84,7 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = No,Outbound,All;
             OptionCaption = 'No,Outbound,All';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -92,7 +92,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Sales Order Integration';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -101,7 +101,7 @@ table 6150807 "NPR Spfy Integration Setup"
             Caption = 'Post on Completion';
             DataClassification = CustomerContent;
             InitValue = true;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -110,7 +110,7 @@ table 6150807 "NPR Spfy Integration Setup"
             Caption = 'Delete on Cancellation';
             DataClassification = CustomerContent;
             InitValue = true;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -120,7 +120,7 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
             OptionCaption = 'Before Capture,On Order Import';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -128,7 +128,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Send Order Fulfillments';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -136,7 +136,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Send Payment Capture Requests';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -144,7 +144,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Send Close Order Requests';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -154,7 +154,7 @@ table 6150807 "NPR Spfy Integration Setup"
             DataClassification = CustomerContent;
             OptionMembers = Authorized,Paid,Both;
             OptionCaption = 'Authorized,Paid,Both';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -162,7 +162,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Retail Voucher Integration';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -170,7 +170,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'Send Negative Inventory';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'The setup is now store-specific (moved to table 6150810 "NPR Spfy Store")';
         }
@@ -178,7 +178,7 @@ table 6150807 "NPR Spfy Integration Setup"
         {
             Caption = 'CC Order Integration';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
@@ -187,7 +187,7 @@ table 6150807 "NPR Spfy Integration Setup"
             Caption = 'CC Order Workflow Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpCs Workflow";
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2024-08-25';
             ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
         }
@@ -224,7 +224,7 @@ table 6150807 "NPR Spfy Integration Setup"
 
     procedure SetDataProcessingHandlerIDToDefaultValue()
     var
-        ShopifyDataProcessingHandlerID: Label 'SHOPIFY', Locked = true, MaxLength = 20;
+        ShopifyDataProcessingHandlerID: Label 'SPFY', Locked = true, MaxLength = 20;
     begin
         "Data Processing Handler ID" := ShopifyDataProcessingHandlerID;
     end;

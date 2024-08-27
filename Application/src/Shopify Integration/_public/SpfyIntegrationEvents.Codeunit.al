@@ -13,20 +13,8 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
-    [Obsolete('The setups are now store-specific. Use the "OnBeforeCheckIfStoreIntegrationAreaIsEnabled" event instead', '2024-08-25')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforeCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     internal procedure OnBeforeCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20]; var AreaIsEnabled: Boolean; var Handled: Boolean)
-    begin
-    end;
-
-    [Obsolete('The setups are now store-specific. Use the "OnCheckIfStoreIntegrationAreaIsEnabled" event instead', '2024-08-25')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnCheckIfIntegrationAreaIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; var AreaIsEnabled: Boolean; var Handled: Boolean)
     begin
     end;
 
