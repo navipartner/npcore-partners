@@ -259,6 +259,7 @@
                 Ticket2.SetFilter("No.", '=%1', Ticket."No.");
                 Ticket2.Get(Ticket."No.");
                 if (PrintSingleTicket(Ticket2)) then begin
+                    Ticket2.Get(Ticket."No.");
                     Ticket2."Printed Date" := Today();
                     Ticket2.Modify();
                     Commit();
