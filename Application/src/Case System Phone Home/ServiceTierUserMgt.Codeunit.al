@@ -518,9 +518,12 @@
         //This condition is handling situations when company had environment type "PROD" and had POS Stores and Units sent to case system in the past,
         //but was switched to DEMO,TEST,SANDBOX etc., so it will send 0 quantities in order to clear data in the case system.
         if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then begin
-            if (TenantDiagnostic."POS Units Last Sent" <> 0DT) OR (TenantDiagnostic."POS Stores Last Sent" <> 0DT) then begin
-                TenantDiagnostic."POS Stores" := 0;
+            if (TenantDiagnostic."POS Units Last Sent" <> 0DT) and (TenantDiagnostic."POS Units Sent on Last Upd." <> 0) then begin
                 TenantDiagnostic."POS Units" := 0;
+                ShouldSendRequest := true;
+            end;
+            if (TenantDiagnostic."POS Stores Last Sent" <> 0DT) and (TenantDiagnostic."POS Stores Sent on Last Upd." <> 0) then begin
+                TenantDiagnostic."POS Stores" := 0;
                 ShouldSendRequest := true;
             end;
         end;
@@ -576,7 +579,6 @@
         SaasTenantDiagnostic: Record "NPR Saas Tenant Diagnostic";
         PosStore: Record "NPR POS Store";
         PosUnit: Record "NPR POS Unit";
-        NPREnvironmentMgt: Codeunit "NPR Environment Mgt.";
         EnvironmentInformation: Codeunit "Environment Information";
         ResponseMessage: Text;
         ShouldSendRequest: Boolean;
@@ -599,16 +601,6 @@
         SaasTenantDiagnostic."POS Units" := PosUnit.Count();
         SaasTenantDiagnostic."POS Stores Last Updated" := CurrentDateTime();
         SaasTenantDiagnostic."POS Units Last Updated" := CurrentDateTime();
-
-        //This condition is handling situations when company had environment type "PROD" and had POS Stores and Units sent to case system in the past,
-        //but was switched to DEMO,TEST,SANDBOX etc., so it will send 0 quantities in order to clear data in the case system.
-        if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then begin
-            if (SaasTenantDiagnostic."POS Units Last Sent" <> 0DT) or (SaasTenantDiagnostic."POS Stores Last Sent" <> 0DT) then begin
-                SaasTenantDiagnostic."POS Stores" := 0;
-                SaasTenantDiagnostic."POS Units" := 0;
-                ShouldSendRequest := true;
-            end;
-        end;
 
         if not ShouldSendRequest then
             if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
