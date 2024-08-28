@@ -2715,6 +2715,7 @@
         "Vendor No." := _Item."Vendor No.";
         GetDescription();
         "Magento Brand" := _Item."NPR Magento Brand";
+        OnAfterInitFromItem(Rec, _Item);
     end;
 
     local procedure InitFromItemCategory()
@@ -3303,6 +3304,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterTransferToSalesLine(NPRPOSSaleLine: Record "NPR POS Sale Line"; var SaleLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitFromItem(var Rec: Record "NPR POS Sale Line"; Item: Record Item)
     begin
     end;
 }
