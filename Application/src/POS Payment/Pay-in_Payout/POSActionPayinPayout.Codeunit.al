@@ -51,10 +51,6 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
         AccountNo: Code[20];
         PayOption: Integer;
     begin
-        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
-        if TakePhotoEnabled then
-            POSActionTakePhotoB.TakePhoto(Sale);
-
         Response.ReadFrom('{}');
         AccountNo := CopyStr(UpperCase(Context.GetStringParameter('FixedAccountCode')), 1, MaxStrLen(AccountNo));
 
@@ -73,6 +69,10 @@ codeunit 6059789 "NPR POS Action Pay-in Payout" implements "NPR IPOS Workflow", 
             GLAccount.TestField("VAT Prod. Posting Group");
             GLAccount.TestField("Gen. Posting Type");
         end;
+
+        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
+        if TakePhotoEnabled then
+            POSActionTakePhotoB.TakePhoto(Sale);
 
         Response.Add('accountNumber', GLAccount."No.");
         Response.Add('description', GLAccount.Name);
