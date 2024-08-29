@@ -60,7 +60,7 @@ table 6150801 "NPR Adyen Setup"
             Caption = 'Management Base URL';
             ObsoleteState = Removed;
             ObsoleteTag = '2024-06-28';
-            ObsoleteReason = 'Replaced with .';
+            ObsoleteReason = 'Not used.';
         }
         field(35; "Environment Type"; Enum "NPR Adyen Environment Type")
         {

@@ -14,6 +14,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         UpdatePSPReferenceForEFTTrans();
         UpdateAdyenSetupCompanyID();
         UpdateAdyenReconLinePostingAllowed();
+        UpdateAdyenReconciliationStatus();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -88,5 +89,36 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         LogMessageStopwatch.LogFinish();
     end;
 
+    local procedure UpdateAdyenReconciliationStatus()
+    var
+        ReconHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconHeader2: Record "NPR Adyen Reconciliation Hdr";
+        ReconLine: Record "NPR Adyen Recon. Line";
+    begin
+        UpgradeStep := 'UpdateAdyenReconciliationStatus';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
 
+        if ReconHeader.FindSet() then
+            repeat
+                ReconHeader2 := ReconHeader;
+                ReconLine.Reset();
+                ReconLine.SetRange("Document No.", ReconHeader2."Document No.");
+                ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::Matched, ReconLine.Status::"Matched Manually");
+                if ReconLine.IsEmpty() then begin
+                    ReconHeader2.Status := ReconHeader2.Status::Matched;
+                    ReconHeader2.Modify();
+                end else begin
+                    ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::Posted, ReconLine.Status::"Not to be Posted");
+                    if ReconLine.IsEmpty() then begin
+                        ReconHeader2.Status := ReconHeader2.Status::Posted;
+                        ReconHeader2.Modify();
+                    end;
+                end;
+            until ReconHeader.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
 }

@@ -23,99 +23,54 @@ page 6184534 "NPR Adyen Reconciliation List"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Reconciliation Document No.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Batch Number"; Rec."Batch Number")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Batch Number.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Merchant Account"; Rec."Merchant Account")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Merchant Account.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Document Date.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Transactions Date"; Rec."Transactions Date")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Transactions Date.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Total Transactions Amount"; Rec."Total Transactions Amount")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Total Transactions Amount.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Total Posted Amount"; Rec."Total Posted Amount")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Total Posted Amount.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
                 field("Webhook Request ID"; Rec."Webhook Request ID")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Webhook Request ID.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
-                field(Posted; Rec.Posted)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies if the Document is Posted.';
+                    ToolTip = 'Specifies the Document Status.';
                     StyleExpr = _StyleExprTxt;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
-                    end;
                 }
             }
         }
@@ -151,10 +106,30 @@ page 6184534 "NPR Adyen Reconciliation List"
 
     trigger OnAfterGetRecord()
     begin
-        _StyleExprTxt := _AdyenManagement.ChangeColorDocument(Rec);
+        _StyleExprTxt := ChangeColorDocument();
+    end;
+
+    local procedure ChangeColorDocument(): Text[50]
+    begin
+        Rec.CalcFields("Failed Lines Exist");
+
+        if Rec."Failed Lines Exist" then
+            exit('Unfavorable');
+
+        if (Rec.Status = Rec.Status::Posted) or
+           (not _AdyenSetup."Enable Automatic Posting" and ((Rec.Status = Rec.Status::Matched)))
+        then
+            exit('Favorable');
+
+        exit('Standard');
+    end;
+
+    trigger OnOpenPage()
+    begin
+        _AdyenSetup.GetRecordOnce();
     end;
 
     var
         _StyleExprTxt: Text[50];
-        _AdyenManagement: Codeunit "NPR Adyen Management";
+        _AdyenSetup: Record "NPR Adyen Setup";
 }

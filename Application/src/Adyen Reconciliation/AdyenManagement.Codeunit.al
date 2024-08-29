@@ -621,21 +621,11 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure ChangeColorLine(ReconciliationLine: Record "NPR Adyen Recon. Line"): Text[50]
     begin
         case ReconciliationLine.Status of
-            ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted":
-                exit('Favorable');
-            ReconciliationLine.Status::"Failed to Match":
+            ReconciliationLine.Status::"Failed to Match", ReconciliationLine.Status::"Failed to Post":
                 exit('Unfavorable');
             else
                 exit('Standard');
         end;
-    end;
-
-    internal procedure ChangeColorDocument(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Text[50]
-    begin
-        if ReconciliationHeader.Posted then
-            exit('Favorable')
-        else
-            exit('Unfavorable');
     end;
 
     internal procedure CreateGeneralLog(LogType: Enum "NPR Adyen Webhook Log Type"; Success: Boolean; Description: Text; RequestEntryNo: Integer)

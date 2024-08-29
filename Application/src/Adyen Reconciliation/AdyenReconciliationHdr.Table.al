@@ -92,6 +92,10 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         {
             DataClassification = CustomerContent;
             Caption = 'Posted';
+
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-08-26';
+            ObsoleteReason = 'Replaced with Status.';
         }
         field(120; "Merchant Account"; Text[80])
         {
@@ -102,6 +106,18 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         {
             DataClassification = CustomerContent;
             Caption = 'Merchant Payout';
+        }
+        field(140; Status; Enum "NPR Adyen Rec. Header Status")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Status';
+            InitValue = Unmatched;
+        }
+        field(150; "Failed Lines Exist"; Boolean)
+        {
+            Caption = 'Failed Lines Exist';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recon. Line" where("Document No." = field("Document No."), Status = filter("Failed to Match" | "Failed to Post")));
         }
     }
     keys
@@ -122,7 +138,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         DocumentIsPartiallyPostedLbl: Label 'The document %1 cannot be deleted because it is partially posted.\\You can try to "Recreate" the current document. The posted lines will remain intact.';
         RecLine: Record "NPR Adyen Recon. Line";
     begin
-        if Rec.Posted then
+        if Rec.Status = Rec.Status::Posted then
             Error(DocumentIsPostedLbl, Rec."Document No.");
         RecLine.Reset();
         RecLine.SetRange("Document No.", Rec."Document No.");

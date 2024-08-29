@@ -121,9 +121,9 @@ page 6184502 "NPR Adyen Reconciliation"
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
-                field(Posted; Rec.Posted)
+                field(Status; Rec.Status)
                 {
-                    ToolTip = 'Specifies if the Document is successfully Posted.';
+                    ToolTip = 'Specifies the Document Status.';
                     Editable = false;
                     ApplicationArea = NPRRetail;
                 }
@@ -291,7 +291,7 @@ page 6184502 "NPR Adyen Reconciliation"
 
     trigger OnAfterGetRecord()
     begin
-        _DocumentPosted := Rec.Posted;
+        _DocumentPosted := Rec.Status = Rec.Status::Posted;
         _AdyenSetup.GetRecordOnce();
         _PostWithTransactionDate := _AdyenSetup."Post with Transaction Date";
 
