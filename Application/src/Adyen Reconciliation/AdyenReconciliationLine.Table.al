@@ -6,7 +6,7 @@ table 6150789 "NPR Adyen Reconciliation Line"
     DataClassification = CustomerContent;
     ObsoleteState = Removed;
     ObsoleteTag = '2024-06-28';
-    ObsoleteReason = 'Replaced by NPR Adyen Recon. Line.';
+    ObsoleteReason = 'Replaced with NPR Adyen Recon. Line.';
 
     fields
     {

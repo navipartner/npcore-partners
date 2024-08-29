@@ -26,11 +26,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Transaction Date.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
 
                 field("Transaction Type"; Rec."Transaction Type")
@@ -39,11 +34,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Transaction Type.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Merchant Reference"; Rec."Merchant Reference")
                 {
@@ -51,11 +41,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Merchant Reference.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Amount (TCY)"; Rec."Amount (TCY)")
                 {
@@ -63,11 +48,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Trasnaction Currency Amount.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Transaction Currency Code"; Rec."Transaction Currency Code")
                 {
@@ -75,11 +55,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Trasnaction Currency Code.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Amount (AAC)"; Rec."Amount(AAC)")
                 {
@@ -87,11 +62,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Acquirer Account Currency Amount.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Adyen Acc. Currency Code"; Rec."Adyen Acc. Currency Code")
                 {
@@ -99,11 +69,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Acquirer Account Currency Code.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
                 {
@@ -111,11 +76,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Transaction Amount (LCY).';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Matching Table Name"; Rec."Matching Table Name")
                 {
@@ -123,11 +83,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Transaction Matching Table.';
                     StyleExpr = _StyleExprTxt;
                     Editable = (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually");
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Matching Entry No."; Rec."Matching Entry System ID")
                 {
@@ -204,11 +159,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                 end;
                         end;
                     end;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field(Status; Rec.Status)
                 {
@@ -228,11 +178,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Markup Amount (AAC).';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Payment Fees (NC)"; Rec."Payment Fees (NC)")
                 {
@@ -240,11 +185,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Payment Fees Total Amount (AAC). Must be a total of Commission, Markup, Scheme Fee and Interchange.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Commission (NC)"; Rec."Commission (NC)")
                 {
@@ -252,11 +192,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Commission Amount (AAC).';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Scheme Fees (NC)"; Rec."Scheme Fees (NC)")
                 {
@@ -264,11 +199,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Scheme Fees Amount (AAC).';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Interchange (NC)"; Rec."Interchange (NC)")
                 {
@@ -276,11 +206,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Interchange Amount (AAC).';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Realized Gains or Losses"; Rec."Realized Gains or Losses")
                 {
@@ -288,11 +213,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Realized Gains or Losses Amount (AAC)';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Posting allowed"; Rec."Posting allowed")
                 {
@@ -300,11 +220,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies if the Posting is allowed.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Posting No."; Rec."Posting No.")
                 {
@@ -312,11 +227,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Posting No.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
@@ -324,11 +234,20 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ToolTip = 'Specifies the Posting Date.';
                     StyleExpr = _StyleExprTxt;
                     Editable = false;
-
-                    trigger OnValidate()
-                    begin
-                        _StyleExprTxt := _AdyenManagement.ChangeColorLine(Rec);
-                    end;
+                }
+                field("Payment Method"; Rec."Payment Method")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Payment Method of the transaction.';
+                    StyleExpr = _StyleExprTxt;
+                    Editable = false;
+                }
+                field("Payment Method Variant"; Rec."Payment Method Variant")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Payment Method Variant of the transaction.';
+                    StyleExpr = _StyleExprTxt;
+                    Editable = false;
                 }
             }
         }

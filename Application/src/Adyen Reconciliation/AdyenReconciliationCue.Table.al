@@ -15,7 +15,7 @@ table 6150802 "NPR Adyen Reconciliation Cue"
         }
         field(10; "Unposted Documents"; Integer)
         {
-            CalcFormula = count("NPR Adyen Reconciliation Hdr" where(Posted = const(false)));
+            CalcFormula = count("NPR Adyen Reconciliation Hdr" where(Status = filter(Matched | Unmatched)));
             Caption = 'Unposted Documents';
             FieldClass = FlowField;
         }

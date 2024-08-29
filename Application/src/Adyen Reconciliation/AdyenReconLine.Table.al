@@ -162,9 +162,19 @@ table 6150874 "NPR Adyen Recon. Line"
             Caption = 'Merchant Reference';
             DataClassification = CustomerContent;
         }
+        field(205; "Payment Method"; Text[30])
+        {
+            Caption = 'Payment Method';
+            DataClassification = CustomerContent;
+        }
         field(210; "Modification Reference"; Text[256])
         {
             Caption = 'Modification Reference';
+            DataClassification = CustomerContent;
+        }
+        field(215; "Payment Method Variant"; Text[50])
+        {
+            Caption = 'Payment Method Variant';
             DataClassification = CustomerContent;
         }
         field(220; "Commission (NC)"; Decimal)

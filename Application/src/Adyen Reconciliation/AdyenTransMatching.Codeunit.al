@@ -87,7 +87,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         _AdyenSetup.GetRecordOnce();
 
-        if RecHeader.Posted then
+        if RecHeader.Status = RecHeader.Status::Posted then
             Error(DocumentIsPostedLbl, RecHeader."Document No.");
 
         RecLine.Reset();
@@ -134,13 +134,18 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
             ReconciliationHeader.Init();
             ReconciliationHeader."Document No." := _NoSeriesMgt.GetNextNo(AdyenGenericSetup."Reconciliation Document Nos.", Today(), true);
+            if ReconciliationHeader."Document No." = '' then begin
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false, StrSubstNo(NoSeriesError02, AdyenGenericSetup."Reconciliation Document Nos."), WebhookRequest.ID);
+                exit(false);
+            end;
             ReconciliationHeader."Document Date" := Today();
             ReconciliationHeader."Posting Date" := Today();
             ReconciliationHeader.Insert();
         end else begin
             ReconciliationHeader.Get(ExistingDocumentNo);
-            if ReconciliationHeader.Posted then
+            if ReconciliationHeader.Status = ReconciliationHeader.Status::Posted then
                 exit(false);
+
             ReconciliationHeader."Document Date" := Today();
             ReconciliationHeader."Posting Date" := Today();
             _AdyenManagement.DeleteReconciliationLines(ReconciliationHeader."Document No.");
@@ -196,6 +201,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Merchant Account" := CopyStr(MerchantAccount, 1, MaxStrLen(ReconciliationLine."Merchant Account"));
         ReconciliationLine."PSP Reference" := CopyStr(GetValueAtCell(LineNo, 3), 1, MaxStrLen(ReconciliationLine."PSP Reference"));
         ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, 4), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Payment Method" := CopyStr(GetValueAtCell(LineNo, 5), 1, MaxStrLen(ReconciliationLine."Payment Method"));
 
         if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 28)) then begin
             // AMS to UTC
@@ -220,6 +226,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         if Evaluate(ReconciliationLine."Commission (NC)", GetValueAtCell(LineNo, 17), 9) then;
         if Evaluate(ReconciliationLine."Markup (NC)", GetValueAtCell(LineNo, 18), 9) then;
+
+        ReconciliationLine."Payment Method Variant" := CopyStr(GetValueAtCell(LineNo, 19), 1, MaxStrLen(ReconciliationLine."Payment Method Variant"));
 
         if Evaluate(ReconciliationLine."Gross Debit", GetValueAtCell(LineNo, 11), 9) then
             ReconciliationLine.Validate("Gross Debit");
@@ -354,7 +362,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     #endregion
 
     #region Matching
-    internal procedure MatchEntries(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer;
+    internal procedure MatchEntries(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer;
     var
         ReconciliationLine: Record "NPR Adyen Recon. Line";
         ReconciliationLine2: Record "NPR Adyen Recon. Line";
@@ -370,6 +378,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine.Status::" ", ReconciliationLine.Status::"Failed to Match");
         if not ReconciliationLine.FindSet(true) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError02, ReconciliationHeader."Document No.", ReconciliationHeader."Merchant Account"), ReconciliationHeader."Webhook Request ID");
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Matched;
+            ReconciliationHeader.Modify();
             exit(MatchedEntries);
         end;
         Clear(MatchedEntries);
@@ -430,8 +440,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         if UnmatchedEntries > 0 then
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError03, Format(UnmatchedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID")
-        else
+        else begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", true, StrSubstNo(MatchTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Matched;
+            ReconciliationHeader.Modify();
+        end;
+
         exit(MatchedEntries);
     end;
 
@@ -642,7 +656,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     #endregion
 
     #region Posting
-    internal procedure PostEntries(ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") Success: Boolean;
+    internal procedure PostEntries(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") Success: Boolean;
     var
         ReconciliationLine: Record "NPR Adyen Recon. Line";
         UnPostedEntries: Integer;
@@ -659,7 +673,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine."Status"::Posted);
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-            ReconciliationHeader.Posted := true;
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
             ReconciliationHeader.Modify();
             exit(true);
         end;
@@ -731,7 +745,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit(false);
         end;
         _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-        ReconciliationHeader.Posted := true;
+        ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
         ReconciliationHeader.Modify();
         exit(true);
     end;
@@ -992,16 +1006,19 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         RecLine: Record "NPR Adyen Recon. Line";
     begin
+        if RecHeader.Status = RecHeader.Status::Posted then
+            exit;
+
         RecLine.SetRange("Document No.", RecHeader."Document No.");
         if RecLine.IsEmpty() then
             exit;
+
         RecLine.SetFilter(Status, '<>%1', RecLine.Status::Posted);
         if not RecLine.IsEmpty() then
             exit;
-        if RecHeader.Posted then
-            exit;
-        RecHeader.Posted := true;
-        RecHeader.Modify(false);
+
+        RecHeader.Status := RecHeader.Status::Posted;
+        RecHeader.Modify();
         exit(true);
     end;
 
@@ -1300,5 +1317,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PostTransactionsError03: Label 'Couldn''t post %1 entries in NP Pay Reconciliation Document %2.';
         PostTransactionsError04: Label 'Transaction %1 is not matched yet.';
         PostTransactionsSuccess01: Label 'Successfully posted entries in NP Pay Reconciliation Document %1.';
-        NoSeriesError01: Label 'No. Series in NP Pay Generic Setup is not specified.';
+        NoSeriesError01: Label 'No. Series in NP Pay Setup is not specified.';
+        NoSeriesError02: Label 'Numbers are configured incorrectly for No. Series %1.';
 }
