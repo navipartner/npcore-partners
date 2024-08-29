@@ -610,6 +610,7 @@
         GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
         GlobalSettingsModalEditorTabButtonLbl: Label 'Editor';
         GlobalSettingsModalEditorMaintenanceTabLbl: Label 'Maintenance';
+        GlobalSettingsModalMobilePosTabLbl:Label 'Mobile Pos';
         GlobalSettingsModalRestaurantTabButtonLbl: Label 'Restaurant';
         GlobalSettingsAuthorizationLbl: Label 'Authorization';
         GlobalSettingsDecimalNumberDigitsLbl: Label 'Decimal Number Digits';
@@ -633,6 +634,7 @@
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
+        GlobalSettingsInstantPaymentParametersLbl: Label 'Instant payment parameters';
         DialogItemSelectionQuantityOutOfLbl: Label 'Quantity:';
         DialogItemSelectionOutOfLbl: Label 'out of';
         DialogItemSelectionEnterTheNumberLbl: Label 'Enter the number';
@@ -1092,6 +1094,7 @@
         Captions.Add('Global_Settings_Modal_RestaurantTabButton', GlobalSettingsModalRestaurantTabButtonLbl);
         Captions.Add('Global_Settings_Modal_EditorTabButton', GlobalSettingsModalEditorTabButtonLbl);
         Captions.Add('Global_Settings_Modal_MaintenanceTab', GlobalSettingsModalEditorMaintenanceTabLbl);
+        Captions.Add('Global_Settings_Modal_MobilePosTab', GlobalSettingsModalMobilePosTabLbl);
         Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
         Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
         Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
@@ -1103,6 +1106,7 @@
         Captions.Add('Global_Settings_PleaseEnterNameForThisAction', GlobalSettingsPleaseEnterNameForThisActionLbl);
         Captions.Add('Global_Settings_NoEditableVariables', GlobalSettingsNoEditableVariablesLbl);
         Captions.Add('Global_Settings_AddNew', GlobalSettingsAddNewLbl);
+        Captions.Add('Global_Settings_InstantPaymentParameters', GlobalSettingsInstantPaymentParametersLbl);
         Captions.Add('Global_Settings_SystemWorkflows', GlobalSettingsSystemWorkflowsLbl);
         Captions.Add('Global_Settings_SystemWorkflowsDefineWorkflow', GlobalSettingsSystemWorkflowsDefineWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkFlowLogin', GlobalSettingsSystemWorkFlowLoginLbl);
