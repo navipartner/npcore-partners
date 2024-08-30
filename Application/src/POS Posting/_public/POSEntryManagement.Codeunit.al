@@ -312,14 +312,18 @@
             POSEntry."Entry Type"::Balancing:
                 begin
                     POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', POSEntry."Entry No.");
-                    POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
                     POSWorkshiftCheckpoint.FindFirst();
                     RecRef.GetTable(POSWorkshiftCheckpoint);
-                    if Large then begin
-                        RetailReportSelectionMgt.SetRequestWindow(true);
-                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Large Balancing (POS Entry)".AsInteger())
-                    end else
-                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
+                    if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::TRANSFER then
+                        RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Bin Transfer".AsInteger())
+                    else begin
+                        POSWorkshiftCheckpoint.TestField(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+                        if Large then begin
+                            RetailReportSelectionMgt.SetRequestWindow(true);
+                            RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Large Balancing (POS Entry)".AsInteger())
+                        end else
+                            RetailReportSelectionMgt.RunObjects(RecRef, "NPR Report Selection Type"::"Balancing (POS Entry)".AsInteger());
+                    end;
                 end;
         end;
 
