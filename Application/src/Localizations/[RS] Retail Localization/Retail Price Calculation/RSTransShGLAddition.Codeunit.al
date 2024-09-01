@@ -7,9 +7,23 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
                 tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
+
     #region Eventsubscribers - RS Transfer Shipment Posting Behaviour
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Shipment", 'OnBeforeCopyTransLines', '', false, false)]
-    local procedure AddTransferGLEntries(TransferHeader: Record "Transfer Header")
+    local procedure OnBeforeCopyTransLines(TransferHeader: Record "Transfer Header")
+    begin
+        PostRetailCalculationEntries(TransferHeader);
+    end;
+
+    #endregion
+
+    #region Transfer Shipment Calculation Posting
+
+    internal procedure PostRetailCalculationEntries(TransferHeader: Record "Transfer Header")
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+        DocumentNo: Code[20];
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
@@ -27,23 +41,25 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TempTransferLine.FindSet();
         repeat
             FindPriceListLine(TransferHeader."Transfer-from Code");
-            PostTransitValueEntry(TransferHeader);
+            PostTransitValueEntry(TransferHeader, DocumentNo);
         until TempTransferLine.Next() = 0;
+
+        SourceCodeSetup.Get();
+        RSRLocalizationMgt.AddGLEntriesToGLRegister(DocumentNo, SourceCodeSetup.Transfer);
     end;
+
     #endregion
 
     #region GL Entry Posting
 
-    local procedure CreateAdditionalGLEntries(TransferHeader: Record "Transfer Header"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure CreateAdditionalGLEntries(CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
-        InitGeneralJournalLine(GenJournalLine, TransferHeader, CalculationValueEntry, RSRetailCalculationType);
-        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
-        GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
+        InitGenJournalLine(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
@@ -51,6 +67,9 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
         CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
+
+        if GenJournalLine.Amount = 0 then
+            exit;
 
         SetGlobalDimensionCodes(GenJournalLine, CalculationValueEntry);
 
@@ -99,15 +118,18 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         end;
     end;
 
-    local procedure InitGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; TransferHeader: Record "Transfer Header"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure InitGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GenJnlLineMarginNoVATLbl: Label 'G/L Calculation Margin Excl. VAT';
         GenJnlLineTransitLbl: Label 'G/L Calculation Transit Adj.';
         GenJnlLineVATLbl: Label 'G/L Calculation VAT';
     begin
         GenJournalLine.Init();
+        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
+        GenJournalLine."Document Type" := GenJournalLine."Document Type"::" ";
         GenJournalLine."Document No." := CalculationValueEntry."Document No.";
-        GenJournalLine."Posting Date" := TransferHeader."Posting Date";
+        GenJournalLine."External Document No." := CalculationValueEntry."External Document No.";
+        GenJournalLine."Posting Date" := CalculationValueEntry."Posting Date";
         case RSRetailCalculationType of
             RSRetailCalculationType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginNoVATLbl;
@@ -116,7 +138,11 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             RSRetailCalculationType::"Transit Adjustment":
                 GenJournalLine.Description := GenJnlLineTransitLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := TransferHeader."Posting Date";
+        GenJournalLine."VAT Reporting Date" := CalculationValueEntry."VAT Reporting Date";
+        GenJournalLine."Document Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Due Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Source Code" := CalculationValueEntry."Source Code";
+        GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
@@ -192,7 +218,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
     #region Additional Value Entry Posting
 
-    local procedure PostTransitValueEntry(TransferHeader: Record "Transfer Header")
+    local procedure PostTransitValueEntry(TransferHeader: Record "Transfer Header"; var DocumentNo: Code[20])
     var
         TransferFromItemLedgerEntry: Record "Item Ledger Entry";
         TempTransferFromILEAppliedItemLedgerEntries: Record "Item Ledger Entry" temporary;
@@ -225,14 +251,14 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
                     CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TempTransferFromILEAppliedItemLedgerEntries);
                     CalculateTransitLocationItemLedgerEntryCostPerUnit(TransitCostPerUnit, TransitLocationItemLedgerEntries);
                     if AppliedEntryCostPerUnit <> TransitCostPerUnit then
-                        InsertCorrectionalValueEntryForTransitLocation(TransferHeader, TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
+                        InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
                 until (TempTransferFromILEAppliedItemLedgerEntries.Next() = 0) and (TransitLocationItemLedgerEntries.Next() = 0);
         until TransferFromItemLedgerEntry.Next() = 0;
 
-        RSRLocalizationMgt.AddTransferGLEntriesToGLRegister(TransitLocationItemLedgerEntries."Document No.");
+        DocumentNo := TempTransferFromILEAppliedItemLedgerEntries."Document No.";
     end;
 
-    local procedure InsertCorrectionalValueEntryForTransitLocation(TransferHeader: Record "Transfer Header"; TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; AppliedEntryCostPerUnit: Decimal; TransitCostPerUnit: Decimal)
+    local procedure InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; AppliedEntryCostPerUnit: Decimal; TransitCostPerUnit: Decimal)
     var
         CorrectionValueEntry: Record "Value Entry";
         StdTransitValueEntry: Record "Value Entry";
@@ -250,7 +276,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         RSRLocalizationMgt.ResetValueEntryAmounts(CorrectionValueEntry);
 
         CorrectionValueEntry.Description := CalculationValueEntryDescLbl;
-        CorrectionValueEntry."Cost per Unit" := -(TransitCostPerUnit - AppliedEntryCostPerUnit);
+        CorrectionValueEntry."Cost per Unit" := -RSRLocalizationMgt.RoundAmountToCurrencyRounding(TransitCostPerUnit - AppliedEntryCostPerUnit, '');
         CorrectionValueEntry."Cost Amount (Actual)" := CorrectionValueEntry."Cost per Unit" * TransitLocationItemLedgerEntries."Invoiced Quantity";
         CorrectionValueEntry."Cost Posted to G/L" := CorrectionValueEntry."Cost Amount (Actual)";
 
@@ -261,9 +287,9 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(CorrectionValueEntry);
 
-        CreateAdditionalGLEntries(TransferHeader, CorrectionValueEntry, RSRetailCalculationType::Margin);
-        CreateAdditionalGLEntries(TransferHeader, CorrectionValueEntry, RSRetailCalculationType::VAT);
-        CreateAdditionalGLEntries(TransferHeader, CorrectionValueEntry, RSRetailCalculationType::"Transit Adjustment");
+        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::Margin);
+        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::VAT);
+        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::"Transit Adjustment");
 
         RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
         RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
@@ -331,7 +357,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             RSRetailCalculationType::VAT:
                 GenJournalLine.Validate("Credit Amount", -CalculateRSGLVATAmount());
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", PriceListLine."Unit Price" * Abs(CalculationValueEntry."Invoiced Quantity") - RSRLocalizationMgt.RoundAmountToCurrencyRounding(Abs(CalculationValueEntry."Cost Amount (Actual)"), GenJournalLine) + CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", PriceListLine."Unit Price" * Abs(CalculationValueEntry."Invoiced Quantity") - (Abs(CalculationValueEntry."Cost Amount (Actual)") + CalculateRSGLVATAmount()));
             RSRetailCalculationType::"Transit Adjustment":
                 GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Amount (Actual)"));
         end;
@@ -343,12 +369,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
-    var
-        Item: Record Item;
     begin
-        if not Item.Get(TempTransferLine."Item No.") then
-            exit;
-        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group"));
+        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
     end;
 
     #endregion

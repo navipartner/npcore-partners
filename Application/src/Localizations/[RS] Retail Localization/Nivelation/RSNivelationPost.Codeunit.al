@@ -2,12 +2,12 @@ codeunit 6151343 "NPR RS Nivelation Post"
 {
     Access = Internal;
 #if not (BC17 or BC18 or BC19)
-    procedure RunNivelationPosting(NivelationHeader: Record "NPR RS Nivelation Header")
+    procedure RunNivelationPosting(NivelationHeader: Record "NPR RS Nivelation Header"; ShowMessageOnSuccess: Boolean)
     var
         PostedNivelationHeader: Record "NPR RS Posted Nivelation Hdr";
         SuccessfulPostingMsg: Label 'Successfully posted a Nivelation Document %1 for %2', Comment = '%1 = Nivelation Header No., %2 = Reffering Document Code';
     begin
-        if PostNivelationDocument(NivelationHeader, PostedNivelationHeader) then
+        if PostNivelationDocument(NivelationHeader, PostedNivelationHeader) and GuiAllowed() and ShowMessageOnSuccess then
             Message(StrSubstNo(SuccessfulPostingMsg, PostedNivelationHeader."No.", NivelationHeader."Referring Document Code"));
     end;
 

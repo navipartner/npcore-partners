@@ -34,7 +34,7 @@ codeunit 6151429 "NPR RS Change Price Nivelation"
 
         CheckForUnitPriceDifferenceAndAddLines(SalesPriceListHeader, PreviousPriceListHeader, NewNivelationHeader, NewNivelationLines, LineNo);
 
-        NivelationPost.RunNivelationPosting(NewNivelationHeader);
+        NivelationPost.RunNivelationPosting(NewNivelationHeader, true);
     end;
 
 

@@ -7,12 +7,23 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
                 tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+
     #region Eventsubscribers - RS Undo Transfer Shipment Posting Behaviour
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Transfer Shipment", 'OnBeforeModifyTransShptLine', '', false, false)]
-    local procedure UndoTransferGLEntries(TransferShipmentLine: Record "Transfer Shipment Line")
+    local procedure OnBeforeModifyTransShptLine(TransferShipmentLine: Record "Transfer Shipment Line")
+    begin
+        PostRetailCalculationEntries(TransferShipmentLine);
+    end;
+    #endregion
+
+    #region Undo Transfer Shipment Calculation Posting
+
+    local procedure PostRetailCalculationEntries(TransferShipmentLine: Record "Transfer Shipment Line")
     var
         NewTransitValueEntry: Record "Value Entry";
         TransferShipmentHeader: Record "Transfer Shipment Header";
+        SourceCodeSetup: Record "Source Code Setup";
         RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
@@ -30,31 +41,30 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         InsertTransitValueEntry(NewTransitValueEntry, TransferShipmentHeader);
 
         if NewTransitValueEntry."Entry No." <> 0 then begin
-            CreateAdditionalGLEntries(TransferShipmentHeader, TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::VAT);
-            CreateAdditionalGLEntries(TransferShipmentHeader, TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::Margin);
-            CreateAdditionalGLEntries(TransferShipmentHeader, TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::"Transit Adjustment");
+            CreateAdditionalGLEntries(TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::VAT);
+            CreateAdditionalGLEntries(TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::Margin);
+            CreateAdditionalGLEntries(TransferShipmentLine, NewTransitValueEntry, RSRetailCalculationType::"Transit Adjustment");
 
             RSRLocalizationMgt.InsertGLItemLedgerRelations(NewTransitValueEntry, GetRSAccountNoFromSetup(TransferShipmentLine, RSRetailCalculationType::VAT));
             RSRLocalizationMgt.InsertGLItemLedgerRelations(NewTransitValueEntry, GetRSAccountNoFromSetup(TransferShipmentLine, RSRetailCalculationType::Margin));
             RSRLocalizationMgt.InsertGLItemLedgerRelations(NewTransitValueEntry, GetRSAccountNoFromSetup(TransferShipmentLine, RSRetailCalculationType::"Transit Adjustment"));
         end;
+
+        SourceCodeSetup.Get();
+        RSRLocalizationMgt.AddGLEntriesToGLRegister(TransferShipmentHeader."No.", SourceCodeSetup.Transfer);
     end;
+
     #endregion
 
     #region GL Entry Posting
-    local procedure CreateAdditionalGLEntries(TransferShipmentHeader: Record "Transfer Shipment Header"; TransferShipmentLine: Record "Transfer Shipment Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure CreateAdditionalGLEntries(TransferShipmentLine: Record "Transfer Shipment Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
-        GLRegister: Record "G/L Register";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
-        GenJournalLine.Init();
-        InitGeneralJournalLine(GenJournalLine, TransferShipmentHeader, RSRetailCalculationType);
-        GenJnlPostLine.GetGLReg(GLRegister);
-        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo(GLRegister."Journal Templ. Name", GLRegister."Journal Batch Name");
-        GenJournalLine."Account No." := GetRSAccountNoFromSetup(TransferShipmentLine, RSRetailCalculationType);
+        InitGenJournalLine(GenJournalLine, TransferShipmentLine, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
@@ -62,6 +72,9 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
         CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
+
+        if GenJournalLine.Amount = 0 then
+            exit;
 
         SetGlobalDimensionCodes(GenJournalLine, CalculationValueEntry);
 
@@ -116,15 +129,18 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         end;
     end;
 
-    local procedure InitGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; TransferShipmentHeader: Record "Transfer Shipment Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure InitGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; TransferShipmentLine: Record "Transfer Shipment Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GenJnlLineMarginNoVATLbl: Label 'G/L Calculation Margin Excl. VAT';
         GenJnlLineTransitLbl: Label 'G/L Calculation Transit Adj.';
         GenJnlLineVATLbl: Label 'G/L Calculation VAT';
     begin
         GenJournalLine.Init();
-        GenJournalLine."Document No." := TransferShipmentHeader."No.";
-        GenJournalLine."Posting Date" := TransferShipmentHeader."Posting Date";
+        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
+        GenJournalLine."Document Type" := GenJournalLine."Document Type"::" ";
+        GenJournalLine."Document No." := CalculationValueEntry."Document No.";
+        GenJournalLine."External Document No." := CalculationValueEntry."External Document No.";
+        GenJournalLine."Posting Date" := CalculationValueEntry."Posting Date";
         case RSRetailCalculationType of
             RSRetailCalculationType::Margin:
                 GenJournalLine.Description := GenJnlLineMarginNoVATLbl;
@@ -133,7 +149,11 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             RSRetailCalculationType::"Transit Adjustment":
                 GenJournalLine.Description := GenJnlLineTransitLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := TransferShipmentHeader."Posting Date";
+        GenJournalLine."VAT Reporting Date" := CalculationValueEntry."VAT Reporting Date";
+        GenJournalLine."Document Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Due Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Source Code" := CalculationValueEntry."Source Code";
+        GenJournalLine."Account No." := GetRSAccountNoFromSetup(TransferShipmentLine, RSRetailCalculationType);
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
