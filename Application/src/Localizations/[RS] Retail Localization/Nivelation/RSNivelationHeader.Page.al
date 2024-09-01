@@ -105,7 +105,7 @@ page 6151084 "NPR RS Nivelation Header"
                         NivelationPost: Codeunit "NPR RS Nivelation Post";
                     begin
                         CheckIsDataSet();
-                        NivelationPost.RunNivelationPosting(Rec)
+                        NivelationPost.RunNivelationPosting(Rec, true)
                     end;
                 }
             }

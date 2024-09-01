@@ -131,6 +131,7 @@
         CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
 
         Success := CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry, ErrorText);
+
         if not Success then begin
             UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true, ErrorText);
             MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
@@ -1414,6 +1415,7 @@
                     end;
                     POSEntry."POS Posting Log Entry No." := POSPostingLogEntryNo;
                     POSEntry.Modify(true);
+                    OnAfterModifyPOSEntryOnMarkPOSEntries(OptStatus, POSEntry, POSEntryWithError, ShowProgressDialog);
                 end;
             until POSEntry.Next() = 0;
     end;
@@ -1802,6 +1804,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeModifySalesPOSPostingBufferCreatedFromPOSPaymentLines(var POSPaymentLineToBeCompressed: Record "NPR POS Entry Payment Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterModifyPOSEntryOnMarkPOSEntries(OptStatus: Option Posted,Error; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; ShowProgressDialog: Boolean)
     begin
     end;
 

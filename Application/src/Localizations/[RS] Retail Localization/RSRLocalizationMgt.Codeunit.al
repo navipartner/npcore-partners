@@ -220,14 +220,14 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         ValueEntry."Cost per Unit" := 0;
     end;
 
-    internal procedure RoundAmountToCurrencyRounding(Amount: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    internal procedure RoundAmountToCurrencyRounding(Amount: Decimal; CurrencyCode: Code[10]): Decimal
     var
         Currency: Record Currency;
     begin
-        if (GenJnlLine."Currency Code" = '') then
+        if (CurrencyCode = '') then
             Currency.InitRoundingPrecision()
         else begin
-            Currency.Get(GenJnlLine."Currency Code");
+            Currency.Get(CurrencyCode);
             Currency.TestField("Amount Rounding Precision");
         end;
 
@@ -244,17 +244,10 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         exit((100 * VATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %") / 100);
     end;
 
-    internal procedure ModifyGLRegForRetailCalculationEntries(var GLRegister: Record "G/L Register"; GLEntry: Record "G/L Entry")
-    begin
-        GLRegister."To Entry No." := GLEntry."Entry No.";
-        GLRegister.Modify();
-    end;
-
-    internal procedure AddTransferGLEntriesToGLRegister(DocumentNo: Code[20])
+    internal procedure AddGLEntriesToGLRegister(DocumentNo: Code[20]; SourceCode: Code[10])
     var
         GLEntry: Record "G/L Entry";
         GLRegister: Record "G/L Register";
-        SourceCodeSetup: Record "Source Code Setup";
         FromEntryNo: Integer;
         ToEntryNo: Integer;
     begin
@@ -266,11 +259,12 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         ToEntryNo := GLEntry."Entry No.";
 
         GLRegister.Init();
-        SourceCodeSetup.Get();
         GLRegister."No." := GLRegister.GetLastEntryNo() + 1;
+#if not (BC23 or BC24)
         GLRegister."Creation Date" := Today();
         GLRegister."Creation Time" := Time();
-        GLRegister."Source Code" := SourceCodeSetup.Transfer;
+#endif
+        GLRegister."Source Code" := SourceCode;
         GLRegister."From Entry No." := FromEntryNo;
         GLRegister."To Entry No." := ToEntryNo;
         GLRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLRegister."User ID"));

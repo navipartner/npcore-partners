@@ -7,31 +7,39 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
                 tabledata "G/L Register" = rm;
 
 #if not (BC17 or BC18 or BC19)
+
     #region Eventsubscribers - RS Transfer Recieve Posting Behaviour
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"TransferOrder-Post Receipt", 'OnBeforeDeleteOneTransferHeader', '', false, false)]
-    local procedure AddTransferGLEntries(TransferReceiptHeader: Record "Transfer Receipt Header"; TransferHeader: Record "Transfer Header")
+    local procedure OnBeforeDeleteOneTransferHeader(TransferReceiptHeader: Record "Transfer Receipt Header")
+    begin
+        PostRetailCalculationEntries(TransferReceiptHeader);
+    end;
+
+    #endregion
+
+    #region Transfer Receipt Calculation Posting
+    local procedure PostRetailCalculationEntries(TransferReceiptHeader: Record "Transfer Receipt Header")
+    var
+        RetailValueEntry: Record "Value Entry";
+        TempRetailValueEntry: Record "Value Entry" temporary;
+        SourceCodeSetup: Record "Source Code Setup";
+        RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        FillTempTransferLines(TransferHeader);
-
-        if TempTransferLine.IsEmpty() then
+        if (IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (not IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
             exit;
 
-        if (not IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
-            PostAdditionalRetailEntries(TransferReceiptHeader);
-    end;
+        FillTempTransferReceiptLines(TransferReceiptHeader);
 
-    local procedure PostAdditionalRetailEntries(TransferReceiptHeader: Record "Transfer Receipt Header")
-    var
-        RetailValueEntry: Record "Value Entry";
-        TempRetailValueEntry: Record "Value Entry" temporary;
-        RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
-    begin
+        if TempTransferReceiptLine.IsEmpty() then
+            exit;
+
         FilterPriceListHeader(TransferReceiptHeader, TransferReceiptHeader."Transfer-to Code");
 
-        TempTransferLine.FindSet();
+        TempTransferReceiptLine.FindSet();
         repeat
             TempRetailValueEntry.DeleteAll();
             FindPriceListLine(TransferReceiptHeader."Transfer-to Code");
@@ -42,32 +50,31 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             if TempRetailValueEntry.FindSet() then
                 repeat
                     InsertTempToValueEntry(RetailValueEntry, TempRetailValueEntry);
-                    CreateAdditionalGLEntries(TransferReceiptHeader, RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
-                    CreateAdditionalGLEntries(TransferReceiptHeader, RetailValueEntry, RSRetailCalculationType::VAT);
-                    CreateAdditionalGLEntries(TransferReceiptHeader, RetailValueEntry, RSRetailCalculationType::Margin);
+                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
+                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
+                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
 
                     RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
                     RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
                     RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
                 until TempRetailValueEntry.Next() = 0;
-        until TempTransferLine.Next() = 0;
+        until TempTransferReceiptLine.Next() = 0;
 
-        RSRLocalizationMgt.AddTransferGLEntriesToGLRegister(TransferReceiptHeader."No.");
+        SourceCodeSetup.Get();
+        RSRLocalizationMgt.AddGLEntriesToGLRegister(TransferReceiptHeader."No.", SourceCodeSetup.Transfer);
     end;
 
     #endregion
 
     #region GL Entry Posting
-    local procedure CreateAdditionalGLEntries(TransferReceiptHeader: Record "Transfer Receipt Header"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure CreateAdditionalGLEntries(CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
         GenJournalLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
-        InitGeneralJournalLine(GenJournalLine, TransferReceiptHeader, RSRetailCalculationType);
-        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
-        GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
+        InitGenJournalLine(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
@@ -75,6 +82,9 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
         CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
+
+        if GenJournalLine.Amount = 0 then
+            exit;
 
         SetGlobalDimensionCodes(GenJournalLine, CalculationValueEntry);
 
@@ -123,15 +133,18 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         end;
     end;
 
-    local procedure InitGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; TransferReceiptHeader: Record "Transfer Receipt Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure InitGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GenJnlLineMarginLbl: Label 'G/L Calculation Margin';
         GenJnlLineMarginNoVATLbl: Label 'G/L Calculation Margin Excl. VAT';
         GenJnlLineVATLbl: Label 'G/L Calculation VAT';
     begin
         GenJournalLine.Init();
-        GenJournalLine."Document No." := TransferReceiptHeader."No.";
-        GenJournalLine."Posting Date" := TransferReceiptHeader."Posting Date";
+        GenJournalLine."Line No." := GenJournalLine.GetNewLineNo('', '');
+        GenJournalLine."Document Type" := GenJournalLine."Document Type"::" ";
+        GenJournalLine."Document No." := CalculationValueEntry."Document No.";
+        GenJournalLine."External Document No." := CalculationValueEntry."External Document No.";
+        GenJournalLine."Posting Date" := CalculationValueEntry."Posting Date";
         case RSRetailCalculationType of
             RSRetailCalculationType::"Margin with VAT":
                 GenJournalLine.Description := GenJnlLineMarginLbl;
@@ -140,7 +153,11 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             RSRetailCalculationType::VAT:
                 GenJournalLine.Description := GenJnlLineVATLbl;
         end;
-        GenJournalLine."VAT Reporting Date" := TransferReceiptHeader."Posting Date";
+        GenJournalLine."VAT Reporting Date" := CalculationValueEntry."VAT Reporting Date";
+        GenJournalLine."Document Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Due Date" := CalculationValueEntry."Posting Date";
+        GenJournalLine."Source Code" := CalculationValueEntry."Source Code";
+        GenJournalLine."Account No." := GetRSAccountNoFromSetup(RSRetailCalculationType);
     end;
 
     local procedure SetGlobalDimensionCodes(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry")
@@ -215,8 +232,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         StdItemLedgerEntry.SetRange("Entry Type", StdItemLedgerEntry."Entry Type"::Transfer);
         StdItemLedgerEntry.SetRange("Document Type", StdItemLedgerEntry."Document Type"::"Transfer Receipt");
         StdItemLedgerEntry.SetRange("Location Code", TransferReceiptHeader."Transfer-to Code");
-        StdItemLedgerEntry.SetRange("Item No.", TempTransferLine."Item No.");
-        StdItemLedgerEntry.SetRange("Order Line No.", TempTransferLine."Line No.");
+        StdItemLedgerEntry.SetRange("Item No.", TempTransferReceiptLine."Item No.");
+        StdItemLedgerEntry.SetRange("Order Line No.", TempTransferReceiptLine."Line No.");
         if StdItemLedgerEntry.IsEmpty() then
             exit;
 
@@ -249,7 +266,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         TempRetailValueEntry.Copy(StdValueEntry);
         TempRetailValueEntry."Entry No." := TempRetailValueEntry.GetLastEntryNo() + 1;
         RSRLocalizationMgt.ResetValueEntryAmounts(TempRetailValueEntry);
-        TempRetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfStdCostPerUnit;
+        TempRetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(PriceListLine."Unit Price" - SumOfStdCostPerUnit, '');
         TempRetailValueEntry."Cost Amount (Actual)" := TempRetailValueEntry."Cost per Unit" * SumOfStdInvQty;
         TempRetailValueEntry."Cost Posted to G/L" := TempRetailValueEntry."Cost Amount (Actual)";
         TempRetailValueEntry.Description := CalculationValueEntryDescLbl;
@@ -277,22 +294,18 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             RSRetailCalculationType::VAT:
                 GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount());
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculationValueEntry."Cost Amount (Actual)", GenJournalLine) - CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
         end;
     end;
 
     local procedure CalculateRSGLVATAmount(): Decimal
     begin
-        exit((PriceListLine."Unit Price" * TempTransferLine.Quantity) * CalculateVATBreakDown());
+        exit((PriceListLine."Unit Price" * TempTransferReceiptLine.Quantity) * CalculateVATBreakDown());
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
-    var
-        Item: Record Item;
     begin
-        if not Item.Get(TempTransferLine."Item No.") then
-            exit;
-        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group"));
+        exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
     end;
 
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
@@ -307,7 +320,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
                     exit(LocalizationSetup."RS Calc. VAT GL Account");
                 end;
             RSRetailCalculationType::"Margin with VAT":
-                exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempTransferLine."Item No.", TempTransferLine."Transfer-to Code"));
+                exit(RSRLocalizationMgt.GetInventoryAccountFromInvPostingSetup(TempTransferReceiptLine."Item No.", TempTransferReceiptLine."Transfer-to Code"));
             RSRetailCalculationType::Margin:
                 begin
                     LocalizationSetup.TestField("RS Calc. Margin GL Account");
@@ -397,19 +410,19 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         exit(Location."NPR Retail Location");
     end;
 
-    local procedure FillTempTransferLines(TransferHeader: Record "Transfer Header")
+    local procedure FillTempTransferReceiptLines(TransferReceiptHeader: Record "Transfer Receipt Header")
     var
-        TransferLine: Record "Transfer Line";
+        TransferReceiptLine: Record "Transfer Receipt Line";
     begin
-        TransferLine.SetRange("Document No.", TransferHeader."No.");
-        if TransferLine.IsEmpty() then
+        TransferReceiptLine.SetRange("Document No.", TransferReceiptHeader."No.");
+        if TransferReceiptLine.IsEmpty() then
             exit;
-        TransferLine.FindSet();
+        TransferReceiptLine.FindSet();
         repeat
-            TempTransferLine.Init();
-            TempTransferLine.Copy(TransferLine);
-            TempTransferLine.Insert();
-        until TransferLine.Next() = 0;
+            TempTransferReceiptLine.Init();
+            TempTransferReceiptLine.Copy(TransferReceiptLine);
+            TempTransferReceiptLine.Insert();
+        until TransferReceiptLine.Next() = 0;
     end;
 
     local procedure FilterPriceListHeader(TransferReceiptHeader: Record "Transfer Receipt Header"; LocationCode: Code[20])
@@ -435,9 +448,9 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     begin
         PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
         PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", TempTransferLine."Item No.");
+        PriceListLine.SetRange("Asset No.", TempTransferReceiptLine."Item No.");
         if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, TempTransferLine."Item No.", PriceListHeader.Code, LocationCode);
+            Error(PriceNotFoundErr, TempTransferReceiptLine."Item No.", PriceListHeader.Code, LocationCode);
     end;
 
     #endregion
@@ -447,7 +460,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         CurrExchRate: Record "Currency Exchange Rate";
         PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
-        TempTransferLine: Record "Transfer Line" temporary;
+        TempTransferReceiptLine: Record "Transfer Receipt Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         JobLine: Boolean;
