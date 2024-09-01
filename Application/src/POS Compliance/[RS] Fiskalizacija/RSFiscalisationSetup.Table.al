@@ -153,6 +153,11 @@ table 6059861 "NPR RS Fiscalisation Setup"
             Caption = 'Print Item Description 2 on Receipt';
             DataClassification = CustomerContent;
         }
+        field(75; "Receipt Cut Per Section"; Boolean)
+        {
+            Caption = 'Receipt Cut Per Section';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

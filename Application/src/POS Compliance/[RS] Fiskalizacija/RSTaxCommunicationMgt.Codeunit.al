@@ -530,7 +530,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
         JObjectHeader.Add('cashier', POSEntry."Salesperson Code");
         if RSPOSAuditLogAuxInfo."Customer Identification" <> '' then
-            JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
+            if StrLen(RSPOSAuditLogAuxInfo."Customer Identification") > 3 then
+                JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
         if RSPOSAuditLogAuxInfo."Additional Customer Field" <> '' then
             JObjectHeader.Add('buyerCostCenterId', RSPOSAuditLogAuxInfo."Additional Customer Field");
         if IsCopy then
@@ -1079,7 +1080,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
         JObjectHeader.Add('cashier', POSEntry."Salesperson Code");
         if RSPOSAuditLogAuxInfo."Customer Identification" <> '' then
-            JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
+            if StrLen(RSPOSAuditLogAuxInfo."Customer Identification") > 3 then
+                JObjectHeader.Add('buyerId', RSPOSAuditLogAuxInfo."Customer Identification");
         if RSPOSAuditLogAuxInfo."Additional Customer Field" <> '' then
             JObjectHeader.Add('buyerCostCenterId', RSPOSAuditLogAuxInfo."Additional Customer Field");
         if RSFiscalizationSetup.Training then
@@ -1588,7 +1590,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         end;
         if SalesHeader."Sell-to Customer No." <> '' then begin
             Customer.Get(SalesHeader."Sell-to Customer No.");
-            RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
+            if Customer."VAT Registration No." <> '' then
+                RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
         end;
 
 #pragma warning disable AA0139
@@ -1743,7 +1746,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         if SalesInvoiceHeader."Sell-to Customer No." <> '' then begin
             Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
-            RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
+            if Customer."VAT Registration No." <> '' then
+                RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
         end;
 
 #pragma warning disable AA0139
@@ -1886,7 +1890,8 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
 
         if SalesCrMemoHeader."Sell-to Customer No." <> '' then begin
             Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
-            RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
+            if Customer."VAT Registration No." <> '' then
+                RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
         end;
 
 #pragma warning disable AA0139

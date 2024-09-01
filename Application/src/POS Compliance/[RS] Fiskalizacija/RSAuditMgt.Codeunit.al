@@ -1036,7 +1036,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         if SalesInvoiceHeader."Sell-to Customer No." <> '' then begin
             Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
-            RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
+            if Customer."VAT Registration No." <> '' then
+                RSPOSAuditLogAuxInfo."Customer Identification" := CustomerVATRegNoRSLabel + Customer."VAT Registration No.";
             RSPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
         end;
 
