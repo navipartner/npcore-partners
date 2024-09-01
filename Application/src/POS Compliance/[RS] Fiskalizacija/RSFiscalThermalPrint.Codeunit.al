@@ -2,6 +2,10 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 {
     Access = Internal;
 
+    var
+        RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup";
+        RSFiscalisationSetupInitilized: Boolean;
+
     #region PRINT FISCAL RECEIPT
     internal procedure PrintReceipt(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     begin
@@ -21,9 +25,9 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         RetailLogo: Record "NPR Retail Logo";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         i, j : Integer;
-        PrintTextList: List of [Text];
         PrintRawInputText: Text;
         PrintText: Text;
+        PrintTextList: List of [Text];
     begin
         PrintRawInputText := RSPOSAuditLogAuxInfo.GetTextFromJournal();
         if StrLen(PrintRawInputText) = 0 then
@@ -60,7 +64,9 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         if RSPOSAuditLogAuxInfo."RS Transaction Type" in [RSPOSAuditLogAuxInfo."RS Transaction Type"::SALE] then
             PrintInvoiceNumberBarcode(Printer, RSPOSAuditLogAuxInfo);
 
-        PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+        GetRSFiscalisationSetup();
+        if RSFiscalisationSetup."Receipt Cut Per Section" then
+            PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
@@ -72,20 +78,26 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         PrintDiscountNonFiscal(RSPOSAuditLogAuxInfo);
         PrintMembershipPointsNonFiscal(RSPOSAuditLogAuxInfo);
         PrintNonFiscalCopyForNormalRefund(RSPOSAuditLogAuxInfo);
+
+        if not RSFiscalisationSetup."Receipt Cut Per Section" then begin
+            Clear(Printer);
+            PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+            Printer.ProcessBuffer(Codeunit::"NPR RS Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        end;
     end;
 
     local procedure PrintThermalReceipt(RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy")
     var
         PrinterDeviceSettings: Record "NPR Printer Device Settings";
-        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         RetailLogo: Record "NPR Retail Logo";
+        RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
         Printer: Codeunit "NPR RP Line Print Mgt.";
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         i, j : Integer;
-        CustomerSignaturePrintLbl: Label '              Потпис купца              ', Locked = true;
-        PrintTextList: List of [Text];
         PrintRawInputText: Text;
         PrintText: Text;
+        PrintTextList: List of [Text];
+        CustomerSignaturePrintLbl: Label '              Потпис купца              ', Locked = true;
     begin
         PrintRawInputText := RSPOSAuditLogAuxCopy.GetTextFromJournal();
         if StrLen(PrintRawInputText) = 0 then
@@ -132,7 +144,9 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         if RSPOSAuditLogAuxCopy."RS Transaction Type" in [RSPOSAuditLogAuxCopy."RS Transaction Type"::SALE] then
             PrintInvoiceNumberBarcode(Printer, RSPOSAuditLogAuxCopy);
 
-        PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+        GetRSFiscalisationSetup();
+        if RSFiscalisationSetup."Receipt Cut Per Section" then
+            PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
@@ -164,7 +178,10 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         PrintThermalLine(Printer, TotalDiscountAmountLbl + Format(Round(RSPOSAuditLogAuxInfo."Discount Amount", 0.01)), 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
-        PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+
+        GetRSFiscalisationSetup();
+        if RSFiscalisationSetup."Receipt Cut Per Section" then
+            PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
@@ -195,6 +212,8 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         MMMembersPointsEntry.SetRange("Posting Date", POSEntry."Posting Date");
         if not MMMembersPointsEntry.FindLast() then
             exit;
+        if Round(MMMembersPointsEntry.Points, 0.01) = 0 then
+            exit;
 
         Printer.SetAutoLineBreak(false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
@@ -202,7 +221,10 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
         PrintThermalLine(Printer, TotalMembershipPointsLbl + Format(Round(MMMembersPointsEntry.Points, 0.01)), 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
-        PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
+
+        GetRSFiscalisationSetup();
+        if RSFiscalisationSetup."Receipt Cut Per Section" then
+            PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'LEFT', true, false);
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
@@ -283,10 +305,15 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 
     #region Helper Procedures
     local procedure ShouldSkipPrintLine(PrintText: Text; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Boolean
+    var
+        PrintCustIdentification: Boolean;
     begin
         case true of
             PrintText.Contains('ИД купца'):
-                exit(RSPOSAuditLogAuxInfo."Customer Identification" = '0');
+                begin
+                    PrintCustIdentification := (RSPOSAuditLogAuxInfo."Customer Identification" = '0') or (RSPOSAuditLogAuxInfo."Customer Identification" = '10:');
+                    exit(PrintCustIdentification);
+                end;
             PrintText.Contains('ЕСИР време'):
                 if RSPOSAuditLogAuxInfo."Prepayment Order No." <> '' then
                     exit(false)
@@ -330,6 +357,15 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
             ResultText += ' ';
         ResultText += AmountText;
     end;
+
+    local procedure GetRSFiscalisationSetup()
+    begin
+        if RSFiscalisationSetupInitilized then
+            exit;
+
+        RSFiscalisationSetup.Get();
+        RSFiscalisationSetupInitilized := true;
+    end;
     #endregion
 
     #region Thermal Printer Processing
@@ -372,6 +408,6 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
     #endregion
 
     var
-        ThermalPrintLineLbl: Label '________________________________________', Locked = true;
         ShortInvoiceNumberFormatLbl: Label '%1-%2', Locked = true, Comment = '%1 = Signed by, %2 = Transaction Counter';
+        ThermalPrintLineLbl: Label '________________________________________', Locked = true;
 }

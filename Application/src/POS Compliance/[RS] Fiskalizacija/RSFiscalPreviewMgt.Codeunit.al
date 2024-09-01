@@ -229,6 +229,8 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         MMMembersPointsEntry.SetRange("Posting Date", POSEntry."Posting Date");
         if not MMMembersPointsEntry.FindLast() then
             exit;
+        if Round(MMMembersPointsEntry.Points, 0.01) = 0 then
+            exit;
 
         HtmlContent += DoubleNewLineHtml + PrintLineLbl + NewLineHtml + MembershipHeadlineLbl + NewLineHtml + TotalMembershipPointsLbl + Format(Round(MMMembersPointsEntry.Points)) + NewLineHtml + PrintLineLbl;
     end;

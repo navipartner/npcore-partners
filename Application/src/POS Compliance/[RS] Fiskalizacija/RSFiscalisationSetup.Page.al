@@ -72,6 +72,11 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether Item Description 2 is printed on a fiscal receipt.';
                 }
+                field("Receipt Cut Per Section"; Rec."Receipt Cut Per Section")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Receipt Cut Per Section field.', Comment = '%';
+                }
             }
             group(LPFRAccess)
             {
