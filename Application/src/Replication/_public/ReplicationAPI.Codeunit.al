@@ -111,8 +111,13 @@
         Method: Code[10];
         URI: Text;
         BatchId: GUID;
+        IsHandled: Boolean;
         IsHandledSendWebRequest: Boolean;
     begin
+        OnBeforeCreateImportEntries(ServiceSetup, ServiceEndPoint, Client, ImportType, NextLinkURI, IsHandled);
+        if IsHandled then
+            exit;
+
         if CheckImportListErrors(ServiceEndPoint) then begin
             BatchId := CreateGuid();
             repeat
@@ -762,6 +767,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendWebRequest(var Response: Codeunit "Temp Blob"; var NextLinkURI: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateImportEntries(ServiceSetup: Record "NPR Replication Service Setup"; ServiceEndPoint: Record "NPR Replication Endpoint"; var Client: HttpClient; ImportType: Record "NPR Nc Import Type"; NextLinkURI: Text; var IsHandled: Boolean)
     begin
     end;
 }
