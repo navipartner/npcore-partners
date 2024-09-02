@@ -1,7 +1,8 @@
 #if not BC17
 table 6150811 "NPR Spfy Store-Item Link"
 {
-    Access = Internal;
+    Access = Public;
+    Extensible = false;
     Caption = 'Shopify Store-Item Link';
     DataClassification = CustomerContent;
     DrillDownPageId = "NPR Spfy Store-Item Links";
