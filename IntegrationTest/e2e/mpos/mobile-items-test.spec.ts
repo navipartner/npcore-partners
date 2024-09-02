@@ -4,12 +4,9 @@ import assert from "assert";
 import { mobileLogin } from "../fixtures/mobileLogin";
 
 test.describe("Mobile add and remove item, search, payment test", () => {
-  test("should be able to add item, open and delete item, search add and delete, add item and do single and multiple payment", async ({
+  test("should be able to add item, open and delete item", async ({
     page,
   }) => {
-    // TODO: FIXME
-    test.fixme();
-    
     await mobileLogin(
       page,
       true,
@@ -89,13 +86,16 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .filter({ hasText: /^Insert Customer$/ })
       .nth(2)
       .click();
-    await page
-      .getByRole("gridcell", { name: "Open menu for Name", exact: true })
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByText("Customer:Spotsmeyer's Furnishings")
-      .click();
+    await page.waitForTimeout(2000);
+    const customerText =  await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).isVisible();
+
+
+      if (customerText) {
+        await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).click();
+      } 
+     else {
+      await page.locator('td').filter({ hasText: '01121212' }).click();
+    }
     const elementExists =
       page
         .frameLocator("iframe")
@@ -152,6 +152,19 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Items" })
       .click();
+   
+    await page.waitForTimeout(2000);
+  });
+  test("should be able to search add and delete", async ({
+    page,
+  }) => {
+    await mobileLogin(
+      page,
+      true,
+      "4",
+      process.env?.[`E2E_OLD_MPOS_USERNAME`],
+      process.env?.[`E2E_OLD_MPOS_PASSWORD`]
+    );
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Sale", exact: true })
@@ -176,9 +189,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+    await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -210,9 +221,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+    await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -228,7 +237,18 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .locator(".item-counter__button")
       .first()
       .click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(2000);   
+  });
+  test("should be able to do single payment", async ({
+    page,
+  }) => {
+    await mobileLogin(
+      page,
+      true,
+      "4",
+      process.env?.[`E2E_OLD_MPOS_USERNAME`],
+      process.env?.[`E2E_OLD_MPOS_PASSWORD`]
+    );
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Items" })
@@ -257,7 +277,18 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       await page.click('button:has-text("OK")');
     }
     await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(5000);
+  });
+  test("should be able to do multiple payment", async ({
+    page,
+  }) => {
+    await mobileLogin(
+      page,
+      true,
+      "4",
+      process.env?.[`E2E_OLD_MPOS_USERNAME`],
+      process.env?.[`E2E_OLD_MPOS_PASSWORD`]
+    );
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Items" })
@@ -293,6 +324,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .getByRole("button", { name: "Cash" })
       .click();
     await page.waitForTimeout(1000);
+    const buttonExists = await page.$('button:has-text("OK")');
     if (buttonExists) {
       await page.click('button:has-text("OK")');
     }

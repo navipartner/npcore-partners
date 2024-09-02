@@ -8,10 +8,7 @@ import { removeLayout } from "../../../fixtures/removeLayout";
 test.describe("Editor mobile device add and remove item, search, and payment test", () => {
   test("should be able to search item, add and remove, do payment", async ({
     page,
-  }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
-    
+  }, workerInfo) => {    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -170,13 +167,16 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .frameLocator("iframe")
       .getByRole("button", { name: "Insert Customer" })
       .click();
-    await page
+    const buttonVisible = await page
+    .getByRole("gridcell", { name: "Open menu for Name", exact: true }).isVisible()
+    if(buttonVisible) {
+
+      await page
       .getByRole("gridcell", { name: "Open menu for Name", exact: true })
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByText("Customer:Spotsmeyer's Furnishings")
-      .click();
+    } else {
+      await page.locator('td').filter({ hasText: '01121212' }).click();
+    }
     const elementExists =
       page
         .frameLocator("iframe")
@@ -336,7 +336,7 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       await page.click('button:has-text("OK")');
     }
     await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(5000);
     await page.setViewportSize({ width: 1075, height: 720 });
     await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
     const popupLocator = page.locator("[id=b3]");

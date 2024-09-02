@@ -24,11 +24,22 @@ export const mobileLogin = async (
   if (popupExists > 0) {
     await page.getByRole("button", { name: "OK" }).click();
   }
-  await page.waitForTimeout(2000);
-  await page
+  await page.waitForTimeout(10000);
+  const pageElementLoaded = await page
+  .frameLocator("iframe")
+  .getByText(salePersonCode, { exact: true }).isVisible()
+  if(pageElementLoaded) {
+    await page
     .frameLocator("iframe")
     .getByText(salePersonCode, { exact: true })
     .click();
+  } else {
+    await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
+    await page
+    .frameLocator("iframe")
+    .getByText(salePersonCode, { exact: true })
+    .click();
+  }
   await page.frameLocator("iframe").locator("div:nth-child(12)").click();
   await page.waitForTimeout(4000);
   const balancingText = page
@@ -42,8 +53,13 @@ export const mobileLogin = async (
   );
   await page.waitForTimeout(1000);
   if (await unfinishedText.isVisible()) {
-    const noBtn = await page.getByRole("button", { name: "No" });
+    const noBtn = page.getByRole("button", { name: "No" });
     await noBtn.click();
+  }
+  await page.waitForTimeout(1000);
+  const partialSaleText = page.getByText('This sale cannot be cancelled');
+  if (await partialSaleText.isVisible()) {
+    await page.getByRole('button', { name: 'OK' }).click();
   }
   await page.waitForTimeout(2000);
 };

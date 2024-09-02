@@ -20,7 +20,14 @@ export const restaurantLogin = async (
   if (popupExists > 0) {
     await page.getByRole("button", { name: "OK" }).click();
   }
-  await page.frameLocator("iframe").getByText("1", { exact: true }).click();
+  await page.waitForTimeout(10000); 
+  const pageElementLoaded = await page.frameLocator("iframe").getByText("1", { exact: true }).isVisible()
+  if(pageElementLoaded) {
+    await page.frameLocator("iframe").getByText("1", { exact: true }).click();
+  } else {
+    await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
+    await page.frameLocator("iframe").getByText("1", { exact: true }).click();
+  }
   await page.frameLocator("iframe").getByText("OK", { exact: true }).click();
   await page.waitForTimeout(4000);
 
