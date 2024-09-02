@@ -65,7 +65,7 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(70; "PSP Reference"; Code[16])
         {
-            Caption = 'PSP Reference';
+            Caption = 'Psp Reference';
             DataClassification = CustomerContent;
         }
         field(80; "Gross Credit"; Decimal)
@@ -280,6 +280,251 @@ table 6150874 "NPR Adyen Recon. Line"
             Caption = 'Posting allowed';
             DataClassification = CustomerContent;
             InitValue = true;
+        }
+        field(390; "Modif. Merchant Reference"; Text[80])
+        {
+            Caption = 'Modification Merchant Reference';
+            DataClassification = CustomerContent;
+        }
+        field(400; "Authorised Date"; DateTime)
+        {
+            Caption = 'Authorised Date';
+            DataClassification = CustomerContent;
+        }
+        field(410; "Authorised Date TimeZone"; Code[10])
+        {
+            Caption = 'Authorised Date TimeZone';
+            DataClassification = CustomerContent;
+        }
+        field(420; "Balance Currency Code"; Code[10])
+        {
+            Caption = 'Balance Currency Code';
+            DataClassification = CustomerContent;
+        }
+        field(430; "Net Debit (BC)"; Decimal)
+        {
+            Caption = 'Net Debit (BC)';
+            DataClassification = CustomerContent;
+        }
+        field(440; "Net Credit (BC)"; Decimal)
+        {
+            Caption = 'Net Credit (BC)';
+            DataClassification = CustomerContent;
+        }
+        field(450; "DCC Markup (NC)"; Decimal)
+        {
+            Caption = 'DCC Markup (NC)';
+            DataClassification = CustomerContent;
+        }
+        field(460; "Global Card Brand"; Text[100])
+        {
+            Caption = 'Global Card Brand';
+            DataClassification = CustomerContent;
+        }
+        field(470; "Gratuity Amount"; Decimal)
+        {
+            Caption = 'Gratuity Amount';
+            DataClassification = CustomerContent;
+        }
+        field(480; "Surcharge Amount"; Decimal)
+        {
+            Caption = 'Surcharge Amount';
+            DataClassification = CustomerContent;
+        }
+        field(490; "Advanced (NC)"; Decimal)
+        {
+            Caption = 'Advanced (NC)';
+            DataClassification = CustomerContent;
+        }
+        field(500; "Advancement Code"; Text[50])
+        {
+            Caption = 'Advancement Code';
+            DataClassification = CustomerContent;
+        }
+        field(510; "Advancement Batch"; Text[50])
+        {
+            Caption = 'Advancement Batch';
+            DataClassification = CustomerContent;
+        }
+        field(520; "Booking Type"; Code[30])
+        {
+            Caption = 'Booking Type';
+            DataClassification = CustomerContent;
+        }
+        field(530; Acquirer; Text[100])
+        {
+            Caption = 'Acquirer';
+            DataClassification = CustomerContent;
+        }
+        field(540; "Split Settlement"; Text[256])
+        {
+            Caption = 'Split Settlement';
+            DataClassification = CustomerContent;
+        }
+        field(550; "Split Payment Data"; Text[256])
+        {
+            Caption = 'Split Payment Data';
+            DataClassification = CustomerContent;
+        }
+        field(560; "Funds Destination"; Text[256])
+        {
+            Caption = 'Funds Destination';
+            DataClassification = CustomerContent;
+        }
+        field(570; "Balance Platform Debit"; Decimal)
+        {
+            Caption = 'Balance Platform Debit';
+            DataClassification = CustomerContent;
+        }
+        field(580; "Balance Platform Credit"; Decimal)
+        {
+            Caption = 'Balance Platform Credit';
+            DataClassification = CustomerContent;
+        }
+        field(590; "Booking Date"; DateTime)
+        {
+            Caption = 'Booking Date';
+            DataClassification = CustomerContent;
+        }
+        field(600; "Booking Date TimeZone"; Code[10])
+        {
+            Caption = 'Booking Date TimeZone';
+            DataClassification = CustomerContent;
+        }
+        field(610; "Booking Date (AMS)"; DateTime)
+        {
+            Caption = 'Booking Date (AMS)';
+            DataClassification = CustomerContent;
+        }
+        field(620; AdditionalType; Text[40])
+        {
+            Caption = 'AdditionalType';
+            DataClassification = CustomerContent;
+        }
+        field(630; Installments; Text[30])
+        {
+            Caption = 'Installments';
+            DataClassification = CustomerContent;
+        }
+        field(640; "Issuer Country"; Code[2])
+        {
+            Caption = 'Issuer Country';
+            DataClassification = CustomerContent;
+        }
+        field(650; "Shopper Country"; Code[2])
+        {
+            Caption = 'Shopper Country';
+            DataClassification = CustomerContent;
+        }
+        field(660; "Clearing Network"; Text[100])
+        {
+            Caption = 'Clearing Network';
+            DataClassification = CustomerContent;
+        }
+        field(670; "Terminal ID"; Text[50])
+        {
+            Caption = 'Terminal ID';
+            DataClassification = CustomerContent;
+        }
+        field(680; "Tender Reference"; Text[30])
+        {
+            Caption = 'Tender Reference';
+            DataClassification = CustomerContent;
+        }
+        field(690; Metadata; Text[2048])
+        {
+            Caption = 'Metadata';
+            DataClassification = CustomerContent;
+        }
+        field(700; "Pos Transaction Date"; DateTime)
+        {
+            Caption = 'Pos Transaction Date';
+            DataClassification = CustomerContent;
+        }
+        field(710; "Pos Transaction Date TimeZone"; Code[10])
+        {
+            Caption = 'Pos Transaction Date TimeZone';
+            DataClassification = CustomerContent;
+        }
+        field(720; Store; Text[100])
+        {
+            Caption = 'Store';
+            DataClassification = CustomerContent;
+        }
+        field(730; "Dispute Reference"; Code[16])
+        {
+            Caption = 'Dispute Reference';
+            DataClassification = CustomerContent;
+        }
+        field(740; "Register Booking Type"; Text[50])
+        {
+            Caption = 'Register Booking Type';
+            DataClassification = CustomerContent;
+        }
+        field(750; ARN; Code[50])
+        {
+            Caption = 'ARN';
+            DataClassification = CustomerContent;
+        }
+        field(760; "Shopper Reference"; Text[100])
+        {
+            Caption = 'Shopper Reference';
+            DataClassification = CustomerContent;
+        }
+        field(770; "Payment Transaction Group"; Text[100])
+        {
+            Caption = 'Payment Transaction Group';
+            DataClassification = CustomerContent;
+        }
+        field(780; "Settlement Flow"; Text[100])
+        {
+            Caption = 'Settlement Flow';
+            DataClassification = CustomerContent;
+        }
+        field(790; "Authorisation Code"; Text[10])
+        {
+            Caption = 'Authorisation Code';
+            DataClassification = CustomerContent;
+        }
+        field(800; "Card Number"; Text[16])
+        {
+            Caption = 'Card Number';
+            DataClassification = CustomerContent;
+        }
+        field(810; MID; Code[50])
+        {
+            Caption = 'MID';
+            DataClassification = CustomerContent;
+        }
+        field(820; "Acquirer Reference"; Text[80])
+        {
+            Caption = 'Acquirer Reference';
+            DataClassification = CustomerContent;
+        }
+        field(830; "Store Code"; Text[100])
+        {
+            Caption = 'Store Code';
+            DataClassification = CustomerContent;
+        }
+        field(840; "Acquirer Auth Code"; Text[100])
+        {
+            Caption = 'Acquirer Auth Code';
+            DataClassification = CustomerContent;
+        }
+        field(850; "Card BIN"; Code[10])
+        {
+            Caption = 'Card BIN';
+            DataClassification = CustomerContent;
+        }
+        field(860; "Card Number Summary"; Code[10])
+        {
+            Caption = 'Card Number Summary';
+            DataClassification = CustomerContent;
+        }
+        field(870; "Submerchant Identifier"; Text[100])
+        {
+            Caption = 'Submerchant Identifier';
+            DataClassification = CustomerContent;
         }
     }
     keys

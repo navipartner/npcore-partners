@@ -179,68 +179,127 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         UserTimeZoneOffset: Duration;
     begin
         InitReconciliationLine(ReconciliationHeader, ReconciliationLine);
-        case ReconciliationHeader."Document Type" of
-            ReconciliationHeader."Document Type"::"Settlement details":
-                begin
-                    ReconciliationLine."Merchant Order Reference" := CopyStr(GetValueAtCell(LineNo, 24), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
-                    if Evaluate(ReconciliationLine."Scheme Fees (NC)", GetValueAtCell(LineNo, 25), 9) then;
-                    if Evaluate(ReconciliationLine."Interchange (NC)", GetValueAtCell(LineNo, 26), 9) then;
-                    if Evaluate(ReconciliationLine."Payment Fees (NC)", GetValueAtCell(LineNo, 27), 9) then;
+        if ReconciliationHeader."Document Type" = ReconciliationHeader."Document Type"::"Settlement details" then
+            if Evaluate(ReconciliationLine."Payment Fees (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Payment Fees (NC)"), ReportWebhookRequest."Report Type")), 9) then;
 
-                end;
-            ReconciliationHeader."Document Type"::"External Settlement detail (C)":
-                begin
-                    ReconciliationLine."Merchant Order Reference" := CopyStr(GetValueAtCell(LineNo, 21), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
-                    if Evaluate(ReconciliationLine."Scheme Fees (NC)", GetValueAtCell(LineNo, 22), 9) then;
-                    if Evaluate(ReconciliationLine."Interchange (NC)", GetValueAtCell(LineNo, 23), 9) then;
-                end;
-        end;
+        ReconciliationLine."Merchant Order Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Merchant Order Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Merchant Order Reference"));
+        if Evaluate(ReconciliationLine."Scheme Fees (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Scheme Fees (NC)"), ReportWebhookRequest."Report Type")), 9) then;
+        if Evaluate(ReconciliationLine."Interchange (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Interchange (NC)"), ReportWebhookRequest."Report Type")), 9) then;
+
         ReconciliationLine."Batch Number" := BatchNumber;
 
-        ReconciliationLine."Company Account" := CopyStr(GetValueAtCell(LineNo, 1), 1, MaxStrLen(ReconciliationLine."Company Account"));
+        ReconciliationLine."Company Account" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Company Account"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Company Account"));
+
         ReconciliationLine."Merchant Account" := CopyStr(MerchantAccount, 1, MaxStrLen(ReconciliationLine."Merchant Account"));
-        ReconciliationLine."PSP Reference" := CopyStr(GetValueAtCell(LineNo, 3), 1, MaxStrLen(ReconciliationLine."PSP Reference"));
-        ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, 4), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
-        ReconciliationLine."Payment Method" := CopyStr(GetValueAtCell(LineNo, 5), 1, MaxStrLen(ReconciliationLine."Payment Method"));
+        ReconciliationLine."PSP Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex('Psp Reference', ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."PSP Reference"));
+        ReconciliationLine."Merchant Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Merchant Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Merchant Reference"));
+        ReconciliationLine."Payment Method" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Payment Method"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Payment Method"));
 
-        if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, 28)) then begin
-            // AMS to UTC
-            UTCOffset := -CalculateAmsterdamToUTCOffset(ReconciliationLine."Transaction Date");
-            if not TypeHelper.GetUserTimezoneOffset(UserTimeZoneOffset) then
-                UserTimeZoneOffset := 0;
-            // UTC to Local
-            ReconciliationLine."Transaction Date" := TypeHelper.AddHoursToDateTime(ReconciliationLine."Transaction Date", UTCOffset) + UserTimeZoneOffset;
-
-            if ReconciliationHeader."Transactions Date" = 0D then begin
-                ReconciliationHeader."Transactions Date" := DT2Date(ReconciliationLine."Transaction Date");
-                ReconciliationHeader.Modify();
-            end;
+        case ReportWebhookRequest."Report Type" of
+            ReportWebhookRequest."Report Type"::"Settlement details":
+                begin
+                    if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, GetColumnIndex('Creation Date (AMS)', ReportWebhookRequest."Report Type"))) then begin
+                        // AMS to UTC
+                        UTCOffset := -CalculateAmsterdamToUTCOffset(ReconciliationLine."Transaction Date");
+                        if not TypeHelper.GetUserTimezoneOffset(UserTimeZoneOffset) then
+                            UserTimeZoneOffset := 0;
+                        // UTC to Local
+                        ReconciliationLine."Transaction Date" := TypeHelper.AddHoursToDateTime(ReconciliationLine."Transaction Date", UTCOffset) + UserTimeZoneOffset;
+                    end;
+                end;
+            ReportWebhookRequest."Report Type"::"External Settlement detail (C)":
+                begin
+                    if Evaluate(ReconciliationLine."Transaction Date", GetValueAtCell(LineNo, GetColumnIndex('Creation Date', ReportWebhookRequest."Report Type"))) then begin
+                        if not TypeHelper.GetUserTimezoneOffset(UserTimeZoneOffset) then
+                            UserTimeZoneOffset := 0;
+                        // UTC to Local
+                        ReconciliationLine."Transaction Date" := ReconciliationLine."Transaction Date" + UserTimeZoneOffset;
+                        // It is assumed that External Settlement Detail report's "Creation Date" is UTC
+                    end;
+                end;
         end;
 
-        ReconciliationLine."Modification Reference" := CopyStr(GetValueAtCell(LineNo, 9), 1, MaxStrLen(ReconciliationLine."Modification Reference"));
-        ReconciliationLine."Transaction Currency Code" := CopyStr(GetValueAtCell(LineNo, 10), 1, MaxStrLen(ReconciliationLine."Transaction Currency Code"));
+        if ReconciliationHeader."Transactions Date" = 0D then begin
+            ReconciliationHeader."Transactions Date" := DT2Date(ReconciliationLine."Transaction Date");
+            ReconciliationHeader.Modify();
+        end;
 
-        if Evaluate(ReconciliationLine."Exchange Rate", GetValueAtCell(LineNo, 13), 9) then;
-        ReconciliationLine."Adyen Acc. Currency Code" := CopyStr(GetValueAtCell(LineNo, 14), 1, MaxStrLen(ReconciliationLine."Adyen Acc. Currency Code"));
+        ReconciliationLine."Modification Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Modification Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Modification Reference"));
+        ReconciliationLine."Transaction Currency Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex('Gross Currency', ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Transaction Currency Code"));
+
+        if Evaluate(ReconciliationLine."Exchange Rate", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Exchange Rate"), ReportWebhookRequest."Report Type")), 9) then;
+        ReconciliationLine."Adyen Acc. Currency Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex('Net Currency', ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Adyen Acc. Currency Code"));
         ReconciliationHeader."Adyen Acc. Currency Code" := ReconciliationLine."Adyen Acc. Currency Code";
 
-        if Evaluate(ReconciliationLine."Commission (NC)", GetValueAtCell(LineNo, 17), 9) then;
-        if Evaluate(ReconciliationLine."Markup (NC)", GetValueAtCell(LineNo, 18), 9) then;
+        if Evaluate(ReconciliationLine."Commission (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Commission (NC)"), ReportWebhookRequest."Report Type")), 9) then;
+        if Evaluate(ReconciliationLine."Markup (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Markup (NC)"), ReportWebhookRequest."Report Type")), 9) then;
 
-        ReconciliationLine."Payment Method Variant" := CopyStr(GetValueAtCell(LineNo, 19), 1, MaxStrLen(ReconciliationLine."Payment Method Variant"));
+        ReconciliationLine."Payment Method Variant" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Payment Method Variant"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Payment Method Variant"));
 
-        if Evaluate(ReconciliationLine."Gross Debit", GetValueAtCell(LineNo, 11), 9) then
+        if Evaluate(ReconciliationLine."Gross Debit", GetValueAtCell(LineNo, GetColumnIndex('Gross Debit (GC)', ReportWebhookRequest."Report Type")), 9) then
             ReconciliationLine.Validate("Gross Debit");
-        if Evaluate(ReconciliationLine."Gross Credit", GetValueAtCell(LineNo, 12), 9) then
+        if Evaluate(ReconciliationLine."Gross Credit", GetValueAtCell(LineNo, GetColumnIndex('Gross Credit (GC)', ReportWebhookRequest."Report Type")), 9) then
             ReconciliationLine.Validate("Gross Credit");
-        if Evaluate(ReconciliationLine."Net Debit", GetValueAtCell(LineNo, 15), 9) then
+        if Evaluate(ReconciliationLine."Net Debit", GetValueAtCell(LineNo, GetColumnIndex('Net Debit (NC)', ReportWebhookRequest."Report Type")), 9) then
             ReconciliationLine.Validate("Net Debit");
-        if Evaluate(ReconciliationLine."Net Credit", GetValueAtCell(LineNo, 16), 9) then
+        if Evaluate(ReconciliationLine."Net Credit", GetValueAtCell(LineNo, GetColumnIndex('Net Credit (NC)', ReportWebhookRequest."Report Type")), 9) then
             ReconciliationLine.Validate("Net Credit");
 
         ReconciliationLine."Other Commissions (NC)" := ReconciliationLine."Payment Fees (NC)" - ReconciliationLine."Markup (NC)";
 
-        case GetValueAtCell(LineNo, 8) of
+        ReconciliationLine."Modif. Merchant Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex('Modification Merchant Reference', ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Modif. Merchant Reference"));
+        if Evaluate(ReconciliationLine."Authorised Date", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Authorised Date"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine."Authorised Date TimeZone" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Authorised Date TimeZone"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Authorised Date TimeZone"));
+        ReconciliationLine."Balance Currency Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Balance Currency Code"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Balance Currency Code"));
+        if Evaluate(ReconciliationLine."Net Debit (BC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Net Debit (BC)"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."Net Credit (BC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Net Credit (BC)"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."DCC Markup (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("DCC Markup (NC)"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine."Global Card Brand" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Global Card Brand"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Global Card Brand"));
+        if Evaluate(ReconciliationLine."Gratuity Amount", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Gratuity Amount"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."Surcharge Amount", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Surcharge Amount"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."Advanced (NC)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Advanced (NC)"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine."Advancement Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Advancement Code"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Advancement Code"));
+        ReconciliationLine."Advancement Batch" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Advancement Batch"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Advancement Batch"));
+        ReconciliationLine."Booking Type" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Booking Type"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Booking Type"));
+        ReconciliationLine.Acquirer := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(Acquirer), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.Acquirer));
+        ReconciliationLine."Split Settlement" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Split Settlement"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Split Settlement"));
+        ReconciliationLine."Split Payment Data" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Split Payment Data"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Split Payment Data"));
+        ReconciliationLine."Funds Destination" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Funds Destination"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Funds Destination"));
+        if Evaluate(ReconciliationLine."Balance Platform Debit", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Balance Platform Debit"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."Balance Platform Credit", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Balance Platform Credit"), ReportWebhookRequest."Report Type"))) then;
+        if Evaluate(ReconciliationLine."Booking Date", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Booking Date"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine."Booking Date TimeZone" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Booking Date TimeZone"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Booking Date TimeZone"));
+        if Evaluate(ReconciliationLine."Booking Date (AMS)", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Booking Date (AMS)"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine.AdditionalType := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(AdditionalType), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.AdditionalType));
+        ReconciliationLine.Installments := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(Installments), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.Installments));
+        ReconciliationLine."Issuer Country" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Issuer Country"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Issuer Country"));
+        ReconciliationLine."Shopper Country" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Shopper Country"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Shopper Country"));
+        ReconciliationLine."Clearing Network" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Clearing Network"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Clearing Network"));
+        ReconciliationLine."Terminal ID" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Terminal ID"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Terminal ID"));
+        ReconciliationLine."Tender Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Tender Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Tender Reference"));
+        ReconciliationLine.Metadata := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(Metadata), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.Metadata));
+        if Evaluate(ReconciliationLine."Pos Transaction Date", GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Pos Transaction Date"), ReportWebhookRequest."Report Type"))) then;
+        ReconciliationLine."Pos Transaction Date TimeZone" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Pos Transaction Date TimeZone"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Pos Transaction Date TimeZone"));
+        ReconciliationLine.Store := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(Store), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.Store));
+        ReconciliationLine."Dispute Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Dispute Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Dispute Reference"));
+        ReconciliationLine."Register Booking Type" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Register Booking Type"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Register Booking Type"));
+        ReconciliationLine.ARN := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(ARN), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.ARN));
+        ReconciliationLine."Shopper Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Shopper Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Shopper Reference"));
+        ReconciliationLine."Payment Transaction Group" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Payment Transaction Group"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Payment Transaction Group"));
+        ReconciliationLine."Settlement Flow" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Settlement Flow"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Settlement Flow"));
+        ReconciliationLine."Authorisation Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Authorisation Code"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Authorisation Code"));
+        ReconciliationLine."Card Number" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Card Number"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Card Number"));
+
+        // External Settlement Detail specific
+        ReconciliationLine.MID := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName(MID), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine.MID));
+        ReconciliationLine."Acquirer Reference" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Acquirer Reference"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Acquirer Reference"));
+        ReconciliationLine."Store Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Store Code"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Store Code"));
+        ReconciliationLine."Acquirer Auth Code" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Acquirer Auth Code"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Acquirer Auth Code"));
+        ReconciliationLine."Card BIN" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Card BIN"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Card BIN"));
+        ReconciliationLine."Card Number Summary" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Card Number Summary"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Card Number Summary"));
+        ReconciliationLine."Submerchant Identifier" := CopyStr(GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Card Number"), ReportWebhookRequest."Report Type")), 1, MaxStrLen(ReconciliationLine."Submerchant Identifier"));
+
+        case GetValueAtCell(LineNo, GetColumnIndex('Type', ReportWebhookRequest."Report Type")) of
             'Fee':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::Fee;
             'Settled':
@@ -269,6 +328,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
             'PaymentCost':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::PaymentCost;
+            'SentForSettle':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::SentForSettle;
+            'SentForRefund':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::SentForRefund;
+            'SettledInstallment':
+                ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::SettledInstallment;
             'SettledExternallyWithInfo':
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::SettledExternallyWithInfo;
             'RefundedExternallyWithInfo':
@@ -285,7 +350,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 ReconciliationLine."Transaction Type" := ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo;
             else begin
                 Clear(ReconciliationLine);
-                _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError03, GetValueAtCell(LineNo, 8)), ReportWebhookRequest.ID);
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Import Lines", false, StrSubstNo(ImportLinesError03, GetValueAtCell(LineNo, GetColumnIndex('Type', ReportWebhookRequest."Report Type"))), ReportWebhookRequest.ID);
                 exit;
             end;
         end;
@@ -311,7 +376,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure FillMerchantPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
     begin
-        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, 15), 9) then
+        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, GetColumnIndex('Net Debit (NC)', ReconciliationHeader."Document Type")), 9) then
             ReconciliationHeader.Modify();
     end;
 
@@ -320,12 +385,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         FromBalance: Decimal;
         ToBalance: Decimal;
     begin
-        if GetValueAtCell(LineNo, 20).Contains('from') then begin
-            if Evaluate(FromBalance, GetValueAtCell(LineNo, 16), 9) then
+        if GetValueAtCell(LineNo, GetColumnIndex('Modification Merchant Reference', ReconciliationHeader."Document Type")).Contains('from') then begin
+            if Evaluate(FromBalance, GetValueAtCell(LineNo, GetColumnIndex('Net Credit (NC)', ReconciliationHeader."Document Type")), 9) then
                 ReconciliationHeader."Opening Balance" += FromBalance; // Might close multiple batches
         end else
-            if GetValueAtCell(LineNo, 20).Contains('to') then begin
-                if Evaluate(ToBalance, GetValueAtCell(LineNo, 15), 9) then
+            if GetValueAtCell(LineNo, GetColumnIndex('Modification Merchant Reference', ReconciliationHeader."Document Type")).Contains('to') then begin
+                if Evaluate(ToBalance, GetValueAtCell(LineNo, GetColumnIndex('Net Debit (NC)', ReconciliationHeader."Document Type")), 9) then
                     ReconciliationHeader."Closing Balance" += ToBalance; // Probably always is a single closing balance entry
             end;
         ReconciliationHeader.Modify();
@@ -333,8 +398,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure InsertAcquirerPayout(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; LineNo: Integer)
     begin
-        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, 15), 9) then;
-        if Evaluate(ReconciliationHeader."Acquirer Commission", GetValueAtCell(LineNo, 17), 9) then;
+        if Evaluate(ReconciliationHeader."Merchant Payout", GetValueAtCell(LineNo, GetColumnIndex('Net Debit (NC)', ReconciliationHeader."Document Type")), 9) then;
+        if Evaluate(ReconciliationHeader."Acquirer Commission", GetValueAtCell(LineNo, GetColumnIndex('Commission', ReconciliationHeader."Document Type")), 9) then;
         ReconciliationHeader.Modify();
     end;
 
@@ -342,14 +407,22 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         ReconciliationLine: Record "NPR Adyen Recon. Line";
         LineNo: Integer;
+        ReportFirstLineNo: Integer;
     begin
         EntryAmount := 0;
-        for LineNo := 2 to GetNumberOfRows() do begin
-            if (GetValueAtCell(LineNo, 2) = CurrentMerchantAccount) then begin
-                if (GetValueAtCell(LineNo, 21) = Format(CurrentBatchNumber)) or
+        case ReportWebhookRequest."Report Type" of
+            ReportWebhookRequest."Report Type"::"Settlement details":
+                ReportFirstLineNo := 2;
+            ReportWebhookRequest."Report Type"::"External Settlement detail (C)":
+                ReportFirstLineNo := 5;
+        end;
+
+        for LineNo := ReportFirstLineNo to GetNumberOfRows() do begin
+            if (GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Merchant Account"), ReconciliationHeader."Document Type")) = CurrentMerchantAccount) then begin
+                if (GetValueAtCell(LineNo, GetColumnIndex(ReconciliationLine.FieldName("Batch Number"), ReconciliationHeader."Document Type")) = Format(CurrentBatchNumber)) or
                     (ReportWebhookRequest."Report Type" <> ReportWebhookRequest."Report Type"::"Settlement details")
                 then begin
-                    case GetValueAtCell(LineNo, 8) of
+                    case GetValueAtCell(LineNo, GetColumnIndex('Type', ReconciliationHeader."Document Type")) of
                         'Balancetransfer':
                             InsertBalanceTransfer(ReconciliationHeader, LineNo);
                         else
@@ -956,7 +1029,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         SchemeValidationField: Text;
         i: Integer;
         SchemeColumnNumber: Integer;
-        InvalidSchemeError: Label 'Validation Scheme Failed: Report did not meet validation criteria. Column ''%1'' does not exist or has an incorrect placement. Please check report''s configuration.';
+        InvalidSchemeError: Label 'Validation Scheme Failed: Report did not meet validation criteria. Column ''%1'' does not exist. Please check report''s configuration.';
         ValidSchemeText: Label 'Validation Success: Report passed all validation criteria.';
         NoSetupCreated: Label 'NP Pay Setup configuration does not exist.';
         PostingNosEmpty: Label 'Posting Document Nos. is not specified in NP Pay Setup.';
@@ -977,17 +1050,18 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         if not GetReportData(WebhookRequest, false) then
             exit;
-        _AdyenManagement.DefineReportScheme(WebhookRequest."Report Type", Scheme, SchemeColumnNumber);
 
         if WebhookRequest."Report Type" = WebhookRequest."Report Type"::Undefined then
             exit;
+
+        _AdyenManagement.DefineReportScheme(WebhookRequest."Report Type", Scheme, SchemeColumnNumber);
 
         SchemeValid := true;
         i := 1;
 
         while SchemeValid and (i <= SchemeColumnNumber) do begin
             SchemeValidationField := Scheme[i];
-            SchemeValid := ValidateFieldName(SchemeValidationField, GetValueAtCell(1, i));
+            SchemeValid := ColumnExists(SchemeValidationField, WebhookRequest."Report Type");
             i += 1;
         end;
 
@@ -1169,15 +1243,22 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure CreateMerchantBatchListFromLines(var MerchantBatchValues: List of [JsonObject]; ReportType: Enum "NPR Adyen Report Type")
     var
         LineNo: Integer;
+        ReportFirstLineNo: Integer;
         JsonObject: JsonObject;
+        RecLine: Record "NPR Adyen Recon. Line";
     begin
-
-        for LineNo := 2 to GetNumberOfRows() do begin
+        case ReportType of
+            ReportType::"Settlement details":
+                ReportFirstLineNo := 2;
+            ReportType::"External Settlement detail (C)":
+                ReportFirstLineNo := 5;
+        end;
+        for LineNo := ReportFirstLineNo to GetNumberOfRows() do begin
             Clear(JsonObject);
-            JsonObject.Add('Merchant Account', GetValueAtCell(LineNo, 2));
+            JsonObject.Add('Merchant Account', GetValueAtCell(LineNo, GetColumnIndex(RecLine.FieldName("Merchant Account"), ReportType)));
             case ReportType of
                 ReportType::"Settlement details":
-                    JsonObject.Add('Batch Number', GetValueAtCell(LineNo, 21));
+                    JsonObject.Add('Batch Number', GetValueAtCell(LineNo, GetColumnIndex(RecLine.FieldName("Batch Number"), ReportType)));
                 ReportType::"External Settlement detail (C)":
                     JsonObject.Add('Batch Number', '0');
             end;
@@ -1192,13 +1273,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         Temp_ExcelBuffer.Reset();
         if Temp_ExcelBuffer.FindLast() then
             exit(Temp_ExcelBuffer."Row No.");
-    end;
-
-    local procedure ValidateFieldName(ControlName: Text; Value: Text): Boolean
-    begin
-        if (ControlName = Value) then
-            exit(true);
-        exit(false);
     end;
 
     local procedure CalculateLCYAmounts(var ReconciliationLine: Record "NPR Adyen Recon. Line")
@@ -1259,6 +1333,35 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
             end;
         end;
+    end;
+
+    local procedure GetColumnIndex(FieldName: Text; ReportType: Enum "NPR Adyen Report Type"): Integer
+    begin
+        Temp_ExcelBuffer.Reset();
+        case ReportType of
+            ReportType::"Settlement details":
+                Temp_ExcelBuffer.SetRange("Row No.", 1);
+            ReportType::"External Settlement detail (C)":
+                Temp_ExcelBuffer.SetRange("Row No.", 4);
+        end;
+        Temp_ExcelBuffer.SetFilter("Cell Value as Text", '=%1', FieldName);
+        if Temp_ExcelBuffer.FindFirst() then
+            exit(Temp_ExcelBuffer."Column No.");
+    end;
+
+    local procedure ColumnExists(SchemeValidationField: Text; ReportType: Enum "NPR Adyen Report Type"): Boolean
+    begin
+        Temp_ExcelBuffer.Reset();
+        case ReportType of
+            ReportType::"Settlement details":
+                Temp_ExcelBuffer.SetRange("Row No.", 1);
+            ReportType::"External Settlement detail (C)":
+                Temp_ExcelBuffer.SetRange("Row No.", 4);
+        end;
+        Temp_ExcelBuffer.SetFilter("Cell Value as Text", '=%1', SchemeValidationField);
+        if Temp_ExcelBuffer.IsEmpty() then
+            exit;
+        exit(true);
     end;
 
     internal procedure CalculateAmsterdamToUTCOffset(ParsedDateTime: DateTime): Integer
