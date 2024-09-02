@@ -2,9 +2,6 @@ import { test } from "../fixtures/restaurant";
 import { restaurantLogin } from "../fixtures/restaurantLogin";
 import * as data from "./util/data/restaurant-test-data.json";
 
-// TODO: FIXME
-test.fixme();
-
 test.beforeEach(async ({ page }) => {
   await restaurantLogin(page);
 });

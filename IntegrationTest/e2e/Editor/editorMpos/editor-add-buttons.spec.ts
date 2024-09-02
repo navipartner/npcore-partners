@@ -7,9 +7,6 @@ test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to mobile items, and drawer, asign it an item action, add item to sale and delete it", async ({
     page,
   }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
-
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -55,9 +52,15 @@ test.describe("Mobile add and remove editable buttons", () => {
       .getByText("Add Item to Order", { exact: true })
       .click();
     await page.waitForTimeout(1000);
-    await page
+    const itemText = await page
       .getByRole("button", { name: "Open menu for No. 1000", exact: true })
-      .click();
+      .isVisible();
+      if(itemText) {
+        await page
+        .getByRole("button", { name: "Open menu for No. 1000", exact: true }).click()
+      } else {
+        await page.locator('td').filter({ hasText: /^1000$/ }).first().click();
+      }
     await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
@@ -129,9 +132,15 @@ test.describe("Mobile add and remove editable buttons", () => {
       .getByText("Add Item to Order", { exact: true })
       .click();
     await page.waitForTimeout(1000);
-    await page
-      .getByRole("button", { name: "Open menu for No. 1000", exact: true })
-      .click();
+    const itemTwoText = await page
+    .getByRole("button", { name: "Open menu for No. 1000", exact: true })
+    .isVisible();
+    if(itemTwoText) {
+      await page
+      .getByRole("button", { name: "Open menu for No. 1000", exact: true }).click()
+    } else {
+      await page.locator('td').filter({ hasText: /^1000$/ }).first().click();
+    }
     await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
@@ -166,10 +175,7 @@ test.describe("Mobile add and remove editable buttons", () => {
   });
   test("should be able to add new button to sale item, asign it an item action and execute action on sale item", async ({
     page,
-  }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
-    
+  }, workerInfo) => {  
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -227,14 +233,23 @@ test.describe("Mobile add and remove editable buttons", () => {
       .getByText("Other", { exact: true })
       .click();
     await page.waitForTimeout(3000);
-
-    await page.getByRole("textbox", { name: "Search POS Actions" }).click();
-    await page
-      .getByRole("textbox", { name: "Search POS Actions" })
-      .fill("discount");
-    await page
-      .getByRole("button", { name: "Open menu for Code DISCOUNT" })
-      .click();
+      const searchText = await page.getByRole("textbox", { name: "Search POS Actions" }).isVisible()
+      const searchLabel = await page.getByLabel('Search POS Actions').isVisible();
+      if(searchText) {
+        await page.getByRole("textbox", { name: "Search POS Actions" }).click();
+        await page
+        .getByRole("textbox", { name: "Search POS Actions" })
+        .fill("discount");
+        await page.getByTitle('Select record "DISCOUNT"').click();
+      } else if(searchLabel) {
+        await page.getByLabel('Search POS Actions').click();
+        await page.getByLabel('Search POS Actions').fill("discount")
+        await page.getByRole('gridcell', { name: 'Code, DISCOUNT' }).click();
+      } else {
+        await page.getByLabel('Untitled field').click();
+        await page.getByLabel('Untitled field').fill("discount")
+        await page.getByRole('gridcell', { name: 'Open menu for Code DISCOUNT' }).click();
+      }
     await page
       .frameLocator("iframe")
       .getByRole("heading", { name: "Variables" })
@@ -251,7 +266,7 @@ test.describe("Mobile add and remove editable buttons", () => {
       .filter({ hasText: "0" })
       .locator("div")
       .click();
-    await page.frameLocator("iframe").getByTitle("#800080").click();
+    await page.frameLocator('iframe').locator('.custom-color-picker__palette-color').first().click();
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.waitForTimeout(1000);
     await page

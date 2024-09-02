@@ -4,7 +4,7 @@ import { login } from "../fixtures/mobileEditorLogin";
 import { mobileLogin } from "../fixtures/mobileLogin";
 import { removeLayout } from "../fixtures/removeLayout";
 
-const createBalancingButton = async (page) => {
+const createBalancingButtonAndDoASale = async (page) => {
   await page
     .frameLocator("iframe")
     .getByRole("contentinfo")
@@ -41,13 +41,27 @@ const createBalancingButton = async (page) => {
     .first()
     .click();
   await page.frameLocator("iframe").getByText("Other", { exact: true }).click();
-  await page.getByRole("textbox", { name: "Search POS Actions" }).click();
-  await page
-    .getByRole("textbox", { name: "Search POS Actions" })
-    .fill("balance");
-  await page
-    .getByRole("button", { name: "Open menu for Code BALANCE_V4" })
-    .click();
+  await page.waitForTimeout(1000)
+  const searchInput = await page.getByLabel('Search POS Actions').isVisible()
+  if(searchInput) {
+    await page.getByLabel('Search POS Actions').click();
+    await page.getByLabel('Search POS Actions').fill("balance");
+    } else {
+      await page.getByLabel('Untitled field').click();
+      await page.getByLabel('Untitled field')
+        .fill("balance");
+  }
+    const button = await page
+    .getByRole("button", { name: "Open menu for Code BALANCE_V4" }).isVisible()
+    const gridCell = await page.getByRole('gridcell', { name: 'Code, BALANCE_V4' }).isVisible()
+    if(button) {
+      await page
+    .getByRole("button", { name: "Open menu for Code BALANCE_V4" }).click()
+    } else if(gridCell) {
+      await page.getByRole('gridcell', { name: 'Code, BALANCE_V4' }).click();
+    } else {
+      await page.locator('td').filter({ hasText: 'Balance the POS at the end of' }).click();
+    }
   await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Save" })
@@ -62,15 +76,21 @@ const createBalancingButton = async (page) => {
     .frameLocator("iframe")
     .getByRole("button", { name: "Overwrite current layout" })
     .click();
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(10000);
+  await page.frameLocator('iframe').getByRole('button', { name: 'Small draft beer' }).click();
+  await page.frameLocator('iframe').getByRole('button', { name: 'Payment' }).click();
+  await page.frameLocator('iframe').getByRole('button', { name: 'Select payment' }).click();
+  await page.frameLocator('iframe').getByRole('button', { name: 'Cash' }).click();
+  await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
+  await page.waitForTimeout(10000);
+
+
 };
 
 test.describe("Balancing v4 mobile test", () => {
   test("User should be able to do balancing by entering amounts in inputs", async ({
     page,
   }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
 
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
@@ -81,7 +101,7 @@ test.describe("Balancing v4 mobile test", () => {
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_USERNAME`],
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_PASSWORD`]
     );
-    await createBalancingButton(page);
+    await createBalancingButtonAndDoASale(page);
     await mobileLogin(
       page,
       false,
@@ -93,6 +113,10 @@ test.describe("Balancing v4 mobile test", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "balancing" })
       .click();
+      const modalVisible = await page.frameLocator("iframe").getByText('Delete all saved POS Saved').isVisible();
+      if(modalVisible) {
+        await page.getByLabel('OK').click();
+      }
     await page
       .frameLocator("iframe")
       .locator(
@@ -449,8 +473,6 @@ test.describe("Balancing v4 mobile test", () => {
   test("User should be able to do balancing by entering coins amount", async ({
     page,
   }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
     
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
@@ -461,7 +483,7 @@ test.describe("Balancing v4 mobile test", () => {
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_USERNAME`],
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_PASSWORD`]
     );
-    await createBalancingButton(page);
+    await createBalancingButtonAndDoASale(page);
     await mobileLogin(
       page,
       false,

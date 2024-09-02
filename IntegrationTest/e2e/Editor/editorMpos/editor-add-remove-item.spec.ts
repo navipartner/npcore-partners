@@ -78,10 +78,7 @@ test.describe("Mobile add and remove item from test", () => {
   });
   test("should be able to add customer and remove it", async ({
     page,
-  }, workerInfo) => {
-    // TODO: FIXME
-    test.fixme();
-    
+  }, workerInfo) => {    
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -100,13 +97,15 @@ test.describe("Mobile add and remove item from test", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Insert Customer" })
       .click();
-    await page
-      .getByRole("gridcell", { name: "Open menu for Name", exact: true })
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByText("Customer:Spotsmeyer's Furnishings")
-      .click();
+      await page.waitForTimeout(2000);
+      const customerText =  await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).isVisible();
+  
+        if (customerText) {
+          await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).click();
+        } 
+       else {
+        await page.locator('td').filter({ hasText: '01121212' }).click();
+      }
     const elementExists =
       page
         .frameLocator("iframe")

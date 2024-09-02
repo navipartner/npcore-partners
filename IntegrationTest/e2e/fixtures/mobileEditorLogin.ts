@@ -3,7 +3,7 @@ import { Page } from "@playwright/test";
 export const login = async (
   page: Page,
   salePersonCode: string,
-  uniqueLayoutKey?: number,
+  uniqueLayoutKey?: string,
   username?: string,
   password?: string
 ) => {
