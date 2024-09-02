@@ -273,15 +273,16 @@ codeunit 6184699 "NPR Vipps Mp ePayment API"
                         OrderLine.Add('id', 'Comment')
                     else
                         OrderLine.Add('id', POSSaleLineRec."No.");
-                    OrderLine.Add('totalAmount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT"));
-                    OrderLine.Add('totalAmountExcludingTax', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec.Amount));
-                    OrderLine.Add('totalTaxAmount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT" - POSSaleLineRec.Amount));
+                    OrderLine.Add('totalAmount', Abs(VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT")));
+                    OrderLine.Add('totalAmountExcludingTax', Abs(VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec.Amount)));
+                    OrderLine.Add('totalTaxAmount', Abs(VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Amount Including VAT" - POSSaleLineRec.Amount)));
                     Evaluate(TaxInt, Format(Format(POSSaleLineRec."VAT %")));
                     OrderLine.Add('taxPercentage', TaxInt);
-                    UnitInfo.Add('unitPrice', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Unit Price"));
-                    UnitInfo.Add('quantity', Format(POSSaleLineRec.Quantity));
+                    UnitInfo.Add('unitPrice', Abs(VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Unit Price")));
+                    UnitInfo.Add('quantity', Format(Abs(POSSaleLineRec.Quantity)));
                     OrderLine.Add('unitInfo', UnitInfo);
-                    OrderLine.Add('discount', VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Discount Amount"));
+                    OrderLine.Add('discount', Abs(VippsMpUtil.DecimalAmountToIntegerAmount(POSSaleLineRec."Discount Amount")));
+                    OrderLine.Add('isReturn', POSSaleLineRec.Quantity < 0);
                     OrderLines.Add(OrderLine.Clone());
                 until POSSaleLineRec.Next() = 0;
 
