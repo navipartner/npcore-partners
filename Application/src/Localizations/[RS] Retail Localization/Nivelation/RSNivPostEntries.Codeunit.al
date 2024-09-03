@@ -265,9 +265,11 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
             PostedNivelationHeader."Source Type"::"POS Entry":
                 exit(CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines));
             PostedNivelationHeader."Source Type"::"Posted Sales Credit Memo":
-                exit(-(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT")));
+                exit(-(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", ''))));
             else
-                exit(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT"));
+                exit(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+                            RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", '')));
         end;
     end;
 
@@ -290,9 +292,11 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
     local procedure CalculatePOSEntryMarginNoVATAmount(PostedNivelationLines: Record "NPR RS Posted Nivelation Lines"): Decimal
     begin
         if PostedNivelationLines.Quantity > 0 then
-            exit(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT"))
+            exit(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+                     RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", '')))
         else
-            exit(-(Abs(PostedNivelationLines."Value Difference" - PostedNivelationLines."Calculated VAT")));
+            exit(-(Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Value Difference", '') -
+                        RSRLocalizationMgt.RoundAmountToCurrencyRounding(PostedNivelationLines."Calculated VAT", ''))));
     end;
 
     #endregion
@@ -303,7 +307,6 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
         ItemJournalLine: Record "Item Journal Line";
         ItemLedgEntry: Record "Item Ledger Entry";
         ValueEntry: Record "Value Entry";
-        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
         InitItemJnlLine(ItemJournalLine, PostedNivelationHeader, PostedNivelationLine);
 
@@ -516,6 +519,7 @@ codeunit 6151372 "NPR RS Niv. Post Entries"
     var
         AddCurrency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         JobLine: Boolean;
         AddCurrencyCode: Code[10];
         CurrencyFactor: Decimal;

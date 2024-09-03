@@ -94,7 +94,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             NivelationLines.Validate("Item No.", TempNivSalesInvLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines.Quantity := TempNivSalesInvLines.Quantity;
-            NivelationLines.Validate("New Price",TempNivSalesInvLines.GetLineAmountInclVAT() / TempNivSalesInvLines.Quantity);
+            NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding((TempNivSalesInvLines.GetLineAmountInclVAT() / TempNivSalesInvLines.Quantity), SalesInvoiceHeader."Currency Code"));
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivSalesInvLines.Next() = 0;
