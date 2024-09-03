@@ -936,7 +936,11 @@
         StoreCode := NewStoreCode;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeCalcNextRunTimeForRecurringJob', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnBeforeCalcNextRunTimeForRecurringJob, '', true, false)]
+#endif
     local procedure NPCalcNextRunDateTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; var NewRunDateTime: DateTime; var IsHandled: Boolean)
     begin
         if IsHandled then
@@ -947,7 +951,11 @@
         NewRunDateTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, StartingDateTime, false);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime, '', true, false)]
+#endif
     local procedure NPCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime(var JobQueueEntry: Record "Job Queue Entry"; var EarliestPossibleRunTime: DateTime; var IsHandled: Boolean)
     begin
         if IsHandled then
@@ -958,7 +966,11 @@
         EarliestPossibleRunTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, EarliestPossibleRunTime, true);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", OnBeforeEnqueueJobQueueEntry, '', true, false)]
+#endif
     local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
     begin
         if JobQueueEntry."Maximum No. of Attempts to Run" = 3 then  //3 - default value in MS standard application
@@ -970,14 +982,22 @@
         UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnBeforeModifyUpdatedJobQueueEntry', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeModifyUpdatedJobQueueEntry, '', true, false)]
+#endif
     local procedure SetDefaultValuesOnBeforeModifyUpdatedJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
     begin
         AutoRestartRetentionPolicyJQ(JobQueueEntry);
         UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterFinalizeRun, '', true, false)]
+#endif
     local procedure RescheduleAfterError(JobQueueEntry: Record "Job Queue Entry")
     var
         JobQueueSendNotif: Codeunit "NPR Job Queue - Send Notif.";
@@ -1002,7 +1022,25 @@
         end;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", OnBeforeEnqueueJobQueueEntry, '', true, false)]
+#endif
+    local procedure CheckScheduledStartDateTimeIsNotOutsideOfAllowedRunWindow(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if not JobQueueEntry."Recurring Job" then
+            exit;
+        If not IsNPRecurringJob(JobQueueEntry) then
+            exit;
+        JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time", true);
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeModifyLogEntry', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnBeforeModifyLogEntry, '', true, false)]
+#endif
     local procedure EmitTelemetry(var JobQueueLogEntry: Record "Job Queue Log Entry")
     begin
         if JobQueueLogEntry.IsTemporary() or (JobQueueLogEntry.Status <> JobQueueLogEntry.Status::Error) then
@@ -1011,37 +1049,61 @@
         EmitTelemetryDataOnError(JobQueueLogEntry);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RunAddPosItemPostingJobQueue()
     begin
         AddPosItemPostingJobQueue();
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RunAddPosPostingJobQueue()
     begin
         AddPosPostingJobQueue();
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RunAddPosSaleDocumentPostingJobQueue()
     begin
         AddPosSaleDocumentPostingJobQueue();
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RunRefreshRetentionPolicyJQ()
     begin
         RefreshRetentionPolicyJQ();
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
     local procedure RunScheduleFeatureFlagReport()
     begin
         ScheduleFeatureFlagReport();
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
     local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin
         if Handled then
@@ -1060,7 +1122,11 @@
         end;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", OnCompanyInitialize, '', true, false)]
+#endif
     local procedure HandleOnCompanyInitialize()
     begin
         InitJobQueueRefreshSetup();
@@ -1076,7 +1142,11 @@
         end;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeSetStatusValue', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnBeforeSetStatusValue, '', false, false)]
+#endif
     local procedure HandleOnBeforeSetStatusValue(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var NewStatus: Option)
     begin
         if NewStatus <> JobQueueEntry.Status::"On Hold" then
