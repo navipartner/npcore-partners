@@ -94,7 +94,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines.Validate("Item No.", TempNivSalesCrMemoLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines.Quantity := -Abs(TempNivSalesCrMemoLines.Quantity);
-            NivelationLines.Validate("New Price", TempNivSalesCrMemoLines.GetLineAmountInclVAT() / TempNivSalesCrMemoLines.Quantity);
+            NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding(TempNivSalesCrMemoLines.GetLineAmountInclVAT() / TempNivSalesCrMemoLines.Quantity, SalesCrMemoHeader."Currency Code"));
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivSalesCrMemoLines.Next() = 0;

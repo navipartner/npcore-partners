@@ -102,7 +102,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             FindPriceListLine(TempNivelationSalesLines."Location Code", TempNivelationSalesLines."No.");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines."Posting Date" := POSEntry."Posting Date";
-            NivelationLines.Validate("New Price", TempNivelationSalesLines."Amount Incl. VAT" / TempNivelationSalesLines.Quantity);
+            NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding((TempNivelationSalesLines."Amount Incl. VAT" / TempNivelationSalesLines.Quantity), TempNivelationSalesLines."Currency Code"));
             if VATSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", TempNivelationSalesLines."VAT Prod. Posting Group") then
                 NivelationLines."VAT %" := VATSetup."VAT %";
             NivelationLines.Insert(true);
