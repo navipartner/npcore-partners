@@ -140,6 +140,37 @@
                     }
                 }
             }
+            group("Customer Ledger Entry Posting Setup")
+            {
+                Caption = 'Customer Ledger Entry Posting Setup';
+                field("Enable POS Entry CLE Posting"; Rec."Enable POS Entry CLE Posting")
+                {
+                    Caption = 'Enable Posting';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Enable posting Customer Ledger Entries from POS Entry when customer is selected on POS.';
+                }
+                field("Customer Posting Group Filter"; Rec."Customer Posting Group Filter")
+                {
+                    ToolTip = 'Set the Customer Posting Group for which Customer Ledger Entries Filter will be posted.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Enable Legal Ent. CLE Posting"; Rec."Enable Legal Ent. CLE Posting")
+                {
+                    Caption = 'Post for Legal Entites';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Enable posting Customer Ledger Entries for customers that are Legal Entities - have VAT Registration No. set on their Customer Card.';
+                }
+                field("General Journal Template Name"; Rec."General Journal Template Name")
+                {
+                    ToolTip = 'Specifies the value of the Journal Template Name which will be assigned to General Journal Lines in the Customer Ledger activity.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("General Journal Batch Name"; Rec."General Journal Batch Name")
+                {
+                    ToolTip = 'Specifies the value of the Journal Batch Name which will be assigned to General Journal Lines in the Customer Ledger activity.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
         }
     }
 }
