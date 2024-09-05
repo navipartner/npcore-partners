@@ -142,5 +142,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner New POS Editor';
             DataClassification = CustomerContent;
         }
+        field(6060126; "NPR BE Fiscal"; Boolean)
+        {
+            Caption = 'NaviPartner BE Fiscalization';
+            DataClassification = CustomerContent;
+        }
     }
 }

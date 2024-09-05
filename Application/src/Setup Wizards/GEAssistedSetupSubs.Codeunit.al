@@ -18,6 +18,7 @@
         AddSIFiscalizationSetupsWizard();
         AddITFiscalizationSetupsWizard();
         AddATFiscalizationSetupsWizard();
+        AddBEFiscalizationSetupsWizard();
         AddRSEInvoiceSetupsWizard();
     end;
 
@@ -175,7 +176,7 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup AT POS Paym. Meth.", ATFiscalizationSetupTxt, AssistedSetupGroup::NPRATFiscal);
     end;
 
-    local procedure AddRSEInvoiceSetupsWizard()
+        local procedure AddRSEInvoiceSetupsWizard()
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
@@ -190,6 +191,15 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI Tax Ex. Reason", RSEITaxExReasonsSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI Paym. Meth.", RSEIPaymMethodSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI UOM Mapping", RSEIUOMMappingSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
+    end;
+
+            local procedure AddBEFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        BEFiscalizationSetupTxt: Label 'Welcome to Belgian Fiscalization Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR BE Enable Fiscal Step", BEFiscalizationSetupTxt, AssistedSetupGroup::NPRBEFiscal);
     end;
 
     procedure GetAppId(): Guid
@@ -223,6 +233,7 @@
         BGSISFiscalizationSetups();
         ITFiscalizationSetups();
         ATFiscalizationSetups();
+        BEFiscalizationSetups();
         RSEInvoiceSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
@@ -1407,7 +1418,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,BEFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1422,7 +1433,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,BEFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1455,6 +1466,9 @@
             Modul::RSEInvoiceSetup:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-RSEInvoice-v1.0');
+            Modul::BEFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-BEFiscalization-v1.0');
         end;
     end;
 
@@ -2600,7 +2614,7 @@
     end;
 
     #endregion
-
+    
     #region RS E-Invoice Wizards
     local procedure RSEInvoiceSetups()
     var
@@ -2827,6 +2841,87 @@
     end;
     #endregion
 
+    #region BE Fiscalization Wizards
+    local procedure BEFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::BEFiscalization)) then
+            exit;
+
+        RemoveBEFiscalizationSetupGuidedExperience();
+
+        AddBEFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::BEFiscalization));
+    end;
+
+    local procedure RemoveBEFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BE Fiscal");
+    end;
+
+    local procedure AddBEFiscalizationSetupsWizard()
+    begin
+        EnableBEFiscalSetupWizard();
+    end;
+
+    local procedure EnableBEFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup BE Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup BE Fiscal",
+                                                AssistedSetupGroup::NPRBEFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup BE Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupBEFiscalWizard_OnAfterFinishStep()
+    begin
+        UpdateSetupBEFiscalWizardStatus();
+    end;
+
+    local procedure UpdateSetupBEFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup BE Fiscal");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR BE Fiscalisation Setup", 'OnAfterValidateEvent', 'Enable BE Fiscal', false, false)]
+    local procedure ResetBEFiscalWizard_OnAfterValidateBEFiscalEnabled(var Rec: Record "NPR BE Fiscalisation Setup"; var xRec: Record "NPR BE Fiscalisation Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."Enable BE Fiscal" <> xRec."Enable BE Fiscal") and not Rec."Enable BE Fiscal" then
+            ResetSetupBEFiscalWizardStatus();
+    end;
+
+    local procedure ResetSetupBEFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup BE Fiscal");
+    end;
+
+    #endregion
+
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
@@ -2852,6 +2947,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,BEFiscalization;
 #endif
 }
