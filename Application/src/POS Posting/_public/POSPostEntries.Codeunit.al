@@ -81,6 +81,10 @@
             Commit();
             if not Success and StopOnErrorVar then
                 Error(ErrorText);
+
+#if not (BC17 or BC18 or BC19)
+            CloseCustLedgerEntries(POSEntry, Success);
+#endif
         end;
 
         if PostSalesDocumentsVar then begin
@@ -129,6 +133,10 @@
             Error(TextErrorGJLinesnotmade, TempGenJournalLine.TableCaption);
 
         CreateGenJnlLinesFromPOSBalancingLines(POSEntry, TempGenJournalLine);
+
+#if not (BC17 or BC18 or BC19)
+        CreateGenJnlLinesForCustLedgEntryPosting(POSEntry, TempGenJournalLine);
+#endif
 
         Success := CheckAndPostGenJournal(TempGenJournalLine, POSEntry, TempPOSEntry, ErrorText);
 
@@ -611,6 +619,25 @@
                     until POSBalancingLine.Next() = 0;
             until POSEntry.Next() = 0;
     end;
+
+#if not (BC17 or BC18 or BC19)
+    local procedure CreateGenJnlLinesForCustLedgEntryPosting(POSEntry: Record "NPR POS Entry"; var GenJournalLine: Record "Gen. Journal Line")
+    var
+        POSPostCustLedgEntry: Codeunit "NPR POS Post Cust. Ledg. Entry";
+    begin
+        POSPostCustLedgEntry.InsertGenJournalLinesForCustLedgEntryPosting(GenJournalLine, _LineNumber, POSEntry);
+    end;
+
+    local procedure CloseCustLedgerEntries(var POSEntry: Record "NPR POS Entry"; Success: Boolean)
+    var
+        POSPostCustLedgEntry: Codeunit "NPR POS Post Cust. Ledg. Entry";
+    begin
+        if not Success then
+            exit;
+
+        POSPostCustLedgEntry.CloseCustLedgerEntries(POSEntry, StopOnErrorVar);
+    end;
+#endif
 
     local procedure PostItemEntries(var POSEntry: Record "NPR POS Entry")
     var
