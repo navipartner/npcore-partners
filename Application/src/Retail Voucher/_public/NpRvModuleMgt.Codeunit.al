@@ -102,5 +102,15 @@
     internal procedure OnPreApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text; SuggestedAmount: Decimal)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCheckCustomReferenceNoAlreadyUsed(var CustomReferenceNo: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeIssueVoucherCheckCustomReferenceNo(var CustomReferenceNo: Text)
+    begin
+    end;
     #endregion
 }
