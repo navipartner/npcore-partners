@@ -97,6 +97,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         TempVoucher: Record "NPR NpRv Voucher" temporary;
         VoucherType: Record "NPR NpRv Voucher Type";
         IssueVoucherMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
         Amount: Decimal;
         Discount: Decimal;
         Quantity: Integer;
@@ -112,6 +113,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
 
         if not Context.GetString('CustomReferenceNo', CustomReferenceNo) then
             CustomReferenceNo := '';
+        NpRvModuleMgt.OnBeforeIssueVoucherCheckCustomReferenceNo(CustomReferenceNo);
 
         Context.SetScopeParameters();
         DiscountType := Context.GetString('DiscountType');
@@ -188,6 +190,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
     local procedure CheckReferenceNoAlreadyUsed(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         IssuePOSActionMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
         CustomReferenceNo: Text;
         ReferenceNoAlreadyUsed: Boolean;
         ReferenceNoAlreadyUsedLbl: Label 'Reference No. %1 already used.Do you want to scan the reference no. again?';
@@ -195,6 +198,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
     begin
         if not Context.GetString('CustomReferenceNo', CustomReferenceNo) then
             CustomReferenceNo := '';
+        NpRvModuleMgt.OnBeforeCheckCustomReferenceNoAlreadyUsed(CustomReferenceNo);
 #pragma warning disable AA0139
         ReferenceNoAlreadyUsed := IssuePOSActionMgtB.CheckReferenceNoAlreadyUsed('', CustomReferenceNo);
         if ReferenceNoAlreadyUsed then
