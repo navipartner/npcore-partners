@@ -22,7 +22,7 @@ test.describe("Balancing v4 test", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "End Of Day Balancing (Balance V4)" })
+      .getByRole("button", { name: "End Of Day Balancing" })
       .click();
     await page.waitForTimeout(2000);
     await page
@@ -345,7 +345,7 @@ test.describe("Balancing v4 test", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "End Of Day Balancing (Balance V4)" })
+      .getByRole("button", { name: "End Of Day Balancing" })
       .click();
     await page
       .frameLocator("iframe")
