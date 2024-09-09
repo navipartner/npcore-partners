@@ -44,7 +44,7 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        ValueEntryNoFilter := GetFilterFromValueEntryMapping(ValueEntry.GetFilter("Entry No."), false);
+        ValueEntryNoFilter := GetFilterFromValueEntryMapping(ValueEntry.GetFilter("Entry No."));
 
         if ValueEntryNoFilter <> '' then
             ValueEntry.SetFilter("Entry No.", StrSubstNo('<>%1', ValueEntryNoFilter));
@@ -77,19 +77,16 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
 
-    internal procedure GetFilterFromValueEntryMapping(BaseValueEntryFilter: Text; IsCOGS: Boolean) ValueEntryFilter: Text
+    internal procedure GetFilterFromValueEntryMapping(BaseValueEntryFilter: Text) ValueEntryFilter: Text
     var
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
         TextBuilder: TextBuilder;
     begin
-        if BaseValueEntryFilter.Contains('|') then
+        if BaseValueEntryFilter <> '' then
             ValueEntryFilter := BaseValueEntryFilter.Replace(',', '|');
 
         if ValueEntryFilter <> '' then
             TextBuilder.Append(ValueEntryFilter);
-
-        if IsCOGS then
-            RSRetValueEntryMapp.SetRange("COGS Correction", true);
 
         if RSRetValueEntryMapp.IsEmpty() then begin
             ValueEntryFilter := TextBuilder.ToText();
@@ -100,21 +97,18 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
         RSRetValueEntryMapp.SetLoadFields("Entry No.");
         if RSRetValueEntryMapp.FindSet() then
             repeat
-                AppendEntryNoFilterToVEFilter(TextBuilder, RSRetValueEntryMapp."Entry No.", not IsCOGS);
+                AppendEntryNoFilterToVEFilter(TextBuilder, RSRetValueEntryMapp."Entry No.");
             until RSRetValueEntryMapp.Next() = 0;
 
         ValueEntryFilter := TextBuilder.ToText();
         RemoveTrailingFilterFromVEFilter(ValueEntryFilter);
     end;
 
-    local procedure AppendEntryNoFilterToVEFilter(var TextBuilder: TextBuilder; EntryNo: Integer; Diff: Boolean)
+    local procedure AppendEntryNoFilterToVEFilter(var TextBuilder: TextBuilder; EntryNo: Integer)
     begin
         case (TextBuilder.Length > 0) of
             true:
-                if Diff then
-                    TextBuilder.Append('&<>' + Format(EntryNo))
-                else
-                    TextBuilder.Append('|' + Format(EntryNo));
+                TextBuilder.Append('|' + Format(EntryNo));
             false:
                 TextBuilder.Append(Format(EntryNo));
         end;

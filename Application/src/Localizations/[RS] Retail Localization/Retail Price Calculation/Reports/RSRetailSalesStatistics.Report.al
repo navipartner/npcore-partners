@@ -42,12 +42,17 @@ report 6014546 "NPR RS Retail Sales Statistics"
 
                 trigger OnAfterGetRecord()
                 begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
-                    Calculation(Item);
-#endif
+                    Clear(ItemSalesLCY);
+                    Clear(ItemSalesQty);
+                    Clear(ItemCOGSLCY);
+                    Clear(ItemInvQty);
 
+                    CalculateSalesAmount(ItemSalesLCY, ItemSalesQty, Item);
                     if ItemSalesQty = 0 then
                         CurrReport.Skip();
+
+                    CalculateCOGSAmount(ItemCOGSLCY, Item);
+                    CalculateInventoryQty(ItemInvQty, Item);
                 end;
             }
         }
@@ -84,12 +89,17 @@ report 6014546 "NPR RS Retail Sales Statistics"
 
                 trigger OnAfterGetRecord()
                 begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
-                    Calculation(Item2);
-#endif
+                    Clear(Item2SalesLCY);
+                    Clear(Item2SalesQty);
+                    Clear(Item2COGSLCY);
+                    Clear(Item2InvQty);
 
-                    if ItemSalesQty = 0 then
+                    CalculateSalesAmount(Item2SalesLCY, Item2SalesQty, Item);
+                    if Item2SalesQty = 0 then
                         CurrReport.Skip();
+
+                    CalculateCOGSAmount(Item2COGSLCY, Item);
+                    CalculateInventoryQty(Item2InvQty, Item);
                 end;
             }
         }
@@ -186,55 +196,92 @@ report 6014546 "NPR RS Retail Sales Statistics"
         exit(RequestPageFiltersTxt);
     end;
 
-#if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
-    local procedure Calculation(Item: Record Item)
+    local procedure CalculateCOGSAmount(var CostAmountLCY: Decimal; Item: Record Item)
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-        RSRetailCostAdjustment: Codeunit "NPR RS Retail Cost Adjustment";
-        ValueEntryNoFilter: Text;
+        RSValueEntryMapping: Query "NPR RS Value Entry Mapping";
     begin
+        RSValueEntryMapping.SetRange(Filter_COGS_Correction, true);
+        RSValueEntryMapping.SetFilter(Filter_Item_No, Item."No.");
+
+        if Item.GetFilter("Date Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Posting_Date, Item."Date Filter");
+
+        if Item.GetFilter("Global Dimension 1 Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Global_Dimension_1_Code, Item."Global Dimension 1 Filter");
+
+        if Item.GetFilter("Global Dimension 2 Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Global_Dimension_2_Code, Item."Global Dimension 2 Filter");
+
+        RSValueEntryMapping.Open();
+        while RSValueEntryMapping.Read() do
+            CostAmountLCY += RSValueEntryMapping.Cost_Amount_Actual;
+    end;
+
+    local procedure CalculateSalesAmount(var SalesAmountLCY: Decimal; var SalesQty: Decimal; Item: Record Item)
+    var
+        ValueEntry: Record "Value Entry";
+        SalesAmountToSubtract: Decimal;
+        SalesQtyToSubtract: Decimal;
+    begin
+        CalculateRetailValueEntryAmount(SalesAmountToSubtract, SalesQtyToSubtract, Item);
+
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetRange("Item No.", Item."No.");
-        ItemLedgerEntry.SetRange("Item No.", Item."No.");
 
         if Item.GetFilter("Date Filter") <> '' then
             ValueEntry.SetRange("Posting Date", Item."Date Filter");
 
-        if Item.GetFilter("Global Dimension 1 Filter") <> '' then begin
+        if Item.GetFilter("Global Dimension 1 Filter") <> '' then
             ValueEntry.SetRange("Global Dimension 1 Code", Item."Global Dimension 1 Filter");
-            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Item."Global Dimension 1 Filter");
-        end;
 
-        if Item.GetFilter("Global Dimension 2 Filter") <> '' then begin
+        if Item.GetFilter("Global Dimension 2 Filter") <> '' then
             ValueEntry.SetRange("Global Dimension 2 Code", Item."Global Dimension 2 Filter");
-            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Item."Global Dimension 2 Filter");
-        end;
-
-        ValueEntryNoFilter := RSRetailCostAdjustment.GetFilterFromValueEntryMapping(ValueEntry.GetFilter("Entry No."), false);
-        if ValueEntryNoFilter <> '' then
-            ValueEntry.SetFilter("Entry No.", StrSubstNo('<>%1', ValueEntryNoFilter));
 
         ValueEntry.CalcSums("Sales Amount (Actual)", "Invoiced Quantity");
 
-        ItemSalesLCY := ValueEntry."Sales Amount (Actual)";
-        Item2SalesLCY := ValueEntry."Sales Amount (Actual)";
-        ItemSalesQty := Abs(ValueEntry."Invoiced Quantity");
-        Item2SalesQty := Abs(ValueEntry."Invoiced Quantity");
+        SalesAmountLCY := ValueEntry."Sales Amount (Actual)" - SalesAmountToSubtract;
+        SalesQty := Abs(ValueEntry."Invoiced Quantity") - SalesQtyToSubtract;
+    end;
 
-        ValueEntry.SetRange("Entry No.");
+    local procedure CalculateRetailValueEntryAmount(var RetailValueEntryAmount: Decimal; var RetailValueEntryQty: Decimal; Item: Record Item)
+    var
+        RSValueEntryMapping: Query "NPR RS Value Entry Mapping";
+    begin
+        RSValueEntryMapping.SetFilter(Filter_Item_No, Item."No.");
 
-        ValueEntryNoFilter := RSRetailCostAdjustment.GetFilterFromValueEntryMapping(ValueEntry.GetFilter("Entry No."), true);
-        if ValueEntryNoFilter <> '' then
-            ValueEntry.SetFilter("Entry No.", StrSubstNo('%1', ValueEntryNoFilter));
+        if Item.GetFilter("Date Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Posting_Date, Item."Date Filter");
 
-        ValueEntry.CalcSums("Cost Amount (Actual)");
-        ItemCOGSLCY := Abs(ValueEntry."Cost Amount (Actual)");
-        Item2COGSLCY := Abs(ValueEntry."Cost Amount (Actual)");
+        if Item.GetFilter("Global Dimension 1 Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Global_Dimension_1_Code, Item."Global Dimension 1 Filter");
+
+        if Item.GetFilter("Global Dimension 2 Filter") <> '' then
+            RSValueEntryMapping.SetRange(Filter_Global_Dimension_2_Code, Item."Global Dimension 2 Filter");
+
+        RSValueEntryMapping.Open();
+        while RSValueEntryMapping.Read() do begin
+            RetailValueEntryAmount += RSValueEntryMapping.Sales_Amount_Actual;
+            RetailValueEntryQty += RSValueEntryMapping.Invoiced_Quantity;
+        end;
+        RSValueEntryMapping.Close();
+    end;
+
+    local procedure CalculateInventoryQty(var InventoryQty: Decimal; Item: Record Item)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
+
+        if Item.GetFilter("Date Filter") <> '' then
+            ItemLedgerEntry.SetRange("Posting Date", Item."Date Filter");
+
+        if Item.GetFilter("Global Dimension 1 Filter") <> '' then
+            ItemLedgerEntry.SetRange("Global Dimension 1 Code", Item."Global Dimension 1 Filter");
+
+        if Item.GetFilter("Global Dimension 2 Filter") <> '' then
+            ItemLedgerEntry.SetRange("Global Dimension 2 Code", Item."Global Dimension 2 Filter");
 
         ItemLedgerEntry.CalcSums(Quantity);
-        ItemInvQty := ItemLedgerEntry.Quantity;
-        Item2InvQty := ItemLedgerEntry.Quantity;
+        InventoryQty := ItemLedgerEntry.Quantity;
     end;
-#endif
 }
