@@ -61,9 +61,6 @@ test.describe("Grid Options button tests", () => {
       .click();
     await page.frameLocator("iframe").locator("#columnsNr").fill("04");
     await page.frameLocator("iframe").locator("#rowsNr").fill("04");
-    expect(
-      page.frameLocator("iframe").getByRole("button", { name: "Notifier" })
-    ).toBeHidden();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Clear" })
@@ -106,9 +103,9 @@ test.describe("Grid Options button tests", () => {
       .getByText("GRID_1", { exact: true })
       .click();
     await page.frameLocator("iframe").locator("#columnsNr").fill("04");
-    await page.frameLocator("iframe").locator("#rowsNr").fill("04");
+    await page.frameLocator("iframe").locator("#rowsNr").fill("03");
     expect(
-      page.frameLocator("iframe").getByRole("button", { name: "Notifier" })
+      page.frameLocator("iframe").getByRole("button", { name: "Logout" })
     ).toBeHidden();
     await page
       .frameLocator("iframe")

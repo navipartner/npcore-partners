@@ -148,7 +148,7 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .locator(
         "div:nth-child(7) > .editable-button__content > .editable-button__button"
-      )
+      ).first()
       .click();
     await page.frameLocator("iframe").getByText("Paste").click();
     await page.waitForTimeout(1000);
@@ -306,11 +306,12 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
+      await page.waitForTimeout(10000)
     await page
       .frameLocator("iframe")
       .locator(
         "div:nth-child(7) > .editable-button__content > .editable-button__button"
-      )
+      ).first()
       .click();
     await page.frameLocator("iframe").getByText("Edit").click();
     await page
@@ -401,11 +402,12 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
+      await page.waitForTimeout(10000)
     await page
       .frameLocator("iframe")
       .locator(
         "div:nth-child(8) >.editable-button__content > .editable-button__button"
-      )
+      ).first()
       .click();
     await page.frameLocator("iframe").getByText("Edit").click();
     await page

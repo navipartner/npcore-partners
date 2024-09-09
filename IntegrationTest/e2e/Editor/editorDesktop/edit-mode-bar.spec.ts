@@ -27,12 +27,12 @@ test.describe("Edit Mode Bar tests", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
+      .getByRole("button", { name: "Qty", exact: true })
       .getByRole("textbox")
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
+      .getByRole("button", { name: "Qty", exact: true })
       .getByRole("textbox")
       .fill("testing quantity");
     await page
@@ -83,27 +83,27 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
       .click();
-    await page.frameLocator("iframe").getByLabel("AmountExclVAT").uncheck();
+    await page.frameLocator("iframe").getByLabel("Amount Excl VAT").uncheck();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
       .click();
     await expect(
-      page.frameLocator("iframe").getByText("AmountExclVAT")
+      page.frameLocator("iframe").getByText("Amount Excl VAT")
     ).not.toBeVisible();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
       .click();
-    await page.frameLocator("iframe").getByLabel("AmountExclVAT").check();
+    await page.frameLocator("iframe").getByLabel("Amount Excl VAT").check();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "AmountExclVAT" })
+      .getByRole("button", { name: "Amount Excl VAT" })
       .getByRole("textbox")
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "AmountExclVAT" })
+      .getByRole("button", { name: "Amount Excl VAT" })
       .getByRole("textbox")
       .fill("testing amount");
     await page
@@ -157,12 +157,12 @@ test.describe("Edit Mode Bar tests", () => {
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "SalespersonName" })
+      .getByRole("button", { name: "Salesperson Name:" })
       .getByRole("textbox")
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "SalespersonName" })
+      .getByRole("button", { name: "Salesperson Name:" })
       .getByRole("textbox")
       .fill("testing footer");
     await page
@@ -223,7 +223,7 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Quantity").uncheck();
+    await page.frameLocator("iframe").getByLabel("Quantity:").uncheck();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
@@ -239,15 +239,15 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Quantity").check();
+    await page.frameLocator("iframe").getByLabel("Quantity:").check();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
+      .getByRole("button", { name: "Quantity:", exact: true })
       .getByRole("textbox")
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
+      .getByRole("button", { name: "Quantity:", exact: true })
       .getByRole("textbox")
       .fill("testing panel");
     await page.waitForTimeout(3000);
@@ -340,11 +340,9 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Small Draft Beer" })
       .click();
-    await page.frameLocator("iframe").getByText("Quantity1").click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Change Quantity", exact: true })
-      .click();
+    await page.frameLocator("iframe").getByRole('button', { name: 'Increase Quantity By 1 Small' }).click(); 
+    await page.waitForTimeout(1000) 
+    await page.frameLocator('iframe').getByRole('button', { name: 'Change Quantity Small Draft' }).click();
     await page.frameLocator("iframe").locator("#button10 div").click();
     await page
       .frameLocator("iframe")
@@ -352,10 +350,8 @@ test.describe("Edit Mode Bar tests", () => {
       .filter({ hasText: "OK" })
       .first()
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByText("Quantity2", { exact: true })
-      .click();
+      await page.frameLocator("iframe").getByRole('button', { name: 'Decrease Quantity By 1 Small' }).click();  
+
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Delete Line" })

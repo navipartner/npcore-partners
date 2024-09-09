@@ -26,28 +26,10 @@ export const login = async (
     .frameLocator("iframe")
     .getByRole("button", { name: "New Layout" })
     .click();
-  await page
-    .frameLocator("iframe")
-    .getByRole("button", { name: "New Layout" })
-    .nth(1)
-    .click();
-  if (
-    await page.frameLocator("iframe").getByRole("textbox").nth(3).isVisible()
-  ) {
-    await page.frameLocator("iframe").getByRole("textbox").nth(3).click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("textbox")
-      .nth(3)
-      .fill(`E2E Testing ${uniqueLayoutKey}`);
-  } else {
-    await page.frameLocator("iframe").getByRole("textbox").nth(2).click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("textbox")
-      .nth(2)
-      .fill(`E2E Testing ${uniqueLayoutKey}`);
-  }
+    await page.frameLocator('iframe').getByRole('button', { name: 'Copy Existing Layout' }).click();
+    await page.frameLocator('iframe').locator('.new-layout-modal__content-inner > .select > .css-b62m3t-container > .react-select__control > .react-select__indicators').click();
+    await page.frameLocator('iframe').getByText('E2E Base layout', { exact: true }).click();
+    await page.frameLocator('iframe').getByRole('textbox').nth(3).fill(`E2E Testing ${uniqueLayoutKey}`);
   await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Create", exact: true })
@@ -99,7 +81,6 @@ export const login = async (
   if (await textLocator.isVisible()) {
     await page.getByRole('button', { name: 'OK' }).click();
   } else {
-
     await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Cancel" })
