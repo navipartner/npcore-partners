@@ -994,6 +994,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
         ShopifyInventoryItemID: Text[30];
         ShopifyItemID: Text[30];
+        xShopifyItemID: Text[30];
         ShopifyVariantID: Text[30];
         LinkExists: Boolean;
     begin
@@ -1020,8 +1021,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         SpfyStoreLinkMgt.UpdateStoreItemLinks(Item);
         SpfyStoreItemLink.Find();
+        xShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyStoreItemVariantLink := SpfyStoreItemLink;
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
+
         //TODO: refactor for Shopify item integration with master/slave item approach
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyItemID, false);
         if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(_ShopifyProductStatus)) then;
@@ -1043,6 +1046,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemLink."Sync. to this Store" := true;
         SpfyStoreItemLink."Synchronization Is Enabled" := true;
         ModifySpfyStoreItemLink(SpfyStoreItemLink, DisableDataLog);
+
+        if (xShopifyItemID <> '') and (ShopifyItemID <> xShopifyItemID) then
+            RecalculateInventoryLevels(SpfyStoreItemLink);
     end;
 
     local procedure ModifySpfyStoreItemLink(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)
