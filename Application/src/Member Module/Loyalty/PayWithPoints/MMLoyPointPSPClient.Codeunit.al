@@ -159,16 +159,15 @@
         LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if (LoyaltyPointsMgrClient.CreateRegisterSalesEftTransaction(IntegrationName(), SaleHeader, EFTTransactionRequest)) then begin
+        if (LoyaltyPointsMgrClient.CreateRegisterSalesEftTransaction(IntegrationName(), SaleHeader, EFTTransactionRequest)) then
             LoyaltyPointsMgrClient.PrepareServiceRequest(EFTTransactionRequest);
-            LoyaltyPointsMgrClient.MakeServiceRequest(EFTTransactionRequest);
-        end;
     end;
 
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "NPR POS Sale"; SalePOS: Record "NPR POS Sale")
     var
+        LoyaltyPointsMgrClient: Codeunit "NPR MM Loy. Point Mgr (Client)";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Integration Type", "Processing Type");
@@ -177,8 +176,10 @@
         EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::AUXILIARY);
         EFTTransactionRequest.SetRange("Auxiliary Operation ID", 1);
         EFTTransactionRequest.SetRange("Result Code", 119);
-        if (EFTTransactionRequest.FindFirst()) then
+        if (EFTTransactionRequest.FindFirst()) then begin
+            LoyaltyPointsMgrClient.MakeServiceRequest(EFTTransactionRequest);
             EFTTransactionRequest.PrintReceipts(false);
+        end;
     end;
 
 }

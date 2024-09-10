@@ -548,13 +548,6 @@
         EFTTransactionRequest.Modify();
         Commit();
 
-        if (not (EFTTransactionRequest.Successful)) then begin
-            // TODO Check Response Code and throw error if needed
-            case MessageCode of
-                '-2062': // Reservation was cancelled prior to capture
-                    Error(ResponseMessage);
-            end;
-        end;
     end;
 
     local procedure FinalizeTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; MessageCode: Text; ResponseMessage: Text; AuthorizationCode: Text; ReferenceNumber: Text)
