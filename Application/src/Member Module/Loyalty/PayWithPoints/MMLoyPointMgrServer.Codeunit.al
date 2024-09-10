@@ -573,7 +573,7 @@
 
                         if (IsReservationCancelled(TmpPaymentLines."Authorization Code")) then begin
                             ResponseMessage := StrSubstNo(CANCEL_2, TmpPaymentLines."Authorization Code");
-                            ResponseMessageId := '-2062'; // This needs to be fatal in client. 
+                            ResponseMessageId := '-2062';
                             exit(false);
                         end;
                     end;
