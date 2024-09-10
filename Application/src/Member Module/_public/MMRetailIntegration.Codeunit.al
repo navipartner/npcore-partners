@@ -31,4 +31,12 @@ codeunit 6151084 "NPR MM Retail Integration"
         POSSalesInfo."Scanned Card Data" := ExternalMemberCardNo;
         POSSalesInfo.Modify();
     end;
+
+    procedure DeletePOSSalesInfo(AssociationType: Option HEADER,LINE; SalesTicketNo: Code[20]; LineNo: Integer)
+    var
+        POSSalesInfo: Record "NPR MM POS Sales Info";
+    begin
+        if POSSalesInfo.Get(AssociationType, SalesTicketNo, LineNo) then
+            POSSalesInfo.Delete(true);
+    end;
 }
