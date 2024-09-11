@@ -62,7 +62,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('paymentDescription', POSPaymentMethod.Description);
         Response.Add('remainingAmount', RemainingAmount);
         TextAmountPrompt := TextAmountLabel;
-        PaymentProcessingEvents.OnBeforeAddAmountPromptLblToResponse(TextAmountPrompt);
+        PaymentProcessingEvents.OnBeforeAddAmountPromptLblToResponse(POSPaymentMethod, TextAmountPrompt);
         Response.Add('amountPrompt', TextAmountPrompt);
         exit(Response);
     end;
