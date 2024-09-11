@@ -41,10 +41,12 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     local procedure PreparePayment(PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         Payments: Codeunit "NPR POS Action: Payment WF2 BL";
+        PaymentProcessingEvents: Codeunit "NPR Payment Processing Events";
         PaymentMethodCode: Code[10];
         WorkflowName: Code[20];
         PosPaymentMethod: Record "NPR POS Payment Method";
         RemainingAmount: Decimal;
+        TextAmountPrompt: Text;
         TextAmountLabel: Label 'Enter Amount';
     begin
         SwitchToPaymentView(Context);
@@ -59,7 +61,9 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('paymentType', POSPaymentMethod."Code");
         Response.Add('paymentDescription', POSPaymentMethod.Description);
         Response.Add('remainingAmount', RemainingAmount);
-        Response.Add('amountPrompt', TextAmountLabel);
+        TextAmountPrompt := TextAmountLabel;
+        PaymentProcessingEvents.OnBeforeAddAmountPromptLblToResponse(TextAmountPrompt);
+        Response.Add('amountPrompt', TextAmountPrompt);
         exit(Response);
     end;
 

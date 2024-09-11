@@ -11,4 +11,9 @@ codeunit 6151042 "NPR Payment Processing Events"
     internal procedure OnAfterCalculateSuggestionPaymentAmount(SalesTicketNo: Code[20]; SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; var SuggestPaymentAmount: Decimal)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeAddAmountPromptLblToResponse(var TextAmountLabel: Text)
+    begin
+    end;
 }
