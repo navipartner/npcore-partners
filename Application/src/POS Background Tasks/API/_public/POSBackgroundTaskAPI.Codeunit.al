@@ -1,7 +1,5 @@
 codeunit 6059863 "NPR POS Background Task API"
 {
-    Access = Internal;
-
     var
         _POSBackgroundTaskManager: Codeunit "NPR POS Backgr. Task Manager";
         _Initialized: Boolean;
