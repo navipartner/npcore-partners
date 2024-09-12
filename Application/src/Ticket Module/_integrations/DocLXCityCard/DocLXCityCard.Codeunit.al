@@ -575,7 +575,6 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        // https://api.copenhagen.citycardsolutions.com/v1.1/article/mobileList/EN?passkey=80ca508e25d506f810440f58050d00a400b64e91e9bc1289ebc310fe161dd61e
         ArticleUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(ArticleRestEndpoint, CityName, EnvironmentName));
     end;
 
@@ -595,10 +594,8 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        // https://npdoclxcitycardapi.azurewebsites.net/api/hello?code=CK1D15x70aFgCG_ZoAx4jvSLfgMLHHkoMBFDtrYgBQcdAzFuWTfhpA==
         HelloUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardHelloUrl');
 
-        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardValidatePath := '/v1.1/coupon/validate/';
     end;
@@ -620,10 +617,8 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        // https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=VxwU2MIlZlULkvMF2ugheeM27BvARbJWXtscRdaEE2d6AzFuvIGYBQ==
         ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
 
-        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));
 
@@ -647,10 +642,8 @@ codeunit 6184830 "NPR DocLXCityCard"
         if (not GetSetup(CityCode, CityName, EnvironmentName)) then
             Error('City Card setup not found or not valid for city: %1', CityCode);
 
-        // https://npdoclxcitycardapi.azurewebsites.net/api/cityCard?code=VxwU2MIlZlULkvMF2ugheeM27BvARbJWXtscRdaEE2d6AzFuvIGYBQ==
         ProxyUrl := AzureKeyVaultMgt.GetAzureKeyVaultSecret('DocLXCityCardProxyUrl');
 
-        // api.copenhagen.citycardsolutions.com
         CityCardHostName := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(HostKeyName, CityName, EnvironmentName));
         CityCardCipherKey := AzureKeyVaultMgt.GetAzureKeyVaultSecret(StrSubstNo(CipherKeyName, CityName, EnvironmentName));
 
