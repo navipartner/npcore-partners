@@ -1113,9 +1113,6 @@
                     POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
                     POSPostingBuffer."Applies-to Doc. Type" := POSPostingBuffer."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSPostingBuffer."Applies-to Doc. No.";
-                    POSPostingBuffer."VAT Prod. Posting Group" := POSPaymentLineToBeCompressed."VAT Prod. Posting Group";
-                    POSPostingBuffer."VAT Bus. Posting Group" := POSPaymentLineToBeCompressed."VAT Bus. Posting Group";
-                    POSPostingBuffer."VAT Calculation Type" := POSPaymentLineToBeCompressed."VAT Calculation Type";
                     PostingDescription := POSPaymentLineToBeCompressed.Description;
                     if POSPaymentMethod.Get(POSPaymentLineToBeCompressed."POS Payment Method Code") then begin
                         if not POSPaymentMethod."Post Condensed" then begin
