@@ -86,6 +86,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         RSRetValueEntryMapp.Init();
         RSRetValueEntryMapp."Entry Type" := ValueEntry."Entry Type";
         RSRetValueEntryMapp."Entry No." := ValueEntry."Entry No.";
+        RSRetValueEntryMapp."Item No." := ValueEntry."Item No.";
         RSRetValueEntryMapp."Document Type" := ValueEntry."Document Type";
         RSRetValueEntryMapp."Document No." := ValueEntry."Document No.";
         RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
@@ -102,6 +103,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         RSRetValueEntryMapp.Init();
         RSRetValueEntryMapp."Entry Type" := ValueEntry."Entry Type";
         RSRetValueEntryMapp."Entry No." := ValueEntry."Entry No.";
+        RSRetValueEntryMapp."Item No." := ValueEntry."Item No.";
         RSRetValueEntryMapp."Document Type" := ValueEntry."Document Type";
         RSRetValueEntryMapp."Document No." := ValueEntry."Document No.";
         RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
@@ -118,6 +120,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         RSRetValueEntryMapp.Init();
         RSRetValueEntryMapp."Entry Type" := ValueEntry."Entry Type";
         RSRetValueEntryMapp."Entry No." := ValueEntry."Entry No.";
+        RSRetValueEntryMapp."Item No." := ValueEntry."Item No.";
         RSRetValueEntryMapp."Document Type" := ValueEntry."Document Type";
         RSRetValueEntryMapp."Document No." := ValueEntry."Document No.";
         RSRetValueEntryMapp."Item Ledger Entry Type" := ValueEntry."Item Ledger Entry Type";
