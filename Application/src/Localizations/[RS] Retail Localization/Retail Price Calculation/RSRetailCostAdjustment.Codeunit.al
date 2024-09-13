@@ -44,10 +44,10 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        ValueEntryNoFilter := GetFilterFromValueEntryMapping(ValueEntry.GetFilter("Entry No."));
+        ValueEntryNoFilter := FormatFilterDiffFromValueEntryMapping(Item, ValueEntry.GetFilter("Entry No."));
 
         if ValueEntryNoFilter <> '' then
-            ValueEntry.SetFilter("Entry No.", StrSubstNo('<>%1', ValueEntryNoFilter));
+            ValueEntry.SetFilter("Entry No.", StrSubstNo('%1', ValueEntryNoFilter));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnPostLinesOnAfterPostLine', '', false, false)]
@@ -77,48 +77,35 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
 
-    internal procedure GetFilterFromValueEntryMapping(BaseValueEntryFilter: Text) ValueEntryFilter: Text
+    local procedure FormatFilterDiffFromValueEntryMapping(Item: Record Item; BaseFilter: Text) ValueEntryNoFilter: Text
     var
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
         TextBuilder: TextBuilder;
+        FilterDiffFormLbl: Label '<>%1', Locked = true, Comment = '%1 = Entry No.';
+        AddFilterDiffFormLbl: Label '&<>%1', Locked = true, Comment = '%1 = Entry No.';
     begin
-        if BaseValueEntryFilter <> '' then
-            ValueEntryFilter := BaseValueEntryFilter.Replace(',', '|');
+        if BaseFilter <> '' then
+            TextBuilder.Append(BaseFilter.Replace(',', '|'));
 
-        if ValueEntryFilter <> '' then
-            TextBuilder.Append(ValueEntryFilter);
-
+        RSRetValueEntryMapp.SetFilter("Location Code", Item.GetFilter("Location Filter"));
+        RSRetValueEntryMapp.SetRange("Item No.", Item."No.");
         if RSRetValueEntryMapp.IsEmpty() then begin
-            ValueEntryFilter := TextBuilder.ToText();
-            RemoveTrailingFilterFromVEFilter(ValueEntryFilter);
+            ValueEntryNoFilter := TextBuilder.ToText();
             exit;
         end;
 
         RSRetValueEntryMapp.SetLoadFields("Entry No.");
         if RSRetValueEntryMapp.FindSet() then
             repeat
-                AppendEntryNoFilterToVEFilter(TextBuilder, RSRetValueEntryMapp."Entry No.");
+                if TextBuilder.Length = 0 then
+                    TextBuilder.Append(StrSubstNo(FilterDiffFormLbl, RSRetValueEntryMapp."Entry No."))
+                else
+                    TextBuilder.Append(StrSubstNo(AddFilterDiffFormLbl, RSRetValueEntryMapp."Entry No."))
             until RSRetValueEntryMapp.Next() = 0;
 
-        ValueEntryFilter := TextBuilder.ToText();
-        RemoveTrailingFilterFromVEFilter(ValueEntryFilter);
+        ValueEntryNoFilter := TextBuilder.ToText();
     end;
 
-    local procedure AppendEntryNoFilterToVEFilter(var TextBuilder: TextBuilder; EntryNo: Integer)
-    begin
-        case (TextBuilder.Length > 0) of
-            true:
-                TextBuilder.Append('|' + Format(EntryNo));
-            false:
-                TextBuilder.Append(Format(EntryNo));
-        end;
-    end;
-
-    local procedure RemoveTrailingFilterFromVEFilter(var ValueEntryFilter: Text)
-    begin
-        if ValueEntryFilter.EndsWith('&<>') then
-            ValueEntryFilter := ValueEntryFilter.Remove(StrLen(ValueEntryFilter) - 1, 1);
-    end;
 #endif
     #endregion RS Retail Cost Adjustment Helper Procedures
 }
