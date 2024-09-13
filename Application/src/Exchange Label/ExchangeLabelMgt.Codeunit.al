@@ -717,4 +717,14 @@
         if not ExchangeLabel.IsEmpty() then
             ExchangeLabel.DeleteAll();
     end;
+
+    procedure CheckIfBarCodeIsExchangeLabel(Barcode: Text): Boolean
+    var
+        ExchangeLabel: Record "NPR Exchange Label";
+    begin
+        ExchangeLabel.SetCurrentKey(Barcode);
+        ExchangeLabel.SetRange(Barcode, Barcode);
+        if not ExchangeLabel.IsEmpty() then
+            exit(true);
+    end;
 }

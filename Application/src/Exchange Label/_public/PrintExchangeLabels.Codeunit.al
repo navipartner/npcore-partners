@@ -40,4 +40,25 @@ codeunit 6059950 "NPR Print Exchange Labels"
     begin
         ExchLabelMgt.DeleteExchangeLabels(RecVariant);
     end;
+
+    procedure CheckIfBarCodeIsExchangeLabel(Barcode: Text): Boolean
+    var
+        ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
+    begin
+        exit(ExchLabelMgt.CheckIfBarCodeIsExchangeLabel(Barcode));
+    end;
+
+    procedure CheckPrefix(Barcode: Text; Prefix: Code[10]): Boolean
+    var
+        ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
+    begin
+        exit(ExchLabelMgt.CheckPrefix(Barcode, Prefix));
+    end;
+
+    procedure ScanExchangeLabel(var SalePOS: Record "NPR POS Sale"; var Validering: Code[20]; CopyValidering: Code[20]) Found: Boolean
+    var
+        ExchLabelMgt: codeunit "NPR Exchange Label Mgt.";
+    begin
+        exit(ExchLabelMgt.ScanExchangeLabel(SalePOS, Validering, CopyValidering));
+    end;
 }
