@@ -442,7 +442,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         if SalesCrMemoHeader."No." <> '' then begin
             RSEIAuxSalesCrMemoHdr.ReadRSEIAuxSalesCrMemoHdrFields(SalesCrMemoHeader);
             RSEIAuxSalesCrMemoHdr.TransferFields(RSEIAuxSalesHeader, false);
-            RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" := RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::"0";
+            RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" := RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::" ";
             RSEIAuxSalesCrMemoHdr."NPR RS EI Reference Number" := SalesCrMemoHeader."No.";
             RSEIAuxSalesCrMemoHdr.SaveRSEIAuxSalesCrMemoHdrFields();
             RSEIOutSalesCrMemoMgt.CreateRequestAndSendSalesCrMemo(SalesCrMemoHeader);
@@ -490,6 +490,15 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             if not RSEIDocTaxExemption.Insert() then
                 RSEIDocTaxExemption.Modify();
         end;
+
+        RSEIDocTaxExemption.SetRange("Document No.", SalesHeader."No.");
+        RSEIDocTaxExemption.FindSet();
+        repeat
+            foreach TaxCategory in TaxCategoriesList do begin
+                if not (RSEIDocTaxExemption."Tax Category" in [TaxCategory]) then
+                    RSEIDocTaxExemption.Delete();
+            end;
+        until RSEIDocTaxExemption.Next() = 0;
         Commit();
 
         RSEIDocTaxExemption.SetRange("Document No.", SalesHeader."No.");

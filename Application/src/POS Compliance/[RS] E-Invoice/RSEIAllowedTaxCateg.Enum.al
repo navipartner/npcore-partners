@@ -16,6 +16,9 @@ enum 6014695 "NPR RS EI Allowed Tax Categ."
     value(2; "AE")
     {
         Caption = 'Reverse VAT calculation';
+        ObsoleteState = Pending;
+        ObsoleteTag = '2024-09-22';
+        ObsoleteReason = 'Replaced by AE10 and AE20.';
     }
     value(3; "Z")
     {
@@ -44,5 +47,13 @@ enum 6014695 "NPR RS EI Allowed Tax Categ."
     value(9; "N")
     {
         Caption = 'Anullment';
+    }
+    value(10; "AE10")
+    {
+        Caption = 'Reverse VAT calculation at the rate of 10%';
+    }
+    value(11; "AE20")
+    {
+        Caption = 'Reverse VAT calculation at the rate of 20%';
     }
 }

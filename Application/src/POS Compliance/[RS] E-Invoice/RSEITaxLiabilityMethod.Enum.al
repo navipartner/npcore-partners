@@ -12,6 +12,9 @@ enum 6014683 "NPR RS EI Tax Liability Method"
     value(1; "0")
     {
         Caption = 'None';
+        ObsoleteState = Pending;
+        ObsoleteTag = '2024-09-29';
+        ObsoleteReason = 'Not going to be used anymore.';
     }
     value(2; "3")
     {
