@@ -32,6 +32,10 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         if SalesInvoiceHeader."No." = '' then
             exit;
 
+        TempSalesInvoiceLine.Reset();
+        TempSalesInvoiceLine.DeleteAll();
+        TempNivSalesInvLines.Reset();
+        TempNivSalesInvLines.DeleteAll();
         FillRetailSalesLines(SalesInvoiceHeader);
 
         if TempSalesInvoiceLine.IsEmpty() then
@@ -98,8 +102,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivSalesInvLines.Next() = 0;
-        NivelationHeader.CalcFields(Amount);
-        NivelationHeader.Modify();
 
         NivelationPost.RunNivelationPosting(NivelationHeader, true)
     end;
@@ -778,7 +780,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
         PriceListFilter := SalesInvoiceHeader."Sell-to Customer No.";
         if (SalesInvoiceHeader."Customer Disc. Group" <> '') and (PriceListFilter <> '') then

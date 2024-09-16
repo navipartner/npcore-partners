@@ -31,6 +31,11 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ReturnDocumentNo: Code[20];
         RSRetailCalculationType: Enum "NPR RS Retail Calculation Type";
     begin
+        TempPOSEntrySalesLines.Reset();
+        TempPOSEntrySalesLines.DeleteAll();
+        TempNivelationSalesLines.Reset();
+        TempNivelationSalesLines.DeleteAll();
+
         FillRetailPOSEntryLines(POSEntry);
 
         if TempPOSEntrySalesLines.IsEmpty() then
@@ -108,8 +113,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivelationSalesLines.Next() = 0;
-        NivelationHeader.CalcFields(Amount);
-        NivelationHeader.Modify();
 
         NivelationPost.RunNivelationPosting(NivelationHeader, ShowNivelationPostingMessage);
     end;
@@ -922,7 +925,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
     local procedure FilterPriceListHeader(POSEntry: Record "NPR POS Entry")
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
         PriceListHeader.SetRange("Assign-to No.", POSEntry."Customer No.");
 

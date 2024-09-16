@@ -32,6 +32,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if (IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (not IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
             exit;
 
+        TempTransferReceiptLine.Reset();
+        TempTransferReceiptLine.DeleteAll();
         FillTempTransferReceiptLines(TransferReceiptHeader);
 
         if TempTransferReceiptLine.IsEmpty() then
@@ -41,6 +43,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
 
         TempTransferReceiptLine.FindSet();
         repeat
+            TempRetailValueEntry.Reset();
             TempRetailValueEntry.DeleteAll();
             FindPriceListLine(TransferReceiptHeader."Transfer-to Code");
 
@@ -432,7 +435,6 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
 
         PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, TransferReceiptHeader."Posting Date"));

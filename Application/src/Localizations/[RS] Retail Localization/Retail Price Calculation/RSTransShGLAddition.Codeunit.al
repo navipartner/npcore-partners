@@ -31,6 +31,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         if not CheckRetailLocation(TransferHeader) then
             exit;
 
+        TempTransferLine.Reset();
+        TempTransferLine.DeleteAll();
         FillRetailTransferLines(TransferHeader);
 
         if TempTransferLine.IsEmpty() then
@@ -473,7 +475,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
 
         PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, TransferHeader."Posting Date"));

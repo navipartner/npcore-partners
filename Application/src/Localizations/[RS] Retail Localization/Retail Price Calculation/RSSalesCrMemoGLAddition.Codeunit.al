@@ -32,6 +32,11 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if SalesCrMemoHeader."No." = '' then
             exit;
 
+        TempSalesCrMemoLine.Reset();
+        TempSalesCrMemoLine.DeleteAll();
+        TempNivSalesCrMemoLines.Reset();
+        TempNivSalesCrMemoLines.DeleteAll();
+
         FillRetailSalesLines(SalesCrMemoHeader);
 
         if TempSalesCrMemoLine.IsEmpty() then
@@ -98,8 +103,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines.Insert(true);
             LineNo += 10000;
         until TempNivSalesCrMemoLines.Next() = 0;
-        NivelationHeader.CalcFields(Amount);
-        NivelationHeader.Modify();
 
         NivelationPost.RunNivelationPosting(NivelationHeader, true)
     end;
@@ -787,7 +790,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
         PriceListFilter := SalesCrMemoHeader."Sell-to Customer No.";
         if (SalesCrMemoHeader."Customer Disc. Group" <> '') and (PriceListFilter <> '') then
