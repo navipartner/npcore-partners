@@ -59,9 +59,15 @@
         ResponseJson: JsonToken;
         TrxUploadErr: Label 'Error while trying to send a transaction to Fiskaly.\%1';
         Url: Text;
+        IsHandled: Boolean;
     begin
         ConnectionParameters.GetSetup(DeAuditAux);
         Url := StrSubstNo('/tss/%1/tx/%2?tx_revision=%3', Format(DeAuditAux."TSS ID", 0, 4), Format(DeAuditAux."Transaction ID", 0, 4), DeAuditAux."Latest Revision" + 1);
+
+        OnBeforeSendHttpRequestForSendTransaction(DeAuditAux, RequestBody, ResponseJson, ConnectionParameters, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PUT', Url) then
             Error(TrxUploadErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
         if not DEAuditMgt.DeAuxInfoInsertResponse(DeAuditAux, ResponseJson) then
@@ -91,6 +97,7 @@
         RequestMetadata: JsonObject;
         ResponseJson: JsonToken;
         TSSCreateErr: Label 'Error while trying to create a new Technical Security System (TSS) at Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at", 0DT);
@@ -99,6 +106,10 @@
         RequestMetadata.Add('bc_code', DETSS.Code);
         RequestMetadata.Add('bc_desription', DETSS.Description);
         RequestBody.Add('metadata', RequestMetadata);
+
+        OnBeforeSendHttpRequestForCreateTSS(DETSS, RequestBody, ResponseJson, ConnectionParameters, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/tss/%1', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSCreateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
@@ -122,6 +133,7 @@
         RequestBody: JsonObject;
         ResponseJson: JsonToken;
         TSSUpdateErr: Label 'Error while trying to set new admin PIN for a Technical Security System (TSS) at Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at");
@@ -131,6 +143,10 @@
 
         RequestBody.Add('admin_puk', DESecretMgt.GetSecretKey(DETSS.AdminPUKSecretLbl()));
         RequestBody.Add('new_admin_pin', NewAdminPIN);
+
+        OnBeforeSendHttpRequestForUpdateAdminPin(DETSS, DESecretMgt, NewAdminPIN, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PATCH', StrSubstNo('/tss/%1/admin', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
@@ -144,11 +160,16 @@
         RequestBody: JsonObject;
         ResponseJson: JsonToken;
         TSSAdminAuthErr: Label 'Error while trying to authenticate admin of a Technical Security System (TSS) at Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at");
 
         RequestBody.Add('admin_pin', DESecretMgt.GetSecretKey(DETSS.AdminPINSecretLbl()));
+
+        OnBeforeSendHttpRequestForAuthenticateAdmin(IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'POST', StrSubstNo('/tss/%1/admin/auth', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSAdminAuthErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
@@ -178,11 +199,16 @@
         RequestBody: JsonObject;
         ResponseJson: JsonToken;
         TSSUpdateErr: Label 'Error while trying to update a Technical Security System (TSS) at Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at");
 
         RequestBody.Add('state', Enum::"NPR DE TSS State".Names().Get(Enum::"NPR DE TSS State".Ordinals().IndexOf(NewState.AsInteger())));
+
+        OnBeforeSendHttpRequestForUpdateTSS_State(DETSS, NewState, RequestBody, ResponseJson, UpdateBCInfo, ConnectionParameters, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PATCH', StrSubstNo('/tss/%1', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSUpdateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
@@ -244,7 +270,7 @@
         DETSS.Insert(false, true);
     end;
 
-    local procedure UpdateDeTssWithDataFromFiskaly(var DETSS: Record "NPR DE TSS"; ResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup")
+    internal procedure UpdateDeTssWithDataFromFiskaly(var DETSS: Record "NPR DE TSS"; ResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup")
     var
         TypeHelper: Codeunit "Type Helper";
         JToken: JsonToken;
@@ -305,6 +331,7 @@
         RequestMetadata: JsonObject;
         ResponseJson: JsonToken;
         ClientCreateErr: Label 'Error while trying to create a new Client at Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         PosUnitAuxDE.TestField(SystemId);
         PosUnitAuxDE.TestField("Fiskaly Client Created at", 0DT);
@@ -323,6 +350,10 @@
         RequestMetadata.Add('pos_unit_no', PosUnitAuxDE."POS Unit No.");
         RequestMetadata.Add('tss_bc_code', DETSS."Code");
         RequestBody.Add('metadata', RequestMetadata);
+
+        OnBeforeSendHttpRequestForCreateClient(PosUnitAuxDE, DETSS, RequestBody, ResponseJson, ConnectionParameters, IsHandled);
+        if IsHandled then
+            exit;
 
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/tss/%1/client/%2', Format(DETSS.SystemId, 0, 4), Format(PosUnitAuxDE.SystemId, 0, 4))) then
             Error(ClientCreateErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
@@ -377,14 +408,20 @@
         RequestBody: JsonObject;
         ResponseJson: JsonToken;
         TSSClientListAccessErr: Label 'Error while retrieving list of clients from Fiskaly.\%1';
+        IsHandled: Boolean;
     begin
         ConnectionParameters.GetSetup(DETSS);
+
+        OnBeforeSendHttpRequestForGetTSSClientList(ResponseJson, DETSS, PosUnitAuxDE, IsHandled);
+        if IsHandled then
+            exit;
+
         if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, 'GET', StrSubstNo('/tss/%1/client', Format(DETSS.SystemId, 0, 4))) then
             Error(TSSClientListAccessErr, StrSubstNo(ErrorDetailsTxt, GetLastErrorText()));
         UpdateDeTssClientFromFiskaly(PosUnitAuxDE, ResponseJson);
     end;
 
-    local procedure UpdateDeTssClientFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
+    internal procedure UpdateDeTssClientFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
     var
         PosUnitAuxDE2: Record "NPR DE POS Unit Aux. Info";
         JToken: JsonToken;
@@ -412,7 +449,7 @@
         end;
     end;
 
-    local procedure UpdateDeTssClientWithDataFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
+    internal procedure UpdateDeTssClientWithDataFromFiskaly(var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; ResponseJson: JsonToken)
     var
         DETSS: Record "NPR DE TSS";
         TypeHelper: Codeunit "Type Helper";
@@ -621,6 +658,45 @@
         Headers.Add('User-Agent', 'Dynamics 365');
     end;
     #endregion
+
+    #region DE Fiskaly Communication Test Event Publishers
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForCreateTSS(var DETSS: Record "NPR DE TSS"; RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; DEAuditSetup: Record "NPR DE Audit Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendHttpRequestForAuthenticateAdmin(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForUpdateTSS_State(var DETSS: Record "NPR DE TSS"; NewState: Enum "NPR DE TSS State"; RequestBody: JsonObject; ResponseJson: JsonToken; UpdateBCInfo: Boolean; DEAuditSetup: Record "NPR DE Audit Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForUpdateAdminPin(var DETSS: Record "NPR DE TSS"; DESecretMgt: Codeunit "NPR DE Secret Mgt."; NewAdminPIN: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForCreateClient(var DEPOSUnitAuxInfo: Record "NPR DE POS Unit Aux. Info"; DETSS: Record "NPR DE TSS"; RequestBody: JsonObject; ResponseJson: JsonToken; DEAuditSetup: Record "NPR DE Audit Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSendTransaction(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; RequestBody: JsonObject; ResponseJson: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForGetTSSClientList(ResponseJson: JsonToken; DETSS: Record "NPR DE TSS"; var PosUnitAuxDE: Record "NPR DE POS Unit Aux. Info"; var IsHandled: Boolean)
+    begin
+    end;
+
+    #endregion DE Fiskaly Communication Test Event Publishers
 
     var
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
