@@ -84,7 +84,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
 
         addafter("Inventory Posting Group")
         {
-            field("NPR ItemAvlByLocation"; ItemAvlByLocation)
+            field("NPR ItemAvlByLocation"; Rec.Inventory)
             {
                 Caption = 'Inv availability by location';
 
@@ -616,7 +616,6 @@ pageextension 6014433 "NPR Item List" extends "Item List"
     end;
 
     var
-        ItemAvlByLocation: Decimal;
         ItemFilter: Record Item;
         MagentoEnabled: Boolean;
         MagentoEnabledDisplayConfig: Boolean;
