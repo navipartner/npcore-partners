@@ -356,7 +356,11 @@
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
+        IsHandled: Boolean;
     begin
+        OnBeforeCheckTssJobQueue(IsHandled);
+        if IsHandled then
+            exit;
         JobQueueEntry.Reset();
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly Job");
@@ -381,7 +385,11 @@
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
+        IsHandled: Boolean;
     begin
+        OnBeforeCheckDSFINVKJobQueue(IsHandled);
+        if IsHandled then
+            exit;
         JobQueueEntry.Reset();
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR DE Fiskaly DSFINVK Job");
@@ -500,6 +508,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnHandleDEAuditAuxLogBeforeModify(var DEPOSAuditAuxLog: Record "NPR DE POS Audit Log Aux. Info"; ResponseJson: JsonToken)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckTssJobQueue(var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDSFINVKJobQueue(var IsHandled: Boolean)
     begin
     end;
 
