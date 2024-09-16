@@ -31,6 +31,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         if PurchInvHeader."No." = '' then
             exit;
 
+        TempPurchInvLine.Reset();
+        TempPurchInvLine.DeleteAll();
+
         FillRetailPurchaseLines(PurchInvHeader);
 
         if TempPurchInvLine.FindSet() then begin
@@ -493,7 +496,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
     begin
         PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
         PriceListHeader.SetRange(Status, "Price Status"::Active);
         PriceListHeader.SetRange("Assign-to No.", PurchInvHeader."Sell-to Customer No.");
 

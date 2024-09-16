@@ -133,8 +133,6 @@ table 6059998 "NPR RS Nivelation Header"
         LocalizationSetup.Get();
         LocalizationSetup.TestField("RS Nivelation Hdr No. Series");
         NoSeriesMgt.InitSeries(LocalizationSetup."RS Nivelation Hdr No. Series", xRec."No. Series", 0D, "No.", "No. Series");
-        Rec.Validate("Posting Date", WorkDate());
-        Rec.Validate(Type);
     end;
 
     local procedure ValidateSourceType()

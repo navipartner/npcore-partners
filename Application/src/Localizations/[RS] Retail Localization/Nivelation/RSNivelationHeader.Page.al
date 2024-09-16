@@ -135,6 +135,12 @@ page 6151084 "NPR RS Nivelation Header"
         IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change";
     end;
 
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        Rec.Validate("Posting Date", WorkDate());
+        Rec.Validate(Type);
+    end;
+
     trigger OnAfterGetRecord()
     begin
         IsPriceChange := Rec.Type = "NPR RS Nivelation Type"::"Price Change";
