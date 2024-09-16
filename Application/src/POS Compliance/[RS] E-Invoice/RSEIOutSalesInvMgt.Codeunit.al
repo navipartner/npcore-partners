@@ -198,6 +198,9 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         DescriptionCodeElement: XmlElement;
         InvoicePeriodElement: XmlElement;
     begin
+        if RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method"::" "] then
+            exit;
+
         InvoicePeriodElement := RSEInvoiceMgt.CreateXmlElement('InvoicePeriod', RSEInvoiceMgt.GetCacNamespace(), '');
 
         DescriptionCodeElement := RSEInvoiceMgt.CreateXmlElement('DescriptionCode', RSEInvoiceMgt.GetCbcNamespace(),

@@ -111,7 +111,7 @@ table 6150833 "NPR RS EI Aux Sales Header"
             exit;
         if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::"Credit Memo"]) then
             exit;
-        Rec."NPR RS EI Tax Liability Method" := Rec."NPR RS EI Tax Liability Method"::"0";
+        Rec."NPR RS EI Tax Liability Method" := Rec."NPR RS EI Tax Liability Method"::" ";
         if not Insert() then
             Modify();
     end;
