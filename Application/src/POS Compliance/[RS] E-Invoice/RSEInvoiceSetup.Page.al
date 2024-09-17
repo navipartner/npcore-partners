@@ -55,6 +55,16 @@ page 6184546 "NPR RS E-Invoice Setup"
                     ToolTip = 'Specifies the value of the Default Unit Of Measure field.';
                 }
             }
+            group("Additional Setup")
+            {
+                Caption = 'Additional Setup';
+
+                field("Allow Zero Amt. Purchase Doc."; Rec."Allow Zero Amt. Purchase Doc.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Allow Zero Amount Purchase Document field.';
+                }
+            }
         }
     }
 

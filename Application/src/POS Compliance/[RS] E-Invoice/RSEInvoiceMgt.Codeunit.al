@@ -72,10 +72,10 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
     #region RS E-Invoice Purchase Subscribers
 
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Invoice", 'OnBeforePostDocument', '', false, false)]
-    local procedure OnBeforePostDocument(var PurchaseHeader: Record "Purchase Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnBeforePostPurchaseDoc', '', false, false)]
+    local procedure OnBeforePostPurchaseDoc(PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
-        ValidateIfPostingIsAllowed(PurchaseHeader);
+        IsHandled := ValidateIfPostingIsAllowed(PurchaseHeader);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterPurchInvHeaderInsert', '', false, false)]
@@ -98,7 +98,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         if RSEIAuxPurchHeader."NPR RS E-Invoice Type Code" in [RSEIAuxPurchHeader."NPR RS E-Invoice Type Code"::"383"] then
             PurchInvHeader."Prepayment Invoice" := true;
 
-        SetEInvoiceDocumentToPosted(PurchInvHeader."Vendor Invoice No.");
+        SetEInvoiceDocumentToPosted(PurchHeader."Vendor Invoice No.", PurchInvHeader."No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterPurchCrMemoHeaderInsert', '', false, false)]
@@ -118,7 +118,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxPurchCrMemHdr.TransferFields(RSEIAuxPurchHeader, false);
         RSEIAuxPurchCrMemHdr.SaveRSEIAuxPurchCrMemoHdrFields();
 
-        SetEInvoiceDocumentToPosted(PurchCrMemoHdr."Vendor Cr. Memo No.");
+        SetEInvoiceDocumentToPosted(PurchCrMemoHdr."Vendor Cr. Memo No.", PurchCrMemoHdr."No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
@@ -460,7 +460,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIDocTaxExemptionPage: Page "NPR RS EI Doc. Tax Exemption";
         TaxCategoriesList: List of [Enum "NPR RS EI Allowed Tax Categ."];
         TaxCategory: Enum "NPR RS EI Allowed Tax Categ.";
-        MustChooseTaxExemptionReasonErr: Label 'You must choose Tax Exemption Reason for all entries exempted from tax';
+        MustChooseTaxExemptionReasonErr: Label 'You must choose Tax Exemption Reason for all entries exempted from tax.';
         NoTaxExemptedLinesErr: Label 'There are no tax exempted lines in this document.';
     begin
         if not IsRSEInvoiceEnabled() then
@@ -716,7 +716,6 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         exit(not RSEInvoiceDocument.IsEmpty());
     end;
 
-
     internal procedure SetSalesAuxTablesStatusForInvoiceDocument(RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     var
         RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
@@ -737,29 +736,67 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Sales Mgt. Helper Procedures
 
     #region RS E-Invoice Purchase Mgt. Helper Procedures
-    local procedure ValidateIfPostingIsAllowed(PurchaseHeader: Record "Purchase Header")
+    local procedure ValidateIfPostingIsAllowed(PurchaseHeader: Record "Purchase Header") Handled: Boolean
     var
         RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
         CannotPostPurchaseDocIfEInvStatusNotApprovedErr: Label 'You cannot post Purchase Document %1 if RS E-Invoice Status is not Approved.', Comment = '%1 = Purchase Header No.';
-        EInvoiceTotalAmountsMustBeEqualErr: Label '%1 must be equal to %2', Comment = '%1 = Purchase Header Amount Incl. VAT, %2 = RS EI Aux Total Amount';
-        TotalTaxAmountLbl: Label 'Total Tax Amount';
     begin
         if not IsRSEInvoiceEnabled() then
             exit;
         RSEIAuxPurchHeader.ReadRSEIAuxPurchHeaderFields(PurchaseHeader);
         if not RSEIAuxPurchHeader."NPR RS E-Invoice" then
             exit;
-        if not (CheckIfPurchaseDocumentIsApproved(PurchaseHeader)) then
-            Error(CannotPostPurchaseDocIfEInvStatusNotApprovedErr, PurchaseHeader."No.");
+        if not (CheckIfPurchaseDocumentIsApproved(PurchaseHeader)) then begin
+            Message(CannotPostPurchaseDocIfEInvStatusNotApprovedErr, PurchaseHeader."No.");
+            Handled := true;
+        end;
 
         PurchaseHeader.CalcFields("Amount Including VAT", Amount);
 
         if RSEIAuxPurchHeader."NPR RS EI Prepayment" then begin
-            if (not (RSEIAuxPurchHeader."NPR RS EI Total Amount" = PurchaseHeader."Amount Including VAT" - PurchaseHeader.Amount)) and GuiAllowed() then
-                Error(EInvoiceTotalAmountsMustBeEqualErr, TotalTaxAmountLbl, RSEIAuxPurchHeader.FieldCaption("NPR RS EI Total Amount"));
+            HandlePrepaymentAmountDiffOnPurchaseHeader(Handled, RSEIAuxPurchHeader, PurchaseHeader)
         end else
-            if (not (RSEIAuxPurchHeader."NPR RS EI Total Amount" = PurchaseHeader."Amount Including VAT")) and GuiAllowed() then
-                Error(EInvoiceTotalAmountsMustBeEqualErr, PurchaseHeader.FieldCaption("Amount Including VAT"), RSEIAuxPurchHeader.FieldCaption("NPR RS EI Total Amount"));
+            HandleTotalAmountDiffOnPurchaseHeader(Handled, RSEIAuxPurchHeader, PurchaseHeader);
+    end;
+
+    local procedure HandlePrepaymentAmountDiffOnPurchaseHeader(var Handled: Boolean; RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header"; PurchaseHeader: Record "Purchase Header")
+    var
+        TotalTaxAmountLbl: Label 'Total Tax Amount';
+    begin
+        if (RSEIAuxPurchHeader."NPR RS EI Total Amount" = PurchaseHeader."Amount Including VAT" - PurchaseHeader.Amount) then
+            exit;
+
+        Message(EInvoiceTotalAmountsMustBeEqualErr, TotalTaxAmountLbl, RSEIAuxPurchHeader.FieldCaption("NPR RS EI Total Amount"));
+        Handled := true;
+    end;
+
+    local procedure HandleTotalAmountDiffOnPurchaseHeader(var Handled: Boolean; RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header"; PurchaseHeader: Record "Purchase Header")
+    var
+        RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
+    begin
+        if (RSEIAuxPurchHeader."NPR RS EI Total Amount" = PurchaseHeader."Amount Including VAT") then
+            exit;
+
+        RSEInvoiceSetup.Get();
+        if RSEInvoiceSetup."Allow Zero Amt. Purchase Doc." then
+            HandleAllowedTotalAmountDiffOnPurchaseHeader(Handled, RSEIAuxPurchHeader, PurchaseHeader)
+        else
+            HandleForbiddenTotalAmountDiffOnPurchaseHeader(Handled, RSEIAuxPurchHeader, PurchaseHeader);
+    end;
+
+    local procedure HandleAllowedTotalAmountDiffOnPurchaseHeader(var Handled: Boolean; RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header"; PurchaseHeader: Record "Purchase Header")
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        EInvoiceTotalAmountsMustBeEqualQst: Label '%1 is not equal to %2. Are you sure you want to proceed with posting?', Comment = '%1 = Purchase Header Amount Incl. VAT, %2 = RS EI Aux Total Amount';
+    begin
+        if not (ConfirmManagement.GetResponseOrDefault(StrSubstNo(EInvoiceTotalAmountsMustBeEqualQst, PurchaseHeader.FieldCaption("Amount Including VAT"), RSEIAuxPurchHeader.FieldCaption("NPR RS EI Total Amount")), false)) then
+            Handled := true;
+    end;
+
+    local procedure HandleForbiddenTotalAmountDiffOnPurchaseHeader(var Handled: Boolean; RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header"; PurchaseHeader: Record "Purchase Header")
+    begin
+        Message(EInvoiceTotalAmountsMustBeEqualErr, PurchaseHeader.FieldCaption("Amount Including VAT"), RSEIAuxPurchHeader.FieldCaption("NPR RS EI Total Amount"));
+        Handled := true;
     end;
 
     local procedure DeleteRelatedRSEInvoiceDocument(DocumentNo: Code[20])
@@ -788,7 +825,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         exit(RSEICommunicationMgt.AcceptIncomingPurchaseDocument(RSEInvoiceDocument));
     end;
 
-    local procedure SetEInvoiceDocumentToPosted(InvoiceDocumentNo: Code[35])
+    local procedure SetEInvoiceDocumentToPosted(InvoiceDocumentNo: Code[35]; DocumentNo: Code[20])
     var
         RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
     begin
@@ -797,6 +834,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         if not RSEInvoiceDocument.FindFirst() then
             exit;
         RSEInvoiceDocument."Posted" := true;
+        RSEInvoiceDocument."Document No." := DocumentNo;
         RSEInvoiceDocument.Modify();
     end;
 
@@ -1037,6 +1075,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
 
     var
         RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
-        SalesDocumentMustContainTaxExemptReasonErr: Label 'Sales Document with Tax Category %1 must have a %2 in %3', Comment = '%1 - Line No., %2 - Field Caption, %3 - Table Caption';
+        SalesDocumentMustContainTaxExemptReasonErr: Label 'Sales Document with Tax Category %1 must have a %2 in %3.', Comment = '%1 - Line No., %2 - Field Caption, %3 - Table Caption';
+        EInvoiceTotalAmountsMustBeEqualErr: Label '%1 must be equal to %2.', Comment = '%1 = Purchase Header Amount Incl. VAT, %2 = RS EI Aux Total Amount';
 #endif
 }
