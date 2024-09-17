@@ -553,6 +553,7 @@
                 if Type = Type::Period then begin
                     TempBuffer."Date 1" := Field.Value;
                     TempBuffer."No." := Format(Count);
+                    TempBuffer."No. (Integer)" := Count;
                 end else
                     TempBuffer."No." := Format(Field.Value);
                 if not (Type = Type::Projectcode) then
@@ -809,7 +810,12 @@
             SortBy::"Profit % last year":
                 TempBuffer.SetCurrentKey("Profit % last year");
             SortBy::"No.":
-                TempBuffer.SetCurrentKey("No.");
+                begin
+                    if Type = Type::Period then
+                        TempBuffer.SetCurrentKey("No. (Integer)")
+                    else
+                        TempBuffer.SetCurrentKey("No.");
+                end;
         end;
     end;
 
