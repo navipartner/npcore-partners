@@ -1,7 +1,6 @@
 table 6150801 "NPR Adyen Setup"
 {
     Access = Internal;
-
     Caption = 'NP Pay Setup';
     DataClassification = CustomerContent;
 
@@ -136,6 +135,85 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             Caption = 'Post Chargebacks Automatically';
         }
+        field(140; "Pay By Link Gateaway Code"; Code[10])
+        {
+            Caption = 'Pay By Link Gateaway Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Payment Gateway";
+        }
+        field(150; "Pay By Link E-Mail Template"; Code[20])
+        {
+            Caption = 'Pay By Link E-Mail Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR E-mail Template Header".Code;
+        }
+        field(160; "Pay By Link Account Type"; Enum "Payment Balance Account Type")
+        {
+            Caption = 'Pay By Link Account Type';
+            DataClassification = CustomerContent;
+        }
+        field(170; "Pay By Link Account No."; Code[20])
+        {
+            Caption = 'Pay By Link Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("Pay By Link Account Type" = CONST("G/L Account")) "G/L Account"
+            ELSE
+            IF ("Pay By Link Account Type" = CONST("Bank Account")) "Bank Account";
+        }
+        field(180; "PayByLink Enable Auto Posting"; Boolean)
+        {
+            Caption = 'Pay By Link Enable Automatic Posting';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                AdyenManagement: Codeunit "NPR Adyen Management";
+                ProccessPostPaymentLine: Label 'Process Posting Payment Lines for posted documents.';
+            begin
+                if "PayByLink Enable Auto Posting" then
+                    AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Post Payment Lines", ProccessPostPaymentLine, 1, 600) //Reschedule to run again in 10 minutes on error
+                else
+                    AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Post Payment Lines");
+            end;
+        }
+        field(190; "Pay By Link Exp. Duration"; Duration)
+        {
+            Caption = 'Pay by Link Expiration';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                CheckExpDuration("Pay By Link Exp. Duration");
+            end;
+        }
+        field(200; "Pay By Link SMS Template"; Code[10])
+        {
+            Caption = 'Pay By Link SMS Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SMS Template Header".Code;
+        }
+        field(210; "PayByLink Posting Retry Count"; Integer)
+        {
+            Caption = 'Pay By Link Posting Retry Count';
+            DataClassification = CustomerContent;
+            InitValue = 3;
+        }
+        field(220; "Enable Pay by Link"; Boolean)
+        {
+            Caption = 'Enable Pay by Link';
+            DataClassification = CustomerContent;
+            InitValue = false;
+
+            trigger OnValidate()
+            var
+                MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+            begin
+                if not MagentoPaymentGateway.Get(Rec."Pay By Link Gateaway Code") then
+                    exit;
+                If MagentoPaymentGateway."Integration Type" = MagentoPaymentGateway."Integration Type"::Adyen then
+                    CreateAdyenJobs();
+            end;
+
+        }
     }
     keys
     {
@@ -155,4 +233,40 @@ table 6150801 "NPR Adyen Setup"
 
     var
         _RecordHasBeenRead: Boolean;
+
+    procedure CheckExpDuration(ExpDuration: Duration)
+    var
+        MaxDurationTxt: Text;
+        MaxDuration: Duration;
+        ExperationErr: Label 'The expiration duration cannot be more than %1';
+    begin
+        MaxDurationTxt := '70 days';
+        Evaluate(MaxDuration, MaxDurationTxt);
+
+        if ExpDuration > MaxDuration then
+            Error(ExperationErr, MaxDurationTxt);
+    end;
+
+    local procedure CreateAdyenJobs()
+    var
+        WebhookSetup: Record "NPR Adyen Webhook Setup";
+        MerchantAccount: Record "NPR Adyen Merchant Account";
+        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        ProccessPaymentStatus: Label 'Process Payment Status for Adyen Pay by Link.';
+        AuthorisationEventFilter: Label 'AUTHORISATION', Locked = true;
+    begin
+        if Rec."Enable Pay by Link" then begin
+            AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen PayByLink Status JQ", ProccessPaymentStatus, 1, 30); //Reschedule to run again in 30 seconds on error
+            AdyenManagement.UpdateMerchantList(0);
+            if MerchantAccount.FindSet() then
+                repeat
+                    AdyenManagement.InitWebhookSetup(WebhookSetup, AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                until MerchantAccount.Next() = 0;
+            AdyenManagement.CreateWebhook(WebhookSetup);
+        end else begin
+            AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen PayByLink Status JQ");
+            AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Post Payment Lines");
+        end;
+    end;
 }

@@ -90,6 +90,64 @@ page 6184531 "NPR Adyen Setup"
                     ToolTip = 'Specifies the No. Series Code for Reconciliation Posting Entries.';
                 }
             }
+            group(PayByLink)
+            {
+                Caption = 'Pay By Link';
+                field("Enable Pay by Link"; Rec."Enable Pay by Link")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Enable Pay by Link field.';
+                    Caption = 'Enable Pay by Link';
+                }
+                field("Payment Gateaway Code"; Rec."Pay By Link Gateaway Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Payment Gateaway Code field.';
+                    Caption = 'Payment Gateaway Code';
+                }
+                field("Pay by Link Exp. Duration"; Rec."Pay By Link Exp. Duration")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay by Link Expiration field.';
+                    Caption = 'Pay by Link Expiration';
+                }
+                field("E-Mail Template"; Rec."Pay By Link E-Mail Template")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link E-Mail Template field.';
+                    Caption = 'E-Mail Template';
+                }
+                field("SMS Template"; Rec."Pay By Link SMS Template")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link SMS Template field.';
+                    Caption = 'SMS Template';
+                }
+                field("Account Type"; Rec."Pay By Link Account Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Account Type field.';
+                    Caption = 'Account Type';
+                }
+                field("Account No."; Rec."Pay By Link Account No.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Account No. field.';
+                    Caption = 'Account No.';
+                }
+                field("PayByLink Enable Auto Posting"; Rec."PayByLink Enable Auto Posting")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Enable Automatic Posting field.';
+                    Caption = 'Enable Automatic Posting';
+                }
+                field("Posting Retry Count"; Rec."PayByLink Posting Retry Count")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Posting Retry Count field.';
+                    Caption = 'Posting Retry Count';
+                }
+            }
         }
     }
 

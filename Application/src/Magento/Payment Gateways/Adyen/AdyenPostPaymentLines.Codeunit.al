@@ -4,18 +4,18 @@ codeunit 6184929 "NPR Adyen Post Payment Lines"
     trigger OnRun()
     var
         MagentoPaymentLine: Record "NPR Magento Payment Line";
-        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        if not PayByLinkSetup.Get() then
+        if not AdyenSetup.Get() then
             exit;
 
-        if not PayByLinkSetup."Enable Pay by Link" then
+        if not AdyenSetup."Enable Pay by Link" then
             exit;
 
-        if not PayByLinkSetup."Enable Automatic Posting" then
+        if not AdyenSetup."PayByLink Enable Auto Posting" then
             exit;
 
-        MagentoPaymentLine.SetRange("Payment Gateway Code", PayByLinkSetup."Payment Gateaway Code");
+        MagentoPaymentLine.SetRange("Payment Gateway Code", AdyenSetup."Pay By Link Gateaway Code");
         MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
         MagentoPaymentLine.SetRange(Posted, false);
         MagentoPaymentLine.SetFilter(Amount, '<>%1', 0);
@@ -49,13 +49,13 @@ codeunit 6184929 "NPR Adyen Post Payment Lines"
 
     local procedure UpdateMagentoPaymentLine(var MagentoPaymentLine: Record "NPR Magento Payment Line")
     var
-        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        If not PayByLinkSetup.Get(MagentoPaymentLine."Payment Gateway Code") then
+        If not AdyenSetup.Get(MagentoPaymentLine."Payment Gateway Code") then
             exit;
 
         MagentoPaymentLine."Try Posting Count" += 1;
-        If MagentoPaymentLine."Try Posting Count" >= PayByLinkSetup."Posting Retry Count" then
+        If MagentoPaymentLine."Try Posting Count" >= AdyenSetup."PayByLink Posting Retry Count" then
             MagentoPaymentLine."Posting Error" := true;
         MagentoPaymentLine.Modify();
     end;

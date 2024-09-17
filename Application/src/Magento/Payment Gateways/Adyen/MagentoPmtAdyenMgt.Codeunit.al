@@ -6,7 +6,7 @@
         WrongTableSuppliedErr: Label 'The table supplied (%1) is wrong. Expected table no. in (%2).', Comment = '%1 = actual table no., %2 = expected table no. or range of numbers';
         NoReferenceGivenLbl: Label 'No BC reference given';
         PayByLinkSetupGotten: Boolean;
-        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        AdyenPayByLinkSetup: Record "NPR Adyen Setup";
         ShowCancelMsg: Boolean;
 
     #region Payment Integration
@@ -256,7 +256,7 @@
         ISO8601Date: Text[50];
         AdyenPGSetup: Record "NPR PG Adyen Setup";
     begin
-        if not AdyenPGSetup.Get(PayByLinkSetup."Payment Gateaway Code") then
+        if not AdyenPGSetup.Get(AdyenPayByLinkSetup."Pay By Link Gateaway Code") then
             exit;
 
         Url := AdyenPGSetup.GetAPIPayByLinkUrl();
@@ -357,14 +357,14 @@
         GetPayByLinkSetup();
 
         PayByLinkDialog.SetResending();
-        PayByLinkDialog.SetValues(MagentoPaymentLine."Requested Amount", Email, '', false, false, PayByLinkSetup."Pay by Link Exp. Duration");
+        PayByLinkDialog.SetValues(MagentoPaymentLine."Requested Amount", Email, '', false, false, AdyenPayByLinkSetup."Pay By Link Exp. Duration");
         if PayByLinkDialog.RunModal() = Action::OK then begin
-            PayByLinkDialog.GetValues(MagentoPaymentLine."Requested Amount", Email, PhoneNo, SendEmail, SendSMS, PayByLinkSetup."Pay by Link Exp. Duration");
+            PayByLinkDialog.GetValues(MagentoPaymentLine."Requested Amount", Email, PhoneNo, SendEmail, SendSMS, AdyenPayByLinkSetup."Pay By Link Exp. Duration");
             if SendEmail then
-                SendEmailNotification(Email, PayByLinkSetup."E-Mail Template", MagentoPaymentLine);
+                SendEmailNotification(Email, AdyenPayByLinkSetup."Pay By Link E-Mail Template", MagentoPaymentLine);
 
             if SendSMS then
-                SendSMSFromMagentoLine(MagentoPaymentLine, PhoneNo, PayByLinkSetup."SMS Template");
+                SendSMSFromMagentoLine(MagentoPaymentLine, PhoneNo, AdyenPayByLinkSetup."Pay By Link SMS Template");
         end;
     end;
 
@@ -427,9 +427,9 @@
 
         GetPayByLinkSetup();
 
-        PayByLinkSetup.TestField("Enable Pay by Link");
+        AdyenPayByLinkSetup.TestField("Enable Pay by Link");
 
-        RequestedExpDate := PayByLinkSetup."Pay by Link Exp. Duration";
+        RequestedExpDate := AdyenPayByLinkSetup."Pay By Link Exp. Duration";
 
         GetDocument(RecVariant, FullAmount, DocumentTableNo, DocumentNo, SalesDocumentType, CustomerNo);
 
@@ -437,7 +437,7 @@
 
         GetPayByLinkParams(CustomerNo, AmtToPay, RequestedAmt, RequestedExpDate, SendEmail, Email, SendSMS, PhoneNo, ShowDialog);
 
-        DocumentToRequest(Request, RecVariant, RequestedAmt, PayByLinkSetup."Payment Gateaway Code");
+        DocumentToRequest(Request, RecVariant, RequestedAmt, AdyenPayByLinkSetup."Pay By Link Gateaway Code");
 
         CreateMagentoPaymentLine(Request, MagentoPaymentLine);
 
@@ -450,10 +450,10 @@
         UpdatePaymentMagentoLine(MagentoPaymentLine, Response, false);
 
         if SendEmail then
-            SendEmailNotification(Email, PayByLinkSetup."E-Mail Template", MagentoPaymentLine);
+            SendEmailNotification(Email, AdyenPayByLinkSetup."Pay By Link E-Mail Template", MagentoPaymentLine);
 
         if SendSMS then
-            SendSMSFromMagentoLine(MagentoPaymentLine, PhoneNo, PayByLinkSetup."SMS Template");
+            SendSMSFromMagentoLine(MagentoPaymentLine, PhoneNo, AdyenPayByLinkSetup."Pay By Link SMS Template");
     end;
 
     local procedure GetPayByLinkParams(CustomerNo: Code[20]; AmtToPay: Decimal; var RequestedAmt: Decimal; var RequestedExpDate: Duration; var SendEmail: Boolean; var Email: Text[80]; var SendSMS: Boolean; var PhoneNo: Text[30]; ShowDialog: Boolean)
@@ -743,7 +743,7 @@
         if PayByLinkSetupGotten then
             exit;
 
-        if not PayByLinkSetup.Get() then
+        if not AdyenPayByLinkSetup.Get() then
             Error(SetupErr);
 
         PayByLinkSetupGotten := true;
@@ -782,9 +782,9 @@
         MagentoPaymentLine."Document Table No." := Request."Document Table No.";
         MagentoPaymentLine."Line No." := LineNo;
         MagentoPaymentLine."Requested Amount" := Request."Request Amount";
-        MagentoPaymentLine."Account Type" := PayByLinkSetup."Account Type";
-        MagentoPaymentLine."Account No." := PayByLinkSetup."Account No.";
-        MagentoPaymentLine."Payment Gateway Code" := PayByLinkSetup."Payment Gateaway Code";
+        MagentoPaymentLine."Account Type" := AdyenPayByLinkSetup."Pay By Link Account Type";
+        MagentoPaymentLine."Account No." := AdyenPayByLinkSetup."Pay By Link Account No.";
+        MagentoPaymentLine."Payment Gateway Code" := AdyenPayByLinkSetup."Pay By Link Gateaway Code";
         MagentoPaymentLine."Payment Type" := MagentoPaymentLine."Payment Type"::"Payment Method";
 
         case Request."Document Table No." of
@@ -914,7 +914,7 @@
     begin
         GetPayByLinkSetup();
 
-        if not AdyenPGSetup.Get(PayByLinkSetup."Payment Gateaway Code") then
+        if not AdyenPGSetup.Get(AdyenPayByLinkSetup."Pay By Link Gateaway Code") then
             exit;
 
         Url := AdyenPGSetup.GetAPIPayByLinkUrl() + '/' + MagentoPaymentLine."Payment ID";
@@ -1020,10 +1020,10 @@
         if not (PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Adyen) then
             exit;
 
-        if not PayByLinkSetup.Get() then
+        if not AdyenPayByLinkSetup.Get() then
             exit;
 
-        if not PayByLinkSetup."Enable Pay by Link" then
+        if not AdyenPayByLinkSetup."Enable Pay by Link" then
             exit;
 
         if PaymentLine."Date Authorized" <> 0D then
@@ -1067,7 +1067,7 @@
     var
         PGAdyen: Record "NPR PG Adyen Setup";
         PG: Record "NPR Magento Payment Gateway";
-        PayByLink: Record "NPR Pay By Link Setup";
+        PayByLink: Record "NPR Adyen Setup";
     begin
         if PaymentLine."Payment Gateway Code" = '' then
             exit(false);

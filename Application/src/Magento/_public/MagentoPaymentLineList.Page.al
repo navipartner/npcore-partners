@@ -362,14 +362,14 @@
                 trigger OnAction()
                 var
                     PaybyLink: Interface "NPR Pay by Link";
-                    PayByLinkSetup: Record "NPR Pay By Link Setup";
+                    AdyenSetup: Record "NPR Adyen Setup";
                     MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
                 begin
                     if not Confirm(CancelPayByLinkQst, false) then
                         exit;
 
-                    PayByLinkSetup.Get();
-                    MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code");
+                    AdyenSetup.Get();
+                    MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code");
                     PaybyLink := MagentoPaymentGateway."Integration Type";
                     PaybyLink.CancelPayByLink(Rec);
                 end;
