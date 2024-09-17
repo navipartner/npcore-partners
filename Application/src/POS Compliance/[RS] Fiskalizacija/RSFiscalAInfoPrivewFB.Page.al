@@ -13,7 +13,11 @@ page 6150853 "NPR RS Fiscal A.Info Privew FB"
             group(FiscalBill)
             {
                 ShowCaption = false;
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
                 usercontrol(FiscalBillPreview; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
+#ELSE
+                usercontrol(FiscalBillPreview; WebPageViewer)
+#ENDIF
                 {
                     ApplicationArea = NPRRSFiscal;
                     trigger ControlAddInReady(callbackUrl: Text)

@@ -11,7 +11,11 @@ page 6151285 "NPR DS Ext.Field Setup FactBox"
     {
         area(content)
         {
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
             usercontrol(DSExtFldAddParamsUC; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
+#ELSE
+            usercontrol(DSExtFldAddParamsUC; WebPageViewer)
+#ENDIF
             {
                 ApplicationArea = NPRRetail;
 

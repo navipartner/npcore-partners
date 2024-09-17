@@ -20,7 +20,11 @@ page 6151320 "NPR PDF Digital Receipt Viewer"
                 {
                     ApplicationArea = NPRRetail;
                 }
+#IF (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
                 usercontrol(QRCodePreview; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
+#ELSE
+                usercontrol(QRCodePreview; WebPageViewer)
+#ENDIF
                 {
                     ApplicationArea = NPRRetail;
                     trigger ControlAddInReady(callbackUrl: Text)
