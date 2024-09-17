@@ -3,6 +3,9 @@ table 6150893 "NPR POS EFT Pay Reserv Setup"
     Caption = 'EFT Payment Reservation Setup';
     DataClassification = ToBeClassified;
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-09-16';
+    ObsoleteReason = 'Table marked for removal. Reason: All the fields are transfered to to "NPR Adyen Setup" table.';
 
     fields
     {

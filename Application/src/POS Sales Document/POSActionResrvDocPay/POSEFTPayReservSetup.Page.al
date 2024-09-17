@@ -1,14 +1,17 @@
 page 6184710 "NPR POS EFT Pay Reserv Setup"
 {
     Extensible = false;
-    ApplicationArea = NPRRetail;
     Caption = 'POS EFT Payment Reservation Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
     SourceTable = "NPR POS EFT Pay Reserv Setup";
-    UsageCategory = Administration;
+    UsageCategory = None;
     PromotedActionCategories = 'New,Process,Report,Navigate';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-09-13';
+    ObsoleteReason = 'Page marked for removal. Reason: All the fields from page are transfered to "NPR Adyen Setup" page in ''Endless Aisle'' section.';
+
     layout
     {
         area(content)

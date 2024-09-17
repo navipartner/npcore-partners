@@ -214,6 +214,31 @@ table 6150801 "NPR Adyen Setup"
             end;
 
         }
+        field(230; "EFT Res. Payment Gateway Code"; Code[10])
+        {
+            Caption = 'EFT Res. Payment Gateway Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Magento Payment Gateway".Code;
+        }
+        field(240; "EFT Res. Account Type"; Enum "Payment Balance Account Type")
+        {
+            Caption = 'EFT Res. Account Type';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if Rec."EFT Res. Account Type" <> xRec."EFT Res. Account Type" then
+                    Rec."EFT Res. Account No." := '';
+            end;
+
+        }
+        field(250; "EFT Res. Account No."; Code[20])
+        {
+            Caption = 'EFT Res. Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = IF ("EFT Res. Account Type" = CONST("G/L Account")) "G/L Account" where("Account Type" = const(Posting), "Direct Posting" = const(true))
+            ELSE
+            IF ("EFT Res. Account Type" = CONST("Bank Account")) "Bank Account";
+        }
     }
     keys
     {

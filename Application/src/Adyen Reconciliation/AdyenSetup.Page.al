@@ -148,6 +148,28 @@ page 6184531 "NPR Adyen Setup"
                     Caption = 'Posting Retry Count';
                 }
             }
+            group(EndlessAisle)
+            {
+                Caption = 'Endless Aisle';
+                field("EFT Res. Payment Gateway Code"; Rec."EFT Res. Payment Gateway Code")
+                {
+                    Caption = 'Payment Gateway Code';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the EFT Res. Payment Gateway Code field.';
+                }
+                field("EFT Res. Account Type"; Rec."EFT Res. Account Type")
+                {
+                    Caption = 'Account Type';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the EFT Res. Account Type field.';
+                }
+                field("EFT Res. Account No."; Rec."EFT Res. Account No.")
+                {
+                    Caption = 'Account No.';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the EFT Res. Account No. field.';
+                }
+            }
         }
     }
 

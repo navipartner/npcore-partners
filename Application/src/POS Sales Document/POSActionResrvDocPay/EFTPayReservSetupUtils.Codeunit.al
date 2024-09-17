@@ -1,9 +1,9 @@
 codeunit 6184955 "NPR EFT Pay Reserv Setup Utils"
 {
     Access = Internal;
-    internal procedure CheckPaymentServationSetup(POSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup")
+    internal procedure CheckPaymentServationSetup(AdyenSetup: Record "NPR Adyen Setup")
     begin
-        POSEFTPayReservSetup.TestField("Account No.");
-        POSEFTPayReservSetup.TestField("Payment Gateway Code");
+        AdyenSetup.TestField("EFT Res. Account No.");
+        AdyenSetup.TestField("EFT Res. Payment Gateway Code");
     end;
 }

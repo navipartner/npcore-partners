@@ -809,7 +809,7 @@
 
     internal procedure CreateMagentoPaymentLineForPOSEFTDocumentRservation(POSPaymentLine: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header"; var MagentoPaymentLine: Record "NPR Magento Payment Line") LineCreated: Boolean
     var
-        POSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
         EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
@@ -818,8 +818,8 @@
         if POSPaymentLine."Line Type" <> POSPaymentLine."Line Type"::"POS Payment" then
             exit;
 
-        POSEFTPayReservSetup.Get();
-        EFTPayReservSetupUtils.CheckPaymentServationSetup(POSEFTPayReservSetup);
+        AdyenSetup.Get();
+        EFTPayReservSetupUtils.CheckPaymentServationSetup(AdyenSetup);
 
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
@@ -842,9 +842,9 @@
         MagentoPaymentLine."Requested Amount" := POSPaymentLine."Amount Including VAT";
         MagentoPaymentLine.Amount := POSPaymentLine."Amount Including VAT";
         MagentoPaymentLine."Date Authorized" := Today;
-        MagentoPaymentLine."Account Type" := POSEFTPayReservSetup."Account Type";
-        MagentoPaymentLine."Account No." := POSEFTPayReservSetup."Account No.";
-        MagentoPaymentLine."Payment Gateway Code" := POSEFTPayReservSetup."Payment Gateway Code";
+        MagentoPaymentLine."Account Type" := AdyenSetup."EFT Res. Account Type";
+        MagentoPaymentLine."Account No." := AdyenSetup."EFT Res. Account No.";
+        MagentoPaymentLine."Payment Gateway Code" := AdyenSetup."EFT Res. Payment Gateway Code";
         MagentoPaymentLine."Transaction ID" := EFTTransactionRequest."PSP Reference";
         MagentoPaymentLine.Insert(true);
 
