@@ -330,7 +330,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 
     local procedure ValidatePaymentParameters(PaymentParameters: JsonObject)
     var
-        POSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
         EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
         PromptPrepayment: Boolean;
         PayAndPost: Boolean;
@@ -352,8 +352,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         if not PaymentReservation then
             exit;
 
-        POSEFTPayReservSetup.Get();
-        EFTPayReservSetupUtils.CheckPaymentServationSetup(POSEFTPayReservSetup);
+        AdyenSetup.Get();
+        EFTPayReservSetupUtils.CheckPaymentServationSetup(AdyenSetup);
 
         if PayAndPost or FullPosting then
             Error(PayAndPostErrorLbl);

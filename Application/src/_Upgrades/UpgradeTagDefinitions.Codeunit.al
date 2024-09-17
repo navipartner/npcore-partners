@@ -208,6 +208,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -791,6 +792,11 @@
                 case UpgradeStep of
                     'UpdatePayByLinkSetup':
                         exit('NPR-UpdatePayByLinkSetup-20240913');
+                end;
+            Codeunit::"NPR UPG POS EFT Pay Res. Setup":
+                case UpgradeStep of
+                    'UpdatePOSEFTPayResSetup':
+                        exit('NPR-UpdatePOSEFTPayResSetup-20240916');
                 end;
         end;
     end;

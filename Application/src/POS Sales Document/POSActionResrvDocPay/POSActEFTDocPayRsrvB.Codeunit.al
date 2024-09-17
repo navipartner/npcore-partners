@@ -230,11 +230,10 @@
 
     internal procedure CheckPOSEFTPaymentReservationSetup()
     var
-        NPRPOSEFTPayReservSetup: Record "NPR POS EFT Pay Reserv Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
         EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
     begin
-        NPRPOSEFTPayReservSetup.Get();
-        EFTPayReservSetupUtils.CheckPaymentServationSetup(NPRPOSEFTPayReservSetup);
-
+        AdyenSetup.Get();
+        EFTPayReservSetupUtils.CheckPaymentServationSetup(AdyenSetup);
     end;
 }
