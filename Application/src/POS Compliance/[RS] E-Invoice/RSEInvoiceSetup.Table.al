@@ -35,6 +35,11 @@ table 6150803 "NPR RS E-Invoice Setup"
             TableRelation = "Unit of Measure";
             DataClassification = CustomerContent;
         }
+        field(10; "Allow Zero Amt. Purchase Doc."; Boolean)
+        {
+            Caption = 'Allow Zero Amount Purchase Document';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
