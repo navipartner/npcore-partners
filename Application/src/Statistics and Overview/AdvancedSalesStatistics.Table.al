@@ -71,6 +71,11 @@
             Caption = 'Date 1';
             DataClassification = CustomerContent;
         }
+        field(14; "No. (Integer)"; Integer)
+        {
+            Caption = 'No. (Integer)';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -109,6 +114,9 @@
         {
         }
         key(Key12; "Date 1")
+        {
+        }
+        key(Key13; "No. (Integer)")
         {
         }
     }
