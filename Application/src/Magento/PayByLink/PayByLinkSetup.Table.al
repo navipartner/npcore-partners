@@ -3,6 +3,9 @@ table 6150892 "NPR Pay by Link Setup"
     Caption = 'NP Pay By Link Setup';
     DataClassification = CustomerContent;
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-09-13';
+    ObsoleteReason = 'Table marked for removal. Reason: All the fields are transfered to "NPR Adyen Setup" table.';
 
     fields
     {

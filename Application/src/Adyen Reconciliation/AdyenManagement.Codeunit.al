@@ -416,18 +416,18 @@ codeunit 6184796 "NPR Adyen Management"
     var
         ProccessPostPaymentLine: Label 'Process Posting Payment Lines for posted documents.';
         AdyenManagement: Codeunit "NPR Adyen Management";
-        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
         MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
     begin
-        if not PayByLinkSetup.Get() then
+        if not AdyenSetup.Get() then
             exit;
-        if not PayByLinkSetup."Enable Pay by Link" then
+        if not AdyenSetup."Enable Pay by Link" then
             exit;
-        if not MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code") then
+        if not MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code") then
             exit;
         if MagentoPaymentGateway."Integration Type" <> MagentoPaymentGateway."Integration Type"::Adyen then
             exit;
-        if PayByLinkSetup."Enable Automatic Posting" then
+        if AdyenSetup."PayByLink Enable Auto Posting" then
             AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Post Payment Lines", ProccessPostPaymentLine, 1, 600) //Reschedule to run again in 10 minutes on error
     end;
 
@@ -437,14 +437,14 @@ codeunit 6184796 "NPR Adyen Management"
         ProcessPayByLinkWebhook: Label 'Process Pay by Link Webhook Requests';
         AdyenManagement: Codeunit "NPR Adyen Management";
         MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
-        PayByLinkSetup: Record "NPR Pay By Link Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
 
     begin
-        if not PayByLinkSetup.Get() then
+        if not AdyenSetup.Get() then
             exit;
-        if not PayByLinkSetup."Enable Pay by Link" then
+        if not AdyenSetup."Enable Pay by Link" then
             exit;
-        if not MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code") then
+        if not MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code") then
             exit;
         if MagentoPaymentGateway."Integration Type" <> MagentoPaymentGateway."Integration Type"::Adyen then
             exit;

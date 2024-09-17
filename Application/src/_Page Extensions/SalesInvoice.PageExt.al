@@ -303,11 +303,11 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
                     trigger OnAction()
                     var
                         PaybyLink: Interface "NPR Pay by Link";
-                        PayByLinkSetup: Record "NPR Pay By Link Setup";
+                        AdyenSetup: Record "NPR Adyen Setup";
                         MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
                     begin
-                        PayByLinkSetup.Get();
-                        MagentoPaymentGateway.Get(PayByLinkSetup."Payment Gateaway Code");
+                        AdyenSetup.Get();
+                        MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code");
                         PaybyLink := MagentoPaymentGateway."Integration Type";
                         PaybyLink.SetDocument(Rec);
                         PaybyLink.SetShowDialog();

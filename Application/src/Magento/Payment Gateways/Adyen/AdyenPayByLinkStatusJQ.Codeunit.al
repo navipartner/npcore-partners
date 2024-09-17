@@ -7,12 +7,12 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
         AdyenManagement: Codeunit "NPR Adyen Management";
         AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
         WebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
-        PaybyLinkSetup: Record "NPR Pay by Link Setup";
+        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        if not PayByLinkSetup.Get() then
+        if not AdyenSetup.Get() then
             exit;
 
-        if not PayByLinkSetup."Enable Pay by Link" then
+        if not AdyenSetup."Enable Pay by Link" then
             exit;
 
         AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::AUTHORISATION);

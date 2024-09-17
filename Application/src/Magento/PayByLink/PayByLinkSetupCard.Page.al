@@ -1,7 +1,6 @@
 page 6184709 "NPR Pay By Link Setup Card"
 {
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     Caption = 'Pay By Link Setup';
     PageType = Card;
     SourceTable = "NPR Pay By Link Setup";
@@ -9,6 +8,9 @@ page 6184709 "NPR Pay By Link Setup Card"
     InsertAllowed = false;
     Extensible = false;
     AdditionalSearchTerms = 'pay by link setup';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-09-13';
+    ObsoleteReason = 'Page marked for removal. Reason: All the fields from page are transfered to "NPR Adyen Setup" page in ''Pay By Link'' section.';
 
     layout
     {

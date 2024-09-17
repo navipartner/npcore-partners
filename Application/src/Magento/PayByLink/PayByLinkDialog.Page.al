@@ -59,9 +59,9 @@ page 6184597 "NPR Pay by Link Dialog"
 
                     trigger OnValidate()
                     var
-                        PayByLinkSetup: Record "NPR Pay By Link Setup";
+                        AdyenSetup: Record "NPR Adyen Setup";
                     begin
-                        PayByLinkSetup.CheckExpDuration(LinkExpiration);
+                        AdyenSetup.CheckExpDuration(LinkExpiration);
                     end;
                 }
             }
