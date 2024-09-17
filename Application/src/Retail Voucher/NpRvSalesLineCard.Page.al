@@ -188,7 +188,7 @@
                 {
                     Editable = false;
                     ShowCaption = false;
-                    Visible = (Rec."Document Source" = Rec."Document Source"::POS);
+                    Visible = (Rec."Document Source" = Rec."Document Source"::POS) or (Rec."Document Source" = Rec."Document Source"::"POS Quote");
                     field("Register No."; Rec."Register No.")
                     {
 
