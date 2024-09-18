@@ -3,14 +3,25 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
     await workflow.respond("SetValuesToContext");
     
     if (context.showSpinner) {
-        _dialogRef = await popup.simpleSpinner({
-            caption: captions.workflowTitle,
+        _dialogRef = await popup.simplePayment({
+            showStatus: true,
+            title: captions.workflowTitle,
+            amount: " ",
             onAbort: async () => {
-                popup.message({ caption: captions.abortErrorMessage, title: captions.workflowTitle, })
+                if (await popup.confirm(captions.confirmAbort)) {
+                    _dialogRef.updateStatus(captions.statusAborting);
+                    await hwc.invoke(
+                        context.hwcRequest.HwcName,
+                        {
+                            CardAction: "RequestCancel"
+                        },
+                        _contextId,
+                    );
+                }
             },
             abortValue: { completed: "Aborted" },
-        });
-    }
+    });
+}
 
     try {
         _contextId = hwc.registerResponseHandler(async (hwcResponse) => {
