@@ -89,6 +89,11 @@ codeunit 6184978 "NPR POS Entry Statistics Mgt"
                     POSQuery.SetFilter(POSQuery.Amount_Incl_Tax, FieldValue.AsValue().AsText());
                 _POSEntry.FieldName("Payment Amount"):
                     POSQuery.SetFilter(POSQuery.Payment_Amount, FieldValue.AsValue().AsText());
+                _POSEntry.FieldName("Ending Time"):
+                    POSQuery.SetFilter(POSQuery.Ending_Time, FieldValue.AsValue().AsText());
+                _POSEntry.FieldName(SystemCreatedAt):
+                    POSQuery.SetFilter(POSQuery.SystemCreatedAt, FieldValue.AsValue().AsText());
+
                 _POSEntrySalesLine.FieldName("Line No."):
                     POSQuery.SetFilter(POSQuery.Line_No, FieldValue.AsValue().AsText());
                 _POSEntrySalesLine.FieldName(Type):
@@ -152,6 +157,9 @@ codeunit 6184978 "NPR POS Entry Statistics Mgt"
         JsonObject.Add(_POSEntry.FieldName("Tax Amount"), POSQuery.Tax_Amount);
         JsonObject.Add(_POSEntry.FieldName("Amount Incl. Tax"), POSQuery.Amount_Incl_Tax);
         JsonObject.Add(_POSEntry.FieldName("Payment Amount"), POSQuery.Payment_Amount);
+        JsonObject.Add(_POSEntry.FieldName("Ending Time"), POSQuery.Ending_Time);
+        JsonObject.Add(_POSEntry.FieldName(SystemCreatedAt), POSQuery.SystemCreatedAt);
+
         JsonObject.Add(_POSEntrySalesLine.FieldName("Line No."), POSQuery.Line_No);
         JsonObject.Add(_POSEntrySalesLine.FieldName(Type), POSQuery.Type);
         JsonObject.Add(_POSEntrySalesLine.FieldName("No."), POSQuery.No);
@@ -172,6 +180,7 @@ codeunit 6184978 "NPR POS Entry Statistics Mgt"
         JsonObject.Add(_POSEntrySalesLine.FieldName("Shortcut Dimension 2 Code"), POSQuery.Sales_Line_Shortcut_Dimension_2_Code);
         JsonObject.Add(_POSEntrySalesLine.FieldName("VAT Calculation Type"), Format(POSQuery.VAT_Calculation_Type));
         JsonObject.Add(_POSEntrySalesLine.FieldName("Return Reason Code"), POSQuery.Return_Reason_Code);
+
         exit(JsonObject);
     end;
 
@@ -194,6 +203,9 @@ codeunit 6184978 "NPR POS Entry Statistics Mgt"
         AddFieldToArray(_POSEntry.FieldName("Tax Amount"), JsonArray);
         AddFieldToArray(_POSEntry.FieldName("Amount Incl. Tax"), JsonArray);
         AddFieldToArray(_POSEntry.FieldName("Payment Amount"), JsonArray);
+        AddFieldToArray(_POSEntry.FieldName("Ending Time"), JsonArray);
+        AddFieldToArray(_POSEntry.FieldName(SystemCreatedAt), JsonArray);
+
         AddFieldToArray(_POSEntrySalesLine.FieldName("Line No."), JsonArray);
         AddFieldToArray(_POSEntrySalesLine.FieldName(Type), JsonArray);
         AddFieldToArray(_POSEntrySalesLine.FieldName("No."), JsonArray);
