@@ -24,6 +24,8 @@ query 6014479 "NPR POS Entry Stats"
             column(Tax_Amount; "Tax Amount") { }
             column(Amount_Incl_Tax; "Amount Incl. Tax") { }
             column(Payment_Amount; "Payment Amount") { }
+            column(Ending_Time; "Ending Time") { }
+            column(SystemCreatedAt; SystemCreatedAt) { }
 
             dataitem(NPRPOSEntrySalesLine; "NPR POS Entry Sales Line")
             {
