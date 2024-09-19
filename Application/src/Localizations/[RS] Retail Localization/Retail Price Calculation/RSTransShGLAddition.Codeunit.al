@@ -276,7 +276,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         RSRLocalizationMgt.ResetValueEntryAmounts(CorrectionValueEntry);
 
         CorrectionValueEntry.Description := CalculationValueEntryDescLbl;
-        CorrectionValueEntry."Cost per Unit" := -RSRLocalizationMgt.RoundAmountToCurrencyRounding(TransitCostPerUnit - AppliedEntryCostPerUnit, '');
+        CorrectionValueEntry."Cost per Unit" := -(TransitCostPerUnit - AppliedEntryCostPerUnit);
         CorrectionValueEntry."Cost Amount (Actual)" := CorrectionValueEntry."Cost per Unit" * TransitLocationItemLedgerEntries."Invoiced Quantity";
         CorrectionValueEntry."Cost Posted to G/L" := CorrectionValueEntry."Cost Amount (Actual)";
 

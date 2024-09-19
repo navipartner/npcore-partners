@@ -29,7 +29,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if (IsRetailLocation(TransferReceiptHeader."Transfer-from Code")) and (not IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
+        if IsRetailLocation(TransferReceiptHeader."Transfer-from Code") or not IsRetailLocation(TransferReceiptHeader."Transfer-to Code") then
             exit;
 
         FillTempTransferReceiptLines(TransferReceiptHeader);
@@ -266,7 +266,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         TempRetailValueEntry.Copy(StdValueEntry);
         TempRetailValueEntry."Entry No." := TempRetailValueEntry.GetLastEntryNo() + 1;
         RSRLocalizationMgt.ResetValueEntryAmounts(TempRetailValueEntry);
-        TempRetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(PriceListLine."Unit Price" - SumOfStdCostPerUnit, '');
+        TempRetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - SumOfStdCostPerUnit;
         TempRetailValueEntry."Cost Amount (Actual)" := TempRetailValueEntry."Cost per Unit" * SumOfStdInvQty;
         TempRetailValueEntry."Cost Posted to G/L" := TempRetailValueEntry."Cost Amount (Actual)";
         TempRetailValueEntry.Description := CalculationValueEntryDescLbl;
