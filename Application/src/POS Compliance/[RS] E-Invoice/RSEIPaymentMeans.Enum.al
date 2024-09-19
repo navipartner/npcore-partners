@@ -37,4 +37,8 @@ enum 6014659 "NPR RS EI Payment Means"
     {
         Caption = 'Bank Giro';
     }
+    value(20; "221")
+    {
+        Caption = 'Credit Transfer (Single Payment)';
+    }
 }
