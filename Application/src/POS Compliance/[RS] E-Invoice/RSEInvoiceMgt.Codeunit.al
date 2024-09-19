@@ -1073,6 +1073,111 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     end;
     #endregion RS E-Invoice Calculation Helper Procedures
 
+    #region RS E-Invoice Documents Download Procedures
+
+    internal procedure DownloadDocument(RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
+    var
+        BaseDocumentValue: Text;
+        FileName: Text;
+    begin
+        if RSEInvoiceDocument.Direction in [RSEInvoiceDocument.Direction::Outgoing] then
+            if not RSEInvoiceDocument.GetDocumentPdfBase64(BaseDocumentValue) then
+                RSEICommunicationMgt.GetSalesInvoice(RSEInvoiceDocument);
+
+        FormatFileName(FileName, RSEInvoiceDocument, false, 0);
+
+        if BaseDocumentValue = '' then
+            RSEInvoiceDocument.GetDocumentPdfBase64(BaseDocumentValue);
+
+        DownloadDocumentAsPDF(BaseDocumentValue, FileName);
+    end;
+
+    internal procedure DownloadAttachment(RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
+    var
+        BaseDocumentValues: List of [Text];
+        BaseDocValue: Text;
+        DataCompression: Codeunit "Data Compression";
+        FileName: Text;
+        AttachmentDoesntExistErr: Label 'This document does not contain an attachment.';
+        FileAttachZipFormatLbl: Label '%1_Attachments.zip';
+    begin
+        if not RSEInvoiceDocument.GetDocumentAttachmentsBase64(BaseDocumentValues) then
+            Error(AttachmentDoesntExistErr);
+
+        if BaseDocumentValues.Count() = 1 then begin
+            FormatFileName(FileName, RSEInvoiceDocument, true, 1);
+            DownloadDocumentAsPDF(BaseDocumentValues.Get(1), FileName);
+            exit;
+        end;
+
+        DataCompression.CreateZipArchive();
+
+        foreach BaseDocValue in BaseDocumentValues do begin
+            FormatFileName(FileName, RSEInvoiceDocument, true, BaseDocumentValues.IndexOf(BaseDocValue));
+            AddFileToDataCommpression(DataCompression, RSEInvoiceDocument, BaseDocValue, BaseDocumentValues.IndexOf(BaseDocValue), FileName);
+        end;
+
+        FileName := StrSubstNo(FileAttachZipFormatLbl, RSEInvoiceDocument."Document No.");
+        DownloadCompressedFile(DataCompression, FileName);
+    end;
+
+    local procedure FormatFileName(var FileName: Text; RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; IsAttachment: Boolean; Index: Integer)
+    var
+        FilePDFFormatLbl: Label 'Document_%1.pdf', Locked = true, Comment = '%1 = Document No.';
+        FileAttachPDFFormatLbl: Label 'Document_%1_Attach_%2.pdf', Comment = '%1 = Document No., %2 = Attachment Index';
+    begin
+        if IsAttachment then
+            FileName := StrSubstNo(FileAttachPDFFormatLbl, RSEInvoiceDocument."Document No.", Index)
+        else
+            FileName := StrSubstNo(FilePDFFormatLbl, RSEInvoiceDocument."Document No.");
+    end;
+
+    local procedure DownloadDocumentAsPDF(DocumentContent: Text; FileName: Text)
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        IStream: InStream;
+        OStream: OutStream;
+    begin
+        TempBlob.CreateOutStream(OStream);
+        Base64Convert.FromBase64(DocumentContent, OStream);
+        TempBlob.CreateInStream(IStream);
+        FileMgt.BLOBExport(TempBlob, FileName, true);
+    end;
+
+    local procedure AddFileToDataCommpression(var DataCompression: Codeunit "Data Compression"; RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; Base64Value: Text; Index: Integer; Filename: Text)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        Base64Convert: Codeunit "Base64 Convert";
+        IStream: InStream;
+        OStream: OutStream;
+    begin
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+        Base64Convert.FromBase64(Base64Value, OStream);
+        TempBlob.CreateInStream(IStream);
+        FormatFileName(FileName, RSEInvoiceDocument, true, Index);
+        DataCompression.AddEntry(IStream, FileName);
+    end;
+
+    local procedure DownloadCompressedFile(DataCompression: Codeunit "Data Compression"; FileName: Text)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        IStream: InStream;
+        OStream: OutStream;
+        ZipArchiveFilterTxt: Label 'Zip File (*.zip)|*.zip', Locked = true;
+        ZipArchiveSaveDialogTxt: Label 'Export Document Attachments';
+    begin
+        TempBlob.CreateOutStream(OStream);
+        DataCompression.SaveZipArchive(OStream);
+        DataCompression.CloseZipArchive();
+        TempBlob.CreateInStream(IStream);
+
+        DownloadFromStream(IStream, ZipArchiveSaveDialogTxt, '', ZipArchiveFilterTxt, FileName);
+    end;
+
+    #endregion RS E-Invoice Documents Download Procedures
+
     var
         RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
         SalesDocumentMustContainTaxExemptReasonErr: Label 'Sales Document with Tax Category %1 must have a %2 in %3.', Comment = '%1 - Line No., %2 - Field Caption, %3 - Table Caption';
