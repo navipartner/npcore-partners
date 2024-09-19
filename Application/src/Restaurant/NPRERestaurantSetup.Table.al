@@ -223,7 +223,7 @@
         }
         field(110; "Select Table Action"; Code[20])
         {
-            Caption = 'Select Table Action';
+            Caption = 'Select Table Action Code';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -387,6 +387,18 @@
             Caption = 'Notif. Resend Delay (min)';
             DataClassification = CustomerContent;
             MinValue = 0;
+        }
+        field(200; "Select Table Behaviour"; Option)
+        {
+            Caption = 'Select Table Behaviour';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Run POS Action,Show Slide-in Menu';
+            OptionMembers = "Run POS Action","Show Slide-in Menu";
+        }
+        field(210; "Restaurant View Layout"; Enum "NPR NPRE Restaur. Layout Type")
+        {
+            Caption = 'Restaurant View Layout';
+            DataClassification = CustomerContent;
         }
     }
 
