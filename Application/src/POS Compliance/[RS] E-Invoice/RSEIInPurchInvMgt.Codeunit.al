@@ -299,6 +299,8 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
         HelperText: Text;
     begin
         RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:PaymentMeans/cbc:PaymentMeansCode', NamespaceManager);
+        if not RSEIPaymentMeans.Names().Contains(HelperText) then
+            exit;
         RSEIPaymentMethodMapp.SetRange("RS EI Payment Means", Enum::"NPR RS EI Payment Means".FromInteger(RSEIPaymentMeans.Ordinals.Get(RSEIPaymentMeans.Names.IndexOf(HelperText))));
         if not RSEIPaymentMethodMapp.FindFirst() then
             exit;
