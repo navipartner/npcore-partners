@@ -168,6 +168,7 @@
             ErrorMessage := CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader, RecRef, ReportID);
 
         AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader);
+        AddEmailAttachmentsToSmtpMessage(RecRef);
 
         if ErrorMessage = '' then begin
             Filename := GetFilename(EmailTemplateHeader, RecRef);
@@ -214,10 +215,16 @@
 
     local procedure AddEmailAttachmentsToSmtpMessage(EmailTemplateHeader: Record "NPR E-mail Template Header")
     var
-        EmailAttachment: Record "NPR E-mail Attachment";
         RecRef: RecordRef;
     begin
         RecRef.GetTable(EmailTemplateHeader);
+        AddEmailAttachmentsToSmtpMessage(RecRef);
+    end;
+
+    local procedure AddEmailAttachmentsToSmtpMessage(RecRef: RecordRef)
+    var
+        EmailAttachment: Record "NPR E-mail Attachment";
+    begin
         EmailAttachment.SetRange("Table No.", RecRef.Number);
         EmailAttachment.SetRange("Primary Key", RecRef.GetPosition(false));
         if EmailAttachment.FindSet() then
