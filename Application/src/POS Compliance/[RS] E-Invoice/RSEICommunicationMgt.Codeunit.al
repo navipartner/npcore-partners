@@ -486,6 +486,30 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
                 Message(CancelingSuccessfullMsg);
     end;
 
+    internal procedure GetSalesInvoice(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
+    var
+        RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
+        HttpRequestType: Enum "Http Request Type";
+        RequestMessage: HttpRequestMessage;
+        Url: Text;
+        ResponseText: Text;
+        GetSalesInvoiceDocPathLbl: Label '/api/publicApi/sales-invoice/xml?invoiceId=%1', Locked = true, Comment = '%1 = Invoice Id';
+    begin
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+            exit;
+
+        RSEInvoiceSetup.GetRSEInvoiceSetupWithCheck();
+
+        Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetSalesInvoiceDocPathLbl, RSEInvoiceDocument."Sales Invoice ID"));
+
+        SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+
+        if SendHttpRequest(RequestMessage, ResponseText, false) then begin
+            RSEInvoiceDocument.SetRequestContent(ResponseText);
+            RSEInvoiceDocument.Modify(true);
+        end;
+    end;
+
     local procedure ProcessSendSalesInvoiceDocumentResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
     var
         JsonHeader: JsonObject;

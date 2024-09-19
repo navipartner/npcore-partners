@@ -136,6 +136,9 @@ table 6150804 "NPR RS E-Invoice Document"
     }
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    var
+        XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true, Comment = '%1 = Element Name';
+
     internal procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -208,5 +211,67 @@ table 6150804 "NPR RS E-Invoice Document"
             ResponseText += ResponseTextLine;
         end;
     end;
+
+    internal procedure GetDocumentPdfBase64(var DocumentPdfBaseValue: Text): Boolean
+    var
+        Document: XmlDocument;
+        DocumentHeaderNode: XmlNode;
+        HelperDocHeaderNode: XmlNode;
+        DocumentContent: Text;
+    begin
+        if Rec.Direction in [Rec.Direction::Outgoing] then
+            DocumentContent := GetRequestContent()
+        else
+            DocumentContent := GetResponseContent();
+
+        XmlDocument.ReadFrom(DocumentContent, Document);
+
+        Document.GetChildElements().Get(1, DocumentHeaderNode);
+
+        if DocumentHeaderNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'DocumentPdf'), HelperDocHeaderNode) then begin
+            DocumentPdfBaseValue := HelperDocHeaderNode.AsXmlElement().InnerText();
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    internal procedure GetDocumentAttachmentsBase64(var AttachmentsText: List of [Text]): Boolean
+    var
+        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+        Document: XmlDocument;
+        InvoiceElement: XmlElement;
+        DocumentBodyNode: XmlNode;
+        AttachmentNodes: XmlNodeList;
+        AttachmentNode: XmlNode;
+        NamespaceManager: XmlNamespaceManager;
+        DocumentContent: Text;
+        AttachmentText: Text;
+    begin
+        if Rec.Direction in [Rec.Direction::Outgoing] then
+            DocumentContent := GetRequestContent()
+        else
+            DocumentContent := GetResponseContent();
+
+        XmlDocument.ReadFrom(DocumentContent, Document);
+        NamespaceManager.NameTable(Document.NameTable());
+        NamespaceManager.AddNamespace('cac', RSEInvoiceMgt.GetCacNamespace());
+        NamespaceManager.AddNamespace('cec', RSEInvoiceMgt.GetCecNamespace());
+        NamespaceManager.AddNamespace('cbc', RSEInvoiceMgt.GetCbcNamespace());
+
+        Document.GetChildElements().Get(1, DocumentBodyNode);
+        if not DocumentBodyNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'Invoice'), DocumentBodyNode) then
+            DocumentBodyNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'CreditNote'), DocumentBodyNode);
+        InvoiceElement := DocumentBodyNode.AsXmlElement();
+
+        DocumentBodyNode.SelectNodes(StrSubstNo(XPathExcludeNamespacePatternLbl, 'AdditionalDocumentReference'), AttachmentNodes);
+
+        foreach AttachmentNode in AttachmentNodes do begin
+            RSEInvoiceMgt.GetTextValue(AttachmentText, AttachmentNode.AsXmlElement(), 'cac:Attachment/cbc:EmbeddedDocumentBinaryObject', NamespaceManager);
+            AttachmentsText.Add(AttachmentText);
+        end;
+
+        exit(AttachmentsText.Count() > 0);
+    end;
+
 #endif
 }

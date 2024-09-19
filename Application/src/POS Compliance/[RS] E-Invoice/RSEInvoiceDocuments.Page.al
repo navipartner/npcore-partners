@@ -148,8 +148,8 @@ page 6184547 "NPR RS E-Invoice Documents"
                     var
                         RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
                         RSEIDateDialog: Page "NPR RS EI Date Dialog";
-                        StartDate: Date;
                         EndDate: Date;
+                        StartDate: Date;
                     begin
                         RSEIDateDialog.LookupMode(true);
                         if RSEIDateDialog.RunModal() <> Action::LookupOK then
@@ -349,10 +349,16 @@ page 6184547 "NPR RS E-Invoice Documents"
                     trigger OnAction()
                     var
                         FileMgt: Codeunit "File Management";
+                        RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
                         TempBlob: Codeunit "Temp Blob";
-                        FileNameLbl: Label '%1.xml', Locked = true;
                         OStream: OutStream;
+                        BaseDocumentValue: Text;
+                        FileNameLbl: Label '%1.xml', Locked = true;
                     begin
+                        if Rec.Direction in [Rec.Direction::Outgoing] then
+                            if not Rec.GetDocumentPdfBase64(BaseDocumentValue) then
+                                RSEICommunicationMgt.GetSalesInvoice(Rec);
+
                         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
                         if Rec."Request Content".HasValue() then begin
                             Rec."Request Content".ExportStream(OStream);
@@ -378,20 +384,52 @@ page 6184547 "NPR RS E-Invoice Documents"
                     var
                         FileMgt: Codeunit "File Management";
                         TempBlob: Codeunit "Temp Blob";
-                        FileNameXmlLbl: Label '%1.xml', Locked = true;
-                        FileNameJsonLbl: Label '%1.json', Locked = true;
                         OStream: OutStream;
+                        FileNameJsonLbl: Label '%1.json', Locked = true;
+                        FileNameXmlLbl: Label '%1.xml', Locked = true;
                     begin
                         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
                         if Rec."Response Content".HasValue() then begin
                             Rec."Response Content".ExportStream(OStream);
                             case Rec.Direction of
                                 Rec.Direction::Outgoing:
-                                    FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameJsonLbl, Rec."Invoice Document No."), true);
+                                    FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameJsonLbl, Rec."Sales Invoice Id"), true);
                                 Rec.Direction::Incoming:
-                                    FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameXmlLbl, Rec."Invoice Document No."), true);
+                                    FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameXmlLbl, Rec."Purchase Invoice Id"), true);
                             end;
                         end;
+                    end;
+                }
+                action(DownloadDocumentPDF)
+                {
+                    Caption = 'Download Document PDF';
+                    ToolTip = 'The document PDF from E-Invoice API will be downloaded.';
+                    Image = SendAsPDF;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedOnly = true;
+                    ApplicationArea = NPRRSEInvoice;
+                    trigger OnAction()
+                    var
+                        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+                    begin
+                        RSEInvoiceMgt.DownloadDocument(Rec);
+                    end;
+                }
+                action(DownloadAttachmentPDF)
+                {
+                    Caption = 'Download Document Attachment';
+                    ToolTip = 'The document attachment from E-Invoice API will be downloaded in the PDF form.';
+                    Image = SendAsPDF;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+                    PromotedOnly = true;
+                    ApplicationArea = NPRRSEInvoice;
+                    trigger OnAction()
+                    var
+                        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+                    begin
+                        RSEInvoiceMgt.DownloadAttachment(Rec);
                     end;
                 }
             }
@@ -444,10 +482,10 @@ page 6184547 "NPR RS E-Invoice Documents"
 
     local procedure OpenPostedDocument()
     var
-        PurchInvHeader: Record "Purch. Inv. Header";
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
-        SalesInvHeader: Record "Sales Invoice Header";
+        PurchInvHeader: Record "Purch. Inv. Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvHeader: Record "Sales Invoice Header";
     begin
         case Rec."Document Type" of
             "NPR RS EI Document Type"::"Purchase Order", "NPR RS EI Document Type"::"Purchase Invoice":
@@ -472,6 +510,7 @@ page 6184547 "NPR RS E-Invoice Documents"
                 end;
         end;
     end;
+
 #endif
 
     var
