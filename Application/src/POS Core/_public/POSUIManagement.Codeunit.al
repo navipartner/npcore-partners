@@ -511,9 +511,10 @@
         CaptionsEditorHavingImgCaptionPopupTextLbl: Label 'Having background image disables having more than one caption.';
         CaptionsEditorSwipeCaptionPopupTextLbl: Label 'Swipe buttons cant have captions.';
         CaptionsEditorDrawerCaptionPopupTextLbl: Label 'Drawer buttons can have only one caption.';
-        IconsEditorSwipeIconPopupTextLbl: Label 'Swipe menu buttons cant have images.';
-        IconsEditorDrawerIconPopupTextLbl: Label 'Drawer menu buttons cant have images.';
-        IconsEditorMobileTooltipPopupTextLbl: Label 'Mobile menu buttons cant have tooltips.';
+        IconsEditorSwipeIconPopupTextLbl: Label 'Swipe menu buttons can''t have images.';
+        IconsEditorDrawerIconPopupTextLbl: Label 'Drawer menu buttons can''t have images.';
+        IconsEditorDrawerMenuButtonsCantChangecolorsLbl: Label 'Drawer menu buttons can''t change colors';
+        IconsEditorMobileTooltipPopupTextLbl: Label 'Mobile menu buttons can''t have tooltips.';
         IconsEditorHavingImgIconPopupTextLbl: Label 'Having background image disables having icon.';
         IconsEditorPleaseProvideLinkLbl: Label 'Please provide link';
         IconsEditorPleaseProvideTooltipLbl: Label 'Please provide tooltip';
@@ -998,6 +999,7 @@
         Captions.Add('Captions_Editor_DrawerCaptionPopupText', CaptionsEditorDrawerCaptionPopupTextLbl);
         Captions.Add('Icons_Editor_SwipeIconPopupText', IconsEditorSwipeIconPopupTextLbl);
         Captions.Add('Icons_Editor_DrawerIconPopupText', IconsEditorDrawerIconPopupTextLbl);
+        Captions.Add('Icons_Editor_DrawerMenuButtonsCantChangecolors',IconsEditorDrawerMenuButtonsCantChangecolorsLbl);
         Captions.Add('Icons_Editor_MobileTooltipPopupText', IconsEditorMobileTooltipPopupTextLbl);
         Captions.Add('Icons_Editor_HavingImgIconPopupText', IconsEditorHavingImgIconPopupTextLbl);
         Captions.Add('Icons_Editor_PleaseProvideLink', IconsEditorPleaseProvideLinkLbl);
