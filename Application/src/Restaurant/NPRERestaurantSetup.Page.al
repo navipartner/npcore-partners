@@ -154,8 +154,17 @@
             }
             group(POSActions)
             {
-                Caption = 'POS Actions (Restaurant View)';
-
+                Caption = 'Restaurant View';
+                group(RestViewLayout)
+                {
+                    Visible = RestViewLayoutSelectionIsVisible;
+                    ShowCaption = false;
+                    field("Restaurant View Layout"; Rec."Restaurant View Layout")
+                    {
+                        ToolTip = 'Specifies the layout type you want to use for your restaurant view.';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
                     ToolTip = 'Specifies the code for the POS action that is used, when restaurant layout is modified on restaurant view. Recommended value is "RV_SAVE_LAYOUT"';
@@ -180,17 +189,29 @@
                         ParamMgt.EditParametersForField(Rec."Select Restaurant Action", Rec.RecordId, Rec.FieldNo("Select Restaurant Action"));
                     end;
                 }
-                field("Select Table Action"; Rec."Select Table Action")
+                field("Select Table Behaviour"; Rec."Select Table Behaviour")
                 {
-                    ToolTip = 'Specifies the code for the POS action that is used, when a seating (table) is selected on restaurant view. Recommended value is "RV_SELECT_TABLE"';
+                    Caption = 'Select Table Action';
+                    ToolTip = 'Specifies what the system should do when a seating (table) is selected on restaurant view.';
                     ApplicationArea = NPRRetail;
-                    Style = Unfavorable;
-                    StyleExpr = SelectTableActionRefreshNeeded;
+                }
+                group(SelectTableActionCode)
+                {
+                    Visible = (Rec."Select Table Behaviour" = Rec."Select Table Behaviour"::"Run POS Action");
+                    ShowCaption = false;
+                    field("Select Table Action"; Rec."Select Table Action")
+                    {
+                        ToolTip = 'Specifies the code for the POS action that is used, when a seating (table) is selected on restaurant view. Recommended value is "RV_SELECT_TABLE"';
+                        ApplicationArea = NPRRetail;
+                        Style = Unfavorable;
+                        StyleExpr = SelectTableActionRefreshNeeded;
+                        ShowMandatory = true;
 
-                    trigger OnAssistEdit()
-                    begin
-                        ParamMgt.EditParametersForField(Rec."Select Table Action", Rec.RecordId, Rec.FieldNo("Select Table Action"));
-                    end;
+                        trigger OnAssistEdit()
+                        begin
+                            ParamMgt.EditParametersForField(Rec."Select Table Action", Rec.RecordId, Rec.FieldNo("Select Table Action"));
+                        end;
+                    }
                 }
                 field("Go to POS Action"; Rec."Go to POS Action")
                 {
@@ -381,12 +402,14 @@
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
         if not Rec.Get() then
             Rec.Insert(true);
 
         ShowKDS := KitchenOrderMgt.KDSAvailable();
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
+        RestViewLayoutSelectionIsVisible := SetupProxy.ModernRestaurantLayoutFeatureFlagIsEnabled();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -400,6 +423,7 @@
         HasAzureADConnection: Boolean;
         NewWaiterPadActionRefreshNeeded: Boolean;
         RefreshEnabled: Boolean;
+        RestViewLayoutSelectionIsVisible: Boolean;
         SaveLayoutActionRefreshNeeded: Boolean;
         SelectRestaurantActionRefreshNeeded: Boolean;
         SelectTableActionRefreshNeeded: Boolean;

@@ -29,7 +29,7 @@
                 TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Waiter Pad Action")), RestaurantSetup.FieldNo("Select Waiter Pad Action"));
         end;
 
-        if RestaurantSetup."Select Table Action" <> '' then begin
+        if (RestaurantSetup."Select Table Behaviour" = RestaurantSetup."Select Table Behaviour"::"Run POS Action") and (RestaurantSetup."Select Table Action" <> '') then begin
             POSSession.RetrieveSessionAction(RestaurantSetup."Select Table Action", TempPOSAction);
             Sender.ConfigureReusableWorkflow(
                 TempPOSAction, POSSession, StrSubstNo(ConfigureReusableWorkflowLbl, RestaurantSetup.TableCaption, RestaurantSetup.FieldCaption("Select Table Action")), RestaurantSetup.FieldNo("Select Table Action"));
@@ -93,7 +93,7 @@
             Options.Add('npre_SelectWaiterPadActionParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Select Waiter Pad Action")));
         end;
 
-        if RestaurantSetup."Select Table Action" <> '' then begin
+        if (RestaurantSetup."Select Table Behaviour" = RestaurantSetup."Select Table Behaviour"::"Run POS Action") and (RestaurantSetup."Select Table Action" <> '') then begin
             Options.Add('npre_SelectTableAction', RestaurantSetup."Select Table Action");
             Options.Add('npre_SelectTableActionParameters', POSActionParameterMgt.GetParametersAsJson(RestaurantSetup.RecordId, RestaurantSetup.FieldNo("Select Table Action")));
         end;
@@ -147,6 +147,7 @@
         if Method in
             ['RequestWaiterPadData',
              'RequestRestaurantLayout',
+             'RestaurantLayoutType',
              'RequestKitchenOrders',
              'RequestKDSData',
              'KDS_GetSetups',
@@ -170,6 +171,8 @@
                 end;
             'RequestRestaurantLayout':
                 RefreshRestaurantLayout(FrontEnd, GetRestaurantCode(Context, false));
+            'RestaurantLayoutType':
+                GetRestaurantLayoutType(Context, FrontEnd);
             'RequestKitchenOrders':
                 RefreshCustomerDisplayKitchenOrders(Context, FrontEnd);
             'RequestKDSData':
@@ -432,6 +435,19 @@
         FrontEnd.InvokeFrontEndMethod2(Request);
 
         RefreshStatus(FrontEnd, RestaurantCode, '', '');
+    end;
+
+    local procedure GetRestaurantLayoutType(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
+        Response: JsonObject;
+        RestLayoutType: Enum "NPR NPRE Restaur. Layout Type";
+        RestLayoutTypeText: Text;
+    begin
+        RestLayoutType := SetupProxy.GetRestaurantLayoutType();
+        RestLayoutType.Names().Get(RestLayoutType.Ordinals().IndexOf(RestLayoutType.AsInteger()), RestLayoutTypeText);
+        Response.Add('restaurantLayoutType', RestLayoutTypeText);
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
     internal procedure RefreshWaiterPadContent(POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var WaiterPad: Record "NPR NPRE Waiter Pad")

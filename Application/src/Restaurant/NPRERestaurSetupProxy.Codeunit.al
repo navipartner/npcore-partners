@@ -239,6 +239,21 @@
         Error(MustBeTempMsg, CallerName);
     end;
 
+    procedure GetRestaurantLayoutType(): Enum "NPR NPRE Restaur. Layout Type"
+    begin
+        if not ModernRestaurantLayoutFeatureFlagIsEnabled() then
+            exit(Enum::"NPR NPRE Restaur. Layout Type"::CLASSIC);
+        GetNPRESetup();
+        exit(_NPRESetup."Restaurant View Layout");
+    end;
+
+    procedure ModernRestaurantLayoutFeatureFlagIsEnabled(): Boolean
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        exit(FeatureFlagsManagement.IsEnabled('modernRestaurantLayout'));
+    end;
+
     #region Microsoft Entra application
     internal procedure CreateAzureADApplication()
     var
