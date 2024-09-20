@@ -3,6 +3,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     Access = Internal;
 
     #region RS E-Invoice Mgt. Procedures
+
     procedure IsRSEInvoiceEnabled(): Boolean
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
@@ -70,6 +71,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Mgt. Procedures
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+
     #region RS E-Invoice Purchase Subscribers
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnBeforePostPurchaseDoc', '', false, false)]
@@ -452,6 +454,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Sales Subscribers
 
     #region RS E-Invoice Tax Exemption Mgt.
+
     internal procedure ApplyTaxExemptionReason(SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
@@ -529,6 +532,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Tax Exemption Mgt.
 
     #region RS E-Invoice Sales Mgt. Helper Procedures
+
     internal procedure CheckIsDataSetOnSalesInvHeader(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         Customer: Record Customer;
@@ -545,8 +549,9 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         if not (RSEIAuxSalesInvHdr."NPR RS EI Send To SEF") then
             exit;
 
-        if (RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
-            Error(TaxLiabilityCodeMustBeChosenErr);
+        if not SalesInvoiceHeader."Prepayment Invoice" then
+            if (RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
+                Error(TaxLiabilityCodeMustBeChosenErr);
         CompanyInfo.Get();
         Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -606,8 +611,9 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         if not (RSEIAuxSalesCrMemoHdr."NPR RS EI Send To SEF") then
             exit;
 
-        if (RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
-            Error(TaxLiabilityCodeMustBeChosenErr);
+        if not SalesCrMemoHeader."Prepayment Credit Memo" then
+            if (RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
+                Error(TaxLiabilityCodeMustBeChosenErr);
         CompanyInfo.Get();
         Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
 
@@ -736,6 +742,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Sales Mgt. Helper Procedures
 
     #region RS E-Invoice Purchase Mgt. Helper Procedures
+
     local procedure ValidateIfPostingIsAllowed(PurchaseHeader: Record "Purchase Header") Handled: Boolean
     var
         RSEIAuxPurchHeader: Record "NPR RS EI Aux Purch. Header";
@@ -907,6 +914,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     #endregion RS E-Invoice Purchase Mgt. Helper Procedures
 
     #region RS E-Invoice XML Helper Procedures
+
     internal procedure GetDecimalValue(var Value: Decimal; Element: XmlElement; XPath: Text; NamespaceManager: XmlNamespaceManager): Boolean
     var
         Node: XmlNode;
@@ -1009,6 +1017,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     begin
         exit(Enum::"NPR RS EI Invoice Type Code".FromInteger(Enum::"NPR RS EI Invoice Type Code".Ordinals().Get(Enum::"NPR RS EI Invoice Type Code".Names().IndexOf(TextValue))));
     end;
+
     #endregion RS E-Invoice XML Helper Procedures
 
     #region RS E-Invoice Calculation Helper Procedures
@@ -1071,6 +1080,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     begin
         exit(TotalAmountWithVAT - PrepaymentSum - InvoiceDiscount);
     end;
+
     #endregion RS E-Invoice Calculation Helper Procedures
 
     #region RS E-Invoice Documents Download Procedures

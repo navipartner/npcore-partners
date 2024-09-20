@@ -96,6 +96,7 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
         AddPaymentMethodInfo(PurchaseHeader, InvoiceElement, NamespaceManager);
 
         PurchaseHeader.Insert();
+        OnAfterInsertPurchaseHeaderOnInsertPurchaseDocument(PurchaseHeader);
 
         AddRSEIPurchHeaderAuxInfo(PurchaseHeader, TempRSEInvoiceDocument, InvoiceElement, NamespaceManager);
 
@@ -432,5 +433,14 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
     end;
 
     #endregion RS E-Invoice Helper Procedures
+
+    #region Automated Test Helpers
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterInsertPurchaseHeaderOnInsertPurchaseDocument(PurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    #endregion Automated Test Helpers
 #endif
 }
