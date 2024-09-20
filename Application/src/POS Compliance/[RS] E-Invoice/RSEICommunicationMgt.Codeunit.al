@@ -49,7 +49,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RSEInvoiceMgt.ProcessSelectedPurchaseInvoicesForImporting(TempRSEInvoiceDocument)
     end;
 
-    local procedure GetPurchaseInvoice(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; PurchaseInvoiceId: Integer)
+    internal procedure GetPurchaseInvoice(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; PurchaseInvoiceId: Integer)
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         RSEIInPurchInvMgt: Codeunit "NPR RS EI In Purch. Inv. Mgt.";
@@ -57,6 +57,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
+        IsHandled: Boolean;
         GetPurchaseInvoiceDocPathLbl: Label '/api/publicApi/purchase-invoice/xml?invoiceId=%1', Locked = true, Comment = '%1 = Invoice Id';
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -68,6 +69,9 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
+        OnBeforeSendHttpRequestforGetPurchaseInvoice(RequestMessage, ResponseText, TempRSEInvoiceDocument, PurchaseInvoiceId, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             RSEIInPurchInvMgt.ProcessGetPurchaseInvoiceDocumentResponse(TempRSEInvoiceDocument, ResponseText, PurchaseInvoiceId);
     end;
@@ -102,6 +106,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         Url: Text;
         ResponseText: Text;
         GetPurchaseInvoiceStatusPathLbl: Label '/api/publicApi/purchase-invoice?invoiceId=%1', Locked = true, Comment = '%1 = Invoice Id';
+        IsHandled: Boolean;
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
             exit;
@@ -111,6 +116,10 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         Url := FormatUrl(RSEInvoiceSetup."API URL", StrSubstNo(GetPurchaseInvoiceStatusPathLbl, RSEInvoiceDocument."Purchase Invoice ID"));
 
         SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
+
+        OnBeforeSendHttpRequestForGetPurchaseDocumentStatus(RequestMessage, ResponseText, RSEInvoiceDocument, IsHandled);
+        if IsHandled then
+            exit;
 
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessGetPurchaseDocumentStatusResponse(RSEInvoiceDocument, ResponseText);
@@ -289,7 +298,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         end;
     end;
 
-    local procedure ProcessGetPurchaseDocumentStatusResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
+    internal procedure ProcessGetPurchaseDocumentStatusResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
     var
         JsonHeader: JsonObject;
         JsonToken: JsonToken;
@@ -363,6 +372,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     #endregion RS EI Purchase Invoice Communication Mgt.
 
     #region RS EI Sales Invoice Communication Mgt.
+
     internal procedure SendSalesDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document")
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
@@ -371,6 +381,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestText: Text;
         ResponseText: Text;
         Url: Text;
+        IsHandled: Boolean;
         SendSalesDocumentPathLbl: Label '/api/publicAPi/sales-invoice/ubl?requestId=%1&sendToCir=%2&executeValidation=%3', Locked = true, Comment = '%1 = Request Id, %2 = Should be sent to CIR, %3 = Should Validation Be Executed';
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -384,6 +395,9 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestText := RSEInvoiceDocument.GetRequestContent();
         SetRequestMessageContent(RequestMessage, RequestText, HttpRequestType::POST, 'application/xml', Url, RSEInvoiceSetup."API Key", true);
 
+        OnBeforeSendHttpRequestForSalesDocument(RequestMessage, ResponseText, RSEInvoiceDocument, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessSendSalesInvoiceDocumentResponse(RSEInvoiceDocument, ResponseText)
         else
@@ -419,6 +433,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestMessage: HttpRequestMessage;
         Url: Text;
         ResponseText: Text;
+        IsHandled: Boolean;
         GetSalesInvoiceDocumentStatusPathLbl: Label '/api/publicApi/sales-invoice?invoiceId=%1', Locked = true, Comment = '%1 = Invoice Id';
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -430,6 +445,9 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
+        OnBeforeSendHttpRequestForGetSalesDocumentStatus(RSEInvoiceDocument, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             ProcessGetSalesDocumentStatusResponse(RSEInvoiceDocument, ResponseText);
     end;
@@ -510,7 +528,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         end;
     end;
 
-    local procedure ProcessSendSalesInvoiceDocumentResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
+    internal procedure ProcessSendSalesInvoiceDocumentResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
     var
         JsonHeader: JsonObject;
         JsonTok: JsonToken;
@@ -587,7 +605,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         end;
     end;
 
-    local procedure ProcessGetSalesDocumentStatusResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
+    internal procedure ProcessGetSalesDocumentStatusResponse(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; ResponseText: Text)
     var
         JsonHeader: JsonObject;
         JsonToken: JsonToken;
@@ -605,6 +623,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     #endregion RS EI Sales Invoice Communication Mgt.
 
     #region RS EI Allowed UOMs
+
     internal procedure GetAllowedUOMs()
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
@@ -612,6 +631,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestMessage: HttpRequestMessage;
         ResponseText: Text;
         Url: Text;
+        IsHandled: Boolean;
         GetAllowedUOMsPathLbl: Label '/api/publicApi/get-unit-measures', Locked = true;
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -623,11 +643,14 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/json', Url, RSEInvoiceSetup."API Key", false);
 
+        OnBeforeSendHttpRequestForGetAllowedUOM(RequestMessage, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             FillAllowedUOMs(ResponseText);
     end;
 
-    local procedure FillAllowedUOMs(ResponseText: Text)
+    internal procedure FillAllowedUOMs(ResponseText: Text)
     var
         JsonArray: JsonArray;
         JsonHeader: JsonObject;
@@ -683,9 +706,11 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
             AllowedUOM.Insert();
         end;
     end;
+
     #endregion RS EI Allowed UOMs
 
     #region RS EI Tax Exemption Reason List
+
     internal procedure GetTaxExemptionReasonList()
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
@@ -693,6 +718,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
         RequestMessage: HttpRequestMessage;
         ResponseText: Text;
         Url: Text;
+        IsHandled: Boolean;
         GetTaxExemptionListPathLbl: Label '/api/publicApi/sales-invoice/getValueAddedTaxExemptionReasonList', Locked = true;
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -704,11 +730,14 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         SetRequestMessageContent(RequestMessage, '', HttpRequestType::GET, 'application/xml', Url, RSEInvoiceSetup."API Key", false);
 
+        OnBeforeSendHttpRequestForGetTaxExemptionReasons(RequestMessage, ResponseText, IsHandled);
+        if IsHandled then
+            exit;
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillTaxExemptionReasonList(ResponseText);
     end;
 
-    local procedure FillTaxExemptionReasonList(ResponseText: Text)
+    internal procedure FillTaxExemptionReasonList(ResponseText: Text)
     var
         RSEITaxExemptionReason: Record "NPR RS EI Tax Exemption Reason";
         JsonArray: JsonArray;
@@ -753,6 +782,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
 
         Message(TaxExemptionReasonListUpdateMsg);
     end;
+
     #endregion RS EI Tax Exemption Reason List
 
     #region RS EI HTTP Request
@@ -785,6 +815,7 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     #endregion RS EI HTTP Request
 
     #region RS E-Invoice Helper Procedures
+
     local procedure SetHeader(var Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)
     begin
         if Headers.Contains(HeaderName) then
@@ -828,5 +859,40 @@ codeunit 6184794 "NPR RS EI Communication Mgt."
     end;
 
     #endregion RS E-Invoice Helper Procedures
+
+    #region Automated Test Mockup Events
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForSalesDocument(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForGetAllowedUOM(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForGetTaxExemptionReasons(RequestMessage: HttpRequestMessage; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForGetSalesDocumentStatus(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var ResponseText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestforGetPurchaseInvoice(RequestMessage: HttpRequestMessage; var ResponseText: Text; var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var PurchaseInvoiceId: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeSendHttpRequestForGetPurchaseDocumentStatus(RequestMessage: HttpRequestMessage; var ResponseText: Text; var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; var IsHandled: Boolean)
+    begin
+    end;
+
+    #endregion Automated Test Mockup Events
+
 #endif
 }
