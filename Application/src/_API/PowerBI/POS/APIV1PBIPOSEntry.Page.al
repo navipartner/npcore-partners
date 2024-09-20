@@ -48,6 +48,10 @@ page 6059935 "NPR APIV1 PBIPOSEntry"
                 {
                     Caption = 'Starting Time', Locked = true;
                 }
+                field(endingTime; Rec."Ending Time")
+                {
+                    Caption = 'Ending Time', Locked = true;
+                }
                 field(postingDate; Rec."Posting Date")
                 {
                     Caption = 'Posting Date', Locked = true;
