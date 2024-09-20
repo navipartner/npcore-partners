@@ -2,7 +2,7 @@ query 6014481 "NPR RS Value Entry Mapping"
 {
     Access = Internal;
     QueryType = Normal;
-    Caption = 'RS COGS Value Entry';
+    Caption = 'RS Value Entry Mapping';
 
     elements
     {
@@ -12,9 +12,7 @@ query 6014481 "NPR RS Value Entry Mapping"
             filter(Filter_Standard_Correction; "Standard Correction") { }
             filter(Filter_Retail_Calculation; "Retail Calculation") { }
 
-            column(Entry_No_; "Entry No.")
-            {
-            }
+            column(Entry_No_; "Entry No.") { }
 
             dataitem(Value_Entry; "Value Entry")
             {
@@ -26,22 +24,11 @@ query 6014481 "NPR RS Value Entry Mapping"
                 filter(Filter_Posting_Date; "Posting Date") { }
                 filter(Filter_Global_Dimension_1_Code; "Global Dimension 1 Code") { }
                 filter(Filter_Global_Dimension_2_Code; "Global Dimension 2 Code") { }
+                filter(Filter_Location_Code; "Location Code") { }
 
-                column(Item_No; "Item No.") { }
-                column(Posting_Date; "Posting Date") { }
-                column(Global_Dimension_1_Code; "Global Dimension 1 Code") { }
-                column(Global_Dimension_2_Code; "Global Dimension 2 Code") { }
                 column(Sales_Amount_Actual; "Sales Amount (Actual)") { }
-
-                column(Invoiced_Quantity; "Invoiced Quantity")
-                {
-                    ReverseSign = true;
-                }
-
-                column(Cost_Amount_Actual; "Cost Amount (Actual)")
-                {
-                    ReverseSign = true;
-                }
+                column(Invoiced_Quantity; "Invoiced Quantity") { }
+                column(Cost_Amount_Actual; "Cost Amount (Actual)") { }
             }
         }
     }
