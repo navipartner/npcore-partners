@@ -44,6 +44,10 @@ page 6059969 "NPR APIV1 PBIValueEntry"
                 {
                     Caption = 'Discount Amount', Locked = true;
                 }
+                field(appliesToEntry; Rec."Applies-to Entry")
+                {
+                    Caption = 'Applies-to Entry', Locked = true;
+                }
                 field(entryNo; Rec."Entry No.")
                 {
                     Caption = 'Entry No.', Locked = true;
