@@ -18,6 +18,8 @@ codeunit 6014499 "NPR Retention Period Impl." implements "Retention Period"
                 Evaluate(PeriodDateFormula, '<-14D>');
             RetentionPeriod::"NPR 2 Years":
                 Evaluate(PeriodDateFormula, '<-2Y>');
+            RetentionPeriod::"NPR 6 Years":
+                Evaluate(PeriodDateFormula, '<-6Y>');
             else
                 RetentionPolicyLog.LogError(LogCategory(), StrSubstNo(WrongInterfaceImplementationErr, RetentionPeriod));
         end;
