@@ -273,6 +273,8 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
 
     local procedure FormatNumber(Input: Decimal): Text
     begin
+        Input := Round(Input, 0.01);
+
         exit(Format(Input, 0, '<SIGN><INTEGER><DECIMALS,3>'));
     end;
 

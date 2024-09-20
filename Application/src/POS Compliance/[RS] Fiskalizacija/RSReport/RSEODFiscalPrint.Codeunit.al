@@ -84,11 +84,12 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
 
     local procedure PrintEODPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
     var
-        CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
+        TempCashBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary;
         CalculatedAmountInclFloat, CountedAmountInclFloat, EndingFloatAmount, InitialFloatAmount : Decimal;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
-        PrintThermalLine(Printer, EndOfDayCaptionLbl, 'A11', true, 'CENTER', true, false);
+        if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::ZREPORT then
+            PrintThermalLine(Printer, EndOfDayCaptionLbl, 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'LEFT', true, false);
 
         PrintThermalLine(Printer, BrutoSalesCaptionLbl, 'A11', true, 'LEFT', true, false);
@@ -100,12 +101,15 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         PrintThermalLine(Printer, TotalDiscountAmountCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."Total Discount (LCY)")), 'A11', false, 'LEFT', true, false);
 
-        if RSReportStatisticsMgt.FindWorkshiftPaymentLine(POSWorkshiftCheckpoint."Entry No.", CashBinCheckpoint) then begin
-            InitialFloatAmount := CashBinCheckpoint."Float Amount";
-            CountedAmountInclFloat := CashBinCheckpoint."Counted Amount Incl. Float";
-            CalculatedAmountInclFloat := CashBinCheckpoint."Calculated Amount Incl. Float";
-            EndingFloatAmount := CashBinCheckpoint."New Float Amount";
-        end;
+        RSReportStatisticsMgt.FindCashWorkshiftPaymentLines(POSWorkshiftCheckpoint."Entry No.", TempCashBinCheckpoint);
+
+        if TempCashBinCheckpoint.FindSet() then
+            repeat
+                InitialFloatAmount += TempCashBinCheckpoint."Float Amount";
+                CountedAmountInclFloat += TempCashBinCheckpoint."Counted Amount Incl. Float";
+                CalculatedAmountInclFloat += TempCashBinCheckpoint."Calculated Amount Incl. Float";
+                EndingFloatAmount += TempCashBinCheckpoint."New Float Amount";
+            until TempCashBinCheckpoint.Next() = 0;
 
         PrintThermalLine(Printer, InitialFloatAmountCaptionLbl, 'A11', true, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(LCYCaptionLbl, FormatNumber(InitialFloatAmount)), 'A11', false, 'LEFT', true, false);
@@ -277,6 +281,8 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
 
     local procedure FormatNumber(Input: Decimal): Text
     begin
+        Input := Round(Input, 0.01);
+
         exit(Format(Input, 0, '<SIGN><INTEGER><DECIMALS,3>'));
     end;
 
@@ -339,7 +345,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         CalculatedAmountInclFloatCaptionLbl: Label 'Izračunati iznos u gotovini', Locked = true;
         CancelledQuantityCaptionLbl: Label 'Broj storniranih racuna', Locked = true;
         CountedAmountInclFloatCaptionLbl: Label 'Prebrojan iznos u gotovini', Locked = true;
-        DifferenceLbl: Label 'Razlika u gorovini', Locked = true;
+        DifferenceLbl: Label 'Razlika u gotovini', Locked = true;
         EndingFloatAmountCaptionLbl: Label 'Stanje u kasi', Locked = true;
         EndOfDayCaptionLbl: Label 'Kraj dana', Locked = true;
         InBankCaptionLbl: Label 'Uplata u banku', Locked = true;

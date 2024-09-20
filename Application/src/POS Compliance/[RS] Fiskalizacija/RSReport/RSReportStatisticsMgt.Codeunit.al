@@ -2,11 +2,20 @@ codeunit 6184939 "NPR RS Report Statistics Mgt."
 {
     Access = Internal;
 
-    internal procedure FindWorkshiftPaymentLine(WorkshiftCheckpointEntryNo: Integer; var PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp."): Boolean
+    internal procedure FindCashWorkshiftPaymentLines(WorkshiftCheckpointEntryNo: Integer; var TempPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp." temporary)
+    var
+        NPRRSPOSPaymMethMapping: Record "NPR RS POS Paym. Meth. Mapping";
+        PaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
     begin
         PaymentBinCheckpoint.SetRange("Workshift Checkpoint Entry No.", WorkshiftCheckpointEntryNo);
-
-        exit(PaymentBinCheckpoint.FindFirst());
+        if PaymentBinCheckpoint.FindSet() then
+            repeat
+                if NPRRSPOSPaymMethMapping.Get(PaymentBinCheckpoint."Payment Method No.") then
+                    if NPRRSPOSPaymMethMapping."RS Payment Method" = NPRRSPOSPaymMethMapping."RS Payment Method"::Cash then begin
+                        TempPaymentBinCheckpoint := PaymentBinCheckpoint;
+                        TempPaymentBinCheckpoint.Insert();
+                    end;
+            until PaymentBinCheckpoint.Next() = 0;
     end;
 
     internal procedure FindPreviousZReport(var PreviousZReport: Record "NPR POS Workshift Checkpoint"; POSUnitNo: Code[10]; WorkshiftEntryNo: Integer): Boolean
