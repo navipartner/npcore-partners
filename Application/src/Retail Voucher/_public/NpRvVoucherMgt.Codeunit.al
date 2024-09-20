@@ -274,6 +274,7 @@
                     Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
                     Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
                     Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+                    OnBeforeModifyIssuedVoucher(Voucher, NpRvSalesLine, VoucherType);
                     if PrevVoucher <> Format(Voucher) then
                         Voucher.Modify(true);
                 end;
@@ -945,6 +946,7 @@
 
     internal procedure FindVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
     begin
+        OnBeforeFindVoucher(ReferenceNo);
         if VoucherTypeCode <> '' then
             Voucher.SetFilter("Voucher Type", VoucherTypeCode);
         Voucher.SetRange("Reference No.", ReferenceNo);
@@ -1111,6 +1113,7 @@
         else
             TempVoucher."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(TempVoucher."Reference No."));
         TempVoucher.Description := CopyStr(TempVoucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(TempVoucher.Description));
+        OnAfterGenerateTempVoucher(VoucherType, TempVoucher);
     end;
 
     internal procedure GenerateReferenceNo(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
@@ -1510,6 +1513,7 @@
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         TryFindPartnerVoucher: Codeunit "NPR Try Find Partner Voucher";
     begin
+        OnBeforeGetVoucher(VoucherNumber);
         NpRvVoucherType.Reset();
         NpRvVoucherType.SetFilter(Code, VoucherType);
         NpRvVoucherType.SetLoadFields("Code");
@@ -1945,4 +1949,25 @@
     local procedure OnAfterUnArchiveVoucher(ArchVoucher: Record "NPR NpRv Arch. Voucher"; Voucher: Record "NPR NpRv Voucher")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindVoucher(var ReferenceNo: Text[50])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetVoucher(var VoucherNumber: Text[50])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeModifyIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; VoucherType: Record "NPR NpRv Voucher Type")
+    begin
+    end;
+
 }
