@@ -10,4 +10,9 @@ enumextension 6014401 "NPR Retention Period Enum" extends "Retention Period Enum
         Caption = '2 Years';
         Implementation = "Retention Period" = "NPR Retention Period Impl.";
     }
+    value(6014402; "NPR 6 Years")
+    {
+        Caption = '6 Years';
+        Implementation = "Retention Period" = "NPR Retention Period Impl.";
+    }
 }
