@@ -44,6 +44,8 @@
             TempNpRvVoucher.Description := CopyStr(TempNpRvVoucher."Reference No." + ' ' + NpRvVoucherType.Description, 1, MaxStrLen(NpRvVoucherType.Description));
         end;
 
+        OnAfterGenerateTempVoucher(NpRvVoucherType, TempNpRvVoucher);
+
         InsertSalesLine(SalesHeader, SalesLine, TempNpRvVoucher);
 
         InsertNpRvSalesLine(SalesHeader, SalesLine, NpRvSalesLine, TempNpRvVoucher);
@@ -877,5 +879,10 @@
             end;
             Commit();
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGenerateTempVoucher(NpRvVoucherType: Record "NPR NpRv Voucher Type"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    begin
     end;
 }
