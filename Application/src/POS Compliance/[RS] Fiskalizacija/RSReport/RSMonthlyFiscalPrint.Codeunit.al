@@ -164,7 +164,7 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
     local procedure PrintGeneralInfo(var Printer: Codeunit "NPR RP Line Print"; POSUnit: Record "NPR POS Unit"; StartDate: Date; EndDate: Date)
     var
         POSEntry: Record "NPR POS Entry";
-        QuantityCancelled, QuantitySucceed : Integer;
+        QuantityCancelled, QuantitySucceed, StartReceiptNo, EndReceiptNo : Integer;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
@@ -180,9 +180,12 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
 
         RSReportStatisticsMgt.CalcQuantitySucceedAndQuantityCancelled(POSEntry, QuantitySucceed, QuantityCancelled);
+        RSReportStatisticsMgt.GetTotalCounterFromPOSAuditLogInPeriod(POSUnit."No.", StartDate, EndDate, StartReceiptNo, EndReceiptNo);
 
         PrintThermalLine(Printer, CaptionValueFormat(CancelledQuantityCaptionLbl, Format(QuantityCancelled)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(SucceedQuantityCaptionLbl, Format(QuantitySucceed)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(StartReceiptCaptionLbl, Format(StartReceiptNo)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(EndReceiptCaptionLbl, Format(EndReceiptNo)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
@@ -297,21 +300,23 @@ codeunit 6184976 "NPR RS Monthly Fiscal Print"
 
     var
         RSReportStatisticsMgt: Codeunit "NPR RS Report Statistics Mgt.";
-        BrutoSalesCaptionLbl: Label 'Bruto sales';
-        CancelledQuantityCaptionLbl: Label 'Number of cancelled receipts';
-        EndingFloatAmountCaptionLbl: Label 'Total sales amount';
-        EndOfDateCaptionLbl: Label 'For the period from %1 to %2', Comment = '%1 - Specifies the start date, %2 - Specifies the end date';
-        LCYCaptionLbl: Label 'RSD';
-        PaymentsTypeLbl: Label 'Types of payment';
-        POSUnitNameCaptionLbl: Label 'POS Unit name';
-        POSUnitNoCaptionLbl: Label 'POS Unit number';
-        ReturnCaptionLbl: Label 'Return';
-        SalesPersonInformationLbl: Label 'Total sales amount per cashier';
-        SucceedQuantityCaptionLbl: Label 'Number of issued receipts';
-        TaxAmountCaptionLbl: Label '%1% VAT', Comment = '%1 - Specifies VAT %';
-        TaxBaseAmountCaptionLbl: Label '%1% Base', Comment = '%1 - Specifies VAT %';
-        TaxCaptionLbl: Label 'VAT';
-        ThermalPrintLineLbl: Label '_____________________________________________';
-        TotalDiscountAmountCaptionLbl: Label 'Total discounts';
-        VATRegNumberCaptionLbl: Label 'Tax ID';
+        BrutoSalesCaptionLbl: Label 'Bruto prodaja', Locked = true;
+        CancelledQuantityCaptionLbl: Label 'Broj storniranih računa', Locked = true;
+        EndingFloatAmountCaptionLbl: Label 'Ukupan iznos prodaje', Locked = true;
+        EndOfDateCaptionLbl: Label 'Za period od %1 do %2', Comment = '%1 - Označava početni datum, %2 - Označava krajnji datum', Locked = true;
+        LCYCaptionLbl: Label 'RSD', Locked = true;
+        PaymentsTypeLbl: Label 'Vrste plaćanja', Locked = true;
+        POSUnitNameCaptionLbl: Label 'Naziv POS jedinice', Locked = true;
+        POSUnitNoCaptionLbl: Label 'Broj POS jedinice', Locked = true;
+        ReturnCaptionLbl: Label 'Povrat', Locked = true;
+        SalesPersonInformationLbl: Label 'Ukupan iznos prodaje po kasiru', Locked = true;
+        SucceedQuantityCaptionLbl: Label 'Broj izdatih računa', Locked = true;
+        TaxAmountCaptionLbl: Label '%1% PDV', Comment = '%1 - Označava procenat PDV-a', Locked = true;
+        TaxBaseAmountCaptionLbl: Label '%1% Osnovica', Comment = '%1 - Označava procenat PDV-a', Locked = true;
+        TaxCaptionLbl: Label 'PDV', Locked = true;
+        ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
+        TotalDiscountAmountCaptionLbl: Label 'Ukupan iznos popusta', Locked = true;
+        VATRegNumberCaptionLbl: Label 'PIB', Locked = true;
+        StartReceiptCaptionLbl: Label 'Broj početnog računa', Locked = true;
+        EndReceiptCaptionLbl: Label 'Broj završnog računa', Locked = true;
 }
