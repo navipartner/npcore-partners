@@ -211,7 +211,7 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         FromEntryNo: Integer;
-        QuantityCancelled, QuantitySucceed : Integer;
+        QuantityCancelled, QuantitySucceed, StartReceiptNo, EndReceiptNo : Integer;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
@@ -230,9 +230,12 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
 
         RSReportStatisticsMgt.CalcQuantitySucceedAndQuantityCancelled(POSEntry, QuantitySucceed, QuantityCancelled);
+        RSReportStatisticsMgt.GetTotalCounterFromPOSAuditLogForSpecificDate(POSUnit."No.", DT2Date(POSWorkshiftCheckpoint."Created At"), StartReceiptNo, EndReceiptNo);
 
         PrintThermalLine(Printer, CaptionValueFormat(CancelledQuantityCaptionLbl, Format(QuantityCancelled)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, CaptionValueFormat(SucceedQuantityCaptionLbl, Format(QuantitySucceed)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(StartReceiptCaptionLbl, Format(StartReceiptNo)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(EndReceiptCaptionLbl, Format(EndReceiptNo)), 'A11', false, 'LEFT', true, false);
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
 
@@ -366,4 +369,6 @@ codeunit 6184934 "NPR RS EOD Fiscal Print"
         VATRegNumberCaptionLbl: Label 'PIB', Locked = true;
         XReportEntryNoCaptionLbl: Label 'X-izveštaj broj', Locked = true;
         ZReportEntryNoCaptionLbl: Label 'Z-izveštaj broj', Locked = true;
+        StartReceiptCaptionLbl: Label 'Broj početnog računa', Locked = true;
+        EndReceiptCaptionLbl: Label 'Broj završnog računa', Locked = true;
 }

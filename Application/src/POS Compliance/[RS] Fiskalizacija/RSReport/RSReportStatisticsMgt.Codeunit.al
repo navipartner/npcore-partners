@@ -159,4 +159,41 @@ codeunit 6184939 "NPR RS Report Statistics Mgt."
         POSEntry.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
         POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
     end;
+
+    internal procedure GetTotalCounterFromPOSAuditLogInPeriod(POSUnitNo: Code[10]; StartDate: Date; EndDate: Date; var StartReceiptNo: Integer; var EndReceiptNo: Integer)
+    var
+        RSPOSAuditLog: Record "NPR RS POS Audit Log Aux. Info";
+    begin
+        Clear(StartReceiptNo);
+        Clear(EndReceiptNo);
+
+        RSPOSAuditLog.SetCurrentKey(SystemCreatedAt);
+        RSPOSAuditLog.SetRange("POS Unit No.", POSUnitNo);
+        RSPOSAuditLog.SetRange("Entry Date", StartDate, EndDate);
+
+        SetReceiptNumbersFromAuditLog(StartReceiptNo, EndReceiptNo, RSPOSAuditLog);
+    end;
+
+    internal procedure GetTotalCounterFromPOSAuditLogForSpecificDate(POSUnitNo: Code[10]; EntryDate: Date; var StartReceiptNo: Integer; var EndReceiptNo: Integer)
+    var
+        RSPOSAuditLog: Record "NPR RS POS Audit Log Aux. Info";
+    begin
+        Clear(StartReceiptNo);
+        Clear(EndReceiptNo);
+        RSPOSAuditLog.SetCurrentKey("POS Unit No.", "POS Entry No.");
+        RSPOSAuditLog.SetRange("POS Unit No.", POSUnitNo);
+        RSPOSAuditLog.SetRange("Entry Date", EntryDate);
+
+        SetReceiptNumbersFromAuditLog(StartReceiptNo, EndReceiptNo, RSPOSAuditLog);
+
+    end;
+
+    local procedure SetReceiptNumbersFromAuditLog(var StartReceiptNo: Integer; var EndReceiptNo: Integer; RSPOSAuditLog: Record "NPR RS POS Audit Log Aux. Info")
+    begin
+        if RSPOSAuditLog.FindFirst() then
+            StartReceiptNo := RSPOSAuditLog."Total Counter";
+
+        if RSPOSAuditLog.FindLast() then
+            EndReceiptNo := RSPOSAuditLog."Total Counter";
+    end;
 }
