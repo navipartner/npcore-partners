@@ -205,6 +205,7 @@
             begin
                 if "Integrate with Shopify" then begin
                     CheckStoreIsAssigned();
+                    PaymentModuleShopify.CreateShopifyRetailVoucherModule();
                     Validate("Apply Payment Module", PaymentModuleShopify.ModuleCode());
                     Validate("Allow Top-up");
                 end;

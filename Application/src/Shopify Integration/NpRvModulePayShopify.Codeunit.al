@@ -14,6 +14,18 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", OnInitVoucherModules, '', true, true)]
 #endif
     local procedure OnInitVoucherModules(var VoucherModule: Record "NPR NpRv Voucher Module")
+    begin
+        CreateShopifyRetailVoucherModule(VoucherModule);
+    end;
+
+    internal procedure CreateShopifyRetailVoucherModule()
+    var
+        VoucherModule: Record "NPR NpRv Voucher Module";
+    begin
+        CreateShopifyRetailVoucherModule(VoucherModule);
+    end;
+
+    local procedure CreateShopifyRetailVoucherModule(var VoucherModule: Record "NPR NpRv Voucher Module")
     var
         ModuleNameLbl: Label 'Apply Payment - Shopify', MaxLength = 50;
     begin
