@@ -65,6 +65,7 @@
 
         ExchangeLabel."Retail Cross Reference No." := InitRetailReference(RecRef);
 
+        CallOnBeforeInsertExchangeLabel(ExchangeLabel, RecRef);
         ExchangeLabel.Insert(true);
         exit(ExchangeLabel."No.");
     end;
@@ -707,6 +708,16 @@
             else
                 Error(UnsupportedTableErr, RecRef.Caption());
         end;
+    end;
+
+    local procedure CallOnBeforeInsertExchangeLabel(var ExchangeLabel: Record "NPR Exchange Label"; var RecRef: RecordRef)
+    var
+        ExchangeLabelRecRef: RecordRef;
+        PrintExchangeLabels: Codeunit "NPR Print Exchange Labels";
+    begin
+        ExchangeLabelRecRef.GetTable(ExchangeLabel);
+        PrintExchangeLabels.CallOnBeforeInsertExchangeLabel(ExchangeLabelRecRef, RecRef);
+        ExchangeLabelRecRef.SetTable(ExchangeLabel);
     end;
 
     procedure DeleteExchangeLabels(RecVariant: Variant)
