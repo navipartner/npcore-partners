@@ -56,6 +56,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
     local procedure UpdateShopifyGiftCardBalance(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     var
         NcTask: Record "NPR Nc Task";
+        ShopifyStore: Record "NPR Spfy Store";
         Voucher: Record "NPR NpRv Voucher";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
@@ -73,6 +74,9 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
                 VoucherRecRef.GetTable(Voucher);
             TaskCreated := SpfyScheduleSend.InitNcTask(ShopifyStoreCode, VoucherRecRef, Voucher."No.", NcTask.Type, NcTask);
         end;
+
+        if not (ShopifyStore.Get(ShopifyStoreCode) and ShopifyStore."Shopify Plus Subscription") then
+            exit;
 
         Clear(NcTask);
         NcTask.Type := NcTask.Type::Modify;
@@ -207,7 +211,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         Voucher.TestField("Voucher Type");
         VourcherType.Get(Voucher."Voucher Type");
         VourcherType.TestField("Integrate with Shopify");
-        VourcherType.CheckStoreIsAssigned(true);
+        VourcherType.CheckStoreIsAssigned();
     end;
 
     procedure IsShopifyIntegratedVoucherType(VoucherTypeCode: Code[20]): Boolean

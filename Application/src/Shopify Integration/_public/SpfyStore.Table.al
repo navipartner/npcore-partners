@@ -225,6 +225,16 @@ table 6150810 "NPR Spfy Store"
                     _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Retail Vouchers");
             end;
         }
+        field(140; "Plan Display Name"; Text[50])
+        {
+            Caption = 'Shopify Plan';
+            DataClassification = CustomerContent;
+        }
+        field(150; "Shopify Plus Subscription"; Boolean)
+        {
+            Caption = 'Shopify Plus Subscription';
+            DataClassification = CustomerContent;
+        }
         field(500; "Auto Set as Shopify Item"; Boolean)
         {
             Caption = 'Auto Set as Shopify Item';

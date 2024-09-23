@@ -199,13 +199,11 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
         xShopifyStore: Record "NPR Spfy Store";
-        JsonHelper: Codeunit "NPR Json Helper";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         Window: Dialog;
-        RetrievedFieldValue: Text;
-        SuccessLbl: Label 'Connection to Shopify store %1 has been successfully established. Do you want to update the store card with the data received from Shopify?', Comment = '%1 - Shopify store code';
+        ShopifyStoreID: Text[30];
         QueryingShopifyLbl: Label 'Querying Shopify...';
     begin
         Window.Open(QueryingShopifyLbl);
@@ -214,25 +212,45 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             Error(GetLastErrorText());
         Window.Close();
 
-        if Confirm(SuccessLbl, true, ShopifyStoreCode) then begin
-            ShopifyResponse.AsObject().Get('shop', ShopifyResponse);
-            ShopifyStore.Get(ShopifyStoreCode);
-            xShopifyStore := ShopifyStore;
-            RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'name', false);
+        ShopifyStore.Get(ShopifyStoreCode);
+        xShopifyStore := ShopifyStore;
+        ClearLastError();
+        if not UpdateShopifyStoreWithDataFromShopify(ShopifyStore, ShopifyStoreID, ShopifyResponse, true) then
+            Error(GetLastErrorText());
+        if Format(ShopifyStore) <> Format(xShopifyStore) then
+            ShopifyStore.Modify();
+        SpfyAssignedIDMgt.AssignShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyStoreID, true);
+    end;
+
+    [TryFunction]
+    procedure UpdateShopifyStoreWithDataFromShopify(var ShopifyStore: Record "NPR Spfy Store"; var ShopifyStoreID: Text[30]; ShopifyResponse: JsonToken; WithDialog: Boolean)
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        ShopifyPlan: JsonToken;
+        RetrievedFieldValue: Text;
+        SuccessLbl: Label 'Connection to Shopify store %1 has been successfully established. Do you want to update the store card with the data received from Shopify?', Comment = '%1 - Shopify store code';
+    begin
+        ShopifyResponse.SelectToken('data.shop', ShopifyResponse);
+        if WithDialog and GuiAllowed() then
+            if Confirm(SuccessLbl, true, ShopifyStore.Code) then begin
+                RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'name', false);
+                if RetrievedFieldValue <> '' then
+                    ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
+                RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currencyCode', false);
+                if RetrievedFieldValue <> '' then
+                    ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
+            end;
+
+        if ShopifyResponse.AsObject().Get('plan', ShopifyPlan) then begin
+            RetrievedFieldValue := JsonHelper.GetJText(ShopifyPlan, 'displayName', false);
             if RetrievedFieldValue <> '' then
-                ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
-            RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currency', false);
-            if RetrievedFieldValue <> '' then
-                ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
-            if Format(ShopifyStore) <> Format(xShopifyStore) then
-                ShopifyStore.Modify();
+                ShopifyStore."Plan Display Name" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Plan Display Name"));
+            ShopifyStore."Shopify Plus Subscription" := JsonHelper.GetJBoolean(ShopifyPlan, 'shopifyPlus', false);
         end;
 
         RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'id', false);
-        if RetrievedFieldValue <> '' then begin
-            SpfyAssignedIDMgt.RemoveAssignedShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-            SpfyAssignedIDMgt.AssignShopifyID(ShopifyStore.RecordId(), "NPR Spfy ID Type"::"Entry ID", CopyStr(RetrievedFieldValue, 1, 30), true);
-        end;
+        if RetrievedFieldValue <> '' then
+            ShopifyStoreID := CopyStr(CopyStr(RetrievedFieldValue, RetrievedFieldValue.LastIndexOf('/') + 1, StrLen(RetrievedFieldValue)), 1, MaxStrLen(ShopifyStoreID));
     end;
 
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)

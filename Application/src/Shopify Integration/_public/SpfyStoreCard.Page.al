@@ -243,13 +243,6 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     ShowMandatory = true;
                 }
-                field("Shopify Store ID"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
-                {
-                    Caption = 'Shopify Store ID';
-                    ToolTip = 'Specifies the Shopify internal ID assigned to this store. Run the "Test connection ..." procedure to update this field with the information from Shopify.';
-                    Editable = false;
-                    ApplicationArea = NPRShopify;
-                }
                 field(TestShopifyConnection; _TestShopifyConnectionLbl)
                 {
                     ApplicationArea = NPRShopify;
@@ -270,6 +263,25 @@ page 6184704 "NPR Spfy Store Card"
                         SpfyIntegrationMgt.TestShopifyStoreConnection(Rec.Code);
                         CurrPage.Update(false);
                     end;
+                }
+                field("Shopify Store ID"; _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                {
+                    Caption = 'Shopify Store ID';
+                    ToolTip = 'Specifies the Shopify internal ID assigned to this store. Run the "Test connection ..." procedure to update this field with the information from Shopify.';
+                    Editable = false;
+                    ApplicationArea = NPRShopify;
+                }
+                field("Plan Display Name"; Rec."Plan Display Name")
+                {
+                    ToolTip = 'Specifies the subscription plan that is currently in effect for the Shopify store. Run the "Test connection ..." procedure to update this field with the latest information from Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+                field("Shopify Plus Subscription"; Rec."Shopify Plus Subscription")
+                {
+                    ToolTip = 'Specifies whether the Shopify Plus subscription is enabled for the Shopify store. Run the "Test connection ..." procedure to update this field with the latest information from Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
                 }
             }
         }
@@ -378,9 +390,47 @@ page 6184704 "NPR Spfy Store Card"
     end;
 
     trigger OnAfterGetCurrRecord()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        Parameters: Dictionary of [Text, Text];
     begin
         UpdateControlVisibility();
         CheckCurrencyCode();
+
+        if SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
+            Parameters.Add('StoreCode', Rec.Code);
+            CurrPage.EnqueueBackgroundTask(_BackgroundTaskId, Codeunit::"NPR Spfy Store Background Task", Parameters);
+        end;
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        NewShopifyStoreID: Text[30];
+        OldShopifyStoreID: Text[30];
+    begin
+        if Results.ContainsKey(Format(Rec.FieldNo("Plan Display Name"))) then
+            Rec."Plan Display Name" := CopyStr(Results.Get(Format(Rec.FieldNo("Plan Display Name"))), 1, MaxStrLen(Rec."Plan Display Name"));
+        if Results.ContainsKey(Format(Rec.FieldNo("Shopify Plus Subscription"))) then
+            Evaluate(Rec."Shopify Plus Subscription", Results.Get(Format(Rec.FieldNo("Shopify Plus Subscription"))), 9);
+
+        if Results.ContainsKey('ShopifyStoreID') then begin
+            NewShopifyStoreID := CopyStr(Results.Get('ShopifyStoreID'), 1, MaxStrLen(NewShopifyStoreID));
+            OldShopifyStoreID := _SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            SpfyAssignedIDMgt.AssignShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID", NewShopifyStoreID, true);
+            if NewShopifyStoreID <> OldShopifyStoreID then begin
+                CurrPage.SaveRecord();
+                CurrPage.Update(false);
+            end;
+        end;
+    end;
+
+    trigger OnPageBackgroundTaskError(TaskId: Integer; ErrorCode: Text; ErrorText: Text; ErrorCallStack: Text; var IsHandled: Boolean)
+    var
+        BackgrndTaskMgt: Codeunit "NPR Page Background Task Mgt.";
+    begin
+        if (TaskId = _BackgroundTaskId) then
+            BackgrndTaskMgt.FailedTaskError(CurrPage.Caption(), ErrorCode, ErrorText);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -458,6 +508,7 @@ page 6184704 "NPR Spfy Store Card"
     var
         TempxShopifyStore: Record "NPR Spfy Store" temporary;
         _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        _BackgroundTaskId: Integer;
         _AutoSetAsShopifyItem: Boolean;
         _AutoSyncItemChanges: Boolean;
         _AutoUpdateItemInfo: Boolean;

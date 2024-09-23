@@ -59,17 +59,18 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
-    [TryFunction]
-    procedure GetShopifyStoreConfiguration(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
+    procedure GetShopifyStoreConfiguration(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
     var
         NcTask: Record "NPR Nc Task";
-        ResponseText: Text;
-        Url: Text;
+        QueryStream: OutStream;
+        RequestJson: JsonObject;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code", false) + 'shop.json';
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
-        ShopifyResponse.ReadFrom(ResponseText);
+        RequestJson.Add('query', 'query { shop { id name currencyCode plan { displayName shopifyPlus } } }');
+        NcTask."Data Output".CreateOutStream(QueryStream);
+        RequestJson.WriteTo(QueryStream);
+
+        exit(ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
     end;
 
     [TryFunction]
@@ -113,12 +114,12 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
+    procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;
         Url: Text;
     begin
-        Url := GetShopifyUrl(NcTask."Store Code") + 'graphql.json';
+        Url := GetShopifyUrl(NcTask."Store Code", CheckIntegrationIsEnabled) + 'graphql.json';
         ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;

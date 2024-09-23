@@ -316,6 +316,9 @@
                 field("Apply Payment Module"; Rec."Apply Payment Module")
                 {
                     ToolTip = 'Specifies the value of the Apply Payment Module field';
+#if not BC17
+                    Editable = not Rec."Integrate with Shopify";
+#endif
                     ApplicationArea = NPRRetail;
                     trigger OnValidate()
                     begin
