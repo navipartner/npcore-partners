@@ -39,12 +39,17 @@ codeunit 6059956 "NPR POS Action - Ins. AddCustF" implements "NPR IPOS Workflow"
     var
         POSSale: Record "NPR POS Sale";
         RSPOSSale: Record "NPR RS POS Sale";
+        Found: Boolean;
     begin
         Sale.GetCurrentSale(POSSale);
-        RSPOSSale."POS Sale SystemId" := POSSale.SystemId;
+        Found := RSPOSSale.Get(POSSale.SystemId);
+        if not Found then
+            RSPOSSale."POS Sale SystemId" := POSSale.SystemId;
         RSPOSSale."RS Add. Customer Field" := CopyStr(Context.GetString('NewAddCustField'), 1, MaxStrLen(RSPOSSale."RS Add. Customer Field"));
-        if not RSPOSSale.Insert() then
-            RSPOSSale.Modify();
+        if Found then
+            RSPOSSale.Modify()
+        else
+            RSPOSSale.Insert();
     end;
 
     local procedure GetActionScript(): Text
