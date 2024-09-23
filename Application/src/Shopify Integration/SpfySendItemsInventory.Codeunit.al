@@ -815,7 +815,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJson.WriteTo(OStream);
 
         ClearLastError();
-        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, true, ShopifyResponse);
         if Success then begin
             ReceivedShopifyID :=
                 _JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''productVariants''].[''edges''][0].[''node''].[''product''].[''id'']', false);
@@ -841,7 +841,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     RequestJson.WriteTo(OStream);
 
                     ClearLastError();
-                    Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, ShopifyResponse);
+                    Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, true, ShopifyResponse);
                     if Success then begin
                         ReceivedShopifyID :=
                             _JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''products''].[''edges''][0].[''node''].[''id'']', false);

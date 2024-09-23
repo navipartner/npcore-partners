@@ -69,6 +69,14 @@
         {
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
+
+#if not BC17
+            trigger OnValidate()
+            begin
+                if "Integrate with Shopify" and "Allow Top-up" then
+                    CheckShopifySubscription(GetStoreCode());
+            end;
+#endif
         }
         field(63; "Print Object Type"; Enum "NPR Print Object Type")
         {
@@ -137,6 +145,27 @@
             Caption = 'Apply Payment Module';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpRv Voucher Module".Code WHERE(Type = CONST("Apply Payment"));
+
+#if not BC17
+            trigger OnValidate()
+            var
+                ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
+                PaymentModuleShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
+            begin
+                if "Integrate with Shopify" then
+                    TestField("Apply Payment Module", PaymentModuleShopify.ModuleCode());
+                if "Apply Payment Module" = PaymentModuleShopify.ModuleCode() then begin
+                    TestField(Code);
+                    if not ReturnVoucherType.Get(Code) then begin
+                        ReturnVoucherType.Init();
+                        ReturnVoucherType."Voucher Type" := Code;
+                        ReturnVoucherType.Insert();
+                    end;
+                    ReturnVoucherType."Return Voucher Type" := Code;
+                    ReturnVoucherType.Modify();
+                end;
+            end;
+#endif
         }
         field(200; "Max Voucher Count"; Integer)
         {
@@ -171,8 +200,14 @@
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                PaymentModuleShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
             begin
-                CheckStoreIsAssigned(true);
+                if "Integrate with Shopify" then begin
+                    CheckStoreIsAssigned();
+                    Validate("Apply Payment Module", PaymentModuleShopify.ModuleCode());
+                    Validate("Allow Top-up");
+                end;
             end;
         }
 #endif
@@ -273,18 +308,28 @@
         exit(CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, 20));
     end;
 
-    internal procedure CheckStoreIsAssigned(WithError: Boolean): Boolean
+    internal procedure CheckStoreIsAssigned(): Boolean
     var
-        StoreCodeMissingErr: Label 'You must assign a Shopify store to %1 %2.', Comment = '%1 - tablecaption, %2 - Code';
+        StoreCodeMissingErr: Label 'You must assign a Shopify store to %1 %2.', Comment = '%1 - Table Caption, %2 - Code';
     begin
-        if not "Integrate with Shopify" then
+        if GetStoreCode() = '' then
+            Error(StoreCodeMissingErr, TableCaption(), Code);
+    end;
+
+    local procedure CheckShopifySubscription(ShopifyStoreCode: Code[20])
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        PartialPaymentsNotAllowedLbl: Label 'Partial payments and top-ups are only allowed with Shopify Plus subscription.';
+    begin
+        if ShopifyStoreCode = '' then
             exit;
-        if GetStoreCode() = '' then begin
-            if WithError then
-                Error(StoreCodeMissingErr, TableCaption, Code);
-            exit(false);
-        end;
-        exit(true);
+
+        ShopifyStore.Get(ShopifyStoreCode);
+        if ShopifyStore."Shopify Plus Subscription" then
+            exit;
+
+        if "Allow Top-up" then
+            Error(PartialPaymentsNotAllowedLbl);
     end;
 #endif
 }

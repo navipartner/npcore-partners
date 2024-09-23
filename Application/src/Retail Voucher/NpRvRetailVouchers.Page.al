@@ -8,8 +8,7 @@ page 6059864 "NPR NpRv Retail Vouchers"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "NPR NpRv Voucher";
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;  //There's another page that is available in BC search: page 6151015 "NPR NpRv Vouchers"
 
     layout
     {
