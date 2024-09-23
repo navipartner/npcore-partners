@@ -208,6 +208,8 @@ page 6184724 "NPR Setup RS EI Paym. Meth."
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPaymentMethodStep()

@@ -199,6 +199,8 @@ page 6151353 "NPR Setup CRO POS Paym. Meth."
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPOSAuditProfileStep()

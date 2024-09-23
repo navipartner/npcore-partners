@@ -208,6 +208,8 @@ page 6184721 "NPR Setup RS EI VAT Posting"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupVATPostingSetupStep()

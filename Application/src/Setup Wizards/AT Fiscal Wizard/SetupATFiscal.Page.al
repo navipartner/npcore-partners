@@ -203,6 +203,8 @@ page 6184672 "NPR Setup AT Fiscal"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowEnableFiscalStep()

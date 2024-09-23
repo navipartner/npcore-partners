@@ -198,6 +198,8 @@ page 6151423 "NPR Setup RS POS Paym. Meth."
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPOSAuditProfileStep()

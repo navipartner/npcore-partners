@@ -199,6 +199,8 @@ page 6151609 "NPR Setup SI Audit Profile"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPOSAuditProfileStep()

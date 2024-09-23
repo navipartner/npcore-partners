@@ -198,6 +198,8 @@ page 6151396 "NPR Setup RS Audit Profile"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPOSAuditProfileStep()

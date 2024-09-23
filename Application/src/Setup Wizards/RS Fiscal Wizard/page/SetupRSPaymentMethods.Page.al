@@ -199,6 +199,8 @@ page 6151468 "NPR Setup RS Payment Methods"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupAuditProfileStep()

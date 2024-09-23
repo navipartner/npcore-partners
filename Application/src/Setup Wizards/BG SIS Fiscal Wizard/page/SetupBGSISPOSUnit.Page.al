@@ -199,6 +199,8 @@ page 6151518 "NPR Setup BG SIS POS Unit"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowPOSUnitStep()

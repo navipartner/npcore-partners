@@ -247,6 +247,8 @@ page 6184725 "NPR Setup RS E-Invoice"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowEnableEInvoiceStep()

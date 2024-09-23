@@ -199,6 +199,8 @@ page 6151536 "NPR Setup BG SIS Return Reason"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowReturnReasonStep()

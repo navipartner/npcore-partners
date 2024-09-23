@@ -208,6 +208,8 @@ page 6184723 "NPR Setup RS EI Tax Ex. Reason"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupVATPostingSetupStep()
