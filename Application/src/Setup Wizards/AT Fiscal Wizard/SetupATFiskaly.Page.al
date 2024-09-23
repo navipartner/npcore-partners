@@ -321,6 +321,8 @@ page 6184684 "NPR Setup AT Fiskaly"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowATOrganizationsStep()

@@ -247,6 +247,8 @@ page 6151341 "NPR Setup CRO Fiscal"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowEnableFiscalStep()

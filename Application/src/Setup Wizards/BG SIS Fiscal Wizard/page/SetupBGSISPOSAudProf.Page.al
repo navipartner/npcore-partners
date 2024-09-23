@@ -199,6 +199,8 @@ page 6151499 "NPR Setup BG SIS POS Aud Prof"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetPOSAuditProfileStep()

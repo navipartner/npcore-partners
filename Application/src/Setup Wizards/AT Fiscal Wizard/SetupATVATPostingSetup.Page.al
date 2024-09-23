@@ -199,6 +199,8 @@ page 6184676 "NPR Setup AT VAT Posting Setup"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowVATPostingSetupStep()

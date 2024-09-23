@@ -198,6 +198,8 @@ page 6184471 "NPR Setup SI POS Store"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupPOSStoreStep()

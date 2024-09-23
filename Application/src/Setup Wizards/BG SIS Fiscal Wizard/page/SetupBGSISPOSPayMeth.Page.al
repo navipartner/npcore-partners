@@ -199,6 +199,8 @@ page 6151514 "NPR Setup BG SIS POS Pay Meth"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowPOSPaymentMethodStep()

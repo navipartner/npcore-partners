@@ -228,6 +228,8 @@ page 6184722 "NPR Setup RS EI UOM Mapping"
     local procedure ShowIntroStep()
     begin
         IntroStepVisible := true;
+        BackActionEnabled := false;
+        FinishActionEnabled := false;
     end;
 
     local procedure ShowSetupAllowedUOMStep()
