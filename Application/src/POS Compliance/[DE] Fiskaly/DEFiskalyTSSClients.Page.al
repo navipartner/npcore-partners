@@ -5,8 +5,9 @@
     ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = List;
     SourceTable = "NPR DE POS Unit Aux. Info";
-    UsageCategory = None;
+    UsageCategory = Administration;
     Editable = false;
+    ApplicationArea = NPRDEFiscal;
 
     layout
     {
@@ -17,42 +18,42 @@
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ToolTip = 'Specifies the POS Unit this Fiskaly client is created for.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Cash Register Brand"; Rec."Cash Register Brand")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Specifies the POS unit cash register brand.';
                 }
                 field("Cash Register Model"; Rec."Cash Register Model")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Specifies the POS unit cash register model.';
                 }
                 field("Serial Number"; Rec."Serial Number")
                 {
                     ToolTip = 'Specifies the POS unit cash register serial number.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("TSS Code"; Rec."TSS Code")
                 {
                     ToolTip = 'Specifies the Technical Security System (TSS) the Fiskaly client is linked to.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Client ID"; Rec.SystemId)
                 {
                     ToolTip = 'Specifies the Fiskaly client ID.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Client Created at"; Rec."Fiskaly Client Created at")
                 {
                     ToolTip = 'Specifies the date/time the client was created at Fiskaly.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Client State"; Rec."Fiskaly Client State")
                 {
                     ToolTip = 'Specifies last known state of the Fiskaly client.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
             }
         }

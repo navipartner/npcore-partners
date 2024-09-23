@@ -16,46 +16,46 @@
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
                     ToolTip = 'Specifies the POS Unit this Fiskaly client is created for.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Cash Register Brand"; Rec."Cash Register Brand")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Specifies the POS unit cash register brand.';
                 }
                 field("Cash Register Model"; Rec."Cash Register Model")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Specifies the POS unit cash register model.';
                 }
                 field("Serial Number"; Rec."Serial Number")
                 {
                     ToolTip = 'Specifies the POS unit cash register serial number.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("TSS Code"; Rec."TSS Code")
                 {
                     ToolTip = 'Specifies the Technical Security System (TSS) the Fiskaly client is linked to.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Client ID"; Rec.SystemId)
                 {
                     ToolTip = 'Specifies the Fiskaly client ID.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Client Created at"; Rec."Fiskaly Client Created at")
                 {
                     ToolTip = 'Specifies the date/time the client was created at Fiskaly.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Client State"; Rec."Fiskaly Client State")
                 {
                     ToolTip = 'Specifies last known state of the Fiskaly client.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Cash Register Created"; Rec."Cash Register Created")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Specifies the value of Cash Registe for DE Fiskaly DSFINKV';
                 }
             }
@@ -75,7 +75,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
 
                 trigger OnAction()
                 var
@@ -107,7 +107,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Creates Client ID on Fiskaly for DE fiscalization.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
 
                 trigger OnAction()
                 var
@@ -134,7 +134,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
                 ToolTip = 'Creates Cash Register on Fiskaly DSFINVK for DE fiscalization.';
                 Visible = false;
 
@@ -187,7 +187,7 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = page "NPR Payment Method Mapper";
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
             }
             action(VATMappings)
             {
@@ -199,7 +199,7 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = page "NPR VAT Prod Post Group Mapper";
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
             }
             action(DEAuditLog)
             {
@@ -211,7 +211,7 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 RunObject = page "NPR DE POS Audit Log Aux. Info";
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
             }
         }
     }

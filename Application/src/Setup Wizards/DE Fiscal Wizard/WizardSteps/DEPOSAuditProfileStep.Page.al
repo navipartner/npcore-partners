@@ -1,6 +1,6 @@
-page 6151397 "NPR RS POS Audit Profile Step"
+page 6184751 "NPR DE POS Audit Profile Step"
 {
-    Caption = 'RS POS Audit Profile Setup';
+    Caption = 'DE POS Audit Profile Setup';
     Extensible = false;
     PageType = ListPart;
     SourceTable = "NPR POS Audit Profile";
@@ -15,38 +15,43 @@ page 6151397 "NPR RS POS Audit Profile Step"
             {
                 field("Code"; Rec.Code)
                 {
+                    ToolTip = 'Specifies the unique code for the POS Audit Profile.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Code of the POS Audit Profile.';
                 }
-                field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
+                field(Description; Rec.Description)
                 {
+                    ToolTip = 'Specifies the short description of profile.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Sale Fiscal No. Series of the POS Audit Profile.';
-                }
-                field("Credit Sale Fiscal No. Series"; Rec."Credit Sale Fiscal No. Series")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Credit Sale Fiscal No. Series of the POS Audit Profile.';
-                }
-                field("Balancing Fiscal No. Series"; Rec."Balancing Fiscal No. Series")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Balancing Fiscal No. Series of the POS Audit Profile.';
-                }
-                field("Fill Sale Fiscal No. On"; Rec."Fill Sale Fiscal No. On")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Enables the Fill Sale Fiscal No. On for the POS Audit Profile.';
                 }
                 field("Sales Ticket No. Series"; Rec."Sales Ticket No. Series")
                 {
+                    ToolTip = 'Specifies the number series used for creating the document number.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Sales Ticket No. Series of the POS Audit Profile.';
+                }
+                field("Sale Fiscal No. Series"; Rec."Sale Fiscal No. Series")
+                {
+                    ToolTip = 'Specifies the number series used for creating the fiscal number.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Credit Sale Fiscal No. Series"; Rec."Credit Sale Fiscal No. Series")
+                {
+                    ToolTip = 'Specifies whether the items will be searched by their cross reference numbers.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Balancing Fiscal No. Series"; Rec."Balancing Fiscal No. Series")
+                {
+                    ToolTip = 'Specifies the number series used for creating the fiscal number for balancing.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Fill Sale Fiscal No. On"; Rec."Fill Sale Fiscal No. On")
+                {
+                    ToolTip = 'Specifes at which point the sale fiscal number will be filled. You can choose between All Sale and Successful Sale.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Audit Log Enabled"; Rec."Audit Log Enabled")
                 {
+                    ToolTip = 'Create additional logs, usually for VAT.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Enables the Audit Log of the POS Audit Profile.';
                 }
                 field("Audit Handler"; Rec."Audit Handler")
                 {
@@ -62,47 +67,55 @@ page 6151397 "NPR RS POS Audit Profile Step"
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
                 {
+                    ToolTip = 'Allow the sale to be finalized with the amount zero.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Allow Zero Amount Sales field';
                 }
                 field("Print Receipt On Sale Cancel"; Rec."Print Receipt On Sale Cancel")
                 {
+                    ToolTip = 'Allow receipts to be printed even when the sale is canceled.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether printing of receipts on POS sale cancel is enabled.';
-                }
-                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
-                }
-                field(DoNotPrintEftReceiptOnSale; Rec.DoNotPrintEftReceiptOnSale)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether printing of EFT receipts on POS sale end is suppressed.';
                 }
                 field("Allow Printing Receipt Copy"; Rec."Allow Printing Receipt Copy")
                 {
+                    ToolTip = 'Set up whether a copy is printed or not. Available options are: Always, Once, Never.';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether printing of receipt copies is enabled.';
+                }
+                field("Do Not Print Receipt on Sale"; Rec."Do Not Print Receipt on Sale")
+                {
+                    ToolTip = 'Specifies whether printing of receipts on POS sale end is suppressed.';
+                    ApplicationArea = NPRRetail;
+                }
+                field(DoNotPrintEftReceiptOnSale; Rec.DoNotPrintEftReceiptOnSale)
+                {
+                    ToolTip = 'Specifies the value of the Do Not Print EFT Receipt on Sale field.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Require Item Return Reason"; Rec."Require Item Return Reason")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Prompts for return reason when returning items in POS';
                 }
             }
         }
     }
-    internal procedure CopyRealToTemp()
+
+    internal procedure CopyToTemp()
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
     begin
-        if POSAuditProfile.FindSet() then
-            repeat
-                Rec.TransferFields(POSAuditProfile);
-                if not Rec.Insert() then
-                    Rec.Modify();
-            until POSAuditProfile.Next() = 0;
+        if not POSAuditProfile.FindSet() then
+            exit;
+
+        repeat
+            Rec.TransferFields(POSAuditProfile);
+            if not Rec.Insert() then
+                Rec.Modify();
+        until POSAuditProfile.Next() = 0;
     end;
 
-    internal procedure RSPOSAuditProfileDataToCreate(): Boolean
+    internal procedure IsDataPopulated(): Boolean
     begin
-        exit(CheckIsDataSet());
+        exit(CheckIsDataPopulated());
     end;
 
     internal procedure CreatePOSAuditProfileData()
@@ -119,15 +132,18 @@ page 6151397 "NPR RS POS Audit Profile Step"
         until Rec.Next() = 0;
     end;
 
-    local procedure CheckIsDataSet(): Boolean
+    local procedure CheckIsDataPopulated(): Boolean
     var
-        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        DEAuditMgt: Codeunit "NPR DE Audit Mgt.";
     begin
         if not Rec.FindSet() then
-            exit;
+            exit(false);
+
         repeat
-            if (Rec."Audit Handler" = RSAuditMgt.HandlerCode()) and (Rec."Audit Log Enabled" = true) and (Rec."Fill Sale Fiscal No. On" = Rec."Fill Sale Fiscal No. On"::Successful) then
+            if (Rec."Audit Handler" = DEAuditMgt.HandlerCode()) and Rec."Audit Log Enabled" then
                 exit(true);
         until Rec.Next() = 0;
+
+        exit(false);
     end;
 }

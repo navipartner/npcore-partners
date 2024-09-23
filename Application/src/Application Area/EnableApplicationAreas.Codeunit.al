@@ -78,6 +78,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR AT Fiscal" := IsATFiscalizationEnabled();
         TempApplicationAreaSetup."NPR ES Fiscal" := IsESFiscalizationEnabled();
         TempApplicationAreaSetup."NPR RS EInvoice" := IsRSEInvoiceEnabled();
+        TempApplicationAreaSetup."NPR DE Fiscal" := IsDEFiscalizationEnabled();
         TempApplicationAreaSetup."NPR BE Fiscal" := IsBEFiscalizationEnabled();
     end;
 
@@ -237,6 +238,16 @@ codeunit 6151349 "NPR Enable Application Areas"
             exit(false);
 
         exit(RSEInvoiceSetup."Enable RS E-Invoice");
+    end;
+
+    local procedure IsDEFiscalizationEnabled(): Boolean
+    var
+        DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
+    begin
+        if not DEFiscalizationSetup.Get() then
+            exit(false);
+
+        exit(DEFiscalizationSetup."Enable DE Fiscal");
     end;
 
     local procedure IsBEFiscalizationEnabled(): Boolean

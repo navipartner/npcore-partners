@@ -7,7 +7,7 @@
     UsageCategory = Administration;
     SourceTable = "NPR DE POS Audit Log Aux. Info";
     SourceTableView = SORTING("POS Entry No.") ORDER(Descending);
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRDEFiscal;
 
     layout
     {
@@ -18,67 +18,67 @@
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
                     ToolTip = 'Specifies the value of the POS Entry No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("NPR Version"; Rec."NPR Version")
                 {
                     ToolTip = 'Specifies the value of the NPR Version field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("TSS Code"; Rec."TSS Code")
                 {
                     ToolTip = 'Specifies the Technical Security System (TSS) Code assinged to the transaction';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("TSS ID"; Rec."TSS ID")
                 {
                     ToolTip = 'Specifies the value of the TSS ID on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Client ID"; Rec."Client ID")
                 {
                     ToolTip = 'Specifies the value of the Client ID on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Transaction ID"; Rec."Transaction ID")
                 {
                     ToolTip = 'Specifies the value of the Transaction ID on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Transaction Type"; Rec."Fiskaly Transaction Type")
                 {
                     ToolTip = 'Specifies the Fiskaly transaction (receipt) type';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Start Time"; Rec."Start Time")
                 {
                     ToolTip = 'Specifies the value of the Start DateTime of transaction on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Finish Time"; Rec."Finish Time")
                 {
                     ToolTip = 'Specifies the value of the Finish DateTime of transaction on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Fiskaly Transaction State"; Rec."Fiskaly Transaction State")
                 {
                     ToolTip = 'Specifies the Fiskaly state of the transaction';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Latest Revision"; Rec."Latest Revision")
                 {
                     ToolTip = 'Specifies the latest revision number of the transaction on Fiskaly';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field(Fiscalized; Rec."Fiscalization Status")
                 {
                     ToolTip = 'Specifies if receipt is loged on TSS system';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field("Error"; Rec."Has Error")
                 {
                     ToolTip = 'Specifies the value of the Error Message if receipt is not loged on TSS system';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
             }
         }

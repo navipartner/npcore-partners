@@ -1,78 +1,27 @@
-page 6059882 "NPR DE TSS List"
+page 6184754 "NPR DE TSS Code Step"
 {
-    Extensible = False;
-    Caption = 'DE Technical Security Systems';
-    ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
-    PageType = List;
+    Caption = 'DE TSS Code Setup';
+    Extensible = false;
+    PageType = ListPart;
     SourceTable = "NPR DE TSS";
-    UsageCategory = Administration;
-    ApplicationArea = NPRDEFiscal;
+    SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {
-        area(content)
+        area(Content)
         {
-            repeater(General)
+            repeater(Group)
             {
-                field("Code"; Rec."Code")
+                field("Code"; Rec.Code)
                 {
-                    ToolTip = 'Specifies a unique code of the TSS. The code is used internally by the system.';
-                    ApplicationArea = NPRDEFiscal;
-                    ShowMandatory = true;
-                }
-                field(Description; Rec.Description)
-                {
-                    ToolTip = 'Specifies a short description of the TSS.';
-                    ApplicationArea = NPRDEFiscal;
-                }
-                field(SystemId; Rec.SystemId)
-                {
-                    ToolTip = 'Specifies an id, which was used to create the TSS at Fiskaly.';
-                    ApplicationArea = NPRDEFiscal;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of Code field.';
                 }
                 field("Connection Parameter Set Code"; Rec."Connection Parameter Set Code")
                 {
-                    ToolTip = 'Specifies connection parameters to be used for the TSS, when exchanging data with Fiskaly.';
-                    ApplicationArea = NPRDEFiscal;
-                    ShowMandatory = true;
-                }
-                field("Fiskaly TSS Created at"; Rec."Fiskaly TSS Created at")
-                {
-                    ToolTip = 'Specifies the date/time the TSS was created at Fiskaly.';
-                    ApplicationArea = NPRDEFiscal;
-                }
-                field("Fiskaly TSS State"; Rec."Fiskaly TSS State")
-                {
-                    ToolTip = 'Specifies last known state of the TSS at Fiskaly.';
-                    ApplicationArea = NPRDEFiscal;
-                }
-                field(TSSAdminPUK; TSSAdminPUK)
-                {
-                    Caption = 'TSS Admin PUK';
-                    ToolTip = 'Specifies the Admin PUK of the TSS, assigned by Fiskaly.';
-                    Editable = false;
-                    ApplicationArea = NPRDEFiscal;
-
-                    trigger OnAssistEdit()
-                    var
-                        TSSAdminPUKLbl: Label 'TSS Admin PUK: %1';
-                    begin
-                        Message(TSSAdminPUKLbl, DESecretMgt.GetSecretKey(Rec.AdminPUKSecretLbl()));
-                    end;
-                }
-                field(TSSAdminPIN; TSSAdminPIN)
-                {
-                    Caption = 'TSS Admin PIN';
-                    ToolTip = 'Specifies the Admin PIN of the TSS, assigned by Fiskaly.';
-                    Editable = false;
-                    ApplicationArea = NPRDEFiscal;
-
-                    trigger OnAssistEdit()
-                    var
-                        TSSAdminPINLbl: Label 'TSS Admin PIN: %1';
-                    begin
-                        Message(TSSAdminPINLbl, DESecretMgt.GetSecretKey(Rec.AdminPINSecretLbl()));
-                    end;
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Cash Register Brand field.';
                 }
             }
         }
@@ -87,12 +36,7 @@ page 6059882 "NPR DE TSS List"
                 Caption = 'Refresh TSS List';
                 ToolTip = 'Copies information about all existing Technical Security Systems (TSS) from Fiskaly to BC.';
                 Image = LinkWeb;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = NPRDEFiscal;
-
                 trigger OnAction()
                 var
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
@@ -110,10 +54,6 @@ page 6059882 "NPR DE TSS List"
                 Caption = 'Create Fiskaly TSS';
                 ToolTip = 'Creates Technical Security System (TSS) at Fiskaly for DE fiscalization.';
                 Image = InsertFromCheckJournal;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 ApplicationArea = NPRDEFiscal;
 
                 trigger OnAction()
@@ -252,26 +192,64 @@ page 6059882 "NPR DE TSS List"
         }
     }
 
-    trigger OnAfterGetRecord()
+    internal procedure CopyRealToTemp()
     begin
-        if DESecretMgt.HasSecretKey(Rec.AdminPUKSecretLbl()) then
-            TSSAdminPUK := '***'
-        else
-            TSSAdminPUK := '';
-        if DESecretMgt.HasSecretKey(Rec.AdminPINSecretLbl()) then
-            TSSAdminPIN := '***'
-        else
-            TSSAdminPIN := '';
+        if not DETSSCode.FindSet() then
+            exit;
+        repeat
+            Rec.TransferFields(DETSSCode);
+            if not Rec.Insert() then
+                Rec.Modify();
+        until DETSSCode.Next() = 0;
     end;
 
-    trigger OnNewRecord(BelowxRec: Boolean)
+    internal procedure DETSSCodeMappingDataToCreate(): Boolean
     begin
-        TSSAdminPUK := '';
-        TSSAdminPIN := ''
+        exit(CheckIsDataSet());
+    end;
+
+    internal procedure DETSSCodeMappingDataToModify(): Boolean
+    begin
+        exit(CheckIsDataChanged());
+    end;
+
+    internal procedure CreateDETSSCodeMappingData()
+    begin
+        if not Rec.FindSet() then
+            exit;
+        repeat
+            DETSSCode.TransferFields(Rec);
+            if not DETSSCode.Insert() then
+                DETSSCode.Modify();
+        until Rec.Next() = 0;
+    end;
+
+    local procedure CheckIsDataSet(): Boolean
+    begin
+        if not Rec.FindSet() then
+            exit(false);
+
+        repeat
+            if ((Rec."Code" <> '')
+                and (Rec."Connection Parameter Set Code" <> '')) then
+                exit(true);
+        until Rec.Next() = 0;
+    end;
+
+    local procedure CheckIsDataChanged(): Boolean
+    begin
+        if not Rec.FindSet() then
+            exit(false);
+
+        repeat
+            if ((Rec."Code" <> xRec."Code")
+                or (Rec."Connection Parameter Set Code" <> xRec."Connection Parameter Set Code")) then
+                exit(true);
+        until Rec.Next() = 0;
     end;
 
     var
+        DETSSCode: Record "NPR DE TSS";
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
-        TSSAdminPIN: Text[200];
-        TSSAdminPUK: Text[200];
+
 }

@@ -1,7 +1,7 @@
 ﻿page 6014459 "NPR DSFINVK Closing List"
 {
     Extensible = False;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRDEFiscal;
     Caption = 'DSFINVK Closing List';
     PageType = List;
     SourceTable = "NPR DSFINVK Closing";
@@ -19,42 +19,42 @@
             {
                 field("DSFINVK Closing No."; Rec."DSFINVK Closing No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Ordinal number of DSFINVK Register Closing.';
                 }
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'POS Unit No. of DSFINVK Register Closing.';
                 }
                 field("Closing Date"; Rec."Closing Date")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'DSFINVK Register Closing Date.';
                 }
                 field("POS Entry No."; Rec."POS Entry No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'POS Entry No. of DSFINVK Register Closing.';
                 }
                 field("Workshift Entry No."; Rec."Workshift Entry No.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Workshift Entry No. of DSFINVK Register Closing.';
                 }
                 field(State; Rec.State)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'DSFINVK Register Closing State on API.';
                 }
                 field("Has Error"; Rec."Has Error")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'DSFINVK Register Closing Error from API.';
                 }
                 field("Trigged Export"; Rec."Trigged Export")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                     ToolTip = 'Is Export started for DSFINVK Register Closing on API.';
                 }
             }
@@ -74,7 +74,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
                 ToolTip = 'Send record to Fiskaly if not fiskalized.';
 
                 trigger OnAction()
@@ -115,7 +115,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
                 ToolTip = 'Show Error Message.';
 
                 trigger OnAction()
