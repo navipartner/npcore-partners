@@ -61,4 +61,14 @@ codeunit 6059950 "NPR Print Exchange Labels"
     begin
         exit(ExchLabelMgt.ScanExchangeLabel(SalePOS, Validering, CopyValidering));
     end;
+
+    internal procedure CallOnBeforeInsertExchangeLabel(var ExchangeLabelRecRef: RecordRef; var RecRef: RecordRef)
+    begin
+        OnBeforeInsertExchangeLabel(ExchangeLabelRecRef, RecRef);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertExchangeLabel(var ExchangeLabelRecRef: RecordRef; var RecRef: RecordRef)
+    begin
+    end;
 }
