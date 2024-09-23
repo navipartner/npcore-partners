@@ -4,8 +4,9 @@
     Caption = 'DE Connection Parameter Set';
     ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
     PageType = Card;
-    UsageCategory = None;
+    UsageCategory = Administration;
     SourceTable = "NPR DE Audit Setup";
+    ApplicationArea = NPRDEFiscal;
 
     layout
     {
@@ -16,12 +17,12 @@
                 field("Primary Key"; Rec."Primary Key")
                 {
                     ToolTip = 'Specifies a code to identify this set of DE Fiskaly connection parameters.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies a text that describes the set of DE Fiskaly connection parameters.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
             }
             group(Connection)
@@ -33,11 +34,11 @@
                     field("Api URL"; Rec."Api URL")
                     {
                         ToolTip = 'Specifies the URL for the Fiskaly API';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRDEFiscal;
                     }
                     field("DSFINVK Api URL"; Rec."DSFINVK Api URL")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRDEFiscal;
                         ToolTip = 'Specifies URL of the DSFINVK API';
                         Importance = Additional;
                         Visible = false;
@@ -51,7 +52,7 @@
                         Caption = 'Api Key';
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Api Key field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRDEFiscal;
 
                         trigger OnValidate()
                         begin
@@ -66,7 +67,7 @@
                         Caption = 'Api Secret';
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Api Secret field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRDEFiscal;
 
                         trigger OnValidate()
                         begin

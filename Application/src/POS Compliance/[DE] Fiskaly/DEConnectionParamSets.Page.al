@@ -6,7 +6,7 @@ page 6059891 "NPR DE Connection Param. Sets"
     PageType = List;
     SourceTable = "NPR DE Audit Setup";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRDEFiscal;
     Editable = false;
 
     layout
@@ -18,12 +18,12 @@ page 6059891 "NPR DE Connection Param. Sets"
                 field("Primary Key"; Rec."Primary Key")
                 {
                     ToolTip = 'Specifies a code to identify this set of DE Fiskaly connection parameters.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies a text that describes the set of DE Fiskaly connection parameters.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRDEFiscal;
                 }
             }
         }
@@ -31,12 +31,12 @@ page 6059891 "NPR DE Connection Param. Sets"
         {
             systempart(LinksFactBox; Links)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
                 Visible = false;
             }
             systempart(NotesFactBox; Notes)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRDEFiscal;
                 Visible = false;
             }
         }
