@@ -615,13 +615,40 @@
     #region Posting payment lines
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesInvoice(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesInvHdrNo: Code[20])
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if SalesInvHdrNo = '' then
             exit;
 
-        PostMagentoPayment(SalesHeader, GenJnlPostLine, SalesInvHdrNo);
+        if FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then begin
+            CaptureSalesInvoice(SalesInvHdrNo);
+            Commit();
+        end else
+            PostMagentoPayment(SalesHeader, GenJnlPostLine, SalesInvHdrNo);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', true, true)]
+    local procedure Cu80OnAfterFinalizePostingOnBeforeCommit(var SalesHeader: Record "Sales Header";
+                                                             var SalesShipmentHeader: Record "Sales Shipment Header";
+                                                             var SalesInvoiceHeader: Record "Sales Invoice Header";
+                                                             var SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+                                                             var ReturnReceiptHeader: Record "Return Receipt Header";
+                                                             var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+                                                             WhseReceive: Boolean;
+                                                             WhseShip: Boolean)
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then begin
+            if SalesInvoiceHeader."No." = '' then
+                exit;
+
+            PostMagentoPaymentV2(SalesHeader, SalesInvoiceHeader);
+        end;
+    end;
+
+    [Obsolete('Not used. Use function PostMagentoPaymentV2 instead', '2024-09-29')]
     local procedure PostMagentoPayment(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesInvHdrNo: Code[20])
     var
         SalesInvHeader: Record "Sales Invoice Header";
@@ -640,10 +667,23 @@
         OnAfterPostMagentoPayment(SalesInvHeader);
     end;
 
+    local procedure PostMagentoPaymentV2(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    begin
+        if not HasMagentoPayment(Database::"Sales Invoice Header", Enum::"Sales Document Type".FromInteger(0), SalesInvoiceHeader."No.") then
+            exit;
+
+
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        PostPaymentLines(SalesHeader, SalesInvoiceHeader."No.");
+
+        OnAfterPostMagentoPayment(SalesInvoiceHeader);
+    end;
+
     internal procedure PostPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     var
         GenJnlLine: Record "Gen. Journal Line";
         SalesInvHeader: Record "Sales Invoice Header";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if PaymentLine.Posted then
             exit;
@@ -658,7 +698,8 @@
         if not HasOpenEntry(PaymentLine) then begin
             PaymentLine.Posted := true;
             PaymentLine.Modify();
-            Commit();
+            if not FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then
+                Commit();
             exit;
         end;
 
@@ -673,12 +714,12 @@
             else
                 exit;
         end;
-
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         PaymentLine.Posted := true;
         PaymentLine.Modify();
         InsertPostingLog(PaymentLine, true);
-        Commit();
+        if not FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then
+            Commit();
     end;
 
     procedure InsertPostingLog(var MagentoPaymentLine: Record "NPR Magento Payment Line"; Success: Boolean)
@@ -712,6 +753,13 @@
                     until PaymentLine.Next() = 0;
                 end;
         end;
+    end;
+
+    local procedure PostPaymentLines(var SalesHeader: Record "Sales Header"; DocNo: Code[20])
+    var
+        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+    begin
+        PostPaymentLines(SalesHeader, DocNo, GenJnlPostLine)
     end;
 
     local procedure SetupGenJnlLineInvoice(SalesInvHeader: Record "Sales Invoice Header"; PaymentLine: Record "NPR Magento Payment Line"; var GenJnlLine: Record "Gen. Journal Line")
@@ -808,18 +856,23 @@
         end;
     end;
 
-    internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
+    internal procedure CaptureSalesInvoice(SalesInvoiceNo: Code[20])
     var
         PaymentLine: Record "NPR Magento Payment Line";
     begin
         PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
-        PaymentLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        PaymentLine.SetRange("Document No.", SalesInvoiceNo);
         PaymentLine.SetFilter("Payment Gateway Code", '<>%1', '');
         PaymentLine.SetRange("Date Captured", 0D);
         if PaymentLine.FindSet() then
             repeat
                 CapturePaymentLine(PaymentLine);
             until PaymentLine.Next() = 0;
+    end;
+
+    internal procedure CaptureSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
+    begin
+        CaptureSalesInvoice(SalesInvoiceHeader."No.")
     end;
 
     internal procedure CaptureSalesHeader(SalesHeader: Record "Sales Header")
