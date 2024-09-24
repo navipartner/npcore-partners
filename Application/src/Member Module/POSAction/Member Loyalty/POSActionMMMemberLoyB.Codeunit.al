@@ -220,7 +220,7 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
             exit;
 
         DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType::String, false);
-        DataSource.AddColumn('RemainingValue', 'Remaining Points', DataType::String, false);
+        DataSource.AddColumn('RemainingValue', 'Remaining Value', DataType::String, false);
         DataSource.AddColumn('RedeemablePoints', 'Redeemable Points', DataType::String, false);
 
         Handled := true;
