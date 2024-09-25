@@ -35,10 +35,8 @@
                 }
                 field("Processing Type"; Rec."Processing Type")
                 {
-
                     ToolTip = 'Specifies the value of the Processing Type field. Possible values are Cash,Voucher,Check,EFT,Customer,PayOut. Use Cash for bills and coins in all currencies. Voucher is used for gift cards, coupons and vouchers. Check is used for checks. EFT for credit and debit card payments. Customer is currently not supported. Payout is used for cash movements, for example Payin/Payout to/from the POS.';
                     ApplicationArea = NPRRetail;
-                    ValuesAllowed = CASH, VOUCHER, CHECK, EFT, PAYOUT, "FOREIGN VOUCHER";
                 }
                 field("Return Payment Method Code"; Rec."Return Payment Method Code")
                 {
