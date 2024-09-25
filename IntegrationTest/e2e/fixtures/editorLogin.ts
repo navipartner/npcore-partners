@@ -8,9 +8,12 @@ export const login = async (
   password?: string
 ) => {
   await page.goto("/BC/Tablet.aspx?page=6150750&tenant=default");
-  await page.getByLabel("User name:").fill(username ?? "");
-  await page.getByLabel("Password:").fill(password ?? "");
-  await page.getByRole("button", { name: "Sign In" }).click();
+  const shouldAuthenticate = await page.getByRole("button", { name: "Sign In" }).count();
+  if (shouldAuthenticate > 0) {
+    await page.getByLabel("User name:").fill(username ?? "");
+    await page.getByLabel("Password:").fill(password ?? "");
+    await page.getByRole("button", { name: "Sign In" }).click();
+  }
   await page.waitForLoadState("networkidle");
   await page.waitForSelector(".spinner", { state: "hidden" });
   const popupLocator = page.locator("[id=b3]");
