@@ -33,7 +33,7 @@ try {
         Set-ExecutionPolicy unrestricted -Force
         . "C:\Run\Prompt.ps1"
 
-        $company = (Get-NAVCompany -ServerInstance BC -Tenant default).CompanyName
+        $company = (Get-NAVCompany -ServerInstance BC -Tenant default | Select-Object -First 1).CompanyName
         $me = whoami
         $userexist = Get-NAVServerUser -ServerInstance BC -Tenant default | Where-Object username -eq $me
         if (!($userexist)) {
@@ -73,12 +73,11 @@ try {
         Set-ExecutionPolicy unrestricted -Force
         . "C:\Run\Prompt.ps1"
 
-        $company = (Get-NAVCompany -ServerInstance BC -Tenant default).CompanyName
+        $company = (Get-NAVCompany -ServerInstance BC -Tenant default | Select-Object -First 1).CompanyName
 
         Write-Host "Invoke codeunit 6060099 'NPR Import Playwright NPR Data'..."
         Invoke-NAVCodeunit -ServerInstance BC -Tenant default -CompanyName $company -CodeunitId 6060099 -Verbose
         #Invoke-NAVCodeunit -ServerInstance BC -Tenant default -CompanyName $company -CodeunitId 6060099 -MethodName "ImportPosUnitsAndUsers" -Verbose
-
     }
 
     Write-Host "Removing session..."
