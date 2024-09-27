@@ -277,7 +277,6 @@ page 6150894 "NPR Download&Import Rest Data"
 
     local procedure ShowFinishStep()
     begin
-        ImportNPRestaurantData();
         CheckIfDataFilledIn();
         IntroStepVisible := false;
         FinishStepVisible := true;
@@ -294,8 +293,14 @@ page 6150894 "NPR Download&Import Rest Data"
         AnyDataToCreate := RestDataToCreate;
     end;
 
-    local procedure FinishAction();
+    local procedure FinishAction()
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        DataWillBeImportedLbl: Label 'Warning: This action will IMPORT data into the system, which may affect its behavior. Are you sure you want to continue?';
     begin
+        if not ConfirmManagement.GetResponseOrDefault(DataWillBeImportedLbl, false) then
+            exit;
+        ImportNPRestaurantData();
         OnAfterFinishStep(AnyDataToCreate);
         CurrPage.Close();
     end;
