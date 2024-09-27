@@ -1,4 +1,4 @@
-﻿codeunit 6184941 "NPR POS Act EFT Doc Pay Rsrv B"
+﻿codeunit 6184941 "NPR POSActionEFTDocPayRsrvB"
 {
     Access = Internal;
     internal procedure CheckCustomer(var SalePOS: Record "NPR POS Sale"; POSSale: Codeunit "NPR POS Sale"; SelectCustomer: Boolean) CustomerSelected: Boolean
@@ -166,7 +166,6 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
     begin
         GetSalesHeaderFromPOSSale(SalePOS, SalesHeader);
 
@@ -179,17 +178,25 @@
             exit;
 
         repeat
-            ReservePOSPaymentLine(SaleLinePOS, SalesHeader, MagentoPaymentLine);
+            ProcessPOSPayment(SaleLinePOS, SalesHeader);
         until SaleLinePOS.Next() = 0;
     end;
 
     internal procedure ReservePOSPaymentLine(SaleLinePOS: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header"; var MagentoPaymentLine: Record "NPR Magento Payment Line") Reserved: Boolean;
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         EFTDocPayReservation: Interface "NPR EFT Doc Pay Reservation";
         OriginalPOSPaymentMethodCode: Code[10];
     begin
         Clear(MagentoPaymentLine);
         OriginalPOSPaymentMethodCode := GetOriginalPaymentMethodCodeFromPaymentLine(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
+
+        if not POSPaymentMethod.Get(OriginalPOSPaymentMethodCode) then
+            exit;
+
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
+            exit;
+
         EFTDocPayReservation := GetEFTDocumentReservationTypeFromPOSPaymentMethod(OriginalPOSPaymentMethodCode, SaleLinePOS."Register No.");
         Reserved := EFTDocPayReservation.Reserve(SaleLinePOS, SalesHeader, MagentoPaymentLine);
     end;
@@ -235,5 +242,49 @@
     begin
         AdyenSetup.Get();
         EFTPayReservSetupUtils.CheckPaymentServationSetup(AdyenSetup);
+    end;
+
+    local procedure ProcessVouchers(SalesHeader: Record "Sales Header"; SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        VoucherSaleLinePOS: Record "NPR NpRv Sales Line";
+        NPRNpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+    begin
+        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::"POS Payment" then
+            exit;
+
+        if not POSPaymentMethod.Get(SaleLinePOS."No.") then
+            exit;
+
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::VOUCHER then
+            exit;
+
+        VoucherSaleLinePOS.Reset();
+        VoucherSaleLinePOS.SetCurrentKey("Retail ID");
+        VoucherSaleLinePOS.SetRange("Retail ID", SaleLinePOS.SystemId);
+        VoucherSaleLinePOS.SetRange(Type, VoucherSaleLinePOS.Type::Payment);
+        if not VoucherSaleLinePOS.FindFirst() then
+            exit;
+
+        NPRNpRvSalesDocMgt.RedeemVoucher(SalesHeader, VoucherSaleLinePOS, SaleLinePOS."Amount Including VAT");
+    end;
+
+    internal procedure ProcessPOSPayment(SaleLinePOS: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        ReservePOSPaymentLine(SaleLinePOS, SalesHeader, MagentoPaymentLine);
+        ProcessVouchers(SalesHeader, SaleLinePOS);
+    end;
+
+    internal procedure DeletePaymentLines()
+    var
+        POSSession: Codeunit "NPR POS Session";
+        DeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+    begin
+        POSSession.GetPaymentLine(POSPaymentLine);
+        while not POSPaymentLine.IsEmpty() do
+            DeletePOSLineB.DeletePaymentLine(POSPaymentLine);
     end;
 }

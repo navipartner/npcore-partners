@@ -10,6 +10,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         TextPrepaymentTitle: Label 'Prepayment';
         TextPrepaymentPctLead: Label 'Please specify prepayment % to be paid after export';
         TextPrepaymentAmountLead: Label 'Please specify prepayment amount to be paid after export';
+        TextScanVoucherRequestLbl: Label 'Do you want to scan a vocuher? Remaining amount: %1.';
         CaptionAskExtDocNo: Label 'Prompt External Doc. No.';
         CaptionAskAttention: Label 'Prompt Attention';
         CaptionAskYourRef: Label 'Prompt Your Reference';
@@ -108,6 +109,14 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionPaymentMethodCodeFrom: Label 'Use Payment Method Code From';
         DescPaymentMethodCodeFrom: Label 'Select source of payment method code for sales document';
         CaptionPrintProformaInvoice: Label 'Print Pro Forma Invoice';
+        CaptionVoucherTypeCode: Label 'Voucher Type';
+        DescVoucherTypeCode: Label 'Specifies Voucher Type';
+        CaptionAskForVouchers: Label 'Ask for vouchers';
+        DescriptionAskForVouchers: Label 'Prompt for scanning a voucher';
+        CaptionAskForVoucherType: Label 'Ask for voucher type';
+        DescAskForVoucherType: Label 'The system is going to ask for the voucher type before scanning';
+        CaptionEnableVoucherList: Label 'Open Voucher List';
+        DescEnableVoucherList: Label 'Open Voucher List if Reference No. is blank';
         OptionNameSetDocumentType: Label 'Order,Invoice,Quote,Restrict,BlanketOrder', Locked = true;
         OptionCptSetDocumentType: Label 'Order,Invoice,Quote,Restrict,Blanket Order';
         OptionNameSetNegBalDocumentType: Label 'ReturnOrder,CreditMemo,Restrict', Locked = true;
@@ -196,10 +205,14 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('PaymentMethodCode', '', CaptionPaymentMethodCode, DescPaymentMethodCode);
         WorkflowConfig.AddTextParameter('CustomerTableView', '', CaptionCustomerTableView, DescCustomerTableView);
         WorkflowConfig.AddTextParameter('POSPaymentMethodCode', '', CaptionPOSPaymentMethodCode, DescPOSPaymentMethodCode);
+        WorkflowConfig.AddTextParameter('VoucherTypeCode', '', CaptionVoucherTypeCode, DescVoucherTypeCode);
         WorkflowConfig.AddIntegerParameter('CustomerLookupPage', 0, CaptionCustomerLookupPage, DescCustomerLookupPage);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, CaptionEnforceCustomerFilter, DescEnforceCustomerFilter);
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
         WorkflowConfig.AddBooleanParameter('GroupCodesEnabled', false, CaptioneGroupCodesEnabled, DescGroupCodesEnabled);
+        WorkflowConfig.AddBooleanParameter('AskForVouchers', true, CaptionAskForVouchers, DescriptionAskForVouchers);
+        WorkflowConfig.AddBooleanParameter('AskForVoucherType', false, CaptionAskForVoucherType, DescAskForVoucherType);
+        WorkflowConfig.AddBooleanParameter('EnableVoucherList', false, CaptionEnableVoucherList, DescEnableVoucherList);
         WorkflowConfig.AddTextParameter('GroupCode', '', CaptionGroupCode, DescGroupCode);
         //labels
         WorkflowConfig.AddLabel('ExtDocNo', GetExternalDocumentNo());
@@ -210,6 +223,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('prepaymentDialogTitle', TextPrepaymentTitle);
         WorkflowConfig.AddLabel('prepaymentPctLead', TextPrepaymentPctLead);
         WorkflowConfig.AddLabel('prepaymentAmountLead', TextPrepaymentAmountLead);
+        WorkflowConfig.AddLabel('ScanVoucherRequestCaption', TextScanVoucherRequestLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -218,7 +232,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             'preparePreWorkflows':
                 FrontEnd.WorkflowResponse(PreparePreWorkflows(Context, Sale));
             'validateSaleBeforeReservation':
-                ValidateSaleBeforeReservation(Context, Sale, SaleLine);
+                FrontEnd.WorkflowResponse(ValidateSaleBeforeReservation(Context, Sale, SaleLine, PaymentLine));
             'exportDocument':
                 FrontEnd.WorkflowResponse(ExportSalesDoc(Context, Sale, SaleLine));
             'endSaleAndDocumentPayment':
@@ -230,7 +244,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
-'const main=async({workflow:n,parameters:t,captions:e})=>{let a,r,i;if(t.ConfirmExport&&!await popup.confirm(e.confirmLead,e.confirmTitle)||t.AskExtDocNo&&(r=await popup.input(e.ExtDocNo),r===null)||t.AskAttention&&(a=await popup.input(e.Attention),a===null)||t.AskYourRef&&(i=await popup.input(e.YourRef),i===null))return;const{preWorkflows:c,additionalParameters:o}=await n.respond("preparePreWorkflows");if(c)for(const s of Object.entries(c)){const[u,m]=s;if(u){const d=await n.run(u,{parameters:m});if((await processPreWorkflowsResponse(u,d)).stopExecution)return}}if(o.pos_payment_reservation&&(await n.respond("validateSaleBeforeReservation",{extDocNo:r,attention:a,yourref:i,additionalParameters:o}),!(await n.run("PAYMENT_2",{parameters:{paymentNo:t.POSPaymentMethodCode,HideAmountDialog:!0,tryEndSale:!1}})).success))return;const{createdSalesHeader:f,createdSalesHeaderDocumentType:l}=await n.respond("exportDocument",{extDocNo:r,attention:a,yourref:i,additionalParameters:o});let p;o.prompt_prepayment?o.prepayment_is_amount?p=await popup.numpad(e.prepaymentAmountLead,e.prepaymentDialogTitle):p=await popup.numpad(e.prepaymentPctLead,e.prepaymentDialogTitle):p=t.FixedPrepaymentValue,await n.respond("endSaleAndDocumentPayment",{additionalParameters:o,createdSalesHeader:f,createdSalesHeaderDocumentType:l,prepaymentAmt:p})};async function processPreWorkflowsResponse(n,t){const e={stopExecution:!1};if(!n)return{};if(!t)return{};switch(n){case"CUSTOMER_SELECT":e.stopExecution=!t.success;break;case"SELECT_SHIP_METHOD":e.stopExecution=!t.success;break}return e}'
+'const main=async({workflow:n,parameters:e,captions:t})=>{let s,u,p;if(e.ConfirmExport&&!await popup.confirm(t.confirmLead,t.confirmTitle)||e.AskExtDocNo&&(u=await popup.input(t.ExtDocNo),u===null)||e.AskAttention&&(s=await popup.input(t.Attention),s===null)||e.AskYourRef&&(p=await popup.input(t.YourRef),p===null))return;const{preWorkflows:l,additionalParameters:a}=await n.respond("preparePreWorkflows");if(l)for(const r of Object.entries(l)){const[o,i]=r;if(o){const d=await n.run(o,{parameters:i});if((await processPreWorkflowsResponse(o,d)).stopExecution)return}}if(a.pos_payment_reservation){let{remainingAmount:r}=await n.respond("validateSaleBeforeReservation",{extDocNo:u,attention:s,yourref:p,additionalParameters:a});if(e.AskForVouchers&&r!==0){let o=!0,i;for(;o;)o=await popup.confirm(t.ScanVoucherRequestCaption.replace("%1",r)),o&&(i=await n.run("SCAN_VOUCHER_2",{parameters:{AskForVoucherType:e.AskForVoucherType,VoucherTypeCode:e.VoucherTypeCode,EnableVoucherList:e.EnableVoucherList,EndSale:!1}}),i.success&&(o=i.remainingAmount!==0,r=i.remainingAmount))}if(r!==0&&!(await n.run("PAYMENT_2",{parameters:{paymentNo:e.POSPaymentMethodCode,HideAmountDialog:!0,tryEndSale:!1}})).success)return}const{createdSalesHeader:f,createdSalesHeaderDocumentType:m}=await n.respond("exportDocument",{extDocNo:u,attention:s,yourref:p,additionalParameters:a});let c;a.prompt_prepayment?a.prepayment_is_amount?c=await popup.numpad(t.prepaymentAmountLead,t.prepaymentDialogTitle):c=await popup.numpad(t.prepaymentPctLead,t.prepaymentDialogTitle):c=e.FixedPrepaymentValue,await n.respond("endSaleAndDocumentPayment",{additionalParameters:a,createdSalesHeader:f,createdSalesHeaderDocumentType:m,prepaymentAmt:c})};async function processPreWorkflowsResponse(n,e){const t={stopExecution:!1};if(!n)return{};if(!e)return{};switch(n){case"CUSTOMER_SELECT":t.stopExecution=!e.success;break;case"SELECT_SHIP_METHOD":t.stopExecution=!e.success;break}return t}'
         )
     end;
 
@@ -381,7 +395,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         Sale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." = '' then
             AddCustomerWorkflow(Context, PreWorkflows);
-        AddSelectShipmentMethodWorkflow(Context, PreWorkflows);
+        AddSelectShipmentMethodWorkflow(SalePOS, Context, PreWorkflows);
         if not GetValueFromPaymentParameters(PaymentParameters, 'pos_payment_reservation') then
             POSActionPaymentWF2.AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
 
@@ -409,11 +423,19 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PreWorkflows.Add('CUSTOMER_SELECT', ActionParameters);
     end;
 
-    local procedure AddSelectShipmentMethodWorkflow(Context: Codeunit "NPR POS JSON Helper"; var PreWorkflows: JsonObject)
+    local procedure AddSelectShipmentMethodWorkflow(SalePOS: Record "NPR POS Sale"; Context: Codeunit "NPR POS JSON Helper"; var PreWorkflows: JsonObject)
     var
+        SaleLinePOS: Record "NPR POS Sale Line";
         ActionParameters: JsonObject;
     begin
         if not Context.GetBooleanParameter('SelectShipmentMethod') then
+            exit;
+
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        SaleLinePOS.SetRange("Shipment Fee", true);
+        if not SaleLinePOS.IsEmpty then
             exit;
 
         PreWorkflows.Add('SELECT_SHIP_METHOD', ActionParameters);
@@ -517,16 +539,18 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         RetailSalesDocMgt.TestSalePOS(SalePOS);
     end;
 
-    local procedure ValidateSaleBeforeReservation(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line")
+    local procedure ValidateSaleBeforeReservation(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line") Response: JsonObject
     var
         SalePOS: Record "NPR POS Sale";
         RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
+        POSPaymentMethodCode: Text;
         CustomerTableView: Text;
         PrepaymentIsAmount: Boolean;
         PayAndPost: Boolean;
         FullPosting: Boolean;
         POSPaymentReservation: Boolean;
+        RemainingAmount: Decimal;
     begin
         Sale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
@@ -546,6 +570,13 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             POSActionDocExportB.CheckPaymentLinesReadyForReservation(SalePOS);
         end;
 
+        if not Context.GetStringParameter('POSPaymentMethodCode', POSPaymentMethodCode) then
+            Clear(POSPaymentMethodCode);
+#pragma warning disable AA0139
+        RemainingAmount := POSActionDocExportB.CalculateRemainingAmount(POSPaymentMethodCode, PaymentLine);
+#pragma warning restore AA0139
+        Response.Add('success', true);
+        Response.Add('remainingAmount', RemainingAmount);
     end;
 
     local procedure SetParameters(var POSSaleLine: Codeunit "NPR POS Sale Line"; Context: Codeunit "NPR POS JSON Helper"; var RetailSalesDocMgt: Codeunit "NPR Sales Doc. Exp. Mgt.")

@@ -126,17 +126,23 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
 
     local procedure VoucherPayment(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
     var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         ReferenceNo: Text;
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
         ActionContext: JsonObject;
         VoucherTypeCode: Code[20];
         SelectedAmount: Decimal;
+        RemainingAmount: Decimal;
         EndSalePar: Boolean;
     begin
         HandleParameters(Context, VoucherTypeCode, EndSalePar, ReferenceNo, SelectedAmount);
         POSActionScanActionB.ProcessPayment(VoucherTypeCode, ReferenceNo, SelectedAmount, Sale, PaymentLine, SaleLine, EndSalePar, ActionContext);
+        VoucherType.Get(VoucherTypeCode);
+        POSActionScanActionB.CalculateRemainingAmount(PaymentLine, VoucherType."Payment Type", ReturnPOSPaymentMethod, RemainingAmount);
 
         Response.Add('tryEndSale', HandleWorkflowResponse(Response, ActionContext));
+        Response.Add('remainingAmount', RemainingAmount);
         exit(Response);
 
     end;
@@ -295,7 +301,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'let main=async({workflow:e,parameters:r,popup:c,context:l,captions:o})=>{debugger;let t,a={tryEndSale:!1,legacy:!1};if(r.VoucherTypeCode)e.context.voucherType=r.VoucherTypeCode;else if(r.AskForVoucherType&&(e.context.voucherType=await e.respond("setVoucherType"),!e.context.voucherType))return a;if(r.ReferenceNo?t=r.ReferenceNo:t=await c.input({title:o.VoucherPaymentTitle,caption:o.ReferenceNo}),t===null)return a;const{selectedVoucherReferenceNo:s,askForAmount:h,suggestedAmount:i,paymentDescription:m,amountPrompt:p,voucherType:y}=await e.respond("calculateVoucherInformation",{VoucherRefNo:t});if(e.context.voucherType=y,!e.context.voucherType||(t=s,!t))return a;let u=i;if(h)for(var f=!0;f;){if(u=i,i>0&&(u=await c.numpad({title:m,caption:p,value:i}),u===null))return a;f=u>i,f&&await c.message(strSubstNo(o.ProposedAmountDifferenceConfirmation,u,i))}let n=await e.respond("prepareRequest",{VoucherRefNo:t,selectedAmount:u});return n.tryEndSale?r.EndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:n.paymentNo}}):n.workflowVersion==1?await e.respond("doLegacyWorkflow",{workflowName:n.workflowName}):n.workflowName&&await e.run(n.workflowName,{parameters:n.parameters}),a};function strSubstNo(e,...r){if(!e.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return e.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(c,l,o)=>{if(l)return l.replace(/(?:{{)|(?:}})/g,t=>t[0]);if(o>=r.length)throw new Error("argument index is out of range in format");return r[o]})}'
+'const main=async({workflow:n,parameters:t,popup:c,context:i,captions:l})=>{let o;const e={tryEndSale:!1,legacy:!1,success:!1,remainingAmount:0};if(t.VoucherTypeCode)i.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(i.voucherType=await n.respond("setVoucherType"),!i.voucherType))return e;if(t.ReferenceNo?o=t.ReferenceNo:o=await c.input({title:l.VoucherPaymentTitle,caption:l.ReferenceNo}),o===null)return e;const{selectedVoucherReferenceNo:f,askForAmount:m,suggestedAmount:a,paymentDescription:p,amountPrompt:d,voucherType:y}=await n.respond("calculateVoucherInformation",{VoucherRefNo:o});if(i.voucherType=y,!i.voucherType||(o=f,!o))return e;let u=a;if(m){let s=!0;for(;s;){if(u=a,a>0&&(u=await c.numpad({title:p,caption:d,value:a}),u===null))return e;s=u>a,s&&await c.message(l.ProposedAmountDifferenceConfirmation.replace("%1",u).replace("%2",a))}}const r=await n.respond("prepareRequest",{VoucherRefNo:o,selectedAmount:u});return r.tryEndSale?t.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:r.paymentNo}}):r.workflowVersion==1?await n.respond("doLegacyWorkflow",{workflowName:r.workflowName}):r.workflowName&&await n.run(r.workflowName,{parameters:r.parameters}),e.success=!0,e.remainingAmount=r.remainingAmount,e};'
         );
     end;
 

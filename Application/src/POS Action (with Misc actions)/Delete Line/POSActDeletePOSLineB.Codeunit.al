@@ -8,6 +8,11 @@ codeunit 6060097 "NPR POSAct:Delete POS Line-B"
         POSSession: Codeunit "NPR POS Session";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
+        DeletePaymentLine(POSPaymentLine);
+    end;
+
+    internal procedure DeletePaymentLine(POSPaymentLine: Codeunit "NPR POS Payment Line")
+    begin
         POSPaymentLine.RefreshCurrent();
         POSPaymentLine.DeleteLine();
     end;

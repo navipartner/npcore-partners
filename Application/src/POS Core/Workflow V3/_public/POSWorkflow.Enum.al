@@ -1029,7 +1029,7 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
     value(300; "EFT_RESERVE_DOC_PAY")
     {
         Caption = 'EFT_RESERVE_DOC_PAY', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Act EFT Doc Pay Rsrv";
+        Implementation = "NPR IPOS Workflow" = "NPR POSActionEFTDocPayRsrv";
     }
     value(310; "SELECT_SHIP_METHOD")
     {

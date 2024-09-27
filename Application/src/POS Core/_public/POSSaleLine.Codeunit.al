@@ -257,7 +257,7 @@
         if (not RefreshCurrent()) then
             exit;
 
-        OnBeforeDeletePOSSaleLine(Rec);
+        OnBeforeDeletePOSSaleLine(Rec, false);
         LocalxRec := Rec;
         Rec.Delete(true);
 
@@ -276,7 +276,7 @@
         POSSale.RefreshCurrent();
     end;
 
-    procedure DeleteAll()
+    procedure DeleteAll(Synchronization: Boolean)
     var
         LocalxRec: Record "NPR POS Sale Line";
     begin
@@ -284,13 +284,18 @@
 
         if Rec.FindSet(true) then
             repeat
-                OnBeforeDeletePOSSaleLine(Rec);
+                OnBeforeDeletePOSSaleLine(Rec, Synchronization);
                 LocalxRec := Rec;
                 Rec.Delete(true);
                 OnAfterDeletePOSSaleLine(LocalxRec);
             until Rec.Next() = 0;
 
         POSSale.RefreshCurrent();
+    end;
+
+    procedure DeleteAll()
+    begin
+        DeleteAll(false);
     end;
 
     procedure DeleteWPadSupportedLinesOnly()
@@ -305,7 +310,7 @@
             exit;
         SupportedSaleLine.FindSet(true);
         repeat
-            OnBeforeDeletePOSSaleLine(SupportedSaleLine);
+            OnBeforeDeletePOSSaleLine(SupportedSaleLine, false);
             xSupportedSaleLine := SupportedSaleLine;
             SupportedSaleLine.Delete(true);
             OnAfterDeletePOSSaleLine(xSupportedSaleLine);
@@ -729,7 +734,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    internal procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    internal procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; Synchronization: Boolean)
     begin
     end;
 

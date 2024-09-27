@@ -3,12 +3,12 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
     Access = Internal;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
-    local procedure CheckOnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    local procedure CheckOnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; Synchronization: Boolean)
     begin
         if SaleLinePOS.IsTemporary() then
             exit;
 
-        if SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item then
+        if (SaleLinePOS."Line Type" = SaleLinePOS."Line Type"::Item) and not Synchronization then
             CheckIsDeletingPOSSaleLineAllowed(SaleLinePOS);
     end;
 

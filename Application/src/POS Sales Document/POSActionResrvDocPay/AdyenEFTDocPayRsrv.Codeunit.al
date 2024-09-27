@@ -11,9 +11,9 @@ codeunit 6184944 "NPR Adyen EFT Doc Pay Rsrv" implements "NPR EFT Doc Pay Reserv
 
     internal procedure GetReservationAmount(SalesHeader: Record "Sales Header") ReservationAmount: Decimal;
     var
-        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
     begin
-        ReservationAmount := MagentoPmtAdyenMgt.GetAmountToPay(SalesHeader."Amount Including VAT", Database::"Sales Header", SalesHeader."No.", SalesHeader."Document Type");
+        ReservationAmount := MagentoPmtMgt.GetAmountToPay(SalesHeader."Amount Including VAT", Database::"Sales Header", SalesHeader."No.", SalesHeader."Document Type");
     end;
 
     internal procedure ValidatePOSPaymentMethod(PaymentMethodCode: Code[10]; POSUnitNo: Code[10])

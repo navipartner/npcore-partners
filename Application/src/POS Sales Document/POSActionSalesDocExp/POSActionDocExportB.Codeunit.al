@@ -155,6 +155,7 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
 
     internal procedure CheckPaymentLinesReadyForReservation(SalePOS: Record "NPR POS Sale")
     var
+        POSPaymentMethod: Record "NPR POS Payment Method";
         SaleLinePOS: Record "NPR POS Sale Line";
         PaymentLineExistErrorLbl: Label 'Payment lines exist for the current POS sale. Please delete them and try again.';
     begin
@@ -163,9 +164,14 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
         SaleLinePOS.SetFilter("Amount Including VAT", '<>0');
-        if SaleLinePOS.IsEmpty then
-            exit;
-        Error(PaymentLineExistErrorLbl);
+        SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", "Line Type", "Amount Including VAT", "No.");
+        if SaleLinePOS.FindSet() then
+            repeat
+                POSPaymentMethod.SetLoadFields("Processing Type", Code);
+                POSPaymentMethod.Get(SaleLinePOS."No.");
+                if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::VOUCHER then
+                    Error(PaymentLineExistErrorLbl);
+            until SaleLinePOS.Next() = 0;
     end;
 
     internal procedure CheckVATSetupsExist(SalePOS: Record "NPR POS Sale")
@@ -194,5 +200,21 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
             if CheckCustomerVATCombination then
                 VATPostingSetup.Get(Customer."VAT Bus. Posting Group", SaleLinePOS."VAT Prod. Posting Group");
         until SaleLinePOS.Next() = 0;
+    end;
+
+    internal procedure CalculateRemainingAmount(POSPaymentMethodCode: Code[10]; PaymentLine: Codeunit "NPR POS Payment Line") RemainingAmount: Decimal
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        SalesAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SubTotal: Decimal;
+    begin
+        POSPaymentMethod.Get(POSPaymentMethodCode);
+        ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
+
+        PaymentLine.CalculateBalance(POSPaymentMethod, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        RemainingAmount := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethod, ReturnPOSPaymentMethod, true);
     end;
 }
