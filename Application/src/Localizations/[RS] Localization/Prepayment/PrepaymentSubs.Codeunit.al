@@ -93,6 +93,7 @@ codeunit 6151410 "NPR Prepayment Subs."
         PrepaymentMgt.CloseEntriesForCrMemo(GenJnlLine);
     end;
 
+#if (BC20 or BC21 or BC22 or BC23 or BC24 or BC25)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostCustomerEntry', '', false, false)]
     local procedure SalesPost_OnBeforePostCustomerEntry(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     begin
@@ -110,7 +111,7 @@ codeunit 6151410 "NPR Prepayment Subs."
             exit;
         PrepaymentMgt.RebalancePostRefundAndPayment(GenJnlLine, SalesHeader, GenJnlPostLine);
     end;
-
+#else
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Post Invoice Events", 'OnPostLedgerEntryOnAfterGenJnlPostLine', '', false, false)]
     local procedure OnPostLedgerEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line");
     begin
@@ -120,6 +121,7 @@ codeunit 6151410 "NPR Prepayment Subs."
             exit;
         PrepaymentMgt.RebalancePostRefundAndPayment(GenJnlLine, SalesHeader, GenJnlPostLine);
     end;
+#endif
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Line", 'OnAfterGetCustomerReceivablesAccount', '', false, false)]
     local procedure OnAfterGetCustomerReceivablesAccount(GenJournalLine: Record "Gen. Journal Line"; CustomerPostingGroup: Record "Customer Posting Group"; var ReceivablesAccount: Code[20]);
