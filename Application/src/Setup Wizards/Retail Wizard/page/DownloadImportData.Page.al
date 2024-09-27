@@ -277,12 +277,10 @@ page 6150812 "NPR Download&Import Data"
     local procedure ShowDownloadStep()
     begin
         DownloadStepVisible := true;
-        ImportPrintTemplateData();
     end;
 
     local procedure ShowFinishStep()
     begin
-        ImportNPRetailBasicData();
         CheckIfDataFilledIn();
         IntroStepVisible := false;
         FinishStepVisible := true;
@@ -299,8 +297,15 @@ page 6150812 "NPR Download&Import Data"
         AnyDataToCreate := TestDataToCreate;
     end;
 
-    local procedure FinishAction();
+    local procedure FinishAction()
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        DataWillBeImportedLbl: Label 'Warning: This action will IMPORT data into the system, which may affect its behavior. Are you sure you want to continue?';
     begin
+        if not ConfirmManagement.GetResponseOrDefault(DataWillBeImportedLbl, false) then
+            exit;
+        ImportPrintTemplateData();
+        ImportNPRetailBasicData();
         OnAfterFinishStep(AnyDataToCreate);
         CurrPage.Close();
     end;
