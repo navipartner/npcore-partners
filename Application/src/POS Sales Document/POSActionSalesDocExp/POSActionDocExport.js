@@ -40,20 +40,49 @@ const main = async ({ workflow, parameters, captions }) => {
     }
   }
   if (additionalParameters.pos_payment_reservation) {
-    await workflow.respond("validateSaleBeforeReservation", {
-      extDocNo: extDocNo,
-      attention: attention,
-      yourref: yourref,
-      additionalParameters: additionalParameters,
-    });
-    const paymentResponse = await workflow.run("PAYMENT_2", {
-      parameters: {
-        paymentNo: parameters.POSPaymentMethodCode,
-        HideAmountDialog: true,
-        tryEndSale: false,
-      },
-    });
-    if (!paymentResponse.success) return;
+    let { remainingAmount } = await workflow.respond(
+      "validateSaleBeforeReservation",
+      {
+        extDocNo: extDocNo,
+        attention: attention,
+        yourref: yourref,
+        additionalParameters: additionalParameters,
+      }
+    );
+    if (parameters.AskForVouchers && remainingAmount !== 0) {
+      let scanVoucher = true;
+      let scanVoucherResponse;
+      while (scanVoucher) {
+        scanVoucher = await popup.confirm(
+          captions.ScanVoucherRequestCaption.replace("%1", remainingAmount)
+        );
+        if (scanVoucher) {
+          scanVoucherResponse = await workflow.run("SCAN_VOUCHER_2", {
+            parameters: {
+              AskForVoucherType: parameters.AskForVoucherType,
+              VoucherTypeCode: parameters.VoucherTypeCode,
+              EnableVoucherList: parameters.EnableVoucherList,
+              EndSale: false,
+            },
+          });
+          if (scanVoucherResponse.success) {
+            scanVoucher = scanVoucherResponse.remainingAmount !== 0;
+            remainingAmount = scanVoucherResponse.remainingAmount;
+          }
+        }
+      }
+    }
+    if (remainingAmount !== 0) {
+      const paymentResponse = await workflow.run("PAYMENT_2", {
+        parameters: {
+          paymentNo: parameters.POSPaymentMethodCode,
+          HideAmountDialog: true,
+          tryEndSale: false,
+        },
+      });
+
+      if (!paymentResponse.success) return;
+    }
   }
   const { createdSalesHeader, createdSalesHeaderDocumentType } =
     await workflow.respond("exportDocument", {

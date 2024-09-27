@@ -416,6 +416,7 @@
         RequestedAmt: Decimal;
         RequestedExpDate: Duration;
         PGInteractionsLogMgt: Codeunit "NPR PG Interactions Log Mgt.";
+        NPRMagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         Log: Record "NPR PG Interaction Log Entry";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         SendEmail: Boolean;
@@ -433,7 +434,7 @@
 
         GetDocument(RecVariant, FullAmount, DocumentTableNo, DocumentNo, SalesDocumentType, CustomerNo);
 
-        AmtToPay := GetAmountToPay(FullAmount, DocumentTableNo, DocumentNo, SalesDocumentType);
+        AmtToPay := NPRMagentoPmtMgt.GetAmountToPay(FullAmount, DocumentTableNo, DocumentNo, SalesDocumentType);
 
         GetPayByLinkParams(CustomerNo, AmtToPay, RequestedAmt, RequestedExpDate, SendEmail, Email, SendSMS, PhoneNo, ShowDialog);
 
@@ -512,23 +513,6 @@
 
     end;
 
-    internal procedure GetAmountToPay(FullAmount: Decimal; DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type") AmountToPay: Decimal;
-    var
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
-        PaidAmount: Decimal;
-    begin
-        CalculateCapturedAmount(DocumentTableNo, DocumentNo, SalesDocumentType, MagentoPaymentLine, PaidAmount);
-
-        CalculateRequestedAmount(DocumentTableNo, DocumentNo, SalesDocumentType, MagentoPaymentLine, PaidAmount);
-
-        if PaidAmount = 0 then
-            AmountToPay := FullAmount
-        else
-            AmountToPay := FullAmount - PaidAmount;
-
-        if AmountToPay < 0 then
-            AmountToPay := 0;
-    end;
 
     local procedure UpsertShopperRef(PaymentLine: Record "NPR Magento Payment Line")
     var
@@ -754,6 +738,7 @@
         LineNo: Integer;
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        PaymentLinkLbl: Label 'Payment link';
     begin
         GetPayByLinkSetup();
 
@@ -780,6 +765,7 @@
 
         MagentoPaymentLine.Init();
         MagentoPaymentLine."Document Table No." := Request."Document Table No.";
+        MagentoPaymentLine.Description := PaymentLinkLbl;
         MagentoPaymentLine."Line No." := LineNo;
         MagentoPaymentLine."Requested Amount" := Request."Request Amount";
         MagentoPaymentLine."Account Type" := AdyenPayByLinkSetup."Pay By Link Account Type";
@@ -814,6 +800,7 @@
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         LineNo: Integer;
+        DescriptionLbl: Label '%1 %2';
     begin
         if POSPaymentLine."Line Type" <> POSPaymentLine."Line Type"::"POS Payment" then
             exit;
@@ -834,6 +821,8 @@
         MagentoPaymentLine."Document Table No." := Database::"Sales Header";
         MagentoPaymentLine."Line No." := LineNo;
 
+        MagentoPaymentLine."No." := EFTTransactionRequest."PSP Reference";
+        MagentoPaymentLine.Description := CopyStr(StrSubstNo(DescriptionLbl, POSPaymentLine.Description, EFTTransactionRequest."PSP Reference"), 1, MaxStrLen(MagentoPaymentLine.Description));
         MagentoPaymentLine."Document Type" := SalesHeader."Document Type";
         MagentoPaymentLine."Document No." := SalesHeader."No.";
         MagentoPaymentLine."Payment Type" := MagentoPaymentLine."Payment Type"::"Payment Method";
@@ -861,6 +850,7 @@
         InStr: InStream;
         ExipresAtISO8601: Text;
         ExpiresAt: DateTime;
+        PayByLinkLbl: Label 'Payment Link %1';
     begin
         Response."Response Body".CreateInStream(InStr);
         InStr.ReadText(ResponseTxt);
@@ -879,6 +869,7 @@
 
             MagentoPaymentLine."Pay by Link URL" := CopyStr(PayByLinkURL, 1, MaxStrLen(MagentoPaymentLine."Pay by Link URL"));
             MagentoPaymentLine."Payment ID" := CopyStr(PaymentID, 1, MaxStrLen(MagentoPaymentLine."Payment ID"));
+            MagentoPaymentLine.Description := CopyStr(StrSubstNo(PayByLinkLbl, MagentoPaymentLine."Payment ID"), 1, MaxStrLen(MagentoPaymentLine.Description));
         end;
         if Evaluate(ExpiresAt, ExipresAtISO8601, 9) then
             MagentoPaymentLine."Expires At" := ExpiresAt;
@@ -940,59 +931,6 @@
         Response."Response Success" := true;
     end;
 
-    local procedure CalculateCapturedAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type"; MagentoPaymentLine: Record "NPR Magento Payment Line"; var PaidAmount: Decimal)
-    var
-        MagentoPaymentLineTransactionID: Record "NPR Magento Payment Line";
-    begin
-        MagentoPaymentLineTransactionID.Reset();
-        MagentoPaymentLineTransactionID.SetRange("Document No.", DocumentNo);
-        MagentoPaymentLineTransactionID.SetRange("Document Type", SalesDocumentType);
-        MagentoPaymentLineTransactionID.SetRange("Document Table No.", DocumentTableNo);
-        MagentoPaymentLineTransactionID.SetLoadFields("Document No.", "Document Type", "Document Table No.", "Transaction ID");
-        MagentoPaymentLineTransactionID.SetCurrentKey("Transaction ID");
-        MagentoPaymentLineTransactionID.SetFilter("Transaction ID", '<>%1', '');
-        if MagentoPaymentLineTransactionID.FindSet() then
-            repeat
-                MagentoPaymentLineTransactionID.SetRange("Transaction ID", MagentoPaymentLineTransactionID."Transaction ID");
-                MagentoPaymentLineTransactionID.FindLast();
-                MagentoPaymentLineTransactionID.SetRange("Transaction ID");
-
-                MagentoPaymentLine.Reset();
-                MagentoPaymentLine.SetRange("Transaction ID", MagentoPaymentLineTransactionID."Transaction ID");
-                MagentoPaymentLine.SetLoadFields("Transaction ID", "Document No.", "Document Table No.", "Document Type", Amount);
-                if MagentoPaymentLine.FindSet() then
-                    repeat
-                        case MagentoPaymentLine."Document Table No." of
-                            DATABASE::"Sales Header":
-                                begin
-                                    if MagentoPaymentLine."Document Type" in [MagentoPaymentLine."Document Type"::Order, MagentoPaymentLine."Document Type"::Invoice] then
-                                        PaidAmount += MagentoPaymentLine.Amount;
-                                end;
-                            DATABASE::"Sales Invoice Header":
-                                PaidAmount += MagentoPaymentLine.Amount;
-
-                        end;
-                    until MagentoPaymentLine.Next() = 0;
-            until MagentoPaymentLineTransactionID.Next() = 0;
-    end;
-
-    local procedure CalculateRequestedAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type"; MagentoPaymentLine: Record "NPR Magento Payment Line"; var PaidAmount: Decimal)
-    begin
-        Clear(MagentoPaymentLine);
-        MagentoPaymentLine.Reset();
-        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
-        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
-        MagentoPaymentLine.SetRange("Document Table No.", DocumentTableNo);
-        MagentoPaymentLine.SetRange("Last Amount", 0);
-        MagentoPaymentLine.SetRange(Amount, 0);
-        MagentoPaymentLine.SetRange("Date Canceled", 0D);
-        MagentoPaymentLine.SetRange("Manually Canceled Link", false);
-        MagentoPaymentLine.SetFilter("Expires At", '>%1', CurrentDateTime());
-        MagentoPaymentLine.SetLoadFields("Requested Amount");
-
-        MagentoPaymentLine.CalcSums("Requested Amount");
-        PaidAmount += MagentoPaymentLine."Requested Amount";
-    end;
 
     internal procedure CheckUnproccesedWebhook(var PaymentLine: Record "NPR Magento Payment Line")
     var

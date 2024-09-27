@@ -129,7 +129,7 @@
         SaleLinePOS."Dimension Set ID" := SalesLine."Dimension Set ID";
         SaleLinePOS."Shipment Fee" := SalesLine."NPR Shipment Fee";
         SaleLinePOS."Store Ship Profile Code" := SalesLine."NPR Store Ship Profile Code";
-         SaleLinePOS."Store Ship Profile Line No." := SalesLine."NPR Store Ship Prof. Line No.";
+        SaleLinePOS."Store Ship Profile Line No." := SalesLine."NPR Store Ship Prof. Line No.";
         SalesDocImptMgtPublic.OnAfterTransferFromSaleLineToSaleLinePOS(SaleLinePOS, SalesLine);
     end;
 
@@ -380,7 +380,7 @@
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
 
-        POSSaleLine.DeleteAll();
+        POSSaleLine.DeleteAll(true);
 
         POSSale.RefreshCurrent();
         POSSale.GetCurrentSale(SalePOS);

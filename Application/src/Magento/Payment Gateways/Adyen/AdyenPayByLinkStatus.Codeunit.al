@@ -66,8 +66,10 @@ codeunit 6184921 "NPR Adyen PayByLink Status"
         AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
         SuccessProcessedLbl: Label 'Adyen Webhook Request was successfully processed.';
     begin
-        if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then
+        if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then begin
             MagentoPaymentLine.Validate("Transaction ID", JsonValueToken.AsValue().AsText());
+            MagentoPaymentLine."No." := CopyStr(MagentoPaymentLine."Transaction ID", 1, MaxStrLen(MagentoPaymentLine."No."));
+        end;
         if JsonObjectToken.AsObject().Get('amount', JsonObjectToken) then
             if JsonObjectToken.IsObject() then
                 if JsonObjectToken.AsObject().Get('value', JsonValueToken) then begin

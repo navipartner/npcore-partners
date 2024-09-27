@@ -663,15 +663,15 @@
         Message(VoucherRedeemedLbl, ReferenceNo);
     end;
 
-    local procedure RedeemVoucher(SalesHeader: Record "Sales Header"; ReferenceNo: Text)
+    internal procedure RedeemVoucher(SalesHeader: Record "Sales Header"; ReferenceNo: Text)
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
         Voucher: Record "NPR NpRv Voucher";
-        LineNo: Decimal;
+        MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         Amount: Decimal;
         AmountNotGtZero: Label 'The remaining amount to be paid on the Sales Header is not greater than 0';
     begin
+        Voucher.SetCurrentKey("Reference No.");
         Voucher.SetRange("Reference No.", ReferenceNo);
         if not Voucher.FindFirst() then
             Error(VoucherNotFoundErr, ReferenceNo);
@@ -681,8 +681,8 @@
             Error(VoucherInUseErr);
 
         // Default to the remaining amount to be paid
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        Amount := GetTotalAmtInclVat(SalesHeader) - SalesHeader."NPR Magento Payment Amount";
+        SalesHeader.CalcFields("Amount Including VAT");
+        Amount := MagentoPmtMgt.GetAmountToPay(SalesHeader."Amount Including VAT", Database::"Sales Header", SalesHeader."No.", SalesHeader."Document Type");
 
         if Amount <= 0 then
             Error(AmountNotGtZero);
@@ -690,12 +690,6 @@
         // Set to voucher's full amount if the total amount isn't available
         if Amount > Voucher.Amount then
             Amount := Voucher.Amount;
-
-        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-        MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
-        if MagentoPaymentLine.FindLast() then;
-        LineNo := MagentoPaymentLine."Line No." + 10000;
 
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
@@ -710,6 +704,50 @@
         NpRvSalesLine.Description := CopyStr(Voucher.Description, 1, MaxStrLen(NpRvSalesLine.Description));
         NpRvSalesLine.Insert(true);
 
+        RedeemVoucher(SalesHeader, NpRvSalesLine, Amount);
+    end;
+
+    internal procedure RedeemVoucher(SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; Amount: Decimal)
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        Voucher: Record "NPR NpRv Voucher";
+        LineNo: Decimal;
+        Modi: Boolean;
+    begin
+        Voucher.SetCurrentKey("Reference No.");
+        Voucher.SetRange("Reference No.", NpRvSalesLine."Reference No.");
+        if not Voucher.FindFirst() then
+            Error(VoucherNotFoundErr, NpRvSalesLine."Reference No.");
+
+        if NpRvSalesLine."External Document No." <> SalesHeader."NPR External Order No." then begin
+            NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
+            Modi := true;
+        end;
+
+        if NpRvSalesLine."Document Source" <> NpRvSalesLine."Document Source"::"Sales Document" then begin
+            NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+            Modi := true;
+        end;
+
+        if NpRvSalesLine."Document Type" <> SalesHeader."Document Type" then begin
+            NpRvSalesLine."Document Type" := SalesHeader."Document Type";
+            Modi := true;
+        end;
+
+        if NpRvSalesLine."Document No." <> SalesHeader."No." then begin
+            NpRvSalesLine."Document No." := SalesHeader."No.";
+            Modi := true;
+        end;
+
+        if Modi then
+            NpRvSalesLine.Modify(true);
+
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+        if MagentoPaymentLine.FindLast() then;
+        LineNo := MagentoPaymentLine."Line No." + 10000;
+
         MagentoPaymentLine.Init();
         MagentoPaymentLine."Document Table No." := Database::"Sales Header";
         MagentoPaymentLine."Document Type" := SalesHeader."Document Type";
@@ -723,6 +761,7 @@
         MagentoPaymentLine."Source Table No." := Database::"NPR NpRv Voucher";
         MagentoPaymentLine."Source No." := Voucher."No.";
         MagentoPaymentLine."External Reference No." := SalesHeader."NPR External Order No.";
+        MagentoPaymentLine."Requested Amount" := Amount;
         MagentoPaymentLine.Amount := Amount;
         MagentoPaymentLine.Insert(true);
 

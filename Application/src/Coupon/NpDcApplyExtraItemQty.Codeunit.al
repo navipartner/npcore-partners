@@ -46,7 +46,7 @@
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon, SaleLinePOSCouponApply, SaleLinePOS) then begin
             if ExtraItemQty <= 0 then begin
                 SaleLinePOSCouponApply.Delete();
-                SaleLineOut.OnBeforeDeletePOSSaleLine(SaleLinePOS);
+                SaleLineOut.OnBeforeDeletePOSSaleLine(SaleLinePOS, false);
                 SaleLinePOS.Delete();
                 SaleLineOut.OnAfterDeletePOSSaleLine(SaleLinePOS);
                 exit;

@@ -116,6 +116,7 @@
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
         PaymentLineBal: Record "NPR Magento Payment Line";
+        BalanceLineFound: Boolean;
     begin
         if not IncludeHeader then
             exit;
@@ -160,9 +161,19 @@
             PaymentLine2."Last Amount" := 0;
             PaymentLine2."Posting Date" := ToSalesHeader."Posting Date";
             PaymentLine2.Insert(true);
+            if not BalanceLineFound then
+                case PaymentLine."Payment Type" of
+                    PaymentLine."Payment Type"::"Payment Method":
+                        if (PaymentLine."Account No." <> '') and (PaymentLine.Amount <> 0) then begin
+                            PaymentLineBal := PaymentLine;
+                            //We always prefere to make the refund agains a payment method insted of a voucher.
+                            BalanceLineFound := true;
+                        end;
+                    PaymentLine."Payment Type"::Voucher:
+                        if (PaymentLine."Account No." <> '') and (PaymentLine.Amount <> 0) then
+                            PaymentLineBal := PaymentLine;
 
-            if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine."Account No." <> '') and (PaymentLine.Amount <> 0) then
-                PaymentLineBal := PaymentLine;
+                end;
         until PaymentLine.Next() = 0;
 
         if (ToSalesHeader."Applies-to Doc. No." <> '') or (ToSalesHeader."Applies-to ID" <> '') then
@@ -243,6 +254,8 @@
         if PaymentAmt < TotalAmountInclVAT then
             Error(Text004, PaymentAmt);
 
+        CheckIfTotalPaymentWhenVoucherInUse(SalesHeader, PaymentAmt, TotalAmountInclVAT);
+        CheckIfTotalPaymentWhenMixedPaymentAndRefund(SalesHeader, PaymentAmt, TotalAmountInclVAT);
         OnCheckPayment(SalesHeader);
     end;
 
@@ -543,9 +556,14 @@
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
         DocNo: Code[20];
+        HasVouchers: Boolean;
+        HasPaymentsAndRefunds: Boolean;
     begin
         if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
+
+        HasVouchers := HasMagentoPaymentVouchers(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        HasPaymentsAndRefunds := HasMagentoPaymentsAndRefunds(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
         DocNo := SalesHeader."Posting No.";
@@ -594,38 +612,48 @@
                 PaymentLine.Modify();
 
                 PaymentAmt += PaymentLine2.Amount;
-            until (PaymentLine.Next() = 0) or (PaymentAmt = TotalAmountInclVAT);
+            until (PaymentLine.Next() = 0) or ((PaymentAmt = TotalAmountInclVAT) and not (HasVouchers or HasPaymentsAndRefunds)); // we don't allow partial processing when there are vouchers or a mix of payments and refunds
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
     local procedure Cu80OnBeforePostSalesInvoice(var SalesHeader: Record "Sales Header")
     begin
-        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order]) then
-            exit;
-        if not SalesHeader.Invoice then
-            exit;
         if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
             exit;
-
-        SalesHeader."Bal. Account No." := '';
-        CheckPayment(SalesHeader);
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Invoice:
+                begin
+                    SalesHeader."Bal. Account No." := '';
+                    CheckPayment(SalesHeader);
+                end;
+            SalesHeader."Document Type"::Order:
+                begin
+                    if not SalesHeader.Invoice then
+                        exit;
+                    SalesHeader."Bal. Account No." := '';
+                    CheckPayment(SalesHeader);
+                end;
+            SalesHeader."Document Type"::"Return Order":
+                begin
+                    if not SalesHeader.Invoice then
+                        exit;
+                    CheckPayment(SalesHeader);
+                end;
+            SalesHeader."Document Type"::"Credit Memo":
+                CheckPayment(SalesHeader);
+        end;
     end;
     #endregion
 
     #region Posting payment lines
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', true, true)]
     local procedure Cu80OnAfterPostSalesInvoice(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesInvHdrNo: Code[20])
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if SalesInvHdrNo = '' then
             exit;
 
-        if FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then begin
-            CaptureSalesInvoice(SalesInvHdrNo);
-            Commit();
-        end else
-            PostMagentoPayment(SalesHeader, GenJnlPostLine, SalesInvHdrNo);
+        CaptureSalesInvoice(SalesInvHdrNo);
+        Commit();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', true, true)]
@@ -637,15 +665,11 @@
                                                              var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
                                                              WhseReceive: Boolean;
                                                              WhseShip: Boolean)
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then begin
-            if SalesInvoiceHeader."No." = '' then
-                exit;
+        if SalesInvoiceHeader."No." = '' then
+            exit;
 
-            PostMagentoPaymentV2(SalesHeader, SalesInvoiceHeader);
-        end;
+        PostMagentoPaymentV2(SalesHeader, SalesInvoiceHeader);
     end;
 
     [Obsolete('Not used. Use function PostMagentoPaymentV2 instead', '2024-09-29')]
@@ -683,7 +707,6 @@
     var
         GenJnlLine: Record "Gen. Journal Line";
         SalesInvHeader: Record "Sales Invoice Header";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if PaymentLine.Posted then
             exit;
@@ -698,8 +721,6 @@
         if not HasOpenEntry(PaymentLine) then begin
             PaymentLine.Posted := true;
             PaymentLine.Modify();
-            if not FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then
-                Commit();
             exit;
         end;
 
@@ -718,8 +739,6 @@
         PaymentLine.Posted := true;
         PaymentLine.Modify();
         InsertPostingLog(PaymentLine, true);
-        if not FeatureFlagsManagement.IsEnabled('splitMagentoPaymentLinePostingAndCapture') then
-            Commit();
     end;
 
     procedure InsertPostingLog(var MagentoPaymentLine: Record "NPR Magento Payment Line"; Success: Boolean)
@@ -746,11 +765,14 @@
                     PaymentLine.SetRange("Document Type", 0);
                     PaymentLine.SetRange("Document No.", DocNo);
                     PaymentLine.SetFilter("Account No.", '<>%1', '');
-                    if not PaymentLine.FindSet() then
-                        exit;
-                    repeat
-                        PostPaymentLine(PaymentLine, GenJnlPostLine);
-                    until PaymentLine.Next() = 0;
+                    //We need this in order for the payments to be applied correctly
+                    //when we have a normal payment method plus a voucher and a return voucher
+                    PaymentLine.SetFilter(Amount, '>=0');
+                    PaymentLine.SetCurrentKey(Amount);
+                    PostPaymentLines(PaymentLine, GenJnlPostLine);
+
+                    PaymentLine.SetFilter(Amount, '<0');
+                    PostPaymentLines(PaymentLine, GenJnlPostLine);
                 end;
         end;
     end;
@@ -1023,6 +1045,162 @@
         end;
     end;
     #endregion
+
+    local procedure CheckIfTotalPaymentWhenVoucherInUse(var SalesHeader: Record "Sales Header"; MagentoPaymentAmount: Decimal; CurrPaymentAmount: Decimal)
+    var
+        HasVouchers: Boolean;
+        TotalAmountErrorLbl: Label 'Partial posting is not allowed when vouchers are in use. Current payment amount: %1, total payment amount: %2.', Comment = '%1 - the payment amount that is being posted. %2 - total payment amount in the magento lines.';
+    begin
+        HasVouchers := HasMagentoPaymentVouchers(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if not HasVouchers then
+            exit;
+
+        if MagentoPaymentAmount <= CurrPaymentAmount then
+            exit;
+
+        Error(TotalAmountErrorLbl, CurrPaymentAmount, MagentoPaymentAmount);
+    end;
+
+    local procedure CheckIfTotalPaymentWhenMixedPaymentAndRefund(var SalesHeader: Record "Sales Header"; MagentoPaymentAmount: Decimal; CurrPaymentAmount: Decimal)
+    var
+        HasPaymentsAndRefunds: Boolean;
+        TotalAmountErrorLbl: Label 'Partial posting is not allowed when there is a mix of payments and refunds. Current payment amount: %1, total payment amount: %2.', Comment = '%1 - the payment amount that is being posted. %2 - total payment amount in the magento lines.';
+    begin
+        HasPaymentsAndRefunds := HasMagentoPaymentsAndRefunds(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
+        if not HasPaymentsAndRefunds then
+            exit;
+
+        if MagentoPaymentAmount <= CurrPaymentAmount then
+            exit;
+
+        Error(TotalAmountErrorLbl, CurrPaymentAmount, MagentoPaymentAmount);
+    end;
+
+    internal procedure PostPaymentLines(var PaymentLine: Record "NPR Magento Payment Line"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    begin
+        if not PaymentLine.FindSet() then
+            exit;
+        repeat
+            PostPaymentLine(PaymentLine, GenJnlPostLine);
+        until PaymentLine.Next() = 0;
+    end;
+
+    internal procedure GetAmountToPay(FullAmount: Decimal; DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type") AmountToPay: Decimal;
+    var
+        PaidAmount: Decimal;
+    begin
+        CalculateCapturedAmount(DocumentTableNo, DocumentNo, SalesDocumentType, PaidAmount);
+
+        CalculateRequestedAmount(DocumentTableNo, DocumentNo, SalesDocumentType, PaidAmount);
+
+        CalculateVoucherAmount(DocumentTableNo, DocumentNo, SalesDocumentType, PaidAmount);
+
+        if PaidAmount = 0 then
+            AmountToPay := FullAmount
+        else
+            AmountToPay := FullAmount - PaidAmount;
+
+        if AmountToPay < 0 then
+            AmountToPay := 0;
+    end;
+
+    local procedure CalculateCapturedAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type"; var PaidAmount: Decimal)
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoPaymentLineTransactionID: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLineTransactionID.Reset();
+        MagentoPaymentLineTransactionID.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLineTransactionID.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLineTransactionID.SetRange("Document Table No.", DocumentTableNo);
+        MagentoPaymentLineTransactionID.SetLoadFields("Document No.", "Document Type", "Document Table No.", "Transaction ID");
+        MagentoPaymentLineTransactionID.SetCurrentKey("Transaction ID");
+        MagentoPaymentLineTransactionID.SetFilter("Transaction ID", '<>%1', '');
+        if MagentoPaymentLineTransactionID.FindSet() then
+            repeat
+                MagentoPaymentLineTransactionID.SetRange("Transaction ID", MagentoPaymentLineTransactionID."Transaction ID");
+                MagentoPaymentLineTransactionID.FindLast();
+                MagentoPaymentLineTransactionID.SetRange("Transaction ID");
+
+                MagentoPaymentLine.Reset();
+                MagentoPaymentLine.SetRange("Transaction ID", MagentoPaymentLineTransactionID."Transaction ID");
+                MagentoPaymentLine.SetLoadFields("Transaction ID", "Document No.", "Document Table No.", "Document Type", Amount);
+                if MagentoPaymentLine.FindSet() then
+                    repeat
+                        case MagentoPaymentLine."Document Table No." of
+                            DATABASE::"Sales Header":
+                                begin
+                                    if MagentoPaymentLine."Document Type" in [MagentoPaymentLine."Document Type"::Order, MagentoPaymentLine."Document Type"::Invoice] then
+                                        PaidAmount += MagentoPaymentLine.Amount;
+                                end;
+                            DATABASE::"Sales Invoice Header":
+                                PaidAmount += MagentoPaymentLine.Amount;
+
+                        end;
+                    until MagentoPaymentLine.Next() = 0;
+            until MagentoPaymentLineTransactionID.Next() = 0;
+    end;
+
+    local procedure CalculateRequestedAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type"; var PaidAmount: Decimal)
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        MagentoPaymentLine.SetRange("Last Amount", 0);
+        MagentoPaymentLine.SetRange(Amount, 0);
+        MagentoPaymentLine.SetRange("Date Canceled", 0D);
+        MagentoPaymentLine.SetRange("Manually Canceled Link", false);
+        MagentoPaymentLine.SetFilter("Expires At", '>%1', CurrentDateTime());
+        MagentoPaymentLine.CalcSums("Requested Amount");
+        PaidAmount += MagentoPaymentLine."Requested Amount";
+    end;
+
+    local procedure CalculateVoucherAmount(DocumentTableNo: Integer; DocumentNo: Code[20]; SalesDocumentType: Enum "Sales Document Type"; var PaidAmount: Decimal)
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.CalcSums(Amount);
+        PaidAmount += MagentoPaymentLine.Amount;
+    end;
+
+    local procedure HasMagentoPaymentVouchers(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) HasVouchers: Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", DocTableNo);
+        PaymentLine.SetRange("Document Type", DocType);
+        PaymentLine.SetRange("Document No.", DocNo);
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
+        HasVouchers := not PaymentLine.IsEmpty();
+    end;
+
+    local procedure HasMagentoPaymentsAndRefunds(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) PaymentsAndRefundsExist: Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", DocTableNo);
+        PaymentLine.SetRange("Document Type", DocType);
+        PaymentLine.SetRange("Document No.", DocNo);
+        PaymentLine.SetFilter(Amount, '<0');
+        if PaymentLine.IsEmpty then
+            exit;
+
+        PaymentLine.SetFilter(Amount, '>=0');
+        if PaymentLine.IsEmpty then
+            exit;
+
+        PaymentsAndRefundsExist := true;
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckPayment(SalesHeader: Record "Sales Header")

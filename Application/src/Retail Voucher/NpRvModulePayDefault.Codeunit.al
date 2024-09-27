@@ -150,6 +150,7 @@
         MagentoPaymentLineNew."External Reference No." := SalesHeader."NPR External Order No.";
         MagentoPaymentLineNew."Payment Type" := MagentoPaymentLineNew."Payment Type"::Voucher;
         MagentoPaymentLineNew."No." := TempNpRvVoucher."Reference No.";
+        MagentoPaymentLineNew."Requested Amount" := -ReturnAmount;
         MagentoPaymentLineNew.Amount := -ReturnAmount;
         MagentoPaymentLineNew."Account Type" := MagentoPaymentLineNew."Account Type"::"G/L Account";
         MagentoPaymentLineNew."Account No." := NpRvVoucherTypeNew."Account No.";
