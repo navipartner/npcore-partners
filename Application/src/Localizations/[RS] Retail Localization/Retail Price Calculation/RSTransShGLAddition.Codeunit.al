@@ -250,6 +250,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             ShowAppliedEntries.FindAppliedEntries(TransferFromItemLedgerEntry, TempTransferFromILEAppliedItemLedgerEntries);
             if TempTransferFromILEAppliedItemLedgerEntries.FindSet() then
                 repeat
+                    Clear(AppliedEntryCostPerUnit);
+                    Clear(TransitCostPerUnit);
                     CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TempTransferFromILEAppliedItemLedgerEntries);
                     CalculateTransitLocationItemLedgerEntryCostPerUnit(TransitCostPerUnit, TransitLocationItemLedgerEntries);
                     if AppliedEntryCostPerUnit <> TransitCostPerUnit then

@@ -261,7 +261,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
             exit;
 
         NewTransitValueEntry."Cost Posted to G/L" := NewTransitValueEntry."Cost Amount (Actual)";
-        NewTransitValueEntry."Cost per Unit" := NewTransitValueEntry."Cost per Unit";
+        NewTransitValueEntry."Cost per Unit" := NewTransitValueEntry."Cost Amount (Actual)" / StdTransitValueEntry."Invoiced Quantity";
         NewTransitValueEntry.Description := CalculationValueEntryDescLbl;
         NewTransitValueEntry.Insert();
 
@@ -387,23 +387,19 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     local procedure CheckRetailLocation(TransShptLine: Record "Transfer Shipment Line"): Boolean
     var
         Location: Record Location;
-        LocationCheck: Boolean;
+        Location2: Record Location;
     begin
-        LocationCheck := false;
-        if Location.Get(TransShptLine."Transfer-from Code") then
-            if Location."NPR Retail Location" then
-                LocationCheck := true;
-        if Location.Get(TransShptLine."Transfer-to Code") then
-            if not Location."NPR Retail Location" then
-                LocationCheck := true;
-        exit(LocationCheck);
+        Location.Get(TransShptLine."Transfer-from Code");
+        Location2.Get(TransShptLine."Transfer-to Code");
+
+        exit((Location."NPR Retail Location") and (not Location2."NPR Retail Location"))
     end;
 
     local procedure FilterPriceListHeader(TransferShipmentHeader: Record "Transfer Shipment Header")
     var
         StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
+        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
     begin
         PriceListHeader.SetLoadFields("Price Type", Status, "Starting Date", "Ending Date", "NPR Location Code", "Assign-to No.");
         PriceListHeader.SetRange("Price Type", "Price Type"::Sale);
