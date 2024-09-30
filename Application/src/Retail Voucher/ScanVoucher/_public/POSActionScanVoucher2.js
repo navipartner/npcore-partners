@@ -59,9 +59,9 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
       if (validateSuggestedAmount) {
         await popup.message(
           captions.ProposedAmountDifferenceConfirmation.replace(
-            "%1",
+            "{0}",
             selectedAmount
-          ).replace("%2", suggestedAmount)
+          ).replace("{1}", suggestedAmount)
         );
       }
     }
