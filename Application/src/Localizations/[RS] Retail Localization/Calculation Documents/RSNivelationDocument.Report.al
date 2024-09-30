@@ -130,33 +130,37 @@ report 6014523 "NPR RS Nivelation Document"
 
     local procedure FindCustomerDetails()
     var
-        Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
         SalesCreditMemo: Record "Sales Cr.Memo Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        if (RSPostedNivelationHdr.Type = "NPR RS Nivelation Type"::"Price Change") then
-            exit;
-        case (RSPostedNivelationHdr."Source Type") of
-            "NPR RS Nivelation Source Type"::"Posted Sales Invoice":
-                if SalesInvoiceHeader.Get(RSPostedNivelationHdr."Referring Document Code") then begin
-                    CustomerName := SalesInvoiceHeader."Sell-to Customer Name";
-                    CustomerAddress := SalesInvoiceHeader."Sell-to Address";
-                    CustomerCity := SalesInvoiceHeader."Sell-to City";
+        case RSPostedNivelationHdr."Source Type" of
+            RSPostedNivelationHdr."Source Type"::"Posted Sales Invoice":
+                if SalesInvoiceHeader.Get(RSPostedNivelationHdr."Referring Document Code") then
+                    GetCustomerDetails(SalesInvoiceHeader."Sell-to Customer No.");
+            RSPostedNivelationHdr."Source Type"::"POS Entry":
+                begin
+                    POSEntry.SetRange("Document No.", RSPostedNivelationHdr."Referring Document Code");
+                    POSEntry.SetFilter("Customer No.", '<>%1', '');
+                    if POSEntry.FindFirst() then
+                        GetCustomerDetails(POSEntry."Customer No.");
                 end;
-            "NPR RS Nivelation Source Type"::"POS Entry":
-                if POSEntry.Get(RSPostedNivelationHdr."Referring Document Code") then
-                    if Customer.Get(POSEntry."Customer No.") then begin
-                        CustomerName := Customer.Name;
-                        CustomerAddress := Customer.Address;
-                        CustomerCity := Customer.City;
-                    end;
-            "NPR RS Nivelation Source Type"::"Posted Sales Credit Memo":
-                if SalesCreditMemo.Get(RSPostedNivelationHdr."Referring Document Code") then begin
-                    CustomerName := SalesCreditMemo."Sell-to Customer Name";
-                    CustomerAddress := SalesCreditMemo."Sell-to Address";
-                    CustomerCity := SalesCreditMemo."Sell-to City";
-                end
+            RSPostedNivelationHdr."Source Type"::"Posted Sales Credit Memo":
+                if SalesCreditMemo.Get(RSPostedNivelationHdr."Referring Document Code") then
+                    GetCustomerDetails(SalesCreditMemo."Sell-to Customer No.");
         end;
+    end;
+
+    local procedure GetCustomerDetails(CustomerNo: Code[20])
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit;
+        if not Customer.Get(CustomerNo) then
+            exit;
+        CustomerName := Customer.Name;
+        CustomerAddress := Customer.Address;
+        CustomerCity := Customer.City;
     end;
 }
