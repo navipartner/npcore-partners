@@ -25,16 +25,8 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Sale Lines" })
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Qty", exact: true })
-      .getByRole("textbox")
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Qty", exact: true })
-      .getByRole("textbox")
-      .fill("testing quantity");
+    await page.frameLocator('iframe').getByRole('button', { name: 'Quantity', exact: true }).getByRole('textbox').click();
+    await page.frameLocator('iframe').getByRole('button', { name: 'Quantity', exact: true }).getByRole('textbox').fill("testing quantity");
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Sale Lines" })
@@ -83,7 +75,7 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Amount Excl VAT").uncheck();
+      await page.frameLocator('iframe').getByLabel('AmountExclVAT').uncheck();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
@@ -95,17 +87,9 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Amount Excl VAT").check();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Amount Excl VAT" })
-      .getByRole("textbox")
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Amount Excl VAT" })
-      .getByRole("textbox")
-      .fill("testing amount");
+      await page.frameLocator('iframe').getByLabel('AmountExclVAT').check();
+      await page.frameLocator('iframe').getByRole('button', { name: 'AmountExclVAT' }).getByRole('textbox').click();
+      await page.frameLocator('iframe').getByRole('button', { name: 'AmountExclVAT' }).getByRole('textbox').fill("testing amount");
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Totals" })
@@ -155,16 +139,8 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Footer" })
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Salesperson Name:" })
-      .getByRole("textbox")
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Salesperson Name:" })
-      .getByRole("textbox")
-      .fill("testing footer");
+      await page.frameLocator('iframe').getByRole('button', { name: 'SalespersonName' }).getByRole('textbox').click()
+      await page.frameLocator('iframe').getByRole('button', { name: 'SalespersonName' }).getByRole('textbox').fill("testing footer");
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Footer", exact: true })
@@ -223,7 +199,8 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Quantity:").uncheck();
+    await page.frameLocator("iframe").getByLabel("Quantity").check();
+    await page.frameLocator("iframe").getByLabel("Quantity").uncheck();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
@@ -239,15 +216,15 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await page.frameLocator("iframe").getByLabel("Quantity:").check();
+    await page.frameLocator("iframe").getByLabel("Quantity").check();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity:", exact: true })
+      .getByRole("button", { name: "Quantity", exact: true })
       .getByRole("textbox")
       .click();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity:", exact: true })
+      .getByRole("button", { name: "Quantity", exact: true })
       .getByRole("textbox")
       .fill("testing panel");
     await page.waitForTimeout(3000);
@@ -255,12 +232,8 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Product Panel" })
-      .click();
     await expect(
-      page.frameLocator("iframe").getByText("testing panel").nth(1)
+      page.frameLocator('iframe').getByText('testing panel')
     ).toBeVisible();
     await page.waitForTimeout(1000);
     await page
@@ -340,9 +313,15 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Small Draft Beer" })
       .click();
-    await page.frameLocator("iframe").getByRole('button', { name: 'Increase Quantity By 1 Small' }).click(); 
-    await page.waitForTimeout(1000) 
-    await page.frameLocator('iframe').getByRole('button', { name: 'Change Quantity Small Draft' }).click();
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "Increase Quantity By 1 Small" })
+      .click();
+    await page.waitForTimeout(1000);
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "Change Quantity Small Draft" })
+      .click();
     await page.frameLocator("iframe").locator("#button10 div").click();
     await page
       .frameLocator("iframe")
@@ -350,7 +329,10 @@ test.describe("Edit Mode Bar tests", () => {
       .filter({ hasText: "OK" })
       .first()
       .click();
-      await page.frameLocator("iframe").getByRole('button', { name: 'Decrease Quantity By 1 Small' }).click();  
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "Decrease Quantity By 1 Small" })
+      .click();
 
     await page
       .frameLocator("iframe")
@@ -446,8 +428,8 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("contentinfo")
       .locator('svg[data-icon="gear"]')
       .click();
-      await page.frameLocator('iframe').locator('button:nth-child(16)').click();
-      await page
+    await page.frameLocator("iframe").locator("button:nth-child(16)").click();
+    await page
       .frameLocator("iframe")
       .locator(
         ".flex > div > .select > .css-b62m3t-container > .react-select__control"
@@ -484,7 +466,7 @@ test.describe("Edit Mode Bar tests", () => {
       .filter({ hasText: "OK" })
       .first()
       .click();
-      await page.frameLocator('iframe').locator('button:nth-child(16)').click();
+    await page.frameLocator("iframe").locator("button:nth-child(16)").click();
     await page
       .frameLocator("iframe")
       .locator("div")
@@ -510,10 +492,10 @@ test.describe("Edit Mode Bar tests", () => {
       .click();
     await page.frameLocator("iframe").locator(".ui-modal__body").isHidden();
     await page
-    .frameLocator("iframe")
-    .getByRole("contentinfo")
-    .locator('svg[data-icon="gear"]')
-    .click();
+      .frameLocator("iframe")
+      .getByRole("contentinfo")
+      .locator('svg[data-icon="gear"]')
+      .click();
     await removeLayout(page, key);
   });
 });
