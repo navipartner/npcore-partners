@@ -1,0 +1,43 @@
+---
+title: "Introduction"
+hide-toc: false
+---
+<Markdown src="../snippets/endpoint-verb-styles.mdx" />
+
+<Aside>
+| Endpoints||
+| :-| :---------------|
+| <GetVerb/>| [/ticketing/capacity/search](/ticketing/api-reference/capacity/get-capacity) |
+</Aside>
+
+The capacity API is responsible for managing the availability of access to a specific admission at a designated time, 
+ensuring the system can allocate resources for a ticket reservation.
+
+Key Concepts:
+    * Item Number: 
+        This represents the product being sold at a high level. 
+        Each item number corresponds to a category or type of ticket, and the base price is associated with 
+        the item number. The base price is drawn from a general price list that applies across all similar items.
+
+    * Admissions: 
+        Admissions define the specific areas or events a ticket grants access to. 
+        Each admission has a unique admission code, along with descriptive information and various predefined limits, 
+        such as capacity or entry restrictions. These limits and policies can be set at different hierarchical levels, 
+        allowing flexibility in how capacity is controlled.
+
+    * Time-Based Validity: 
+        In addition to defining what a ticket allows access to, the admission must also specify when the access is valid. 
+        Every admission needs to be linked to a specific time slot to ensure proper scheduling. 
+        In cases where the time is not explicitly provided, the system may assign a time slot automatically (defined by setup), 
+        which is particularly useful for scenarios like walk-up ticket sales at kiosks, 
+        where tickets should be valid immediately upon purchase.
+
+    * Dynamic Pricing: 
+        Each time slot can independently manage its pricing. 
+        While the base price is determined by the item number, time slots can either use a fixed price or 
+        apply dynamic pricing adjustments to the base price based on demand, capacity, or other factors.
+
+    * Time Slot Visibility: All available time slots are displayed to the consumer, even if they are no longer 
+        allocatable (e.g., fully booked or sold out). This is intentional, as it allows the system to provide 
+        visibility into popular events, offering a sense of urgency or exclusivity that can drive consumer interest.
+

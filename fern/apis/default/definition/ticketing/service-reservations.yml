@@ -1,0 +1,342 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalHeaders: ./global-types.yml
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml  
+  errorTypes: ./types-errors.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Reservations
+  auth: false
+  base-path: /ticketing
+  headers:
+    x-api-version: optional<globalHeaders.ApiVersionDate>
+  endpoints:
+
+    createReservation:
+      docs: 
+        The process begins by creating a reservation for a ticket. 
+        This step typically involves specifying details such as the event, date, number of tickets, and any other relevant preferences. 
+        Once this request is made, the system will provisionally hold the requested tickets until the reservation is confirmed. 
+        It is important to note that the token has a limited lifespan and will expire after a certain time. This expiration serves several purposes, including ensuring that the tickets are not held indefinitely and that the system can release them for other customers if necessary.
+      method: POST
+      path: /reservation
+      request:
+        name: createReservation 
+        body: CreateReservationRequest
+      response: 
+        type: GetReservationDetails
+      errors:
+        - errorTypes.BadRequestError
+      examples:
+        # Success response
+          - name: ExampleCreateReservation1
+            path-parameters:
+              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              company: $globalApiTypes.Company.ExampleCompanyCronus
+            request:
+               reserve:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  content:
+                    - admissionCode: CASTLE
+                      scheduleId: 452
+            response:
+              body:
+                token: $simpleTypes.Token.ExampleToken
+                expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+                reservationStatus: registered
+                reservations:
+                  - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                    quantity: 2
+                    ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
+                    content:
+                      - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+
+    updateReservation:
+      docs: 
+        The token can be utilized to modify or update the reservation before it's confirmed. 
+        For instance, changes like adjusting the number of tickets or even changing the item number. The import aspect to note is that the existing reservation is deleted and replaced with the updated one. 
+        Updating as opposed to creating new reservations is important for releasing the previously held tickets back to the pool for other customers to reserve.
+      method: PUT
+      path: /reservation/{token}
+      path-parameters:
+        token: simpleTypes.Token
+      request:
+        name: updateReservation 
+        body: CreateReservationRequest
+      response: GetReservationDetails
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          request:
+              reserve:
+               - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                 quantity: 3
+                 content:
+                 - admissionCode: CASTLE
+                   scheduleId: 452
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+              reservationStatus: registered
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 3
+                  ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
+                  content:
+                  - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+
+    cancelReservation:
+      docs: 
+        The token can be utilized to cancel an registered reservation. Confirmed reservations cannot be cancelled but must instead be revoked.
+        This action is typically taken when the customer no longer requires the tickets or has decided not to proceed with the purchase. 
+        Deleting the reservation ensures that the held tickets are released back into the system for other customers to reserve.
+      method: POST
+      path: /reservation/{token}/cancel
+      path-parameters:
+        token: simpleTypes.Token
+      request: 
+        name: cancelReservation
+      response: ReservationActionResponse
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        # Success response
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              reservationStatus: cancelled
+
+    preConfirmReservation:
+      docs: 
+        The token can be utilized to pre-confirm an existing reservation.
+        This action is typically taken when you want to extend the reservation's lifespan before confirming it.
+      method: POST
+      path: /reservation/{token}/pre-confirm
+      path-parameters:
+        token: simpleTypes.Token
+      request: 
+        name: preConfirmReservation
+      response: ReservationActionResponse
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        # Success response
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+              reservationStatus: registered
+
+    confirmReservation:
+      docs: 
+        Confirming a reservation is the final step in the process. Tickets are finalized and the reservation is no longer provisional. 
+        The operation is irreversible and the tickets are considered sold. The operation will return the final details of the reservation, such as ticket numbers.
+      method: POST
+      path: /reservation/{token}/confirm
+      path-parameters:
+        token: simpleTypes.Token
+      request:
+        name: confirmReservation 
+        body: ConfirmReservationRequest
+      response: GetReservationDetails
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        # Success response
+        - name: ExampleConfirmReservation1
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          request:
+            ticketHolder: John Doe
+            notificationAddress: john.doe@acme.com
+            paymentReference: PAY123456
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              reservationStatus: confirmed
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticket: $ReservationTicketDetails.ExampleTicketConfirmed
+                  content:
+                  - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+
+    getReservation:
+      docs: Get the content of an existing ticket reservation.
+      method: GET
+      path: /reservation/{token}
+      path-parameters:
+        token: simpleTypes.Token
+      request: 
+        name: getReservation
+      response: GetReservationDetails
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+        # Success response
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+              reservationStatus: registered
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
+                  content:
+                    - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
+              reservationStatus: confirmed
+              reservations:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  quantity: 2
+                  ticket: $ReservationTicketDetails.ExampleTicketConfirmed
+                  content:
+                    - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+
+    getTickets:
+      docs: Retrieve ticket by its reservation token
+      display-name: Get Tickets
+      method: GET
+      path: /reservation/{token}/tickets
+      path-parameters:
+        token: simpleTypes.Token
+      request: 
+        name: getTickets
+      response: list<compositeTypes.TicketDetails>
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            token: $simpleTypes.Token.ExampleToken
+          response:
+            body: 
+            - $compositeTypes.TicketDetails.ExampleTicket1
+
+types:
+  ## Complex types
+  ## Top Level Request types
+  CreateReservationRequest:
+    properties:
+      reserve: list<CreateReservationItemRequest>
+  
+  ConfirmReservationRequest:
+    properties:
+      ticketHolder: optional<simpleTypes.TicketHolder>
+      notificationAddress: optional<simpleTypes.NotificationAddress>
+      paymentReference: optional<simpleTypes.PaymentReference>
+
+  ## Nested Request types
+  CreateReservationItemRequest:
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      quantity: simpleTypes.NumberOfTickets
+      content: optional<list<compositeTypes.TicketContentRequest>>
+
+ 
+  ## Response types
+  ## Top Level Response types
+  GetReservationDetails:
+    properties:
+      token: simpleTypes.Token
+      expiresAt: optional<simpleTypes.ExpiresAt>
+      reservationStatus: simpleTypes.ReservationStatus
+      reservations: list<ReservationItemDetails>
+  
+  ReservationActionResponse:
+    properties:
+      expiresAt: optional<simpleTypes.ExpiresAt>
+      reservationStatus: simpleTypes.ReservationStatus
+
+  ## Nested Response types
+  ReservationItemDetails:
+    docs: List of items contained in the ticket reservation
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      quantity: simpleTypes.NumberOfTickets
+      ticket: ReservationTicketDetails
+      content: list<TicketContentDetails>
+
+  TicketContentDetails:
+    docs: Each item in the ticket reservation may have multiple admissions with individual schedules
+    properties:
+      admissionDetails: compositeTypes.AdmissionDetails
+    
+  AdmissionDetailsFull:
+    extends: compositeTypes.AdmissionDetails
+    properties:
+      reschedulePolicy: string
+
+  ReservationTicketDetails:
+    docs: Details of the ticket 
+    properties:
+      ticketNumbers: optional<list<simpleTypes.TicketId>>
+      validFrom: datetime
+      validUntil: datetime
+      pinCode: optional<simpleTypes.PinCode>
+      unitPrice: double
+      unitPriceInclVat: double
+      currencyCode: string
+      ticketHolder: optional<string>
+    examples: 
+      - name: ExampleTicketConfirmed
+        value:
+          ticketNumbers: [TICKET123, TICKET124]
+          validFrom: 2024-10-15T00:00:00Z
+          validUntil: 2024-10-15T23:59:59Z
+          pinCode: 12-34
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          ticketHolder: John Doe
+      - name: ExampleTicketUnconfirmed
+        value:
+          validFrom: 2024-10-15T00:00:00Z
+          validUntil: 2024-10-15T23:59:59Z
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+
+

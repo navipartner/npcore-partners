@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+errors:
+  BadRequest:
+    status-code: 400
+  UnauthenticatedError:
+    status-code: 401
+  RequestFailed:
+    status-code: 402
+  Forbiden:
+    status-code: 403
+  ResourceNotFound:
+    status-code: 404
+  RequestConflict:
+    status-code: 409
+  TooManyRequests:
+    status-code: 429

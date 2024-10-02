@@ -1,0 +1,25 @@
+---
+title: "Introduction"
+---
+
+<Markdown src="../snippets/endpoint-verb-styles.mdx" />
+
+<Aside>
+| Endpoints||
+| :-| :---------------|
+| <GetVerb/>| [/ticketing/ticket/:ticketNumber](/ticketing/api-reference/tickets/get-ticket) |
+| <PostVerb/>| [/ticketing/ticket/:ticketNumber/revoke](/ticketing/api-reference/tickets/revoke-ticket) |
+| <PostVerb/>| [/ticketing/ticket/:ticketNumber/validateArrival](/ticketing/api-reference/tickets/validate-arrival) |
+| <PostVerb/>| [/ticketing/ticket/:ticketNumber/validateDeparture](/ticketing/api-reference/tickets/validate-departure) |
+| <PostVerb/>| [/ticketing/ticket/:memberNumber/validateMemberArrival](/ticketing/api-reference/tickets/validate-member-arrival) |
+| <PostVerb/>| [/ticketing/ticket/:ticketNumber/sendAsETicket](/ticketing/api-reference/tickets/send-as-e-ticket) |
+| <PostVerb/>| [/ticketing/ticket/:ticketNumber/exchangeForCoupon](/ticketing/api-reference/tickets/exchange-for-coupon) |
+</Aside>
+
+The ticket is the essential document that customers must show upon arrival to gain access to a specific location or event. This section oversees the entire lifecycle of the ticket, handling processes such as retrieving ticket information, validating the ticket when the customer arrives, and providing options for ticket distribution.
+
+Each ticket may permit entry to multiple admissions or sections, with the ticket details indicating which 
+specific areas or events the holder is entitled to access. When a ticket is validated upon arrival, 
+the API must specify which admission they are entering. 
+However, if no admission is explicitly stated in the API request, the system will automatically apply 
+the default admission assigned to the ticket. 

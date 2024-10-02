@@ -1,0 +1,41 @@
+---
+title: "Introduction"
+---
+
+<Markdown src="../snippets/endpoint-verb-styles.mdx" />
+
+<Aside>
+| Endpoints||
+| :-| :---------------|
+| <GetVerb/>| [/ticketing/catalog/:storeCode](/ticketing/api-reference/catalog/get-catalog) |
+</Aside>
+
+The catalog endpoints serve as the foundation for a headless setup, offering a centralized way to access essential information 
+about the available tickets. 
+These endpoints allow applications, such as mobile apps or web front-ends, to retrieve ticket details in a structured, 
+API-first manner without relying on a traditional website interface. 
+By providing data directly, the headless setup enables greater flexibility in how the ticket information 
+is presented and consumed by various user interfaces.
+
+Key Concepts:
+
+    * Store Code Parameter:
+        The store code acts as a filter, allowing the system to tailor the available ticket information to a specific 
+        sales channel or store front. Each store or sales channel may have its own unique set of tickets
+        and the store code ensures that only the relevant subset of tickets is returned. 
+        This is particularly useful in cases where different platforms, regions, or partners require distinct offerings.
+
+    * Localized Storefront:
+        The store front is typically designed to target a specific language or region. 
+        As a result, the catalog endpoint ensures that ticket information is delivered in the appropriate language for 
+        the store's target audience. By supporting multiple languages, the system can accommodate global users 
+        while ensuring that the presentation and messaging are localized.
+
+    * Formatted Content Fields:
+        The catalog also supports two fields that can include HTML styling and formatting. 
+        These fields provide flexibility for content presentation, allowing rich text formatting such as bold text, 
+        lists, links, or other HTML elements. 
+        This ensures that the ticket descriptions or other important information can be presented in an 
+        engaging and readable way, enhancing the user experience across different devices or platforms. 
+        It also allows ticket sellers to include more detailed or visually appealing descriptions 
+        without requiring separate design templates for each store.

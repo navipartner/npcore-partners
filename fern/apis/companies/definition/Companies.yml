@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./global-api-types.yml
+
+types:
+  CompanyResponse:
+    properties:
+      id: uuid
+      systemVersion: string
+      name: string
+      displayName: string
+
+  Companies:
+    properties:
+      value: list<CompanyResponse>
+
+service:
+  auth: true
+  base-path: /companies
+  endpoints: 
+    getCompanies:
+      display-name: Get all companies
+      docs: Get list of all companies in the selected environment. More information how to work with companies can be found [here](/systemservices/companies).
+      path: ""
+      method: GET
+      response: Companies
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          response:
+            body:
+              value:
+                - id: "17ff1351-d07d-4b85-8957-b4b585f47aad"
+                  systemVersion: "24.0.16410.18056"
+                  name: "CRONUS International Ltd."
+                  displayName: ""
+                - id: "872336d7-5183-4c0b-9b47-755f3d6d77e7"
+                  systemVersion: "24.0.16410.18056"
+                  name: "TestCompany"
+                  displayName: "TestCompany"

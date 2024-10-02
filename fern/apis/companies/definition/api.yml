@@ -1,0 +1,32 @@
+name: companies
+
+environments:
+  Production: https://api.npretail.app
+default-environment: Production
+
+imports:
+  errors: ./errors.yml
+  globalApiTypes: ./global-api-types.yml
+
+base-path: /{saasguid}/{saasenv}
+path-parameters:
+  saasguid: globalApiTypes.SaasGuid
+  saasenv: globalApiTypes.SaasEnv
+
+headers:
+  x-api-version: optional<globalApiTypes.ApiVersionDate>
+
+error-discrimination:
+  strategy: status-code
+
+auth: Bearer                  # The name here must match the name of the auth-scheme defined below.
+auth-schemes:
+  Bearer:                     # The name here must match the name of the auth scheme defined above.
+    scheme: bearer
+    token:
+      name: apiKey
+      env: MY_API_KEY
+
+audiences:
+  - internal
+  - external

@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalTypes: ./global-types.yml
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml
+  errorTypes: ./types-errors.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Catalog
+  auth: false
+  base-path: /ticketing
+  headers:
+    x-api-version: optional<globalTypes.ApiVersionDate>
+
+  endpoints:
+    getCatalog:
+      docs: Get the list of ticket items and their descriptions
+      display-name: Get Catalog
+      method: GET
+      path: /catalog/{storeCode}
+      path-parameters:
+        storeCode: simpleTypes.StoreCode
+      request:
+        name: getCatalog
+      response: 
+        type: StoreCatalogResponse
+        status-code: 200
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+        - name: ExampleCatalog1
+          docs: Example response for the getCatalog endpoint
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          response:
+            body:
+              storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+              items:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  recommendedPrice: $RecommendedPrice.ExampleRecommendedPrice
+                  ticketType: $TicketType.ExampleTicketTypeWeb
+                  description: $compositeTypes.Descriptions.ExampleTicket31001
+                  contents: 
+                    - $AdmissionCatalog.ExampleAdmissionCastle
+
+types:
+  ## Complex Types
+  StoreCatalogResponse:
+    docs: 
+      Response containing the list of ticket items and their descriptions
+    properties:
+      storeCode: simpleTypes.StoreCode
+      items: list<Item>
+
+  Item:
+    docs: 
+      A ticket item or product available for sale
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      variants: optional<list<ItemVariant>>
+      recommendedPrice: RecommendedPrice
+      ticketType: TicketType
+      description: compositeTypes.Descriptions
+      contents: list<AdmissionCatalog>
+
+  ItemVariant:
+    docs: Additional details for an item number. If the item number is a variant, this will contain the variant code, description and the specific item number for that combination .
+    properties:
+      variantCode: string
+      eanItemNumber: string
+      description: string
+
+  RecommendedPrice:
+    docs: 
+      Recommended price for an item. 
+      Note that this price is a recommendation only and may be overridden when selecting a schedule.
+    properties:
+      unitPrice: simpleTypes.UnitPrice
+      unitPriceIncludesVat: simpleTypes.UnitPriceIncludesVat
+      vatPct: double
+      currencyCode: string
+    examples:
+      - name: ExampleRecommendedPrice
+        value:
+          unitPrice: 100.00
+          unitPriceIncludesVat: true
+          vatPct: 25.00
+          currencyCode: "SEK"
+
+  TicketType:
+    docs: 
+      Tickets are divided into types, such as 'WEB', 'POS', 'KIOSK', etc. 
+      Types are typically a functional grouping and determines sales behavior and printing layouts whereas category could be used to organize tickets for reporting purposes.
+    properties:
+      code: string
+      description: string
+      category: string
+    examples:
+      - name: ExampleTicketTypeWeb
+        value:
+          code: "WEB"
+          description: "Web sales"
+          category: "Online"
+
+  AdmissionCatalog:
+    docs: 
+      An admission component for a specific item number.
+    extends: compositeTypes.AdmissionBase
+    properties:
+      capacityControl: simpleTypes.CapacityControl
+      maxCapacity: optional<integer>
+      scheduleSelection: simpleTypes.ScheduleSelection
+    examples:
+      - name: ExampleAdmissionCastle
+        value:
+          code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          description: $compositeTypes.Descriptions.ExampleAdmissionCastle
+          default: true
+          included: "mandatory"
+          capacityControl: "sales"
+          scheduleSelection: "noScheduleSelection"
+          maxCapacity: 175
+

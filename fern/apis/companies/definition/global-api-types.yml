@@ -1,0 +1,36 @@
+types:
+  ApiVersionDate:
+    type: date
+    docs: 
+      The x-api-version header is to specify which version of the API a client wants to interact with. 
+      This allows the server to provide different responses or behaviors based on the version provided. 
+      Version is a date in the format "YYYY-MM-DD". When not specified, the latest version is assumed.
+    examples:
+      - name: ExampleApiVersionDate
+        value: "2024-10-11"
+
+  SaasGuid: 
+    type: string
+    docs: 
+      A unique identifier (GUID) for the Business Central tenant in the Software as a Service (SaaS) environment. [More details.](/url-paths#1-saasguid-saas-guid)
+    examples:
+      - name: ExampleSaasGuid
+        value: "01234567-89ab-cdef-0123-456789abcdef"
+
+  SaasEnv:
+    type: string
+    docs: 
+      Specifies which environment of the Business Central tenant you want to access. [More details.](/url-paths#2-saasenv-saas-environment)
+    examples: 
+      - name: ExampleSaasEnvSandBox
+        value: sandbox
+      - name: ExampleSaasEnvProduction
+        value: production
+
+  Company:
+    type: string
+    docs: 
+      The name of the specific company within the chosen Business Central environment. [More details.](/url-paths#3-company)
+    examples: 
+      - name: ExampleCompanyCronus
+        value: CRONUS%20International%20Ltd.

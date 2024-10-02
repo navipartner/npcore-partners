@@ -1,0 +1,84 @@
+---
+slug: url-paths
+description: Describes how to correctly build API URL.
+---
+
+## Overview
+
+Our API uses a set of global path parameters that must be included in every request. These parameters help route your request to the correct Business Central instance, environment, and company. Understanding and correctly using these parameters is crucial for successful API interactions.
+
+<Note>If you are a developer working against NaviPartner container environment called Crane, you should also see differences in [Working with Crane](/crane) section.</Note>
+
+## Required Parameters
+
+Every API request must include the following three path parameters in the order specified:
+
+1. `saasguid`
+2. `saasenv`
+3. `company`
+
+### 1. saasguid (SaaS GUID)
+
+- **Type**: String (UUID format)
+- **Description**: A unique identifier for the Business Central tenant in the Software as a Service (SaaS) environment.
+- **Purpose**: This GUID ensures that your request is directed to the correct Business Central tenant.
+- **Format**: A standard UUID (Universally Unique Identifier), consisting of 32 hexadecimal digits displayed in 5 groups separated by hyphens, in the form 8-4-4-4-12.
+- **Example**: `12345678-1234-1234-1234-123456789012`
+
+### 2. saasenv (SaaS Environment)
+
+- **Type**: String
+- **Description**: Specifies which environment of the Business Central tenant you want to access.
+- **Purpose**: Business Central can have multiple environments for different purposes (e.g., production, testing, development). This parameter ensures your request goes to the intended environment.
+- **Possible Values**:
+  - `production`: The live, operational environment
+  - `sandbox`: A non-production environment for testing or development
+  - Custom named environments (e.g., `test-1`, `dev-2`)
+- **Example**: `production` or `sandbox-1`
+
+### 3. company
+
+- **Type**: String
+- **Description**: The name of the specific company within the chosen Business Central environment.
+- **Purpose**: Business Central environments can contain multiple companies, each representing a separate data set. This parameter directs your request to the correct company data.
+- **Format**: The exact name of the company as it appears in Business Central. It may contain spaces and special characters, which should be properly URL-encoded in the request.
+- **Example**: `CRONUS%20International%20Ltd.` (URL-encoded version of "CRONUS International Ltd.")
+
+<Note>More information how to work with companies can be found [here](/systemservices/companies).</Note>
+
+## URL Structure
+
+The general structure of the API URL including these parameters is:
+
+```
+https://api.navipartner.com/{saasguid}/{saasenv}/{company}/[endpoint]
+```
+
+## Example
+
+Here's an example of how these parameters might look in a full API request URL:
+
+```
+https://api.navipartner.com/12345678-1234-1234-1234-123456789012/production/CRONUS%20International%20Ltd./configurations
+```
+
+In this example:
+- `saasguid` is `12345678-1234-1234-1234-123456789012`
+- `saasenv` is `production`
+- `company` is `CRONUS International Ltd.` (URL-encoded in the actual request)
+- The specific endpoint being accessed is `configurations`
+
+
+## Important Notes
+
+1. **Order Matters**: Always provide these parameters in the order specified: `saasguid`, then `saasenv`, then `company`.
+
+2. **URL Encoding**: Ensure that the `company` name (and any other parameters that might contain spaces or special characters) are properly URL-encoded in your requests.
+
+3. **Case Sensitivity**: The `saasguid` is typically case-insensitive, but `saasenv` and `company` may be case-sensitive depending on the specific Business Central setup. It's best to use the exact casing as provided by your Business Central administrator.
+
+4. **Obtaining Parameter Values**: If you're unsure about the correct values for these parameters, contact your Business Central administrator or the person who provided you with API access.
+
+5. **Security**: Treat the `saasguid` as sensitive information, as it's a key identifier for the Business Central tenant.
+
+By correctly using these global path parameters, you ensure that your API requests are routed to the exact Business Central instance, environment, and company data set you intend to interact with.

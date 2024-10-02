@@ -19,6 +19,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         ErrorDuringAppConsentErr: Label 'An error occurred while giving consent to the Azure AD app.\\Error message: %1', Comment = '%1 = error message';
         ConsentFailedErr: Label 'Failed to give consent.';
         WaitingForAppToBeReadyMsg: Label 'Waiting for the Azure AD App to be ready for approval...';
+        ParameterValueEmptyErr: Label '%1 cannot be blank.', Comment = '%1 = name of the parameter that was evaluated.';
+        FindExistingEntraAppsErr: Label 'An error occurred while searching for existing Entra apps with DisplayName = %1 in Entra directory. Error message was:\\%2', Comment = '%1 = name of the application, %2 = error message.';
+        ExistingAppRegisteredOnlyMsg: Label 'The Entra application %1 has already been found in the Entra directory, so it was only registered in Business Central.', Comment = '%1 = name of the application';
+        EntraAppRegenerateQst: Label 'Do you want to regenerate secret for the Microsoft Entra Application %1?', Comment = '%1 = Application Name; Do not translate Microsoft Entra Application.';
         [NonDebuggable]
         _AccessToken: Text;
         _AccessTokenExpiry: DateTime;
@@ -34,30 +38,51 @@ codeunit 6060060 "NPR AAD Application Mgt."
         Expires: DateTime;
         AzureADTenant: Codeunit "Azure AD Tenant";
         Window: Dialog;
+        ExistingAppsArray: JsonArray;
+        ExistingAppToken: JsonToken;
+        ClientGuid: Guid;
     begin
-        AppJson := CreateAzureADApplication(AppDisplayName, PermissionSets);
-
-        AppJson.SelectToken('appId', BufferToken);
-        ApplicationId := BufferToken.AsValue().AsText();
-
-        AppJson.SelectToken('id', BufferToken);
-        ApplicationObjectId := BufferToken.AsValue().AsText();
-
-        if (Confirm(GrantConsentQst, true)) then begin
-            // Azure is really slow to actually recognize the new app,
-            // so we sleep here to ensure that it's ready for approval.
-            Window.Open(WaitingForAppToBeReadyMsg);
-            Sleep(20000);
-            Window.Close();
-
-            if (not TryGrantConsentToApp(ApplicationId, AzureADTenant.GetAadTenantId(), ErrorTxt)) then
-                Message(ErrorDuringAppConsentErr, ErrorTxt);
+        if (not TryFindExistingAppsWithSameDisplayNameInEntra(AppDisplayName, ExistingAppsArray)) then begin
+            Error(FindExistingEntraAppsErr, AppDisplayName, GetLastErrorText())
         end;
 
-        if (TryCreateAzureADSecret(ApplicationObjectId, SecretDisplayName, Secret, Expires)) then
-            Message(CreatedAzureADAppSuccessMsg, ApplicationId, Secret, AzureADTenant.GetAadTenantId(), Expires)
-        else
-            Message(CreateAADAppCreationOfSecretFailedMsg, ApplicationId, AzureADTenant.GetAadTenantId());
+        if (ExistingAppsArray.Count = 0) then begin
+            // Create new application, try to grant consent and register in BC:
+            AppJson := CreateAzureADApplication(AppDisplayName, PermissionSets);
+
+            AppJson.SelectToken('appId', BufferToken);
+            ApplicationId := BufferToken.AsValue().AsText();
+
+            AppJson.SelectToken('id', BufferToken);
+            ApplicationObjectId := BufferToken.AsValue().AsText();
+
+            if (Confirm(GrantConsentQst, true)) then begin
+                // Azure is really slow to actually recognize the new app,
+                // so we sleep here to ensure that it's ready for approval.
+                Window.Open(WaitingForAppToBeReadyMsg);
+                Sleep(20000);
+                Window.Close();
+
+                if (not TryGrantConsentToApp(ApplicationId, AzureADTenant.GetAadTenantId(), ErrorTxt)) then
+                    Message(ErrorDuringAppConsentErr, ErrorTxt);
+            end;
+
+            if (TryCreateAzureADSecret(ApplicationObjectId, SecretDisplayName, Secret, Expires)) then
+                Message(CreatedAzureADAppSuccessMsg, ApplicationId, Secret, AzureADTenant.GetAadTenantId(), Expires)
+            else
+                Message(CreateAADAppCreationOfSecretFailedMsg, ApplicationId, AzureADTenant.GetAadTenantId());
+        end else begin
+            // Use an existing application (the first one - ideally we should try to find an app with consent already granted or let the user select one) and register in BC:
+            ExistingAppsArray.Get(0, ExistingAppToken);
+
+            AppJson := ExistingAppToken.AsObject();
+            ExistingAppToken.SelectToken('appId', BufferToken);
+            ClientGuid := BufferToken.AsValue().AsText();
+
+            RegisterAzureADApplication(ClientGuid, AppDisplayName, PermissionSets);
+
+            Message(ExistingAppRegisteredOnlyMsg, AppDisplayName);
+        end;
     end;
 
     internal procedure CreateAzureADSecret(ApplicationId: Guid; DisplayName: Text)
@@ -76,6 +101,18 @@ codeunit 6060060 "NPR AAD Application Mgt."
             Error(CouldNotCreateSecretErr, GetLastErrorText());
 
         Message(CreatedSecretMsg, LowerCase(DelChr(ApplicationId, '=', '{}')), Secret, AzureADTenant.GetAadTenantId(), Expires);
+    end;
+
+    internal procedure RegenerateEntraAppSecret(var EntraApp: Record "AAD Application"; WithConfirmDialog: Boolean)
+    begin
+        EntraApp.TestField("Client Id");
+        EntraApp.TestField(Description);
+
+        if not Confirm(EntraAppRegenerateQst, false, EntraApp.Description) then begin
+            Error('');
+        end;
+
+        CreateAzureADSecret(EntraApp."Client Id", StrSubstNo('%1 - %2', EntraApp.Description, Format(CurrentDateTime, 0, '<Year4>-<Month,2>-<Day,2> <Hours24,2>:<Minutes,2>')));
     end;
 
     local procedure CreateAzureADApplication(DisplayName: Text[50]; PermissionSets: List of [Code[20]]) AppJson: JsonObject
@@ -180,6 +217,40 @@ codeunit 6060060 "NPR AAD Application Mgt."
         AppJson.ReadFrom(ResponseTxt);
     end;
 
+    [NonDebuggable]
+    [TryFunction]
+    local procedure TryFindExistingAppsWithSameDisplayNameInEntra(DisplayName: Text; var ExistingApps: JsonArray)
+    var
+        Client: HttpClient;
+        ResponseMsg: HttpResponseMessage;
+        ResponseTxt: Text;
+        RedirectUrl: Text;
+        ResponseToken: JsonToken;
+        ValueToken: JsonToken;
+    begin
+        if (DisplayName = '') then begin
+            Error(ParameterValueEmptyErr, 'DisplayName');
+        end;
+
+        Clear(ExistingApps);
+
+        RedirectUrl := GetRedirectUrl();
+
+        Client.DefaultRequestHeaders.Add('Authorization', 'Bearer ' + GetGraphAccessToken());
+        Client.DefaultRequestHeaders.Add('ConsistencyLevel', 'eventual');
+        Client.Get(StrSubstNo('https://graph.microsoft.com/v1.0/applications?$filter=displayName eq ''%1''', DisplayName), ResponseMsg);
+
+        ResponseMsg.Content.ReadAs(ResponseTxt);
+
+        if (not ResponseMsg.IsSuccessStatusCode()) then
+            Error(BadApiResponseErr, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseTxt);
+
+        ResponseToken.ReadFrom(ResponseTxt);
+
+        ResponseToken.SelectToken('value', ValueToken);
+        ExistingApps := ValueToken.AsArray();
+    end;
+
     internal procedure TryGrantConsentToApp(ClientId: Guid; TenantId: Text; var PermissionGrantErrorTxt: Text): Boolean
     var
         AADApplication: Record "AAD Application";
@@ -219,8 +290,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         JToken: JsonToken;
         ExpiresToken: JsonToken;
         SecretToken: JsonToken;
+        ExpirationDateTimeString: Text;
     begin
-        Request := StrSubstNo('{"passwordCredential":{"displayName":"%1"}}', DisplayName);
+        ExpirationDateTimeString := GetFormattedDateInNumberOfYears(100);
+        Request := StrSubstNo('{"passwordCredential":{"displayName":"%1", "endDateTime": "%2"}}', DisplayName, ExpirationDateTimeString);
         Content.WriteFrom(Request);
 
         Content.GetHeaders(ContentHeaders);
@@ -401,5 +474,15 @@ codeunit 6060060 "NPR AAD Application Mgt."
     local procedure TryGetJValue(Token: JsonToken; var BigInt: BigInteger)
     begin
         BigInt := Token.AsValue().AsBigInteger();
+    end;
+
+    local procedure GetFormattedDateInNumberOfYears(NumberOfYears: Integer) Result: Text
+    var
+        FutureDate: Date;
+        FutureDateTime: DateTime;
+    begin
+        FutureDate := CalcDate(StrSubstNo('<+%1Y>', NumberOfYears), Today);
+        FutureDateTime := CreateDateTime(FutureDate, 0T);
+        Result := Format(FutureDateTime, 0, '<Standard Format,9>');
     end;
 }

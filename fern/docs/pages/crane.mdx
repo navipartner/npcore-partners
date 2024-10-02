@@ -1,0 +1,52 @@
+---
+title: Working with Crane
+slug: crane
+description: How to override common configurations to work with the NaviPartner Crane environment.
+---
+
+## Crane containers and necessary API configuration changes
+
+When working with NaviPartner's Crane container environment, specific adjustments are required to the standard REST API configuration. These changes primarily involve modifying the URL structure and adding an additional HTTP header to properly route requests to the Crane environment instead of the default Business Central online.
+
+### Updated URL Structure
+
+In the standard REST API configuration, the URL is structured as follows:
+```
+https://api.navipartner.com/{saasguid}/{saasenv}/{company}/[endpoint]
+```
+
+When routing requests to the Crane container environment, the URL must be adjusted to the following format:
+```
+https://api.navipartner.com/{container-name}/{nst-instance}/{company}/[endpoint]
+```
+
+- `{container-name}`: Replace `{saasguid}` with the name of the specific Crane container you are targeting.
+- `{nst-instance}`: Replace `{saasenv}` with the NST (Navision Service Tier) instance name within the Crane environment. Currently we use only `BC` value.
+- `{company}`: This remains the same as in the original configuration, representing the target company within Business Central.
+
+### Additional Header Requirement
+
+To ensure that API requests are correctly routed to the Crane environment, an additional HTTP header is required. This header indicates that the request should be handled by the Crane container rather than the standard Business Central online instance.
+
+Add the following header to your API requests:
+
+```json
+"bcapi-remote-type": "crane"
+```
+
+### Example API Request
+Below is an example of how an API request would look after applying the necessary changes:
+
+#### Original Request
+```
+GET https://api.navipartner.com/c35fabce-d6b1-4e2f-b539-dabc68f0e7bb/production/MyCompany/v1.0/customers
+```
+
+#### Modified Request for Crane
+```
+GET https://api.navipartner.com/XY123456/BC/MyCompany/v1.0/customers
+```
+
+### Summary
+To integrate your application with the Crane container environment, ensure you adjust the URL structure as described and include the `"bcapi-remote-type": "crane"` header in your API requests. 
+These changes will direct your requests to the appropriate environment, allowing you to interact with Business Central within the Crane infrastructure.
