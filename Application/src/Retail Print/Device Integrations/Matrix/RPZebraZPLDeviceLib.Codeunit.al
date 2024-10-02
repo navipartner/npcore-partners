@@ -87,6 +87,8 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
                 GraphicBox(POSPrintBuffer.Width, POSPrintBuffer.Height, 1, 'B', 0, POSPrintBuffer.X, POSPrintBuffer.Y);
             (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 3)) = 'BOX'):
                 ParseGraphicBox(POSPrintBuffer.Font, POSPrintBuffer.Width, POSPrintBuffer.Height, POSPrintBuffer.X, POSPrintBuffer.Y);
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 7)) = 'GRAPHIC'):
+                ParseGraphicField(POSPrintBuffer.Font, POSPrintBuffer.Height, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
             (CopyStr(POSPrintBuffer.Font, 1, 4) = 'Font'):
                 begin
                     StringLib.Construct(POSPrintBuffer.Font);
@@ -427,6 +429,15 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         FieldSeparator();
     end;
 
+    procedure GraphicField(X: Integer; Y: Integer; CompressionType: Text[1]; BinaryByteCount: Integer; GraphicFieldCount: Integer; BytesPerRow: Integer; Data: Text)
+    begin
+        FieldOrigin(X, Y);
+
+        AddStringToBuffer(StrSubstNo('^GF%1,%2,%3,%4,%5', CompressionType, BinaryByteCount, GraphicFieldCount, BytesPerRow, Data));
+
+        FieldSeparator();
+    end;
+
     procedure LabelLength(Length: Integer)
     begin
         AddStringToBuffer(StrSubstNo('^LL%1', Length));
@@ -476,6 +487,40 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         Evaluate(Rounding, StringLib.SelectStringSep(3, ','));
 
         GraphicBox(Width, Height, Thickness, Color, Rounding, X, Y);
+    end;
+
+    local procedure ParseGraphicField(FontType: Text; Height: Integer; X: Integer; Y: Integer; Data: Text)
+    var
+        CompressionType: Text[1];
+        FontAndParams: List of [Text];
+        HexSize: Integer;
+        ErrImplementationLbl: Label 'Compression Type %1 has not been implemented.', Comment = '%1 = Compression Type.';
+        ErrNoDataLbl: Label 'No graphical data provided.';
+        ErrNoHeightLbl: Label 'Height must be a positive number.';
+        ErrParamsLbl: Label 'Unable to resolve parameters for font GRAPHIC.';
+    begin
+        if (Data = '') then
+            Error(ErrNoDataLbl);
+
+        if (Height <= 0) then
+            Error(ErrNoHeightLbl);
+
+        FontAndParams := FontType.Split(' ');
+        if FontAndParams.Count() <> 2 then
+            Error(ErrParamsLbl);
+
+        CompressionType := FontAndParams.Get(2); // Error if length of param > 1
+
+        case CompressionType of
+            'A':
+                begin
+                    HexSize := (StrLen(Data) div 2); // two characters per dot
+                    GraphicField(X, Y, CompressionType, HexSize, HexSize, (HexSize div Height), Data);
+                end;
+            else
+                Error(ErrImplementationLbl, CompressionType);
+        end;
+
     end;
 
     procedure MediaDarkness(Darkness: Integer)
