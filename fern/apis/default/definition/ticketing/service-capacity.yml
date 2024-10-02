@@ -1,0 +1,146 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+docs: I am testing new feature...
+
+imports:
+  globalHeaders: ./global-types.yml
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml
+  errorTypes: ./types-errors.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Capacity
+  auth: false
+  base-path: /ticketing
+  headers:
+    x-api-version: optional<globalHeaders.ApiVersionDate>
+  endpoints:
+
+    getCapacity:
+      docs: Retrieve the capacity and availability for a ticket item number. 
+      path: /capacity/search
+      method: GET
+      request: 
+        name: getCapacity
+        query-parameters:
+          itemNumber: simpleTypes.ItemNumber
+          referenceDate: optional<simpleTypes.ReferenceDate>
+          quantity: optional<simpleTypes.NumberOfTickets>
+          admissionCode: optional<simpleTypes.AdmissionCode>
+          customerNumber: optional<simpleTypes.CustomerNumber>
+      response: list<AdmissionCapacity>
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+        ### Success
+        - name: ExampleCapacity1
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+            referenceDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+            quantity: 2
+          response:
+              body:
+              - code: "CASTLE"
+                #description: $compositeTypes.Descriptions.ExampleAdmissionCastle
+                default: true
+                included: "mandatory"
+                referenceDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+                quantity: 2
+                unitPrice: 100.00
+                discountPct: 0.00
+                unitPriceIncludesVat: true
+                vatPct: 25.00
+                schedules:
+                  - allocatable: true
+                    allocationModel: "capacity"
+                    remainingCapacity: 10
+                    explanation: "Schedule is allocatable"
+                    schedule: $compositeTypes.ScheduleDetails.ExampleMorning
+                    price: $SchedulePrice.ExampleFixedPrice
+                    sales: $ScheduleSales.ExampleSalesPeriod
+                  - allocatable: true
+                    allocationModel: "capacity"
+                    remainingCapacity: 12
+                    explanation: "Schedule is allocatable"
+                    schedule: $compositeTypes.ScheduleDetails.ExampleEvening
+                    price: $SchedulePrice.ExampleFixedPrice
+                    sales: $ScheduleSales.ExampleSalesPeriod
+types:
+  ## Complex types
+  ## Top Level Request types
+  GetCapacityRequest:
+    properties:
+      schedules: list<AdmissionSearch>
+
+  ## Response types
+  ## Top Level Response types
+  AdmissionCapacity: 
+    docs: 
+      An admission component for a specific item number. 
+    extends: compositeTypes.AdmissionBase
+    properties:
+      customerNumber: optional<simpleTypes.CustomerNumber>
+      referenceDate: simpleTypes.ReferenceDate
+      quantity: simpleTypes.NumberOfTickets
+      unitPrice: simpleTypes.UnitPrice
+      discountPct: simpleTypes.DiscountPct
+      unitPriceIncludesVat: simpleTypes.UnitPriceIncludesVat
+      vatPct: simpleTypes.VatPct
+      schedules: list<Schedule>
+
+  ## nested types
+  AdmissionSearch:
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      referenceDate: optional<simpleTypes.ReferenceDate>
+      quantity: optional<simpleTypes.NumberOfTickets>
+      admissionCode: optional<simpleTypes.AdmissionCode>
+      customerNumber: optional<simpleTypes.CustomerNumber>
+
+  Schedule:
+    properties:
+      allocatable: simpleTypes.Allocatable
+      allocationModel: simpleTypes.AllocationModel
+      remainingCapacity: simpleTypes.RemainingCapacity
+      explanation:  simpleTypes.AllocationExplanation
+      schedule: compositeTypes.ScheduleDetails
+      price: SchedulePrice
+      sales: ScheduleSales
+
+  SchedulePrice:
+    docs: Note that adjustment amounts are currency agnostic.
+    properties:
+      pricingOption: simpleTypes.PricingOption
+      adjustmentAmount: simpleTypes.AdjustedAmount
+      adjustmentPct: simpleTypes.AdjustedDiscountPct
+      adjustedUnitPrice: simpleTypes.AdjustedUnitPrice
+      adjustedTotalPrice: simpleTypes.AdjustedTotalPrice
+    examples:
+      - name: ExampleFixedPrice
+        value:
+          pricingOption: "fixed"
+          adjustmentAmount: 0.00
+          adjustmentPct: 0.00
+          adjustedUnitPrice: 100.00
+          adjustedTotalPrice: 200.00
+
+  ScheduleSales:
+    docs: The sales period for the schedule.
+    properties:
+      salesFromDate: date
+      salesFromTime: string
+      salesUntilDate: date
+      salesUntilTime: string
+    examples:
+      - name: ExampleSalesPeriod
+        value:
+          salesFromDate: $simpleTypes.ReferenceDate.ExampleSalesFromDate
+          salesFromTime: "00:00"
+          salesUntilDate: $simpleTypes.ReferenceDate.ExampleSalesUntilDate
+          salesUntilTime: "23:59"
+

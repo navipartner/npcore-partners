@@ -15,6 +15,7 @@ codeunit 6014471 "NPR Webservice Install"
         InitMMMemberWebService();
         InitRepWSFunctions();
         InitTMTicketWebService();
+        InitModernApiWSCodeunits();
     end;
 
     local procedure InitMPOSWebService()
@@ -85,5 +86,16 @@ codeunit 6014471 "NPR Webservice Install"
         TMTicketWebServiceMgr: Codeunit "NPR TM Ticket WebService Mgr";
     begin
         TMTicketWebServiceMgr.InitTMTicketWebService();
+    end;
+
+    local procedure InitModernApiWSCodeunits()
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    var
+        restApi: Codeunit "NPR REST API Request Processor";
+#endif
+    begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        restApi.RegisterService();
+#endif
     end;
 }

@@ -1,0 +1,36 @@
+types:
+  ## Error Definitions
+  ErrorMessageResponse:
+    properties:
+      code: ErrorCode
+      message: ErrorDescription
+  
+  ErrorCode:
+    type: string
+    docs: A unique identifier for an error
+  
+  ErrorDescription:
+    type: string
+    docs: A description of the error
+
+errors:
+  NotFoundError:
+    status-code: 404
+    type: ErrorMessageResponse
+    docs: The requested resource was not found
+    examples:
+      - name: Not Found
+        value: 
+          code: not_found_error_code
+          message: A human readable message describing the error
+
+  BadRequestError:
+    status-code: 400
+    type: ErrorMessageResponse
+    docs: The request is invalid
+    examples:
+      - name: Bad Request
+        value: 
+          code: the_payload_is_not_valid
+          message: A human readable message describing the error
+

@@ -1,0 +1,289 @@
+types:
+
+  ## Simple types
+  Token:
+    type: string
+    docs: A unique token that identifies a ticket reservation
+    examples:
+      - name: ExampleToken
+        value: ABC123456DEF789GHI
+
+  ItemNumber:
+    type: string
+    docs: An item or product number defined in the ticketing system
+    examples:
+      - name: ExampleItemNumber
+        value: "31001"
+
+  AdmissionCode:
+    type: string
+    docs: A unique code that identifies a specific admission.
+    examples:
+      - name: ExampleAdmissionCastle
+        value: CASTLE
+
+  ScheduleId:
+    type: integer
+    docs: The ID of a specific time slot for a specific admission
+    examples:
+      - name: ExampleMorningId
+        value: 452
+      - name: ExampleEveningId
+        value: 489
+
+  NumberOfTickets:
+    type: integer
+    docs: The number of tickets to reserved
+
+  ExpiresAt:
+    type: datetime
+    docs: The date and time when the token expires and reservation is no longer valid
+    examples:
+      - name: ExampleExpiresAt
+        value: "2024-10-11T12:13:00Z"
+
+  TicketHolder:
+    type: string
+    docs: The name of the person holding the ticket(s)
+
+  NotificationAddress:
+    type: string
+    docs: The email address or mobile phone number to send tickets and notifications to
+    examples:
+      - name: ExampleEmail
+        value: "john@acme.com"
+
+  PaymentReference:
+    type: string
+    docs: 
+      A reference to the payment transaction. Unless provided, the reservation is not considered paid. 
+      A confirmed unpaid reservation must be paid on site before the tickets are valid for usage.
+
+  ReservationStatusEnum:
+    enum:
+      - registered
+      - confirmed
+      - cancelled
+      - expired
+
+  ReservationStatus:
+    type: ReservationStatusEnum
+    docs: The status of the reservation
+
+  TicketId:
+    type: string
+    docs: The unique identifier of a ticket
+    examples:
+      - name: ExampleTicket1
+        value: TICKET123
+      - name: ExampleTicket2
+        value: TICKET124
+      - name: ExampleTicket3
+        value: TICKET124
+      - name: ExampleTicketInvalid
+        value: FOO123
+
+  PinCode:
+    type: string
+    docs: A pin code for the ticket, used for validation when rescheduling or revoking a confirmed ticket
+
+  UnitPrice:
+    type: double
+    docs: The unit price of the ticket.
+
+  UnitPriceIncludesVat:
+    type: boolean
+    docs: Indicates if the unit price includes VAT.
+
+  DiscountPct:
+    type: double
+    docs: The discount percentage for the admission based either on the customer or the quantity of tickets.
+
+  VatPct:
+    type: double
+    docs: The VAT percentage for the admission.
+
+  StoreCode:
+    type: string
+    docs: 
+      A unique identifier for a store - a logical grouping defining a subset of ticket items. 
+      This is used to filter the list of ticket items returned by the API.
+    examples:
+      - name: ExampleStoreCode
+        value: "EN"
+  
+  CustomerNumber:
+    type: string
+    docs: The customer number of the user making the request. The customer number affects pricing.
+
+  ReferenceDate:
+    type: date
+    docs: A date to use as a reference for the capacity search. If not specified, the current date will be used. 
+    examples:
+      - name: ExampleSalesFromDate
+        value: "2024-10-11"
+      - name: ExampleSalesUntilDate
+        value: "2024-10-17"
+      - name: ExampleCheckCapacityDate
+        value: "2024-10-15"
+
+  ReferenceDateTime:
+    type: datetime
+    docs: A date and time to use as a reference for the capacity search. If not specified, the current date and time will be used. 
+    examples:
+      - name: ExampleValidFrom
+        value: 2024-10-15T00:00:00Z
+      - name: ExampleValidUntil
+        value: 2024-10-15T23:59:59Z
+
+  DefaultAdmission:
+    type: boolean
+    docs: Indicates if this admission is the default admission when there are multiple admission defined.
+
+  AdmissionIsIncludedEnum:
+    enum:
+      - mandatory
+      - optional
+      - optionalSelected
+
+  AdmissionIsIncluded:
+    type: AdmissionIsIncludedEnum
+    docs: 
+      Indicates if the admission is mandatory or optional. Mandatory implies that the admission can not be deselected. 
+      Optional implies that you must opt-in to include the admission, while optionalSelected implies that the admission is optional but selected by default.
+
+  CapacityControlEnum:
+    enum:
+      - none
+      - sales
+      - admitted
+      - full
+      #- seats
+
+  CapacityControl:
+    type: CapacityControlEnum
+    docs: 
+      Indicates the type of capacity control for the admission. 
+      None implies that there is no capacity control. 
+      Sales implies that the capacity is controlled by the number of tickets sold. 
+      Admitted implies that the capacity is controlled by the number of tickets admitted. 
+      Full implies that the capacity is admitted and departed. 
+      #Seats implies that the capacity is controlled by the number of seats available.
+
+  ScheduleSelectionEnum:
+    enum:
+      - noScheduleSelection
+      - currentSchedule
+      - nextAvailableSchedule
+      
+  ScheduleSelection:
+    type: ScheduleSelectionEnum
+    docs: 
+      All reservations require a schedule id. 
+      However, this field indicates the type of automation you get when performing a reservation without providing schedule id for the admission.
+      * NoScheduleSelection implies that there is no _automatic_ schedule selection when no schedule id provided (reservation will fail). 
+      * CurrentSchedule implies that the current schedule (aka "today") is selected. 
+      * NextAvailableSchedule implies that the next available schedule is selected.
+      The current and Next-available select rules work well in a POS sales scenario.
+
+  PricingOptionEnum:
+    enum:
+      - fixed
+      - dynamic_fixed_amount
+      - dynamic_relative_amount
+      - dynamic_percentage
+
+  PricingOption:
+    type: PricingOptionEnum
+    docs: 
+      The pricing option for the schedule. 
+      Fixed implies that the price is fixed - calculated by the ERP module only.
+      Dynamic_fixed_amount implies that the price is fixed but set by the schedule rather than the ERP module.
+      Dynamic_relative_amount implies that the base price is from the ERP module and offset by a relative amount defined by the schedule. 
+      Dynamic_percentage implies that the base price is from the ERP module and offset by a percentage defined by the schedule. 
+
+  AdjustedAmount:
+    type: double
+    docs: The amount used to adjust admission unit price.
+
+  AdjustedDiscountPct:
+    type: double
+    docs: The percentage used to adjust admission unit price.
+
+  AdjustedUnitPrice:
+    type: double
+    docs: The calculated adjusted unit price for the admission.
+
+  AdjustedTotalPrice:
+    type: double
+    docs: The calculated adjusted total price for the admission. (Adjusted unit price * quantity).
+
+  ArrivalFromTime:
+    type: string
+    docs: The earliest time a customer can arrive for the time slot.
+  
+  ArrivalUntilTime:
+    type: string
+    docs: The latest time a customer can arrive for the time slot.
+
+  Allocatable:
+    type: boolean
+    docs: Indicates if the schedule is allocatable. This boolean is used to determine if the schedule can be booked and considers arrival times and capacity. 
+
+  AllocationModelEnum:
+    enum:
+      - capacity
+      - waiting_list
+
+  AllocationModel:
+    type: AllocationModelEnum
+    docs: Whether the schedule is allocated based on capacity or waiting list. When the allocation model is waiting list, the reservation requires a waiting list ID.
+
+  RemainingCapacity:
+    type: integer
+    docs: The remaining capacity for the schedule. Note that this number can be positive even when the schedule is not allocatable.
+
+  AllocationExplanation:
+    type: string
+    docs: An explanation why the schedule is allocatable or not allocatable.
+    audiences:
+      - internal
+
+  MemberNumber:
+    type: string
+    docs: The unique identifier of a member
+    examples:
+      - name: ExampleMemberNumber
+        value: MEMBER123
+
+  ScannerStation:
+    type: string
+    docs: The name of the scanner station
+    examples:
+      - name: ExampleScannerStationEntrance
+        value: Entrance
+      - name: ExampleScannerStationExit
+        value: Exit
+
+  CouponCode:
+    type: string
+    docs: The alias of the coupon type. This is used to identify the coupon type in the system. 
+  
+  CouponId:
+    type: string
+    docs: The unique identifier of a coupon
+    examples:
+      - name: ExampleCouponId
+        value: COUPON123
+
+  Admitted:
+      type: boolean
+      docs: Indicates whether the ticket has been registered as admitted to the admission
+
+  Departed:
+      type: boolean
+      docs: Indicates whether the ticket has been registered as departed from the admission
+
+  TicketSent:
+      type: boolean
+      docs: Indicates whether the ticket has been sent as an e-ticket

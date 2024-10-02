@@ -1,0 +1,31 @@
+---
+title: "Introduction"
+---
+
+<Markdown src="../snippets/endpoint-verb-styles.mdx" />
+
+<Aside>
+| Endpoints||
+| :-| :---------------|
+|<PostVerb/>|[/ticketing/reservation](/ticketing/api-reference/reservations/create-reservation) |
+|<PutVerb/>|[ticketing/reservation/:token](/ticketing/api-reference/reservations/update-reservation)|
+|<PostVerb/>|[ticketing/reservation/:token/cancel](ticketing/api-reference/reservations/cancel-reservation)|
+|<PostVerb/>|[ticketing/reservation/:token/pre-confirm](/ticketing/api-reference/reservations/pre-confirm-reservation)|
+|<PostVerb/>|[ticketing/reservation/:token/confirm](/ticketing/api-reference/reservations/confirm-reservation)|
+|<GetVerb/>|[ticketing/reservation/:token](/ticketing/api-reference/reservations/get-reservation)|
+|<GetVerb/>|[ticketing/reservation/:token/tickets](/ticketing/api-reference/reservations/get-tickets)|
+</Aside>
+
+The Reservation API is designed to manage the lifecycle of reservations for tickets. 
+
+## Key Concepts
+
+- Reservation Token: A unique identifier assigned to each reservation. This token is used in most operations to reference a specific reservation.
+- Reservation States: A reservation can be in different states, such as:
+  * "registered" (initially created)
+  * "confirmed" (finalized)
+  * "cancelled"
+  * "expired"
+- Expiration: Reservations have a limited lifespan to prevent indefinite holds on tickets. Cancelled and Expired reservation will be purged from the system.
+- Item Numbers: These represent specific products or ticket types in the system.
+- Admission Codes and Schedule IDs: These are used to specify particular admissions and time slots for reservations.

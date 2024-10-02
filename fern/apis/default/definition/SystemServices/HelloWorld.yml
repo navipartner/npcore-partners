@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  HelloWorld:
+    properties:
+      message: string
+
+service:
+  auth: true
+  base-path: /helloworld
+  endpoints: 
+    getHelloWorld:
+      display-name: Hello World
+      docs: Hello World provides a simple, data-agnostic method to test the API connection, ensuring that your integration is set up correctly and functioning as expected.
+      path: ""
+      method: GET
+      response: HelloWorld
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body:
+              message: "Hello World!"

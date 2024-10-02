@@ -1,0 +1,145 @@
+instances:
+  - url: https://navipartner.docs.buildwithfern.com
+    custom-domain: api.navipartner.com
+
+title: NaviPartner | NP Retail API Documentation
+
+announcement:
+    message: "🚀 The site is under construction currently ... We are going live during the next days! 🚀"
+
+layout:
+  searchbar-placement: sidebar  # header, header-tabs, sidebar
+  page-width: full
+  content-alignment: center   # center, left
+  header-position: fixed      # fixed, static
+  disable-header: false
+
+tabs: 
+  api: 
+    display-name: API Reference
+    icon: puzzle
+  help:
+    display-name: Help Center
+    icon: home
+  github:
+    display-name: GitHub
+    icon: brands github
+    href: https://github.com/navipartner/npcore
+
+navigation:
+  #- section: Home
+  #  contents:
+    # Public pages visible on the landing page:
+    - page: Introduction
+      icon: fa-solid house
+      path: docs/pages/intro.mdx
+    - page: URL and Path Parameters
+      icon: fa-solid fa-link
+      path: docs/pages/paths.mdx
+    - page: Authentication
+      icon: fa-solid fa-key
+      path: docs/pages/auth.mdx
+    - page: Errors
+      icon: fa-solid fa-bug
+      path: docs/pages/errors.mdx
+    - page: Error Codes
+      icon: fa-solid fa-rectangle-list
+      path: docs/pages/errors-codes.mdx
+    # Hidden pages (accessible only from specific areas):
+    - page: Crane
+      path: docs/pages/crane.mdx
+      hidden: true
+
+      # Companies API definition (specific as routed directly to a specific OData endpoint):
+    - api: API Companies
+      api-name: companies
+      #icon: fa-solid fa-code
+      #flattened: true
+      display-errors: false
+      layout:
+        - companies:
+            title: Companies
+            summary: ./docs/pages/companies/companies.mdx
+
+    # General BC services API definition:
+    - api: API Reference
+      api-name: default
+      #icon: fa-solid fa-code
+      #flattened: true
+      display-errors: false
+      playground:
+        environments:
+         - Production
+      layout:
+        - section: System Services
+          contents:
+          - systemservices.helloworld:
+              title: Hello World
+        - section: Ticketing
+          summary: ./docs/pages/ticketing/overview.mdx
+          contents:
+            - page: Getting started
+              path: ./docs/pages/ticketing/get-started.mdx
+            - ticketing.service-catalog:
+                title: Catalog
+                #icon: puzzle
+                summary: ./docs/pages/ticketing/catalog-summary.mdx
+                contents:
+                  - endpoint: ticketing.service-catalog.getCatalog
+            - ticketing.service-capacity:
+                title: Capacity
+                #icon: puzzle
+                summary: ./docs/pages/ticketing/capacity-summary.mdx
+                contents:
+                  - endpoint: ticketing.service-capacity.getCapacity
+            - ticketing.service-ticket:
+                title: Tickets
+                #icon: puzzle
+                summary: ./docs/pages/ticketing/tickets-summary.mdx
+                contents:
+                  - endpoint: ticketing.service-ticket.getTicket
+                  - endpoint: ticketing.service-ticket.revokeTicket
+                  - endpoint: ticketing.service-ticket.validateArrival
+                  - endpoint: ticketing.service-ticket.validateDeparture
+                  - endpoint: ticketing.service-ticket.validateMemberArrival
+                  - endpoint: ticketing.service-ticket.sendAsETicket
+                  - endpoint: ticketing.service-ticket.exchangeForCoupon
+            - ticketing.service-reservations:
+                title: Reservations
+                #icon: puzzle
+                summary: ./docs/pages/ticketing/reservation-summary.mdx              
+                contents:
+                  - endpoint: ticketing.service-reservations.createReservation
+                  - endpoint: ticketing.service-reservations.updateReservation
+                  - endpoint: ticketing.service-reservations.cancelReservation
+                  - endpoint: ticketing.service-reservations.preConfirmReservation
+                  - endpoint: ticketing.service-reservations.confirmReservation
+                  - endpoint: ticketing.service-reservations.getReservation
+                  - endpoint: ticketing.service-reservations.getTickets
+
+navbar-links:
+  - type: secondary
+    text: Support
+    url: https://www.navipartner.com/support/
+  - type: secondary
+    text: NP Retail Documentation
+    url: https://docs.navipartner.com/docs/retail/gettingstarted/intro/
+  - type: primary
+    text: Get a demo
+    url: https://www.navipartner.com/get-trial/
+
+colors:
+  accentPrimary: 
+    light: "#4A90E2"
+    dark: "#4A90E2"
+  background: 
+    light: "#FFFFFF"
+    dark: "#14171D"
+
+logo:
+  dark: ./docs/assets/NaviPartner_rgb.png
+  light: ./docs/assets/NaviPartner_rgb.png
+  height: 20
+  href: https://navipartner.com
+
+favicon: ./docs/assets/favicon.ico

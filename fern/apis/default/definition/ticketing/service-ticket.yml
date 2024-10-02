@@ -1,0 +1,305 @@
+  # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalHeaders: ./global-types.yml
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml  
+  errorTypes: ./types-errors.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Tickets
+  auth: false
+  base-path: /ticketing
+  headers:
+    x-api-version: optional<globalHeaders.ApiVersionDate>
+  endpoints:
+
+    getTicket:
+      docs: Retrieve a ticket by its ID
+      display-name: Get Ticket
+      method: GET
+      path: /ticket/{ticketNumber}
+      request: 
+        name: getTicket
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      response: compositeTypes.TicketDetails
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+          - path-parameters:
+              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              company: $globalApiTypes.Company.ExampleCompanyCronus
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            response:
+              body: $compositeTypes.TicketDetails.ExampleTicket1
+
+    revokeTicket:
+      docs: Revoke a ticket by its ID
+      method: POST
+      path: /ticket/{ticketNumber}/revoke
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request: 
+        name: revokeTicket
+      response: RevokedResponse
+      errors:
+        - errorTypes.NotFoundError
+      examples:
+         - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+           response:
+             body:
+               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+               revoked: true
+
+    validateArrival:
+      docs: Validate a ticket for arrival by its ID
+      method: POST
+      path: /ticket/{ticketNumber}/validateArrival
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request:
+        name: validateArrival
+        body: optional<ValidateTicketsRequest> 
+      response: optional<AdmittedResponse>
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          request:
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+            scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationEntrance
+          response:
+            body:
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              admitted: true
+
+    validateDeparture:
+      docs: Validate a ticket for departure by its ID
+      method: POST
+      path: /ticket/{ticketNumber}/validateDeparture
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request:
+        name: validateDeparture  
+        body: optional<ValidateTicketsRequest>
+      response: DepartedResponse
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          request:
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+            scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationExit
+          response:
+            body:
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              departed: true
+
+    validateMemberArrival:
+      docs: 
+        Validate a member number for a arrival to the admission. 
+        This endpoint is used when a member swipes their card at the entrance to validate their arrival at an admission.
+      method: POST
+      path: /ticket/{memberNumber}/validateMemberArrival
+      path-parameters:
+        memberNumber: simpleTypes.MemberNumber
+      request:
+        name: validateMemberArrival 
+        body: CreateMemberReservationRequest
+      response: list<compositeTypes.TicketDetails>
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          request:
+            reserve:
+              - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                quantity: 1
+                #content:
+                #  - admissionCode: $AdmissionCode.ExampleAdmissionCastle
+                #    scheduleId: $ScheduleId.ExampleMorningId
+          response:
+            body: 
+              - $compositeTypes.TicketDetails.ExampleTicketMember
+
+    sendAsETicket:
+      display-name: Send As E-Ticket
+      docs: 
+        Send a ticket as an e-ticket to the ticket holder. 
+        This endpoint is used to send an e-ticket to the ticket holder's email address or phone number.
+      method: POST
+      path: /ticket/{ticketNumber}/sendAsETicket
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request:
+        name: sendAsETicket 
+        body: SendTicketRequest
+      response: TicketSentResponse
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          request:
+            notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+          response:
+            body:
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketSent: true
+
+    exchangeForCoupon:
+      display-name: Exchange For Coupon
+      docs: 
+        Exchange a ticket for a coupon. 
+        This endpoint is used to exchange a ticket for a coupon that grants a discount that can be used for a future purchases.
+      method: POST
+      path: /ticket/{ticketNumber}/exchangeForCoupon
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request:
+        name: exchangeForCoupon 
+        body: GetTicketCouponRequest
+      response: TicketCouponResponse
+      errors:
+        - errorTypes.NotFoundError
+        - errorTypes.BadRequestError
+      examples:
+          - path-parameters:
+              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              company: $globalApiTypes.Company.ExampleCompanyCronus
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            request:
+              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              couponCode: "DISCOUNT10"
+            response:
+              body:
+                couponId: "COUPON123"
+
+      ## TODO for version 2
+      # GetTicketChangeRequest
+      # ConfirmTicketChangeRequest
+      # OfflineTicketValidationRequest
+      # GetTicketPrintUrl 
+
+types:
+  ## Top-Level Type Definitions
+  GetTicketsRequest:
+    docs: Request to get ticket details
+    properties:
+      ticketNumber: simpleTypes.TicketId
+
+  ValidateTicketsRequest:
+    docs: Request to validate a ticket
+    properties:
+      admissionCode: optional<simpleTypes.AdmissionCode>
+      scannerStation: optional<string>
+    examples:
+      - name: ExampleValidateArrival
+        value:
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationEntrance
+      - name: ExampleValidateDeparture
+        value:
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationExit
+
+  SendTicketRequest:
+    docs: Request to send a ticket as an e-ticket
+    properties:
+      notificationAddress: simpleTypes.NotificationAddress
+      
+  CreateMemberReservationRequest:
+    docs: Request to validate a member arrival
+    properties:
+      reserve: list<CreateMemberReservationItemRequest>
+
+  GetTicketCouponRequest:
+    docs: Request to exchange a ticket for a coupon
+    properties:
+      ticketNumber: simpleTypes.TicketId
+      couponCode: optional<simpleTypes.CouponCode>
+
+  ## Complex Type Definitions
+  TicketCouponResponse:
+    properties:
+      couponId: simpleTypes.CouponId
+
+  CreateMemberReservationItemRequest:
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      quantity: simpleTypes.NumberOfTickets
+      content: optional<list<compositeTypes.TicketContentRequest>>
+
+  ActionResponseSuccess:
+      type: boolean
+      docs: Indicates whether the action was successful
+
+  ActionResponseCode:
+      type: string
+      docs: A code that identifies the reason of the action result
+
+  ActionResponseMessage:
+      type: string
+      docs: A message that describes the result of the action 
+
+  RevokedResponse:
+    properties:
+      ticketNumber: simpleTypes.TicketId
+      revoked: ActionResponseSuccess
+      code: optional<ActionResponseCode>
+      message: optional<ActionResponseMessage>
+
+  AdmittedResponse:
+    properties:
+      ticketNumber: simpleTypes.TicketId
+      admitted: simpleTypes.Admitted
+      code: optional<ActionResponseCode>
+      message: optional<ActionResponseMessage>
+
+  DepartedResponse:
+    properties:
+      ticketNumber: simpleTypes.TicketId
+      departed: simpleTypes.Departed
+      code: optional<ActionResponseCode>
+      message: optional<ActionResponseMessage>
+
+  TicketSentResponse:
+    properties:
+      ticketNumber: simpleTypes.TicketId
+      ticketSent: simpleTypes.TicketSent
+      code: optional<ActionResponseCode>
+      message: optional<ActionResponseMessage>
+    examples:
+      - name: ExampleTicketSent
+        value:
+          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          ticketSent: true
+      - name: ExampleTicketNotSent  
+        value:
+          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          ticketSent: false
+          code: "ticket_not_sent"
+          message: "Ticket could not be sent as e-ticket."
+
+
