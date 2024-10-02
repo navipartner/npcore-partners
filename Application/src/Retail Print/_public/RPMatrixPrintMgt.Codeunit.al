@@ -40,6 +40,11 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
         UpdateField(X, Y, Align, 0, 0, 0, '', Format(Date, 0), false);
     end;
 
+    internal procedure AddGraphicField(X: Integer; Y: Integer; Height: Integer; Data: Text)
+    begin
+        UpdateField(x, y, 1, 0, 0, Height, '', CopyStr(Data, 1, 2048), false);
+    end;
+
     internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer; HideHRI: Boolean)
     begin
         UpdateField(1, 0, Align, BarcodeWidth, 0, 0, BarcodeType, BarcodeValue, HideHRI);

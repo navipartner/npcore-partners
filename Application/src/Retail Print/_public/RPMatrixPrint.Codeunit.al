@@ -20,6 +20,11 @@ codeunit 6060039 "NPR RP Matrix Print"
         RPMatrixPrintMgt.AddDateField(X, Y, Align, Date);
     end;
 
+    procedure AddGraphicField(X: Integer; Y: Integer; Height: Integer; Data: Text)
+    begin
+        RPMatrixPrintMgt.AddGraphicField(X, Y, Height, Data);
+    end;
+
     [Obsolete('Pending removal, use overload procedure instead', '2023-06-28')]
     procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text[30]; BarcodeWidth: Integer; Align: Integer)
     begin
