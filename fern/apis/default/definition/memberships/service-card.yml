@@ -1,0 +1,286 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Card
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+    addCard:
+      docs: 
+        This endpoint allows you to add an additional card for an existing member under a specific membership. 
+        It is useful when a member needs a new card for identification or for cases where multiple cards 
+        are allowed for the same member (e.g., secondary or replacement cards).
+      display-name: Add Card
+      method: POST
+      path: /{membershipId}/member/{memberId}/card
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+        memberId: simpleTypes.MemberId
+      request:
+        name: addCard
+        body: AddCardRequest
+      response: AddCardResponse
+      examples:
+        - name: ExampleAddCard
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          request: $AddCardRequest.ExampleAddCard
+          response: 
+            body: $AddCardResponse.ExampleAddCard
+
+    replaceCard:
+      docs: 
+        Use this endpoint to replace an existing member card with a new one. 
+        When a card is replaced, the old card is blocked, and a new card is issued to the member. 
+        This is typically used when a card is lost, damaged, or needs to be reissued.
+      display-name: Replace Card
+      method: POST
+      path: /{membershipId}/member/{memberId}/card/{cardId}/replace
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+        memberId: simpleTypes.MemberId
+        cardId: simpleTypes.CardId
+      request:
+        name: replaceCard
+        body: ReplaceCardRequest
+      response: ReplaceCardResponse
+      examples:
+        - name: ExampleReplaceCard
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+            cardId: $simpleTypes.CardId.ExampleCardIdBlocked
+          request: $ReplaceCardRequest.ExampleReplaceCard
+          response: 
+            body: $ReplaceCardResponse.ExampleReplaceCard
+
+    getCardId:
+      docs: 
+        Retrieve details about a specific card using its unique card ID. 
+        This endpoint provides detailed information about the card, 
+        such as the member it belongs to, its status, and its validity.
+      display-name: Get using Id
+      method: GET
+      path: /card/id/{cardId}
+      path-parameters:
+        cardId: simpleTypes.CardId
+      request:
+        name: getCardId
+      response: GetCardResponse
+      examples:
+        - name: ExampleGetCard
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardId: $simpleTypes.CardId.ExampleCardId
+          response: 
+            body: $GetCardResponse.ExampleGetCard
+
+    getCardNumber:
+      docs: 
+        Retrieve details of a specific card using its card number. 
+        This endpoint allows access to card information when the card number is known, 
+        providing key details such as the card's status and associated member.
+      display-name: Get using Number
+      method: GET
+      path: /card/number/{cardNumber}
+      path-parameters:
+        cardNumber: simpleTypes.CardNumber
+      request:
+        name: getCardNumber
+      response: GetCardResponse
+      examples:
+        - name: ExampleGetCard
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          response: 
+            body: $GetCardResponse.ExampleGetCard
+
+    registerArrival:
+      docs: 
+        This endpoint registers the member's arrival at a facility using their card. 
+        The card number is used to log the arrival and generate a ticket for the member.
+        Use Ticketing API to retrieve ticket details using the ticket number.
+      display-name: Register Arrival
+      method: POST
+      path: /card/{cardNumber}/register-arrival
+      path-parameters:
+        cardNumber: simpleTypes.CardNumber
+      request:
+        name: registerMemberArrival
+        body: RegisterArrivalRequest
+      response: RegisterArrivalResponse
+      examples:
+        - name: ExampleRegisterArrival
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          request: $RegisterArrivalRequest.ExampleRegisterArrival
+          response: 
+            body: $RegisterArrivalResponse.ExampleRegisterArrival
+
+    sendToWallet:
+      display-name: Send to Wallet
+      docs: 
+        Sends the card to the apple wallet via email or phone number specified in the request. 
+      method: POST
+      path: /card/{cardNumber}/sendToWallet
+      path-parameters:
+        cardNumber: simpleTypes.CardNumber
+      request:
+        name: sendToWallet 
+        body: SendWalletRequest
+      response: WalletSentResponse
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          request:
+            notificationAddress: $simpleTypes.NotificationAddress.ExamplePhone
+          response:
+            body:
+              cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+              cardSent: true
+
+    # printMemberCard:
+    #   docs: Print a member's card
+    #   display-name: Print Member Card
+    #   method: POST
+    #   path: /member/{memberId}/card/print
+    #   path-parameters:
+    #     memberId: simpleTypes.MemberId
+    #   request:
+    #     name: printMemberCard
+
+types:
+  # Add Card Service
+  AddCardRequest:
+    docs: Request to add an additional member card
+    properties:
+      cardNumber: simpleTypes.CardNumber
+      expiryDate: simpleTypes.ExpiryDate
+    examples:
+      - name: ExampleAddCard
+        value:
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+
+  AddCardResponse:
+    docs: Response to adding an additional member card
+    properties:
+      card: compositeTypes.MemberCardEntity
+    examples:
+      - name: ExampleAddCard
+        value:
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCard
+
+  # Replace Card Service
+  ReplaceCardRequest:
+    docs: Request to add an additional member card
+    properties:
+      cardNumber: optional<simpleTypes.CardNumber>
+      expiryDate: optional<simpleTypes.ExpiryDate>
+    examples:
+      - name: ExampleReplaceCard
+        value:
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+
+  ReplaceCardResponse:
+    docs: Response to adding an additional member card
+    properties:
+      card: list<compositeTypes.MemberCardEntity>
+    examples:
+      - name: ExampleReplaceCard
+        value:
+          card: 
+            - $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
+            - $compositeTypes.MemberCardEntity.ExampleMemberCard
+  
+  # Get Card Services
+  GetCardResponse:
+    docs: Response to getting a card
+    properties:
+      card: compositeTypes.MemberCardDTOResponse
+    examples:
+      - name: ExampleGetCard
+        value:
+          card: $compositeTypes.MemberCardDTOResponse.ExampleMemberCardDTO
+
+  # Register Arrival Service
+  AdmissionCode:
+    type: string
+    docs: A unique code that identifies a specific admission.
+    examples:
+      - name: ExampleAdmissionCastle
+        value: CASTLE
+  
+  TicketId:
+    type: string
+    docs: The unique identifier of a ticket
+    examples:
+      - name: ExampleTicket
+        value: TICKET123
+
+  RegisterArrivalRequest:
+    docs: Request to register a member's arrival
+    properties:
+      admissionCode: optional<AdmissionCode>
+    examples:
+      - name: ExampleRegisterArrival
+        value:
+          admissionCode: $AdmissionCode.ExampleAdmissionCastle
+
+  RegisterArrivalResponse:
+    docs: Response to registering a member's arrival
+    properties:
+      cardNumber: simpleTypes.CardNumber
+      ticketNumber: TicketId
+    examples:
+      - name: ExampleRegisterArrival
+        value:
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          ticketNumber: $TicketId.ExampleTicket
+
+  # Send to Wallet Service
+  SendWalletRequest:
+    docs: Request to send a card to the wallet
+    properties:
+      notificationAddress: simpleTypes.NotificationAddress
+    examples:
+      - name: ExampleSendToWallet
+        value:
+          notificationAddress: $simpleTypes.NotificationAddress.ExamplePhone
+  WalletSentResponse:
+    docs: Response to sending a card to the wallet
+    properties:
+      cardNumber: simpleTypes.CardNumber
+      cardSent: boolean
+    examples:
+      - name: ExampleSendToWallet
+        value:
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          cardSent: true

@@ -1,24 +1,15 @@
 ---
-title: "Introduction"
+title: "Membership Catalog Services"
 ---
 
-<Markdown src="../snippets/endpoint-verb-styles.mdx" />
-
-<Aside>
-| Endpoints||
-| :-| :---------------|
-| <GetVerb/>| [/ticketing/catalog/:storeCode](/api-reference/ticketing/service-catalog/get-catalog) |
-</Aside>
-
-The catalog endpoints serve as the foundation for a headless setup, offering a centralized way to access essential information 
-about the available tickets. 
+The catalog endpoints serve as the foundation for a headless setup, offering a centralized way to access essential information about the available types of memberships. 
 
 Key Concepts:
 
     * Store Code Parameter:
         The store code acts as a filter, allowing the system to tailor the available ticket information to a specific 
-        sales channel or store front. Each store or sales channel may have its own unique set of tickets
-        and the store code ensures that only the relevant subset of tickets is returned. 
+        sales channel or store front. Each store or sales channel may have its own unique set of memberships
+        and the store code ensures that only the relevant subset of catalog items are returned. 
         This is particularly useful in cases where different platforms, regions, or partners require distinct offerings.
 
     * Localized Storefront:

@@ -82,19 +82,16 @@ navigation:
               path: ./docs/pages/ticketing/get-started.mdx
             - ticketing.service-catalog:
                 title: Catalog
-                #icon: puzzle
                 summary: ./docs/pages/ticketing/catalog-summary.mdx
                 contents:
                   - endpoint: ticketing.service-catalog.getCatalog
             - ticketing.service-capacity:
                 title: Capacity
-                #icon: puzzle
                 summary: ./docs/pages/ticketing/capacity-summary.mdx
                 contents:
                   - endpoint: ticketing.service-capacity.getCapacity
             - ticketing.service-ticket:
                 title: Tickets
-                #icon: puzzle
                 summary: ./docs/pages/ticketing/tickets-summary.mdx
                 contents:
                   - endpoint: ticketing.service-ticket.getTicket
@@ -102,11 +99,10 @@ navigation:
                   - endpoint: ticketing.service-ticket.validateArrival
                   - endpoint: ticketing.service-ticket.validateDeparture
                   - endpoint: ticketing.service-ticket.validateMemberArrival
-                  - endpoint: ticketing.service-ticket.sendAsETicket
+                  - endpoint: ticketing.service-ticket.sendToWallet
                   - endpoint: ticketing.service-ticket.exchangeForCoupon
             - ticketing.service-reservations:
                 title: Reservations
-                #icon: puzzle
                 summary: ./docs/pages/ticketing/reservation-summary.mdx              
                 contents:
                   - endpoint: ticketing.service-reservations.createReservation
@@ -116,6 +112,69 @@ navigation:
                   - endpoint: ticketing.service-reservations.confirmReservation
                   - endpoint: ticketing.service-reservations.getReservation
                   - endpoint: ticketing.service-reservations.getTickets
+
+        - section: Memberships
+          summary: ./docs/pages/memberships/overview.mdx
+          contents:
+            - memberships.service-catalog:
+                title: Catalog
+                summary: ./docs/pages/memberships/catalog-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-catalog.getCatalog
+            - memberships.service-membership:
+                title: Membership
+                summary: ./docs/pages/memberships/membership-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-membership.createMembership
+                  - endpoint: memberships.service-membership.getMembershipId
+                  - endpoint: memberships.service-membership.getMembershipNumber
+                  - endpoint: memberships.service-membership.blockMembership
+                  - endpoint: memberships.service-membership.unblockMembership
+                  - endpoint: memberships.service-membership.getMembers
+            - memberships.service-member:
+                title: Member
+                summary: ./docs/pages/memberships/member-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-member.getMemberId
+                  - endpoint: memberships.service-member.getMemberNumber
+                  - endpoint: memberships.service-member.addMember
+                  - endpoint: memberships.service-member.updateMember
+                  - endpoint: memberships.service-member.getMemberImage
+                  - endpoint: memberships.service-member.setMemberImage
+                  - endpoint: memberships.service-member.findMembers
+                  - endpoint: memberships.service-member.blockMember
+                  - endpoint: memberships.service-member.unblockMember
+            - memberships.service-card:
+                title: Card
+                summary: ./docs/pages/memberships/card-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-card.getCardId
+                  - endpoint: memberships.service-card.getCardNumber
+                  - endpoint: memberships.service-card.addCard
+                  - endpoint: memberships.service-card.replaceCard
+                  - endpoint: memberships.service-card.registerArrival
+                  - endpoint: memberships.service-card.sendToWallet
+
+            - memberships.service-lifecycle:
+                title: Lifecycle
+                summary: ./docs/pages/memberships/lifecycle-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-lifecycle.getMembershipHistory
+                  - endpoint: memberships.service-lifecycle.activateMembership
+                  - endpoint: memberships.service-lifecycle.cancelMembership
+                  - endpoint: memberships.service-lifecycle.getRenewalOptions
+                  - endpoint: memberships.service-lifecycle.renewMembership
+                  - endpoint: memberships.service-lifecycle.getUpgradeOptions
+                  - endpoint: memberships.service-lifecycle.upgradeMembership
+                  - endpoint: memberships.service-lifecycle.getExtendOptions
+                  - endpoint: memberships.service-lifecycle.extendMembership
+
+            - memberships.service-misc:
+                title: Miscellaneous
+                summary: ./docs/pages/memberships/misc-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-misc.resolveIdentifier
+
 
 navbar-links:
   - type: secondary

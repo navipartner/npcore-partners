@@ -1,10 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  globalTypes: ./global-types.yml
   simpleTypes: ./types-simple.yml
   compositeTypes: ./types-composite.yml
-  errorTypes: ./types-errors.yml
   globalApiTypes: ./../global-api-types.yml
 
 service:
@@ -12,7 +10,7 @@ service:
   auth: false
   base-path: /ticketing
   headers:
-    x-api-version: optional<globalTypes.ApiVersionDate>
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
 
   endpoints:
     getCatalog:
@@ -26,9 +24,6 @@ service:
         name: getCatalog
       response: 
         type: StoreCatalogResponse
-        status-code: 200
-      errors:
-        - errorTypes.NotFoundError
       examples:
         - name: ExampleCatalog1
           docs: Example response for the getCatalog endpoint
@@ -52,14 +47,14 @@ types:
   ## Complex Types
   StoreCatalogResponse:
     docs: 
-      Response containing the list of ticket items and their descriptions
+      Represents the catalog of ticket items available at a specific store. Includes the store code and a list of items that customers can browse and purchase.
     properties:
       storeCode: simpleTypes.StoreCode
       items: list<Item>
 
   Item:
     docs: 
-      A ticket item or product available for sale
+      Describes a ticket item available for sale, including its unique identifier, pricing, type, descriptions, and associated admissions. Used to present detailed ticket options to customers.
     properties:
       itemNumber: simpleTypes.ItemNumber
       variants: optional<list<ItemVariant>>
@@ -77,8 +72,7 @@ types:
 
   RecommendedPrice:
     docs: 
-      Recommended price for an item. 
-      Note that this price is a recommendation only and may be overridden when selecting a schedule.
+      Suggests a base price for a ticket item before any adjustments like discounts or dynamic pricing. Assists in displaying price information to customers during their purchasing decision.
     properties:
       unitPrice: simpleTypes.UnitPrice
       unitPriceIncludesVat: simpleTypes.UnitPriceIncludesVat
@@ -94,8 +88,7 @@ types:
 
   TicketType:
     docs: 
-      Tickets are divided into types, such as 'WEB', 'POS', 'KIOSK', etc. 
-      Types are typically a functional grouping and determines sales behavior and printing layouts whereas category could be used to organize tickets for reporting purposes.
+      Categorizes the ticket item based on sales channels or functional groupings, such as "WEB" or "POS". Influences how the ticket is sold and processed within the system.
     properties:
       code: string
       description: string
@@ -109,7 +102,7 @@ types:
 
   AdmissionCatalog:
     docs: 
-      An admission component for a specific item number.
+      Details the admissions included with a ticket item, specifying access rights like entry to events or exhibits. Informs customers about what experiences are included with their purchase.
     extends: compositeTypes.AdmissionBase
     properties:
       capacityControl: simpleTypes.CapacityControl

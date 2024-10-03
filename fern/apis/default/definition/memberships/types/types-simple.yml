@@ -1,0 +1,582 @@
+types:
+
+  ## Setup related types
+  CommunityCode:
+    type: string
+    docs: Code representing the community associated with the membership.
+    examples:
+      - name: ExampleCommunityCode
+        value: "RIVERLAND"
+
+  MembershipCode:
+    type: string
+    docs: Code representing the type of membership.
+    examples:
+      - name: SILVER
+        value: "SILVER"
+      - name: GOLD
+        value: "GOLD"
+      - name: PLATINUM
+        value: "PLATINUM"
+
+  Description:
+    type: string
+    docs: Description of the membership item.
+    examples:
+      - name: ExampleItem
+        value: "Membership Item"
+      - name: ExampleShort
+        value: "Short Description including HTML styling"
+      - name: ExampleFull
+        value: "Full Description including HTML styling"
+
+
+  CacheInstanceId:
+    type: string
+    docs: Identifier for the NST instance. Providing this value will increase the performance of the API when the NST is load-balanced. 
+    examples:
+      - name: ExampleCacheInstanceId
+        value: "789"
+  
+  ItemNumber:
+    type: string
+    docs: Unique identifier for an item.
+    examples:
+      - name: ExampleItemNumber
+        value: "M12345"
+      - name: ExampleRenewWithItem
+        value: "RENEW-12346"
+      - name: ExampleUpgradeWithItem
+        value: "UPGRADE-12346"
+      - name: ExampleExtendWithItem
+        value: "EXTEND-12346"
+
+  ## Membership related types
+  MembershipId:
+    type: integer
+    docs: Unique identifier for a membership.
+    examples:
+      - name: ExampleMembershipId
+        value: 1224
+
+  MembershipNumber:
+    type: string
+    docs: Unique membership number.
+    examples:
+      - name: ExampleMembershipNumber
+        value: "MS-DEMO-00152"
+
+  CustomerNumber:
+    type: string
+    docs: Customer number associated with the membership.
+    examples:
+      - name: ExampleCustomerNumber
+        value: "D000188"
+
+  ActivationDate:
+    type: date
+    docs: The date from which the membership should be active. Setup can dictated and override this date.
+    examples:
+      - name: ExampleActivationDate
+        value: "2024-09-17"
+
+  CompanyName:
+    type: string
+    docs: The name of the company associated with the membership.
+    examples:
+      - name: ExampleCompanyName
+        value: "Acme Inc."
+
+  PreassignedCustomerNumber:
+    type: string
+    docs: A preassigned customer number for the membership. When there is no customer number, the system will generate one.
+    examples:
+      - name: ExamplePreassignedCustomerNumber
+        value: "D000188"
+
+  IssueDate:
+    type: date
+    docs: The date the membership was issued.
+    examples:
+      - name: ExampleIssueDate
+        value: "2024-09-17"
+
+  ValidFromDate:
+    type: date
+    docs: The date the membership starts being valid.
+    examples:
+      - name: ExampleValidFromDate
+        value: "2024-09-17"
+
+  ValidUntilDate:
+    type: date
+    docs: The date the membership expires.
+    examples:
+      - name: ExampleValidUntilDate
+        value: "2025-09-16"
+  
+  TimeEntryId:
+    type: integer
+    docs: Unique identifier for a time entry.
+    examples:
+      - name: ExampleTimeEntryId
+        value: 1234
+ 
+  LifecycleActionEnum:
+    enum:
+      - new
+      - renew
+      - upgrade
+      - extend
+      - auto_renew
+
+  LifecycleAction:
+    type: LifecycleActionEnum
+    docs: The lifecycle action for the membership.
+    examples:
+      - name: ExampleNew
+        value: new
+      - name: ExampleRenew
+        value: renew
+      - name: ExampleUpgrade
+        value: upgrade
+      - name: ExampleExtend
+        value: extend
+      - name: ExampleAutoRenew
+        value: auto_renew
+
+  LifecycleDate:
+    type: date
+    docs: The lifecycle dates for the membership.
+    examples:
+      - name: ValidFromDate
+        value: "2024-09-17"
+      - name: ValidUntilDate
+        value: "2025-09-16"
+      - name: CancelDate
+        value: "2024-10-07"
+      - name: RenewFromDate
+        value: "2025-09-17"
+      - name: RenewUntilDate
+        value: "2026-09-16"
+      - name: UpgradeFromDate
+        value: "2024-10-08" # Day after cancel
+      - name: ExtendFromDate
+        value: "2024-10-08" # Day after cancel
+      - name: ExtendUntilDate
+        value: "2025-10-07" # 12 months after ExtendStart
+
+  PeriodStart:
+    type: date
+    docs: "The start date for option."
+
+  PeriodEnd:
+    type: date
+    docs: "The end date for the option."
+
+  Amount:
+    type: double
+    docs: The amount associated with the membership.
+    examples:
+      - name: ExampleAmount
+        value: 80 
+  
+  AmountInclVat:
+    type: double
+    docs: The amount including VAT associated with the membership.
+    examples:
+      - name: ExampleAmountInclVat
+        value: 100
+
+  ReceiptNumber:
+    type: string
+    docs: The receipt number associated with the sale.
+    examples:
+      - name: ExampleReceiptNumber
+        value: "R123456789"
+      - name: ExampleReceiptNumber2
+        value: "R987654321"
+
+  ReceiptLine:
+    type: integer
+    docs: The receipt line number associated with the sale.
+    examples:
+      - name: ExampleReceiptLine
+        value: 10
+
+  ## Member related types
+  MemberId:
+    type: integer
+    docs: Unique identifier for a member.
+    examples:
+      - name: ExampleMemberId
+        value: 4331
+    
+  ContactNumber:
+    type: string
+    docs: The contact number for the member.
+    examples:
+      - name: ExampleContactNumber
+        value: "C1234567890"
+
+  MemberNumber:
+    type: string
+    docs: Unique number identifying the member.
+    examples:
+      - name: ExampleMemberNumber
+        value: "M123456789"
+
+  FirstName:
+    type: string
+    docs: The first name of the member.
+    examples:
+      - name: ExampleFirstName
+        value: "John"
+
+  MiddleName:
+    type: string
+    docs: The middle name of the member.
+    examples:
+      - name: ExampleMiddleName
+        value: "A."
+
+  LastName:
+    type: string
+    docs: The last name of the member.
+    examples:
+      - name: ExampleLastName
+        value: "Doe"
+
+  Address:
+    type: string
+    docs: The address of the member.
+    examples:
+      - name: ExampleAddress
+        value: "123 Main Street"
+
+  PostCode:
+    type: string
+    docs: The postal code of the member's address.
+    examples:
+      - name: ExamplePostCode
+        value: "12345"
+
+  City:
+    type: string
+    docs: The city where the member resides.
+    examples:
+      - name: ExampleCity
+        value: "New York"
+
+  Country:
+    type: string
+    docs: The country where the member resides.
+    examples:
+      - name: ExampleCountry
+        value: "USA"
+
+  Birthday:
+    type: date
+    docs: The birth date of the member.
+    examples:
+      - name: ExampleBirthday
+        value: "1980-01-01"
+
+  GenderEnum:
+    enum:
+      - not_specified
+      - female
+      - male
+      - other
+
+  Gender:
+    type: GenderEnum
+    docs: The gender of the member.
+    examples:
+      - name: ExampleGender
+        value: male
+
+  Newsletter:
+    type: boolean
+    docs: Indicates whether the member is subscribed to the newsletter.
+    examples:
+      - name: ExampleNewsletter
+        value: true
+
+  PhoneNo:
+    type: string
+    docs: The phone number of the member.
+    examples:
+      - name: ExamplePhoneNo
+        value: "+1234567890"
+
+  Email:
+    type: string
+    docs: The email address of the member.
+    examples:
+      - name: ExampleEmail
+        value: "john.doe@acme.com"
+
+  Base64Image:
+    type: base64
+    docs: Base64 encoded image of the member.
+    examples:
+      - name: ExampleBase64Image
+        value: SGVsbG8gV29ybGQ=
+
+  GDPRApprovalEnum:
+    enum:
+      - pending
+      - accepted
+      - rejected
+      - delegated
+
+  GDPRApproval:
+    type: boolean
+    docs: Indicates if the member has given GDPR approval.
+    examples:
+      - name: ExampleGDPRApproval
+        value: true
+
+  NotificationMethod:
+    type: string
+    docs: The preferred notification method for the member.
+    examples:
+      - name: ExampleNotificationMethod
+        value: "Email"
+  
+  NotificationAddress:
+    type: string
+    docs: The email address or mobile phone number to send cards and notifications to
+    examples:
+      - name: ExampleEmail
+        value: "john@acme.com"
+      - name: ExamplePhone
+        value: "+46701234567"
+
+  ## Card Related Types
+  CardId:
+    type: integer
+    docs: Unique identifier for a card.
+    examples:
+      - name: ExampleCardId
+        value: 123434
+      - name: ExampleCardIdBlocked
+        value: 598
+
+  CardNumber:
+    type: string
+    docs: Unique identifier for a card.
+    examples:
+      - name: ExampleCardNumber
+        value: "MC1234567890"
+      - name: ExampleCardNumberBlocked
+        value: "MC-XXXX-67891"
+
+  ExpiryDate: 
+    type: date
+    docs: The expiry date of the card.
+    examples:
+      - name: ExampleExpiryDate
+        value: "2029-09-17"
+
+  TemporaryCard:
+      type: boolean
+      docs: Indicates whether the card is temporary.
+      examples:
+        - name: ExampleTemporaryCard
+          value: false
+          
+  ## Role Related Types
+  RoleEnum:
+    enum:
+      - membership_admin
+      - member
+      - guardian
+      - dependant
+
+  Role:
+    type: RoleEnum
+    docs: The role of the member.
+    examples:
+      - name: ExampleRoleAdmin
+        value: membership_admin
+
+
+  #######################
+  DocumentId:
+    type: string
+    docs: Unique identifier for the membership document.
+    examples:
+      - name: ExampleDocumentId
+        value: "EA3AD944335C49DB962E4C854937990A"
+
+  MediaId:
+    type: uuid
+    docs: Unique identifier for the media.
+    examples:
+      - name: ExampleMediaId
+        value: f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+  CreatedAt:
+    type: datetime
+    docs: Date and time when the membership period was created.
+    examples:
+      - name: ExampleCreatedAt
+        value: "2024-09-17T00:00:00"
+
+  Context:
+    type: string
+    docs: Context name associated with the membership period.
+    examples:
+      - name: ExampleContext
+        value: "MembershipPeriodContext"
+
+  Blocked:
+    type: boolean
+    docs: Indicates whether the membership period is blocked.
+    examples:
+      - name: ExampleBlocked
+        value: false
+      - name: ExampleBlockedTrue
+        value: true
+
+  Active:
+    type: boolean
+    docs: Indicates whether the membership period is active.
+    examples:
+      - name: ExampleActive
+        value: true
+
+  ActivateOnFirstUse:
+    type: boolean
+    docs: Specifies if the membership will activate upon first use.
+    examples:
+      - name: ExampleActivateOnFirstUse
+        value: false
+
+  ProductId:
+    type: string
+    docs: Identifier for the product associated with the membership period.
+    examples:
+      - name: ExampleProductId
+        value: "P12345"
+
+  LoyaltyProgram:
+    type: string
+    docs: Name of the loyalty program associated with the membership.
+    examples:
+      - name: ExampleLoyaltyProgram
+        value: "VIPProgram"
+
+  MemberCardinality:
+    type: integer
+    docs: Cardinality of the member in the membership.
+    examples:
+      - name: ExampleMemberCardinality
+        value: 2
+
+  MemberCount:
+    properties:
+      named: integer
+      anonymous: integer
+
+  ######################
+  AttributeCode:
+    type: string
+    docs: Code representing the specific attribute.
+    examples:
+      - name: ExampleAttributeCode
+        value: "ATT001"
+
+  AttributeName:
+    type: string
+    docs: Name of the attribute.
+    examples:
+      - name: ExampleAttributeName
+        value: "Membership Level"
+
+  AttributeValue:
+    type: string
+    docs: Value assigned to the attribute.
+    examples:
+      - name: ExampleAttributeValue
+        value: "Gold"
+
+  Attribute:
+    properties:
+      code: AttributeCode
+      name: AttributeName
+      value: AttributeValue
+
+  Attributes:
+    properties:
+      attribute: list<Attribute>
+
+  RequestFieldUpdate:
+    properties:
+      field: list<Field>
+
+  Field:
+    properties:
+      entryNo: FieldEntryNo
+      #fieldNo: simpleTypes.FieldNo
+      #caption: simpleTypes.Caption
+      #currentValue: simpleTypes.CurrentValue
+
+  FieldEntryNo:
+    type: integer
+    docs: Number representing the specific field id to update.
+    examples:
+      - name: ExampleFieldEntryNo
+        value: 10
+
+  Limit:
+    type: integer
+    docs: The maximum number of results to return.
+    examples:
+      - name: ExampleLimit
+        value: 10
+
+  Offset:
+    type: integer
+    docs: The starting point for results, used for pagination.
+    examples:
+      - name: ExampleOffset
+        value: 20
+
+  IdentifierTypeEnum:
+    enum:
+      - membership
+      - member
+      - card
+
+  IdentifierType:
+    type: IdentifierTypeEnum
+    docs: The type of identifier
+    examples:
+      - name: ExampleIdentifierType
+        value: membership
+
+  StoreCode:
+    type: string
+    docs: 
+      A unique identifier for a store - a logical grouping defining a subset of membership items. 
+      This is used to filter the list of membership related items returned by the API.
+    examples:
+      - name: ExampleStoreCode
+        value: "EN"
+
+  ItemMemberTypeEnum:
+    enum:
+      - new_membership
+      - add_member
+      - add_card
+      - replace_card
+
+  ItemMemberType:
+    type: string
+    docs: Type of membership item.
+    examples:
+      - name: ExampleNewMembership
+        value: new_membership

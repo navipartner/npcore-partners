@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+  
+service:
+  display-name: Catalog
+  auth: false
+  base-path: /membership
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+
+  endpoints:
+    getCatalog:
+      docs: Get the list of membership items and their descriptions for a specific store.
+      display-name: Get Catalog
+      method: GET
+      path: /catalog/{storeCode}
+      path-parameters:
+        storeCode: simpleTypes.StoreCode
+      request: 
+        name: getCatalog
+      response:
+        type: StoreCatalogResponse
+      examples:
+        - name: ExampleCatalog1
+          docs: Example response for the getCatalog endpoint
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          response:
+            body:
+              storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+              items:
+                - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  type: $simpleTypes.ItemMemberType.ExampleNewMembership
+                  recommendedPrice: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+                  membershipCode: $simpleTypes.MembershipCode.GOLD
+                  itemDescription: $simpleTypes.Description.ExampleItem
+                  shortDescription: $simpleTypes.Description.ExampleShort
+                  fullDescription: $simpleTypes.Description.ExampleFull
+
+types:
+  StoreCatalogResponse:
+    docs: 
+      Represents the catalog of membership items available at a specific store. Includes the store code and a list of items that customers can browse and purchase.
+    properties:
+      storeCode: simpleTypes.StoreCode
+      items: optional<list<compositeTypes.MembershipItemCatalogDTO>>

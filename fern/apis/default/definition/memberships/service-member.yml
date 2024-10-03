@@ -1,0 +1,357 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+service:
+  display-name: Lifecycle
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+    addMember:
+      docs: 
+        Use this endpoint to add a new member to a membership. 
+        This is used when a new individual needs to be linked to an existing membership, 
+        either at the time of membership creation or later. 
+      display-name: Add Member
+      method: POST
+      path: /member/{membershipId}/add
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: addMember
+        body: AddMemberRequest
+      response: AddMemberResponse
+      examples:
+        - name: ExampleAddMember
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          request: $AddMemberRequest.ExampleAddMember
+          response:
+            body: $AddMemberResponse.ExampleAddMember
+
+    getMemberId:
+      docs: 
+        Retrieve details of a specific member using their unique member ID. 
+      display-name: Get using Id
+      method: GET 
+      path: /member/id/{memberId}
+      path-parameters:
+        memberId: simpleTypes.MemberId
+      request:
+        name: getMember
+      response: GetMemberResponse 
+      examples:
+        - name: ExampleGetMember
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          response: 
+            body: $GetMemberResponse.ExampleGetMember
+
+    getMemberNumber:
+      docs: 
+        Use this endpoint to retrieve details of a member based on their member number. This is helpful when the member number is available but the member ID is not known.
+      display-name: Get using Number
+      method: GET 
+      path: /member/number/{memberNumber}
+      path-parameters:
+        memberNumber: simpleTypes.MemberNumber
+      request:
+        name: getMemberNumber
+      response: GetMemberResponse 
+      examples:
+        - name: ExampleGetMemberNumber
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          response: 
+            body: $GetMemberResponse.ExampleGetMember
+
+    blockMember:
+      docs:
+        Block a specific member from further activity. 
+        This is typically used in scenarios where a member's access needs to be temporarily or permanently disabled. 
+        **Family Membership Downgrade** For family or group memberships, when the allowed number of 
+        valid members decreases (e.g., before a downgrade to a smaller membership plan), this endpoint can be used to 
+        block excess members to comply with the new membership limitations.
+      display-name: Block Member
+      method: POST
+      path: /member/{memberId}/block
+      path-parameters:
+        memberId: simpleTypes.MemberId  
+      request:
+        name: blockMember
+      response: BlockMemberResponse
+      examples:
+        - name: ExampleBlockMember
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          response: 
+            body: $BlockMemberResponse.ExampleBlockMember
+
+    unblockMember:
+      docs: 
+        Unblock a previously blocked member, allowing them to resume activities associated with their membership. 
+        This endpoint re-enables access that was previously restricted.
+      display-name: Unblock Member
+      method: POST
+      path: /member/{memberId}/unblock
+      path-parameters:
+        memberId: simpleTypes.MemberId  
+      request:
+        name: unblockMember
+      response: UnblockMemberResponse
+      examples:
+        - name: ExampleUnblockMember
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          response: 
+            body: $UnblockMemberResponse.ExampleUnblockMember
+
+    updateMember:
+      docs: 
+        Update the details of an existing member. 
+        This endpoint is used when a member's information needs to be changed, such as updating their contact details, name, or personal information.
+      display-name: Update Member
+      method: PUT
+      path: /member/{memberId}
+      path-parameters:
+        memberId: simpleTypes.MemberId
+      request:
+        name: updateMember
+        body: UpdateMemberRequest
+      response: UpdateMemberResponse
+      examples:
+        - name: ExampleUpdateMember
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          request: $UpdateMemberRequest.ExampleUpdateMember
+          response: 
+            body: $UpdateMemberResponse.ExampleUpdateMember
+
+    getMemberImage:
+      docs: 
+        Retrieve the image associated with a specific member. 
+      display-name: Get Member Image
+      method: GET
+      path: /member/{memberId}/image
+      path-parameters:
+        memberId: simpleTypes.MemberId
+      request:
+        name: getMemberImage
+      response: GetMemberImageResponse
+      examples:
+        - name: ExampleGetMemberImage
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          response:
+            body: $GetMemberImageResponse.ExampleGetMemberImage
+
+    setMemberImage:
+      docs: 
+        Create or update the image associated with a member. 
+        Use this endpoint to upload a new photo or update an existing one linked to the member’s profile.
+      display-name: Set Member Image
+      method: PUT
+      path: /member/{memberId}/image
+      path-parameters:
+        memberId: simpleTypes.MemberId
+      request:
+        name: setMemberImage
+        body: SetMemberImageRequest
+      response: SetMemberImageResponse
+      examples:
+        - name: ExampleSetMemberImage
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          request: $SetMemberImageRequest.ExampleSetMemberImage
+          response: 
+            body: $SetMemberImageResponse.ExampleSetMemberImage
+    
+    findMembers:
+      docs: 
+         Search for members based on various criteria such as name, birth date, email, phone number, or card number. 
+         This endpoint allows you to perform a flexible search and return a list of members that match the provided criteria.
+      display-name: Find Members
+      method: GET
+      path: /member
+      request:
+        name: findMembers
+        query-parameters:
+          memberNumber: optional<simpleTypes.MemberNumber>
+          #firstName: optional<simpleTypes.FirstName>
+          lastName: optional<simpleTypes.LastName>
+          birthDate: optional<simpleTypes.Birthday>
+          email: optional<simpleTypes.Email>
+          phone: optional<simpleTypes.PhoneNo>
+          cardNumber: optional<simpleTypes.CardNumber>
+          limit: optional<simpleTypes.Limit>
+          offset: optional<simpleTypes.Offset>
+      response: GetMemberListResponse
+      examples:
+        - name: ExampleFindMembers
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+            #firstName: $simpleTypes.FirstName.ExampleFirstName
+            lastName: $simpleTypes.LastName.ExampleLastName
+            birthDate: $simpleTypes.Birthday.ExampleBirthday
+            email: $simpleTypes.Email.ExampleEmail
+            phone: $simpleTypes.PhoneNo.ExamplePhoneNo
+            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+            #limit: $simpleTypes.Limit.ExampleLimit
+            #offset: $simpleTypes.Offset.ExampleOffset
+          response: 
+            body: $GetMemberListResponse.ExampleGetMember
+
+
+types:
+  # Add Member Service
+  AddMemberRequest: 
+    docs: Request to add a member to a membership
+    properties:
+      membershipId: simpleTypes.MembershipId
+      member: compositeTypes.MemberWithCardDTORequest
+    examples:
+      - name: ExampleAddMember
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          member: $compositeTypes.MemberWithCardDTORequest.ExampleMember
+
+  AddMemberResponse:
+    docs: Response to adding a member to a membership
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      member: compositeTypes.MemberDTO
+    examples:
+      - name: ExampleAddMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          member: $compositeTypes.MemberDTO.ExampleMembershipDTO
+
+  # Get Member Service
+  GetMemberResponse:
+    docs: Response to retrieving a member
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      member: compositeTypes.MemberDTO
+    examples:
+      - name: ExampleGetMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          member: $compositeTypes.MemberDTO.ExampleMembershipDTO
+
+  GetMemberListResponse:
+    docs: Response to retrieving a member
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      members: list<compositeTypes.MemberDTO>
+    examples:
+      - name: ExampleGetMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          members: 
+            - $compositeTypes.MemberDTO.ExampleMembershipDTO
+
+  # Get Member Image Service
+  GetMemberImageResponse:
+    docs: Response to retrieving a member image
+    properties:
+      image: simpleTypes.Base64Image
+    examples:
+      - name: ExampleGetMemberImage
+        value:
+          image: $simpleTypes.Base64Image.ExampleBase64Image
+
+  # Set Member Image Service
+  SetMemberImageRequest:
+    docs: Request to set a member image
+    properties:
+      image: simpleTypes.Base64Image
+    examples:
+      - name: ExampleSetMemberImage
+        value:
+          image: $simpleTypes.Base64Image.ExampleBase64Image
+        
+  SetMemberImageResponse:
+    docs: Response to setting a member image
+    properties:
+      mediaId: simpleTypes.MediaId
+    examples:
+      - name: ExampleSetMemberImage
+        value:
+          mediaId: $simpleTypes.MediaId.ExampleMediaId
+  
+  # Block Membership Service
+  BlockMemberResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      member: compositeTypes.MemberEntityResponse
+    examples:
+      - name: ExampleBlockMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          member: $compositeTypes.MemberEntityResponse.ExampleMemberBlocked
+
+  # Unblock Membership Service
+  UnblockMemberResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      member: compositeTypes.MemberEntityResponse
+    examples:
+      - name: ExampleUnblockMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          member: $compositeTypes.MemberEntityResponse.ExampleMember
+
+  # Update Member Service
+  UpdateMemberRequest:
+    docs: Request to update a member
+    properties:
+      member: compositeTypes.MemberEntityRequest
+    examples:
+      - name: ExampleUpdateMember
+        value:
+          member: $compositeTypes.MemberEntityRequest.ExampleMember
+  
+  UpdateMemberResponse:
+    docs: Response to updating a member
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      member: compositeTypes.MemberEntityResponse
+    examples:
+      - name: ExampleUpdateMember
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          member: $compositeTypes.MemberEntityResponse.ExampleMember

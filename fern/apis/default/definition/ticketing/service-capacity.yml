@@ -3,10 +3,8 @@
 docs: I am testing new feature...
 
 imports:
-  globalHeaders: ./global-types.yml
   simpleTypes: ./types-simple.yml
   compositeTypes: ./types-composite.yml
-  errorTypes: ./types-errors.yml
   globalApiTypes: ./../global-api-types.yml
 
 service:
@@ -14,7 +12,7 @@ service:
   auth: false
   base-path: /ticketing
   headers:
-    x-api-version: optional<globalHeaders.ApiVersionDate>
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
 
     getCapacity:
@@ -30,8 +28,6 @@ service:
           admissionCode: optional<simpleTypes.AdmissionCode>
           customerNumber: optional<simpleTypes.CustomerNumber>
       response: list<AdmissionCapacity>
-      errors:
-        - errorTypes.NotFoundError
       examples:
         ### Success
         - name: ExampleCapacity1
@@ -71,17 +67,12 @@ service:
                     price: $SchedulePrice.ExampleFixedPrice
                     sales: $ScheduleSales.ExampleSalesPeriod
 types:
-  ## Complex types
-  ## Top Level Request types
-  GetCapacityRequest:
-    properties:
-      schedules: list<AdmissionSearch>
-
-  ## Response types
+## Response types
   ## Top Level Response types
   AdmissionCapacity: 
     docs: 
-      An admission component for a specific item number. 
+      Provides detailed capacity and availability information for a specific admission associated with a ticket item. 
+      Includes pricing, quantity, and schedule details to help determine if the desired number of tickets can be reserved on a particular date.
     extends: compositeTypes.AdmissionBase
     properties:
       customerNumber: optional<simpleTypes.CustomerNumber>
@@ -95,6 +86,9 @@ types:
 
   ## nested types
   AdmissionSearch:
+    docs:
+      Represents the criteria used to search for capacity information for an admission. 
+      Used in requests to specify the ticket item, date, quantity, and optionally filter by admission code or customer number.
     properties:
       itemNumber: simpleTypes.ItemNumber
       referenceDate: optional<simpleTypes.ReferenceDate>
@@ -103,6 +97,9 @@ types:
       customerNumber: optional<simpleTypes.CustomerNumber>
 
   Schedule:
+    docs:
+      Contains information about a specific schedule or time slot for an admission, including whether it can be allocated (reserved), 
+      remaining capacity, pricing adjustments, and sales periods. Helps clients identify available schedules and understand any limitations or special pricing.
     properties:
       allocatable: simpleTypes.Allocatable
       allocationModel: simpleTypes.AllocationModel
@@ -113,7 +110,9 @@ types:
       sales: ScheduleSales
 
   SchedulePrice:
-    docs: Note that adjustment amounts are currency agnostic.
+    docs: 
+      Details pricing adjustments applied to an admission's base price for a specific schedule. 
+      Includes information on dynamic pricing options, adjustment amounts or percentages, and calculates the adjusted unit and total prices for the reservation.
     properties:
       pricingOption: simpleTypes.PricingOption
       adjustmentAmount: simpleTypes.AdjustedAmount
@@ -130,7 +129,9 @@ types:
           adjustedTotalPrice: 200.00
 
   ScheduleSales:
-    docs: The sales period for the schedule.
+    docs: 
+      Specifies the sales period for a schedule, indicating when ticket sales start and end for that schedule. 
+      Informs clients about the booking window, enabling them to display availability and enforce booking rules accordingly.
     properties:
       salesFromDate: date
       salesFromTime: string

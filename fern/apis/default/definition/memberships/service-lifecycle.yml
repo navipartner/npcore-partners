@@ -1,0 +1,372 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+service:
+  display-name: Lifecycle
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+    getMembershipHistory:
+      docs: 
+        Use this endpoint to retrieve the lifecycle history of a membership. 
+        It provides a chronological log of events, including creation, renewals, upgrades, and cancellations.
+      display-name: Get Membership History
+      method: GET 
+      path: /membership/{membershipId}/history
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getMembershipHistory
+      response: GetMembershipHistoryResponse
+      examples:
+        - name: ExampleGetMembershipHistory
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $GetMembershipHistoryResponse.Example
+
+    activateMembership:
+      docs: 
+        Activate a membership that has been created but is not yet active. 
+        This is commonly used when a membership is set up ahead of time and needs to be activated for use.
+      display-name: Activate Membership
+      method: POST
+      path: /membership/{membershipId}/activate
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: activateMembership
+      response: ConfirmMembershipActivateResponse
+      examples:
+        - name: ExampleActivateMembership
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $ConfirmMembershipActivateResponse.Example
+
+    cancelMembership:
+      docs: 
+        Cancel an active membership using this endpoint. 
+        You can provide a cancellation date, allowing the membership to run until that date, or cancel it immediately.
+      display-name: Cancel Membership
+      method: POST  
+      path: /membership/{membershipId}/cancel
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: cancelMembership
+        body: CancelMembershipRequest
+      response: ConfirmMembershipCancelResponse
+      examples:
+        - name: ExampleCancelMembership
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          request: $CancelMembershipRequest.Example
+          response:
+            body: $ConfirmMembershipCancelResponse.Example
+
+    getRenewalOptions:
+      docs: 
+        Retrieve a list of available renewal options for a membership. 
+        Each option is represented by an `itemNumber`, which includes predefined configurations such as price, 
+        duration, and other relevant details. 
+        The `itemNumber` returned from this endpoint can be used as a parameter in the `renewMembership` endpoint 
+        to proceed with the renewal.
+      display-name: Get Renewal Options
+      method: GET
+      path: /membership/{membershipId}/renew/options
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getRenewOptions
+      response: GetRenewOptionsResponse
+      examples:
+        - name: ExampleGetRenewOptions
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $GetRenewOptionsResponse.Example
+
+    renewMembership:
+      docs: 
+        Use this endpoint to renew an existing membership. 
+        The renewal will **add a new period** after the current membership period expires. 
+        To renew, you must provide the `itemNumber` from the `getRenewalOptions` endpoint, 
+        which specifies the predefined renewal configuration such as price and duration.
+      display-name: Renew Membership
+      method: POST  
+      path: /membership/{membershipId}/renew
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: renewMembership
+        body: RenewMembershipRequest
+      response: ConfirmMembershipRenewResponse
+      examples:
+        - name: ExampleRenewMembership
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          request: $RenewMembershipRequest.Example
+          response:
+            body: $ConfirmMembershipRenewResponse.Example
+
+    getUpgradeOptions:
+      docs: 
+         Retrieve a list of available upgrade options for a membership. Each upgrade option is represented by an 
+         `itemNumber`, which includes predefined details such as the upgraded benefits and any 
+         pricing adjustments. The `itemNumber` returned from this endpoint can be used as a parameter in 
+         the `upgradeMembership` endpoint to execute the upgrade.
+      display-name: Get Upgrade Options
+      method: GET
+      path: /membership/{membershipId}/upgrade/options
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getUpgradeOptions
+      response: GetUpgradeOptionsResponse
+      examples:
+      - name: ExampleGetUpgradeOptions
+        path-parameters:
+          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          company: $globalApiTypes.Company.ExampleCompanyCronus
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+        response:
+          body: $GetUpgradeOptionsResponse.Example
+
+    upgradeMembership:
+      docs: 
+        Use this endpoint to upgrade an active membership to a higher (or lower) plan or tier. 
+        The upgrade will **terminate the current membership period** and apply the new membership tier immediately. 
+        However, the **overall membership duration remains unchanged**. You must provide the `itemNumber` from 
+        the `getUpgradeOptions` endpoint, which includes the predefined details for the upgrade.
+      display-name: Upgrade Membership
+      method: POST  
+      path: /membership/{membershipId}/upgrade
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: upgradeMembership
+        body: UpgradeMembershipRequest
+      response: ConfirmMembershipUpgradeResponse
+      examples:
+      - name: ExampleUpgradeMembership
+        path-parameters:
+          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          company: $globalApiTypes.Company.ExampleCompanyCronus
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+        request: $UpgradeMembershipRequest.Example
+        response:
+          body: $ConfirmMembershipUpgradeResponse.Example
+
+    getExtendOptions:
+      docs: 
+        Retrieve a list of available extension options for a membership. Each option is represented by an 
+        `itemNumber`, which includes predefined configurations such as new duration and pricing. 
+        The `itemNumber` returned from this endpoint can be used as a parameter in the `extendMembership` 
+        endpoint to apply the extension.
+      display-name: Get Extend Options
+      method: GET
+      path: /membership/{membershipId}/extend/options
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getExtendOptions
+      response: GetExtendOptionsResponse
+      examples:
+      - name: ExampleGetExtendOptions
+        path-parameters:
+          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          company: $globalApiTypes.Company.ExampleCompanyCronus
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+        response:
+          body: $GetExtendOptionsResponse.Example
+
+    extendMembership:
+      docs: 
+        Use this endpoint to extend the duration of an active membership. The extension 
+        will **terminate the current period** and create a **new period starting from today**, based on the 
+        provided extension configuration. The **overall membership duration will be greater** 
+        than the original duration. 
+        You must provide the `itemNumber` from the `getExtendOptions` endpoint to apply the extension.
+      display-name: Extend Membership
+      method: POST  
+      path: /membership/{membershipId}/extend
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: extendMembership
+        body: ExtendMembershipRequest
+      response: ConfirmMembershipExtendResponse
+      examples:
+      - name: ExampleExtendMembership
+        path-parameters:
+          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          company: $globalApiTypes.Company.ExampleCompanyCronus
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+        request: $ExtendMembershipRequest.Example
+        response:
+          body: $ConfirmMembershipExtendResponse.Example
+
+
+###################################################
+types:
+
+  # Get Membership History Service
+  GetMembershipHistoryResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleActivate
+
+  # Confirm Membership Activate Service
+  ConfirmMembershipActivateResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleActivate
+
+  # Confirm Membership Cancel Service
+  CancelMembershipRequest:
+    properties:
+      cancelDate: simpleTypes.LifecycleDate
+    examples:
+      - name: Example
+        value:
+          cancelDate: $simpleTypes.LifecycleDate.CancelDate
+
+  ConfirmMembershipCancelResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleCancel
+          
+  # Confirm Membership Renew Service
+  RenewMembershipRequest:
+    properties:
+      renewWithItem: simpleTypes.ItemNumber
+    examples:
+      - name: Example
+        value:
+          renewWithItem: $simpleTypes.ItemNumber.ExampleRenewWithItem
+
+  ConfirmMembershipRenewResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleRenew
+          
+  # Get Renew Options Service
+  GetRenewOptionsResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      renewalOptions: list<compositeTypes.LifecycleOptionDTO>
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          renewalOptions: 
+            - $compositeTypes.LifecycleOptionDTO.ExampleRenewWithItem
+
+  # Confirm Membership Upgrade Service
+  UpgradeMembershipRequest:
+    properties:
+      renewWithItem: simpleTypes.ItemNumber
+    examples:
+      - name: Example
+        value:
+          renewWithItem: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
+
+  ConfirmMembershipUpgradeResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleUpgrade
+          
+  # Get Upgrade Options Service
+  GetUpgradeOptionsResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      renewalOptions: list<compositeTypes.LifecycleOptionDTO>
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          renewalOptions: 
+            - $compositeTypes.LifecycleOptionDTO.ExampleUpgradeWithItem
+
+  # Confirm Membership Extend Service
+  ExtendMembershipRequest:
+    properties:
+      extendWithItem: simpleTypes.ItemNumber
+    examples:
+      - name: Example
+        value:
+          extendWithItem: $simpleTypes.ItemNumber.ExampleExtendWithItem
+
+  ConfirmMembershipExtendResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipLifecycleDTO
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipLifecycleDTO.ExampleExtend
+          
+  # Get Extend Options Service
+  GetExtendOptionsResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      extendOptions: list<compositeTypes.LifecycleOptionDTO>
+    examples:
+      - name: Example
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          extendOptions: 
+            - $compositeTypes.LifecycleOptionDTO.ExampleExtendWithItem

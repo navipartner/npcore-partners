@@ -1,10 +1,8 @@
   # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  globalHeaders: ./global-types.yml
   simpleTypes: ./types-simple.yml
   compositeTypes: ./types-composite.yml  
-  errorTypes: ./types-errors.yml
   globalApiTypes: ./../global-api-types.yml
 
 service:
@@ -12,11 +10,13 @@ service:
   auth: false
   base-path: /ticketing
   headers:
-    x-api-version: optional<globalHeaders.ApiVersionDate>
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
 
     getTicket:
-      docs: Retrieve a ticket by its ID
+      docs: 
+        Retrieves detailed information about a specific ticket using its unique ticketNumber. 
+        Clients use this endpoint to obtain ticket details such as validity periods, admissions, and any associated information after a reservation has been confirmed.
       display-name: Get Ticket
       method: GET
       path: /ticket/{ticketNumber}
@@ -25,8 +25,6 @@ service:
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       response: compositeTypes.TicketDetails
-      errors:
-        - errorTypes.NotFoundError
       examples:
           - path-parameters:
               saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -37,7 +35,10 @@ service:
               body: $compositeTypes.TicketDetails.ExampleTicket1
 
     revokeTicket:
-      docs: Revoke a ticket by its ID
+      docs: 
+        Revokes a ticket identified by its ticketNumber, effectively canceling it after it has been confirmed. 
+        This action makes the ticket invalid for entry or use and releases any held resources. 
+        Useful for handling refunds or cancellations initiated by the customer or the system.
       method: POST
       path: /ticket/{ticketNumber}/revoke
       path-parameters:
@@ -45,8 +46,6 @@ service:
       request: 
         name: revokeTicket
       response: RevokedResponse
-      errors:
-        - errorTypes.NotFoundError
       examples:
          - path-parameters:
             saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -59,7 +58,10 @@ service:
                revoked: true
 
     validateArrival:
-      docs: Validate a ticket for arrival by its ID
+      docs: 
+        Validates a ticket for arrival at a specific admission point, marking the ticket as admitted. 
+        This endpoint is typically used at entry points (e.g., gates or doors) to verify the ticket's validity and record the customer's arrival. 
+        Optional parameters like admissionCode and scannerStation provide context for the validation.
       method: POST
       path: /ticket/{ticketNumber}/validateArrival
       path-parameters:
@@ -68,9 +70,6 @@ service:
         name: validateArrival
         body: optional<ValidateTicketsRequest> 
       response: optional<AdmittedResponse>
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         - path-parameters:
             saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -86,7 +85,10 @@ service:
               admitted: true
 
     validateDeparture:
-      docs: Validate a ticket for departure by its ID
+      docs:
+        Validates a ticket for departure from an admission, marking the ticket as departed. 
+        Used when tracking both entry and exit of customers, this endpoint helps manage capacities and ensures that the ticket is correctly processed upon leaving. 
+        Similar to arrival validation, it can include admissionCode and scannerStation.
       method: POST
       path: /ticket/{ticketNumber}/validateDeparture
       path-parameters:
@@ -111,8 +113,9 @@ service:
 
     validateMemberArrival:
       docs: 
-        Validate a member number for a arrival to the admission. 
-        This endpoint is used when a member swipes their card at the entrance to validate their arrival at an admission.
+        Validates the arrival of a member using their member card number, possibly creating a reservation on-the-fly if necessary. 
+        This endpoint is used when members, such as season pass holders or VIPs, arrive at an admission point without a prior reservation. 
+        It ensures that their access is recorded and any tickets are generated accordingly.
       method: POST
       path: /ticket/{memberNumber}/validateMemberArrival
       path-parameters:
@@ -138,22 +141,20 @@ service:
             body: 
               - $compositeTypes.TicketDetails.ExampleTicketMember
 
-    sendAsETicket:
-      display-name: Send As E-Ticket
+    sendToWallet:
+      display-name: Send to Wallet
       docs: 
-        Send a ticket as an e-ticket to the ticket holder. 
-        This endpoint is used to send an e-ticket to the ticket holder's email address or phone number.
+        Sends a confirmed ticket as an e-ticket ("apple" wallet) to the customer's email address or phone number specified in the request. 
+        This endpoint facilitates electronic delivery of tickets, allowing customers to receive and present their tickets digitally. 
+        Useful for post-purchase communications and ensuring customers have access to their tickets.
       method: POST
-      path: /ticket/{ticketNumber}/sendAsETicket
+      path: /ticket/{ticketNumber}/sendToWallet
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:
-        name: sendAsETicket 
+        name: sendToWallet 
         body: SendTicketRequest
       response: TicketSentResponse
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         - path-parameters:
             saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -170,8 +171,9 @@ service:
     exchangeForCoupon:
       display-name: Exchange For Coupon
       docs: 
-        Exchange a ticket for a coupon. 
-        This endpoint is used to exchange a ticket for a coupon that grants a discount that can be used for a future purchases.
+        Exchanges a ticket for a coupon, which can be used for discounts on future purchases. 
+        This endpoint is used when a customer opts to convert their ticket into a coupon, providing multiple value retention options.
+        The ticket is validated, and a coupon is issued, providing value retention for the customer.
       method: POST
       path: /ticket/{ticketNumber}/exchangeForCoupon
       path-parameters:
@@ -180,9 +182,6 @@ service:
         name: exchangeForCoupon 
         body: GetTicketCouponRequest
       response: TicketCouponResponse
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
           - path-parameters:
               saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid

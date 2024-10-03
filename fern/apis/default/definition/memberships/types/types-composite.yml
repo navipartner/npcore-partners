@@ -1,0 +1,574 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types-simple.yml
+ 
+types:
+
+  MembershipDTO:
+    docs:
+      # Use this DTO to retrieve membership details along with the members associated with it. 
+      This is a composite type representing a Membership and its associated Members. 
+      It extends the MembershipEntity and includes a list of members linked to the membership.
+    extends:
+      MembershipEntity
+    properties:
+      members: optional<list<MemberDTOWithinMembership>>
+    examples:
+      - name: ExampleMembershipDTO
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          members:
+            - $MemberDTOWithinMembership.ExampleMembershipToMember
+
+  MemberDTOWithinMembership:
+    docs:
+      # Use this DTO to represent a membership within the context of a member.
+      This composite type describes the relationship between a Member and a Membership. 
+      It includes details about the member's role within the membership and the membership details.
+    properties:
+      role: simpleTypes.Role
+      contactNumber: simpleTypes.ContactNumber
+      member: MemberWithCardDTOResponse
+    examples:
+      - name: ExampleMembershipToMember
+        value:
+          role: $simpleTypes.Role.ExampleRoleAdmin
+          contactNumber: $simpleTypes.ContactNumber.ExampleContactNumber
+          member: $MemberWithCardDTOResponse.ExampleMember
+
+  ##
+  MemberDTO:
+    docs:
+      # Use this DTO to retrieve member information along with the memberships linked to them. 
+      This is a composite type representing a Member and the Memberships they are associated with. 
+      It extends the MemberEntity and includes a list of memberships to which the member belongs.
+    extends: 
+      MemberEntityResponse
+    properties:
+      memberships: optional<list<MembershipDTOWithinMember>>
+    examples:
+      - name: ExampleMembershipDTO
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          memberships:
+            - $MembershipDTOWithinMember.ExampleMembershipDTOWithinMember
+
+  MembershipDTOWithinMember:
+    docs:
+      This object is a composite type that describes the relationship between the MembershipEntity and the MemberEntity.
+    properties:
+      role: simpleTypes.Role
+      contactNumber: simpleTypes.ContactNumber
+      membership: MembershipToCardDTO
+    examples:
+      - name: ExampleMembershipDTOWithinMember
+        value:
+          role: $simpleTypes.Role.ExampleRoleAdmin
+          contactNumber: $simpleTypes.ContactNumber.ExampleContactNumber
+          membership: $MembershipToCardDTO.ExampleMembershipToCardDTO
+  
+  ##
+  MemberCardDTOResponse:
+    docs:
+      # Use this DTO to retrieve card details along with its related member and membership.
+      This is a composite type representing a MemberCard along with the associated Member and Membership. 
+      It includes information about the member who holds the card and the membership the card is tied to. 
+    extends: 
+      MemberCardEntity
+    properties:
+      member: MemberEntityResponse
+      membership: MembershipEntity
+    examples:
+      - name: ExampleMemberCardDTO
+        value:
+          cardId: $simpleTypes.CardId.ExampleCardId
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+          temporary: false
+          member: $MemberEntityResponse.ExampleMember
+          membership: $MembershipEntity.ExampleMembership
+
+  ##
+  MemberWithCardDTORequest:
+    docs:
+      # Use this DTO when creating or updating a member along with their cards.
+      This is a request DTO used to create or update a Member along with their associated cards. 
+      It extends the MemberEntityRequest and optionally includes a list of cards for the member. 
+    extends: 
+      MemberEntityRequest
+    properties:
+      cards: optional<list<MemberCardEntity>>
+    examples:
+      - name: ExampleMember
+        value:
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+          cards: 
+            - $MemberCardEntity.ExampleMemberCardCreate
+
+  MemberWithCardDTOResponse:
+    docs:
+      # Use this DTO to retrieve a member’s details along with their cards.    
+      This is a response DTO representing a Member and their associated cards. 
+      It extends the MemberEntityResponse and includes a list of cards tied to the member. 
+    extends: 
+      MemberEntityResponse
+    properties:
+      cards: list<MemberCardEntity>
+    examples:
+      - name: ExampleMember
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          cards: 
+            - $MemberCardEntity.ExampleMemberCard
+   
+  MembershipToCardDTO:
+    docs:
+      # Use this DTO to retrieve membership details and the cards associated with members of the membership.
+      This composite type represents a Membership along with its associated Cards. 
+      It extends the MembershipEntity and includes a list of cards linked to members of the membership.
+    extends: 
+      MembershipEntity
+    properties:
+      cards: list<MemberCardEntity>
+    examples:
+      - name: ExampleMembershipToCardDTO
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          cards: 
+            - $MemberCardEntity.ExampleMemberCard
+
+  ### Entities
+  MembershipEntity:
+    docs:
+      The MembershipEntity describes the basic attributes of a Membership. 
+    properties:
+      membershipId: simpleTypes.MembershipId
+      membershipNumber: simpleTypes.MembershipNumber
+      communityCode: simpleTypes.CommunityCode
+      membershipCode: simpleTypes.MembershipCode
+      issueDate: simpleTypes.IssueDate
+      validFromDate: optional<simpleTypes.ValidFromDate>
+      validUntilDate: optional<simpleTypes.ValidUntilDate>
+      customerNumber: optional<simpleTypes.CustomerNumber>
+      documentId: optional<simpleTypes.DocumentId>
+      blocked: simpleTypes.Blocked
+      active: optional<simpleTypes.Active>
+    examples:
+      - name: ExampleMembership
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+      - name: ExampleMembershipBlocked
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+
+  MemberEntityRequest:
+    docs:
+      # Use this DTO to create or update a member without including their associated memberships or cards.
+      The MemberEntityRequest defines the basic properties required to create or update a Member. 
+    properties:
+      firstName: optional<simpleTypes.FirstName>
+      middleName: optional<simpleTypes.MiddleName>
+      lastName: optional<simpleTypes.LastName>
+      address: optional<simpleTypes.Address>
+      postCode: optional<simpleTypes.PostCode>
+      city: optional<simpleTypes.City>
+      country: optional<simpleTypes.Country>
+      birthday: optional<simpleTypes.Birthday>
+      gender: optional<simpleTypes.Gender>
+      newsletter: optional<simpleTypes.Newsletter>
+      phoneNo: optional<simpleTypes.PhoneNo>
+      email: optional<simpleTypes.Email>
+    examples:
+      - name : ExampleMember
+        value:
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+
+  MemberEntityResponse:
+    docs:
+      The MemberEntityResponse extends the MemberEntityRequest and includes additional properties such as 
+      the member's ID, membership number, and blocked status. This DTO is used when returning a member's details.
+    extends: 
+      MemberEntityRequest
+    properties:
+      memberId: simpleTypes.MemberId
+      memberNumber: simpleTypes.MemberNumber
+      blocked: simpleTypes.Blocked
+    examples:
+      - name : ExampleMember
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+      - name : ExampleMemberBlocked
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          middleName: $simpleTypes.MiddleName.ExampleMiddleName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          address: $simpleTypes.Address.ExampleAddress
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          country: $simpleTypes.Country.ExampleCountry
+          birthday: $simpleTypes.Birthday.ExampleBirthday
+          gender: $simpleTypes.Gender.ExampleGender
+          newsletter: $simpleTypes.Newsletter.ExampleNewsletter
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          email: $simpleTypes.Email.ExampleEmail
+          blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+
+  MemberCardEntity:
+    docs:
+      The MemberCardEntity describes the attributes of a card linked to a Member. 
+      It is used within other composite DTOs to represent the cards associated with a member or membership.
+    properties:
+      cardId: optional<simpleTypes.CardId>
+      cardNumber: simpleTypes.CardNumber
+      expiryDate: simpleTypes.ExpiryDate
+      temporary: simpleTypes.TemporaryCard
+      blocked: optional<simpleTypes.Blocked>
+    examples:
+      - name: ExampleMemberCard
+        value:
+          cardId: $simpleTypes.CardId.ExampleCardId
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+          temporary: false
+      - name: ExampleMemberCardBlocked
+        value:
+          cardId: $simpleTypes.CardId.ExampleCardIdBlocked
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumberBlocked
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+          temporary: false
+          blocked: true
+      - name: ExampleMemberCardCreate
+        value:
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+          temporary: false
+
+  MembershipLifecycleDTO:
+    docs: 
+      # Use this DTO to retrieve the timeline of a membership including activation, renewal, upgrade, and extension details.
+      The MembershipLifecycleDTO is a composite type representing the timeline of a membership.
+      It includes details when the membership was activated, renewed, upgraded, or extended.
+    extends: 
+      MembershipEntity
+    properties:
+      entries: list<MembershipTimeEntryEntity>
+    examples:
+      - name: ExampleActivate
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          entries:
+              - $MembershipTimeEntryEntity.ExampleActivateEntry
+      - name: ExampleCancel
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.CancelDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          entries:
+              - $MembershipTimeEntryEntity.ExampleCancelEntry
+      - name: ExampleRenew
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          entries:
+              - $MembershipTimeEntryEntity.ExampleActivateEntry
+              - $MembershipTimeEntryEntity.ExampleRenewEntry
+      - name: ExampleUpgrade
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          entries:
+              - $MembershipTimeEntryEntity.ExampleCancelEntry
+              - $MembershipTimeEntryEntity.ExampleUpgradeEntry
+      - name: ExampleExtend
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          entries:
+              - $MembershipTimeEntryEntity.ExampleCancelEntry
+              - $MembershipTimeEntryEntity.ExampleExtendEntry
+
+  MembershipTimeEntryEntity:
+    docs:
+      The MembershipTimeEntryEntity describes the attributes of a time entry linked to a Membership. 
+      It is used within other composite DTOs to represent the validity associated with a membership.
+    properties:
+      timeEntryId: simpleTypes.TimeEntryId
+      validFromDate: simpleTypes.ValidFromDate
+      validUntilDate: simpleTypes.ValidUntilDate
+      activateOnFirstUse: simpleTypes.ActivateOnFirstUse
+      lifecycleAction: simpleTypes.LifecycleAction
+      itemNumber: simpleTypes.ItemNumber
+      amount: simpleTypes.Amount
+      amountInclVat: simpleTypes.AmountInclVat
+      receiptNumber: simpleTypes.ReceiptNumber
+      receiptLine: simpleTypes.ReceiptLine
+      membershipCode: simpleTypes.MembershipCode
+    examples:
+      - name: ExampleActivateEntry
+        value:
+          timeEntryId: 1223
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
+          activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleNew
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber
+          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+      - name: ExampleCancelEntry
+        value:
+          timeEntryId: 2332
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.CancelDate
+          activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleNew
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber
+          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+      - name: ExampleRenewEntry
+        value:
+          timeEntryId: 3443
+          validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
+          activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleRenew
+          itemNumber: $simpleTypes.ItemNumber.ExampleRenewWithItem
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
+          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+      - name: ExampleUpgradeEntry
+        value:
+          timeEntryId: 4554
+          validFromDate: $simpleTypes.LifecycleDate.UpgradeFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
+          activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleUpgrade
+          itemNumber: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
+          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+
+      - name: ExampleExtendEntry
+        value:
+          timeEntryId: 4554
+          validFromDate: $simpleTypes.LifecycleDate.ExtendFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
+          activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleExtend
+          itemNumber: $simpleTypes.ItemNumber.ExampleExtendWithItem
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
+          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+
+  LifecycleOptionDTO:
+    docs:
+      # Use this DTO to retrieve the available lifecycle options for a membership.
+      This composite type represents an item used to facilitate the renewal of a membership. It includes details such as the item number, renewal period, and pricing.
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      lifecycleAction: simpleTypes.LifecycleAction
+      description: string
+      targetMembershipCode: simpleTypes.MembershipCode
+      periodStart: simpleTypes.PeriodStart
+      periodEnd: simpleTypes.PeriodEnd
+      amount: simpleTypes.Amount
+      amountInclVat: simpleTypes.AmountInclVat
+      memberCardinality: integer
+      presentationOrder: integer
+    examples:
+      - name: ExampleRenewWithItem
+        value:
+          itemNumber: $simpleTypes.ItemNumber.ExampleRenewWithItem
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleRenew
+          description: "Renew GOLD Membership for 1 year"
+          targetMembershipCode: $simpleTypes.MembershipCode.GOLD
+          periodStart: $simpleTypes.LifecycleDate.RenewFromDate
+          periodEnd: $simpleTypes.LifecycleDate.RenewUntilDate
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          memberCardinality: 2
+          presentationOrder: 0
+      - name: ExampleUpgradeWithItem
+        value:
+          itemNumber: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleUpgrade
+          description: "Upgrade to PLATINUM Membership for the remaining period"
+          targetMembershipCode: $simpleTypes.MembershipCode.PLATINUM
+          periodStart: $simpleTypes.LifecycleDate.UpgradeFromDate
+          periodEnd: $simpleTypes.LifecycleDate.ValidUntilDate
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          memberCardinality: 2
+          presentationOrder: 0
+      - name: ExampleExtendWithItem
+        value:
+          itemNumber: $simpleTypes.ItemNumber.ExampleExtendWithItem
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleExtend
+          description: "Extend GOLD Membership with 1 year from today"
+          targetMembershipCode: $simpleTypes.MembershipCode.GOLD
+          periodStart: $simpleTypes.LifecycleDate.ExtendFromDate
+          periodEnd: $simpleTypes.LifecycleDate.ExtendUntilDate
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          memberCardinality: 2
+          presentationOrder: 0
+
+
+  MembershipItemCatalogDTO:
+    docs: 
+      Describes a membership item available for sale, including its unique identifier, pricing, type, and descriptions, Used to present detailed membership options to customers.  
+    properties:
+      itemNumber: simpleTypes.ItemNumber
+      type: simpleTypes.ItemMemberType
+      recommendedPrice: simpleTypes.AmountInclVat
+      membershipCode: simpleTypes.MembershipCode
+      itemDescription: simpleTypes.Description
+      shortDescription: simpleTypes.Description
+      fullDescription: simpleTypes.Description
+
+###########################
