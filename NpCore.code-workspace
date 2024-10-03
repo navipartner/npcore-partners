@@ -15,6 +15,10 @@
     {
       "name": "DOCUMENTATION",
       "path": "./Documentation"
+    },
+    {
+      "name": "FERN",
+      "path": "./fern"
     }
   ],
   "settings": {
