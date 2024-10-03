@@ -1,12 +1,8 @@
-table 6150691 "NPR EFT Adyen Local Unit Setup"
+table 6150913 "NPR EFT Adyen Unit Setup"
 {
     Access = Internal;
-    Caption = 'EFT Adyen Local POS Unit Setup';
+    Caption = 'EFT Adyen Unit Setup';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteTag = '2024-09-09';
-    ObsoleteReason = 'Use EFT Adyen Unit Setup instead';
-
 
     fields
     {
@@ -15,17 +11,11 @@ table 6150691 "NPR EFT Adyen Local Unit Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit"."No.";
             Caption = 'POS Unit No.';
-            ObsoleteState = Pending;
-            ObsoleteTag = '2024-09-09';
-            ObsoleteReason = 'Use EFT Adyen Unit Setup instead';
         }
         field(2; "Terminal LAN IP"; Text[15])
         {
             DataClassification = CustomerContent;
             Caption = 'Terminal LAN IP';
-            ObsoleteState = Pending;
-            ObsoleteTag = '2024-09-09';
-            ObsoleteReason = 'Use EFT Adyen Unit Setup instead';
 
             trigger OnValidate()
             var
@@ -41,9 +31,12 @@ table 6150691 "NPR EFT Adyen Local Unit Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Poi Id';
-            ObsoleteState = Pending;
-            ObsoleteTag = '2024-09-09';
-            ObsoleteReason = 'Use EFT Adyen Unit Setup instead';
+        }
+    }
+    keys
+    {
+        key(Key1; "POS Unit No.")
+        {
         }
     }
 }

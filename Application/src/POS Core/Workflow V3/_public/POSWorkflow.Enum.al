@@ -1121,6 +1121,16 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_ADYEN_LOCAL', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT Adyen Local";
     }
+    value(6184488; EFT_ADYEN_MPOS_TTP)
+    {
+        Caption = 'EFT_ADYEN_MPOS_TTP', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT Adyen TTP";
+    }
+    value(6184489; EFT_ADYEN_MPOS_LAN)
+    {
+        Caption = 'EFT_ADYEN_MPOS_LAN', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Adyen Mpos Lan";
+    }
     value(6184500; CASH_DRAWER_STATUS)
     {
         Caption = 'CASH_DRAWER_STATUS', Locked = true, MaxLength = 20;

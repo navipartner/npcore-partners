@@ -101,9 +101,15 @@
             Caption = 'Local Key Version';
             DataClassification = CustomerContent;
         }
+
         field(17; "Manual Capture"; Boolean)
         {
             Caption = 'Manual Capture';
+            DataClassification = CustomerContent;
+        }
+        field(18; "In Person Store Id"; Text[250])
+        {
+            Caption = 'Store Id';
             DataClassification = CustomerContent;
         }
     }
@@ -118,4 +124,19 @@
     fieldgroups
     {
     }
+
+    procedure GetEncryptionKeyMaterialJson(): Text
+    var
+        KeyMaterial: Codeunit "Json Text Reader/Writer";
+    begin
+        KeyMaterial.SetDoNotFormat();
+        KeyMaterial.WriteStartObject('');
+        KeyMaterial.WriteStringProperty('KeyIdentifier', Rec."Local Key Identifier");
+        KeyMaterial.WriteStringProperty('Password', Rec."Local Key Passphrase");
+        //Do not use Number value since it will output decimal
+        KeyMaterial.WriteProperty('KeyVersion');
+        KeyMaterial.WriteValue(Rec."Local Key Version");
+        KeyMaterial.WriteEndObject(); //root
+        exit(KeyMaterial.GetJSonAsText());
+    end;
 }

@@ -1,6 +1,6 @@
 https://docs.adyen.com/point-of-sale/
 
-We have 2 integrations to adyen, one for their cloud API and one for their local terminal API.
+We have 4 integrations to adyen, one for their cloud API, two for their local terminal API (via hardware and mpos) and one for their Tap-To-Pay App.
 The JSON payloads are the same in both directions as it is the same terminal processing that occurs.
 
 The result parsing is shared because the payloads are the same.
@@ -19,6 +19,17 @@ This means the workflow is not doing anything apart from polling the BC backend 
 The local integration uses the adyen .NET SDK embedded in our hardware connector.
 This means the workflow is forwarding the json request to our hardware connector, awaiting a json response.
 Because the local integration depends on our hardware connector that means that an MPOS setup cannot use it, without communicating via a hardware box, setup somewhere in the store with the HWC running on it.
+
+# Mpos Tap-to-Pay
+The tap to pay integration uses the adyen .NET SDK embedded in our mpos app.
+This means the workflow is forwarding the json request to our mpos, awaiting a json response.
+This integration is currently only supported via Android mpos with the Adyen Tap-to-Pay app installed.
+
+# Mpos LAN
+The tap to pay integration uses the adyen .NET SDK embedded in our mpos app.
+This means the workflow is forwarding the json request to our mpos, awaiting a json response.
+This integration is currently only supported via Android mpos which is responsible for encrypting the info, and forwarding the request to the terminal.
+The terminal can be standard terminals or enterprise smart terminals like the AMS1.
 
 # Common 
 The common folder contains all shared objects between the two integrations. This is mainly request building and response parsing as the JSON payloads are identical between the two.
