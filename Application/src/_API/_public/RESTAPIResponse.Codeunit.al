@@ -184,13 +184,12 @@ codeunit 6185021 "NPR REST API Response"
 
     #region Generic Response handling functions
     procedure CreateSuccessResponse(StatusCode: Enum "NPR REST API HTTP Status Code"; Value: JsonObject): Codeunit "NPR REST API Response"
-    var
-        Response: Codeunit "NPR REST API Response";
     begin
-        Response.Init();
-        Response.SetStatusCode(StatusCode);
-        Response.SetJson(Value);
-        exit(Response);
+        InitcurrCodeunit();
+        Init();
+        SetStatusCode(StatusCode);
+        SetJson(Value);
+        exit(_CurrCodeunit);
     end;
 
     procedure CreateErrorResponse(ErrorCode: Enum "NPR REST API Error Code"; ErrorMessage: Text): Codeunit "NPR REST API Response"
@@ -210,10 +209,10 @@ codeunit 6185021 "NPR REST API Response"
 
     procedure CreateErrorResponse(ErrorCode: Enum "NPR REST API Error Code"; ErrorMessage: Text; ErrorStatusCode: enum "NPR REST API HTTP Status Code"): Codeunit "NPR REST API Response"
     var
-        Response: Codeunit "NPR REST API Response";
         JsonBuilder: Codeunit "NPR JSON Builder";
         ErrorCodeName: Text;
     begin
+        InitcurrCodeunit();
         if (ErrorMessage.Trim() = '') then begin
             ErrorMessage := Format(ErrorCode);
         end;
@@ -234,10 +233,10 @@ codeunit 6185021 "NPR REST API Response"
                 .AddProperty('message', ErrorMessage)
             .EndObject();
 
-        Response.Init();
-        Response.SetStatusCode(ErrorStatusCode);
-        Response.SetJson(JsonBuilder.Build());
-        exit(Response);
+        Init();
+        SetStatusCode(ErrorStatusCode);
+        SetJson(JsonBuilder.Build());
+        exit(_CurrCodeunit);
     end;
 
     local procedure CreateSimpleJsonResponse(PropertyName: Text; PropertyValue: Text): JsonObject
