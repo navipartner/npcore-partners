@@ -1419,70 +1419,77 @@
         exit(POS_CreateRevokeRequestWorker(Token, TicketNo, SalesReceiptNo, SalesLineNo, AmountInOut, RevokeQuantity, ResponseMessage));
     end;
 
-    local procedure POS_CreateRevokeRequestWorker(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var RevokeQuantity: Integer; var ResponseMessage: Text): Integer
+    local procedure POS_CreateRevokeRequestWorker(var Token: Text[100]; TicketNo: Code[20]; SalesReceiptNo: Code[20]; SalesLineNo: Integer; var AmountInOut: Decimal; var QuantityToRevoke: Integer; var ResponseMessage: Text): Integer
     var
         Ticket: Record "NPR TM Ticket";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
 
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         DetTicketAccessEntry2: Record "NPR TM Det. Ticket AccessEntry";
-        InitialQuantity: Integer;
         TotalRefundAmount: Decimal;
         AdmissionRefundAmount: Decimal;
         TotalPct: Decimal;
         UsePctDistribution: Boolean;
-        AdmissionCount: Integer;
+        NumberOfAdmissions: Integer;
+        PaidQuantity, QuantityPerUnit : Integer;
         UnitPrice: Decimal;
         AlreadyAsked: Boolean;
         AllowRevoke: Boolean;
         TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
         PrimaryRequestLine: Boolean;
+        REVOKE_FAIL_BLOCKED, REVOKE_OK, REVOKE_FAIL_CANCEL, REVOKE_FAIL_POLICY : integer;
     begin
+        REVOKE_OK := 10;
+        REVOKE_FAIL_BLOCKED := 0;
+        REVOKE_FAIL_CANCEL := -10;
+        REVOKE_FAIL_POLICY := -20;
 
         Ticket.Get(TicketNo);
         if (Ticket.Blocked) then begin
             ResponseMessage := StrSubstNo(TICKET_BLOCKED, TicketNo);
-            exit(0);
+            exit(REVOKE_FAIL_BLOCKED);
         end;
+
+        if (Token = '') then
+            Token := GetNewToken();
+        PrimaryRequestLine := true;
 
         LockResources('POS_CreateRevokeRequest');
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
         TicketBOM.FindSet();
-        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         repeat
             TotalPct += TicketBOM."Refund Price %";
-            TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketBOM."Admission Code");
-            if not TicketAccessEntry.IsEmpty() then
-                AdmissionCount += 1;
         until (TicketBOM.Next() = 0);
         UsePctDistribution := (TotalPct = 100);
 
-        TicketAccessEntry.SetRange("Admission Code");
+        TicketAccessEntry.Reset();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        NumberOfAdmissions := TicketAccessEntry.Count;
+
         TicketAccessEntry.FindSet();
-
-        if (Token = '') then
-            Token := GetNewToken();
-        PrimaryRequestLine := true;
-
         repeat
+            TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
+            QuantityPerUnit := TicketBOM.Quantity; // TicketBOM.Quantity is the ticket quantity per uom (normally 1)
+            if (QuantityPerUnit < 1) then
+                QuantityPerUnit := 1;
 
-            DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-            DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-            DetTicketAccessEntry2.FindFirst();
-            InitialQuantity := DetTicketAccessEntry2.Quantity;
-
-            Admission.Get(TicketAccessEntry."Admission Code");
             AdmissionRefundAmount := 0;
+            QuantityToRevoke := TicketAccessEntry.Quantity;
 
-            TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code");
-            RevokeQuantity := TicketAccessEntry.Quantity;
+            DetTicketAccessEntry2.Reset();
+            DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry2.SetFilter(Type, '=%1|=%2|=%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID);
+            if (DetTicketAccessEntry2.FindFirst()) then
+                PaidQuantity := DetTicketAccessEntry2.Quantity;
 
-            UnitPrice := AmountInOut / InitialQuantity;
+            if (PaidQuantity = 0) then
+                UnitPrice := 0
+            else
+                UnitPrice := AmountInOut / QuantityPerUnit;
 
             case TicketBOM."Revoke Policy" of
                 TicketBOM."Revoke Policy"::UNUSED:
@@ -1493,38 +1500,33 @@
                         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
                         if (DetTicketAccessEntry.FindFirst()) then begin
 
-                            DetTicketAccessEntry2.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-                            DetTicketAccessEntry2.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-                            DetTicketAccessEntry2.FindFirst();
-                            if (TicketAccessEntry.Quantity >= DetTicketAccessEntry2.Quantity) then begin
-                                ResponseMessage := StrSubstNo(REVOKE_UNUSED_ERROR, TicketNo, Admission.Description, DetTicketAccessEntry."Created Datetime", Ticket."Item No.", TicketAccessEntry."Admission Code");
-                                exit(-20);
+                            if (PaidQuantity = QuantityToRevoke) then begin
+                                ResponseMessage := StrSubstNo(REVOKE_UNUSED_ERROR, TicketNo, TicketBOM.Description, DetTicketAccessEntry."Created Datetime", Ticket."Item No.", TicketAccessEntry."Admission Code");
+                                exit(REVOKE_FAIL_POLICY);
                             end;
 
-                            RevokeQuantity := DetTicketAccessEntry2.Quantity - TicketAccessEntry.Quantity;
-                            AmountInOut := UnitPrice * RevokeQuantity;
-
-                            if (UsePctDistribution) then
-                                AdmissionRefundAmount := RevokeQuantity * UnitPrice * TicketBOM."Refund Price %" / 100;
-
-                            if (not UsePctDistribution) then
-                                AdmissionRefundAmount := RevokeQuantity * UnitPrice / AdmissionCount;
-
-                        end else begin
-                            if (UsePctDistribution) then
-                                AdmissionRefundAmount := TicketAccessEntry.Quantity * UnitPrice * TicketBOM."Refund Price %" / 100;
-
-                            if (not UsePctDistribution) then
-                                AdmissionRefundAmount := TicketAccessEntry.Quantity * UnitPrice / AdmissionCount;
+                            // Group tickets will get the non-admitted quantity refunded
+                            QuantityToRevoke := PaidQuantity - QuantityToRevoke;
                         end;
+
+                        if (UsePctDistribution) then
+                            AdmissionRefundAmount := QuantityToRevoke * UnitPrice * TicketBOM."Refund Price %" / 100;
+
+                        if (not UsePctDistribution) then
+                            AdmissionRefundAmount := QuantityToRevoke * UnitPrice / NumberOfAdmissions;
 
                     end;
                 TicketBOM."Revoke Policy"::NEVER:
                     Error(REVOKE_NEVER_ERROR, TicketNo, Ticket."Item No.", TicketAccessEntry."Admission Code");
 
                 TicketBOM."Revoke Policy"::ALWAYS:
-                    AdmissionRefundAmount := AmountInOut / AdmissionCount;
+                    begin
+                        if (UsePctDistribution) then
+                            AdmissionRefundAmount := PaidQuantity * UnitPrice * TicketBOM."Refund Price %" / 100;
 
+                        if (not UsePctDistribution) then
+                            AdmissionRefundAmount := PaidQuantity * UnitPrice / NumberOfAdmissions;
+                    end;
                 else
                     Error(INVALID_POLICY, TicketBOM."Revoke Policy");
             end;
@@ -1534,13 +1536,8 @@
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::CANCELED_ADMISSION);
             if (DetTicketAccessEntry.FindFirst()) then begin
                 ResponseMessage := StrSubstNo(TICKET_CANCELLED, TicketNo, DetTicketAccessEntry."Created Datetime");
-                exit(-10);
+                exit(REVOKE_FAIL_CANCEL);
             end;
-
-            DetTicketAccessEntry.Reset();
-            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-            DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-            DetTicketAccessEntry.FindFirst();
 
             // Ticket is prepaid by third party
             DetTicketAccessEntry.Reset();
@@ -1550,7 +1547,7 @@
                 if (AdmissionRefundAmount <> 0) then begin
                     if (not AlreadyAsked) then begin
                         AlreadyAsked := true;
-                        AllowRevoke := Confirm(PREPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.");
+                        AllowRevoke := Confirm(PREPAID_REFUND, false, TicketAccessEntry."Admission Code", DetTicketAccessEntry."Sales Channel No.");
                     end;
                     if (not AllowRevoke) then
                         AdmissionRefundAmount := 0;
@@ -1565,7 +1562,7 @@
                 if (AdmissionRefundAmount <> 0) then begin
                     if (not AlreadyAsked) then begin
                         AlreadyAsked := true;
-                        AllowRevoke := Confirm(POSTPAID_REFUND, false, Admission."Admission Code", DetTicketAccessEntry."Sales Channel No.");
+                        AllowRevoke := Confirm(POSTPAID_REFUND, false, TicketAccessEntry."Admission Code", DetTicketAccessEntry."Sales Channel No.");
                     end;
                     if (not AllowRevoke) then
                         AdmissionRefundAmount := 0;
@@ -1592,12 +1589,12 @@
             ReservationRequest."Revoke Ticket Request" := true;
             ReservationRequest."Primary Request Line" := PrimaryRequestLine;
             ReservationRequest."Revoke Access Entry No." := TicketAccessEntry."Entry No.";
-            ReservationRequest.Quantity := RevokeQuantity;
+            ReservationRequest.Quantity := 1;
             ReservationRequest.Amount := AdmissionRefundAmount;
             ReservationRequest."AmountInclVat" := 0; //AdmissionRefundAmount;
 
             ReservationRequest."External Member No." := Ticket."External Member Card No.";
-            ReservationRequest."Admission Description" := Admission.Description;
+            ReservationRequest."Admission Description" := TicketBOM."Admission Description";
 
             ReservationRequest."Created Date Time" := CurrentDateTime();
 
@@ -1613,9 +1610,10 @@
 
         until (TicketAccessEntry.Next() = 0);
 
+        QuantityToRevoke := 1;
         AmountInOut := Round(TotalRefundAmount, 0.01);
 
-        exit(10);
+        exit(REVOKE_OK);
     end;
 
     procedure WS_CreateRevokeRequest(var Token: Text[100]; TicketNo: Code[20]; AuthorizationCode: Code[10]; VAR AmountInclVatInOut: Decimal; VAR RevokeQuantity: Integer)

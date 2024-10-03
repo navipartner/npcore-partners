@@ -157,6 +157,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         AdmissionCode: Code[20];
         ExternalTicketNumber: Code[30];
         TicketMaxQty: Integer;
+        TicketCurrentQty: Integer;
         ShowQtyDialog: Boolean;
         DefaultTicketNumber: Text;
         ShowWelcomeMessage: Boolean;
@@ -182,13 +183,15 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             Context.SetContext('TicketToken', TicketToken);
 
         AdmissionCode := CopyStr(Context.GetStringParameter('Admission Code'), 1, MaxStrLen(AdmissionCode));
-        TicketMaxQty := GetGroupTicketQuantity(Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
+        ShowQtyDialog := GetGroupTicketQuantity(ExternalTicketNumber, AdmissionCode, FunctionId, TicketCurrentQty, TicketMaxQty);
         Context.SetContext('TicketMaxQty', TicketMaxQty);
+        if (TicketMaxQty <> TicketCurrentQty) then
+            Context.SetContext('TicketMaxQty', StrSubstNo('%1 of %2', TicketCurrentQty, TicketMaxQty));
         Context.SetContext('ShowTicketQtyDialog', ShowQtyDialog);
 
     end;
 
-    local procedure GetGroupTicketQuantity(Context: Codeunit "NPR POS JSON Helper"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
+    local procedure GetGroupTicketQuantity(ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var TicketCurrentQty: Integer; var TicketMaxQty: Integer) ShowQtyDialogOut: Boolean
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
@@ -196,12 +199,11 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         IsAdmitted: Boolean;
     begin
+
+        // Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
-        if (not Ticket.FindFirst()) then begin
-            // Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
-            ShowQtyDialogOut := false;
-            exit(0);
-        end;
+        if (not Ticket.FindFirst()) then
+            exit(false);
 
         Ticket.TestField(Blocked, false);
         TicketType.Get(Ticket."Ticket Type Code");
@@ -212,27 +214,24 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         TicketAccessEntry.FindFirst();
 
         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-        if (AdmissionCode = '') then begin
-            DetTicketAccessEntry.Reset();
-            DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        end;
-
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
         IsAdmitted := DetTicketAccessEntry.FindFirst();
 
+        TicketMaxQty := TicketAccessEntry.Quantity;
+        DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|=%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID);
+        if (DetTicketAccessEntry.FindFirst()) then
+            TicketMaxQty := DetTicketAccessEntry.Quantity;
+
+        TicketCurrentQty := TicketAccessEntry.Quantity;
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-        DetTicketAccessEntry.FindFirst();
-        TicketMaxQty := DetTicketAccessEntry.Quantity;
+        if (DetTicketAccessEntry.FindFirst()) then
+            TicketCurrentQty := DetTicketAccessEntry.Quantity;
 
         ShowQtyDialogOut := ((not IsAdmitted) and (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP));
         if (FunctionId = 2) then
             ShowQtyDialogOut := false;
 
-        Context.SetContext('TicketQty', TicketAccessEntry.Quantity);
-        Context.SetContext('TicketMaxQty', TicketMaxQty);
-        Context.SetContext('ShowTicketQtyDialog', ShowQtyDialogOut);
-
-        exit(TicketMaxQty);
+        exit(ShowQtyDialogOut);
     end;
 
     local procedure DoWorkflowFunction(Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; PosUnitNo: Code[10]) Response: JsonObject
@@ -268,7 +267,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
                 POSFunction.ShowQuickStatistics(AdmissionCode);
             1:
                 begin
-                    if (SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode)) then
+                    if (SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, AdmissionCode, true)) then
                         POSFunction.RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint, ResponseText);
                 end;
             2:
@@ -280,7 +279,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
             5:
                 POSFunction.EditTicketHolder(POSSession, ExternalTicketNumber);
             6:
-                SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '');
+                SetGroupTicketConfirmedQuantity(Context, ExternalTicketNumber, '', false);
             7:
                 POSFunction.PickupPreConfirmedTicket(TicketReference, true, true, true);
             8:
@@ -317,11 +316,13 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         )
     end;
 
-    local procedure SetGroupTicketConfirmedQuantity(Context: Codeunit "NPR POS JSON Helper"; TicketReference: Code[50]; AdmissionCode: Code[20]): Boolean
+    local procedure SetGroupTicketConfirmedQuantity(Context: Codeunit "NPR POS JSON Helper"; TicketReference: Code[50]; AdmissionCode: Code[20]; ValidatePayment: Boolean): Boolean
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TICKET_UNPAID: Label 'Ticket is not valid for admission until it has been paid in full. Admission %1 is missing payment information.';
         ResponseMessage: Text;
         NewTicketQty: Integer;
         QtyChanged: Boolean;
@@ -341,6 +342,16 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         Context.GetInteger('TicketQuantity', NewTicketQty);
         if (NewTicketQty <= 0) then
             exit(true); // Accept current quantity on ticket. 
+
+        if (ValidatePayment) then begin
+            TicketAccessEntry.SetCurrentKey("Ticket No.");
+            TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+            TicketAccessEntry.FindSet();
+            repeat
+                if (not TicketManagement.CheckAdmissionIsPaid(TicketAccessEntry."Entry No.")) then
+                    Error(TICKET_UNPAID, AdmissionCode);
+            until (TicketAccessEntry.Next() = 0);
+        end;
 
         QtyChanged := TicketManagement.AttemptChangeConfirmedTicketQuantity(Ticket."No.", AdmissionCode, NewTicketQty, ResponseMessage);
 
