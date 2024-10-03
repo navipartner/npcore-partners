@@ -37,4 +37,8 @@ enum 6014605 "NPR EFT Adyen Response Type"
     {
         Caption = 'DisableContract';
     }
+    value(8; CacheRecoveredResponse)
+    {
+        Caption = 'CacheRecoveredResponse', Comment = 'Used in tap to pay, where result is cached if pos webview closes.';
+    }
 }

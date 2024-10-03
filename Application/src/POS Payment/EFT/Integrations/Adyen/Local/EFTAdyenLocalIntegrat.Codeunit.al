@@ -87,26 +87,20 @@
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        EFTAdyenPaymTypeSetup: Page "NPR EFT Adyen Paym. Type Setup";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
             exit;
 
         EFTAdyenIntegration.GetPaymentTypeParameters(EFTSetup, EFTAdyenPaymentTypeSetup);
         Commit();
-        PAGE.RunModal(PAGE::"NPR EFT Adyen Paym. Type Setup", EFTAdyenPaymentTypeSetup);
+        EFTAdyenPaymTypeSetup.SetLocal();
+        EFTAdyenPaymTypeSetup.SetRecord(EFTAdyenPaymentTypeSetup);
+        EFTAdyenPaymTypeSetup.RunModal();
     end;
 
-    procedure GetTerminalEndpoint(EFTSetup: Record "NPR EFT Setup"): Text[200]
-    var
-        EFTAdyenLocalUnitSetup: Record "NPR EFT Adyen Local Unit Setup";
-    begin
-        GetPOSUnitParameters(EFTSetup, EFTAdyenLocalUnitSetup);
-#pragma warning disable AA0139
-        exit(StrSubstNo('https://%1:8443/nexo', EFTAdyenLocalUnitSetup."Terminal LAN IP"));
-#pragma warning restore AA0139
-    end;
 
-    procedure GetPOSUnitParameters(EFTSetup: Record "NPR EFT Setup"; EFTAdyenLocalUnitSetup: Record "NPR EFT Adyen Local Unit Setup")
+    procedure GetPOSUnitParameters(EFTSetup: Record "NPR EFT Setup"; var EFTAdyenLocalUnitSetup: Record "NPR EFT Adyen Local Unit Setup")
     begin
         EFTSetup.TestField("Payment Type POS");
 

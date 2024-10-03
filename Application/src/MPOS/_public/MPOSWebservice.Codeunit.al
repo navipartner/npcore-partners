@@ -246,5 +246,33 @@
 
         exit(StrSubstNo(ResultTxt, Item."No.", Item.Description, ItemVariant.Code, ItemVariant.Description, Item."Item Category Code", ItemCategory.Description));
     end;
+
+    procedure GetAdyenTapToPayBoardingToken(BoardingRequestToken: Text): Text;
+    var
+        UserSetup: Record "User Setup";
+        POSUnit: Record "NPR POS Unit";
+        EFTSetup: Record "NPR EFT Setup";
+        EFTAdyenTTPInteg: Codeunit "NPR EFT Adyen TTP Integ.";
+        EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        EFTAdyneBoardingToken: Codeunit "NPR EFT Adyen Boarding Token";
+        Base64Token: Text;
+        LblUserSetup: Label 'No such user in UserSetup %1';
+        LblPosUnit: Label 'User not registered for a POS Unit';
+        LblEftSetup: Label 'No mathcing EFT setup was found for POS unit %1';
+        LblAdyenPaySetup: Label 'No matching setup was found for Adyen Payment Parameters for payment type %1';
+    begin
+        if (not UserSetup.Get(UserId())) then
+            Error(LblUserSetup, UserId());
+        if (not POSUnit.Get(UserSetup."NPR POS Unit No.")) then
+            Error(LblPosUnit);
+        EFTSetup.SetRange("POS Unit No.", POSUnit."No.");
+        EFTSetup.SetRange("EFT Integration Type", EFTAdyenTTPInteg.IntegrationType());
+        if (not EFTSetup.FindFirst()) then
+            Error(LblEftSetup, POSUnit."No.");
+        if (not EFTAdyenPaymTypeSetup.Get(EFTSetup."Payment Type POS")) then
+            Error(LblAdyenPaySetup, EFTSetup."Payment Type POS");
+        EFTAdyneBoardingToken.RequestBoardingToken(EFTAdyenPaymTypeSetup, BoardingRequestToken, Base64Token);
+        exit(Base64Token);
+    end;
 }
 

@@ -49,6 +49,7 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
             Json.WriteEndObject(); // TransactionConditions
         end;
         Json.WriteEndObject(); // PaymentTransaction
+
         Json.WriteStartObject('PaymentData');
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND then
             Json.WriteStringProperty('PaymentType', 'Refund');
@@ -59,6 +60,7 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
             Json.WriteEndObject(); // CardAcquisitionReference
         end;
         Json.WriteEndObject(); // PaymentData
+
         Json.WriteEndObject(); // PaymentRequest
         Json.WriteEndObject(); // SaleToPOIRequest
         Json.WriteEndObject(); // Root

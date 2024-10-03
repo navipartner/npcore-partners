@@ -25,7 +25,6 @@
         ERROR_RESPONSE_TYPE: Label 'Unknown response type %1';
     begin
         EFTTransactionRequest.Get(_EftTransactionEntryNo);
-
         case _ResponseType of
             Enum::"NPR EFT Adyen Response Type"::Diagnose:
                 ParseDiagnoseTransaction(_Data, EFTTransactionRequest);
@@ -43,6 +42,8 @@
                 ParseRejectNotification(_Data, EFTTransactionRequest);
             Enum::"NPR EFT Adyen Response Type"::DisableContract:
                 ParseDisableContract(_Data, EFTTransactionRequest);
+            Enum::"NPR EFT Adyen Response Type"::CacheRecoveredResponse:
+                ParsePaymentTransactionAsLookup(_Data, EFTTransactionRequest);
             else
                 Error(ERROR_RESPONSE_TYPE, _ResponseType);
         end;
@@ -55,6 +56,37 @@
         _ResponseType := ResponseTypeIn;
         _Data := DataIn;
         _EftTransactionEntryNo := EntryNo;
+    end;
+
+    local procedure ParsePaymentTransactionAsLookup(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        JObject: JsonObject;
+        JToken: JsonToken;
+    begin
+        OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
+        JObject.ReadFrom(Response);
+
+        if TrySelectToken(JObject, 'SaleToPOIResponse', JToken, false) then begin
+            //Assume direct payment response.
+            JObject := JToken.AsObject();
+
+            TrySelectToken(JObject, 'MessageHeader', JToken, true);
+            ValidateHeader(JToken.AsObject(), OriginalEFTTransactionRequest);
+        end;
+
+        TrySelectToken(JObject, 'PaymentResponse', JToken, true);
+        JObject := JToken.AsObject();
+
+        ParsePaymentResponse(JObject, EFTTransactionRequest);
+
+        case OriginalEFTTransactionRequest."Processing Type" of
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
+            EFTTransactionRequest."Processing Type"::REFUND:
+                EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output" * -1;
+        end;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParsePaymentTransaction(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
@@ -563,22 +595,53 @@
         end;
     end;
 
-    local procedure ParseAdditionalDataString(QueryString: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure ParseAdditionalDataString(DataString: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         NameValueCollection: Dictionary of [Text, Text];
+#IF BC17
+        RegEx: Codeunit DotNet_Regex;
+#ELSE
+        Regex: Codeunit Regex;
+#ENDIF
         "Key": Text;
     begin
-        ParseQueryString(QueryString, NameValueCollection);
+        if (DataString = '') then exit;
+        //Adyen can pass either a key/value pair query string or base64 string containing json object with message
+        //Only fallthrough value would be if there is only 1 key with no value: 'keyName=', this is unlikely though. 
+        if (RegEx.IsMatch(DataString, '^[a-zA-Z0-9+/]+={0,2}$')) then begin
+            ParseB64JsonKeyValueString(DataString, NameValueCollection);
+        end else begin
+            ParseQueryString(DataString, NameValueCollection);
+        end;
         foreach Key in NameValueCollection.Keys() do begin
-            case Key of
-                'AID':
+            case Key.ToLower() of
+                'aid':
                     EFTTransactionRequest."Card Application ID" := NameValueCollection.Get(Key);
-                'applicationPreferredName':
+                'applicationpreferredname':
                     EFTTransactionRequest."Card Name" := NameValueCollection.Get(Key);
-                'shopperReference':
+                'shopperreference':
                     EFTTransactionRequest."External Customer ID" := NameValueCollection.Get(Key);
                 'message':
                     EFTTransactionRequest."Result Display Text" := CopyStr(NameValueCollection.Get(Key), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+            end;
+        end;
+    end;
+
+    [TryFunction]
+    local procedure ParseB64JsonKeyValueString(DataString: Text; var NameValueCollection: Dictionary of [Text, Text])
+    var
+        Base64Convert: Codeunit "Base64 Convert";
+        Json: JsonObject;
+        JToken: JsonToken;
+        "Key": Text;
+    begin
+        Clear(NameValueCollection);
+        if (Json.ReadFrom(Base64Convert.FromBase64(DataString))) then begin
+            if (Json.Get('additionalData', JToken)) then
+                Json := JToken.AsObject();
+            foreach Key in Json.Keys() do begin
+                Json.Get(Key, JToken);
+                NameValueCollection.Add(Key, JToken.AsValue().AsText());
             end;
         end;
     end;

@@ -92,7 +92,7 @@
 
         EFTAdyenintegration.GetPaymentTypeParameters(EFTSetup, EFTAdyenPaymentTypeSetup);
         Commit();
-        EFTAdyenPaymTypeSetup.SetCloud(true);
+        EFTAdyenPaymTypeSetup.SetCloud();
         EFTAdyenPaymTypeSetup.SetRecord(EFTAdyenPaymentTypeSetup);
         EFTAdyenPaymTypeSetup.RunModal();
     end;
@@ -105,6 +105,7 @@
         exit(EFTTypePOSUnitGenParam.GetTextParameterValue(IntegrationType(), EFTSetupIn."POS Unit No.", 'POI ID', '', true));
 #pragma warning restore AA0139
     end;
+
     procedure GetAPIKey(EFTSetupIn: Record "NPR EFT Setup"): Text
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
@@ -113,6 +114,7 @@
         EFTAdyenintegration.GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup."API Key");
     end;
+
     procedure GetEnvironment(EFTSetupIn: Record "NPR EFT Setup"): Integer
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
