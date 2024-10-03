@@ -1,0 +1,18 @@
+---
+title: "Membership Lifecycle Services"
+hide-toc: false
+---
+
+The lifecycle endpoints are designed to manage and track the different stages and key events in a membership's existence. These endpoints help organizations and users understand the status, changes, and important transitions in a membership’s lifecycle, providing insight into its history and future.
+
+### Membership History ### 
+This endpoint provides a detailed view of the membership's past, capturing important milestones like creation, renewals, upgrades, downgrades, suspensions, and cancellations. It is useful for auditing and understanding the entire journey of the membership, from initiation to the current state.
+
+### Renew ### 
+The renew endpoint extends the membership beyond its current expiration date, adding additional time after the current period ends. This keeps the membership alive and ensures continuity for the member without any gaps in service.
+
+### Upgrade ###
+The upgrade endpoint allows for the membership to be transitioned to a higher or lower plan or tier. This changes the benefits or features associated with the membership but does not affect the overall membership duration. The focus here is on enhancing the membership while keeping the time period intact.
+
+### Extend ###
+The extend endpoint is used to modify the membership's time period by immediately terminating the current period and starting a new period from today. Unlike renewals, this results in an overall membership duration that is greater than before.

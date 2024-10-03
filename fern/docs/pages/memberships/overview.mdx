@@ -1,0 +1,33 @@
+---
+title: "Introduction to Memberships"
+
+---
+
+At a high level, the membership, member, and card entities form the core building blocks of a flexible system designed to manage the relationships between individuals and the memberships they hold. Each entity has a specific role within the system, and they are interrelated in a way that accommodates a wide range of use cases, such as family memberships, guardianship, and individual access management.
+
+## Membership ##
+A membership represents a defined relationship between an individual or a group of individuals (members) and an organization or service. Each membership can have one or more members, and it includes important information such as the type of membership, its associated benefits, and most importantly, a validity period that defines when the membership is active. A membership may also include complex structures like family memberships where multiple individuals (e.g., parents and children) are grouped together under the same membership umbrella.
+
+The validity of a membership is tied to time periods, which dictate when the membership is active. Time periods can be manipulated through actions like renewals (adding time after the current period), upgrades (changing the benefits while maintaining the same time frame), and extensions (terminating the current period early and starting a new one from today). These actions ensure that memberships are flexible and can adapt to different needs and life situations.
+
+## Member ##
+A member is an individual associated with one or more memberships. In many cases, a member will have a single membership, but they can hold multiple memberships concurrently, especially in scenarios like family memberships or guardianship relationships. For example, a parent may hold their own individual membership but also be a guardian on their child's membership, where they can manage and oversee the child's membership.
+
+The member entity is primarily focused on the person—their personal details, contact information, and their association with one or more memberships. The ability to link members to multiple memberships allows for flexibility in managing groups or families where a person may need to oversee or participate in different memberships simultaneously.
+
+## Card ##
+A card is a physical or virtual representation of a member’s access to their membership. Each member can have zero or more cards, and the cards are tied to specific memberships. Cards are primarily used to authenticate the member's access to services associated with the membership, such as gaining entry to a facility, participating in an event or getting membership benefits such as discounts.
+
+A card is linked to a specific member and a specific membership, providing a bridge between the person and their ability to interact with the membership benefits. Cards can be added, replaced, or removed as needed, and in cases where a card is lost or damaged, it can be replaced with a new one while blocking the old one. Not all members may have cards (for example, in cases where physical access is not required), but the option to assign cards provides flexibility in how memberships are managed.
+
+## Time Periods and Membership Lifecycle Actions ##
+A membership must have a valid time period that defines when it is active. This period ensures that members are only able to use their membership benefits during specific times. Various actions can manipulate these time periods:
+
+- **Renewals:** A renewal adds additional time after the current period, ensuring the membership continues without interruption once the current period ends.
+
+- **Upgrades:** An upgrade does not alter the time period but modifies the membership’s benefits by transitioning it to a higher or lower tier. The current period is terminated, but the overall duration remains the same.
+
+- **Extensions:** An extension creates a new period starting from today, terminating the current period early and ensuring the new period is longer than the original. This action increases the overall membership duration.
+
+These time period adjustments allow memberships to evolve over time, adapting to the changing needs of the member or the organization, while maintaining clarity over when a membership is valid and usable.
+

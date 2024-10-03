@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+service:
+  display-name: Miscellaneous
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+
+    resolveIdentifier:
+      docs: Resolves number as a specific membership, member, or card
+      display-name: Resolve Member Identifier
+      method: GET
+      path: /misc/{identifier}/resolve
+      path-parameters:
+        identifier: string
+      request:
+        name: resolveMemberIdentifier
+      response: ResolveMemberIdentifierResponse
+      examples:
+        - name: ExampleResolveIdentifier
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            identifier: "MS-DEMO-00152"  # Member Card Number
+          response:
+            body: $ResolveMemberIdentifierResponse.ExampleResolveMemberIdentifier
+
+    # generateNotificationToken:
+    #   docs: Generate a notification token for a member
+    #   display-name: Generate Notification Token
+    #   method: POST
+    #   path: /member/{memberId}/notification-token
+    #   path-parameters:
+    #     memberId: simpleTypes.MemberId
+    #   request:
+    #     name: generateNotificationToken
+
+    # expireNotificationToken:
+    #   docs: Expire a notification token
+    #   display-name: Expire Notification Token
+    #   method: POST
+    #   path: /member/{memberId}/notification-token/expire
+    #   path-parameters:
+    #     memberId: simpleTypes.MemberId
+    #   request:
+    #     name: expireNotificationToken
+
+    # validateNotificationToken:
+    #   docs: Validate a notification token
+    #   display-name: Validate Notification Token
+    #   method: POST
+    #   path: /notification-token/validate
+    #   request:
+    #     name: validateNotificationToken
+
+    # memberEmailExists:
+    #   docs: Check if a member's email exists
+    #   display-name: Check Member Email Exists
+    #   method: POST
+    #   path: /member/email-exists
+    #   request:
+    #     name: memberEmailExists
+
+    # getMembershipRoles:
+    #   docs: Retrieve roles associated with a membership
+    #   display-name: Get Membership Roles
+    #   method: GET
+    #   path: /membership/{membershipId}/roles
+    #   path-parameters:
+    #     membershipId: simpleTypes.MembershipId
+    #   request:
+    #     name: getMembershipRoles
+
+    # getMembershipTicketList:
+    #   docs: Retrieve a list of tickets associated with a membership
+    #   display-name: Get Membership Tickets
+    #   method: GET
+    #   path: /membership/{membershipId}/tickets
+    #   path-parameters:
+    #     membershipId: simpleTypes.MembershipId
+    #   request:
+    #     name: getMembershipTicketList
+
+    # changeMembershipValidation:
+    #   docs: "**** Validate a change to a membership"
+    #   display-name: Validate Membership Change
+    #   method: POST
+    #   path: /membership/{membershipId}/validate-change
+    #   path-parameters:
+    #     membershipId: simpleTypes.MembershipId
+    #   request:
+    #     name: membershipValidation
+
+
+types:
+  ResolveMemberIdentifierResponse:
+    properties:
+      type: simpleTypes.IdentifierType
+      membershipId: simpleTypes.MembershipId
+      memberId: simpleTypes.MemberId
+      cardId: simpleTypes.CardId
+      membershipNumber: simpleTypes.MembershipNumber
+      memberNumber: simpleTypes.MemberNumber
+      cardNumber: simpleTypes.CardNumber
+    examples:
+      - name: ExampleResolveMemberIdentifier
+        value:
+          type: $simpleTypes.IdentifierType.ExampleIdentifierType
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          cardId: $simpleTypes.CardId.ExampleCardId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber

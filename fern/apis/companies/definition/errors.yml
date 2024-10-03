@@ -7,7 +7,7 @@ errors:
     status-code: 401
   RequestFailed:
     status-code: 402
-  Forbiden:
+  Forbidden:
     status-code: 403
   ResourceNotFound:
     status-code: 404

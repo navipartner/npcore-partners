@@ -1,10 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 imports:
-  globalHeaders: ./global-types.yml
   simpleTypes: ./types-simple.yml
   compositeTypes: ./types-composite.yml  
-  errorTypes: ./types-errors.yml
   globalApiTypes: ./../global-api-types.yml
 
 service:
@@ -12,15 +10,16 @@ service:
   auth: false
   base-path: /ticketing
   headers:
-    x-api-version: optional<globalHeaders.ApiVersionDate>
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
 
     createReservation:
       docs: 
-        The process begins by creating a reservation for a ticket. 
-        This step typically involves specifying details such as the event, date, number of tickets, and any other relevant preferences. 
-        Once this request is made, the system will provisionally hold the requested tickets until the reservation is confirmed. 
-        It is important to note that the token has a limited lifespan and will expire after a certain time. This expiration serves several purposes, including ensuring that the tickets are not held indefinitely and that the system can release them for other customers if necessary.
+        Initiates a new reservation for tickets. 
+        Clients use this endpoint to provisionally hold tickets by specifying the desired items, 
+        quantities, and any specific admissions or schedules. 
+        Returns a token representing the reservation, along with its expiration time, 
+        allowing clients to manage or confirm the reservation before it expires.
       method: POST
       path: /reservation
       request:
@@ -28,8 +27,6 @@ service:
         body: CreateReservationRequest
       response: 
         type: GetReservationDetails
-      errors:
-        - errorTypes.BadRequestError
       examples:
         # Success response
           - name: ExampleCreateReservation1
@@ -58,9 +55,9 @@ service:
 
     updateReservation:
       docs: 
-        The token can be utilized to modify or update the reservation before it's confirmed. 
-        For instance, changes like adjusting the number of tickets or even changing the item number. The import aspect to note is that the existing reservation is deleted and replaced with the updated one. 
-        Updating as opposed to creating new reservations is important for releasing the previously held tickets back to the pool for other customers to reserve.
+        Modifies an existing reservation identified by a token. 
+        This endpoint replaces the current reservation details with new ones provided in the request, such as changing quantities or items. 
+        Useful for adjusting reservations before confirmation, ensuring that held tickets are updated and previous allocations are released.
       method: PUT
       path: /reservation/{token}
       path-parameters:
@@ -69,9 +66,6 @@ service:
         name: updateReservation 
         body: CreateReservationRequest
       response: GetReservationDetails
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         - path-parameters:
             saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -99,9 +93,9 @@ service:
 
     cancelReservation:
       docs: 
-        The token can be utilized to cancel an registered reservation. Confirmed reservations cannot be cancelled but must instead be revoked.
-        This action is typically taken when the customer no longer requires the tickets or has decided not to proceed with the purchase. 
-        Deleting the reservation ensures that the held tickets are released back into the system for other customers to reserve.
+        Cancels an existing registered reservation using its token. 
+        This endpoint releases the held tickets back into the system, making them available for other customers. 
+        Note that confirmed reservations cannot be canceled using this endpoint; they must be revoked through a different process.
       method: POST
       path: /reservation/{token}/cancel
       path-parameters:
@@ -109,9 +103,6 @@ service:
       request: 
         name: cancelReservation
       response: ReservationActionResponse
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         # Success response
         - path-parameters:
@@ -125,8 +116,10 @@ service:
 
     preConfirmReservation:
       docs: 
-        The token can be utilized to pre-confirm an existing reservation.
-        This action is typically taken when you want to extend the reservation's lifespan before confirming it.
+        Extends the lifespan of a provisional reservation identified by a token. 
+        Clients use this endpoint to keep the reservation active for a longer period before confirming it, 
+        preventing the tickets from expiring and being released back into the system.      
+        This action is typically taken when you want to extend the reservation's lifespan just before starting the payment process.
       method: POST
       path: /reservation/{token}/pre-confirm
       path-parameters:
@@ -134,9 +127,6 @@ service:
       request: 
         name: preConfirmReservation
       response: ReservationActionResponse
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         # Success response
         - path-parameters:
@@ -151,8 +141,9 @@ service:
 
     confirmReservation:
       docs: 
-        Confirming a reservation is the final step in the process. Tickets are finalized and the reservation is no longer provisional. 
-        The operation is irreversible and the tickets are considered sold. The operation will return the final details of the reservation, such as ticket numbers.
+        Finalizes a provisional reservation, turning it into a confirmed booking. 
+        This endpoint requires the reservation token and may include additional customer information such as ticket holder details and payment reference. 
+        Upon successful confirmation, the reservation status is updated, and ticket numbers are assigned.
       method: POST
       path: /reservation/{token}/confirm
       path-parameters:
@@ -161,9 +152,6 @@ service:
         name: confirmReservation 
         body: ConfirmReservationRequest
       response: GetReservationDetails
-      errors:
-        - errorTypes.NotFoundError
-        - errorTypes.BadRequestError
       examples:
         # Success response
         - name: ExampleConfirmReservation1
@@ -188,7 +176,9 @@ service:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
 
     getReservation:
-      docs: Get the content of an existing ticket reservation.
+      docs: 
+        Retrieves the current details of an existing reservation using its token. 
+        This endpoint allows clients to check the status, contents, and expiration time of a reservation, whether it's registered or confirmed.        
       method: GET
       path: /reservation/{token}
       path-parameters:
@@ -196,8 +186,6 @@ service:
       request: 
         name: getReservation
       response: GetReservationDetails
-      errors:
-        - errorTypes.NotFoundError
       examples:
         # Success response
         - path-parameters:
@@ -234,7 +222,9 @@ service:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
 
     getTickets:
-      docs: Retrieve ticket by its reservation token
+      docs: 
+        Obtains the detailed ticket information for a confirmed reservation identified by its token. 
+        Clients use this endpoint to retrieve ticket details such as ticket numbers, validity periods, and any other pertinent information needed for ticket delivery or display.
       display-name: Get Tickets
       method: GET
       path: /reservation/{token}/tickets
@@ -243,8 +233,6 @@ service:
       request: 
         name: getTickets
       response: list<compositeTypes.TicketDetails>
-      errors:
-        - errorTypes.NotFoundError
       examples:
         - path-parameters:
             saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
@@ -259,10 +247,19 @@ types:
   ## Complex types
   ## Top Level Request types
   CreateReservationRequest:
+    docs:
+      Used when initiating a new reservation for tickets. 
+      Contains a list of items (reserve) that the customer wants to reserve, 
+      specifying the ticket item numbers, quantities, and any additional content like admissions and schedules.
     properties:
       reserve: list<CreateReservationItemRequest>
   
   ConfirmReservationRequest:
+    docs:
+      Submitted when confirming a reservation, finalizing the ticket purchase. 
+      May include customer details such as ticketHolder name, 
+      notificationAddress for sending tickets or notifications, 
+      and a paymentReference to link the reservation to a payment transaction.
     properties:
       ticketHolder: optional<simpleTypes.TicketHolder>
       notificationAddress: optional<simpleTypes.NotificationAddress>
@@ -270,6 +267,10 @@ types:
 
   ## Nested Request types
   CreateReservationItemRequest:
+    docs:
+      Represents an individual ticket item within a reservation request. 
+      Includes the itemNumber, the desired quantity of tickets, and optional content detailing 
+      specific admissions or schedules associated with the ticket.
     properties:
       itemNumber: simpleTypes.ItemNumber
       quantity: simpleTypes.NumberOfTickets
@@ -279,6 +280,10 @@ types:
   ## Response types
   ## Top Level Response types
   GetReservationDetails:
+    docs:
+      Returned in response to reservation-related operations to provide the current state of the reservation. 
+      Includes the token identifying the reservation, its expiresAt timestamp, 
+      reservationStatus, and a list of reserved items (reservations) with their details.
     properties:
       token: simpleTypes.Token
       expiresAt: optional<simpleTypes.ExpiresAt>
@@ -286,13 +291,18 @@ types:
       reservations: list<ReservationItemDetails>
   
   ReservationActionResponse:
+    docs:
+      Provides a simplified response after performing actions like canceling or pre-confirming a reservation. 
+      Includes the updated reservationStatus and optionally the new expiresAt time if the reservation's lifespan was extended.
     properties:
       expiresAt: optional<simpleTypes.ExpiresAt>
       reservationStatus: simpleTypes.ReservationStatus
 
   ## Nested Response types
   ReservationItemDetails:
-    docs: List of items contained in the ticket reservation
+    docs: 
+      Contains detailed information about a specific item in a reservation. 
+      Includes the itemNumber, quantity reserved, associated ticket details, and a list of content items specifying admissions or other components included with the ticket.
     properties:
       itemNumber: simpleTypes.ItemNumber
       quantity: simpleTypes.NumberOfTickets
@@ -300,17 +310,27 @@ types:
       content: list<TicketContentDetails>
 
   TicketContentDetails:
-    docs: Each item in the ticket reservation may have multiple admissions with individual schedules
+    docs: 
+      Provides details about the admissions or content associated with a reserved ticket item. 
+      Contains admissionDetails that specify the particular admissions, schedules, 
+      and any relevant information for each component of the ticket.
     properties:
       admissionDetails: compositeTypes.AdmissionDetails
     
   AdmissionDetailsFull:
+    docs:
+      Extends AdmissionDetails with additional information specific to reservations, such as the reschedulePolicy. 
+      Offers comprehensive details about an admission, including policies affecting changes after reservation.
     extends: compositeTypes.AdmissionDetails
     properties:
       reschedulePolicy: string
 
   ReservationTicketDetails:
-    docs: Details of the ticket 
+    docs: 
+      Offers detailed ticket information within a reservation, 
+      including ticketNumbers if confirmed, validity periods (validFrom, validUntil), 
+      pricing details, and optional customer information like pinCode and ticketHolder name. 
+      Used to inform customers about their tickets and any actions they can perform.
     properties:
       ticketNumbers: optional<list<simpleTypes.TicketId>>
       validFrom: datetime
@@ -338,5 +358,3 @@ types:
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
-
-

@@ -1,8 +1,25 @@
 ---
 title: "Introduction to the Ticketing API"
-
 ---
-### Reservations: The Reservation Lifecycle
+
+## Catalog: The store front ##
+
+The catalog endpoints provide access to essential ticket information for headless setups, 
+offering a flexible entry point for different sales channels. The store code acts as a 
+filter to display a subset of tickets tailored to a specific sales channel or platform, 
+allowing for customized offers. The store fronts are usually localized by language, and 
+certain fields support HTML formatting for enhanced presentation of ticket details.
+
+## Capacity: Availability and Time Slots ##
+
+The capacity API handles the availability of tickets for specific admissions at defined times. 
+Admissions represent the areas or events a ticket allows access to and are identified by unique codes. 
+To be valid, a ticket must be linked to a time slot that defines when it can be used. 
+Even sold-out or non-allocatable time slots are shown to indicate popularity and scarcity.
+Dynamic pricing allows for time slots to have variable prices based on demand.
+
+
+## Reservations: The Reservation Lifecycle ##
 
 The ticket reservation system manages the entire lifecycle of a ticket, from initial creation to confirmation, 
 cancellation, and validation. When a reservation is made, the system returns a token that can be used to 
@@ -12,24 +29,9 @@ This token expires after a set period, and tickets are not valid until confirmed
 The item number is a key identifier that represents the type of product being sold (i.e., the ticket) 
 and is used to determine its base price from a general price list. 
 
-### Ticket: Admission and Access Control
+## Ticket: Admission and Access Control ##
 
 Each ticket grants access to one or more admissions, which are sections or events a user can attend. 
 For tickets to be valid, they must specify not only what the holder can access but also when they can access it. 
 
-### Capacity: Availability and Time Slots
-
-The capacity API handles the availability of tickets for specific admissions at defined times. 
-Admissions represent the areas or events a ticket allows access to and are identified by unique codes. 
-To be valid, a ticket must be linked to a time slot that defines when it can be used. 
-Even sold-out or non-allocatable time slots are shown to indicate popularity and scarcity.
-Dynamic pricing allows for time slots to have variable prices based on demand.
-
-### Catalog: The store front 
-
-The catalog endpoints provide access to essential ticket information for headless setups, 
-offering a flexible entry point for different sales channels. The store code acts as a 
-filter to display a subset of tickets tailored to a specific sales channel or platform, 
-allowing for customized offers. The store fronts are usually localized by language, and 
-certain fields support HTML formatting for enhanced presentation of ticket details.
 

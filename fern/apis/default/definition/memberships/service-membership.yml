@@ -1,0 +1,219 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+service:
+  display-name: Memberships
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+    createMembership:
+      docs: Use this endpoint to create a new membership. 
+      display-name: Create Membership
+      method: POST
+      path: /membership
+      request:
+        name: createMembership
+        body: CreateMembershipRequest
+      response: CreateMembershipResponse
+      examples:
+        - name: ExampleMembership1
+          docs: Example response for the createMembership endpoint
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateMembershipRequest.ExampleCreateMembership
+          response:
+            body: $CreateMembershipResponse.ExampleCreateMembership
+
+    getMembershipId:
+      docs: 
+        This endpoint retrieves the details of a specific membership using its unique membership ID. 
+        It’s useful for checking the status, validity, and other details of an existing membership.
+      display-name: Get using Id
+      method: GET
+      path: /membership/id/{membershipId}
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getMembershipId
+      response: GetMembershipResponse
+      examples:
+        - name: ExampleGetMembershipId
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $GetMembershipResponse.ExampleGetMembership
+
+    getMembershipNumber:
+      docs: 
+        Use this endpoint to retrieve membership details based on the membership number. 
+        This is helpful when the ID isn't available but the membership number is known.
+      display-name: Get using Number
+      method: GET
+      path: /membership/number/{membershipNumber}
+      path-parameters:
+        membershipNumber: simpleTypes.MembershipNumber
+      request:
+        name: getMembershipNumber
+      response: GetMembershipResponse
+      examples:
+        - name: ExampleGetMembershipNumber
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          response:
+            body: $GetMembershipResponse.ExampleGetMembership
+
+    blockMembership:
+      docs:  
+        Use this endpoint to block a membership, preventing any further activity on it. 
+      display-name: Block Membership
+      method: POST
+      path: /membership/{membershipId}/block
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: blockMembership
+      response: BlockMembershipResponse
+      examples:
+        - name: ExampleBlockMembership
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $BlockMembershipResponse.ExampleBlockMembership
+
+    unblockMembership:
+      docs: 
+        Unblock a previously blocked membership using this endpoint. 
+        It reactivates the membership, allowing members to resume activity after a block period.
+      display-name: Unblock Membership
+      method: POST
+      path: /membership/{membershipId}/unblock
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: unblockMembership
+      response: UnblockMembershipResponse
+      examples:
+        - name: ExampleUnblockMembership
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $UnblockMembershipResponse.ExampleUnblockMembership
+
+    getMembers:
+      docs: 
+        This endpoint retrieves all members associated with a specific membership. 
+        It is useful you need to see a list of all participants or account holders under a single membership.
+      display-name: Get Members
+      method: GET
+      path: /membership/{membershipId}/members
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getMembershipMembers
+      response: GetMembersResponse
+      examples:
+        - name: GetMembershipMembers
+          path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response: 
+            body: $GetMembersResponse.ExampleGetMembers
+
+
+###################################################
+types:
+  # Create Membership Service
+  CreateMembershipRequest:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      itemNumber: simpleTypes.ItemNumber
+      activationDate: optional<simpleTypes.ActivationDate>
+      companyName: optional<simpleTypes.CompanyName>
+      preassignedCustomerNumber: optional<simpleTypes.PreassignedCustomerNumber>
+    examples:
+      - name: ExampleCreateMembership
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          #activationDate: $simpleTypes.ActivationDate.ExampleActivationDate
+          #companyName: $simpleTypes.CompanyName.ExampleCompanyName
+          #preassignedCustomerNumber: $simpleTypes.PreassignedCustomerNumber.ExamplePreassignedCustomerNumber
+
+  CreateMembershipResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipEntity
+    examples:
+      - name: ExampleCreateMembership
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipEntity.ExampleMembership
+
+
+  # Get Membership Service
+  GetMembershipResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipEntity
+    examples:
+      - name: ExampleGetMembership
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipEntity.ExampleMembership
+
+  # Block Membership Service
+  BlockMembershipResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipEntity
+    examples:
+      - name: ExampleBlockMembership
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipEntity.ExampleMembershipBlocked
+
+  # Unblock Membership Service
+  UnblockMembershipResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipEntity
+    examples:
+      - name: ExampleUnblockMembership
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipEntity.ExampleMembership
+  
+  # Get Members Service
+  GetMembersResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipDTO
+    examples:
+      - name: ExampleGetMembers
+        value:
+          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
+          membership: $compositeTypes.MembershipDTO.ExampleMembershipDTO
+
