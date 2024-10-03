@@ -10,6 +10,10 @@ codeunit 6150648 "NPR Json Parser"
         TokenStack: List of [JsonToken];
         HasCurrCodeunit: Boolean;
         CurrCodeunit: Variant;
+        ObjectPropertyNotFoundErr: Label 'Property %1 not found or is not an object', Comment = '%1 is a property name';
+        ArrayPropertyNotFoundErr: Label 'Property %1 not found or is not an array', Comment = '%1 is a property name';
+        CanNotExistObjectErr: Label 'Cannot exit object: No object to exit from';
+        CanNotExistArrayErr: Label 'Cannot exit array: No array to exit from';
 
     procedure Parse(JsonText: Text): Codeunit "NPR JSON Parser"
     var
@@ -34,7 +38,7 @@ codeunit 6150648 "NPR Json Parser"
     begin
         InitcurrCodeunit();
         if not TryEnterObject(PropertyName) then
-            Error('Property %1 not found or is not an object', PropertyName);
+            Error(ObjectPropertyNotFoundErr, PropertyName);
         exit(CurrCodeunit);
     end;
 
@@ -57,7 +61,7 @@ codeunit 6150648 "NPR Json Parser"
     begin
         InitcurrCodeunit();
         if TokenStack.Count = 0 then
-            Error('Cannot exit object: No object to exit from');
+            Error(CanNotExistObjectErr);
 
         JsonToken := TokenStack.Get(TokenStack.Count);
         TokenStack.RemoveAt(TokenStack.Count);
@@ -72,7 +76,7 @@ codeunit 6150648 "NPR Json Parser"
     begin
         InitcurrCodeunit();
         if not TryEnterArray(PropertyName) then
-            Error('Property %1 not found or is not an array', PropertyName);
+            Error(ArrayPropertyNotFoundErr, PropertyName);
         exit(CurrCodeunit);
     end;
 
@@ -95,7 +99,7 @@ codeunit 6150648 "NPR Json Parser"
     begin
         InitcurrCodeunit();
         if TokenStack.Count = 0 then
-            Error('Cannot exit array: No array to exit from');
+            Error(CanNotExistArrayErr);
 
         JsonToken := TokenStack.Get(TokenStack.Count);
         TokenStack.RemoveAt(TokenStack.Count);
@@ -109,7 +113,7 @@ codeunit 6150648 "NPR Json Parser"
     procedure GetProperty(PropertyName: Text; var Value: List of [Text]; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
     begin
         InitcurrCodeunit();
-        HasProperty := TryGetPropertyList(PropertyName, Value);
+        HasProperty := TryGetProperty(PropertyName, Value);
         exit(CurrCodeunit);
     end;
 
@@ -120,7 +124,7 @@ codeunit 6150648 "NPR Json Parser"
         exit(GetProperty(PropertyName, Value, hasProperty));
     end;
 
-    procedure TryGetPropertyList(PropertyName: Text; var Value: List of [Text]): Boolean
+    procedure TryGetProperty(PropertyName: Text; var Value: List of [Text]): Boolean
     var
         valueJsonToken: JsonToken;
         ArrayElement: JsonToken;
@@ -181,7 +185,7 @@ codeunit 6150648 "NPR Json Parser"
     procedure GetProperty(PropertyName: Text; var Value: Text; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
     begin
         InitcurrCodeunit();
-        HasProperty := TryGetPropertyText(PropertyName, Value);
+        HasProperty := TryGetProperty(PropertyName, Value);
         exit(CurrCodeunit);
     end;
 
@@ -192,7 +196,7 @@ codeunit 6150648 "NPR Json Parser"
         exit(GetProperty(PropertyName, Value, hasProperty));
     end;
 
-    procedure TryGetPropertyText(PropertyName: Text; var Value: Text): Boolean
+    procedure TryGetProperty(PropertyName: Text; var Value: Text): Boolean
     var
         valueJsonToken: JsonToken;
     begin
@@ -216,7 +220,7 @@ codeunit 6150648 "NPR Json Parser"
     procedure GetProperty(PropertyName: Text; var Value: Integer; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
     begin
         InitcurrCodeunit();
-        HasProperty := TryGetPropertyInteger(PropertyName, Value);
+        HasProperty := TryGetProperty(PropertyName, Value);
         exit(CurrCodeunit);
     end;
 
@@ -227,7 +231,7 @@ codeunit 6150648 "NPR Json Parser"
         exit(GetProperty(PropertyName, Value, hasProperty));
     end;
 
-    procedure TryGetPropertyInteger(PropertyName: Text; var Value: Integer): Boolean
+    procedure TryGetProperty(PropertyName: Text; var Value: Integer): Boolean
     var
         valueJsonToken: JsonToken;
     begin
@@ -242,7 +246,7 @@ codeunit 6150648 "NPR Json Parser"
         exit(true);
     end;
 
-    procedure GetValuesAsJsonValueList(var ValueList: List of [JsonValue]): Codeunit "NPR JSON Parser"
+    procedure GetValues(var ValueList: List of [JsonValue]): Codeunit "NPR JSON Parser"
     var
         ArrayElement: JsonToken;
     begin
@@ -253,21 +257,21 @@ codeunit 6150648 "NPR Json Parser"
         exit(CurrCodeunit);
     end;
 
-    procedure GetPropertyBoolean(PropertyName: Text; var Value: Boolean): Codeunit "NPR JSON Parser"
+    procedure GetProperty(PropertyName: Text; var Value: Boolean): Codeunit "NPR JSON Parser"
     var
         hasProperty: Boolean;
     begin
-        exit(GetPropertyBoolean(PropertyName, Value, hasProperty));
+        exit(GetProperty(PropertyName, Value, hasProperty));
     end;
 
-    procedure GetPropertyBoolean(PropertyName: Text; var Value: Boolean; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    procedure GetProperty(PropertyName: Text; var Value: Boolean; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
     begin
         InitcurrCodeunit();
-        HasProperty := TryGetPropertyBoolean(PropertyName, Value);
+        HasProperty := TryGetProperty(PropertyName, Value);
         exit(CurrCodeunit);
     end;
 
-    procedure TryGetPropertyBoolean(PropertyName: Text; var Value: Boolean): Boolean
+    procedure TryGetProperty(PropertyName: Text; var Value: Boolean): Boolean
     var
         valueJsonToken: JsonToken;
     begin
@@ -282,21 +286,21 @@ codeunit 6150648 "NPR Json Parser"
         exit(true);
     end;
 
-    procedure GetPropertyDecimal(PropertyName: Text; var Value: Decimal): Codeunit "NPR JSON Parser"
+    procedure GetProperty(PropertyName: Text; var Value: Decimal): Codeunit "NPR JSON Parser"
     var
         hasProperty: Boolean;
     begin
-        exit(GetPropertyDecimal(PropertyName, Value, hasProperty));
+        exit(GetProperty(PropertyName, Value, hasProperty));
     end;
 
-    procedure GetPropertyDecimal(PropertyName: Text; var Value: Decimal; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    procedure GetProperty(PropertyName: Text; var Value: Decimal; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
     begin
         InitcurrCodeunit();
-        HasProperty := TryGetPropertyDecimal(PropertyName, Value);
+        HasProperty := TryGetProperty(PropertyName, Value);
         exit(CurrCodeunit);
     end;
 
-    procedure TryGetPropertyDecimal(PropertyName: Text; var Value: Decimal): Boolean
+    procedure TryGetProperty(PropertyName: Text; var Value: Decimal): Boolean
     var
         valueJsonToken: JsonToken;
     begin
