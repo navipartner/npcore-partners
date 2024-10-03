@@ -1027,7 +1027,6 @@
 
     procedure ChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer)
     var
-        TicketRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -1035,7 +1034,8 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntryNo: Integer;
         AllowAdmissionOverAllocation: Enum "NPR TM Ternary";
-        OriginalQty: Integer;
+        PaidQty: Integer;
+        CurrentQty: Integer;
         ExtAdmSchEntryNo: Integer;
         QTY_CHANGE_NOT_ALLOWED: Label 'Ticket %1 has been used and quantity cannot be changed. %2 %3.';
         ENTRY_NOT_FOUND: Label 'Ticket %1 has been paid and quantity cannot be changed. %2 %3.';
@@ -1060,6 +1060,17 @@
             if (DetTicketAccessEntry.FindFirst()) then
                 RaiseError(StrSubstNo(QTY_CHANGE_NOT_ALLOWED, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), QTY_CHANGE_NOT_ALLOWED_NO);
 
+            PaidQty := 0;
+            DetTicketAccessEntry.Reset();
+            DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+            DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+            DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID);
+            if (DetTicketAccessEntry.FindFirst()) then
+                PaidQty := DetTicketAccessEntry.Quantity;
+
+            if (NewTicketQuantity > PaidQty) then
+                RaiseError(StrSubstNo(HAS_PAYMENT, Ticket."External Ticket No."), HAS_PAYMENT_NO);
+
             DetTicketAccessEntry.Reset();
             DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
@@ -1067,16 +1078,13 @@
             if (not DetTicketAccessEntry.FindLast()) then
                 RaiseError(StrSubstNo(ENTRY_NOT_FOUND, TicketNo, DetTicketAccessEntry.TableCaption(), DetTicketAccessEntry."Entry No."), ENTRY_NOT_FOUND_NO);
 
-            OriginalQty := DetTicketAccessEntry.Quantity;
+            CurrentQty := DetTicketAccessEntry.Quantity;
             ExtAdmSchEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
 
-            if (DetTicketAccessEntry."Closed By Entry No." = 0) then begin // not paid
-                DetTicketAccessEntry.Quantity := NewTicketQuantity;
-                DetTicketAccessEntry.Modify();
-
-                TicketAccessEntry.Quantity := NewTicketQuantity;
-                TicketAccessEntry.Modify();
-            end;
+            DetTicketAccessEntry.Quantity := NewTicketQuantity;
+            DetTicketAccessEntry.Modify();
+            TicketAccessEntry.Quantity := NewTicketQuantity;
+            TicketAccessEntry.Modify();
 
             DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
             if (DetTicketAccessEntry.FindFirst()) then begin
@@ -1085,14 +1093,7 @@
                 DetTicketAccessEntry.Modify();
             end;
 
-            if (NewTicketQuantity > OriginalQty) then begin
-                DetTicketAccessEntry.Reset();
-                DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
-                DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-                DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID);
-                if (not DetTicketAccessEntry.IsEmpty()) then
-                    RaiseError(StrSubstNo(HAS_PAYMENT, Ticket."External Ticket No."), HAS_PAYMENT_NO);
-
+            if (NewTicketQuantity > CurrentQty) then begin
                 AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_FALSE;
                 if (TicketBom."POS Sale May Exceed Capacity") then
                     AllowAdmissionOverAllocation := AllowAdmissionOverAllocation::TERNARY_UNKNOWN;
@@ -1103,21 +1104,6 @@
             end;
 
         until (TicketAccessEntry.Next() = 0);
-
-
-        //-> TODO: this assumes base 1 as the sales quantity and since the input is quantity to admit and not a factor of the base quantity, this is not correct
-        TicketRequest.Get(Ticket."Ticket Reservation Entry No.");
-        TicketRequest.SetCurrentKey("Session Token ID");
-        TicketRequest.SetFilter("Session Token ID", '=%1', TicketRequest."Session Token ID");
-        TicketRequest.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
-        TicketRequest.FindSet();
-        repeat
-            if (TicketRequest."Admission Inclusion" <> TicketRequest."Admission Inclusion"::NOT_SELECTED) then begin
-                TicketRequest.Quantity := NewTicketQuantity;
-                TicketRequest.Modify();
-            end;
-        until (TicketRequest.Next() = 0);
-
     end;
 
     local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
@@ -1423,7 +1409,6 @@
     local procedure ValidateTicketReference(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketIdentifier: Text[30];
     begin
@@ -1456,16 +1441,22 @@
         if (TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED) then
             RaiseError(StrSubstNo(TICKET_CANCELED, TicketIdentifier), TICKET_CANCELED_NO);
 
-        if (not SkipPaymentCheck) then begin
-            DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
-            DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-            DetailedTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetailedTicketAccessEntry.Type::PAYMENT, DetailedTicketAccessEntry.Type::PREPAID, DetailedTicketAccessEntry.Type::POSTPAID);
-            if (DetailedTicketAccessEntry.IsEmpty()) then
+        if (not SkipPaymentCheck) then
+            if (not CheckAdmissionIsPaid(TicketAccessEntry."Entry No.")) then
                 RaiseError(StrSubstNo(MISSING_PAYMENT, TicketIdentifier), MISSING_PAYMENT_NO);
-        end;
 
         TicketAccessEntryNo := TicketAccessEntry."Entry No.";
         exit;
+    end;
+
+    internal procedure CheckAdmissionIsPaid(TicketAccessEntryNo: Integer): Boolean
+    var
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.");
+        DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
+        DetailedTicketAccessEntry.SetFilter(Type, '=%1|=%2|%3', DetailedTicketAccessEntry.Type::PAYMENT, DetailedTicketAccessEntry.Type::PREPAID, DetailedTicketAccessEntry.Type::POSTPAID);
+        exit(not DetailedTicketAccessEntry.IsEmpty());
     end;
 
     procedure CheckIfCanBeConsumed(TicketNo: Code[20]; AdmissionCode: Code[20]; ItemNo: Code[20]; var ReasonText: Text): Boolean
