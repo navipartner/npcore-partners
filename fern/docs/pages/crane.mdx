@@ -12,12 +12,12 @@ When working with NaviPartner's Crane container environment, specific adjustment
 
 In the standard REST API configuration, the URL is structured as follows:
 ```
-https://api.navipartner.com/{saasguid}/{saasenv}/{company}/[endpoint]
+https://api.navipartner.app/{saasguid}/{saasenv}/{company}/[endpoint]
 ```
 
 When routing requests to the Crane container environment, the URL must be adjusted to the following format:
 ```
-https://api.navipartner.com/{container-name}/{nst-instance}/{company}/[endpoint]
+https://api.navipartner.app/{container-name}/{nst-instance}/{company}/[endpoint]
 ```
 
 - `{container-name}`: Replace `{saasguid}` with the name of the specific Crane container you are targeting.
@@ -31,7 +31,7 @@ To ensure that API requests are correctly routed to the Crane environment, an ad
 Add the following header to your API requests:
 
 ```json
-"bcapi-remote-type": "crane"
+"x-npr-api-remote-type": "crane"
 ```
 
 ### Example API Request
@@ -39,14 +39,14 @@ Below is an example of how an API request would look after applying the necessar
 
 #### Original Request
 ```
-GET https://api.navipartner.com/c35fabce-d6b1-4e2f-b539-dabc68f0e7bb/production/MyCompany/v1.0/customers
+GET https://api.navipartner.app/c35fabce-d6b1-4e2f-b539-dabc68f0e7bb/production/MyCompany/v1.0/customers
 ```
 
 #### Modified Request for Crane
 ```
-GET https://api.navipartner.com/XY123456/BC/MyCompany/v1.0/customers
+GET https://api.navipartner.app/XY123456/BC/MyCompany/v1.0/customers
 ```
 
 ### Summary
-To integrate your application with the Crane container environment, ensure you adjust the URL structure as described and include the `"bcapi-remote-type": "crane"` header in your API requests. 
+To integrate your application with the Crane container environment, ensure you adjust the URL structure as described and include the `"x-npr-api-remote-type": "crane"` header in your API requests. 
 These changes will direct your requests to the appropriate environment, allowing you to interact with Business Central within the Crane infrastructure.
