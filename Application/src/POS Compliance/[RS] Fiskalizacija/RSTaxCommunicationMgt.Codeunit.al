@@ -547,6 +547,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         HasArchVoucherEntry := NpRvArchVoucherEntry.FindFirst();
         CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
+            Clear(JArray);
             Clear(JObjectLines);
             if POSEntry."Amount Incl. Tax" = 0 then
                 POSEntry."Amount Incl. Tax" += 0.01;
@@ -782,8 +783,11 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                     JObjectHeader.Add('referentDocumentDT', Format(RSPOSAuditLogAuxInfoReferent."SDC DateTime"));
                 end else
                     JObjectHeader.Add('referentDocumentNumber', '');
-                SalesInvoiceHeader.CalcFields("Amount Including VAT");
-                JObjectLines.Add('amount', SalesInvoiceHeader."Amount Including VAT" - RSPOSAuditLogAuxInfoReferent."Total Amount");
+
+                if JObjectLines.Contains('amount') then
+                    JObjectLines.Replace('amount', Round(SalesInvoiceHeader."Amount Including VAT" - RSPOSAuditLogAuxInfoReferent."Total Amount", 0.01))
+                else
+                    JObjectLines.Add('amount', Round(SalesInvoiceHeader."Amount Including VAT" - RSPOSAuditLogAuxInfoReferent."Total Amount", 0.01))
             end else
                 JObjectHeader.Add('referentDocumentNumber', '');
         end;
@@ -940,7 +944,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
     local procedure CreateJSONBodyForRSFiscalAdvanceSale(var RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesHeader: Record "Sales Header"; IsCopy: Boolean): Text
     var
         RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         POSEntry: Record "NPR POS Entry";
         RSPOSAuditLogAuxInfoReferent: Record "NPR RS POS Audit Log Aux. Info";
@@ -975,10 +978,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             else
                 JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::ADVANCE));
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::SALE));
-        Clear(JObjectLines);
-        SalesInvoiceHeader.CalcFields("Amount Including VAT");
-        JObjectLines.Add('amount', SalesInvoiceHeader."Amount Including VAT");
-        CalculatePaymentMethods(RSPOSAuditLogAuxInfo, POSEntryPaymentLine, JArray, JObjectLines);
         if RSPOSAuditLogAuxInfo."POS Entry Type" in [RSPOSAuditLogAuxInfo."POS Entry Type"::"Credit Sale"] then begin
             Clear(JObjectLines);
             POSEntry.Get(RSPOSAuditLogAuxInfo."POS Entry No.");
@@ -1208,8 +1207,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('invoiceType', GetEnumValueName(Enum::"NPR RS Invoice Type"::PROFORMA));
         JObjectHeader.Add('transactionType', GetEnumValueName(Enum::"NPR RS Transaction Type"::REFUND));
         Clear(JObjectLines);
-        SalesHeader.CalcFields("Amount Including VAT");
-        JObjectLines.Add('amount', '0,00');
+        JObjectHeader.Add('amount', '0,00');
         if not RSFiscalizationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
             if RSPaymentMethodMapping.Get(SalesHeader."Payment Method Code") then
                 JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
