@@ -6,7 +6,7 @@ page 6184569 "NPR RS POPDV Records"
     Caption = 'RS POPDV Records';
     DataCaptionExpression = PageCaptionTxt;
     PageType = Card;
-    PromotedActionCategories = 'New,Process,Report,XML';
+    PromotedActionCategories = 'New,Process,Report,XML,Excel';
     SourceTable = "NPR VAT EV Entry";
     InsertAllowed = false;
     ModifyAllowed = false;
@@ -3497,6 +3497,52 @@ page 6184569 "NPR RS POPDV Records"
                     end;
                 }
             }
+            group(Excel)
+            {
+                Caption = 'Excel';
+                action(ExportIncomingExcel)
+                {
+                    Caption = 'Export Incoming Invoices';
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    Image = ExportElectronicDocument;
+                    ToolTip = 'Executes the Export Incoming Invoices action.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnAction()
+                    var
+                        RSLocalExcelMgt: Codeunit "NPR RS Local Excel Mgt.";
+                    begin
+                        if not ValidateExcelExport() then
+                            exit;
+
+                        RSLocalExcelMgt.SetDates(StartDate, EndDate);
+                        RSLocalExcelMgt.ExportIncomingInvoicesExcel();
+                    end;
+                }
+                action(ExportOutgoingExcel)
+                {
+                    Caption = 'Export Outgoing Invoices';
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedOnly = true;
+                    PromotedIsBig = true;
+                    Image = ExportElectronicDocument;
+                    ToolTip = 'Executes the Export Outgoing Invoices action.';
+                    ApplicationArea = NPRRSLocal;
+                    trigger OnAction()
+                    var
+                        RSLocalExcelMgt: Codeunit "NPR RS Local Excel Mgt.";
+                    begin
+                        if not ValidateExcelExport() then
+                            exit;
+
+                        RSLocalExcelMgt.SetDates(StartDate, EndDate);
+                        RSLocalExcelMgt.ExportOutgoingInvoicesExcel();
+                    end;
+                }
+            }
         }
     }
 
@@ -3555,6 +3601,20 @@ page 6184569 "NPR RS POPDV Records"
             exit;
 
         exit(true);
+    end;
+
+    local procedure ValidateExcelExport(): Boolean
+    begin
+        if (StartDate = 0D) or (EndDate = 0D) then begin
+            if not ConfirmManagement.GetResponseOrDefault(DatesInputQst, true) then
+                exit(false)
+            else begin
+                CurrPage.Close();
+                Page.Run(Page::"NPR RS POPDV Records");
+                exit(false)
+            end;
+        end else
+            exit(true)
     end;
 
     var
