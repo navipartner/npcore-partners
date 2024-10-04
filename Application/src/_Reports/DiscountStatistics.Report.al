@@ -122,6 +122,7 @@
                     DataItemLink = "Item No." = FIELD("No.");
                     DataItemLinkReference = Item;
                     DataItemTableView = SORTING("Item No.", "Posting Date", "Item Ledger Entry Type") WHERE("Item Ledger Entry Type" = CONST(Sale));
+                    RequestFilterFields = "Location Code";
                     column(Entry_No_Caption; Entry_No_Caption_Lbl)
                     {
                     }
@@ -158,6 +159,12 @@
                     column(Document_No_; "Document No.")
                     {
                     }
+                    column(LocationCodeFilter; LocationCodeFilter)
+                    {
+                    }
+                    column(Location_Code_Filter_Caption_Lbl; Location_Code_Filter_Caption_Lbl)
+                    {
+                    }
                     trigger OnAfterGetRecord()
                     var
                     begin
@@ -172,6 +179,8 @@
                     begin
                         SetRange("Salespers./Purch. Code", "Salesperson/Purchaser".Code);
                         SetFilter("Discount Amount", '<>%1', 0);
+                        if LocationCodeFilter <> '' then
+                            SetFilter("Location Code", '=%1', LocationCodeFilter);
                         Item.CopyFilter("Date Filter", ValueEntry."Posting Date");
                     end;
                 }
@@ -227,6 +236,7 @@
         ItemDiscGroupFilter := Item.GetFilter("Item Disc. Group");
         DiscountFilterType := DiscountTypeFilter.GetFilter("Discount Type");
         DiscountCodeFilter := DiscountTypeFilter.GetFilter("Discount Code");
+        LocationCodeFilter := ValueEntry.GetFilter("Location Code");
         if DiscountFilterType <> '' then
             ShowDiscountType0 := IsOption0InFilter(DiscountFilterType);
     end;
@@ -266,6 +276,7 @@
         ItemNoFilter: Text;
         SalesPersonFilter: Text;
         SupplierFilter: Text;
+        LocationCodeFilter: Text;
         Total_VE_Discount_Amt: Decimal;
         Total_VE_Qty: Decimal;
         Total_VE_Sales_Amt: Decimal;
@@ -285,5 +296,6 @@
         Salesperson_Filter_Caption_Lbl: Label 'Salesperson/purchaser';
         Total_Caption_Lbl: Label 'Total';
         Vendor_Filter_Caption_Lbl: Label 'Vendor filter';
+        Location_Code_Filter_Caption_Lbl: Label 'Location Filter';
         ShowDiscountType0: Boolean;
 }

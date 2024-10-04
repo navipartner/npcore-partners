@@ -2077,7 +2077,7 @@
       <Width>27.1083cm</Width>
       <Page>
         <PageHeader>
-          <Height>5.62784cm</Height>
+          <Height>5.07815cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
@@ -2663,7 +2663,7 @@
                   <rd:DefaultName>Textbox90</rd:DefaultName>
                   <Top>1.84753in</Top>
                   <Left>0.06443in</Left>
-                  <Height>0.1935in</Height>
+                  <Height>0.15174in</Height>
                   <Width>1.47917in</Width>
                   <ZIndex>19</ZIndex>
                   <Style>
@@ -2695,7 +2695,7 @@
                   <rd:DefaultName>Textbox90</rd:DefaultName>
                   <Top>1.84753in</Top>
                   <Left>1.58527in</Left>
-                  <Height>0.1935in</Height>
+                  <Height>0.15174in</Height>
                   <Width>1.22917in</Width>
                   <ZIndex>20</ZIndex>
                   <Style>
@@ -2708,9 +2708,73 @@
                     <PaddingBottom>2pt</PaddingBottom>
                   </Style>
                 </Textbox>
+                <Textbox Name="Textbox108">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!Location_Code_Filter_Caption_Lbl.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>0.87117in</Top>
+                  <Left>2.81583in</Left>
+                  <Height>0.15183in</Height>
+                  <Width>1.47917in</Width>
+                  <ZIndex>21</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
+                <Textbox Name="Textbox129">
+                  <CanGrow>true</CanGrow>
+                  <KeepTogether>true</KeepTogether>
+                  <Paragraphs>
+                    <Paragraph>
+                      <TextRuns>
+                        <TextRun>
+                          <Value>=First(Fields!LocationCodeFilter.Value, "DataSet_Result")</Value>
+                          <Style>
+                            <FontSize>8pt</FontSize>
+                          </Style>
+                        </TextRun>
+                      </TextRuns>
+                      <Style />
+                    </Paragraph>
+                  </Paragraphs>
+                  <rd:DefaultName>Textbox90</rd:DefaultName>
+                  <Top>0.87117in</Top>
+                  <Left>4.33667in</Left>
+                  <Height>0.15183in</Height>
+                  <Width>1.22917in</Width>
+                  <ZIndex>22</ZIndex>
+                  <Style>
+                    <Border>
+                      <Style>None</Style>
+                    </Border>
+                    <PaddingLeft>2pt</PaddingLeft>
+                    <PaddingRight>2pt</PaddingRight>
+                    <PaddingTop>2pt</PaddingTop>
+                    <PaddingBottom>2pt</PaddingBottom>
+                  </Style>
+                </Textbox>
               </ReportItems>
               <KeepTogether>true</KeepTogether>
-              <Height>5.57845cm</Height>
+              <Height>5.07815cm</Height>
               <Width>27cm</Width>
               <Style>
                 <Border>
@@ -3094,6 +3158,12 @@ End Function
         </Field>
         <Field Name="Document_No_">
           <DataField>Document_No_</DataField>
+        </Field>
+        <Field Name="LocationCodeFilter">
+          <DataField>LocationCodeFilter</DataField>
+        </Field>
+        <Field Name="Location_Code_Filter_Caption_Lbl">
+          <DataField>Location_Code_Filter_Caption_Lbl</DataField>
         </Field>
       </Fields>
       <Query>
