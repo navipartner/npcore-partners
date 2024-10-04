@@ -224,6 +224,14 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Item No.", CopyStr(AppendPrefix(ExcelBuf2."Cell Value as Text", ItemWorksheetLine), 1, FieldLength));
+                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Category Code"), MappedColumnNo, FieldLength) then
+                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+# pragma warning disable AA0139
+                                if (FeatureFlag.IsEnabled('itemWkshtExcelImportValidateItemCategoryCode_v2')) then
+                                    ItemWorksheetLine.Validate("Item Category Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength))
+                                else
+                                    ItemWorksheetLine."Item Category Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
+# pragma warning restore AA0139
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vendor No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Vendor No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
@@ -263,14 +271,6 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Variety Group"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Variety Group", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
-                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Item Category Code"), MappedColumnNo, FieldLength) then
-                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
-# pragma warning disable AA0139
-                                if (FeatureFlag.IsEnabled('itemWkshtExcelImportValidateItemCategoryCode')) then
-                                    ItemWorksheetLine.Validate("Item Category Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength))
-                                else
-                                    ItemWorksheetLine."Item Category Code" := CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength);
-# pragma warning restore
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Product Group Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
 # pragma warning disable AA0139
