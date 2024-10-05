@@ -1160,6 +1160,7 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
         CheckSum: Integer;
+        InvalidReferenceNoLength: Label 'Invalid EAN13: %1. Reference No. length cannot exceed more than 12 characters.', Comment = '%1=ReferenceNo';
     begin
         VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::EAN13 then
@@ -1170,7 +1171,7 @@
             if StrLen(ReferenceNo) < 12 then
                 ReferenceNo := CopyStr(ReferenceNo, 1, 2) + PadStr('', 12 - StrLen(ReferenceNo), '0') + CopyStr(ReferenceNo, 3);
             if StrLen(ReferenceNo) > 12 then
-                Error(InvalidRefNoErr, ReferenceNo);
+                Error(InvalidReferenceNoLength, ReferenceNo);
             if not TryGetCheckSum(ReferenceNo, CheckSum) then
                 Error(InvalidRefNoErr, ReferenceNo);
             ReferenceNo := ReferenceNo + Format(CheckSum);
